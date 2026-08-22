@@ -1,0 +1,130 @@
+plugins {
+    id 'java-library'
+    id 'net.neoforged.moddev' version '2.0.141'
+}
+
+version = mod_version
+group = mod_group_id
+base.archivesName = mod_id
+
+java {
+    toolchain.languageVersion = JavaLanguageVersion.of(21)
+    withSourcesJar()
+}
+
+repositories {
+    mavenCentral()
+}
+
+neoForge {
+    version = project.neo_version
+
+    accessTransformers.from('src/main/resources/META-INF/accesstransformer.cfg')
+
+    runs {
+        server {
+            server()
+            programArgument '--nogui'
+            gameDirectory = file('run/server')
+        }
+        client {
+            client()
+            gameDirectory = file('run/client')
+        }
+    }
+
+    mods {
+        "${mod_id}" {
+            sourceSet sourceSets.main
+        }
+    }
+
+    unitTest {
+        enable()
+        testedMod = mods."${mod_id}"
+    }
+}
+
+// Libraries bundled into the mod jar (not present on the vanilla/NeoForge classpath).
+dependencies {
+    jarJar(implementation("org.yaml:snakeyaml")) {
+        version {
+            strictly "[2.0,3.0)"
+            prefer project.snakeyaml_version
+        }
+    }
+    // jarJar only affects the built jar, so dev runs would not see SnakeYAML at all without this
+    additionalRuntimeClasspath "org.yaml:snakeyaml:${project.snakeyaml_version}"
+
+    // Molang, the expression language behind shop conditions and behaviour trees. Upstream uses the same library, so
+    // expressions written for the plugin evaluate identically here.
+    jarJar(implementation("team.unnamed:mocha")) {
+        version {
+            strictly "[3.0,4.0)"
+            prefer project.mocha_version
+        }
+    }
+    additionalRuntimeClasspath "team.unnamed:mocha:${project.mocha_version}"
+
+    // Javassist is mocha's own dependency, and jarJar embeds only what it is given - transitives are not followed. Dev
+    // runs get it from the Gradle classpath either way, so the omission is invisible there and fatal in the built jar:
+    // the server dies at startup with NoClassDefFoundError: javassist/NotFoundException when the Molang engine registers.
+    jarJar(implementation("org.javassist:javassist")) {
+        version {
+            strictly "[3.30,4.0)"
+            prefer project.javassist_version
+        }
+    }
+    additionalRuntimeClasspath "org.javassist:javassist:${project.javassist_version}"
+
+    testImplementation platform("org.junit:junit-bom:5.11.3")
+    testImplementation "org.junit.jupiter:junit-jupiter"
+    testRuntimeOnly "org.junit.platform:junit-platform-launcher"
+}
+
+tasks.named('test', Test).configure {
+    useJUnitPlatform()
+    testLogging {
+        events 'passed', 'failed', 'skipped'
+        exceptionFormat 'full'
+    }
+}
+
+// Expand gradle.properties into neoforge.mods.toml
+tasks.named('processResources', ProcessResources).configure {
+    def replacements = [
+            minecraft_version      : minecraft_version,
+            minecraft_version_range: minecraft_version_range,
+            neo_version            : neo_version,
+            neo_version_range      : neo_version_range,
+            loader_version_range   : loader_version_range,
+            mod_id                 : mod_id,
+            mod_name               : mod_name,
+            mod_license            : mod_license,
+            mod_version            : mod_version,
+            mod_authors            : mod_authors,
+            mod_description        : mod_description,
+    ]
+    inputs.properties replacements
+    filesMatching(['META-INF/neoforge.mods.toml']) {
+        expand replacements
+    }
+}
+
+tasks.withType(JavaCompile).configureEach {
+    options.encoding = 'UTF-8'
+    options.release = 21
+}
+
+tasks.named('jar', Jar).configure {
+    manifest {
+        attributes([
+                'Specification-Title'   : mod_name,
+                'Specification-Vendor'  : mod_authors,
+                'Specification-Version' : '1',
+                'Implementation-Title'  : mod_name,
+                'Implementation-Version': mod_version,
+                'Implementation-Vendor' : mod_authors,
+        ])
+    }
+}
