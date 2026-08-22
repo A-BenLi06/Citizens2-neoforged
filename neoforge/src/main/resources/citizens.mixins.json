@@ -1,0 +1,13 @@
+{
+  "required": true,
+  "minVersion": "0.8.5",
+  "package": "net.citizensnpcs.mixin",
+  "compatibilityLevel": "JAVA_21",
+  "mixins": [
+    "LivingEntitySoundMixin",
+    "MobSoundMixin"
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  }
+}

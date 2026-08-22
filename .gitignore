@@ -12,3 +12,17 @@ dependency-reduced-pom.xml
 *.jardesc
 *.lnk
 *.bbmodel
+
+# Gradle (neoforge module)
+.gradle/
+build/
+!gradle/wrapper/gradle-wrapper.jar
+
+# Upstream sources kept locally for porting reference only
+reference/
+# Test server the npctest datapack runs against (world, logs, usercache)
+neoforge/run/
+# Built jars live on the release, not in git
+artifacts/
+# Local agent working notes
+.claude/
