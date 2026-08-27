@@ -135,6 +135,8 @@ public class Settings {
         HOLOGRAM_ALWAYS_UPDATE_POSITION("npc.hologram.always-update-position", false),
         HOLOGRAM_UPDATE_RATE("npc.hologram.update-rate-ticks", "npc.hologram.update-rate", "1s"),
         KEEP_CHUNKS_LOADED("npc.chunks.always-keep-loaded", false),
+        PLAYER_NPCS_COUNT_FOR_MOB_SPAWNING("npc.player-npcs-count-for-mob-spawning", false),
+        PLAYER_NPCS_LOAD_CHUNKS("npc.chunks.player-npcs-load-chunks", false),
         MAX_NPC_LIMIT_CHECKS("npc.limits.max-permission-checks", 100),
         MESSAGE_COLOUR("general.color-scheme.message", "<green>"),
         CONTROLLABLE_GROUND_DIRECTION_MODIFIER("npc.controllable.ground-direction-modifier", 1.0D),

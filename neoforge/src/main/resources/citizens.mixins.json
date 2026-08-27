@@ -4,8 +4,11 @@
   "package": "net.citizensnpcs.mixin",
   "compatibilityLevel": "JAVA_21",
   "mixins": [
+    "ChunkMapMixin",
     "LivingEntitySoundMixin",
-    "MobSoundMixin"
+    "MobSoundMixin",
+    "ServerEntityMixin",
+    "ServerPlayerMixin"
   ],
   "injectors": {
     "defaultRequire": 1
