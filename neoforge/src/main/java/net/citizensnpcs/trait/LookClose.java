@@ -18,6 +18,7 @@ import net.citizensnpcs.api.persistence.Persist;
 import net.citizensnpcs.api.trait.Trait;
 import net.citizensnpcs.api.trait.TraitName;
 import net.citizensnpcs.api.util.Location;
+import net.citizensnpcs.api.util.Messaging;
 import net.citizensnpcs.trait.RotationTrait.PacketRotationSession;
 import net.citizensnpcs.util.Util;
 import net.minecraft.server.level.ServerPlayer;
@@ -57,6 +58,8 @@ public class LookClose extends Trait {
     private final Map<UUID, PacketRotationSession> sessions = new HashMap<>();
     @Persist("perplayer")
     private boolean perPlayer;
+    /** Rate limiter for the "nobody was targeted" diagnostic; not persisted. */
+    private int debugCountdown;
     @Persist
     private int randomLookDelay = Setting.DEFAULT_RANDOM_LOOK_DELAY.asTicks();
     @Persist
@@ -134,6 +137,8 @@ public class LookClose extends Trait {
             }
         }
         if (old != lookingAt) {
+            Messaging.debug("LookClose on NPC", npc.getId(), "target", old == null ? "none" : old.getName().getString(),
+                    "->", lookingAt == null ? "none" : lookingAt.getName().getString());
             NPCLookCloseChangeTargetEvent event = new NPCLookCloseChangeTargetEvent(npc, old, lookingAt);
             NeoForge.EVENT_BUS.post(event);
             if (event.getNewTarget() != null && !isValid(event.getNewTarget()))
@@ -144,17 +149,26 @@ public class LookClose extends Trait {
 
     private List<ServerPlayer> getNearbyPlayers() {
         Entity entity = npc.getEntity();
-        List<ServerPlayer> players = new ArrayList<>();
-        for (ServerPlayer player : npc.getEntity().level().getServer().getPlayerList().getPlayers()) {
+        List<ServerPlayer> online = entity.level().getServer().getPlayerList().getPlayers();
+        if (online.isEmpty())
+            return List.of();
+        // built lazily and squared once: run() calls this on every NPC on every tick, and on all but a handful of them
+        // nobody is in range, so the common answer costs no allocation at all
+        List<ServerPlayer> players = null;
+        double rangeSquared = range * range;
+        for (ServerPlayer player : online) {
             if (player.level() != entity.level())
                 continue;
-            if (player.distanceToSqr(entity) > range * range)
+            if (player.distanceToSqr(entity) > rangeSquared)
                 continue;
             if (CitizensAPI.getNPCRegistry().isNPC(player))
                 continue;
+            if (players == null) {
+                players = new ArrayList<>(4);
+            }
             players.add(player);
         }
-        return players;
+        return players == null ? List.of() : players;
     }
 
     private boolean isValid(Player entity) {
@@ -233,8 +247,23 @@ public class LookClose extends Trait {
         if (npc.getNavigator().isNavigating() || npc.getNavigator().isPaused()) {
             npc.getNavigator().setPaused(lookingAt != null);
         }
-        if (lookingAt == null)
+        if (lookingAt == null) {
+            // the state worth reporting when an operator says "it does not look at me": somebody is close enough, and
+            // yet no target was taken. Rate-limited because run() is every tick on every NPC, and gated on the debug
+            // flag before the scan rather than inside Messaging.debug, so a server with debug off pays nothing for it
+            if (--debugCountdown <= 0) {
+                debugCountdown = 40;
+                if (Messaging.isDebugging()) {
+                    List<ServerPlayer> nearby = getNearbyPlayers();
+                    if (!nearby.isEmpty()) {
+                        Messaging.debug("LookClose on NPC", npc.getId(), "has", nearby.size(),
+                                "player(s) within range", range, "but took no target; enabled=" + enabled,
+                                "perPlayer=" + perPlayer, "navigating=" + npc.getNavigator().isNavigating());
+                    }
+                }
+            }
             return;
+        }
 
         // the actual turning is RotationTrait's job, which eases into the target a few degrees per tick instead of
         // snapping to it

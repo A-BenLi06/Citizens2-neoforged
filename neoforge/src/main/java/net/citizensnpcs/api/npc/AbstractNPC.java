@@ -51,6 +51,11 @@ public abstract class AbstractNPC implements NPC {
     private final List<String> clearSaveData = new ArrayList<>();
     protected Object coloredNameComponentCache;
     protected String coloredNameStringCache;
+    /** Name the cached {@link #nameIsRewrittenByPlaceholders()} answer was computed for. */
+    private String namePlaceholderCachedFor;
+    /** Provider count at that point; -1 so the first call always computes. */
+    private int namePlaceholderGeneration = -1;
+    private boolean namePlaceholderRewrites;
     private final BehaviorController goalController = new SimpleBehaviorController();
     private final int id;
     private Supplier<ItemStack> itemProvider = () -> {
@@ -342,7 +347,30 @@ public abstract class AbstractNPC implements NPC {
                 || data().get(NPC.Metadata.ALWAYS_USE_NAME_HOLOGRAM, false)
                 || (coloredNameStringCache != null && coloredNameStringCache.contains("§")
                         && getEntityType() != EntityType.PLAYER)
-                || !Placeholders.replaceName(name, null, this).equals(name);
+                || nameIsRewrittenByPlaceholders();
+    }
+
+    /**
+     * Whether running the name through {@link Placeholders} produces something different from the name itself.
+     * <p>
+     * This is the last term of {@link #requiresNameHologram()}, which {@code ScoreboardTrait.update()} calls on every NPC
+     * on every tick. Answering it directly means a fresh {@code Matcher}, a {@code StringBuffer} and a result
+     * {@code String} per NPC per tick — a few thousand throwaway objects a second on a server with a couple of hundred
+     * NPCs, all to re-derive an answer that had not changed.
+     * <p>
+     * The answer depends only on the name and on which placeholder providers are registered, so it is cached against
+     * both. It is not enough to test whether the name merely <em>contains</em> a placeholder: {@code <npc>} expands to the
+     * name itself and so leaves it unchanged, and only a real replacement can tell that apart. So the replacement is still
+     * run — just once per name instead of twenty times a second.
+     */
+    private boolean nameIsRewrittenByPlaceholders() {
+        int generation = Placeholders.providerCount();
+        if (generation != namePlaceholderGeneration || !Objects.equals(name, namePlaceholderCachedFor)) {
+            namePlaceholderGeneration = generation;
+            namePlaceholderCachedFor = name;
+            namePlaceholderRewrites = !Objects.equals(Placeholders.replaceName(name, null, this), name);
+        }
+        return namePlaceholderRewrites;
     }
 
     @Override

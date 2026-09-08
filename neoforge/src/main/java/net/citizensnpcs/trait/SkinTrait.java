@@ -71,8 +71,9 @@ public class SkinTrait extends Trait {
             return false;
         if (textureRaw != null && signature != null) {
             // an explicit texture needs no lookup, so it is never subject to Mojang rate limiting
-            SkinProperty property = new SkinProperty(getSkinName() == null ? npc.getName() : getSkinName(), textureRaw,
-                    signature);
+            // the first argument is the GameProfile property name and has to be "textures" - passing the skin's own
+            // name here put the texture under a key the client never reads, so every NPC drew the default skin
+            SkinProperty property = new SkinProperty(SkinProperty.TEXTURES_KEY, textureRaw, signature);
             GameProfile profile = entity.getGameProfile();
             profile.getProperties().removeAll(SkinProperty.TEXTURES_KEY);
             profile.getProperties().put(SkinProperty.TEXTURES_KEY, property.toMojang());

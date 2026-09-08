@@ -148,7 +148,8 @@ public class MojangSkinGenerator {
                 String hex = Long.toHexString(xuid);
                 GameProfile profile = new GameProfile(
                         UUID.fromString("00000000-0000-0000-" + hex.substring(0, 4) + "-" + hex.substring(4)), name);
-                return new SkinProperty(stringMember(output, "texture_id"), stringMember(output, "value"),
+                // same trap as SkinTrait had: this slot is the profile property name, not an identifier
+                return new SkinProperty(SkinProperty.TEXTURES_KEY, stringMember(output, "value"),
                         stringMember(output, "signature")).applyProperties(profile);
             } finally {
                 closeQuietly(reader);

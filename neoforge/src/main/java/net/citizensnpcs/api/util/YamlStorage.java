@@ -83,7 +83,12 @@ public class YamlStorage implements Storage {
         Runnable task = () -> {
             try (FileWriter writer = new FileWriter(file)) {
                 if (header != null && !header.isEmpty()) {
-                    writer.write("# " + header + "\n");
+                    // every line, not just the first: a multi-line header with only its first line
+                    // commented produces a file that is no longer valid YAML, and the breakage only shows
+                    // up the next time somebody adds a key under it
+                    for (String line : header.split("\n", -1)) {
+                        writer.write(line.isEmpty() ? "#\n" : "# " + line + "\n");
+                    }
                 }
                 yaml.dump(toSave, writer);
             } catch (IOException e) {

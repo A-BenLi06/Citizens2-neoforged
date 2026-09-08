@@ -129,6 +129,16 @@ public class Placeholders {
                 location.getZ() + SEARCH_RADIUS);
     }
 
+    /**
+     * How many providers have been registered, which callers use to tell whether a cached replacement is still valid.
+     * <p>
+     * Registration is add-only, so the count doubles as a generation number: if it has not moved, the same input still
+     * produces the same output and a cached answer can be trusted.
+     */
+    public static int providerCount() {
+        return PLACEHOLDERS.size();
+    }
+
     public static void registerNPCPlaceholder(Pattern regex, PlaceholderFunction func) {
         if (regex.pattern().charAt(0) != '<') {
             regex = Pattern.compile('<' + regex.pattern() + '>', regex.flags());

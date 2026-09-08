@@ -13,6 +13,14 @@ import com.mojang.authlib.properties.Property;
  * handles are gone and the calls are direct.
  */
 public class SkinProperty {
+    /**
+     * The {@link GameProfile} property name, which for a skin is always {@link #TEXTURES_KEY}.
+     * <p>
+     * Not the skin's owner or any human-facing label: {@link #toMojang} puts this straight into the {@link Property} that
+     * goes out on the wire, and the client files the texture under whatever name arrives. Anything other than
+     * {@code "textures"} means the client stores the skin under a key it never looks in, and draws the default skin
+     * instead — with no error anywhere.
+     */
     public final String name;
     public final String signature;
     public final String value;

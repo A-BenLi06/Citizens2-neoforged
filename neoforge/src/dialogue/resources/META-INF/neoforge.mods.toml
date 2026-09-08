@@ -1,0 +1,33 @@
+modLoader = "javafml"
+loaderVersion = "[4,)"
+license = "OSL-3.0"
+
+[[mods]]
+modId = "interactions"
+version = "${file.jarVersion}"
+displayName = "Yuuniverse Interactions"
+description = '''
+NPC dialogue and cutscenes, reading the conversation files the Bukkit Interactions plugin wrote so an existing
+server's dialogue migrates without editing. Drives NPCs through Citizens.
+'''
+
+[[dependencies.interactions]]
+modId = "neoforge"
+type = "required"
+versionRange = "[21,)"
+ordering = "NONE"
+side = "BOTH"
+
+[[dependencies.interactions]]
+modId = "minecraft"
+type = "required"
+versionRange = "[1.21.1,1.22)"
+ordering = "NONE"
+side = "BOTH"
+
+[[dependencies.interactions]]
+modId = "citizens"
+type = "required"
+versionRange = "[2.0,)"
+ordering = "AFTER"
+side = "BOTH"

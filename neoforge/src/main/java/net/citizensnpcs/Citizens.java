@@ -1,6 +1,7 @@
 package net.citizensnpcs;
 
 import net.citizensnpcs.util.LuckPermsGroups;
+import net.citizensnpcs.util.ParadigmGroups;
 import net.citizensnpcs.api.npc.templates.TemplateRegistry;
 import net.citizensnpcs.commands.TemplateCommands;
 import net.citizensnpcs.api.exception.NPCLoadException;
@@ -307,8 +308,12 @@ public class Citizens implements CitizensPlugin {
         }
         CitizensAPI.setImplementation(this);
 
-        // group checks (shop requirements, player filters, guard targeting) resolve only if a permission mod is present
-        LuckPermsGroups.install();
+        // Group checks (shop requirements, player filters, guard targeting) resolve only if a permission mod is
+        // present; whichever is installed wins, and with none Citizens answers "unknown" rather than guessing.
+        // Managing groups is deliberately not Citizens' job - these are bridges to a real permission mod.
+        if (!LuckPermsGroups.install()) {
+            ParadigmGroups.install();
+        }
 
         eventListen = new EventListen();
         NeoForge.EVENT_BUS.register(eventListen);

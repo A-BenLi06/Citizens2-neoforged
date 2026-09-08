@@ -49,6 +49,8 @@ public class ScoreboardTrait extends Trait {
     @Persist
     private Set<String> tags = new HashSet<>(Set.of("CITIZENS_NPC"));
     private PlayerTeam team;
+    /** The NPC's UUID in string form, built once rather than on every tick. */
+    private String uuidEntry;
 
     public ScoreboardTrait() {
         super("scoreboardtrait");
@@ -141,15 +143,26 @@ public class ScoreboardTrait extends Trait {
             return;
         }
         // a player NPC joins by its profile name because that is the entry the client matches; anything else has no
-        // name of its own on the client, so its UUID is used
-        String entry = entity instanceof ServerPlayer player ? player.getGameProfile().getName()
-                : npc.getUniqueId().toString();
+        // name of its own on the client, so its UUID is used. The UUID's string form is cached: building it is 36
+        // characters of garbage, and update() runs on every NPC on every tick
+        String entry;
+        if (entity instanceof ServerPlayer player) {
+            entry = player.getGameProfile().getName();
+        } else {
+            if (uuidEntry == null) {
+                uuidEntry = npc.getUniqueId().toString();
+            }
+            entry = uuidEntry;
+        }
         if (team == null || !entry.equals(lastEntry)) {
             createTeam(entry);
         }
-        String forceVisible = npc.data().<Object> get(NPC.Metadata.NAMEPLATE_VISIBLE, true).toString();
-        boolean nameVisible = !npc.requiresNameHologram()
-                && (forceVisible.equals("true") || forceVisible.equals("hover"));
+        // read without forcing it through toString(): the value is a Boolean unless somebody set "hover", and
+        // stringifying it every tick for every NPC allocates for nothing
+        Object forceVisible = npc.data().<Object> get(NPC.Metadata.NAMEPLATE_VISIBLE, true);
+        boolean wantsNameplate = forceVisible instanceof Boolean bool ? bool
+                : "true".equals(forceVisible) || "hover".equals(forceVisible);
+        boolean nameVisible = !npc.requiresNameHologram() && wantsNameplate;
         Team.Visibility visibility = nameVisible ? Team.Visibility.ALWAYS : Team.Visibility.NEVER;
         if (visibility != team.getNameTagVisibility()) {
             team.setNameTagVisibility(visibility);

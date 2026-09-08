@@ -10,3 +10,9 @@
 - Reasoning: inventory and successful compilation do not establish execution semantics. Trace command consumers, transaction outcomes, saved-progress readers, configuration consumers, and actual service entry points. Treat stale comments/session summaries as hypotheses rather than proof.
 - Verification: forced 112-test baseline passed. Four dialogue acceptance probes executed with three reproducible failures (two sound IDs and cooldown preservation). Two isolated test-server runs produced 103/106 and 105/106 passing assertions; knockback fixture failures remain unresolved. Isolated command lookup confirmed Bukkit-style `minecraft:give` and `minecraft:setblock` roots absent while their native counterparts exist.
 - Result: audit acceptance fails. Implementation defects are documented, not represented as fixed. No production deployment or permission-system rewrite was performed. See the report for the full list of open gates and evidence limits.
+
+## 2026-09-08 21:12:41 +08:00 — Preserve the existing implementation baseline
+
+- Recorded the pre-existing NeoForge and Interactions implementation before parity repairs. No functional changes in this checkpoint; the untracked dialogue source set and its build wiring are now reviewable independently of subsequent fixes.
+- Existing audit baseline: 112 ordinary tests pass, three dialogue acceptance failures and unresolved knockback fixture failures.
+

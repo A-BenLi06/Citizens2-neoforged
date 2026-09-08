@@ -7,6 +7,7 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.io.File;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -127,5 +128,28 @@ public class YamlStorageRoundTripTest {
         DataKey root = storage.getKey("root");
         assertEquals("value", root.getString("renamed-key"));
         assertNull(root.getRaw("label"), "@Persist(\"renamed-key\") must override the field name");
+    }
+
+    /**
+     * A header spanning several lines has to be commented on every one of them.
+     * <p>
+     * Only the first line used to get a '#', which left the rest of the header as bare document text: the file was no
+     * longer valid YAML, and it failed by silently parsing as nothing rather than by raising anything.
+     */
+    @Test
+    public void aMultiLineHeaderIsCommentedOnEveryLine(@TempDir Path dir) throws Exception {
+        File file = new File(dir.toFile(), "headered.yml");
+        YamlStorage storage = new YamlStorage(file, "line one\n\nline three");
+        storage.getKey("").setRaw("a.b", "c");
+        storage.save();
+
+        List<String> lines = Files.readAllLines(file.toPath());
+        assertTrue(lines.contains("# line one"), "first header line");
+        assertTrue(lines.contains("#"), "a blank header line stays a comment");
+        assertTrue(lines.contains("# line three"), "a later header line is commented too");
+
+        YamlStorage reread = new YamlStorage(file, null);
+        assertTrue(reread.load(), "the file still parses");
+        assertEquals("c", reread.getKey("a").getString("b"), "and the data survived the header");
     }
 }

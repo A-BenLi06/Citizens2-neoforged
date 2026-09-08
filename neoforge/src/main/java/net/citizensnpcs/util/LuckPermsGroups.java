@@ -51,8 +51,11 @@ public final class LuckPermsGroups {
      */
     public static boolean install() {
         if (!ModList.get().isLoaded(MOD_ID)) {
-            Messaging.log("LuckPerms not installed - NPC group checks (shop requirements, player filters, guard"
-                    + " targeting) stay unresolved. Install LuckPerms to switch them on.");
+            // Deliberately does not tell the reader to install LuckPerms: on 1.21.1 its only builds are from August
+            // 2024 and the newer one kicks every player at login (its issues #4106 and #4235). Naming no mod is more
+            // useful than naming the one that breaks the server.
+            Messaging.log("No permission mod is providing groups - NPC group checks (shop requirements, player"
+                    + " filters, guard targeting) will answer \"unknown\", which never counts as a match.");
             return false;
         }
         try {

@@ -16,6 +16,25 @@ repositories {
     mavenCentral()
 }
 
+// The dialogue engine: its own source set, its own jar, its own mod id. It compiles against Citizens' classes because
+// it resolves "NPC with id 57" through them, exactly as the Bukkit plugin depended on Citizens.
+sourceSets {
+    dialogue {
+        // ModDevGradle puts Minecraft and NeoForge on the main source set only, so the second mod borrows main's
+        // classpath wholesale rather than re-declaring the platform
+        compileClasspath += sourceSets.main.output + sourceSets.main.compileClasspath
+        runtimeClasspath += sourceSets.main.output + sourceSets.main.runtimeClasspath
+    }
+}
+
+tasks.register('dialogueJar', Jar) {
+    from sourceSets.dialogue.output
+    archiveBaseName = 'yuuniverse-interactions'
+    archiveVersion = project.version
+}
+
+tasks.named('build') { dependsOn 'dialogueJar' }
+
 neoForge {
     version = project.neo_version
 
@@ -36,6 +55,11 @@ neoForge {
     mods {
         "${mod_id}" {
             sourceSet sourceSets.main
+        }
+        // The dialogue engine is a separate mod in its own jar - it drives NPCs through Citizens' API the way the old
+        // Interactions plugin did, and must be removable without touching Citizens.
+        "interactions" {
+            sourceSet sourceSets.dialogue
         }
     }
 

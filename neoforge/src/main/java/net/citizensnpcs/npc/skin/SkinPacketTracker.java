@@ -1,12 +1,16 @@
 package net.citizensnpcs.npc.skin;
 
+import java.util.Collection;
 import java.util.EnumSet;
 import java.util.List;
 
 import net.citizensnpcs.Settings.Setting;
 import com.mojang.authlib.GameProfile;
+import com.mojang.authlib.properties.Property;
 import net.citizensnpcs.trait.MirrorTrait;
 import net.citizensnpcs.api.npc.NPC;
+import net.citizensnpcs.api.util.Messaging;
+import net.citizensnpcs.util.SkinProperty;
 import net.citizensnpcs.npc.entity.EntityHumanNPC;
 import net.minecraft.network.protocol.game.ClientboundPlayerInfoRemovePacket;
 import net.minecraft.network.protocol.game.ClientboundPlayerInfoUpdatePacket;
@@ -75,12 +79,34 @@ public final class SkinPacketTracker {
     }
 
     /**
-     * Sends the NPC's profile to a single player, used when a viewer starts tracking it.
+     * Sends the NPC's profile to one viewer that is about to start tracking it.
+     * <p>
+     * This has to happen <em>before</em> the entity spawn packet, which is why {@code ServerEntityMixin} calls it from the
+     * head of {@code ServerEntity.sendPairingData} rather than from {@code PlayerEvent.StartTracking}: a 1.21 client
+     * refuses to create a player entity it has no tab-list entry for, logging "Server attempted to add player prior to
+     * sending player info" and dropping it. Without this the NPC exists on the server, reports itself as spawned, and is
+     * simply never drawn.
+     * <p>
+     * {@link Action#UPDATE_LISTED} is sent only when the NPC is meant to appear in the tab list. The entry itself exists
+     * either way and carries the skin, so an unlisted NPC renders normally without the add-then-remove sequence
+     * {@link #respawn} needs for a profile change.
      */
     public static void sendTo(EntityHumanNPC entity, ServerPlayer viewer) {
         if (entity == null || entity.isRemoved() || viewer == null)
             return;
-        send(entity, viewer, EnumSet.of(Action.ADD_PLAYER, Action.UPDATE_LISTED));
+        NPC npc = entity.getNPC();
+        send(entity, viewer, npc == null || npc.shouldRemoveFromTabList() ? EnumSet.of(Action.ADD_PLAYER)
+                : EnumSet.of(Action.ADD_PLAYER, Action.UPDATE_LISTED));
+    }
+
+    /**
+     * Drops the tab-list entry again when a viewer stops tracking the NPC, so a client that walks past a few hundred NPCs
+     * does not keep an entry for every one of them.
+     */
+    public static void removeFrom(EntityHumanNPC entity, ServerPlayer viewer) {
+        if (entity == null || viewer == null)
+            return;
+        viewer.connection.send(new ClientboundPlayerInfoRemovePacket(List.of(entity.getUUID())));
     }
 
     /**
@@ -105,6 +131,19 @@ public final class SkinPacketTracker {
      * which is how each player comes to see themselves on the NPC.
      */
     private static void send(EntityHumanNPC entity, ServerPlayer viewer, EnumSet<Action> actions) {
+        if (Messaging.isDebugging()) {
+            // what actually goes on the wire, so "the NPC has the wrong skin" can be split into "the server never sent
+            // the texture" and "the client did not use what was sent"
+            Collection<Property> textures = entity.getGameProfile().getProperties().get(SkinProperty.TEXTURES_KEY);
+            Property first = textures.isEmpty() ? null : textures.iterator().next();
+            Messaging.debug("skin ->", viewer.getGameProfile().getName(), "for NPC",
+                    entity.getNPC() == null ? -1 : entity.getNPC().getId(), "profile", entity.getGameProfile().getId(),
+                    "name", entity.getGameProfile().getName(), "textures=" + textures.size(),
+                    first == null ? "(none)"
+                            : "property-name=" + first.name() + " value=" + first.value().length() + "ch signed="
+                                    + (first.signature() != null),
+                    "actions=" + actions);
+        }
         GameProfile mirrored = mirroredProfile(entity, viewer);
         if (mirrored == null) {
             viewer.connection.send(new ClientboundPlayerInfoUpdatePacket(actions, List.of(entity)));
