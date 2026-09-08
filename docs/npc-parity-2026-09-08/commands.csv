@@ -1,0 +1,200 @@
+command,upstream,port,status
+citizens load,main/src/main/java/net/citizensnpcs/commands/AdminCommands.java,neoforge/src/main/java/net/citizensnpcs/commands/AdminCommands.java,declaration present; behavior unverified
+citizens reload,main/src/main/java/net/citizensnpcs/commands/AdminCommands.java,neoforge/src/main/java/net/citizensnpcs/commands/AdminCommands.java,declaration present; behavior unverified
+citizens save,main/src/main/java/net/citizensnpcs/commands/AdminCommands.java,neoforge/src/main/java/net/citizensnpcs/commands/AdminCommands.java,declaration present; behavior unverified
+npc activationrange,main/src/main/java/net/citizensnpcs/commands/NPCCommands.java,neoforge/src/main/java/net/citizensnpcs/commands/NPCCommands.java,declaration present; behavior unverified
+npc age,main/src/main/java/net/citizensnpcs/commands/NPCCommands.java,neoforge/src/main/java/net/citizensnpcs/commands/NPCCommands.java,declaration present; behavior unverified
+npc aggressive,main/src/main/java/net/citizensnpcs/commands/NPCCommands.java,neoforge/src/main/java/net/citizensnpcs/commands/NPCCommands.java,declaration present; behavior unverified
+npc ai,main/src/main/java/net/citizensnpcs/commands/NPCCommands.java,neoforge/src/main/java/net/citizensnpcs/commands/NPCCommands.java,declaration present; behavior unverified
+npc allay,main/src/main/java/net/citizensnpcs/trait/versioned/AllayTrait.java,,missing declaration
+npc anchor,main/src/main/java/net/citizensnpcs/commands/NPCCommands.java,neoforge/src/main/java/net/citizensnpcs/commands/NPCCommands.java,declaration present; behavior unverified
+npc areaeffectcloud,main/src/main/java/net/citizensnpcs/trait/versioned/AreaEffectCloudTrait.java,,missing declaration
+npc armadillo,main/src/main/java/net/citizensnpcs/trait/versioned/ArmadilloTrait.java,,missing declaration
+npc armorstand,main/src/main/java/net/citizensnpcs/commands/NPCCommands.java,neoforge/src/main/java/net/citizensnpcs/commands/NPCCommands.java,declaration present; behavior unverified
+npc attribute,main/src/main/java/net/citizensnpcs/commands/NPCCommands.java,neoforge/src/main/java/net/citizensnpcs/commands/NPCCommands.java,declaration present; behavior unverified
+npc axolotl,main/src/main/java/net/citizensnpcs/trait/versioned/AxolotlTrait.java,,missing declaration
+npc bat,main/src/main/java/net/citizensnpcs/commands/NPCCommands.java,neoforge/src/main/java/net/citizensnpcs/commands/NPCCommands.java,declaration present; behavior unverified
+npc bee,main/src/main/java/net/citizensnpcs/trait/versioned/BeeTrait.java,,missing declaration
+npc behavior,main/src/main/java/net/citizensnpcs/commands/NPCCommands.java,neoforge/src/main/java/net/citizensnpcs/commands/NPCCommands.java,declaration present; behavior unverified
+npc boat,main/src/main/java/net/citizensnpcs/trait/versioned/BoatTrait.java,,missing declaration
+npc bossbar,main/src/main/java/net/citizensnpcs/trait/versioned/BossBarTrait.java,,missing declaration
+npc breakblock,main/src/main/java/net/citizensnpcs/commands/NPCCommands.java,neoforge/src/main/java/net/citizensnpcs/commands/NPCCommands.java,declaration present; behavior unverified
+npc camel,main/src/main/java/net/citizensnpcs/trait/versioned/CamelTrait.java,,missing declaration
+npc cat,main/src/main/java/net/citizensnpcs/trait/versioned/CatTrait.java,,missing declaration
+npc chicken,main/src/main/java/net/citizensnpcs/trait/versioned/ChickenTrait.java,,missing declaration
+npc chunkload,main/src/main/java/net/citizensnpcs/commands/NPCCommands.java,neoforge/src/main/java/net/citizensnpcs/commands/NPCCommands.java,declaration present; behavior unverified
+npc cload,main/src/main/java/net/citizensnpcs/commands/NPCCommands.java,neoforge/src/main/java/net/citizensnpcs/commands/NPCCommands.java,declaration present; behavior unverified
+npc cmd,main/src/main/java/net/citizensnpcs/commands/NPCCommands.java,neoforge/src/main/java/net/citizensnpcs/commands/NPCCommands.java,declaration present; behavior unverified
+npc collidable,main/src/main/java/net/citizensnpcs/commands/NPCCommands.java,neoforge/src/main/java/net/citizensnpcs/commands/NPCCommands.java,declaration present; behavior unverified
+npc command,main/src/main/java/net/citizensnpcs/commands/NPCCommands.java,neoforge/src/main/java/net/citizensnpcs/commands/NPCCommands.java,declaration present; behavior unverified
+npc configgui,main/src/main/java/net/citizensnpcs/commands/NPCCommands.java,neoforge/src/main/java/net/citizensnpcs/commands/NPCCommands.java,declaration present; behavior unverified
+npc control,main/src/main/java/net/citizensnpcs/commands/NPCCommands.java,neoforge/src/main/java/net/citizensnpcs/commands/NPCCommands.java,declaration present; behavior unverified
+npc controllable,main/src/main/java/net/citizensnpcs/commands/NPCCommands.java,neoforge/src/main/java/net/citizensnpcs/commands/NPCCommands.java,declaration present; behavior unverified
+npc copier,main/src/main/java/net/citizensnpcs/commands/EditorCommands.java,neoforge/src/main/java/net/citizensnpcs/commands/EditorCommands.java,declaration present; behavior unverified
+npc coppergolem,main/src/main/java/net/citizensnpcs/trait/versioned/CopperGolemTrait.java,,missing declaration
+npc copy,main/src/main/java/net/citizensnpcs/commands/NPCCommands.java,neoforge/src/main/java/net/citizensnpcs/commands/NPCCommands.java,declaration present; behavior unverified
+npc cow,main/src/main/java/net/citizensnpcs/trait/versioned/CowTrait.java,,missing declaration
+npc create,main/src/main/java/net/citizensnpcs/commands/NPCCommands.java,neoforge/src/main/java/net/citizensnpcs/commands/NPCCommands.java,declaration present; behavior unverified
+npc debug,main/src/main/java/net/citizensnpcs/commands/NPCCommands.java,neoforge/src/main/java/net/citizensnpcs/commands/NPCCommands.java,declaration present; behavior unverified
+npc desel,main/src/main/java/net/citizensnpcs/commands/NPCCommands.java,neoforge/src/main/java/net/citizensnpcs/commands/NPCCommands.java,declaration present; behavior unverified
+npc deselect,main/src/main/java/net/citizensnpcs/commands/NPCCommands.java,neoforge/src/main/java/net/citizensnpcs/commands/NPCCommands.java,declaration present; behavior unverified
+npc despawn,main/src/main/java/net/citizensnpcs/commands/NPCCommands.java,neoforge/src/main/java/net/citizensnpcs/commands/NPCCommands.java,declaration present; behavior unverified
+npc disguise,main/src/main/java/net/citizensnpcs/commands/NPCCommands.java,neoforge/src/main/java/net/citizensnpcs/commands/NPCCommands.java,declaration present; behavior unverified
+npc display,main/src/main/java/net/citizensnpcs/trait/versioned/DisplayTrait.java,,missing declaration
+npc donkey,main/src/main/java/net/citizensnpcs/commands/NPCCommands.java,neoforge/src/main/java/net/citizensnpcs/commands/NPCCommands.java,declaration present; behavior unverified
+npc drops,main/src/main/java/net/citizensnpcs/commands/NPCCommands.java,neoforge/src/main/java/net/citizensnpcs/commands/NPCCommands.java,declaration present; behavior unverified
+npc endercrystal,main/src/main/java/net/citizensnpcs/commands/NPCCommands.java,neoforge/src/main/java/net/citizensnpcs/commands/NPCCommands.java,declaration present; behavior unverified
+npc enderdragon,main/src/main/java/net/citizensnpcs/trait/versioned/EnderDragonTrait.java,,missing declaration
+npc enderman,main/src/main/java/net/citizensnpcs/commands/NPCCommands.java,neoforge/src/main/java/net/citizensnpcs/commands/NPCCommands.java,declaration present; behavior unverified
+npc entitypose,main/src/main/java/net/citizensnpcs/commands/NPCCommands.java,neoforge/src/main/java/net/citizensnpcs/commands/NPCCommands.java,declaration present; behavior unverified
+npc equip,main/src/main/java/net/citizensnpcs/commands/EditorCommands.java,neoforge/src/main/java/net/citizensnpcs/commands/EditorCommands.java,declaration present; behavior unverified
+npc eval,main/src/main/java/net/citizensnpcs/commands/NPCCommands.java,neoforge/src/main/java/net/citizensnpcs/commands/NPCCommands.java,declaration present; behavior unverified
+npc fish,main/src/main/java/net/citizensnpcs/commands/NPCCommands.java,neoforge/src/main/java/net/citizensnpcs/commands/NPCCommands.java,declaration present; behavior unverified
+npc flyable,main/src/main/java/net/citizensnpcs/commands/NPCCommands.java,neoforge/src/main/java/net/citizensnpcs/commands/NPCCommands.java,declaration present; behavior unverified
+npc follow,main/src/main/java/net/citizensnpcs/commands/NPCCommands.java,neoforge/src/main/java/net/citizensnpcs/commands/NPCCommands.java,declaration present; behavior unverified
+npc forcefield,main/src/main/java/net/citizensnpcs/commands/NPCCommands.java,neoforge/src/main/java/net/citizensnpcs/commands/NPCCommands.java,declaration present; behavior unverified
+npc fox,main/src/main/java/net/citizensnpcs/trait/versioned/FoxTrait.java,,missing declaration
+npc frog,main/src/main/java/net/citizensnpcs/trait/versioned/FrogTrait.java,,missing declaration
+npc gamemode,main/src/main/java/net/citizensnpcs/commands/NPCCommands.java,neoforge/src/main/java/net/citizensnpcs/commands/NPCCommands.java,declaration present; behavior unverified
+npc glowing,main/src/main/java/net/citizensnpcs/commands/NPCCommands.java,neoforge/src/main/java/net/citizensnpcs/commands/NPCCommands.java,declaration present; behavior unverified
+npc goat,main/src/main/java/net/citizensnpcs/trait/versioned/GoatTrait.java,,missing declaration
+npc gravity,main/src/main/java/net/citizensnpcs/commands/NPCCommands.java,neoforge/src/main/java/net/citizensnpcs/commands/NPCCommands.java,declaration present; behavior unverified
+npc hidename,main/src/main/java/net/citizensnpcs/commands/NPCCommands.java,neoforge/src/main/java/net/citizensnpcs/commands/NPCCommands.java,declaration present; behavior unverified
+npc hitbox,main/src/main/java/net/citizensnpcs/commands/NPCCommands.java,neoforge/src/main/java/net/citizensnpcs/commands/NPCCommands.java,declaration present; behavior unverified
+npc hologram,main/src/main/java/net/citizensnpcs/commands/NPCCommands.java,neoforge/src/main/java/net/citizensnpcs/commands/NPCCommands.java,declaration present; behavior unverified
+npc home,main/src/main/java/net/citizensnpcs/commands/NPCCommands.java,neoforge/src/main/java/net/citizensnpcs/commands/NPCCommands.java,declaration present; behavior unverified
+npc horse,main/src/main/java/net/citizensnpcs/commands/NPCCommands.java,neoforge/src/main/java/net/citizensnpcs/commands/NPCCommands.java,declaration present; behavior unverified
+npc hurt,main/src/main/java/net/citizensnpcs/commands/NPCCommands.java,neoforge/src/main/java/net/citizensnpcs/commands/NPCCommands.java,declaration present; behavior unverified
+npc id,main/src/main/java/net/citizensnpcs/commands/NPCCommands.java,neoforge/src/main/java/net/citizensnpcs/commands/NPCCommands.java,declaration present; behavior unverified
+npc interaction,main/src/main/java/net/citizensnpcs/trait/versioned/InteractionTrait.java,,missing declaration
+npc inventory,main/src/main/java/net/citizensnpcs/commands/NPCCommands.java,neoforge/src/main/java/net/citizensnpcs/commands/NPCCommands.java,declaration present; behavior unverified
+npc item,main/src/main/java/net/citizensnpcs/commands/NPCCommands.java,neoforge/src/main/java/net/citizensnpcs/commands/NPCCommands.java,declaration present; behavior unverified
+npc itemdisplay,main/src/main/java/net/citizensnpcs/trait/versioned/ItemDisplayTrait.java,,missing declaration
+npc itemframe,main/src/main/java/net/citizensnpcs/commands/NPCCommands.java,neoforge/src/main/java/net/citizensnpcs/commands/NPCCommands.java,declaration present; behavior unverified
+npc jump,main/src/main/java/net/citizensnpcs/commands/NPCCommands.java,neoforge/src/main/java/net/citizensnpcs/commands/NPCCommands.java,declaration present; behavior unverified
+npc knockback,main/src/main/java/net/citizensnpcs/commands/NPCCommands.java,neoforge/src/main/java/net/citizensnpcs/commands/NPCCommands.java,declaration present; behavior unverified
+npc leashable,main/src/main/java/net/citizensnpcs/commands/NPCCommands.java,neoforge/src/main/java/net/citizensnpcs/commands/NPCCommands.java,declaration present; behavior unverified
+npc list,main/src/main/java/net/citizensnpcs/commands/NPCCommands.java,neoforge/src/main/java/net/citizensnpcs/commands/NPCCommands.java,declaration present; behavior unverified
+npc llama,main/src/main/java/net/citizensnpcs/trait/versioned/LlamaTrait.java,,missing declaration
+npc look,main/src/main/java/net/citizensnpcs/commands/NPCCommands.java,neoforge/src/main/java/net/citizensnpcs/commands/NPCCommands.java,declaration present; behavior unverified
+npc lookclose,main/src/main/java/net/citizensnpcs/commands/NPCCommands.java,neoforge/src/main/java/net/citizensnpcs/commands/NPCCommands.java,declaration present; behavior unverified
+npc mannequin,main/src/main/java/net/citizensnpcs/trait/versioned/MannequinTrait.java,,missing declaration
+npc metadata,main/src/main/java/net/citizensnpcs/commands/NPCCommands.java,neoforge/src/main/java/net/citizensnpcs/commands/NPCCommands.java,declaration present; behavior unverified
+npc minecart,main/src/main/java/net/citizensnpcs/commands/NPCCommands.java,neoforge/src/main/java/net/citizensnpcs/commands/NPCCommands.java,declaration present; behavior unverified
+npc mirror,main/src/main/java/net/citizensnpcs/commands/NPCCommands.java,neoforge/src/main/java/net/citizensnpcs/commands/NPCCommands.java,declaration present; behavior unverified
+npc mooshroom,main/src/main/java/net/citizensnpcs/trait/versioned/MushroomCowTrait.java,,missing declaration
+npc mount,main/src/main/java/net/citizensnpcs/commands/NPCCommands.java,neoforge/src/main/java/net/citizensnpcs/commands/NPCCommands.java,declaration present; behavior unverified
+npc move,main/src/main/java/net/citizensnpcs/commands/NPCCommands.java,neoforge/src/main/java/net/citizensnpcs/commands/NPCCommands.java,declaration present; behavior unverified
+npc mule,main/src/main/java/net/citizensnpcs/commands/NPCCommands.java,neoforge/src/main/java/net/citizensnpcs/commands/NPCCommands.java,declaration present; behavior unverified
+npc mushroomcow,main/src/main/java/net/citizensnpcs/trait/versioned/MushroomCowTrait.java,,missing declaration
+npc name,main/src/main/java/net/citizensnpcs/commands/NPCCommands.java,neoforge/src/main/java/net/citizensnpcs/commands/NPCCommands.java,declaration present; behavior unverified
+npc ocelot,main/src/main/java/net/citizensnpcs/commands/NPCCommands.java,neoforge/src/main/java/net/citizensnpcs/commands/NPCCommands.java,declaration present; behavior unverified
+npc owner,main/src/main/java/net/citizensnpcs/commands/NPCCommands.java,neoforge/src/main/java/net/citizensnpcs/commands/NPCCommands.java,declaration present; behavior unverified
+npc packet,main/src/main/java/net/citizensnpcs/commands/NPCCommands.java,neoforge/src/main/java/net/citizensnpcs/commands/NPCCommands.java,declaration present; behavior unverified
+npc painting,main/src/main/java/net/citizensnpcs/commands/NPCCommands.java,neoforge/src/main/java/net/citizensnpcs/commands/NPCCommands.java,declaration present; behavior unverified
+npc panda,main/src/main/java/net/citizensnpcs/trait/versioned/PandaTrait.java,,missing declaration
+npc panimate,main/src/main/java/net/citizensnpcs/commands/NPCCommands.java,neoforge/src/main/java/net/citizensnpcs/commands/NPCCommands.java,declaration present; behavior unverified
+npc parrot,main/src/main/java/net/citizensnpcs/trait/versioned/ParrotTrait.java,,missing declaration
+npc passive,main/src/main/java/net/citizensnpcs/commands/NPCCommands.java,neoforge/src/main/java/net/citizensnpcs/commands/NPCCommands.java,declaration present; behavior unverified
+npc path,main/src/main/java/net/citizensnpcs/commands/EditorCommands.java,neoforge/src/main/java/net/citizensnpcs/commands/EditorCommands.java,declaration present; behavior unverified
+npc patho,main/src/main/java/net/citizensnpcs/commands/NPCCommands.java,neoforge/src/main/java/net/citizensnpcs/commands/NPCCommands.java,declaration present; behavior unverified
+npc pathopt,main/src/main/java/net/citizensnpcs/commands/NPCCommands.java,neoforge/src/main/java/net/citizensnpcs/commands/NPCCommands.java,declaration present; behavior unverified
+npc pathto,main/src/main/java/net/citizensnpcs/commands/NPCCommands.java,neoforge/src/main/java/net/citizensnpcs/commands/NPCCommands.java,declaration present; behavior unverified
+npc pausepathfinding,main/src/main/java/net/citizensnpcs/commands/NPCCommands.java,neoforge/src/main/java/net/citizensnpcs/commands/NPCCommands.java,declaration present; behavior unverified
+npc phantom,main/src/main/java/net/citizensnpcs/trait/versioned/PhantomTrait.java,,missing declaration
+npc pickupitems,main/src/main/java/net/citizensnpcs/commands/NPCCommands.java,neoforge/src/main/java/net/citizensnpcs/commands/NPCCommands.java,declaration present; behavior unverified
+npc pig,main/src/main/java/net/citizensnpcs/trait/versioned/PigTrait.java,,missing declaration
+npc piglin,main/src/main/java/net/citizensnpcs/trait/versioned/PiglinTrait.java,,missing declaration
+npc playerfilter,main/src/main/java/net/citizensnpcs/commands/NPCCommands.java,neoforge/src/main/java/net/citizensnpcs/commands/NPCCommands.java,declaration present; behavior unverified
+npc playerlist,main/src/main/java/net/citizensnpcs/commands/NPCCommands.java,neoforge/src/main/java/net/citizensnpcs/commands/NPCCommands.java,declaration present; behavior unverified
+npc playsound,main/src/main/java/net/citizensnpcs/commands/NPCCommands.java,neoforge/src/main/java/net/citizensnpcs/commands/NPCCommands.java,declaration present; behavior unverified
+npc po,main/src/main/java/net/citizensnpcs/commands/NPCCommands.java,neoforge/src/main/java/net/citizensnpcs/commands/NPCCommands.java,declaration present; behavior unverified
+npc polarbear,main/src/main/java/net/citizensnpcs/trait/versioned/PolarBearTrait.java,,missing declaration
+npc pose,main/src/main/java/net/citizensnpcs/commands/NPCCommands.java,neoforge/src/main/java/net/citizensnpcs/commands/NPCCommands.java,declaration present; behavior unverified
+npc potioneffect,main/src/main/java/net/citizensnpcs/trait/versioned/PotionEffectsTrait.java,,missing declaration
+npc powered,main/src/main/java/net/citizensnpcs/commands/NPCCommands.java,neoforge/src/main/java/net/citizensnpcs/commands/NPCCommands.java,declaration present; behavior unverified
+npc prof,,neoforge/src/main/java/net/citizensnpcs/commands/NPCCommands.java,port-only declaration
+npc profession,,neoforge/src/main/java/net/citizensnpcs/commands/NPCCommands.java,port-only declaration
+npc protect,,neoforge/src/main/java/net/citizensnpcs/commands/NPCCommands.java,port-only declaration
+npc protected,,neoforge/src/main/java/net/citizensnpcs/commands/NPCCommands.java,port-only declaration
+npc pufferfish,main/src/main/java/net/citizensnpcs/trait/versioned/PufferFishTrait.java,,missing declaration
+npc pushable,main/src/main/java/net/citizensnpcs/commands/NPCCommands.java,neoforge/src/main/java/net/citizensnpcs/commands/NPCCommands.java,declaration present; behavior unverified
+npc rabbittype,main/src/main/java/net/citizensnpcs/commands/NPCCommands.java,neoforge/src/main/java/net/citizensnpcs/commands/NPCCommands.java,declaration present; behavior unverified
+npc rbtype,main/src/main/java/net/citizensnpcs/commands/NPCCommands.java,neoforge/src/main/java/net/citizensnpcs/commands/NPCCommands.java,declaration present; behavior unverified
+npc rem,main/src/main/java/net/citizensnpcs/commands/NPCCommands.java,neoforge/src/main/java/net/citizensnpcs/commands/NPCCommands.java,declaration present; behavior unverified
+npc remove,main/src/main/java/net/citizensnpcs/commands/NPCCommands.java,neoforge/src/main/java/net/citizensnpcs/commands/NPCCommands.java,declaration present; behavior unverified
+npc rename,main/src/main/java/net/citizensnpcs/commands/NPCCommands.java,neoforge/src/main/java/net/citizensnpcs/commands/NPCCommands.java,declaration present; behavior unverified
+npc respawn,main/src/main/java/net/citizensnpcs/commands/NPCCommands.java,neoforge/src/main/java/net/citizensnpcs/commands/NPCCommands.java,declaration present; behavior unverified
+npc rotate,main/src/main/java/net/citizensnpcs/commands/NPCCommands.java,neoforge/src/main/java/net/citizensnpcs/commands/NPCCommands.java,declaration present; behavior unverified
+npc rotationsettings,main/src/main/java/net/citizensnpcs/commands/NPCCommands.java,neoforge/src/main/java/net/citizensnpcs/commands/NPCCommands.java,declaration present; behavior unverified
+npc saddle,,neoforge/src/main/java/net/citizensnpcs/commands/NPCCommands.java,port-only declaration
+npc scaledmaxhealth,main/src/main/java/net/citizensnpcs/commands/NPCCommands.java,neoforge/src/main/java/net/citizensnpcs/commands/NPCCommands.java,declaration present; behavior unverified
+npc sel,main/src/main/java/net/citizensnpcs/commands/NPCCommands.java,neoforge/src/main/java/net/citizensnpcs/commands/NPCCommands.java,declaration present; behavior unverified
+npc select,main/src/main/java/net/citizensnpcs/commands/NPCCommands.java,neoforge/src/main/java/net/citizensnpcs/commands/NPCCommands.java,declaration present; behavior unverified
+npc setequipment,main/src/main/java/net/citizensnpcs/commands/NPCCommands.java,neoforge/src/main/java/net/citizensnpcs/commands/NPCCommands.java,declaration present; behavior unverified
+npc sheep,main/src/main/java/net/citizensnpcs/commands/NPCCommands.java,neoforge/src/main/java/net/citizensnpcs/commands/NPCCommands.java,declaration present; behavior unverified
+npc shop,main/src/main/java/net/citizensnpcs/commands/NPCCommands.java,neoforge/src/main/java/net/citizensnpcs/commands/NPCCommands.java,declaration present; behavior unverified
+npc shopitem,main/src/main/java/net/citizensnpcs/commands/NPCCommands.java,neoforge/src/main/java/net/citizensnpcs/commands/NPCCommands.java,declaration present; behavior unverified
+npc showshop,main/src/main/java/net/citizensnpcs/commands/NPCCommands.java,neoforge/src/main/java/net/citizensnpcs/commands/NPCCommands.java,declaration present; behavior unverified
+npc shulker,main/src/main/java/net/citizensnpcs/trait/versioned/ShulkerTrait.java,,missing declaration
+npc sitting,main/src/main/java/net/citizensnpcs/commands/NPCCommands.java,neoforge/src/main/java/net/citizensnpcs/commands/NPCCommands.java,declaration present; behavior unverified
+npc size,,neoforge/src/main/java/net/citizensnpcs/commands/NPCCommands.java,port-only declaration
+npc skin,main/src/main/java/net/citizensnpcs/commands/NPCCommands.java,neoforge/src/main/java/net/citizensnpcs/commands/NPCCommands.java,declaration present; behavior unverified
+npc skinlayers,main/src/main/java/net/citizensnpcs/commands/NPCCommands.java,neoforge/src/main/java/net/citizensnpcs/commands/NPCCommands.java,declaration present; behavior unverified
+npc slimesize,main/src/main/java/net/citizensnpcs/commands/NPCCommands.java,neoforge/src/main/java/net/citizensnpcs/commands/NPCCommands.java,declaration present; behavior unverified
+npc sneak,,neoforge/src/main/java/net/citizensnpcs/commands/NPCCommands.java,port-only declaration
+npc sniffer,main/src/main/java/net/citizensnpcs/trait/versioned/SnifferTrait.java,,missing declaration
+npc snowgolem,main/src/main/java/net/citizensnpcs/trait/versioned/SnowmanTrait.java,,missing declaration
+npc snowman,main/src/main/java/net/citizensnpcs/trait/versioned/SnowmanTrait.java,,missing declaration
+npc sound,main/src/main/java/net/citizensnpcs/commands/NPCCommands.java,neoforge/src/main/java/net/citizensnpcs/commands/NPCCommands.java,declaration present; behavior unverified
+npc spawn,main/src/main/java/net/citizensnpcs/commands/NPCCommands.java,neoforge/src/main/java/net/citizensnpcs/commands/NPCCommands.java,declaration present; behavior unverified
+npc speak,main/src/main/java/net/citizensnpcs/commands/NPCCommands.java,neoforge/src/main/java/net/citizensnpcs/commands/NPCCommands.java,declaration present; behavior unverified
+npc spectate,main/src/main/java/net/citizensnpcs/commands/NPCCommands.java,neoforge/src/main/java/net/citizensnpcs/commands/NPCCommands.java,declaration present; behavior unverified
+npc speed,main/src/main/java/net/citizensnpcs/commands/NPCCommands.java,neoforge/src/main/java/net/citizensnpcs/commands/NPCCommands.java,declaration present; behavior unverified
+npc spellcaster,main/src/main/java/net/citizensnpcs/trait/versioned/SpellcasterTrait.java,,missing declaration
+npc sulfurcube,main/src/main/java/net/citizensnpcs/trait/versioned/SulfurCubeTrait.java,,missing declaration
+npc swim,main/src/main/java/net/citizensnpcs/commands/NPCCommands.java,neoforge/src/main/java/net/citizensnpcs/commands/NPCCommands.java,declaration present; behavior unverified
+npc target,main/src/main/java/net/citizensnpcs/commands/NPCCommands.java,neoforge/src/main/java/net/citizensnpcs/commands/NPCCommands.java,declaration present; behavior unverified
+npc targetable,main/src/main/java/net/citizensnpcs/commands/NPCCommands.java,neoforge/src/main/java/net/citizensnpcs/commands/NPCCommands.java,declaration present; behavior unverified
+npc teleport,main/src/main/java/net/citizensnpcs/commands/NPCCommands.java,neoforge/src/main/java/net/citizensnpcs/commands/NPCCommands.java,declaration present; behavior unverified
+npc text,main/src/main/java/net/citizensnpcs/commands/EditorCommands.java,,missing declaration
+npc textdisplay,main/src/main/java/net/citizensnpcs/trait/versioned/TextDisplayTrait.java,,missing declaration
+npc tp,main/src/main/java/net/citizensnpcs/commands/NPCCommands.java,neoforge/src/main/java/net/citizensnpcs/commands/NPCCommands.java,declaration present; behavior unverified
+npc tph,main/src/main/java/net/citizensnpcs/commands/NPCCommands.java,neoforge/src/main/java/net/citizensnpcs/commands/NPCCommands.java,declaration present; behavior unverified
+npc tphere,main/src/main/java/net/citizensnpcs/commands/NPCCommands.java,neoforge/src/main/java/net/citizensnpcs/commands/NPCCommands.java,declaration present; behavior unverified
+npc tpto,main/src/main/java/net/citizensnpcs/commands/NPCCommands.java,neoforge/src/main/java/net/citizensnpcs/commands/NPCCommands.java,declaration present; behavior unverified
+npc trackingrange,main/src/main/java/net/citizensnpcs/commands/NPCCommands.java,neoforge/src/main/java/net/citizensnpcs/commands/NPCCommands.java,declaration present; behavior unverified
+npc tropicalfish,main/src/main/java/net/citizensnpcs/trait/versioned/TropicalFishTrait.java,,missing declaration
+npc type,main/src/main/java/net/citizensnpcs/commands/NPCCommands.java,neoforge/src/main/java/net/citizensnpcs/commands/NPCCommands.java,declaration present; behavior unverified
+npc undo,main/src/main/java/net/citizensnpcs/commands/NPCCommands.java,neoforge/src/main/java/net/citizensnpcs/commands/NPCCommands.java,declaration present; behavior unverified
+npc useitem,main/src/main/java/net/citizensnpcs/commands/NPCCommands.java,neoforge/src/main/java/net/citizensnpcs/commands/NPCCommands.java,declaration present; behavior unverified
+npc vel,main/src/main/java/net/citizensnpcs/commands/NPCCommands.java,neoforge/src/main/java/net/citizensnpcs/commands/NPCCommands.java,declaration present; behavior unverified
+npc velocity,main/src/main/java/net/citizensnpcs/commands/NPCCommands.java,neoforge/src/main/java/net/citizensnpcs/commands/NPCCommands.java,declaration present; behavior unverified
+npc vex,main/src/main/java/net/citizensnpcs/trait/versioned/VexTrait.java,,missing declaration
+npc villager,main/src/main/java/net/citizensnpcs/trait/versioned/VillagerTrait.java,,missing declaration
+npc vulnerable,main/src/main/java/net/citizensnpcs/commands/NPCCommands.java,neoforge/src/main/java/net/citizensnpcs/commands/NPCCommands.java,declaration present; behavior unverified
+npc wander,main/src/main/java/net/citizensnpcs/commands/NPCCommands.java,neoforge/src/main/java/net/citizensnpcs/commands/NPCCommands.java,declaration present; behavior unverified
+npc warden,main/src/main/java/net/citizensnpcs/trait/versioned/WardenTrait.java,,missing declaration
+npc wither,main/src/main/java/net/citizensnpcs/commands/NPCCommands.java,neoforge/src/main/java/net/citizensnpcs/commands/NPCCommands.java,declaration present; behavior unverified
+npc wolf,main/src/main/java/net/citizensnpcs/commands/NPCCommands.java,neoforge/src/main/java/net/citizensnpcs/commands/NPCCommands.java,declaration present; behavior unverified
+template apply,main/src/main/java/net/citizensnpcs/commands/TemplateCommands.java,neoforge/src/main/java/net/citizensnpcs/commands/TemplateCommands.java,declaration present; behavior unverified
+template generate,main/src/main/java/net/citizensnpcs/commands/TemplateCommands.java,neoforge/src/main/java/net/citizensnpcs/commands/TemplateCommands.java,declaration present; behavior unverified
+template list,main/src/main/java/net/citizensnpcs/commands/TemplateCommands.java,neoforge/src/main/java/net/citizensnpcs/commands/TemplateCommands.java,declaration present; behavior unverified
+tpl apply,main/src/main/java/net/citizensnpcs/commands/TemplateCommands.java,neoforge/src/main/java/net/citizensnpcs/commands/TemplateCommands.java,declaration present; behavior unverified
+tpl generate,main/src/main/java/net/citizensnpcs/commands/TemplateCommands.java,neoforge/src/main/java/net/citizensnpcs/commands/TemplateCommands.java,declaration present; behavior unverified
+tpl list,main/src/main/java/net/citizensnpcs/commands/TemplateCommands.java,neoforge/src/main/java/net/citizensnpcs/commands/TemplateCommands.java,declaration present; behavior unverified
+trait *,main/src/main/java/net/citizensnpcs/commands/TraitCommands.java,neoforge/src/main/java/net/citizensnpcs/commands/TraitCommands.java,declaration present; behavior unverified
+trait a,main/src/main/java/net/citizensnpcs/commands/TraitCommands.java,neoforge/src/main/java/net/citizensnpcs/commands/TraitCommands.java,declaration present; behavior unverified
+trait add,main/src/main/java/net/citizensnpcs/commands/TraitCommands.java,neoforge/src/main/java/net/citizensnpcs/commands/TraitCommands.java,declaration present; behavior unverified
+trait clearsaves,main/src/main/java/net/citizensnpcs/commands/TraitCommands.java,neoforge/src/main/java/net/citizensnpcs/commands/TraitCommands.java,declaration present; behavior unverified
+trait r,main/src/main/java/net/citizensnpcs/commands/TraitCommands.java,neoforge/src/main/java/net/citizensnpcs/commands/TraitCommands.java,declaration present; behavior unverified
+trait rem,main/src/main/java/net/citizensnpcs/commands/TraitCommands.java,neoforge/src/main/java/net/citizensnpcs/commands/TraitCommands.java,declaration present; behavior unverified
+trait remove,main/src/main/java/net/citizensnpcs/commands/TraitCommands.java,neoforge/src/main/java/net/citizensnpcs/commands/TraitCommands.java,declaration present; behavior unverified
+waypoints add,main/src/main/java/net/citizensnpcs/commands/WaypointCommands.java,neoforge/src/main/java/net/citizensnpcs/commands/WaypointCommands.java,declaration present; behavior unverified
+waypoints hpa,main/src/main/java/net/citizensnpcs/commands/WaypointCommands.java,,missing declaration
+waypoints provider,main/src/main/java/net/citizensnpcs/commands/WaypointCommands.java,neoforge/src/main/java/net/citizensnpcs/commands/WaypointCommands.java,declaration present; behavior unverified
+waypoints remove,main/src/main/java/net/citizensnpcs/commands/WaypointCommands.java,neoforge/src/main/java/net/citizensnpcs/commands/WaypointCommands.java,declaration present; behavior unverified
+wp add,main/src/main/java/net/citizensnpcs/commands/WaypointCommands.java,neoforge/src/main/java/net/citizensnpcs/commands/WaypointCommands.java,declaration present; behavior unverified
+wp hpa,main/src/main/java/net/citizensnpcs/commands/WaypointCommands.java,,missing declaration
+wp provider,main/src/main/java/net/citizensnpcs/commands/WaypointCommands.java,neoforge/src/main/java/net/citizensnpcs/commands/WaypointCommands.java,declaration present; behavior unverified
+wp remove,main/src/main/java/net/citizensnpcs/commands/WaypointCommands.java,neoforge/src/main/java/net/citizensnpcs/commands/WaypointCommands.java,declaration present; behavior unverified

@@ -1,0 +1,217 @@
+upstream,port_same_basename,status
+main/src/main/java/net/citizensnpcs/Citizens.java,neoforge/src/main/java/net/citizensnpcs/Citizens.java,source counterpart; behavior unverified
+main/src/main/java/net/citizensnpcs/CitizensPlaceholders.java,,no same-basename source; inspect platform replacement/version applicability
+main/src/main/java/net/citizensnpcs/DenizenHook.java,,no same-basename source; inspect platform replacement/version applicability
+main/src/main/java/net/citizensnpcs/EventListen.java,neoforge/src/main/java/net/citizensnpcs/EventListen.java,source counterpart; behavior unverified
+main/src/main/java/net/citizensnpcs/Metrics.java,,no same-basename source; inspect platform replacement/version applicability
+main/src/main/java/net/citizensnpcs/NPCNeedsRespawnEvent.java,neoforge/src/main/java/net/citizensnpcs/api/event/NPCNeedsRespawnEvent.java,source counterpart; behavior unverified
+main/src/main/java/net/citizensnpcs/PacketEventsHook.java,,no same-basename source; inspect platform replacement/version applicability
+main/src/main/java/net/citizensnpcs/PaymentHook.java,,no same-basename source; inspect platform replacement/version applicability
+main/src/main/java/net/citizensnpcs/Settings.java,neoforge/src/main/java/net/citizensnpcs/Settings.java,source counterpart; behavior unverified
+main/src/main/java/net/citizensnpcs/commands/AdminCommands.java,neoforge/src/main/java/net/citizensnpcs/commands/AdminCommands.java,source counterpart; behavior unverified
+main/src/main/java/net/citizensnpcs/commands/EditorCommands.java,neoforge/src/main/java/net/citizensnpcs/commands/EditorCommands.java,source counterpart; behavior unverified
+main/src/main/java/net/citizensnpcs/commands/NPCCommandSelector.java,neoforge/src/main/java/net/citizensnpcs/commands/NPCCommandSelector.java,source counterpart; behavior unverified
+main/src/main/java/net/citizensnpcs/commands/NPCCommands.java,neoforge/src/main/java/net/citizensnpcs/commands/NPCCommands.java,source counterpart; behavior unverified
+main/src/main/java/net/citizensnpcs/commands/TemplateCommands.java,neoforge/src/main/java/net/citizensnpcs/commands/TemplateCommands.java,source counterpart; behavior unverified
+main/src/main/java/net/citizensnpcs/commands/TraitCommands.java,neoforge/src/main/java/net/citizensnpcs/commands/TraitCommands.java,source counterpart; behavior unverified
+main/src/main/java/net/citizensnpcs/commands/WaypointCommands.java,neoforge/src/main/java/net/citizensnpcs/commands/WaypointCommands.java,source counterpart; behavior unverified
+main/src/main/java/net/citizensnpcs/commands/gui/NPCConfigurator.java,neoforge/src/main/java/net/citizensnpcs/commands/gui/NPCConfigurator.java,source counterpart; behavior unverified
+main/src/main/java/net/citizensnpcs/commands/history/CommandHistory.java,neoforge/src/main/java/net/citizensnpcs/commands/history/CommandHistory.java,source counterpart; behavior unverified
+main/src/main/java/net/citizensnpcs/commands/history/CommandHistoryItem.java,neoforge/src/main/java/net/citizensnpcs/commands/history/CommandHistoryItem.java,source counterpart; behavior unverified
+main/src/main/java/net/citizensnpcs/commands/history/CreateNPCHistoryItem.java,neoforge/src/main/java/net/citizensnpcs/commands/history/CreateNPCHistoryItem.java,source counterpart; behavior unverified
+main/src/main/java/net/citizensnpcs/commands/history/RemoveNPCHistoryItem.java,neoforge/src/main/java/net/citizensnpcs/commands/history/RemoveNPCHistoryItem.java,source counterpart; behavior unverified
+main/src/main/java/net/citizensnpcs/editor/CopierEditor.java,neoforge/src/main/java/net/citizensnpcs/editor/CopierEditor.java,source counterpart; behavior unverified
+main/src/main/java/net/citizensnpcs/editor/Editor.java,neoforge/src/main/java/net/citizensnpcs/editor/Editor.java,source counterpart; behavior unverified
+main/src/main/java/net/citizensnpcs/editor/EndermanEquipperGUI.java,neoforge/src/main/java/net/citizensnpcs/editor/EndermanEquipperGUI.java,source counterpart; behavior unverified
+main/src/main/java/net/citizensnpcs/editor/EquipmentEditor.java,neoforge/src/main/java/net/citizensnpcs/editor/EquipmentEditor.java,source counterpart; behavior unverified
+main/src/main/java/net/citizensnpcs/editor/Equipper.java,neoforge/src/main/java/net/citizensnpcs/editor/Equipper.java,source counterpart; behavior unverified
+main/src/main/java/net/citizensnpcs/editor/GenericEquipperGUI.java,neoforge/src/main/java/net/citizensnpcs/editor/GenericEquipperGUI.java,source counterpart; behavior unverified
+main/src/main/java/net/citizensnpcs/editor/HorseEquipper.java,neoforge/src/main/java/net/citizensnpcs/editor/HorseEquipper.java,source counterpart; behavior unverified
+main/src/main/java/net/citizensnpcs/editor/SaddleEquipperGUI.java,neoforge/src/main/java/net/citizensnpcs/editor/SaddleEquipperGUI.java,source counterpart; behavior unverified
+main/src/main/java/net/citizensnpcs/editor/SheepEquipper.java,neoforge/src/main/java/net/citizensnpcs/editor/SheepEquipper.java,source counterpart; behavior unverified
+main/src/main/java/net/citizensnpcs/npc/AbstractEntityController.java,neoforge/src/main/java/net/citizensnpcs/npc/AbstractEntityController.java,source counterpart; behavior unverified
+main/src/main/java/net/citizensnpcs/npc/CitizensNPC.java,neoforge/src/main/java/net/citizensnpcs/npc/CitizensNPC.java,source counterpart; behavior unverified
+main/src/main/java/net/citizensnpcs/npc/CitizensNPCRegistry.java,neoforge/src/main/java/net/citizensnpcs/npc/CitizensNPCRegistry.java,source counterpart; behavior unverified
+main/src/main/java/net/citizensnpcs/npc/CitizensTraitFactory.java,neoforge/src/main/java/net/citizensnpcs/npc/CitizensTraitFactory.java,source counterpart; behavior unverified
+main/src/main/java/net/citizensnpcs/npc/EntityController.java,neoforge/src/main/java/net/citizensnpcs/npc/EntityController.java,source counterpart; behavior unverified
+main/src/main/java/net/citizensnpcs/npc/EntityControllers.java,neoforge/src/main/java/net/citizensnpcs/npc/EntityControllers.java,source counterpart; behavior unverified
+main/src/main/java/net/citizensnpcs/npc/NPCSelector.java,neoforge/src/main/java/net/citizensnpcs/api/npc/NPCSelector.java,source counterpart; behavior unverified
+main/src/main/java/net/citizensnpcs/npc/ai/AStarNavigationStrategy.java,neoforge/src/main/java/net/citizensnpcs/npc/ai/AStarNavigationStrategy.java,source counterpart; behavior unverified
+main/src/main/java/net/citizensnpcs/npc/ai/BoundingBoxExaminer.java,neoforge/src/main/java/net/citizensnpcs/npc/ai/BoundingBoxExaminer.java,source counterpart; behavior unverified
+main/src/main/java/net/citizensnpcs/npc/ai/CitizensNavigator.java,neoforge/src/main/java/net/citizensnpcs/npc/ai/CitizensNavigator.java,source counterpart; behavior unverified
+main/src/main/java/net/citizensnpcs/npc/ai/FlyingAStarNavigationStrategy.java,neoforge/src/main/java/net/citizensnpcs/npc/ai/FlyingAStarNavigationStrategy.java,source counterpart; behavior unverified
+main/src/main/java/net/citizensnpcs/npc/ai/MCNavigationStrategy.java,neoforge/src/main/java/net/citizensnpcs/npc/ai/MCNavigationStrategy.java,source counterpart; behavior unverified
+main/src/main/java/net/citizensnpcs/npc/ai/MCTargetStrategy.java,neoforge/src/main/java/net/citizensnpcs/npc/ai/MCTargetStrategy.java,source counterpart; behavior unverified
+main/src/main/java/net/citizensnpcs/npc/ai/NMSChunkBlockSource.java,,no same-basename source; inspect platform replacement/version applicability
+main/src/main/java/net/citizensnpcs/npc/ai/NPCHolder.java,neoforge/src/main/java/net/citizensnpcs/npc/ai/NPCHolder.java,source counterpart; behavior unverified
+main/src/main/java/net/citizensnpcs/npc/ai/StraightLineNavigationStrategy.java,neoforge/src/main/java/net/citizensnpcs/npc/ai/StraightLineNavigationStrategy.java,source counterpart; behavior unverified
+main/src/main/java/net/citizensnpcs/npc/ai/tree/BehaviorTreeParser.java,neoforge/src/main/java/net/citizensnpcs/npc/ai/tree/BehaviorTreeParser.java,source counterpart; behavior unverified
+main/src/main/java/net/citizensnpcs/npc/ai/tree/CitizensBehaviorRegistry.java,neoforge/src/main/java/net/citizensnpcs/npc/ai/tree/CitizensBehaviorRegistry.java,source counterpart; behavior unverified
+main/src/main/java/net/citizensnpcs/npc/ai/tree/MolangEngine.java,neoforge/src/main/java/net/citizensnpcs/npc/ai/tree/MolangEngine.java,source counterpart; behavior unverified
+main/src/main/java/net/citizensnpcs/npc/ai/tree/NPCExpressionScope.java,neoforge/src/main/java/net/citizensnpcs/npc/ai/tree/NPCExpressionScope.java,source counterpart; behavior unverified
+main/src/main/java/net/citizensnpcs/npc/skin/Skin.java,neoforge/src/main/java/net/citizensnpcs/npc/skin/Skin.java,source counterpart; behavior unverified
+main/src/main/java/net/citizensnpcs/npc/skin/SkinPacketTracker.java,neoforge/src/main/java/net/citizensnpcs/npc/skin/SkinPacketTracker.java,source counterpart; behavior unverified
+main/src/main/java/net/citizensnpcs/npc/skin/SkinUpdateTracker.java,,no same-basename source; inspect platform replacement/version applicability
+main/src/main/java/net/citizensnpcs/npc/skin/SkinnableEntity.java,,no same-basename source; inspect platform replacement/version applicability
+main/src/main/java/net/citizensnpcs/npc/skin/profile/ProfileFetchResult.java,,no same-basename source; inspect platform replacement/version applicability
+main/src/main/java/net/citizensnpcs/npc/skin/profile/ProfileFetchThread.java,,no same-basename source; inspect platform replacement/version applicability
+main/src/main/java/net/citizensnpcs/npc/skin/profile/ProfileFetcher.java,,no same-basename source; inspect platform replacement/version applicability
+main/src/main/java/net/citizensnpcs/npc/skin/profile/ProfileRequest.java,,no same-basename source; inspect platform replacement/version applicability
+main/src/main/java/net/citizensnpcs/trait/Age.java,neoforge/src/main/java/net/citizensnpcs/trait/Age.java,source counterpart; behavior unverified
+main/src/main/java/net/citizensnpcs/trait/Anchors.java,neoforge/src/main/java/net/citizensnpcs/trait/Anchors.java,source counterpart; behavior unverified
+main/src/main/java/net/citizensnpcs/trait/ArmorStandTrait.java,neoforge/src/main/java/net/citizensnpcs/trait/ArmorStandTrait.java,source counterpart; behavior unverified
+main/src/main/java/net/citizensnpcs/trait/AttributeTrait.java,neoforge/src/main/java/net/citizensnpcs/trait/AttributeTrait.java,source counterpart; behavior unverified
+main/src/main/java/net/citizensnpcs/trait/BatTrait.java,neoforge/src/main/java/net/citizensnpcs/trait/BatTrait.java,source counterpart; behavior unverified
+main/src/main/java/net/citizensnpcs/trait/BehaviorTrait.java,neoforge/src/main/java/net/citizensnpcs/trait/BehaviorTrait.java,source counterpart; behavior unverified
+main/src/main/java/net/citizensnpcs/trait/BoundingBoxTrait.java,neoforge/src/main/java/net/citizensnpcs/trait/BoundingBoxTrait.java,source counterpart; behavior unverified
+main/src/main/java/net/citizensnpcs/trait/ChunkTicketTrait.java,neoforge/src/main/java/net/citizensnpcs/trait/ChunkTicketTrait.java,source counterpart; behavior unverified
+main/src/main/java/net/citizensnpcs/trait/ClickRedirectTrait.java,neoforge/src/main/java/net/citizensnpcs/trait/ClickRedirectTrait.java,source counterpart; behavior unverified
+main/src/main/java/net/citizensnpcs/trait/CommandTrait.java,neoforge/src/main/java/net/citizensnpcs/trait/CommandTrait.java,source counterpart; behavior unverified
+main/src/main/java/net/citizensnpcs/trait/Controllable.java,neoforge/src/main/java/net/citizensnpcs/trait/Controllable.java,source counterpart; behavior unverified
+main/src/main/java/net/citizensnpcs/trait/CurrentLocation.java,neoforge/src/main/java/net/citizensnpcs/api/trait/trait/CurrentLocation.java,source counterpart; behavior unverified
+main/src/main/java/net/citizensnpcs/trait/DisguiseTrait.java,neoforge/src/main/java/net/citizensnpcs/trait/DisguiseTrait.java,source counterpart; behavior unverified
+main/src/main/java/net/citizensnpcs/trait/DropsTrait.java,neoforge/src/main/java/net/citizensnpcs/trait/DropsTrait.java,source counterpart; behavior unverified
+main/src/main/java/net/citizensnpcs/trait/EnderCrystalTrait.java,neoforge/src/main/java/net/citizensnpcs/trait/EnderCrystalTrait.java,source counterpart; behavior unverified
+main/src/main/java/net/citizensnpcs/trait/EndermanTrait.java,neoforge/src/main/java/net/citizensnpcs/trait/EndermanTrait.java,source counterpart; behavior unverified
+main/src/main/java/net/citizensnpcs/trait/EntityPoseTrait.java,neoforge/src/main/java/net/citizensnpcs/trait/EntityPoseTrait.java,source counterpart; behavior unverified
+main/src/main/java/net/citizensnpcs/trait/FollowTrait.java,neoforge/src/main/java/net/citizensnpcs/trait/FollowTrait.java,source counterpart; behavior unverified
+main/src/main/java/net/citizensnpcs/trait/ForcefieldTrait.java,neoforge/src/main/java/net/citizensnpcs/trait/ForcefieldTrait.java,source counterpart; behavior unverified
+main/src/main/java/net/citizensnpcs/trait/GameModeTrait.java,neoforge/src/main/java/net/citizensnpcs/trait/GameModeTrait.java,source counterpart; behavior unverified
+main/src/main/java/net/citizensnpcs/trait/Gravity.java,neoforge/src/main/java/net/citizensnpcs/trait/Gravity.java,source counterpart; behavior unverified
+main/src/main/java/net/citizensnpcs/trait/HologramTrait.java,neoforge/src/main/java/net/citizensnpcs/trait/HologramTrait.java,source counterpart; behavior unverified
+main/src/main/java/net/citizensnpcs/trait/HomeTrait.java,neoforge/src/main/java/net/citizensnpcs/trait/HomeTrait.java,source counterpart; behavior unverified
+main/src/main/java/net/citizensnpcs/trait/HorseModifiers.java,neoforge/src/main/java/net/citizensnpcs/trait/HorseModifiers.java,source counterpart; behavior unverified
+main/src/main/java/net/citizensnpcs/trait/ItemFrameTrait.java,neoforge/src/main/java/net/citizensnpcs/trait/ItemFrameTrait.java,source counterpart; behavior unverified
+main/src/main/java/net/citizensnpcs/trait/LeashedTrait.java,neoforge/src/main/java/net/citizensnpcs/trait/LeashedTrait.java,source counterpart; behavior unverified
+main/src/main/java/net/citizensnpcs/trait/LookClose.java,neoforge/src/main/java/net/citizensnpcs/trait/LookClose.java,source counterpart; behavior unverified
+main/src/main/java/net/citizensnpcs/trait/MirrorTrait.java,neoforge/src/main/java/net/citizensnpcs/trait/MirrorTrait.java,source counterpart; behavior unverified
+main/src/main/java/net/citizensnpcs/trait/MountTrait.java,neoforge/src/main/java/net/citizensnpcs/trait/MountTrait.java,source counterpart; behavior unverified
+main/src/main/java/net/citizensnpcs/trait/OcelotModifiers.java,neoforge/src/main/java/net/citizensnpcs/trait/OcelotModifiers.java,source counterpart; behavior unverified
+main/src/main/java/net/citizensnpcs/trait/PacketNPC.java,neoforge/src/main/java/net/citizensnpcs/trait/PacketNPC.java,source counterpart; behavior unverified
+main/src/main/java/net/citizensnpcs/trait/PaintingTrait.java,neoforge/src/main/java/net/citizensnpcs/trait/PaintingTrait.java,source counterpart; behavior unverified
+main/src/main/java/net/citizensnpcs/trait/PausePathfindingTrait.java,neoforge/src/main/java/net/citizensnpcs/trait/PausePathfindingTrait.java,source counterpart; behavior unverified
+main/src/main/java/net/citizensnpcs/trait/Poses.java,neoforge/src/main/java/net/citizensnpcs/trait/Poses.java,source counterpart; behavior unverified
+main/src/main/java/net/citizensnpcs/trait/Powered.java,neoforge/src/main/java/net/citizensnpcs/trait/Powered.java,source counterpart; behavior unverified
+main/src/main/java/net/citizensnpcs/trait/RabbitType.java,neoforge/src/main/java/net/citizensnpcs/trait/RabbitType.java,source counterpart; behavior unverified
+main/src/main/java/net/citizensnpcs/trait/RotationTrait.java,neoforge/src/main/java/net/citizensnpcs/trait/RotationTrait.java,source counterpart; behavior unverified
+main/src/main/java/net/citizensnpcs/trait/Saddle.java,neoforge/src/main/java/net/citizensnpcs/trait/Saddle.java,source counterpart; behavior unverified
+main/src/main/java/net/citizensnpcs/trait/ScaledMaxHealthTrait.java,neoforge/src/main/java/net/citizensnpcs/trait/ScaledMaxHealthTrait.java,source counterpart; behavior unverified
+main/src/main/java/net/citizensnpcs/trait/ScoreboardTrait.java,neoforge/src/main/java/net/citizensnpcs/trait/ScoreboardTrait.java,source counterpart; behavior unverified
+main/src/main/java/net/citizensnpcs/trait/SheepTrait.java,neoforge/src/main/java/net/citizensnpcs/trait/SheepTrait.java,source counterpart; behavior unverified
+main/src/main/java/net/citizensnpcs/trait/ShopTrait.java,neoforge/src/main/java/net/citizensnpcs/trait/ShopTrait.java,source counterpart; behavior unverified
+main/src/main/java/net/citizensnpcs/trait/SitTrait.java,neoforge/src/main/java/net/citizensnpcs/trait/SitTrait.java,source counterpart; behavior unverified
+main/src/main/java/net/citizensnpcs/trait/SkinLayers.java,neoforge/src/main/java/net/citizensnpcs/trait/SkinLayers.java,source counterpart; behavior unverified
+main/src/main/java/net/citizensnpcs/trait/SkinTrait.java,neoforge/src/main/java/net/citizensnpcs/trait/SkinTrait.java,source counterpart; behavior unverified
+main/src/main/java/net/citizensnpcs/trait/SleepTrait.java,neoforge/src/main/java/net/citizensnpcs/trait/SleepTrait.java,source counterpart; behavior unverified
+main/src/main/java/net/citizensnpcs/trait/SlimeSize.java,neoforge/src/main/java/net/citizensnpcs/trait/SlimeSize.java,source counterpart; behavior unverified
+main/src/main/java/net/citizensnpcs/trait/SneakTrait.java,neoforge/src/main/java/net/citizensnpcs/trait/SneakTrait.java,source counterpart; behavior unverified
+main/src/main/java/net/citizensnpcs/trait/TargetableTrait.java,neoforge/src/main/java/net/citizensnpcs/trait/TargetableTrait.java,source counterpart; behavior unverified
+main/src/main/java/net/citizensnpcs/trait/VillagerProfession.java,neoforge/src/main/java/net/citizensnpcs/trait/VillagerProfession.java,source counterpart; behavior unverified
+main/src/main/java/net/citizensnpcs/trait/WitherTrait.java,neoforge/src/main/java/net/citizensnpcs/trait/WitherTrait.java,source counterpart; behavior unverified
+main/src/main/java/net/citizensnpcs/trait/WolfModifiers.java,neoforge/src/main/java/net/citizensnpcs/trait/WolfModifiers.java,source counterpart; behavior unverified
+main/src/main/java/net/citizensnpcs/trait/WoolColor.java,neoforge/src/main/java/net/citizensnpcs/trait/WoolColor.java,source counterpart; behavior unverified
+main/src/main/java/net/citizensnpcs/trait/scoreboard/AbstractScoreboard.java,,no same-basename source; inspect platform replacement/version applicability
+main/src/main/java/net/citizensnpcs/trait/scoreboard/AbstractTeam.java,,no same-basename source; inspect platform replacement/version applicability
+main/src/main/java/net/citizensnpcs/trait/scoreboard/BukkitScoreboardImpl.java,,no same-basename source; inspect platform replacement/version applicability
+main/src/main/java/net/citizensnpcs/trait/scoreboard/BukkitScoreboardManager.java,,no same-basename source; inspect platform replacement/version applicability
+main/src/main/java/net/citizensnpcs/trait/scoreboard/BukkitTeamImpl.java,,no same-basename source; inspect platform replacement/version applicability
+main/src/main/java/net/citizensnpcs/trait/scoreboard/CitizensScoreboardManager.java,,no same-basename source; inspect platform replacement/version applicability
+main/src/main/java/net/citizensnpcs/trait/scoreboard/FoliaScoreboardImpl.java,,no same-basename source; inspect platform replacement/version applicability
+main/src/main/java/net/citizensnpcs/trait/scoreboard/FoliaTeamImpl.java,,no same-basename source; inspect platform replacement/version applicability
+main/src/main/java/net/citizensnpcs/trait/scoreboard/MegavexScoreboardManager.java,,no same-basename source; inspect platform replacement/version applicability
+main/src/main/java/net/citizensnpcs/trait/shop/CommandAction.java,neoforge/src/main/java/net/citizensnpcs/trait/shop/CommandAction.java,source counterpart; behavior unverified
+main/src/main/java/net/citizensnpcs/trait/shop/ConditionAction.java,neoforge/src/main/java/net/citizensnpcs/trait/shop/ConditionAction.java,source counterpart; behavior unverified
+main/src/main/java/net/citizensnpcs/trait/shop/ExperienceAction.java,neoforge/src/main/java/net/citizensnpcs/trait/shop/ExperienceAction.java,source counterpart; behavior unverified
+main/src/main/java/net/citizensnpcs/trait/shop/ItemAction.java,neoforge/src/main/java/net/citizensnpcs/trait/shop/ItemAction.java,source counterpart; behavior unverified
+main/src/main/java/net/citizensnpcs/trait/shop/MoneyAction.java,neoforge/src/main/java/net/citizensnpcs/trait/shop/MoneyAction.java,source counterpart; behavior unverified
+main/src/main/java/net/citizensnpcs/trait/shop/NPCShopAction.java,neoforge/src/main/java/net/citizensnpcs/trait/shop/NPCShopAction.java,source counterpart; behavior unverified
+main/src/main/java/net/citizensnpcs/trait/shop/OpenShopAction.java,neoforge/src/main/java/net/citizensnpcs/trait/shop/OpenShopAction.java,source counterpart; behavior unverified
+main/src/main/java/net/citizensnpcs/trait/shop/PermissionAction.java,neoforge/src/main/java/net/citizensnpcs/trait/shop/PermissionAction.java,source counterpart; behavior unverified
+main/src/main/java/net/citizensnpcs/trait/shop/StoredShops.java,neoforge/src/main/java/net/citizensnpcs/trait/shop/StoredShops.java,source counterpart; behavior unverified
+main/src/main/java/net/citizensnpcs/trait/text/Text.java,neoforge/src/main/java/net/citizensnpcs/trait/text/Text.java,source counterpart; behavior unverified
+main/src/main/java/net/citizensnpcs/trait/text/TextBasePrompt.java,,no same-basename source; inspect platform replacement/version applicability
+main/src/main/java/net/citizensnpcs/trait/versioned/AllayTrait.java,neoforge/src/main/java/net/citizensnpcs/trait/versioned/AllayTrait.java,source counterpart; behavior unverified
+main/src/main/java/net/citizensnpcs/trait/versioned/AreaEffectCloudTrait.java,neoforge/src/main/java/net/citizensnpcs/trait/versioned/AreaEffectCloudTrait.java,source counterpart; behavior unverified
+main/src/main/java/net/citizensnpcs/trait/versioned/ArmadilloTrait.java,neoforge/src/main/java/net/citizensnpcs/trait/versioned/ArmadilloTrait.java,source counterpart; behavior unverified
+main/src/main/java/net/citizensnpcs/trait/versioned/AxolotlTrait.java,neoforge/src/main/java/net/citizensnpcs/trait/versioned/AxolotlTrait.java,source counterpart; behavior unverified
+main/src/main/java/net/citizensnpcs/trait/versioned/BeeTrait.java,neoforge/src/main/java/net/citizensnpcs/trait/versioned/BeeTrait.java,source counterpart; behavior unverified
+main/src/main/java/net/citizensnpcs/trait/versioned/BoatTrait.java,neoforge/src/main/java/net/citizensnpcs/trait/versioned/BoatTrait.java,source counterpart; behavior unverified
+main/src/main/java/net/citizensnpcs/trait/versioned/BossBarTrait.java,neoforge/src/main/java/net/citizensnpcs/trait/versioned/BossBarTrait.java,source counterpart; behavior unverified
+main/src/main/java/net/citizensnpcs/trait/versioned/CamelTrait.java,neoforge/src/main/java/net/citizensnpcs/trait/versioned/CamelTrait.java,source counterpart; behavior unverified
+main/src/main/java/net/citizensnpcs/trait/versioned/CatTrait.java,neoforge/src/main/java/net/citizensnpcs/trait/versioned/CatTrait.java,source counterpart; behavior unverified
+main/src/main/java/net/citizensnpcs/trait/versioned/ChickenTrait.java,,no same-basename source; inspect platform replacement/version applicability
+main/src/main/java/net/citizensnpcs/trait/versioned/CopperGolemTrait.java,,no same-basename source; inspect platform replacement/version applicability
+main/src/main/java/net/citizensnpcs/trait/versioned/CowTrait.java,,no same-basename source; inspect platform replacement/version applicability
+main/src/main/java/net/citizensnpcs/trait/versioned/DisplayTrait.java,neoforge/src/main/java/net/citizensnpcs/trait/versioned/DisplayTrait.java,source counterpart; behavior unverified
+main/src/main/java/net/citizensnpcs/trait/versioned/EnderDragonTrait.java,neoforge/src/main/java/net/citizensnpcs/trait/versioned/EnderDragonTrait.java,source counterpart; behavior unverified
+main/src/main/java/net/citizensnpcs/trait/versioned/FoxTrait.java,neoforge/src/main/java/net/citizensnpcs/trait/versioned/FoxTrait.java,source counterpart; behavior unverified
+main/src/main/java/net/citizensnpcs/trait/versioned/FrogTrait.java,neoforge/src/main/java/net/citizensnpcs/trait/versioned/FrogTrait.java,source counterpart; behavior unverified
+main/src/main/java/net/citizensnpcs/trait/versioned/GoatTrait.java,neoforge/src/main/java/net/citizensnpcs/trait/versioned/GoatTrait.java,source counterpart; behavior unverified
+main/src/main/java/net/citizensnpcs/trait/versioned/InteractionTrait.java,,no same-basename source; inspect platform replacement/version applicability
+main/src/main/java/net/citizensnpcs/trait/versioned/ItemDisplayTrait.java,neoforge/src/main/java/net/citizensnpcs/trait/versioned/ItemDisplayTrait.java,source counterpart; behavior unverified
+main/src/main/java/net/citizensnpcs/trait/versioned/LlamaTrait.java,neoforge/src/main/java/net/citizensnpcs/trait/versioned/LlamaTrait.java,source counterpart; behavior unverified
+main/src/main/java/net/citizensnpcs/trait/versioned/MannequinTrait.java,,no same-basename source; inspect platform replacement/version applicability
+main/src/main/java/net/citizensnpcs/trait/versioned/MushroomCowTrait.java,neoforge/src/main/java/net/citizensnpcs/trait/versioned/MushroomCowTrait.java,source counterpart; behavior unverified
+main/src/main/java/net/citizensnpcs/trait/versioned/PandaTrait.java,neoforge/src/main/java/net/citizensnpcs/trait/versioned/PandaTrait.java,source counterpart; behavior unverified
+main/src/main/java/net/citizensnpcs/trait/versioned/ParrotTrait.java,neoforge/src/main/java/net/citizensnpcs/trait/versioned/ParrotTrait.java,source counterpart; behavior unverified
+main/src/main/java/net/citizensnpcs/trait/versioned/PhantomTrait.java,neoforge/src/main/java/net/citizensnpcs/trait/versioned/PhantomTrait.java,source counterpart; behavior unverified
+main/src/main/java/net/citizensnpcs/trait/versioned/PigTrait.java,,no same-basename source; inspect platform replacement/version applicability
+main/src/main/java/net/citizensnpcs/trait/versioned/PiglinTrait.java,neoforge/src/main/java/net/citizensnpcs/trait/versioned/PiglinTrait.java,source counterpart; behavior unverified
+main/src/main/java/net/citizensnpcs/trait/versioned/PolarBearTrait.java,neoforge/src/main/java/net/citizensnpcs/trait/versioned/PolarBearTrait.java,source counterpart; behavior unverified
+main/src/main/java/net/citizensnpcs/trait/versioned/PotionEffectsTrait.java,neoforge/src/main/java/net/citizensnpcs/trait/versioned/PotionEffectsTrait.java,source counterpart; behavior unverified
+main/src/main/java/net/citizensnpcs/trait/versioned/PufferFishTrait.java,neoforge/src/main/java/net/citizensnpcs/trait/versioned/PufferFishTrait.java,source counterpart; behavior unverified
+main/src/main/java/net/citizensnpcs/trait/versioned/ShulkerTrait.java,neoforge/src/main/java/net/citizensnpcs/trait/versioned/ShulkerTrait.java,source counterpart; behavior unverified
+main/src/main/java/net/citizensnpcs/trait/versioned/SnifferTrait.java,neoforge/src/main/java/net/citizensnpcs/trait/versioned/SnifferTrait.java,source counterpart; behavior unverified
+main/src/main/java/net/citizensnpcs/trait/versioned/SnowmanTrait.java,neoforge/src/main/java/net/citizensnpcs/trait/versioned/SnowmanTrait.java,source counterpart; behavior unverified
+main/src/main/java/net/citizensnpcs/trait/versioned/SpellcasterTrait.java,neoforge/src/main/java/net/citizensnpcs/trait/versioned/SpellcasterTrait.java,source counterpart; behavior unverified
+main/src/main/java/net/citizensnpcs/trait/versioned/SulfurCubeTrait.java,,no same-basename source; inspect platform replacement/version applicability
+main/src/main/java/net/citizensnpcs/trait/versioned/TextDisplayTrait.java,neoforge/src/main/java/net/citizensnpcs/trait/versioned/TextDisplayTrait.java,source counterpart; behavior unverified
+main/src/main/java/net/citizensnpcs/trait/versioned/TropicalFishTrait.java,neoforge/src/main/java/net/citizensnpcs/trait/versioned/TropicalFishTrait.java,source counterpart; behavior unverified
+main/src/main/java/net/citizensnpcs/trait/versioned/VexTrait.java,neoforge/src/main/java/net/citizensnpcs/trait/versioned/VexTrait.java,source counterpart; behavior unverified
+main/src/main/java/net/citizensnpcs/trait/versioned/VillagerTrait.java,neoforge/src/main/java/net/citizensnpcs/trait/versioned/VillagerTrait.java,source counterpart; behavior unverified
+main/src/main/java/net/citizensnpcs/trait/versioned/WardenTrait.java,neoforge/src/main/java/net/citizensnpcs/trait/versioned/WardenTrait.java,source counterpart; behavior unverified
+main/src/main/java/net/citizensnpcs/trait/waypoint/EntityMarkers.java,neoforge/src/main/java/net/citizensnpcs/trait/waypoint/EntityMarkers.java,source counterpart; behavior unverified
+main/src/main/java/net/citizensnpcs/trait/waypoint/GuidedWaypointProvider.java,neoforge/src/main/java/net/citizensnpcs/trait/waypoint/GuidedWaypointProvider.java,source counterpart; behavior unverified
+main/src/main/java/net/citizensnpcs/trait/waypoint/LinearWaypointProvider.java,neoforge/src/main/java/net/citizensnpcs/trait/waypoint/LinearWaypointProvider.java,source counterpart; behavior unverified
+main/src/main/java/net/citizensnpcs/trait/waypoint/LinearWaypointsCompleteEvent.java,neoforge/src/main/java/net/citizensnpcs/trait/waypoint/LinearWaypointsCompleteEvent.java,source counterpart; behavior unverified
+main/src/main/java/net/citizensnpcs/trait/waypoint/WanderWaypointProvider.java,neoforge/src/main/java/net/citizensnpcs/trait/waypoint/WanderWaypointProvider.java,source counterpart; behavior unverified
+main/src/main/java/net/citizensnpcs/trait/waypoint/Waypoint.java,neoforge/src/main/java/net/citizensnpcs/trait/waypoint/Waypoint.java,source counterpart; behavior unverified
+main/src/main/java/net/citizensnpcs/trait/waypoint/WaypointEditor.java,neoforge/src/main/java/net/citizensnpcs/trait/waypoint/WaypointEditor.java,source counterpart; behavior unverified
+main/src/main/java/net/citizensnpcs/trait/waypoint/WaypointProvider.java,neoforge/src/main/java/net/citizensnpcs/trait/waypoint/WaypointProvider.java,source counterpart; behavior unverified
+main/src/main/java/net/citizensnpcs/trait/waypoint/Waypoints.java,neoforge/src/main/java/net/citizensnpcs/trait/waypoint/Waypoints.java,source counterpart; behavior unverified
+main/src/main/java/net/citizensnpcs/trait/waypoint/triggers/AnimationTrigger.java,neoforge/src/main/java/net/citizensnpcs/trait/waypoint/triggers/AnimationTrigger.java,source counterpart; behavior unverified
+main/src/main/java/net/citizensnpcs/trait/waypoint/triggers/AnimationTriggerPrompt.java,neoforge/src/main/java/net/citizensnpcs/trait/waypoint/triggers/AnimationTriggerPrompt.java,source counterpart; behavior unverified
+main/src/main/java/net/citizensnpcs/trait/waypoint/triggers/ChatTrigger.java,neoforge/src/main/java/net/citizensnpcs/trait/waypoint/triggers/ChatTrigger.java,source counterpart; behavior unverified
+main/src/main/java/net/citizensnpcs/trait/waypoint/triggers/ChatTriggerPrompt.java,neoforge/src/main/java/net/citizensnpcs/trait/waypoint/triggers/ChatTriggerPrompt.java,source counterpart; behavior unverified
+main/src/main/java/net/citizensnpcs/trait/waypoint/triggers/CommandTrigger.java,neoforge/src/main/java/net/citizensnpcs/trait/waypoint/triggers/CommandTrigger.java,source counterpart; behavior unverified
+main/src/main/java/net/citizensnpcs/trait/waypoint/triggers/CommandTriggerPrompt.java,neoforge/src/main/java/net/citizensnpcs/trait/waypoint/triggers/CommandTriggerPrompt.java,source counterpart; behavior unverified
+main/src/main/java/net/citizensnpcs/trait/waypoint/triggers/DelayTrigger.java,neoforge/src/main/java/net/citizensnpcs/trait/waypoint/triggers/DelayTrigger.java,source counterpart; behavior unverified
+main/src/main/java/net/citizensnpcs/trait/waypoint/triggers/DelayTriggerPrompt.java,neoforge/src/main/java/net/citizensnpcs/trait/waypoint/triggers/DelayTriggerPrompt.java,source counterpart; behavior unverified
+main/src/main/java/net/citizensnpcs/trait/waypoint/triggers/SpeedTrigger.java,neoforge/src/main/java/net/citizensnpcs/trait/waypoint/triggers/SpeedTrigger.java,source counterpart; behavior unverified
+main/src/main/java/net/citizensnpcs/trait/waypoint/triggers/SpeedTriggerPrompt.java,neoforge/src/main/java/net/citizensnpcs/trait/waypoint/triggers/SpeedTriggerPrompt.java,source counterpart; behavior unverified
+main/src/main/java/net/citizensnpcs/trait/waypoint/triggers/TeleportTrigger.java,neoforge/src/main/java/net/citizensnpcs/trait/waypoint/triggers/TeleportTrigger.java,source counterpart; behavior unverified
+main/src/main/java/net/citizensnpcs/trait/waypoint/triggers/TeleportTriggerPrompt.java,neoforge/src/main/java/net/citizensnpcs/trait/waypoint/triggers/TeleportTriggerPrompt.java,source counterpart; behavior unverified
+main/src/main/java/net/citizensnpcs/trait/waypoint/triggers/TriggerAddPrompt.java,neoforge/src/main/java/net/citizensnpcs/trait/waypoint/triggers/TriggerAddPrompt.java,source counterpart; behavior unverified
+main/src/main/java/net/citizensnpcs/trait/waypoint/triggers/TriggerEditPrompt.java,neoforge/src/main/java/net/citizensnpcs/trait/waypoint/triggers/TriggerEditPrompt.java,source counterpart; behavior unverified
+main/src/main/java/net/citizensnpcs/trait/waypoint/triggers/WaypointTrigger.java,neoforge/src/main/java/net/citizensnpcs/trait/waypoint/triggers/WaypointTrigger.java,source counterpart; behavior unverified
+main/src/main/java/net/citizensnpcs/trait/waypoint/triggers/WaypointTriggerPrompt.java,neoforge/src/main/java/net/citizensnpcs/trait/waypoint/triggers/WaypointTriggerPrompt.java,source counterpart; behavior unverified
+main/src/main/java/net/citizensnpcs/trait/waypoint/triggers/WaypointTriggerRegistry.java,neoforge/src/main/java/net/citizensnpcs/trait/waypoint/triggers/WaypointTriggerRegistry.java,source counterpart; behavior unverified
+main/src/main/java/net/citizensnpcs/util/AbstractBlockBreaker.java,,no same-basename source; inspect platform replacement/version applicability
+main/src/main/java/net/citizensnpcs/util/Anchor.java,neoforge/src/main/java/net/citizensnpcs/util/Anchor.java,source counterpart; behavior unverified
+main/src/main/java/net/citizensnpcs/util/ChunkCoord.java,neoforge/src/main/java/net/citizensnpcs/util/ChunkCoord.java,source counterpart; behavior unverified
+main/src/main/java/net/citizensnpcs/util/EmptyChannel.java,neoforge/src/main/java/net/citizensnpcs/util/EmptyChannel.java,source counterpart; behavior unverified
+main/src/main/java/net/citizensnpcs/util/EntityMetadataValue.java,neoforge/src/main/java/net/citizensnpcs/util/EntityMetadataValue.java,source counterpart; behavior unverified
+main/src/main/java/net/citizensnpcs/util/EntityPacketTracker.java,neoforge/src/main/java/net/citizensnpcs/util/EntityPacketTracker.java,source counterpart; behavior unverified
+main/src/main/java/net/citizensnpcs/util/GameProfileWrapper.java,neoforge/src/main/java/net/citizensnpcs/util/GameProfileWrapper.java,source counterpart; behavior unverified
+main/src/main/java/net/citizensnpcs/util/InventoryMultiplexer.java,neoforge/src/main/java/net/citizensnpcs/util/InventoryMultiplexer.java,source counterpart; behavior unverified
+main/src/main/java/net/citizensnpcs/util/Messages.java,neoforge/src/main/java/net/citizensnpcs/util/Messages.java,source counterpart; behavior unverified
+main/src/main/java/net/citizensnpcs/util/MojangSkinGenerator.java,neoforge/src/main/java/net/citizensnpcs/util/MojangSkinGenerator.java,source counterpart; behavior unverified
+main/src/main/java/net/citizensnpcs/util/NMS.java,,no same-basename source; inspect platform replacement/version applicability
+main/src/main/java/net/citizensnpcs/util/NMSBridge.java,,no same-basename source; inspect platform replacement/version applicability
+main/src/main/java/net/citizensnpcs/util/PlayerAnimation.java,neoforge/src/main/java/net/citizensnpcs/util/PlayerAnimation.java,source counterpart; behavior unverified
+main/src/main/java/net/citizensnpcs/util/PlayerUpdateTask.java,,no same-basename source; inspect platform replacement/version applicability
+main/src/main/java/net/citizensnpcs/util/Pose.java,neoforge/src/main/java/net/citizensnpcs/util/Pose.java,source counterpart; behavior unverified
+main/src/main/java/net/citizensnpcs/util/SkinProperty.java,neoforge/src/main/java/net/citizensnpcs/util/SkinProperty.java,source counterpart; behavior unverified
+main/src/main/java/net/citizensnpcs/util/StringHelper.java,neoforge/src/main/java/net/citizensnpcs/util/StringHelper.java,source counterpart; behavior unverified
+main/src/main/java/net/citizensnpcs/util/Util.java,neoforge/src/main/java/net/citizensnpcs/util/Util.java,source counterpart; behavior unverified
+main/src/main/java/net/citizensnpcs/util/XORShiftRNG.java,neoforge/src/main/java/net/citizensnpcs/util/XORShiftRNG.java,source counterpart; behavior unverified

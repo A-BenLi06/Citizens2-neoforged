@@ -1,0 +1,13 @@
+// Opt-in acceptance probes. The normal build remains unchanged.
+// From neoforge/: ./gradlew.bat -I ../tools/audit-tests.gradle test --tests '*LegacyParityAuditTest'
+allprojects {
+    afterEvaluate { project ->
+        if (project.extensions.findByName('neoForge') != null) {
+            project.sourceSets.test.java.setSrcDirs([project.file('../tools/audit-tests')])
+            project.sourceSets.test.compileClasspath += project.sourceSets.dialogue.output
+            project.sourceSets.test.runtimeClasspath += project.sourceSets.dialogue.output
+            project.tasks.named('compileTestJava') { dependsOn 'dialogueClasses' }
+            project.neoForge.unitTest.testedMod = project.neoForge.mods.interactions
+        }
+    }
+}
