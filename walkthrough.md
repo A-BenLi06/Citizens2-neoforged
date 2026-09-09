@@ -23,3 +23,8 @@
 - Connected saved-dialogue predicates to player progress, recheck option requirements at selection, shuffle random-dialogue candidates, and allow choices beyond nine.
 - Resolve Bukkit sound constants against real sound registry paths so note_block underscores survive conversion.
 - Validation: eight dialogue regression tests pass; ordinary test suite and build pass (112 tests). Production data and running server were not changed. This batch addresses state/playback defects; command/service parity and transaction failures remain open in the audit.
+## 2026-09-09 10:27:06 +08:00 — Resolve legacy vanilla command roots
+
+- Normalize a leading slash and Bukkit minecraft: command roots only when the namespaced root is absent and the native root exists. Apply this before dispatch and after alias rewriting; preserve all arguments, item/component namespaces, and registered mod commands.
+- Fixed alias-result tokenization to recognize all whitespace, including tabs.
+- Validation: ten dialogue regression tests pass and build succeeds. This repairs root lookup only; legacy NBT arguments, nested command migration, external command services and action failure propagation remain separate work.

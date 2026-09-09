@@ -163,10 +163,11 @@ public final class Actions {
      *            at operator level, which is what the old plugin did
      */
     private void command(String body, ServerPlayer player, boolean asConsole) {
-        String line = body.trim();
-        if (line.startsWith("/")) {
-            line = line.substring(1);
-        }
+        MinecraftServer server = player.getServer();
+        if (server == null)
+            throw new IllegalStateException("Dialogue player has no server");
+        var root = server.getCommands().getDispatcher().getRoot();
+        String line = LegacyCommand.normalize(body, name -> root.getChild(name) != null);
         String[] parts = line.split("\\s+");
         String head = parts[0].toLowerCase(Locale.ROOT);
         if (head.equals("si") && parts.length >= 3 && parts[1].equalsIgnoreCase("give")) {
@@ -183,12 +184,9 @@ public final class Actions {
             return;
         }
         if (!rewritten.equals(line)) {
-            line = rewritten;
-            parts = line.split("\s+");
+            line = LegacyCommand.normalize(rewritten, name -> root.getChild(name) != null);
+            parts = line.split("\\s+");
         }
-        MinecraftServer server = player.getServer();
-        if (server == null)
-            return;
         CommandSourceStack source = asConsole ? server.createCommandSourceStack()
                 : player.createCommandSourceStack().withPermission(4);
         if (server.getCommands().getDispatcher().getRoot().getChild(parts[0]) == null) {

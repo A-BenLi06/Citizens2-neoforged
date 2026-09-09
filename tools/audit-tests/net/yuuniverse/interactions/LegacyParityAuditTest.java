@@ -38,6 +38,21 @@ public class LegacyParityAuditTest {
     }
 
     @Test
+    void bukkitCommandPrefixDoesNotRewriteItemArguments() {
+        String args = " @s minecraft:paper[minecraft:custom_name='\"minecraft:give\"'] 1";
+        assertEquals("give" + args, LegacyCommand.normalize("/minecraft:give" + args, "give"::equals));
+        assertEquals("setblock\t~ ~ ~ minecraft:stone",
+                LegacyCommand.normalize("minecraft:setblock\t~ ~ ~ minecraft:stone", "setblock"::equals));
+    }
+
+    @Test
+    void registeredNamespacedAndModCommandsKeepTheirIdentity() {
+        assertEquals("minecraft:give @s stone", LegacyCommand.normalize("minecraft:give @s stone", name -> true));
+        assertEquals("other:give @s stone", LegacyCommand.normalize("other:give @s stone", "give"::equals));
+        assertEquals("minecraft:missing", LegacyCommand.normalize("minecraft:missing", name -> false));
+    }
+
+    @Test
     void progressSaveDoesNotEraseExistingCooldownRecords() throws Exception {
         UUID player = UUID.randomUUID();
         Path file = directory.resolve(player + ".yml");
