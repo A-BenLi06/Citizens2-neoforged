@@ -40,13 +40,13 @@ import net.citizensnpcs.trait.DisguiseTrait;
 import net.citizensnpcs.trait.HologramTrait;
 import net.citizensnpcs.trait.HologramTrait.HologramRenderer;
 import net.citizensnpcs.trait.ScoreboardTrait;
+import net.citizensnpcs.trait.SneakTrait;
 import net.citizensnpcs.util.ChunkCoord;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.Display;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
-import net.minecraft.world.entity.Pose;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.Mob;
 import net.neoforged.neoforge.common.NeoForge;
@@ -300,12 +300,7 @@ public class CitizensNPC extends AbstractNPC {
 
     @Override
     public void setSneaking(boolean sneaking) {
-        // TODO(P6): upstream delegates to SneakTrait, which persists the state and reapplies it on respawn
-        Entity entity = getEntity();
-        if (entity != null) {
-            entity.setShiftKeyDown(sneaking);
-            entity.setPose(sneaking ? Pose.CROUCHING : Pose.STANDING);
-        }
+        getOrAddTrait(SneakTrait.class).setSneaking(sneaking);
     }
 
     /**
@@ -695,4 +690,3 @@ public class CitizensNPC extends AbstractNPC {
     /** The metadata key {@code NPCSelector} stores selections under. Kept as a literal so the two stay in step. */
     private static final String SELECTORS_METADATA = "selectors";
 }
-

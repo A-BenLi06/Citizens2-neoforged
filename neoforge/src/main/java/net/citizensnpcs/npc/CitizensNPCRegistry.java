@@ -12,6 +12,9 @@ import com.google.common.collect.Maps;
 
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 import net.citizensnpcs.api.CitizensAPI;
+import net.citizensnpcs.Settings.Setting;
+import net.citizensnpcs.trait.ArmorStandTrait;
+import net.citizensnpcs.trait.LookClose;
 import net.citizensnpcs.api.CitizensPlugin;
 import net.citizensnpcs.api.event.DespawnReason;
 import net.citizensnpcs.api.event.NPCCreateEvent;
@@ -68,7 +71,10 @@ public class CitizensNPCRegistry implements NPCRegistry {
         npcs.put(id, npc);
         uniqueNPCs.put(npc.getUniqueId(), npc);
         NeoForge.EVENT_BUS.post(new NPCCreateEvent(npc));
-        // TODO(P6): upstream attaches ArmorStandTrait for armour stands and LookClose when the setting is on
+        if (type == EntityType.ARMOR_STAND)
+            npc.getOrAddTrait(ArmorStandTrait.class);
+        if (Setting.DEFAULT_LOOK_CLOSE.asBoolean())
+            npc.getOrAddTrait(LookClose.class);
         return npc;
     }
 

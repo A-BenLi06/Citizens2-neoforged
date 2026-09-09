@@ -1,4 +1,5 @@
 [ACTIONAUDIT] COMPLETE 10/10
+[NATIVEAPIAUDIT] COMPLETE 8/8
 [NPCTEST] PASS aec-radius-per-tick
 [NPCTEST] PASS allay-spawned
 [NPCTEST] PASS armadillo-legacy-state-mapped

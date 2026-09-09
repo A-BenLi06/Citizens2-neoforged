@@ -44,3 +44,9 @@
 - Versioned the repaired fixture overlay: wait for both actors with a bounded timeout, assert damage success, compare centre-coordinate displacement, and retain existence assertions. Declared Gradle overlay inputs/outputs so edits actually reach the test world. Added required marker checks that fail the task on missing/failed runtime assertions.
 - Verification: all 107 NPC scenario assertions, 10 dialogue action probes, and 10 new Sentinel probes pass on both NeoForge 21.1.233 and 21.1.248. On 21.1.248, all 15 dialogue regression tests and 112 ordinary tests pass; build succeeds. Verified that release jars exclude runtime probes.
 - Production server/data were not modified. Full modpack/client behavior, remaining Sentinel features, permission/service bridges, and the other audit gates remain open. Read-only Paradigm inspection confirmed its versioned public API exposes permission queries but no primary-group mutation method; an additive alias would not reproduce GroupManager semantics.
+## 2026-09-09 20:46:59 +08:00 — Restore native NPC creation and sneaking API behavior
+
+- Matched upstream registry creation: attach ArmorStandTrait to armor stands and honor the configured DEFAULT_LOOK_CLOSE flag for new NPCs, preserving existing trait instances.
+- Route NPC.setSneaking through SneakTrait so calls made while unspawned persist, apply at spawn, survive respawn, and can be disabled through the same API.
+- Added eight real registry/entity probes using an anonymous in-memory registry. They verify both LookClose defaults, armor-stand attachment, unspawned sneak state, spawn application, serialized data, respawn, and disabling sneak.
+- Validation on NeoForge 21.1.248: all required runtime markers pass (107 NPC scenarios, 10 action probes, 10 Sentinel probes, 8 native API probes); 112 ordinary tests and build pass. Release artifacts contain no runtime audit classes. Production remains unchanged; the full parity goal remains active.
