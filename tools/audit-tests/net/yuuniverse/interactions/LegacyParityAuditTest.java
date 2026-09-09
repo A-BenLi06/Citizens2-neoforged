@@ -53,6 +53,55 @@ public class LegacyParityAuditTest {
     }
 
     @Test
+    void missingRewardIsDiscoveredBeforeAnyPaymentRuns() {
+        var executed = new java.util.ArrayList<String>();
+        assertThrows(IllegalArgumentException.class, () -> ActionBatch.run(java.util.List.of("payment", "missingReward"),
+                action -> {
+                    if (action.equals("missingReward")) throw new IllegalArgumentException("Missing item");
+                    return () -> executed.add(action);
+                }));
+        assertTrue(executed.isEmpty());
+    }
+
+    @Test
+    void failedPaymentStopsRewardsAndLaterActions() {
+        var executed = new java.util.ArrayList<String>();
+        assertThrows(IllegalStateException.class, () -> ActionBatch.run(java.util.List.of("payment", "reward"),
+                action -> () -> {
+                    if (action.equals("payment")) throw new IllegalStateException("Debit rejected");
+                    executed.add(action);
+                }));
+        assertTrue(executed.isEmpty());
+    }
+
+    @Test
+    void overlappingItemCostsAreReservedWithoutChangingTheRealStack() {
+        var stack = new net.minecraft.world.item.ItemStack(net.minecraft.world.item.Items.PAPER, 5);
+        var plan = new CheckItem.PaymentPlan(java.util.List.of(stack));
+        plan.reserve("%checkitem_remove_mat:minecraft:paper,amt:3%");
+        assertThrows(IllegalStateException.class, () -> plan.reserve("%checkitem_matcontains:paper,amt:3%"));
+        assertEquals(5, stack.getCount());
+    }
+
+    @Test
+    void invalidPaymentAmountsDoNotSilentlyBecomeOne() {
+        var plan = new CheckItem.PaymentPlan(java.util.List.of(
+                new net.minecraft.world.item.ItemStack(net.minecraft.world.item.Items.PAPER, 5)));
+        for (String amount : java.util.List.of("0", "-1", "invalid"))
+            assertThrows(IllegalArgumentException.class,
+                    () -> plan.reserve("%checkitem_mat:minecraft:paper,amt:" + amount + "%"));
+    }
+
+    @Test
+    void economyAmountsRespectCurrencyPrecisionWithoutRoundingOrOverflow() {
+        assertEquals(1234, Economy.minorUnits("12.34", 2));
+        assertEquals(12, Economy.minorUnits("12", 0));
+        assertThrows(ArithmeticException.class, () -> Economy.minorUnits("1.001", 2));
+        assertThrows(ArithmeticException.class, () -> Economy.minorUnits("999999999999999999999999", 2));
+        assertThrows(IllegalArgumentException.class, () -> Economy.minorUnits("-1", 2));
+    }
+
+    @Test
     void progressSaveDoesNotEraseExistingCooldownRecords() throws Exception {
         UUID player = UUID.randomUUID();
         Path file = directory.resolve(player + ".yml");

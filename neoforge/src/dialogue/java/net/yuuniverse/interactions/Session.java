@@ -38,6 +38,7 @@ public class Session {
     private boolean awaitingChoice;
     private List<Conversation.Option> offered = new ArrayList<>();
     private boolean finished;
+    private Conversation.Option pendingChoice;
 
     public Session(Engine engine, Conversation conversation, Conversation.Node node, ServerPlayer player, Entity npc) {
         this.engine = engine;
@@ -73,6 +74,25 @@ public class Session {
         if (conversation.slowEffect) {
             player.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SLOWDOWN, 40, 2, false, false, false));
         }
+        if (pendingChoice != null) {
+            Conversation.Option selected = pendingChoice;
+            pendingChoice = null;
+            if (!Conditions.all(selected.requires, player, engine.progress())
+                    || !engine.actions().runAll(selected.actions, player, npcName())) {
+                end(false);
+                return;
+            }
+            Conversation.Node next = conversation.node(selected.startConversation);
+            if (next == null) {
+                end(true);
+                return;
+            }
+            node = next;
+            lineOrder = node.orderedLines(player.getRandom());
+            lineIndex = 0;
+            current = null;
+            ticksOnLine = 0;
+        }
         if (awaitingChoice)
             return;
         if (current == null) {
@@ -82,7 +102,10 @@ public class Session {
             return;
         }
         if (++ticksOnLine >= Math.max(1, (int) Math.round(current.time * 20))) {
-            engine.actions().runAll(current.lastActions, player, npcName());
+            if (!engine.actions().runAll(current.lastActions, player, npcName())) {
+                end(false);
+                return;
+            }
             current = null;
             ticksOnLine = 0;
         }
@@ -118,6 +141,12 @@ public class Session {
     }
 
     private void show(Conversation.Line line) {
+        List<String> wholeLine = new ArrayList<>(line.actions);
+        wholeLine.addAll(line.lastActions);
+        if (!engine.actions().validateAll(wholeLine, player, npcName())) {
+            end(false);
+            return;
+        }
         current = line;
         ticksOnLine = 0;
         for (String raw : line.textOrEmpty()) {
@@ -130,7 +159,10 @@ public class Session {
             message.append(Text.legacy(text));
             player.sendSystemMessage(message);
         }
-        engine.actions().runAll(line.actions, player, npcName());
+        if (!engine.actions().runAll(line.actions, player, npcName())) {
+            end(false);
+            return;
+        }
         if (line.saveToPlayer) {
             engine.progress().markSeen(player.getUUID(), player.getGameProfile().getName(),
                     progressKey(node.key, line.key));
@@ -223,17 +255,8 @@ public class Session {
         if (!Conditions.all(option.requires, player, engine.progress()))
             return false;
         awaitingChoice = false;
-        engine.actions().runAll(option.actions, player, npcName());
-        Conversation.Node next = conversation.node(option.startConversation);
-        if (next == null) {
-            end(true);
-            return true;
-        }
-        node = next;
-        lineOrder = node.orderedLines(player.getRandom());
-        lineIndex = 0;
-        current = null;
-        ticksOnLine = 0;
+        // Execute from tick, outside the /interactions choose command's execution queue.
+        pendingChoice = option;
         return true;
     }
 
@@ -241,6 +264,7 @@ public class Session {
         if (finished)
             return;
         finished = true;
+        pendingChoice = null;
         awaitingChoice = false;
         if (conversation.slowEffect) {
             player.removeEffect(MobEffects.MOVEMENT_SLOWDOWN);

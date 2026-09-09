@@ -35,6 +35,42 @@ public final class CheckItem {
     private CheckItem() {
     }
 
+    /** A private inventory projection catches overlapping costs before any real items are removed. */
+    static final class PaymentPlan {
+        private final java.util.List<ItemStack> remaining;
+
+        PaymentPlan(java.util.List<ItemStack> inventory) {
+            remaining = inventory.stream().map(ItemStack::copy).toList();
+        }
+
+        void reserve(String expansion) {
+            Query query = Query.parse(expansion);
+            if (query == null)
+                throw new IllegalArgumentException("Invalid item payment: " + expansion);
+            long available = remaining.stream().filter(stack -> matches(stack, query))
+                    .mapToLong(ItemStack::getCount).sum();
+            if (available < query.amount)
+                throw new IllegalStateException("Insufficient items for combined dialogue payments");
+            int left = query.amount;
+            for (ItemStack stack : remaining) {
+                if (matches(stack, query)) {
+                    int take = Math.min(left, stack.getCount());
+                    stack.shrink(take);
+                    left -= take;
+                }
+                if (left == 0) break;
+            }
+        }
+    }
+
+    static boolean consume(String expansion, ServerPlayer player) {
+        Query query = Query.parse(expansion);
+        if (query == null || player == null || count(player, query) < query.amount)
+            return false;
+        remove(player, query, query.amount);
+        return true;
+    }
+
     /** @return the expansion's answer: {@code yes} when enough matching items are held, {@code no} otherwise */
     public static String evaluate(String expansion, ServerPlayer player) {
         Query query = Query.parse(expansion);
@@ -195,9 +231,10 @@ public final class CheckItem {
             int amt = rest.lastIndexOf(",amt:");
             if (amt >= 0) {
                 try {
-                    query.amount = Math.max(1, Integer.parseInt(rest.substring(amt + 5).trim()));
+                    query.amount = Integer.parseInt(rest.substring(amt + 5).trim());
+                    if (query.amount <= 0) return null;
                 } catch (NumberFormatException ignored) {
-                    // keep 1
+                    return null;
                 }
                 rest = rest.substring(0, amt);
             }

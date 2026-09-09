@@ -22,17 +22,7 @@ import net.minecraft.world.effect.MobEffect;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.item.ItemStack;
 
-/**
- * Runs the actions a dialogue line carries. The old plugin had exactly seven verbs and this understands all of them.
- * <p>
- * Two of those verbs - {@code console_command} and {@code player_command_as_op} - are escape hatches into whatever else
- * the server had installed, and that is where the migrated data leans hardest: roughly 2859 of those calls are plain
- * vanilla commands that work unchanged, while {@code eco} (2277) and {@code si} (1899) belonged to plugins that do not
- * exist here. Those two are intercepted and served locally - {@code si} from {@link ItemLibrary}, {@code eco} through
- * whatever economy mod is present - so the dialogues keep working rather than failing at the till. Anything else is
- * passed to the server's own dispatcher, and a command that does not exist is reported once rather than silently doing
- * nothing.
- */
+/** Validates dialogue actions before execution and reports failures to the owning session. */
 public final class Actions {
     private static final Logger LOGGER = LoggerFactory.getLogger("interactions");
 
@@ -44,48 +34,70 @@ public final class Actions {
         this.economy = economy;
     }
 
-    public void runAll(List<String> actions, ServerPlayer player, Component npcName) {
-        for (String action : actions) {
-            try {
-                run(action, player, npcName);
-            } catch (Exception ex) {
-                LOGGER.error("Dialogue action failed [{}]: {}", action, ex.toString());
-            }
+    public boolean runAll(List<String> actions, ServerPlayer player, Component npcName) {
+        return process(actions, player, npcName, true);
+    }
+
+    public boolean validateAll(List<String> actions, ServerPlayer player, Component npcName) {
+        return process(actions, player, npcName, false);
+    }
+
+    private boolean process(List<String> actions, ServerPlayer player, Component npcName, boolean execute) {
+        if (actions.isEmpty()) return true;
+        try {
+            var inventory = player.getInventory();
+            var payments = new CheckItem.PaymentPlan(java.util.stream.IntStream.range(0, inventory.getContainerSize())
+                    .mapToObj(inventory::getItem).toList());
+            ActionBatch.run(actions, action -> {
+                run(action, player, npcName, true, payments);
+                return () -> {
+                    if (execute) run(action, player, npcName, false, payments);
+                };
+            });
+            return true;
+        } catch (Exception ex) {
+            LOGGER.error("Dialogue action batch failed for {}: {}", player.getUUID(), actions, ex);
+            player.sendSystemMessage(Component.translatableWithFallback("interactions.action.failed",
+                    "This conversation could not complete an action. Please contact a server administrator."));
+            return false;
         }
     }
 
-    private void run(String raw, ServerPlayer player, Component npcName) {
+    private void run(String raw, ServerPlayer player, Component npcName, boolean validate, CheckItem.PaymentPlan payments) {
         if (raw == null || player == null)
-            return;
+            throw new IllegalArgumentException("Missing action or player");
         String action = Text.placeholders(raw.trim(), player);
         int colon = action.indexOf(':');
         if (colon < 0) {
-            LOGGER.warn("Dialogue action has no verb: {}", raw);
-            return;
+            throw new IllegalArgumentException("Dialogue action has no verb: " + raw);
         }
         String verb = action.substring(0, colon).trim().toLowerCase(Locale.ROOT);
         String body = action.substring(colon + 1).trim();
         switch (verb) {
-            case "playsound" -> playSound(body, player);
-            case "title" -> title(body, player);
-            case "teleport" -> teleport(body, player);
-            case "give_potion_effect" -> potion(body, player);
-            case "remove_item" -> CheckItem.evaluate(body, player);
-            case "console_command" -> command(body, player, true);
-            case "player_command_as_op" -> command(body, player, false);
-            default -> LOGGER.warn("Unknown dialogue action verb \"{}\" in: {}", verb, raw);
+            case "playsound" -> playSound(body, player, validate);
+            case "title" -> { if (!validate) title(body, player); }
+            case "teleport" -> teleport(body, player, validate);
+            case "give_potion_effect" -> potion(body, player, validate);
+            case "remove_item" -> {
+                if (validate) payments.reserve(body);
+                else if (!CheckItem.consume(body, player))
+                    throw new IllegalStateException("Required items unavailable: " + body);
+            }
+            case "console_command" -> command(body, player, true, validate);
+            case "player_command_as_op" -> command(body, player, false, validate);
+            default -> throw new IllegalArgumentException("Unknown dialogue action verb: " + verb);
         }
     }
 
     /** {@code playsound: BLOCK_NOTE_BLOCK_PLING;10;0.1} - a Bukkit Sound name, then volume and pitch. */
-    private void playSound(String body, ServerPlayer player) {
+    private void playSound(String body, ServerPlayer player, boolean validate) {
         List<String> parts = Text.semicolons(body);
         ResourceLocation id = soundId(parts.get(0));
         SoundEvent sound = id == null ? null : BuiltInRegistries.SOUND_EVENT.getOptional(id).orElse(null);
         if (sound == null) {
-            LOGGER.warn("Dialogue asked for sound \"{}\", which does not exist here.", parts.get(0));
-            return;
+            throw new IllegalArgumentException("Unknown dialogue sound: " + parts.get(0));
         }
+        if (validate) return;
         float volume = parts.size() > 1 ? floatOr(parts.get(1), 1) : 1;
         float pitch = parts.size() > 2 ? floatOr(parts.get(2), 1) : 1;
         player.connection.send(new net.minecraft.network.protocol.game.ClientboundSoundPacket(
@@ -118,40 +130,37 @@ public final class Actions {
     }
 
     /** {@code teleport: uDays;1666;86;-545;90;90} - a Bukkit world name, coordinates, then yaw and pitch. */
-    private void teleport(String body, ServerPlayer player) {
+    private void teleport(String body, ServerPlayer player, boolean validate) {
         List<String> parts = Text.semicolons(body);
         if (parts.size() < 4) {
-            LOGGER.warn("Dialogue teleport needs world;x;y;z: {}", body);
-            return;
+            throw new IllegalArgumentException("Dialogue teleport needs world;x;y;z: " + body);
         }
         ServerLevel level = Worlds.resolve(player.getServer(), parts.get(0));
         if (level == null) {
-            LOGGER.warn("Dialogue teleport names world \"{}\", which does not exist here.", parts.get(0));
-            return;
+            throw new IllegalArgumentException("Unknown dialogue world: " + parts.get(0));
         }
         double x = floatOr(parts.get(1), player.getX());
         double y = floatOr(parts.get(2), player.getY());
         double z = floatOr(parts.get(3), player.getZ());
         float yaw = parts.size() > 4 ? floatOr(parts.get(4), player.getYRot()) : player.getYRot();
         float pitch = parts.size() > 5 ? floatOr(parts.get(5), player.getXRot()) : player.getXRot();
-        player.teleportTo(level, x, y, z, yaw, pitch);
+        if (!validate) player.teleportTo(level, x, y, z, yaw, pitch);
     }
 
     /** {@code give_potion_effect: BLINDNESS;30;5;true} - effect, seconds, amplifier, then whether particles hide. */
-    private void potion(String body, ServerPlayer player) {
+    private void potion(String body, ServerPlayer player, boolean validate) {
         List<String> parts = Text.semicolons(body);
         ResourceLocation id = ResourceLocation.tryParse(parts.get(0).trim().toLowerCase(Locale.ROOT).indexOf(':') >= 0
                 ? parts.get(0).trim().toLowerCase(Locale.ROOT)
                 : "minecraft:" + parts.get(0).trim().toLowerCase(Locale.ROOT));
         MobEffect effect = id == null ? null : BuiltInRegistries.MOB_EFFECT.getOptional(id).orElse(null);
         if (effect == null) {
-            LOGGER.warn("Dialogue asked for potion effect \"{}\", which does not exist here.", parts.get(0));
-            return;
+            throw new IllegalArgumentException("Unknown dialogue potion effect: " + parts.get(0));
         }
         int seconds = parts.size() > 1 ? (int) floatOr(parts.get(1), 10) : 10;
         int amplifier = parts.size() > 2 ? (int) floatOr(parts.get(2), 0) : 0;
         boolean hidden = parts.size() > 3 && Boolean.parseBoolean(parts.get(3).trim());
-        player.addEffect(new MobEffectInstance(BuiltInRegistries.MOB_EFFECT.wrapAsHolder(effect), seconds * 20,
+        if (!validate) player.addEffect(new MobEffectInstance(BuiltInRegistries.MOB_EFFECT.wrapAsHolder(effect), seconds * 20,
                 amplifier, false, !hidden, !hidden));
     }
 
@@ -162,7 +171,7 @@ public final class Actions {
      *            true for {@code console_command}; {@code player_command_as_op} runs with the player as the source but
      *            at operator level, which is what the old plugin did
      */
-    private void command(String body, ServerPlayer player, boolean asConsole) {
+    private void command(String body, ServerPlayer player, boolean asConsole, boolean validate) {
         MinecraftServer server = player.getServer();
         if (server == null)
             throw new IllegalStateException("Dialogue player has no server");
@@ -171,17 +180,17 @@ public final class Actions {
         String[] parts = line.split("\\s+");
         String head = parts[0].toLowerCase(Locale.ROOT);
         if (head.equals("si") && parts.length >= 3 && parts[1].equalsIgnoreCase("give")) {
-            giveSavedItem(parts, player);
+            giveSavedItem(parts, player, validate);
             return;
         }
         if (head.equals("eco") || head.equals("balance") || head.equals("money")) {
-            if (economy.handle(parts, player))
+            if (economy.handle(parts, player, validate))
                 return;
         }
-        // a command that belonged to a Bukkit plugin is rewritten, or dropped when it has no equivalent here
+        // A missing bridge must fail preflight before another action consumes payment.
         String rewritten = CommandAliases.rewrite(line, player.getGameProfile().getName());
         if (rewritten.isBlank()) {
-            return;
+            throw new IllegalStateException("Dialogue command has an empty alias: " + line);
         }
         if (!rewritten.equals(line)) {
             line = LegacyCommand.normalize(rewritten, name -> root.getChild(name) != null);
@@ -190,23 +199,41 @@ public final class Actions {
         CommandSourceStack source = asConsole ? server.createCommandSourceStack()
                 : player.createCommandSourceStack().withPermission(4);
         if (server.getCommands().getDispatcher().getRoot().getChild(parts[0]) == null) {
-            LOGGER.warn("Dialogue ran \"{}\", but no such command exists on this server.", parts[0]);
-            return;
+            throw new IllegalArgumentException("Unknown dialogue command: " + parts[0]);
         }
+        var parsed = server.getCommands().getDispatcher().parse(line, source);
+        var error = net.minecraft.commands.Commands.getParseException(parsed);
+        if (error != null)
+            throw new IllegalArgumentException("Invalid dialogue command: " + line, error);
+        if (com.mojang.brigadier.context.ContextChain.tryFlatten(parsed.getContext().build(line)).isEmpty())
+            throw new IllegalArgumentException("Incomplete dialogue command: " + line);
+        if (validate) return;
+        boolean[] outcome = { false, false };
+        source = source.withCallback((success, result) -> {
+            outcome[0] = true;
+            outcome[1] |= success;
+        });
         server.getCommands().performPrefixedCommand(source, line);
+        if (!outcome[0] || !outcome[1])
+            throw new IllegalStateException("Dialogue command did not succeed: " + line);
     }
 
     /** {@code si give <id> <amount> <player> silent} - hand over one of the saved items. */
-    private void giveSavedItem(String[] parts, ServerPlayer player) {
+    private void giveSavedItem(String[] parts, ServerPlayer player, boolean validate) {
         String id = parts[2];
-        int amount = parts.length > 3 ? (int) floatOr(parts[3], 1) : 1;
+        int amount = parts.length > 3 ? Integer.parseInt(parts[3]) : 1;
+        if (amount <= 0)
+            throw new IllegalArgumentException("Saved item amount must be positive");
+        ServerPlayer recipient = parts.length > 4 ? player.getServer().getPlayerList().getPlayerByName(parts[4]) : player;
+        if (recipient == null)
+            throw new IllegalArgumentException("Saved item recipient is not online");
         ItemStack stack = items.get(id, amount);
         if (stack == null) {
-            LOGGER.warn("Dialogue asked for saved item {}, which is not in the item database.", id);
-            return;
+            throw new IllegalArgumentException("Missing saved item: " + id);
         }
-        if (!player.getInventory().add(stack) && !stack.isEmpty()) {
-            player.drop(stack, false);
+        if (validate) return;
+        if (!recipient.getInventory().add(stack) && !stack.isEmpty()) {
+            recipient.drop(stack, false);
         }
     }
 

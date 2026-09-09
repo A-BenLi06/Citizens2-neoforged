@@ -24,8 +24,8 @@ import org.yaml.snakeyaml.Yaml;
  * the mapping is a file: one line per command, edited without touching the mod.
  * <p>
  * A template may use {@code {player}} for the acting player and {@code {1}}, {@code {2}} … for the original command's
- * arguments. An empty value means "ignore this command", for actions that have no equivalent and should stop filling the
- * log. A command with no entry is passed through unchanged, which is right for the ~2859 vanilla calls.
+ * arguments. An empty value marks an unavailable command; action preflight rejects it before payment. A command with
+ * no entry is passed to the server dispatcher after legacy vanilla root normalization.
  */
 public final class CommandAliases {
     private static final Logger LOGGER = LoggerFactory.getLogger("interactions");
@@ -44,8 +44,7 @@ public final class CommandAliases {
     }
 
     /**
-     * @return the command to run instead, or the original when nothing is mapped; an empty string means the call should
-     *         be dropped
+     * @return the command to run instead, or the original when nothing is mapped; an empty string means unavailable
      */
     public static String rewrite(String line, String playerName) {
         String[] parts = line.trim().split("\\s+");
@@ -88,7 +87,7 @@ public final class CommandAliases {
                 dropped.put(name, template);
             }
         });
-        LOGGER.info("{} command alias(es) in effect, {} of them dropping the call.", TEMPLATES.size(), dropped.size());
+        LOGGER.info("{} command alias(es) in effect, {} of them unavailable.", TEMPLATES.size(), dropped.size());
     }
 
     private static void write(File file) {
@@ -97,11 +96,11 @@ public final class CommandAliases {
             writer.println("# What a dialogue command should become on this server.");
             writer.println("#");
             writer.println("# The conversations were written against Bukkit plugins. Vanilla commands (setblock, give,");
-            writer.println("# fill, playsound, tellraw, ...) need no entry - about 2859 of the calls are those and pass");
-            writer.println("# through untouched. Only the plugin-specific names belong here.");
+            writer.println("# fill, playsound, tellraw, ...) normally need no entry. Bukkit minecraft: roots are resolved");
+            writer.println("# against native command roots. Command arguments must match this Minecraft version.");
             writer.println("#");
             writer.println("# {player} is the player in the conversation; {1}, {2}, ... are the original arguments.");
-            writer.println("# An empty value drops the call quietly, for anything with no equivalent here.");
+            writer.println("# An empty value marks a missing service and fails action preflight before payment.");
             writer.println("#");
             writer.println("# manuadd was GroupManager's. The template below is Paradigm's shape but has NOT been");
             writer.println("# verified against a running Paradigm - check it with /paradigm and correct this one line");

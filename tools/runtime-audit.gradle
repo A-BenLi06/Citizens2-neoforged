@@ -1,0 +1,9 @@
+// Opt-in only: run against the isolated audit server, never the production directory.
+allprojects {
+    afterEvaluate { p ->
+        if (p.extensions.findByName('neoForge') != null) {
+            p.sourceSets.dialogue.java.srcDir(p.file('../tools/runtime-audit'))
+            p.neoForge.runs.named('server') { gameDirectory = p.file('../artifacts/audit-server') }
+        }
+    }
+}

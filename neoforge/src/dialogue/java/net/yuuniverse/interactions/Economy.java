@@ -13,21 +13,7 @@ import org.slf4j.LoggerFactory;
 import net.minecraft.server.level.ServerPlayer;
 import net.neoforged.fml.ModList;
 
-/**
- * Serves the {@code eco} command the dialogues use 2277 times, which belonged to EssentialsX, by handing the money to
- * the server's own economy mod.
- * <p>
- * Bound reflectively to {@code net.yuuniverse.economy.api.YuuniverseEconomyApi} so this mod neither compiles nor runs
- * against the economy and keeps working without it. The API takes <em>minor units</em> - the currency's own smallest
- * denomination - while the dialogues were written in whole units, so the amount is scaled by the currency's declared
- * {@code scale} before it is passed on.
- * <p>
- * Every call carries an idempotency key built from the player, the amount and the moment, because the API asks for one:
- * that is what stops a double-fired dialogue action from paying twice.
- * <p>
- * When no economy is reachable the attempt is <em>reported, never faked</em>. A dialogue that appears to pay a player who
- * received nothing, or to charge one who was never charged, is worse than one that logs a failure.
- */
+/** Optional economy API bridge. Amounts use the configured currency precision; failures propagate to the session. */
 public final class Economy {
     private static final Logger LOGGER = LoggerFactory.getLogger("interactions");
     private static final String MOD_ID = "yuuniverse_economy";
@@ -39,7 +25,6 @@ public final class Economy {
     private Method balance;
     private String currencyId;
     private int scale;
-    private boolean warned;
 
     /** Looks for the economy once, at server start. */
     public void install() {
@@ -81,56 +66,74 @@ public final class Economy {
             definition = all == null || all.isEmpty() ? null : all.get(0);
         }
         if (definition == null) {
-            currencyId = "default";
-            scale = 0;
-            return;
+            throw new IllegalStateException("Economy has no configured currency");
         }
         currencyId = String.valueOf(definition.getClass().getMethod("id").invoke(definition));
         Object rawScale = definition.getClass().getMethod("scale").invoke(definition);
         scale = rawScale instanceof Number number ? number.intValue() : 0;
     }
 
-    /**
-     * @return true when the call was dealt with here, so the caller must not pass it to the command dispatcher
-     */
-    public boolean handle(String[] parts, ServerPlayer player) {
-        if (parts.length < 3)
+    /** Validate dependencies and amounts without modifying balances; execution failures propagate to the session. */
+    public boolean handle(String[] parts, ServerPlayer player, boolean validate) {
+        String root = parts[0].toLowerCase(Locale.ROOT);
+        boolean inquiry = root.equals("balance") || root.equals("money");
+        if (!inquiry && !root.equals("eco"))
             return false;
-        String verb = parts[1].toLowerCase(Locale.ROOT);
-        BigDecimal whole;
-        try {
-            whole = new BigDecimal(parts[parts.length - 1].trim());
-        } catch (NumberFormatException ex) {
-            return false;
+        if (api == null)
+            throw new IllegalStateException("Dialogue economy service is unavailable");
+        if (inquiry) {
+            if (parts.length > 2)
+                throw new IllegalArgumentException("Balance expects at most one player");
+            ServerPlayer recipient = recipient(player, parts.length == 2 ? parts[1] : null);
+            try {
+                long minor = ((Number) balance.invoke(api, recipient.getUUID(), currencyId)).longValue();
+                if (!validate)
+                    player.sendSystemMessage(net.minecraft.network.chat.Component.translatableWithFallback(
+                            "interactions.balance", "%s: %s %s", recipient.getGameProfile().getName(),
+                            BigDecimal.valueOf(minor, scale).toPlainString(), currencyId));
+            } catch (ReflectiveOperationException ex) {
+                throw new IllegalStateException("Could not read dialogue balance", ex);
+            }
+            return true;
         }
+        if (parts.length != 4)
+            throw new IllegalArgumentException("Economy action expects eco <give|take|set> <player> <amount>");
+        String verb = parts[1].toLowerCase(Locale.ROOT);
         Method target = switch (verb) {
             case "give", "add", "deposit" -> credit;
             case "take", "remove", "withdraw" -> debit;
             case "set" -> setBalance;
-            default -> null;
+            default -> throw new IllegalArgumentException("Unknown economy operation: " + verb);
         };
-        if (target == null)
-            return false;
-        if (api == null) {
-            if (!warned) {
-                warned = true;
-                LOGGER.warn("A dialogue tried to {} {} for {}, but no economy is wired up - nothing changed hands."
-                        + " Further attempts are not logged.", verb, whole, player.getGameProfile().getName());
-            }
-            return true;
-        }
-        long minorUnits = whole.movePointRight(scale).setScale(0, java.math.RoundingMode.HALF_UP).longValueExact();
-        String key = "interactions:" + player.getUUID() + ":" + verb + ":" + minorUnits + ":"
-                + System.currentTimeMillis();
+        ServerPlayer recipient = recipient(player, parts[2]);
+        long minorUnits = minorUnits(parts[3], scale);
         try {
-            target.invoke(api, player.getUUID(), currencyId, minorUnits, key, "npc-dialogue");
-        } catch (Throwable ex) {
-            LOGGER.error("Economy {} of {} for {} failed: {}", verb, whole, player.getGameProfile().getName(),
-                    ex.getCause() == null ? ex.toString() : ex.getCause().toString());
+            if (target == debit && ((Number) balance.invoke(api, recipient.getUUID(), currencyId)).longValue() < minorUnits)
+                throw new IllegalStateException("Insufficient balance for dialogue payment");
+            if (validate || (minorUnits == 0 && target != setBalance))
+                return true;
+            // Each execution has its own ledger key. No automatic retry is made after an uncertain outcome.
+            target.invoke(api, recipient.getUUID(), currencyId, minorUnits,
+                    "interactions:" + UUID.randomUUID(), "npc-dialogue");
+        } catch (ReflectiveOperationException ex) {
+            throw new IllegalStateException("Dialogue economy operation failed", ex.getCause() == null ? ex : ex.getCause());
         }
         return true;
     }
 
+    static long minorUnits(String raw, int scale) {
+        BigDecimal whole = new BigDecimal(raw);
+        if (whole.signum() < 0)
+            throw new IllegalArgumentException("Economy amount must not be negative");
+        return whole.movePointRight(scale).longValueExact();
+    }
+
+    private static ServerPlayer recipient(ServerPlayer actor, String name) {
+        ServerPlayer recipient = name == null ? actor : actor.getServer().getPlayerList().getPlayerByName(name);
+        if (recipient == null)
+            throw new IllegalArgumentException("Economy recipient is not online: " + name);
+        return recipient;
+    }
     /** @return the player's balance in whole units, or -1 when no economy is reachable */
     public double balanceOf(ServerPlayer player) {
         if (api == null || balance == null)

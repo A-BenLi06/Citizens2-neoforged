@@ -2,7 +2,19 @@
 
 Audit date: 2026-09-08, UTC+08:00. **Acceptance result: FAIL — feature parity and error-free operation are not established.**
 
-This is an audit of the current working tree, the old Arclight plugin snapshot, and the deployed NeoForge installation. It does not replace the production jars or alter either server's configuration, world, player records, permissions, or economy. The changes delivered with this report are audit tools, opt-in acceptance tests, and documentation. The functional defects below remain open.
+This records the initial audit of the working tree, old Arclight plugin snapshot, and deployed NeoForge installation. Production jars and data have not been replaced. The findings below describe the audit baseline; subsequent repairs are tracked separately in the next section and in `walkthrough.md`.
+
+## Repair status — 2026-09-09, UTC+08:00
+
+- `2f7c3ea`: persistent conversation-scoped cooldowns (legacy values are **start timestamps**, not expiry times), lossless player YAML updates, saved-dialogue predicates, randomized dialogue selection, option requirement rechecks, choices beyond nine, and registry-based sound resolution.
+- `ba84774`: Bukkit vanilla command roots resolve against the native dispatcher without rewriting arguments. This does not convert 1.20 NBT or nested commands.
+- Action execution now preflights a complete action list and a line's delayed actions before consuming its immediate payment. Missing saved items, unavailable economy, blank aliases, unknown/incomplete commands, and combined insufficient item costs fail before execution. Runtime failures stop remaining actions and end the session without marking completion. Option actions execute from the server tick so command outcomes are observed outside the selecting command's queue.
+- Saved-item and economy commands respect an explicitly named online recipient; balance queries use the economy API. Currency values must be non-negative and exactly representable at the configured precision. Economy exceptions propagate instead of masquerading as success.
+- Validation: 15 opt-in dialogue regression tests and 10 real dedicated-server action probes pass on NeoForge 21.1.233. The original NPC fixture still reports knockback failures. Full modpack/client acceptance on 21.1.248 remains outstanding.
+
+**Limits:** preflight plus failure propagation is not an atomic transaction spanning inventory, arbitrary commands, and external services. Earlier successful external side effects cannot be rolled back by this batch, and effects across separate dialogue lines are not transactionally grouped. Offline recipients are explicitly rejected rather than redirected to the actor. The economy success path still needs testing with the actual companion mod. The permission, shop, quest, camera, metadata, configuration, native trait-command and other open parity findings remain acceptance gates. No production deployment has been performed.
+
+Run dialogue tests with `-I ../tools/audit-tests.gradle`; run dedicated-server probes with `-I ../tools/runtime-audit.gradle runServer` from `neoforge/`, after preparing the isolated `artifacts/audit-server` fixture. The runtime probe source is added only by that init script and must not be packaged into release jars. Run the normal build afterward to remove the opt-in sources from the outputs.
 
 ## Baselines and evidence
 
