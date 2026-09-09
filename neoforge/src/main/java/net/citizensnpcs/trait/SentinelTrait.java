@@ -28,26 +28,11 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.item.ItemStack;
 
 /**
- * A guard NPC: picks enemies out of the players nearby, chases and fights them, then goes home.
+ * Native melee guard behavior reading Sentinel's persisted fields: targeting, pursuit, retaliation, squad aggro,
+ * respawn, health, regeneration, and greetings. Ranged combat and other unimplemented Sentinel features remain tracked
+ * in the parity audit. Historical projectile counters alone do not establish whether those features are required.
  * <p>
- * This is the subset of the Sentinel <em>plugin</em> that a real server was actually using, reimplemented natively.
- * Sentinel is a separate Bukkit plugin rather than part of Citizens, so it has no NeoForge counterpart at all and its data
- * would otherwise be dead weight in {@code saves.yml}. The trait deliberately reads Sentinel's own key names, so an
- * existing {@code sentinel:} block migrates with no editing — including the {@code stats_*} counters, which are carried
- * through untouched rather than reset.
- * <p>
- * What is implemented is melee guarding: target selection by held item or permission group, chase, attack, retaliation,
- * returning to a spawn point, respawning, squad-wide aggro and greeting/warning text. What is <em>not</em> implemented is
- * everything ranged — arrows, potions, fireballs, snowballs, eggs, skulls, llama spit, shulker bullets, evoker fangs,
- * ender pearls and the ammo bookkeeping that goes with them. That is a deliberate scoping decision, not an oversight: on
- * the server this was written for, every one of those counters was zero across every guard, and only {@code stats_punches}
- * had ever moved.
- * <p>
- * The chase and the attack themselves are not written here — {@code navigator.setTarget(entity, true)} already runs
- * {@code MCTargetStrategy}, which paths to a moving target, respects {@link
- * net.citizensnpcs.api.ai.NavigatorParameters#attackRange} and {@link
- * net.citizensnpcs.api.ai.NavigatorParameters#attackDelayTicks} and swings on cooldown. Sentinel's {@code reach} and
- * {@code attackRate} are mapped onto exactly those two.
+ * Melee movement and attacks use the Citizens navigator, with Sentinel's reach and attackRate mapped to its parameters.
  */
 @TraitName("sentinel")
 public class SentinelTrait extends Trait {
@@ -58,6 +43,8 @@ public class SentinelTrait extends Trait {
     private double chaseRange = 70;
     @Persist("attackRate")
     private int attackRate = 30;
+    @Persist("healRate")
+    private int healRate = 100;
     @Persist
     private double reach = 4.5;
     @Persist
@@ -97,6 +84,7 @@ public class SentinelTrait extends Trait {
     private int greetCooldown;
     private final Map<java.util.UUID, Integer> greeted = new HashMap<>();
     private int respawnCountdown = -1;
+    private long timeSinceHeal;
     /** Compiled once per distinct pattern rather than per player per tick. */
     private final List<Pattern> heldItemPatterns = new ArrayList<>();
     private final Set<String> heldItemRaw = new LinkedHashSet<>();
@@ -188,17 +176,17 @@ public class SentinelTrait extends Trait {
         npc.getNavigator().getDefaultParameters().attackRange(reach).attackDelayTicks(attackRate)
                 .speedModifier((float) speed);
         // -1 means "leave it to the entity", which is Sentinel's convention for damage and armour too
-        if (health > 0 && npc.getEntity() instanceof LivingEntity living) {
-            npc.getOrAddTrait(ScaledMaxHealthTrait.class).setMaxHealth(health);
-            if (living.getHealth() > health) {
-                living.setHealth((float) health);
-            }
+        if (health > 0 && npc.getEntity() instanceof LivingEntity) {
+            ScaledMaxHealthTrait scaled = npc.getOrAddTrait(ScaledMaxHealthTrait.class);
+            scaled.setMaxHealth(health);
+            // Adding the trait to an already spawned NPC called onSpawn before its value was assigned.
+            scaled.onSpawn();
         }
         npc.data().setPersistent(NPC.Metadata.KNOCKBACK, allowKnockback);
-        if (invincible) {
-            // Sentinel's "invincible" is Citizens' protection: nothing can damage it at all
-            npc.data().setPersistent(NPC.Metadata.DEFAULT_PROTECTED, true);
-        }
+        // Sentinel sets protection in both directions, including the default non-invincible guard.
+        npc.data().setPersistent(NPC.Metadata.DEFAULT_PROTECTED, invincible);
+        if (npc.getEntity() != null)
+            npc.getEntity().setInvulnerable(invincible);
     }
 
     /**
@@ -219,6 +207,7 @@ public class SentinelTrait extends Trait {
             tickRespawn();
             return;
         }
+        tickHealing();
         if (target != null && !isStillValid(target)) {
             clearTarget();
         }
@@ -232,6 +221,19 @@ public class SentinelTrait extends Trait {
             }
         }
         greet();
+    }
+
+    private void tickHealing() {
+        timeSinceHeal++;
+        if (healRate <= 0 || timeSinceHeal <= healRate
+                || !(npc.getEntity() instanceof LivingEntity living) || !living.isAlive())
+            return;
+        if (living.getHealth() >= living.getMaxHealth())
+            return;
+        // The old plugin restores one nominal hit point, not one heart. Respect scaled health above vanilla's cap.
+        float amount = health > living.getMaxHealth() ? (float) (living.getMaxHealth() / health) : 1;
+        living.setHealth(Math.min(living.getMaxHealth(), living.getHealth() + amount));
+        timeSinceHeal = 0;
     }
 
     private void tickRespawn() {

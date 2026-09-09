@@ -4,6 +4,31 @@ allprojects {
         if (p.extensions.findByName('neoForge') != null) {
             p.sourceSets.dialogue.java.srcDir(p.file('../tools/runtime-audit'))
             p.neoForge.runs.named('server') { gameDirectory = p.file('../artifacts/audit-server') }
+            p.tasks.named('prepareServerRun') {
+                def fixture = p.file('../artifacts/audit-server/world/datapacks/npctest')
+                inputs.dir(p.file('../tools/runtime-audit-datapack'))
+                outputs.dir(fixture)
+                doLast {
+                    if (!new File(fixture, 'pack.mcmeta').isFile())
+                        throw new GradleException('Prepare the isolated npctest server fixture before running runtime audits')
+                    p.copy {
+                        from p.file('../tools/runtime-audit-datapack')
+                        into fixture
+                    }
+                }
+            }
+            p.tasks.named('runServer') {
+                doLast {
+                    def log = p.file('../artifacts/audit-server/logs/latest.log').getText('UTF-8')
+                    def passed = (log =~ /\[NPCTEST\] PASS ([\w-]+)/).collect { it[1] }.toSet()
+                    def missing = p.file('../tools/runtime-audit-expected.txt').readLines('UTF-8')
+                            .findAll { !it.isBlank() && !log.contains(it) }
+                    if (log.contains('[NPCTEST] FAIL') || log.contains('[ACTIONAUDIT] FAILED')
+                            || log.contains('[SENTINELAUDIT] FAILED') || !missing.isEmpty()) {
+                        throw new GradleException("Runtime audit failed or incomplete: ${passed.size()} NPC assertions, missing ${missing}; inspect isolated logs/latest.log")
+                    }
+                }
+            }
         }
     }
 }
