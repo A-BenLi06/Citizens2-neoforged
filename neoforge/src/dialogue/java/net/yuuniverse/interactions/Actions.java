@@ -98,7 +98,10 @@ public final class Actions {
         String value = bukkitName.trim();
         if (value.indexOf(':') >= 0)
             return ResourceLocation.tryParse(value.toLowerCase(Locale.ROOT));
-        return ResourceLocation.tryParse("minecraft:" + value.toLowerCase(Locale.ROOT).replace('_', '.'));
+        return BuiltInRegistries.SOUND_EVENT.keySet().stream()
+                .filter(id -> id.getNamespace().equals("minecraft")
+                        && id.getPath().replace('.', '_').equalsIgnoreCase(value))
+                .findFirst().orElse(null);
     }
 
     /** {@code title: 20;80;20;&6&lHeader;&fSubtitle} - fade in, stay, fade out, then the two lines. */

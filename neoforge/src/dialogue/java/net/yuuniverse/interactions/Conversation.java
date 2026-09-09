@@ -37,6 +37,10 @@ public class Conversation {
     /** The file this came from, for diagnostics. */
     public String source = "";
 
+    public String id() {
+        return source.endsWith(".yml") ? source.substring(0, source.length() - 4) : source;
+    }
+
     public Node first() {
         return nodes.isEmpty() ? null : nodes.values().iterator().next();
     }
@@ -55,6 +59,16 @@ public class Conversation {
 
         public Node(String key) {
             this.key = key;
+        }
+
+        public List<Line> orderedLines(net.minecraft.util.RandomSource random) {
+            List<Line> ordered = new ArrayList<>(lines);
+            if (randomDialogue) {
+                for (int i = ordered.size() - 1; i > 0; i--) {
+                    Collections.swap(ordered, i, random.nextInt(i + 1));
+                }
+            }
+            return ordered;
         }
     }
 

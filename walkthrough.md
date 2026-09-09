@@ -16,3 +16,10 @@
 - Recorded the pre-existing NeoForge and Interactions implementation before parity repairs. No functional changes in this checkpoint; the untracked dialogue source set and its build wiring are now reviewable independently of subsequent fixes.
 - Existing audit baseline: 112 ordinary tests pass, three dialogue acceptance failures and unresolved knockback fixture failures.
 
+## 2026-09-09 10:25:19 +08:00 — Preserve legacy dialogue state and playback semantics
+
+- Replaced lossy hand-written player YAML with a structured store that preserves unknown fields, dialogue keys and conversation-specific cooldown records. Save via a temporary file and replacement; retain failed writes for retry and refuse to overwrite unreadable records.
+- Verified against the old Interactions bytecode that cooldown values are start timestamps, then restored duration-based checks scoped to each conversation and surviving restart.
+- Connected saved-dialogue predicates to player progress, recheck option requirements at selection, shuffle random-dialogue candidates, and allow choices beyond nine.
+- Resolve Bukkit sound constants against real sound registry paths so note_block underscores survive conversion.
+- Validation: eight dialogue regression tests pass; ordinary test suite and build pass (112 tests). Production data and running server were not changed. This batch addresses state/playback defects; command/service parity and transaction failures remain open in the audit.

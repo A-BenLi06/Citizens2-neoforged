@@ -31,6 +31,7 @@ public class Session {
     private final Engine engine;
 
     private Conversation.Node node;
+    private List<Conversation.Line> lineOrder;
     private int lineIndex;
     private int ticksOnLine;
     private Conversation.Line current;
@@ -44,6 +45,7 @@ public class Session {
         this.node = node;
         this.player = player;
         this.npc = npc;
+        lineOrder = node.orderedLines(player.getRandom());
     }
 
     public boolean isFinished() {
@@ -88,15 +90,15 @@ public class Session {
 
     /** @return true when a line was shown, false when this node has no lines left */
     private boolean advance() {
-        while (lineIndex < node.lines.size()) {
-            Conversation.Line line = resolve(node.lines.get(lineIndex++));
+        while (lineIndex < lineOrder.size()) {
+            Conversation.Line line = resolve(lineOrder.get(lineIndex++));
             if (line == null) {
                 continue;
             }
             show(line);
             if (node.randomDialogue) {
                 // one line of the run, not all of them
-                lineIndex = node.lines.size();
+                lineIndex = lineOrder.size();
             }
             return true;
         }
@@ -109,10 +111,10 @@ public class Session {
      */
     private Conversation.Line resolve(Conversation.Line line) {
         for (Conversation.Line alternative : line.conditional) {
-            if (Conditions.all(alternative.requires, player))
+            if (Conditions.all(alternative.requires, player, engine.progress()))
                 return alternative;
         }
-        return Conditions.all(line.requires, player) ? line : null;
+        return Conditions.all(line.requires, player, engine.progress()) ? line : null;
     }
 
     private void show(Conversation.Line line) {
@@ -145,7 +147,7 @@ public class Session {
     private void offerOptionsOrEnd() {
         offered = new ArrayList<>();
         for (Conversation.Option option : node.options) {
-            if (Conditions.all(option.requires, player)) {
+            if (Conditions.all(option.requires, player, engine.progress())) {
                 offered.add(option);
             }
         }
@@ -218,6 +220,8 @@ public class Session {
         if (!awaitingChoice || oneBased < 1 || oneBased > offered.size())
             return false;
         Conversation.Option option = offered.get(oneBased - 1);
+        if (!Conditions.all(option.requires, player, engine.progress()))
+            return false;
         awaitingChoice = false;
         engine.actions().runAll(option.actions, player, npcName());
         Conversation.Node next = conversation.node(option.startConversation);
@@ -226,6 +230,7 @@ public class Session {
             return true;
         }
         node = next;
+        lineOrder = node.orderedLines(player.getRandom());
         lineIndex = 0;
         current = null;
         ticksOnLine = 0;

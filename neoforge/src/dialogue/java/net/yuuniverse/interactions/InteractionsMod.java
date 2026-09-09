@@ -52,7 +52,6 @@ public class InteractionsMod implements Session.Engine {
     private final Economy economy = new Economy();
     private final ProgressStore progress = new ProgressStore(new File(dataFolder, "players"));
     private final Map<UUID, Session> sessions = new ConcurrentHashMap<>();
-    private final Map<UUID, Long> cooldowns = new HashMap<>();
     private Actions actions;
     private int saveCountdown = 600;
 
@@ -113,15 +112,18 @@ public class InteractionsMod implements Session.Engine {
             return;
         if (sessions.containsKey(player.getUUID()))
             return;
-        Long until = cooldowns.get(player.getUUID());
-        if (until != null && until > System.currentTimeMillis()) {
+        if (!progress.isReadable(player.getUUID())
+                || progress.isCoolingDown(player.getUUID(), conversation.id(), conversation.cooldownSeconds,
+                        System.currentTimeMillis())) {
             return;
         }
         Conversation.Node first = conversation.first();
         if (first == null)
             return;
         if (conversation.cooldownSeconds > 0) {
-            cooldowns.put(player.getUUID(), System.currentTimeMillis() + conversation.cooldownSeconds * 1000L);
+            progress.setCooldown(player.getUUID(), player.getGameProfile().getName(), conversation.id(),
+                    System.currentTimeMillis());
+            progress.saveDirty();
         }
         sessions.put(player.getUUID(), new Session(this, conversation, first, player, npc.getEntity()));
     }
@@ -186,7 +188,7 @@ public class InteractionsMod implements Session.Engine {
     @SubscribeEvent
     public void onRegisterCommands(RegisterCommandsEvent event) {
         LiteralArgumentBuilder<CommandSourceStack> root = Commands.literal("interactions");
-        root.then(Commands.literal("choose").then(Commands.argument("option", IntegerArgumentType.integer(1, 9))
+        root.then(Commands.literal("choose").then(Commands.argument("option", IntegerArgumentType.integer(1))
                 .executes(context -> {
                     ServerPlayer player = context.getSource().getPlayer();
                     Session session = player == null ? null : sessions.get(player.getUUID());

@@ -2,6 +2,7 @@ package net.yuuniverse.interactions;
 
 import java.util.List;
 import java.util.Locale;
+import java.util.function.Function;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -23,16 +24,20 @@ public final class Conditions {
     }
 
     public static boolean all(List<String> requires, ServerPlayer player) {
+        return all(requires, player, null);
+    }
+
+    public static boolean all(List<String> requires, ServerPlayer player, ProgressStore progress) {
         if (requires == null || requires.isEmpty())
             return true;
         for (String require : requires) {
-            if (!holds(require, player))
+            if (!holds(require, value -> resolve(value, player, progress)))
                 return false;
         }
         return true;
     }
 
-    private static boolean holds(String raw, ServerPlayer player) {
+    static boolean holds(String raw, Function<String, String> resolver) {
         if (raw == null)
             return true;
         String expression = raw.trim();
@@ -46,7 +51,7 @@ public final class Conditions {
         }
         String left = expression.substring(0, split).trim();
         String right = expression.substring(split + 2).trim().toLowerCase(Locale.ROOT);
-        String actual = resolve(left, player);
+        String actual = resolver.apply(left);
         if (actual == null) {
             LOGGER.warn("Dialogue condition uses a placeholder this server cannot answer: {}", left);
             return false;
@@ -57,11 +62,16 @@ public final class Conditions {
     /**
      * @return the placeholder's value, or null when this server has no answer for it
      */
-    private static String resolve(String placeholder, ServerPlayer player) {
+    private static String resolve(String placeholder, ServerPlayer player, ProgressStore progress) {
         String body = placeholder.trim();
         if (!body.startsWith("%") || !body.endsWith("%"))
             return body;
         String inner = body.substring(1, body.length() - 1);
+        if (inner.startsWith("interactions_has_dialogue_")) {
+            return player == null || progress == null ? null
+                    : Boolean.toString(progress.hasSeen(player.getUUID(),
+                            inner.substring("interactions_has_dialogue_".length())));
+        }
         if (inner.startsWith("checkitem_")) {
             // asked in its non-removing form on purpose: testing a condition must never consume anything, only the
             // remove_item action may. The migrated files do use the removing spelling inside requires.
