@@ -143,31 +143,35 @@ public class InteractionsMod implements Session.Engine {
         sessions.put(player.getUUID(), new Session(this, conversation, first, player, npc.getEntity()));
     }
 
+    void pollProximity(ServerPlayer player, Iterable<NPC> npcs) {
+        if (sessions.containsKey(player.getUUID())) return;
+        NPC nearest = null;
+        Conversation selected = null;
+        double closest = Double.POSITIVE_INFINITY;
+        for (NPC npc : npcs) {
+            if (!npc.isSpawned() || npc.getEntity().level() != player.level()) continue;
+            Conversation candidate = library.forNpc(npc.getId());
+            if (candidate == null) candidate = library.forNpcName(npc.getName());
+            if (candidate == null) continue;
+            double distance = npc.getEntity().distanceToSqr(player);
+            if (candidate.isWithinStartRadius(distance) && distance < closest) {
+                nearest = npc;
+                selected = candidate;
+                closest = distance;
+            }
+        }
+        if (selected == null) {
+            proximityEntries.remove(player.getUUID());
+        } else if (!selected.id().equals(proximityEntries.put(player.getUUID(), selected.id()))) {
+            startConversation(player, nearest, selected);
+        }
+    }
+
     @SubscribeEvent
     public void onServerTick(ServerTickEvent.Post event) {
         if (actions != null && event.getServer().getTickCount() % 20 == 0) {
             for (ServerPlayer player : event.getServer().getPlayerList().getPlayers()) {
-                if (sessions.containsKey(player.getUUID())) continue;
-                NPC nearest = null;
-                Conversation selected = null;
-                double closest = Double.POSITIVE_INFINITY;
-                for (NPC npc : CitizensAPI.getNPCRegistry()) {
-                    if (!npc.isSpawned() || npc.getEntity().level() != player.level()) continue;
-                    Conversation candidate = library.forNpc(npc.getId());
-                    if (candidate == null) candidate = library.forNpcName(npc.getName());
-                    if (candidate == null) continue;
-                    double distance = npc.getEntity().distanceToSqr(player);
-                    if (candidate.isWithinStartRadius(distance) && distance < closest) {
-                        nearest = npc;
-                        selected = candidate;
-                        closest = distance;
-                    }
-                }
-                if (selected == null) {
-                    proximityEntries.remove(player.getUUID());
-                } else if (!selected.id().equals(proximityEntries.put(player.getUUID(), selected.id()))) {
-                    startConversation(player, nearest, selected);
-                }
+                pollProximity(player, CitizensAPI.getNPCRegistry());
             }
         }
         if (!sessions.isEmpty()) {
