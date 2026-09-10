@@ -29,13 +29,21 @@ public class Conversation {
     public boolean slowEffect;
     public boolean saveProgress;
     public boolean requiresPermission;
-    /** Seconds. 0 means "only when clicked", which is how every migrated file is written. */
+    /** Distance in blocks. Zero disables proximity starts. */
     public double startRadius;
     public double endRadius = 5;
     public int cooldownSeconds;
     public boolean canBeStartedOnAir;
     /** The file this came from, for diagnostics. */
     public String source = "";
+
+    public boolean isWithinStartRadius(double distanceSquared) {
+        return Double.isFinite(startRadius) && startRadius > 0 && distanceSquared <= startRadius * startRadius;
+    }
+
+    public boolean isOutsideEndRadius(double distanceSquared) {
+        return endRadius != 0 && distanceSquared > endRadius * endRadius;
+    }
 
     public String id() {
         return source.endsWith(".yml") ? source.substring(0, source.length() - 4) : source;

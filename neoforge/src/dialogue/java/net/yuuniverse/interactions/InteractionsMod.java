@@ -52,6 +52,7 @@ public class InteractionsMod implements Session.Engine {
     private final Economy economy = new Economy();
     private final ProgressStore progress = new ProgressStore(new File(dataFolder, "players"));
     private final Map<UUID, Session> sessions = new ConcurrentHashMap<>();
+    private final Map<UUID, String> proximityEntries = new HashMap<>();
     private Actions actions;
     private int saveCountdown = 600;
 
@@ -93,6 +94,7 @@ public class InteractionsMod implements Session.Engine {
             session.end(false);
         }
         sessions.clear();
+        proximityEntries.clear();
         progress.saveDirty();
     }
 
@@ -110,7 +112,20 @@ public class InteractionsMod implements Session.Engine {
         }
         if (conversation == null)
             return;
+        startConversation(player, npc, conversation);
+    }
+
+    private void startConversation(ServerPlayer player, NPC npc, Conversation conversation) {
         if (sessions.containsKey(player.getUUID()))
+            return;
+        if (!npc.isSpawned() || npc.getEntity().level() != player.level()
+                || conversation.isOutsideEndRadius(npc.getEntity().distanceToSqr(player)))
+            return;
+        if (conversation.requiresPermission && !net.citizensnpcs.api.util.PermissionUtil.hasPermission(
+                player, "interactions.start." + conversation.id()))
+            return;
+        if (!conversation.canBeStartedOnAir && !player.level().getBlockState(
+                net.minecraft.core.BlockPos.containing(player.getX(), player.getY() - 1, player.getZ())).isSolid())
             return;
         if (!progress.isReadable(player.getUUID())
                 || progress.isCoolingDown(player.getUUID(), conversation.id(), conversation.cooldownSeconds,
@@ -130,6 +145,31 @@ public class InteractionsMod implements Session.Engine {
 
     @SubscribeEvent
     public void onServerTick(ServerTickEvent.Post event) {
+        if (actions != null && event.getServer().getTickCount() % 20 == 0) {
+            for (ServerPlayer player : event.getServer().getPlayerList().getPlayers()) {
+                if (sessions.containsKey(player.getUUID())) continue;
+                NPC nearest = null;
+                Conversation selected = null;
+                double closest = Double.POSITIVE_INFINITY;
+                for (NPC npc : CitizensAPI.getNPCRegistry()) {
+                    if (!npc.isSpawned() || npc.getEntity().level() != player.level()) continue;
+                    Conversation candidate = library.forNpc(npc.getId());
+                    if (candidate == null) candidate = library.forNpcName(npc.getName());
+                    if (candidate == null) continue;
+                    double distance = npc.getEntity().distanceToSqr(player);
+                    if (candidate.isWithinStartRadius(distance) && distance < closest) {
+                        nearest = npc;
+                        selected = candidate;
+                        closest = distance;
+                    }
+                }
+                if (selected == null) {
+                    proximityEntries.remove(player.getUUID());
+                } else if (!selected.id().equals(proximityEntries.put(player.getUUID(), selected.id()))) {
+                    startConversation(player, nearest, selected);
+                }
+            }
+        }
         if (!sessions.isEmpty()) {
             sessions.values().removeIf(session -> {
                 try {
@@ -178,6 +218,7 @@ public class InteractionsMod implements Session.Engine {
 
     @SubscribeEvent
     public void onLogout(PlayerEvent.PlayerLoggedOutEvent event) {
+        proximityEntries.remove(event.getEntity().getUUID());
         Session session = sessions.remove(event.getEntity().getUUID());
         if (session != null) {
             session.end(false);
@@ -203,6 +244,7 @@ public class InteractionsMod implements Session.Engine {
                 session.end(false);
             }
             sessions.clear();
+            proximityEntries.clear();
             progress.saveDirty();
             ItemAliases.load(new File(dataFolder, "item-aliases.yml"));
             CommandAliases.load(new File(dataFolder, "command-aliases.yml"));

@@ -66,7 +66,7 @@ public class Session {
         if (finished)
             return;
         if (npc != null && (npc.isRemoved() || npc.level() != player.level()
-                || npc.distanceTo(player) > conversation.endRadius + 0.5)) {
+                || conversation.isOutsideEndRadius(npc.distanceToSqr(player)))) {
             // walked away: the old plugin ends the conversation rather than talking to nobody
             end(false);
             return;

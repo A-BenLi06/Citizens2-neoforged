@@ -15,6 +15,19 @@ import org.junit.jupiter.api.io.TempDir;
 
 /** Acceptance probes kept separate from the default suite: these expose open parity defects. */
 public class LegacyParityAuditTest {
+    @Test
+    void radiusSettingsMatchLegacyBoundaries() {
+        Conversation story = new Conversation();
+        assertFalse(story.isWithinStartRadius(0));
+        story.startRadius = 3;
+        assertTrue(story.isWithinStartRadius(9));
+        assertFalse(story.isWithinStartRadius(9.001));
+        story.endRadius = 0;
+        assertFalse(story.isOutsideEndRadius(1000000));
+        story.endRadius = 3;
+        assertFalse(story.isOutsideEndRadius(9));
+        assertTrue(story.isOutsideEndRadius(9.001));
+    }
     @BeforeAll
     static void bootstrap() {
         net.minecraft.server.Bootstrap.bootStrap();
