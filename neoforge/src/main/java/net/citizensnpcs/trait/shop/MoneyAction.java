@@ -1,5 +1,6 @@
 package net.citizensnpcs.trait.shop;
 
+import java.math.BigDecimal;
 import java.util.function.Consumer;
 
 import net.citizensnpcs.api.gui.InputMenus;
@@ -39,56 +40,87 @@ public class MoneyAction extends NPCShopAction {
 
     @Override
     public int getMaxRepeats(Entity entity, InventoryMultiplexer inventory) {
-        if (!(entity instanceof ServerPlayer player) || money <= 0)
+        if (!(entity instanceof ServerPlayer player))
             return -1;
         EconomyProvider economy = EconomyProvider.getProvider();
-        return economy == null ? 0 : (int) Math.floor(economy.getBalance(player) / money);
+        return affordableRepeats(economy == null ? -1 : economy.getBalance(player), money);
     }
 
     @Override
     public Transaction grant(NPCShopStorage storage, Entity entity, InventoryMultiplexer inventory, int repeats) {
-        if (money <= 0)
+        if (!Double.isFinite(money) || money < 0 || repeats < 0)
+            return Transaction.fail();
+        if (money == 0 || repeats == 0)
             return Transaction.success();
         if (!(entity instanceof ServerPlayer player))
             return Transaction.fail();
         EconomyProvider economy = EconomyProvider.getProvider();
         if (economy == null)
             return unavailable();
-        double amount = money * repeats;
-        return Transaction.create(() -> storage.isUnlimited() || storage.getBalance() - amount >= 0, () -> {
+        double amount = total(money, repeats);
+        return Transaction.create(() -> storage.isUnlimited() || storage.getBalance() >= amount, () -> {
+            double nextBalance = storage.isUnlimited() ? 0 : adjustBalance(storage.getBalance(), -amount);
             if (economy.deposit(player, amount)) {
-                storage.setBalance(storage.getBalance() - amount);
+                storage.setBalance(nextBalance);
             } else {
                 throw new IllegalStateException("Economy rejected NPC shop deposit of " + amount);
             }
         }, () -> {
+            double nextBalance = storage.isUnlimited() ? 0 : adjustBalance(storage.getBalance(), amount);
             if (!economy.withdraw(player, amount))
                 throw new IllegalStateException("Economy rejected NPC shop deposit rollback of " + amount);
-            storage.setBalance(storage.getBalance() + amount);
+            storage.setBalance(nextBalance);
         });
     }
 
     @Override
     public Transaction take(NPCShopStorage storage, Entity entity, InventoryMultiplexer inventory, int repeats) {
-        if (money <= 0)
+        if (!Double.isFinite(money) || money < 0 || repeats < 0)
+            return Transaction.fail();
+        if (money == 0 || repeats == 0)
             return Transaction.success();
         if (!(entity instanceof ServerPlayer player))
             return Transaction.fail();
         EconomyProvider economy = EconomyProvider.getProvider();
         if (economy == null)
             return unavailable();
-        double amount = money * repeats;
+        double amount = total(money, repeats);
         return Transaction.create(() -> economy.getBalance(player) >= amount, () -> {
+            double nextBalance = storage.isUnlimited() ? 0 : adjustBalance(storage.getBalance(), amount);
             if (economy.withdraw(player, amount)) {
-                storage.setBalance(storage.getBalance() + amount);
+                storage.setBalance(nextBalance);
             } else {
                 throw new IllegalStateException("Economy rejected NPC shop withdrawal of " + amount);
             }
         }, () -> {
+            double nextBalance = storage.isUnlimited() ? 0 : adjustBalance(storage.getBalance(), -amount);
             if (!economy.deposit(player, amount))
                 throw new IllegalStateException("Economy rejected NPC shop payment refund of " + amount);
-            storage.setBalance(storage.getBalance() - amount);
+            storage.setBalance(nextBalance);
         });
+    }
+
+    static double total(double price, int repeats) {
+        return exactDouble(BigDecimal.valueOf(price).multiply(BigDecimal.valueOf(repeats)));
+    }
+
+    static double adjustBalance(double balance, double delta) {
+        return exactDouble(BigDecimal.valueOf(balance).add(BigDecimal.valueOf(delta)));
+    }
+
+    private static double exactDouble(BigDecimal value) {
+        double result = value.doubleValue();
+        if (!Double.isFinite(result) || BigDecimal.valueOf(result).compareTo(value) != 0)
+            throw new IllegalArgumentException("Money amount exceeds the economy provider's numeric range");
+        return result;
+    }
+
+    static int affordableRepeats(double balance, double price) {
+        if (!Double.isFinite(price) || price < 0) return 0;
+        if (price == 0) return -1;
+        if (!Double.isFinite(balance) || balance < 0) return 0;
+        return BigDecimal.valueOf(balance).divideToIntegralValue(BigDecimal.valueOf(price))
+                .min(BigDecimal.valueOf(Integer.MAX_VALUE)).intValueExact();
     }
 
     /** No economy is installed, so a money cost cannot be met - and must not be waived. */
@@ -114,7 +146,7 @@ public class MoneyAction extends NPCShopAction {
             return InputMenus.filteredStringSetter(() -> Double.toString(action.money), input -> {
                 try {
                     double result = Double.parseDouble(input);
-                    if (result < 0)
+                    if (!Double.isFinite(result) || result < 0)
                         return false;
                     action.money = result;
                 } catch (NumberFormatException ex) {

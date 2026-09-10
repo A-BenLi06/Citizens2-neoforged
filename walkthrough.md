@@ -68,3 +68,12 @@
 - Verified public method signatures against the production Economy 0.4.1 jar without modifying production. Added three regression tests covering configured precision, reflected credit/debit/balance calls, unique keys, formatting, rejected writes, zero-value operations, and unavailable balance lookup.
 - Validation on NeoForge 21.1.248: 120 ordinary tests pass and final build succeeds. The isolated server without the optional economy mod passes all 107 NPC assertions and 36 runtime probes. Release jars exclude audit probes.
 - Remaining acceptance: run with the real economy mod and isolated ledger to verify service lifecycle, frozen/missing accounts, successful payments, refunds, and persistence. This change does not establish complete integration or full Citizens/plugin parity. Production remains unchanged.
+
+## 2026-09-10 09:59:05 +08:00 — Preserve decimal NPC prices in batch purchases and refunds
+
+- Replaced binary floating-point multiplication/division in MoneyAction with decimal arithmetic. Prices such as 0.1 repeated three times now produce 0.3, and a balance of 0.3 can afford three purchases at 0.1.
+- Apply decimal addition/subtraction to finite shop balances so compensation restores the original decimal value. Validate that the resulting amount is representable by the double-based EconomyProvider before calling the external mutation; do not round large unrepresentable balances or mutate the wallet before detecting accounting overflow.
+- Reject negative or non-finite persisted prices and negative repeat counts; reject non-finite editor input. Keep zero-cost actions valid and unavailable economy balances unaffordable.
+- Added four regression tests for repeated decimal prices, affordability boundaries, compensation arithmetic, numeric range failures and invalid action configuration.
+- Validation on NeoForge 21.1.248: 124 tests pass, final build succeeds, and the isolated server passes all 107 NPC assertions and 36 runtime probes. Release jars contain no runtime probes. Logs: artifacts/repair-money-final248.log and artifacts/repair-money-arithmetic-runtime248.log.
+- Real-economy ledger integration acceptance and the other full parity gates remain open. Production was not modified.
