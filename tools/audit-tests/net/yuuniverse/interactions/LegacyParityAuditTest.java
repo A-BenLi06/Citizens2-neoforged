@@ -16,6 +16,29 @@ import org.junit.jupiter.api.io.TempDir;
 /** Acceptance probes kept separate from the default suite: these expose open parity defects. */
 public class LegacyParityAuditTest {
     @Test
+    void globalSettingsDefaultToLegacyRestrictions() {
+        assertEquals(DialogueSettings.DEFAULT,
+                DialogueSettings.load(directory.resolve("missing.yml").toFile(), new DialogueSettings(true, true)));
+    }
+
+    @Test
+    void globalSettingsLoadWithoutRewritingUnknownFields() throws Exception {
+        Path file = directory.resolve("config.yml");
+        String contents = "allow_chat_while_in_conversation: true\nallow_mob_damage: false\nunknown_setting: retained\n";
+        Files.writeString(file, contents);
+        assertEquals(new DialogueSettings(true, false), DialogueSettings.load(file.toFile(), DialogueSettings.DEFAULT));
+        assertEquals(contents, Files.readString(file));
+    }
+
+    @Test
+    void invalidGlobalSettingsRetainPreviousSnapshot() throws Exception {
+        Path file = directory.resolve("config.yml");
+        Files.writeString(file, "allow_chat_while_in_conversation: false\nallow_mob_damage: invalid\n");
+        DialogueSettings previous = new DialogueSettings(true, true);
+        assertEquals(previous, DialogueSettings.load(file.toFile(), previous));
+    }
+
+    @Test
     void radiusSettingsMatchLegacyBoundaries() {
         Conversation story = new Conversation();
         assertFalse(story.isWithinStartRadius(0));

@@ -54,6 +54,7 @@ public class InteractionsMod implements Session.Engine {
     private final Map<UUID, Session> sessions = new ConcurrentHashMap<>();
     private final Map<UUID, String> proximityEntries = new HashMap<>();
     private Actions actions;
+    private DialogueSettings settings = DialogueSettings.DEFAULT;
     private int saveCountdown = 600;
 
     public InteractionsMod() {
@@ -72,6 +73,7 @@ public class InteractionsMod implements Session.Engine {
 
     @SubscribeEvent
     public void onServerStarted(ServerStartedEvent event) {
+        settings = DialogueSettings.load(new File(dataFolder, "config.yml"), settings);
         dataFolder.mkdirs();
         new File(dataFolder, "conversations").mkdirs();
         new File(dataFolder, "players").mkdirs();
@@ -141,6 +143,20 @@ public class InteractionsMod implements Session.Engine {
             progress.saveDirty();
         }
         sessions.put(player.getUUID(), new Session(this, conversation, first, player, npc.getEntity()));
+        if (!settings.allowMobDamage()) {
+            for (var mob : player.serverLevel().getEntitiesOfClass(net.minecraft.world.entity.Mob.class,
+                    new net.minecraft.world.phys.AABB(player.position(), player.position()).inflate(30),
+                    mob -> mob.getTarget() == player)) {
+                mob.setTarget(null);
+            }
+        }
+    }
+
+    @SubscribeEvent
+    public void onTarget(net.neoforged.neoforge.event.entity.living.LivingChangeTargetEvent event) {
+        if (settings.allowMobDamage() || event.getNewAboutToBeSetTarget() == null) return;
+        Session session = sessions.get(event.getNewAboutToBeSetTarget().getUUID());
+        if (session != null && !session.isFinished()) event.setCanceled(true);
     }
 
     void pollProximity(ServerPlayer player, Iterable<NPC> npcs) {
@@ -193,12 +209,7 @@ public class InteractionsMod implements Session.Engine {
     }
 
     /**
-     * Takes the player's chat while a conversation is running.
-     * <p>
-     * This is the half the click-only version was missing: a player answers a prompt by typing, and without this their
-     * answer goes out as a public chat message while the dialogue keeps waiting. The old plugin suppressed chat outright
-     * during a conversation ({@code allow_chat_while_in_conversation: false}), so taking the message is also what that
-     * server behaved like.
+     * Keeps dialogue answers private and applies the global chat setting to other messages.
      */
     @SubscribeEvent
     public void onChat(ServerChatEvent event) {
@@ -207,17 +218,19 @@ public class InteractionsMod implements Session.Engine {
             return;
         String typed = event.getRawText().trim();
         if (!session.isAwaitingChoice()) {
-            // mid-line: the message is still swallowed rather than shouted, but there is nothing to answer yet
-            event.setCanceled(true);
+            // Ordinary chat follows the global setting; valid answers remain private.
+            if (!settings.allowChat()) event.setCanceled(true);
             return;
         }
         if (session.chooseByText(typed)) {
             event.setCanceled(true);
             return;
         }
+        if (settings.allowChat()) return;
         event.setCanceled(true);
-        event.getPlayer().sendSystemMessage(Component.literal(" 请输入 1-" + session.offeredCount()
-                + " 之间的编号,或点击上面的选项。").withStyle(net.minecraft.ChatFormatting.YELLOW));
+        event.getPlayer().sendSystemMessage(Component.translatableWithFallback("interactions.choice.invalid",
+                "Enter a number from 1 to %s, or click an option.", session.offeredCount())
+                .withStyle(net.minecraft.ChatFormatting.YELLOW));
     }
 
     @SubscribeEvent
@@ -243,6 +256,7 @@ public class InteractionsMod implements Session.Engine {
                     return 1;
                 })));
         root.then(Commands.literal("reload").requires(source -> source.hasPermission(3)).executes(context -> {
+            settings = DialogueSettings.load(new File(dataFolder, "config.yml"), settings);
             MinecraftServer server = context.getSource().getServer();
             for (Session session : sessions.values()) {
                 session.end(false);

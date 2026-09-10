@@ -118,3 +118,11 @@
 - Corrected two fixture assumptions discovered by execution: FakePlayer intentionally refuses riding, and mounting ServerPlayer requires acknowledging the vanilla teleport before sending movement. Prior failed runs are excluded; the successful run proves the new hook executes via rotation and post-release movement checks.
 - Validation on NeoForge 21.1.248: all 107 NPC assertions and 61 runtime probes pass; 124 ordinary tests and final build pass. Release jars exclude runtime probes. Logs: artifacts/repair-vehicle-acceptance248.log and artifacts/repair-vehicle-final248.log.
 - Still open: noncontrolling passengers, modded vehicle behavior, connected-client visuals and camera/selection controls, along with other full parity gates. Production was not modified.
+
+## 2026-09-11 01:20:59 +08:00 — Restore legacy dialogue chat and mob-target settings
+
+- Read allow_chat_while_in_conversation and allow_mob_damage from the existing Interactions config.yml at startup and reload. Missing keys use legacy false defaults; malformed reloads retain the previous complete snapshot. Unknown settings are preserved because loading never rewrites the file.
+- Ordinary chat follows the configured policy while valid dialogue answers remain private. With mob targeting disabled, starting a conversation clears nearby mobs targeting that player and the NeoForge target-change event blocks new targets until the session finishes. This is target suppression, not damage immunity, matching the inspected legacy behavior.
+- Added three settings tests (19 dialogue audit tests pass) and four controller/event probes covering chat denial/allowance and actual Mob.setTarget denial/allowance. All 107 NPC assertions and 65 runtime probes pass on NeoForge 21.1.248. Evidence: artifacts/repair-global-settings-tests248.log and artifacts/repair-global-settings-runtime248.log.
+- Initial nearby-target clearing, connected-client chat display, command/inventory restrictions, camera controls and complete modpack parity still need further acceptance. No production files were changed.
+- Final validation: 124 ordinary tests and normal build pass; all release jars exclude runtime audit classes. Evidence: artifacts/repair-global-settings-final248.log.
