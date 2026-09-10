@@ -108,3 +108,4 @@
 [NPCTEST] PASS wither-bossbar-spawned
 [NPCTEST] PASS wolf-collar-and-breed
 [SENTINELAUDIT] COMPLETE 10/10
+[SHOPAUDIT] COMPLETE 8/8

@@ -287,7 +287,8 @@ public class CommandTrait extends Trait {
         Transaction global = chargeGlobalCommandCosts(player, hand);
         if (!global.isPossible())
             return;
-        global.run();
+        if (!runCharge(global))
+            return;
 
         Runnable task = new Runnable() {
             boolean failedCharge;
@@ -344,6 +345,8 @@ public class CommandTrait extends Trait {
 
             private void runCommand(ServerPlayer player, Hand hand, NPCCommand command) {
                 Runnable runnable = () -> {
+                    if (failedCharge)
+                        return;
                     PlayerNPCCommand info = playerTracking.get(player.getUUID());
                     if (info == null && (executionMode == ExecutionMode.SEQUENTIAL
                             || PlayerNPCCommand.requiresTracking(command))) {
@@ -361,7 +364,10 @@ public class CommandTrait extends Trait {
                         return;
 
                     if (!failedCharge) {
-                        charge.run();
+                        if (!runCharge(charge)) {
+                            failedCharge = true;
+                            return;
+                        }
                     }
                     if (!temporaryPermissions.isEmpty()) {
                         PermissionUtil.Attachment attachment = PermissionUtil.grantTemporary(player,
@@ -389,6 +395,16 @@ public class CommandTrait extends Trait {
 
     public double getCost() {
         return cost;
+    }
+
+    private static boolean runCharge(Transaction charge) {
+        try {
+            charge.run();
+            return true;
+        } catch (RuntimeException failure) {
+            org.slf4j.LoggerFactory.getLogger(CommandTrait.class).error("NPC command payment failed", failure);
+            return false;
+        }
     }
 
     public ExecutionMode getExecutionMode() {

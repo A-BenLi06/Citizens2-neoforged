@@ -50,3 +50,12 @@
 - Route NPC.setSneaking through SneakTrait so calls made while unspawned persist, apply at spawn, survive respawn, and can be disabled through the same API.
 - Added eight real registry/entity probes using an anonymous in-memory registry. They verify both LookClose defaults, armor-stand attachment, unspawned sneak state, spawn application, serialized data, respawn, and disabling sneak.
 - Validation on NeoForge 21.1.248: all required runtime markers pass (107 NPC scenarios, 10 action probes, 10 Sentinel probes, 8 native API probes); 112 ordinary tests and build pass. Release artifacts contain no runtime audit classes. Production remains unchanged; the full parity goal remains active.
+
+## 2026-09-10 09:50:09 +08:00 — Abort rejected native shop payments and compensate completed transactions
+
+- MoneyAction now reports rejected deposits and withdrawals as execution failures. Successful compensation restores both the player wallet and the finite shop balance; rejected compensation leaves accounting unchanged and is logged for reconciliation.
+- Composed costs recheck each part immediately before execution, abort subsequent actions on failure, and undo completed actions in reverse order. Refund failures do not prevent other refunds, and preserve the original execution exception. Completed compensation is cleared to prevent duplicate refunds.
+- Native shop purchases catch action failures, undo completed rewards and costs, and do not count failed purchases. NPC command charges stop on execution failure; already queued commands also stop after an earlier charge failure.
+- Added five transaction regression tests and eight isolated dedicated-server shop probes using a controllable economy provider and synthetic reward action through the actual shop click path. They cover debit/credit accounting, both compensation directions, rejected payment, rejected refund, unavailable reward, and successful purchase.
+- Validation on NeoForge 21.1.248: 117 ordinary tests pass; build succeeds; 107 NPC assertions and all 36 runtime probes pass. Release jars contain no runtime audit classes. Logs: artifacts/repair-shop-runtime248.log and artifacts/repair-shop-final248.log.
+- Limits: external providers must accurately report whether mutations succeeded. Compensation is best effort, not a durable cross-service atomic transaction; failed refunds require reconciliation. The real Yuuniverse economy provider bridge, delayed command acceptance coverage, and remaining parity gates are still open. Production remains unchanged.

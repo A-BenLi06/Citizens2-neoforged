@@ -107,16 +107,29 @@ public class NPCShopItem implements Cloneable {
      */
     private List<Transaction> apply(List<NPCShopAction> actions, Function<NPCShopAction, Transaction> func) {
         List<Transaction> pending = new ArrayList<>();
-        for (NPCShopAction action : actions) {
-            Transaction take = func.apply(action);
-            if (!take.isPossible()) {
-                pending.forEach(Transaction::rollback);
-                return null;
+        try {
+            for (NPCShopAction action : actions) {
+                Transaction take = func.apply(action);
+                if (!take.isPossible()) {
+                    rollback(pending);
+                    return null;
+                }
+                take.run();
+                pending.add(take);
             }
-            take.run();
-            pending.add(take);
+        } catch (RuntimeException failure) {
+            rollback(pending);
+            org.slf4j.LoggerFactory.getLogger(NPCShopItem.class).error("NPC shop transaction failed", failure);
+            return null;
         }
         return pending;
+    }
+
+    private static void rollback(List<Transaction> completed) {
+        try { Transaction.rollbackAll(completed); }
+        catch (RuntimeException failure) {
+            org.slf4j.LoggerFactory.getLogger(NPCShopItem.class).error("NPC shop refund failed; manual reconciliation required", failure);
+        }
     }
 
     private void changeAction(List<NPCShopAction> source, Function<NPCShopAction, Boolean> filter,
@@ -258,7 +271,7 @@ public class NPCShopItem implements Cloneable {
             return;
         }
         if (apply(result, action -> action.grant(storage, player, inventory, repeats)) == null) {
-            take.forEach(Transaction::rollback);
+            rollback(take);
             return;
         }
         if (resultMessage != null) {

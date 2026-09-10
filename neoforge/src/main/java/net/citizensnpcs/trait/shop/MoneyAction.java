@@ -59,9 +59,13 @@ public class MoneyAction extends NPCShopAction {
             if (economy.deposit(player, amount)) {
                 storage.setBalance(storage.getBalance() - amount);
             } else {
-                Messaging.severe("Failed to deposit", amount, "in an NPC shop");
+                throw new IllegalStateException("Economy rejected NPC shop deposit of " + amount);
             }
-        }, () -> economy.withdraw(player, amount));
+        }, () -> {
+            if (!economy.withdraw(player, amount))
+                throw new IllegalStateException("Economy rejected NPC shop deposit rollback of " + amount);
+            storage.setBalance(storage.getBalance() + amount);
+        });
     }
 
     @Override
@@ -78,9 +82,13 @@ public class MoneyAction extends NPCShopAction {
             if (economy.withdraw(player, amount)) {
                 storage.setBalance(storage.getBalance() + amount);
             } else {
-                Messaging.severe("Failed to withdraw", amount, "in an NPC shop");
+                throw new IllegalStateException("Economy rejected NPC shop withdrawal of " + amount);
             }
-        }, () -> economy.deposit(player, amount));
+        }, () -> {
+            if (!economy.deposit(player, amount))
+                throw new IllegalStateException("Economy rejected NPC shop payment refund of " + amount);
+            storage.setBalance(storage.getBalance() - amount);
+        });
     }
 
     /** No economy is installed, so a money cost cannot be met - and must not be waived. */

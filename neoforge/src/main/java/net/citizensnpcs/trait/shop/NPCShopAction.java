@@ -89,12 +89,47 @@ public abstract class NPCShopAction implements Cloneable {
             execute.run();
         }
 
-        /** All-or-nothing: possible only if every part is, and running it runs all of them. */
+        /** Runs parts in order and attempts to undo completed parts if a later part fails. */
         public static Transaction compose(Collection<Transaction> txn) {
             if (txn.isEmpty())
                 return success();
-            return create(() -> txn.stream().allMatch(t -> t == null || t.isPossible()),
-                    () -> txn.forEach(Transaction::run), () -> txn.forEach(Transaction::rollback));
+            List<Transaction> parts = txn.stream().filter(java.util.Objects::nonNull).toList();
+            List<Transaction> completed = new ArrayList<>();
+            return create(() -> parts.stream().allMatch(Transaction::isPossible), () -> {
+                completed.clear();
+                try {
+                    for (Transaction part : parts) {
+                        if (!part.isPossible())
+                            throw new IllegalStateException("Shop transaction became unavailable");
+                        part.run();
+                        completed.add(part);
+                    }
+                } catch (RuntimeException failure) {
+                    try { rollbackAll(completed); }
+                    catch (RuntimeException undoFailure) { failure.addSuppressed(undoFailure); }
+                    completed.clear();
+                    throw failure;
+                }
+            }, () -> {
+                try {
+                    rollbackAll(completed);
+                } finally {
+                    completed.clear();
+                }
+            });
+        }
+
+        /** Undo completed changes in reverse order, attempting all refunds even when one fails. */
+        public static void rollbackAll(List<Transaction> completed) {
+            RuntimeException failure = null;
+            for (int i = completed.size() - 1; i >= 0; i--) {
+                try { completed.get(i).rollback(); }
+                catch (RuntimeException ex) {
+                    if (failure == null) failure = ex;
+                    else failure.addSuppressed(ex);
+                }
+            }
+            if (failure != null) throw failure;
         }
 
         public static Transaction compose(Transaction... txn) {
