@@ -2,6 +2,9 @@ modLoader = "javafml"
 loaderVersion = "[4,)"
 license = "OSL-3.0"
 
+[[mixins]]
+config = "interactions.mixins.json"
+
 [[mods]]
 modId = "interactions"
 version = "${file.jarVersion}"

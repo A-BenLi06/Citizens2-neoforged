@@ -47,6 +47,7 @@ public class Session {
         this.player = player;
         this.npc = npc;
         lineOrder = node.orderedLines(player.getRandom());
+        DialogueMovement.begin(this);
     }
 
     public boolean isFinished() {
@@ -264,6 +265,7 @@ public class Session {
         if (finished)
             return;
         finished = true;
+        DialogueMovement.end(this);
         pendingChoice = null;
         awaitingChoice = false;
         if (conversation.slowEffect) {
