@@ -77,3 +77,12 @@
 - Added four regression tests for repeated decimal prices, affordability boundaries, compensation arithmetic, numeric range failures and invalid action configuration.
 - Validation on NeoForge 21.1.248: 124 tests pass, final build succeeds, and the isolated server passes all 107 NPC assertions and 36 runtime probes. Release jars contain no runtime probes. Logs: artifacts/repair-money-final248.log and artifacts/repair-money-arithmetic-runtime248.log.
 - Real-economy ledger integration acceptance and the other full parity gates remain open. Production was not modified.
+
+## 2026-09-10 10:03:13 +08:00 — Verify native NPC money against the real Economy ledger and restart
+
+- Added a separate opt-in server fixture using the actual production-version Economy 0.4.1 jar, a fresh audit currency and SQLite ledger, and loopback port 25579. Production files were read only to copy the jar; the production world/database were never used for writes.
+- Ten first-pass checks verify native provider installation, initial balance, exact batch affordability/debit, refund of wallet and finite till, insufficient funds, excess precision, frozen accounts, missing accounts, and the saved final balance. All pass on NeoForge 21.1.248.
+- A second server process reloads the same isolated ledger and verifies the provider is installed and the final 9.7 balance survived shutdown/restart. Both runtime Gradle tasks require explicit success markers and fail on probe errors.
+- Added a fixture preparation script and reproducible commands. The fixture account is intentionally reset only by the first audit pass; the verification pass reads it. Existing fixture worlds/configs are preserved by preparation.
+- Final normal build and 124 regression tests pass; release jars exclude runtime probes. Recorded the narrowed real-mod acceptance evidence in the parity report without marking the overall audit complete.
+- No additional product-code defect was reproduced in these ledger paths. Dialogue economy success, full native command/UI entry points, all remaining plugin parity gates, and full modpack/client acceptance remain outstanding.
