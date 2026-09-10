@@ -16,6 +16,29 @@ import org.junit.jupiter.api.io.TempDir;
 /** Acceptance probes kept separate from the default suite: these expose open parity defects. */
 public class LegacyParityAuditTest {
     @Test
+    void commandRestrictionsPreserveLegacyPrefixesAndDialogueControls() throws Exception {
+        Path file = directory.resolve("commands.yml");
+        Files.writeString(file, "allow_commands_while_in_conversation: false\ncommands_whitelist: ['/help', '/login']\n");
+        var settings = DialogueSettings.load(file.toFile(), DialogueSettings.DEFAULT);
+        assertTrue(settings.permitsCommand("HELP topic"));
+        assertTrue(settings.permitsCommand("login password"));
+        assertTrue(settings.permitsCommand("helper")); // Legacy whitelist uses prefix matching, not command roots.
+        assertTrue(settings.permitsCommand("interactions choose 2"));
+        assertFalse(settings.permitsCommand("interactions reload"));
+        assertFalse(settings.permitsCommand("execute run help"));
+        assertFalse(settings.permitsCommand("interactions chooseother"));
+        assertTrue(new DialogueSettings(false, false, true, java.util.List.of()).permitsCommand("anything"));
+    }
+
+    @Test
+    void malformedCommandWhitelistRetainsSettings() throws Exception {
+        Path file = directory.resolve("commands.yml");
+        Files.writeString(file, "commands_whitelist: [3]\n");
+        var previous = new DialogueSettings(true, true, true, java.util.List.of("/help"));
+        assertEquals(previous, DialogueSettings.load(file.toFile(), previous));
+    }
+
+    @Test
     void globalSettingsDefaultToLegacyRestrictions() {
         assertEquals(DialogueSettings.DEFAULT,
                 DialogueSettings.load(directory.resolve("missing.yml").toFile(), new DialogueSettings(true, true)));

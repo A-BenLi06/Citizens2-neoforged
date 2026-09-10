@@ -67,6 +67,9 @@ public class InteractionsMod implements Session.Engine {
     }
 
     @Override
+    public DialogueSettings settings() { return settings; }
+
+    @Override
     public ProgressStore progress() {
         return progress;
     }

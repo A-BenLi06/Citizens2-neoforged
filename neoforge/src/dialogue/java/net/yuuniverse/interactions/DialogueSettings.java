@@ -4,20 +4,43 @@ import java.io.File;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.util.Map;
+import java.util.List;
+import java.util.Locale;
 import org.slf4j.LoggerFactory;
 import org.yaml.snakeyaml.LoaderOptions;
 import org.yaml.snakeyaml.Yaml;
 
 /** Reads supported legacy global settings without rewriting unknown settings. */
-public record DialogueSettings(boolean allowChat, boolean allowMobDamage) {
+public record DialogueSettings(boolean allowChat, boolean allowMobDamage, boolean allowCommands,
+        List<String> commandsWhitelist) {
     public static final DialogueSettings DEFAULT = new DialogueSettings(false, false);
+
+    public DialogueSettings(boolean allowChat, boolean allowMobDamage) {
+        this(allowChat, allowMobDamage, false, List.of());
+    }
+
+    public DialogueSettings {
+        commandsWhitelist = List.copyOf(commandsWhitelist);
+    }
+
+    public boolean permitsCommand(String command) {
+        if (allowCommands) return true;
+        // This command carries dialogue option clicks, which must remain usable while commands are restricted.
+        if (command.equals("interactions choose") || command.startsWith("interactions choose ")) return true;
+        String legacyInput = "/" + command.toLowerCase(Locale.ROOT);
+        return commandsWhitelist.stream().anyMatch(legacyInput::startsWith);
+    }
 
     public static DialogueSettings load(File file, DialogueSettings previous) {
         if (!file.exists()) return DEFAULT;
         try (var reader = Files.newBufferedReader(file.toPath(), StandardCharsets.UTF_8)) {
             Object data = new Yaml(new LoaderOptions()).load(reader);
             if (!(data instanceof Map<?, ?> values)) throw new IllegalArgumentException("Expected a settings map");
-            return new DialogueSettings(flag(values, "allow_chat_while_in_conversation"), flag(values, "allow_mob_damage"));
+            Object whitelist = values.containsKey("commands_whitelist") ? values.get("commands_whitelist") : List.of();
+            if (!(whitelist instanceof List<?> entries) || entries.stream().anyMatch(entry -> !(entry instanceof String)))
+                throw new IllegalArgumentException("Expected a string list for commands_whitelist");
+            return new DialogueSettings(flag(values, "allow_chat_while_in_conversation"), flag(values, "allow_mob_damage"),
+                    flag(values, "allow_commands_while_in_conversation"), entries.stream().map(String.class::cast).toList());
         } catch (Exception failure) {
             LoggerFactory.getLogger("interactions").error("Could not load {}; retaining previous dialogue settings", file, failure);
             return previous;

@@ -48,10 +48,15 @@ public class Session {
         this.npc = npc;
         lineOrder = node.orderedLines(player.getRandom());
         DialogueMovement.begin(this);
+        DialogueCommands.begin(this);
     }
 
     public boolean isFinished() {
         return finished;
+    }
+
+    boolean permitsCommand(String command) {
+        return engine.settings().permitsCommand(command);
     }
 
     public ServerPlayer player() {
@@ -266,6 +271,7 @@ public class Session {
             return;
         finished = true;
         DialogueMovement.end(this);
+        DialogueCommands.end(this);
         pendingChoice = null;
         awaitingChoice = false;
         if (conversation.slowEffect) {
@@ -283,6 +289,8 @@ public class Session {
 
     /** What a session needs from the mod, kept as an interface so the session is testable on its own. */
     public interface Engine {
+        default DialogueSettings settings() { return DialogueSettings.DEFAULT; }
+
         Actions actions();
 
         ProgressStore progress();
