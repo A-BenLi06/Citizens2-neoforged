@@ -271,6 +271,7 @@ public class Citizens implements CitizensPlugin {
      */
     @SubscribeEvent
     public void onServerStarted(ServerStartedEvent event) {
+        net.citizensnpcs.util.YuuniverseEconomy.install();
         if (saves == null)
             return;
         try {
@@ -357,6 +358,7 @@ public class Citizens implements CitizensPlugin {
     @SubscribeEvent
     public void onServerStopping(ServerStoppingEvent event) {
         enabled = false;
+        net.citizensnpcs.util.YuuniverseEconomy.uninstall();
         Editor.leaveAll();
         ChatPrompts.abandonAll();
         if (npcRegistry != null) {
