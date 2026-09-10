@@ -11,7 +11,8 @@ import net.minecraft.server.network.CommonListenerCookie;
 import net.minecraft.server.network.ServerGamePacketListenerImpl;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
-import net.neoforged.neoforge.common.util.FakePlayer;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.server.level.ClientInformation;
 import net.neoforged.neoforge.event.tick.ServerTickEvent;
 import org.slf4j.LoggerFactory;
 
@@ -24,9 +25,11 @@ public final class MovementRuntimeAudit {
         ran = true;
         Session session = null;
         Session replacement = null;
-        FakePlayer player = null;
+        ServerPlayer player = null;
+        net.minecraft.world.entity.Entity vehicle = null;
         try {
-            player = new FakePlayer(event.getServer().overworld(), new GameProfile(UUID.randomUUID(), "MoveAudit"));
+            player = new ServerPlayer(event.getServer(), event.getServer().overworld(),
+                    new GameProfile(UUID.randomUUID(), "MoveAudit"), ClientInformation.createDefault());
             player.setPos(0, -55, 0);
             var listener = new ServerGamePacketListenerImpl(event.getServer(), new Connection(PacketFlow.SERVERBOUND),
                     player, CommonListenerCookie.createInitial(player.getGameProfile(), false));
@@ -59,15 +62,48 @@ public final class MovementRuntimeAudit {
             check(!DialogueMovement.isBlocked(player.getUUID()), "session_end_releases_lock");
             listener.handleMovePlayer(new ServerboundMovePlayerPacket.Pos(0.25, -54.5, 0, false));
             check(player.getX() == 0.25, "normal_movement_restored");
-            LoggerFactory.getLogger("interactions").info("[MOVEMENTAUDIT] COMPLETE 8/8");
+            vehicle = net.minecraft.world.entity.EntityType.BOAT.create(player.serverLevel());
+            vehicle.setPos(0, -54.5, 0);
+            player.serverLevel().addFreshEntity(vehicle);
+            check(player.startRiding(vehicle, true) && vehicle.getControllingPassenger() == player, "vehicle_control_established");
+            listener.handleAcceptTeleportPacket(new ServerboundAcceptTeleportationPacket(teleportId.getInt(listener)));
+            // Match the connection's tick-start vehicle snapshot without advancing unrelated player physics.
+            setField(listener, "lastVehicle", vehicle);
+            for (String prefix : new String[] { "vehicleFirstGood", "vehicleLastGood" }) {
+                setField(listener, prefix + "X", vehicle.getX());
+                setField(listener, prefix + "Y", vehicle.getY());
+                setField(listener, prefix + "Z", vehicle.getZ());
+            }
+            replacement = new Session(engine, story, node, player, null);
+            var requested = net.minecraft.world.entity.EntityType.BOAT.create(player.serverLevel());
+            requested.setPos(1, -54.5, 0);
+            requested.setYRot(60);
+            listener.handleMoveVehicle(new net.minecraft.network.protocol.game.ServerboundMoveVehiclePacket(requested));
+            check(vehicle.getX() == 0 && vehicle.getZ() == 0, "vehicle_horizontal_packet_rejected");
+            check(vehicle.getYRot() == 60, "vehicle_rotation_preserved");
+            requested.setPos(0, -54.25, 0);
+            listener.handleMoveVehicle(new net.minecraft.network.protocol.game.ServerboundMoveVehiclePacket(requested));
+            check(vehicle.getY() == -54.25, "vehicle_vertical_movement_allowed");
+            replacement.end(false);
+            requested.setPos(0.25, -54.25, 0);
+            listener.handleMoveVehicle(new net.minecraft.network.protocol.game.ServerboundMoveVehiclePacket(requested));
+            check(vehicle.getX() == 0.25, "vehicle_movement_restored");
+            LoggerFactory.getLogger("interactions").info("[MOVEMENTAUDIT] COMPLETE 13/13");
         } catch (Throwable failure) {
             LoggerFactory.getLogger("interactions").error("[MOVEMENTAUDIT] FAILED", failure);
         } finally {
             if (session != null) session.end(false);
             if (replacement != null) replacement.end(false);
+            if (player != null) player.stopRiding();
+            if (vehicle != null) vehicle.discard();
             if (player != null) player.serverLevel().removePlayerImmediately(player,
                     net.minecraft.world.entity.Entity.RemovalReason.DISCARDED);
         }
+    }
+    private static void setField(Object listener, String name, Object value) throws ReflectiveOperationException {
+        var field = ServerGamePacketListenerImpl.class.getDeclaredField(name);
+        field.setAccessible(true);
+        field.set(listener, value);
     }
     private static void check(boolean pass, String name) {
         if (!pass) throw new AssertionError(name);
