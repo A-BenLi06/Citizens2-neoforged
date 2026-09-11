@@ -37,7 +37,7 @@ public final class SkipRuntimeAudit {
             var story = new Conversation();
             var node = new Conversation.Node("conversation1");
             var line = new Conversation.Line();
-            line.time = 100;
+            line.time = -1;
             line.text.add("Audit %next%");
             line.actions.add("player_command_as_op: give @s minecraft:paper 1");
             line.lastActions.add("player_command_as_op: give @s minecraft:diamond 1");
@@ -57,6 +57,9 @@ public final class SkipRuntimeAudit {
             check(!session.skipDialogue(false), "cannot_skip_before_line_starts");
             session.tick();
             check(player.getInventory().countItem(Items.PAPER) == 1, "initial_actions_run_once");
+            for (int tick = 0; tick < 100; tick++) session.tick();
+            check(!session.isFinished() && !session.isAwaitingChoice()
+                    && player.getInventory().countItem(Items.DIAMOND) == 0, "negative_one_waits_for_manual_advance");
             check(messages.stream().anyMatch(message -> message.getString().contains("Audit Continue"))
                     && messages.stream().noneMatch(message -> message.getString().contains("%next%")), "next_marker_rendered");
             check(messages.stream().flatMap(message -> message.toFlatList().stream()).anyMatch(component ->
@@ -85,7 +88,7 @@ public final class SkipRuntimeAudit {
             session.tick();
             check(player.getInventory().countItem(Items.DIAMOND) == 2 && session.isAwaitingChoice(),
                     "npc_skip_completes_once_and_reaches_options");
-            LoggerFactory.getLogger("interactions").info("[SKIPAUDIT] COMPLETE 12/12");
+            LoggerFactory.getLogger("interactions").info("[SKIPAUDIT] COMPLETE 13/13");
         } catch (Throwable failure) {
             LoggerFactory.getLogger("interactions").error("[SKIPAUDIT] FAILED", failure);
         } finally {

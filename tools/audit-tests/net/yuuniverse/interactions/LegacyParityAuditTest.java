@@ -16,6 +16,35 @@ import org.junit.jupiter.api.io.TempDir;
 /** Acceptance probes kept separate from the default suite: these expose open parity defects. */
 public class LegacyParityAuditTest {
     @Test
+    void lineRoutingAndManualDurationLoadFromLegacyYaml() throws Exception {
+        Files.writeString(directory.resolve("route.yml"), """
+                starts_with: ['NPC with id 1']
+                conversation:
+                  conversation1:
+                    dialogue:
+                      dialogue1:
+                        text: ['Wait %next%']
+                        time: -1
+                        start_conversation: conversation2
+                        start_options: conversation3
+                        conditional_dialogue:
+                          conditional1:
+                            text: ['Alternative']
+                            start_conversation: conversation4
+                  conversation2: {}
+                  conversation3: {}
+                  conversation4: {}
+                """);
+        var library = new ConversationLibrary();
+        library.load(directory.toFile());
+        var line = library.forNpc(1).first().lines.get(0);
+        assertEquals(-1, line.time);
+        assertEquals("conversation2", line.startConversation);
+        assertEquals("conversation3", line.startOptions);
+        assertEquals("conversation4", line.conditional.get(0).startConversation);
+    }
+
+    @Test
     void nextMarkerControlsCommandSkipping() {
         var line = new Conversation.Line();
         line.text.add("Ordinary text");

@@ -35,6 +35,7 @@ public class Session {
     private int lineIndex;
     private int ticksOnLine;
     private Conversation.Line current;
+    private Conversation.Line completedLine;
     private boolean awaitingChoice;
     private List<Conversation.Option> offered = new ArrayList<>();
     private boolean finished;
@@ -102,26 +103,23 @@ public class Session {
                 end(true);
                 return;
             }
-            node = next;
-            lineOrder = node.orderedLines(player.getRandom());
-            lineIndex = 0;
-            current = null;
-            ticksOnLine = 0;
+            enterNode(next);
         }
         if (awaitingChoice)
             return;
         if (current == null) {
             if (!advance()) {
-                offerOptionsOrEnd();
+                finishNode();
             }
             return;
         }
-        if (skipRequested || ++ticksOnLine >= Math.max(1, (int) Math.round(current.time * 20))) {
+        if (skipRequested || (current.time != -1 && ++ticksOnLine >= Math.max(1, (int) Math.round(current.time * 20)))) {
             skipRequested = false;
             if (!engine.actions().runAll(current.lastActions, player, npcName())) {
                 end(false);
                 return;
             }
+            completedLine = current;
             current = null;
             ticksOnLine = 0;
         }
@@ -130,8 +128,9 @@ public class Session {
     /** @return true when a line was shown, false when this node has no lines left */
     private boolean advance() {
         while (lineIndex < lineOrder.size()) {
-            Conversation.Line line = resolve(lineOrder.get(lineIndex++));
-            if (line == null) {
+            Conversation.Line line = lineOrder.get(lineIndex++);
+            if (redirectConditional(line)) return true;
+            if (!Conditions.all(line.requires, player, engine.progress())) {
                 continue;
             }
             show(line);
@@ -144,19 +143,29 @@ public class Session {
         return false;
     }
 
-    /**
-     * Picks which form of a line to play: a {@code conditional_dialogue} alternative whose {@code requires} hold, else
-     * the line itself if its own requires hold, else nothing.
-     */
-    private Conversation.Line resolve(Conversation.Line line) {
-        for (Conversation.Line alternative : line.conditional) {
-            if (Conditions.all(alternative.requires, player, engine.progress()))
-                return alternative;
+    /** Redirect before text/actions; empty requirements are ignored by the legacy conditional scheduler. */
+    private boolean redirectConditional(Conversation.Line line) {
+        for (Conversation.Conditional redirect : line.conditional) {
+            if (redirect.requires.isEmpty() || !Conditions.all(redirect.requires, player, engine.progress())) continue;
+            Conversation.Node target = conversation.node(redirect.startConversation);
+            if (target == null) {
+                org.slf4j.LoggerFactory.getLogger("interactions").error("{} / {} / {} has a missing conditional target {}",
+                        conversation.source, node.key, line.key, redirect.startConversation);
+                end(false);
+            } else {
+                enterNode(target);
+            }
+            return true;
         }
-        return Conditions.all(line.requires, player, engine.progress()) ? line : null;
+        return false;
     }
 
     private void show(Conversation.Line line) {
+        // The old scheduler uses routing only after the last sequential line (or its one random line).
+        if ((node.randomDialogue || lineIndex == lineOrder.size()) && !validRoute(line)) {
+            end(false);
+            return;
+        }
         List<String> wholeLine = new ArrayList<>(line.actions);
         wholeLine.addAll(line.lastActions);
         if (!engine.actions().validateAll(wholeLine, player, npcName())) {
@@ -200,9 +209,44 @@ public class Session {
         return file + "." + nodeKey + "." + lineKey;
     }
 
-    private void offerOptionsOrEnd() {
+    private void enterNode(Conversation.Node next) {
+        node = next;
+        lineOrder = node.orderedLines(player.getRandom());
+        lineIndex = 0;
+        current = null;
+        completedLine = null;
+        ticksOnLine = 0;
+    }
+
+    private boolean validRoute(Conversation.Line line) {
+        String target = line.startOptions != null ? line.startOptions : line.startConversation;
+        if (target == null || conversation.node(target) != null) return true;
+        org.slf4j.LoggerFactory.getLogger("interactions").error("{} / {} / {} references missing dialogue node {}",
+                conversation.source, node.key, line.key, target);
+        return false;
+    }
+
+    private void finishNode() {
+        if (completedLine != null) {
+            if (!validRoute(completedLine)) {
+                end(false);
+                return;
+            }
+            if (completedLine.startOptions != null) {
+                offerOptionsOrEnd(conversation.node(completedLine.startOptions).options);
+                return;
+            }
+            if (completedLine.startConversation != null) {
+                enterNode(conversation.node(completedLine.startConversation));
+                return;
+            }
+        }
+        offerOptionsOrEnd(node.options);
+    }
+
+    private void offerOptionsOrEnd(List<Conversation.Option> options) {
         offered = new ArrayList<>();
-        for (Conversation.Option option : node.options) {
+        for (Conversation.Option option : options) {
             if (Conditions.all(option.requires, player, engine.progress())) {
                 offered.add(option);
             }

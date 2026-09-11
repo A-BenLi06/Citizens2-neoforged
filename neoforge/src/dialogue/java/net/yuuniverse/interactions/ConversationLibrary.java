@@ -200,6 +200,8 @@ public final class ConversationLibrary {
         }
         line.time = dbl(raw.get("time"), 2);
         line.showName = bool(raw.get("show_name"), true);
+        line.startConversation = str(raw.get("start_conversation"), null);
+        line.startOptions = str(raw.get("start_options"), null);
         line.saveToPlayer = bool(raw.get("save_dialogue_to_player"), false);
         for (Object action : list(raw.get("actions"))) {
             line.actions.add(String.valueOf(action));
@@ -214,7 +216,11 @@ public final class ConversationLibrary {
         if (conditional instanceof Map) {
             for (Object value : sortedByKey((Map<String, Object>) conditional).values()) {
                 if (value instanceof Map) {
-                    line.conditional.add(parseLine((Map<String, Object>) value));
+                    Map<String, Object> fields = (Map<String, Object>) value;
+                    Conversation.Conditional redirect = new Conversation.Conditional();
+                    redirect.startConversation = str(fields.get("start_conversation"), null);
+                    for (Object require : list(fields.get("requires"))) redirect.requires.add(String.valueOf(require));
+                    line.conditional.add(redirect);
                 }
             }
         }

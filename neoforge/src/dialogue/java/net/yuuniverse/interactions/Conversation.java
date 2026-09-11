@@ -88,6 +88,9 @@ public class Conversation {
         /** Seconds the line is shown before the next one. */
         public double time = 2;
         public boolean showName = true;
+        /** Terminal-line routing; start_options takes precedence over start_conversation. */
+        public String startConversation;
+        public String startOptions;
         /** Run when the line is shown. */
         public final List<String> actions = new ArrayList<>();
         /** Run when the line finishes - the old plugin's {@code last_actions}. */
@@ -96,8 +99,8 @@ public class Conversation {
         public boolean saveToPlayer;
         /** All must hold for the line to play; an empty list always plays. */
         public final List<String> requires = new ArrayList<>();
-        /** {@code conditional_dialogue}: alternatives tried in order, first one whose requires hold wins. */
-        public final List<Line> conditional = new ArrayList<>();
+        /** {@code conditional_dialogue}: redirects checked before this line is shown. */
+        public final List<Conditional> conditional = new ArrayList<>();
 
         public List<String> textOrEmpty() {
             return text.isEmpty() ? Collections.emptyList() : text;
@@ -106,6 +109,11 @@ public class Conversation {
         public boolean canBeSkipped() {
             return text.stream().anyMatch(value -> value.contains("%next%"));
         }
+    }
+
+    public static class Conditional {
+        public final List<String> requires = new ArrayList<>();
+        public String startConversation;
     }
 
     /** One {@code optionN}: a clickable choice that jumps to another node. */
