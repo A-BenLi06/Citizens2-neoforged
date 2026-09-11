@@ -172,7 +172,38 @@ public final class RoutingRuntimeAudit {
             session = new Session(engine, story, source, player, null);
             for (int i = 0; i < 20; i++) session.tick();
             check(!session.isFinished() && player.getInventory().isEmpty(), "conditional_cycles_do_not_recurse_or_run_actions");
-            LoggerFactory.getLogger("interactions").info("[ROUTINGAUDIT] COMPLETE 18/18");
+            session.end(false);
+
+            player.getInventory().clearContent();
+            player.getInventory().add(new ItemStack(Items.PAPER));
+            source.lines.clear();
+            source.options.clear();
+            var brokenOption = new Conversation.Option();
+            brokenOption.startConversation = "missing_option_target";
+            brokenOption.actions.add("remove_item: %checkitem_remove_mat:minecraft:paper,amt:1%");
+            brokenOption.actions.add("player_command_as_op: give @s minecraft:diamond 1");
+            source.options.add(brokenOption);
+            story.source = "routing-audit.yml";
+            story.saveProgress = true;
+            session = new Session(engine, story, source, player, null);
+            session.tick();
+            session.choose(1);
+            session.tick();
+            check(session.isFinished() && player.getInventory().countItem(Items.PAPER) == 1
+                    && player.getInventory().countItem(Items.DIAMOND) == 0, "missing_option_target_preserves_payment_and_reward");
+            check(!progress.hasSeen(player.getUUID(), "routing-audit.source.completed"),
+                    "missing_option_target_does_not_mark_completed");
+
+            brokenOption.startConversation = target.key;
+            target.lines.get(0).conditional.clear();
+            session = new Session(engine, story, source, player, null);
+            session.tick();
+            session.choose(1);
+            session.tick();
+            check(!session.isFinished() && player.getInventory().countItem(Items.PAPER) == 0
+                    && player.getInventory().countItem(Items.DIAMOND) == 1
+                    && player.getInventory().countItem(Items.EMERALD) == 1, "valid_option_target_executes_actions_and_enters_node");
+            LoggerFactory.getLogger("interactions").info("[ROUTINGAUDIT] COMPLETE 21/21");
         } catch (Throwable failure) {
             LoggerFactory.getLogger("interactions").error("[ROUTINGAUDIT] FAILED", failure);
         } finally {

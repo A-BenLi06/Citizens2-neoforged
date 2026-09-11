@@ -156,3 +156,12 @@
 - The first runtime run failed the pre-existing pathfind-minecraft-detour assertion (106/107) while its initial routing checks passed. The final rerun passed that unchanged pathfinding check and the expanded routing suite. The earlier failure remains recorded and its cause is not established; it is not counted as successful acceptance.
 - Actual connected-client story playthroughs, complete reward/service migration, inventory restrictions, option presentation and full modpack coverage remain open. No production data was modified.
 - Final validation: 124 ordinary tests and normal build passed; release jars contain no runtime audit classes. Evidence: artifacts/repair-routing-final248.log.
+
+## 2026-09-11 12:25:05 +08:00 — Validate option destinations before executing actions
+
+- Found that a selected option ran its actions before resolving start_conversation. A misspelled destination therefore consumed payment or issued rewards and then recorded a successful completion because missing targets and intentional end options shared the same null result.
+- Resolve an explicitly configured option destination before any selected-option actions execute. A missing destination logs the configuration error and ends unsuccessfully. An omitted destination retains its intentional end behavior; valid destinations still execute actions and enter the next node.
+- Added three real-inventory/progress runtime assertions: missing targets preserve both payment and rewards, missing targets do not mark the source completed, and valid targets still consume payment, grant the reward and enter the target node.
+- All 107 NPC assertions and 111 runtime probes passed on NeoForge 21.1.248, including the previously intermittent pathfind-minecraft-detour check. Evidence: artifacts/repair-option-target-runtime248.log. This does not establish why that earlier failure occurred.
+- Remaining scope includes broader dialogue UI/global restrictions, reward/service migration and real-client full-modpack acceptance. No production files changed.
+- Final validation: 124 ordinary tests and normal build pass; release jars exclude runtime audit classes. Evidence: artifacts/repair-option-target-final248.log.

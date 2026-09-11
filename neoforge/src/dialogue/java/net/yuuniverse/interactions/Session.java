@@ -93,12 +93,18 @@ public class Session {
         if (pendingChoice != null) {
             Conversation.Option selected = pendingChoice;
             pendingChoice = null;
+            Conversation.Node next = conversation.node(selected.startConversation);
+            if (selected.startConversation != null && next == null) {
+                org.slf4j.LoggerFactory.getLogger("interactions").error("{} / {} has an option referencing missing node {}",
+                        conversation.source, node.key, selected.startConversation);
+                end(false);
+                return;
+            }
             if (!Conditions.all(selected.requires, player, engine.progress())
                     || !engine.actions().runAll(selected.actions, player, npcName())) {
                 end(false);
                 return;
             }
-            Conversation.Node next = conversation.node(selected.startConversation);
             if (next == null) {
                 end(true);
                 return;
