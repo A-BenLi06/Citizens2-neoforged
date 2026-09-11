@@ -16,6 +16,25 @@ import org.junit.jupiter.api.io.TempDir;
 /** Acceptance probes kept separate from the default suite: these expose open parity defects. */
 public class LegacyParityAuditTest {
     @Test
+    void selectionSettingsValidateModeAndOverflow() throws Exception {
+        Path file = directory.resolve("selection.yml");
+        Files.writeString(file, "selectable_options: true\nselectable_options_mode: SCROLL\nselectable_options_restart_on_overflow: false\n");
+        var settings = DialogueSettings.load(file.toFile(), DialogueSettings.DEFAULT);
+        assertEquals(new SelectionSettings(true, SelectionSettings.Mode.SCROLL, false), settings.selection());
+        Files.writeString(file, "selectable_options_mode: invalid\n");
+        assertEquals(settings, DialogueSettings.load(file.toFile(), settings));
+    }
+
+    @Test
+    void selectedOptionMessagesLoadSeparatelyFromNormalOptions() throws Exception {
+        Path file = directory.resolve("messages.yml");
+        Files.writeString(file, "selectableOptionsFormatNormal: 'Row %number% %text%'\nselectableOptionsFormatSelected: 'Selected %number% %text%'\n");
+        var messages = DialogueMessages.load(file.toFile(), DialogueMessages.DEFAULT);
+        assertEquals("Row 1 Choice", messages.selectableLabel(1, "&aChoice", false, null).getString());
+        assertEquals("Selected 2 Choice", messages.selectableLabel(2, "&aChoice", true, null).getString());
+    }
+
+    @Test
     void optionMessageTemplatesLoadAndPreserveUnknownMessages() throws Exception {
         Path file = directory.resolve("options.yml");
         String source = "optionsFormat: '&6%number%. %text%'\nclickableOptionHover: 'Pick %option%'\n"

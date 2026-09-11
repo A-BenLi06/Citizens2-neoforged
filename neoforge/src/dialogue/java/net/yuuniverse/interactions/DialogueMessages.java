@@ -13,11 +13,16 @@ import org.yaml.snakeyaml.Yaml;
 
 /** Supported legacy message overrides; absent entries use translatable English fallbacks. */
 public record DialogueMessages(String nextText, String nextHover, String optionsFormat, String clickableOptionHover,
-        List<String> optionsMainFormat) {
+        List<String> optionsMainFormat, String selectableNormal, String selectableSelected) {
     public static final DialogueMessages DEFAULT = new DialogueMessages(null, null);
 
     public DialogueMessages(String nextText, String nextHover) {
         this(nextText, nextHover, null, null, null);
+    }
+
+    public DialogueMessages(String nextText, String nextHover, String optionsFormat, String clickableOptionHover,
+            List<String> optionsMainFormat) {
+        this(nextText, nextHover, optionsFormat, clickableOptionHover, optionsMainFormat, null, null);
     }
 
     public DialogueMessages {
@@ -35,6 +40,15 @@ public record DialogueMessages(String nextText, String nextHover, String options
         if (clickableOptionHover == null) return Component.translatableWithFallback("interactions.option.hover",
                 "Click to choose option %s.", number);
         return Text.legacy(Text.placeholders(clickableOptionHover.replace("%option%", Integer.toString(number)), player));
+    }
+
+    public Component selectableLabel(int number, String text, boolean selected, ServerPlayer player) {
+        String format = selected ? selectableSelected : selectableNormal;
+        String body = selected ? Text.plain(Text.legacy(text)) : text;
+        if (format != null) return Text.legacy(Text.placeholders(format.replace("%number%", Integer.toString(number))
+                .replace("%text%", body), player));
+        return selected ? Component.translatableWithFallback("interactions.option.selected", "» [%s] %s (Sneak to choose)",
+                number, Text.legacy(Text.placeholders(body, player))) : optionLabel(number, body, player);
     }
 
     public Component nextLabel() {
@@ -60,7 +74,8 @@ public record DialogueMessages(String nextText, String nextHover, String options
                 layout = entries.stream().map(String.class::cast).toList();
             }
             return new DialogueMessages(message(values, "nextDialogueText"), message(values, "nextDialogueHover"),
-                    message(values, "optionsFormat"), message(values, "clickableOptionHover"), layout);
+                    message(values, "optionsFormat"), message(values, "clickableOptionHover"), layout,
+                    message(values, "selectableOptionsFormatNormal"), message(values, "selectableOptionsFormatSelected"));
         } catch (Exception failure) {
             LoggerFactory.getLogger("interactions").error("Could not load {}; retaining previous dialogue messages", file, failure);
             return previous;

@@ -13,7 +13,7 @@ import org.yaml.snakeyaml.Yaml;
 /** Reads supported legacy global settings without rewriting unknown settings. */
 public record DialogueSettings(boolean allowChat, boolean allowMobDamage, boolean allowCommands,
         List<String> commandsWhitelist, boolean skipDialogueOnNpcClick, boolean allowInventoryInteract,
-        boolean clickableOptions, boolean useEmptySpaces) {
+        boolean clickableOptions, boolean useEmptySpaces, SelectionSettings selection) {
     public static final DialogueSettings DEFAULT = new DialogueSettings(false, false);
 
     public DialogueSettings(boolean allowChat, boolean allowMobDamage) {
@@ -32,6 +32,12 @@ public record DialogueSettings(boolean allowChat, boolean allowMobDamage, boolea
     public DialogueSettings(boolean allowChat, boolean allowMobDamage, boolean allowCommands, List<String> whitelist,
             boolean skipDialogueOnNpcClick, boolean allowInventoryInteract) {
         this(allowChat, allowMobDamage, allowCommands, whitelist, skipDialogueOnNpcClick, allowInventoryInteract, true, true);
+    }
+
+    public DialogueSettings(boolean allowChat, boolean allowMobDamage, boolean allowCommands, List<String> whitelist,
+            boolean skipDialogueOnNpcClick, boolean allowInventoryInteract, boolean clickableOptions, boolean useEmptySpaces) {
+        this(allowChat, allowMobDamage, allowCommands, whitelist, skipDialogueOnNpcClick, allowInventoryInteract,
+                clickableOptions, useEmptySpaces, SelectionSettings.DEFAULT);
     }
 
     public DialogueSettings {
@@ -59,7 +65,11 @@ public record DialogueSettings(boolean allowChat, boolean allowMobDamage, boolea
                     flag(values, "allow_commands_while_in_conversation"), entries.stream().map(String.class::cast).toList(),
                     flag(values, "skip_dialogue_on_npc_click"),
                     flag(values, "allow_inventory_interact_while_in_conversation", true),
-                    flag(values, "clickable_options", true), flag(values, "use_empty_spaces", true));
+                    flag(values, "clickable_options", true), flag(values, "use_empty_spaces", true),
+                    new SelectionSettings(flag(values, "selectable_options", true),
+                            SelectionSettings.Mode.valueOf(String.valueOf(values.containsKey("selectable_options_mode")
+                                    ? values.get("selectable_options_mode") : "MOVE").toUpperCase(Locale.ROOT)),
+                            flag(values, "selectable_options_restart_on_overflow", true)));
         } catch (Exception failure) {
             LoggerFactory.getLogger("interactions").error("Could not load {}; retaining previous dialogue settings", file, failure);
             return previous;

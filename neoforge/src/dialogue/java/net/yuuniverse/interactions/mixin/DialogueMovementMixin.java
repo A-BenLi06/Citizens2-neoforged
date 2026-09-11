@@ -40,6 +40,8 @@ public abstract class DialogueMovementMixin {
     private void interactions$blockHorizontalMovement(ServerboundMovePlayerPacket packet, CallbackInfo callback) {
         if (!DialogueMovement.isBlocked(player.getUUID()) || !packet.hasPosition() || player.isPassenger()) return;
         if (packet.getX(player.getX()) == player.getX() && packet.getZ(player.getZ()) == player.getZ()) return;
+        net.yuuniverse.interactions.DialogueSelection.move(player, packet.getX(player.getX()) - player.getX(),
+                packet.getY(player.getY()) - player.getY(), packet.getZ(player.getZ()) - player.getZ());
         teleport(player.getX(), player.getY(), player.getZ(), Mth.wrapDegrees(packet.getYRot(player.getYRot())),
                 Mth.wrapDegrees(packet.getXRot(player.getXRot())));
         callback.cancel();

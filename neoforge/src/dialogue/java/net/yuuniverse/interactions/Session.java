@@ -41,6 +41,8 @@ public class Session {
     private boolean finished;
     private Conversation.Option pendingChoice;
     private boolean skipRequested;
+    private int selectedOption;
+    private long selectionDelay;
 
     public Session(Engine engine, Conversation conversation, Conversation.Node node, ServerPlayer player, Entity npc) {
         this.engine = engine;
@@ -52,6 +54,7 @@ public class Session {
         DialogueMovement.begin(this);
         DialogueCommands.begin(this);
         DialogueInventory.begin(this);
+        DialogueSelection.begin(this);
     }
 
     public boolean isFinished() {
@@ -63,6 +66,32 @@ public class Session {
     }
 
     boolean permitsInventoryInteract() { return engine.settings().allowInventoryInteract(); }
+
+    boolean usesSelection(SelectionSettings.Mode mode) {
+        return !finished && conversation.blockMovement && engine.settings().selection().enabled()
+                && engine.settings().selection().mode() == mode;
+    }
+
+    private boolean selectable() {
+        return !finished && awaitingChoice && conversation.blockMovement && engine.settings().selection().enabled();
+    }
+
+    boolean cycleSelection(int direction, long now) {
+        if (!selectable() || direction == 0 || now < selectionDelay) return false;
+        selectionDelay = now + SelectionSettings.REPEAT_DELAY_MILLIS;
+        int next = selectedOption + Integer.signum(direction);
+        if (engine.settings().selection().wrap()) next = Math.floorMod(next, offered.size());
+        else next = Math.max(0, Math.min(offered.size() - 1, next));
+        if (next == selectedOption) return false;
+        selectedOption = next;
+        // Legacy redraw clears the prior selection display; rendering must not execute dialogue actions again.
+        for (int i = 0; i < 13; i++) player.sendSystemMessage(Component.empty());
+        if (completedLine != null) renderLine(completedLine);
+        renderOptions();
+        return true;
+    }
+
+    boolean confirmSelection() { return selectable() && choose(selectedOption + 1); }
 
     /** Queues a single line completion; rewards run on tick, outside the command dispatch queue. */
     public boolean skipDialogue(boolean npcClick) {
@@ -183,6 +212,18 @@ public class Session {
         }
         current = line;
         ticksOnLine = 0;
+        renderLine(line);
+        if (!engine.actions().runAll(line.actions, player, npcName())) {
+            end(false);
+            return;
+        }
+        if (line.saveToPlayer) {
+            engine.progress().markSeen(player.getUUID(), player.getGameProfile().getName(),
+                    progressKey(node.key, line.key));
+        }
+    }
+
+    private void renderLine(Conversation.Line line) {
         for (String raw : line.textOrEmpty()) {
             String text = Text.placeholders(raw, player);
             MutableComponent message = Component.empty();
@@ -200,14 +241,6 @@ public class Session {
                 message.append(Text.legacy(text));
             }
             player.sendSystemMessage(message);
-        }
-        if (!engine.actions().runAll(line.actions, player, npcName())) {
-            end(false);
-            return;
-        }
-        if (line.saveToPlayer) {
-            engine.progress().markSeen(player.getUUID(), player.getGameProfile().getName(),
-                    progressKey(node.key, line.key));
         }
     }
 
@@ -265,14 +298,22 @@ public class Session {
             return;
         }
         awaitingChoice = true;
+        selectedOption = 0;
+        selectionDelay = 0;
+        renderOptions();
+    }
+
+    private void renderOptions() {
         if (engine.settings().useEmptySpaces()) player.sendSystemMessage(Component.empty());
         List<Component> rendered = new ArrayList<>();
         for (int i = 0; i < offered.size(); i++) {
             Conversation.Option option = offered.get(i);
             final int number = i + 1;
             String command = "/interactions choose " + number;
-            MutableComponent message = engine.messages().optionLabel(number, option.text, player).copy();
-            if (engine.settings().clickableOptions()) {
+            MutableComponent message = (selectable()
+                    ? engine.messages().selectableLabel(number, option.text, i == selectedOption, player)
+                    : engine.messages().optionLabel(number, option.text, player)).copy();
+            if (!selectable() && engine.settings().clickableOptions()) {
                 message.withStyle(style -> style.withClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, command))
                         .withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, engine.messages().optionTooltip(number, player))));
             }
@@ -287,7 +328,10 @@ public class Session {
             }
         } else {
             rendered.forEach(player::sendSystemMessage);
-            player.sendSystemMessage((engine.settings().clickableOptions()
+            player.sendSystemMessage((selectable()
+                    ? Component.translatableWithFallback("interactions.options.prompt.selectable",
+                            "Change the selected option, then sneak to choose.")
+                    : engine.settings().clickableOptions()
                     ? Component.translatableWithFallback("interactions.options.prompt", "Click an option or enter its number in chat.")
                     : Component.translatableWithFallback("interactions.options.prompt.typed", "Enter an option number in chat."))
                     .withStyle(Style.EMPTY.withColor(ChatFormatting.DARK_GRAY)));
@@ -357,6 +401,7 @@ public class Session {
         DialogueMovement.end(this);
         DialogueCommands.end(this);
         DialogueInventory.end(this);
+        DialogueSelection.end(this);
         skipRequested = false;
         pendingChoice = null;
         awaitingChoice = false;
