@@ -39,6 +39,7 @@ public class Session {
     private List<Conversation.Option> offered = new ArrayList<>();
     private boolean finished;
     private Conversation.Option pendingChoice;
+    private boolean skipRequested;
 
     public Session(Engine engine, Conversation conversation, Conversation.Node node, ServerPlayer player, Entity npc) {
         this.engine = engine;
@@ -57,6 +58,14 @@ public class Session {
 
     boolean permitsCommand(String command) {
         return engine.settings().permitsCommand(command);
+    }
+
+    /** Queues a single line completion; rewards run on tick, outside the command dispatch queue. */
+    public boolean skipDialogue(boolean npcClick) {
+        if (finished || awaitingChoice || current == null || skipRequested) return false;
+        if (npcClick ? !engine.settings().skipDialogueOnNpcClick() : !current.canBeSkipped()) return false;
+        skipRequested = true;
+        return true;
     }
 
     public ServerPlayer player() {
@@ -107,7 +116,8 @@ public class Session {
             }
             return;
         }
-        if (++ticksOnLine >= Math.max(1, (int) Math.round(current.time * 20))) {
+        if (skipRequested || ++ticksOnLine >= Math.max(1, (int) Math.round(current.time * 20))) {
+            skipRequested = false;
             if (!engine.actions().runAll(current.lastActions, player, npcName())) {
                 end(false);
                 return;
@@ -162,7 +172,15 @@ public class Session {
                 message.append(Text.legacy(conversation.name)).append(Component.literal(": ")
                         .withStyle(Style.EMPTY.withColor(ChatFormatting.GRAY)));
             }
-            message.append(Text.legacy(text));
+            int nextMarker = text.indexOf("%next%");
+            if (nextMarker >= 0) {
+                message.append(Text.legacy(text.substring(0, nextMarker)));
+                message.append(engine.messages().nextLabel().copy().withStyle(style -> style
+                        .withClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/interactions skipdialogue"))
+                        .withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, engine.messages().nextTooltip()))));
+            } else {
+                message.append(Text.legacy(text));
+            }
             player.sendSystemMessage(message);
         }
         if (!engine.actions().runAll(line.actions, player, npcName())) {
@@ -272,6 +290,7 @@ public class Session {
         finished = true;
         DialogueMovement.end(this);
         DialogueCommands.end(this);
+        skipRequested = false;
         pendingChoice = null;
         awaitingChoice = false;
         if (conversation.slowEffect) {
@@ -290,6 +309,7 @@ public class Session {
     /** What a session needs from the mod, kept as an interface so the session is testable on its own. */
     public interface Engine {
         default DialogueSettings settings() { return DialogueSettings.DEFAULT; }
+        default DialogueMessages messages() { return DialogueMessages.DEFAULT; }
 
         Actions actions();
 

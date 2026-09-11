@@ -85,6 +85,13 @@ public final class ProximityRuntimeAudit {
             }
             controller.pollProximity(player, registry);
             check(sessions.get(player.getUUID()) == original, "active_session_not_replaced");
+            original.tick();
+            controller.onRightClick(new net.citizensnpcs.api.event.NPCRightClickEvent(npc, player));
+            check(!(Boolean) field(original, "skipRequested"), "npc_click_does_not_skip_by_default");
+            settingsField.set(controller, new DialogueSettings(false, false, false, java.util.List.of(), true));
+            controller.onRightClick(new net.citizensnpcs.api.event.NPCRightClickEvent(npc, player));
+            check((Boolean) field(original, "skipRequested"), "configured_npc_click_requests_skip");
+            settingsField.set(controller, DialogueSettings.DEFAULT);
             original.end(false);
             controller.onServerTick(event);
             controller.pollProximity(player, registry);
@@ -110,7 +117,7 @@ public final class ProximityRuntimeAudit {
             check(sessions.isEmpty(), "air_start_disabled_blocks_entry");
             Files.delete(folder.resolve("entry.yml"));
             Files.delete(folder);
-            LoggerFactory.getLogger("interactions").info("[PROXIMITYAUDIT] COMPLETE 12/12");
+            LoggerFactory.getLogger("interactions").info("[PROXIMITYAUDIT] COMPLETE 14/14");
         } catch (Throwable failure) {
             LoggerFactory.getLogger("interactions").error("[PROXIMITYAUDIT] FAILED", failure);
         } finally {

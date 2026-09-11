@@ -55,6 +55,7 @@ public class InteractionsMod implements Session.Engine {
     private final Map<UUID, String> proximityEntries = new HashMap<>();
     private Actions actions;
     private DialogueSettings settings = DialogueSettings.DEFAULT;
+    private DialogueMessages messages = DialogueMessages.DEFAULT;
     private int saveCountdown = 600;
 
     public InteractionsMod() {
@@ -70,6 +71,9 @@ public class InteractionsMod implements Session.Engine {
     public DialogueSettings settings() { return settings; }
 
     @Override
+    public DialogueMessages messages() { return messages; }
+
+    @Override
     public ProgressStore progress() {
         return progress;
     }
@@ -77,6 +81,7 @@ public class InteractionsMod implements Session.Engine {
     @SubscribeEvent
     public void onServerStarted(ServerStartedEvent event) {
         settings = DialogueSettings.load(new File(dataFolder, "config.yml"), settings);
+        messages = DialogueMessages.load(new File(dataFolder, "messages.yml"), messages);
         dataFolder.mkdirs();
         new File(dataFolder, "conversations").mkdirs();
         new File(dataFolder, "players").mkdirs();
@@ -117,6 +122,11 @@ public class InteractionsMod implements Session.Engine {
         }
         if (conversation == null)
             return;
+        Session active = sessions.get(player.getUUID());
+        if (active != null) {
+            active.skipDialogue(true);
+            return;
+        }
         startConversation(player, npc, conversation);
     }
 
@@ -249,6 +259,11 @@ public class InteractionsMod implements Session.Engine {
     @SubscribeEvent
     public void onRegisterCommands(RegisterCommandsEvent event) {
         LiteralArgumentBuilder<CommandSourceStack> root = Commands.literal("interactions");
+        root.then(Commands.literal("skipdialogue").executes(context -> {
+            ServerPlayer player = context.getSource().getPlayer();
+            Session session = player == null ? null : sessions.get(player.getUUID());
+            return session != null && session.skipDialogue(false) ? 1 : 0;
+        }));
         root.then(Commands.literal("choose").then(Commands.argument("option", IntegerArgumentType.integer(1))
                 .executes(context -> {
                     ServerPlayer player = context.getSource().getPlayer();
@@ -260,6 +275,7 @@ public class InteractionsMod implements Session.Engine {
                 })));
         root.then(Commands.literal("reload").requires(source -> source.hasPermission(3)).executes(context -> {
             settings = DialogueSettings.load(new File(dataFolder, "config.yml"), settings);
+            messages = DialogueMessages.load(new File(dataFolder, "messages.yml"), messages);
             MinecraftServer server = context.getSource().getServer();
             for (Session session : sessions.values()) {
                 session.end(false);

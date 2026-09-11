@@ -12,11 +12,15 @@ import org.yaml.snakeyaml.Yaml;
 
 /** Reads supported legacy global settings without rewriting unknown settings. */
 public record DialogueSettings(boolean allowChat, boolean allowMobDamage, boolean allowCommands,
-        List<String> commandsWhitelist) {
+        List<String> commandsWhitelist, boolean skipDialogueOnNpcClick) {
     public static final DialogueSettings DEFAULT = new DialogueSettings(false, false);
 
     public DialogueSettings(boolean allowChat, boolean allowMobDamage) {
         this(allowChat, allowMobDamage, false, List.of());
+    }
+
+    public DialogueSettings(boolean allowChat, boolean allowMobDamage, boolean allowCommands, List<String> whitelist) {
+        this(allowChat, allowMobDamage, allowCommands, whitelist, false);
     }
 
     public DialogueSettings {
@@ -27,6 +31,7 @@ public record DialogueSettings(boolean allowChat, boolean allowMobDamage, boolea
         if (allowCommands) return true;
         // This command carries dialogue option clicks, which must remain usable while commands are restricted.
         if (command.equals("interactions choose") || command.startsWith("interactions choose ")) return true;
+        if (command.equals("interactions skipdialogue")) return true;
         String legacyInput = "/" + command.toLowerCase(Locale.ROOT);
         return commandsWhitelist.stream().anyMatch(legacyInput::startsWith);
     }
@@ -40,7 +45,8 @@ public record DialogueSettings(boolean allowChat, boolean allowMobDamage, boolea
             if (!(whitelist instanceof List<?> entries) || entries.stream().anyMatch(entry -> !(entry instanceof String)))
                 throw new IllegalArgumentException("Expected a string list for commands_whitelist");
             return new DialogueSettings(flag(values, "allow_chat_while_in_conversation"), flag(values, "allow_mob_damage"),
-                    flag(values, "allow_commands_while_in_conversation"), entries.stream().map(String.class::cast).toList());
+                    flag(values, "allow_commands_while_in_conversation"), entries.stream().map(String.class::cast).toList(),
+                    flag(values, "skip_dialogue_on_npc_click"));
         } catch (Exception failure) {
             LoggerFactory.getLogger("interactions").error("Could not load {}; retaining previous dialogue settings", file, failure);
             return previous;

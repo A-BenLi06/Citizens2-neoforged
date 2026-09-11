@@ -102,6 +102,10 @@ public class Conversation {
         public List<String> textOrEmpty() {
             return text.isEmpty() ? Collections.emptyList() : text;
         }
+
+        public boolean canBeSkipped() {
+            return text.stream().anyMatch(value -> value.contains("%next%"));
+        }
     }
 
     /** One {@code optionN}: a clickable choice that jumps to another node. */

@@ -16,6 +16,38 @@ import org.junit.jupiter.api.io.TempDir;
 /** Acceptance probes kept separate from the default suite: these expose open parity defects. */
 public class LegacyParityAuditTest {
     @Test
+    void nextMarkerControlsCommandSkipping() {
+        var line = new Conversation.Line();
+        line.text.add("Ordinary text");
+        assertFalse(line.canBeSkipped());
+        line.text.add("Continue %next%");
+        assertTrue(line.canBeSkipped());
+        assertTrue(DialogueSettings.DEFAULT.permitsCommand("interactions skipdialogue"));
+        assertFalse(DialogueSettings.DEFAULT.permitsCommand("interactions skipdialogueother"));
+    }
+
+    @Test
+    void npcClickSkippingIsOptIn() throws Exception {
+        assertFalse(DialogueSettings.DEFAULT.skipDialogueOnNpcClick());
+        Path file = directory.resolve("skip.yml");
+        Files.writeString(file, "skip_dialogue_on_npc_click: true\n");
+        assertTrue(DialogueSettings.load(file.toFile(), DialogueSettings.DEFAULT).skipDialogueOnNpcClick());
+    }
+
+    @Test
+    void nextMessagesPreserveCustomTextAndRejectInvalidReload() throws Exception {
+        Path file = directory.resolve("messages.yml");
+        String contents = "nextDialogueText: '&aContinue'\nnextDialogueHover: '&eProceed'\nunknown: preserved\n";
+        Files.writeString(file, contents);
+        var messages = DialogueMessages.load(file.toFile(), DialogueMessages.DEFAULT);
+        assertEquals("Continue", messages.nextLabel().getString());
+        assertEquals("Proceed", messages.nextTooltip().getString());
+        assertEquals(contents, Files.readString(file));
+        Files.writeString(file, "nextDialogueText: [invalid]\n");
+        assertEquals(messages, DialogueMessages.load(file.toFile(), messages));
+    }
+
+    @Test
     void commandRestrictionsPreserveLegacyPrefixesAndDialogueControls() throws Exception {
         Path file = directory.resolve("commands.yml");
         Files.writeString(file, "allow_commands_while_in_conversation: false\ncommands_whitelist: ['/help', '/login']\n");
