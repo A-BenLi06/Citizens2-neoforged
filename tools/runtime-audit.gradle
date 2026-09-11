@@ -29,7 +29,7 @@ allprojects {
                             || log.contains('[SHOPAUDIT] FAILED') || log.contains('[RADIUSAUDIT] FAILED')
                             || log.contains('[PROXIMITYAUDIT] FAILED') || log.contains('[MOVEMENTAUDIT] FAILED')
                             || log.contains('[COMMANDAUDIT] FAILED') || log.contains('[SKIPAUDIT] FAILED')
-                            || log.contains('[ROUTINGAUDIT] FAILED') || !missing.isEmpty()) {
+                            || log.contains('[ROUTINGAUDIT] FAILED') || log.contains('[INVENTORYAUDIT] FAILED') || !missing.isEmpty()) {
                         throw new GradleException("Runtime audit failed or incomplete: ${passed.size()} NPC assertions, missing ${missing}; inspect isolated logs/latest.log")
                     }
                 }

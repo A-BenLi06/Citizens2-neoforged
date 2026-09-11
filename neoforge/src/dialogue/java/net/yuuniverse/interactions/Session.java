@@ -51,6 +51,7 @@ public class Session {
         lineOrder = node.orderedLines(player.getRandom());
         DialogueMovement.begin(this);
         DialogueCommands.begin(this);
+        DialogueInventory.begin(this);
     }
 
     public boolean isFinished() {
@@ -60,6 +61,8 @@ public class Session {
     boolean permitsCommand(String command) {
         return engine.settings().permitsCommand(command);
     }
+
+    boolean permitsInventoryInteract() { return engine.settings().allowInventoryInteract(); }
 
     /** Queues a single line completion; rewards run on tick, outside the command dispatch queue. */
     public boolean skipDialogue(boolean npcClick) {
@@ -340,6 +343,7 @@ public class Session {
         finished = true;
         DialogueMovement.end(this);
         DialogueCommands.end(this);
+        DialogueInventory.end(this);
         skipRequested = false;
         pendingChoice = null;
         awaitingChoice = false;

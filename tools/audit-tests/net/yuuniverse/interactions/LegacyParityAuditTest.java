@@ -16,6 +16,17 @@ import org.junit.jupiter.api.io.TempDir;
 /** Acceptance probes kept separate from the default suite: these expose open parity defects. */
 public class LegacyParityAuditTest {
     @Test
+    void inventoryRestrictionLoadsWithoutChangingLegacyDefault() throws Exception {
+        assertTrue(DialogueSettings.DEFAULT.allowInventoryInteract());
+        Path file = directory.resolve("inventory.yml");
+        Files.writeString(file, "allow_inventory_interact_while_in_conversation: false\n");
+        var restricted = DialogueSettings.load(file.toFile(), DialogueSettings.DEFAULT);
+        assertFalse(restricted.allowInventoryInteract());
+        Files.writeString(file, "allow_inventory_interact_while_in_conversation: true\n");
+        assertTrue(DialogueSettings.load(file.toFile(), restricted).allowInventoryInteract());
+    }
+
+    @Test
     void lineRoutingAndManualDurationLoadFromLegacyYaml() throws Exception {
         Files.writeString(directory.resolve("route.yml"), """
                 starts_with: ['NPC with id 1']
