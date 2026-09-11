@@ -16,6 +16,38 @@ import org.junit.jupiter.api.io.TempDir;
 /** Acceptance probes kept separate from the default suite: these expose open parity defects. */
 public class LegacyParityAuditTest {
     @Test
+    void optionMessageTemplatesLoadAndPreserveUnknownMessages() throws Exception {
+        Path file = directory.resolve("options.yml");
+        String source = "optionsFormat: '&6%number%. %text%'\nclickableOptionHover: 'Pick %option%'\n"
+                + "optionsMainFormat: ['Header', '%options%', 'Footer']\nunknown: retained\n";
+        Files.writeString(file, source);
+        var messages = DialogueMessages.load(file.toFile(), DialogueMessages.DEFAULT);
+        assertEquals("2. Choice", messages.optionLabel(2, "Choice", null).getString());
+        assertEquals("Pick 2", messages.optionTooltip(2, null).getString());
+        assertEquals(java.util.List.of("Header", "%options%", "Footer"), messages.optionsMainFormat());
+        assertEquals(source, Files.readString(file));
+    }
+
+    @Test
+    void invalidOptionLayoutRetainsPreviousMessages() throws Exception {
+        Path file = directory.resolve("options.yml");
+        Files.writeString(file, "optionsMainFormat: [17]\n");
+        var previous = new DialogueMessages("Next", "Continue", "%text%", "%option%", java.util.List.of("%options%"));
+        assertEquals(previous, DialogueMessages.load(file.toFile(), previous));
+    }
+
+    @Test
+    void optionClickAndSpacingSettingsCanBeDisabled() throws Exception {
+        assertTrue(DialogueSettings.DEFAULT.clickableOptions());
+        assertTrue(DialogueSettings.DEFAULT.useEmptySpaces());
+        Path file = directory.resolve("options.yml");
+        Files.writeString(file, "clickable_options: false\nuse_empty_spaces: false\n");
+        var settings = DialogueSettings.load(file.toFile(), DialogueSettings.DEFAULT);
+        assertFalse(settings.clickableOptions());
+        assertFalse(settings.useEmptySpaces());
+    }
+
+    @Test
     void inventoryRestrictionLoadsWithoutChangingLegacyDefault() throws Exception {
         assertTrue(DialogueSettings.DEFAULT.allowInventoryInteract());
         Path file = directory.resolve("inventory.yml");

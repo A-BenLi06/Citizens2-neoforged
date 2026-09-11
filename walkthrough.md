@@ -176,3 +176,13 @@
 - First runtime attempt failed due to an incorrect creative-packet accessor in the mixin target (getItem instead of itemStack). Corrected against the mapped 1.21.1 API and reran successfully; the failed run is excluded from acceptance.
 - Still open: connected-client inventory prediction/display, special modded containers, physical block interactions such as pressure plates/trampling, and legacy denial-message customization. This is not full global-restriction or modpack parity. Production was not modified.
 - Final validation: 124 ordinary tests and normal build pass; all release jars exclude runtime audit classes. Evidence: artifacts/repair-inventory-final248.log.
+
+## 2026-09-11 17:25:08 +08:00 — Restore configurable option presentation and clickable behavior
+
+- Read legacy optionsFormat, clickableOptionHover and optionsMainFormat from messages.yml, preserving unknown keys and retaining the previous snapshot after malformed reloads. Option text/hover substitute the legacy number tokens; text retains legacy colors and supported player placeholders.
+- Render the configured outer layout, expanding lines containing %options% into the filtered option list as the old sender does. Honor clickable_options and option-stage use_empty_spaces. Disabled clicks omit command/hover events while typed choices remain available.
+- Removed hardcoded Chinese option instructions and hover text. Missing message overrides use translatable English labels/prompts; configured layouts are not appended with an extra default prompt.
+- Corrected typed option text matching to expand player placeholders consistently with the displayed option body. Hidden options retain consecutive visible indices, and click commands select the corresponding visible reward.
+- Validation: 29 dialogue audit tests passed. Final isolated NeoForge 21.1.248 acceptance passed 107 NPC assertions and 137 runtime probes. Ten new checks cover layout, filtering/indices, hover substitution, color, actual reward selection, disabled clicks, typed selection, fallback prompts/spacing and expanded-name matching. Logs: artifacts/repair-option-display-runtime248-final.log, artifacts/repair-option-display-tests248.log and artifacts/repair-option-display-dialogue-tests.xml.
+- Still open: selectable movement/scroll controls and selected-row formatting, inline options, global message prefixes/name formatting, other message overrides, actual connected-client rendering and full modpack parity. No production changes.
+- Final validation: 124 ordinary tests and normal build pass; release jars exclude runtime audit classes. Evidence: artifacts/repair-option-display-final248.log.

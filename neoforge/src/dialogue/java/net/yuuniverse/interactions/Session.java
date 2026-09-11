@@ -265,21 +265,33 @@ public class Session {
             return;
         }
         awaitingChoice = true;
-        player.sendSystemMessage(Component.empty());
+        if (engine.settings().useEmptySpaces()) player.sendSystemMessage(Component.empty());
+        List<Component> rendered = new ArrayList<>();
         for (int i = 0; i < offered.size(); i++) {
             Conversation.Option option = offered.get(i);
             final int number = i + 1;
             String command = "/interactions choose " + number;
-            player.sendSystemMessage(Component.literal(" [" + (i + 1) + "] ")
-                    .withStyle(Style.EMPTY.withColor(ChatFormatting.GOLD))
-                    .append(Text.legacy(Text.placeholders(option.text, player)))
-                    .withStyle(style -> style.withClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, command))
-                            .withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT,
-                                    Component.literal("点击选择,或直接在聊天里输入 " + number)))
-                            .withUnderlined(true)));
+            MutableComponent message = engine.messages().optionLabel(number, option.text, player).copy();
+            if (engine.settings().clickableOptions()) {
+                message.withStyle(style -> style.withClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, command))
+                        .withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, engine.messages().optionTooltip(number, player))));
+            }
+            rendered.add(message);
         }
-        player.sendSystemMessage(Component.literal(" (点击上面的选项,或在聊天里输入编号)")
-                .withStyle(Style.EMPTY.withColor(ChatFormatting.DARK_GRAY)));
+        List<String> layout = engine.messages().optionsMainFormat();
+        if (layout != null) {
+            for (String line : layout) {
+                // Legacy layout lines containing the marker expand to the whole option list.
+                if (line.contains("%options%")) rendered.forEach(player::sendSystemMessage);
+                else player.sendSystemMessage(Text.legacy(Text.placeholders(line, player)));
+            }
+        } else {
+            rendered.forEach(player::sendSystemMessage);
+            player.sendSystemMessage((engine.settings().clickableOptions()
+                    ? Component.translatableWithFallback("interactions.options.prompt", "Click an option or enter its number in chat.")
+                    : Component.translatableWithFallback("interactions.options.prompt.typed", "Enter an option number in chat."))
+                    .withStyle(Style.EMPTY.withColor(ChatFormatting.DARK_GRAY)));
+        }
     }
 
     /** @return true while the session is waiting for the player to pick an option */
@@ -314,7 +326,8 @@ public class Session {
         String needle = text.toLowerCase(java.util.Locale.ROOT);
         int match = -1;
         for (int i = 0; i < offered.size(); i++) {
-            String plain = Text.plain(Text.legacy(offered.get(i).text)).toLowerCase(java.util.Locale.ROOT);
+            String plain = Text.plain(Text.legacy(Text.placeholders(offered.get(i).text, player)))
+                    .toLowerCase(java.util.Locale.ROOT);
             if (plain.contains(needle)) {
                 if (match >= 0)
                     return false;
