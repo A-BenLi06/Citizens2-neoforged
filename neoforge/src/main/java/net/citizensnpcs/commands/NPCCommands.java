@@ -42,6 +42,7 @@ import java.util.Locale;
 
 import com.google.common.base.Joiner;
 import com.google.common.base.Splitter;
+import com.google.common.primitives.Ints;
 
 import java.util.Arrays;
 import java.util.UUID;
@@ -133,6 +134,7 @@ import java.time.Duration;
 import net.citizensnpcs.api.ai.NavigatorParameters;
 import net.citizensnpcs.api.ai.PathfinderType;
 import net.citizensnpcs.api.ai.TeleportStuckAction;
+import net.citizensnpcs.api.ai.speech.SpeechContext;
 import net.citizensnpcs.api.event.SpawnReason;
 import net.citizensnpcs.api.npc.MemoryNPCDataStore;
 import net.citizensnpcs.api.npc.NPC;
@@ -2991,14 +2993,47 @@ public class NPCCommands {
 
     @Command(
             aliases = { "npc" },
-            usage = "speak [message]",
+            usage = "speak [message] --bubble [duration] --target [npcid|player name] --range [blocks]",
             desc = "",
             modifiers = { "speak" },
             min = 2,
-            permission = "citizens.npc.speak",
-            parsePlaceholders = true)
-    public void speak(CommandContext args, CommandSourceStack sender, NPC npc) throws CommandException {
-        npc.speak(new net.citizensnpcs.api.ai.speech.SpeechContext(args.getJoinedStrings(1)));
+            permission = "citizens.npc.speak")
+    public void speak(CommandContext args, CommandSourceStack sender, NPC npc, @Flag("bubble") Duration bubbleDuration,
+            @Flag("type") String type, @Flag("target") String target, @Flag("range") Float range)
+            throws CommandException {
+        String message = args.getJoinedStrings(1);
+        SpeechContext context = new SpeechContext(message);
+        ServerPlayer playerRecipient = null;
+        if (target != null) {
+            Integer targetId = Ints.tryParse(target);
+            if (targetId != null) {
+                NPC targetNPC = CitizensAPI.getNPCRegistry().getById(targetId);
+                if (targetNPC != null && targetNPC.isSpawned()) {
+                    context.addRecipient(targetNPC.getEntity());
+                }
+            } else {
+                playerRecipient = sender.getServer().getPlayerList().getPlayerByName(target);
+                if (playerRecipient != null) {
+                    context.addRecipient(playerRecipient);
+                }
+            }
+        }
+        if (bubbleDuration != null) {
+            HologramTrait trait = npc.getOrAddTrait(HologramTrait.class);
+            trait.addTemporaryLine(Placeholders.replace(message,
+                    playerRecipient == null ? null : playerRecipient.createCommandSourceStack(), npc),
+                    Durations.toTicks(bubbleDuration));
+            return;
+        }
+        if (!npc.isSpawned())
+            return;
+        Entity entity = npc.getEntity();
+        if (range != null) {
+            entity.level().getEntities(entity, entity.getBoundingBox().inflate(range)).stream()
+                    .filter(e -> !CitizensAPI.getNPCRegistry().isNPC(e)).forEach(context::addRecipient);
+        }
+        context.setTalker(entity);
+        npc.speak(context);
     }
 
     @Command(
