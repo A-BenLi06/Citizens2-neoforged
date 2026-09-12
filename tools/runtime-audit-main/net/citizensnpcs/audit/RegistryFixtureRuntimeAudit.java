@@ -20,6 +20,6 @@ public final class RegistryFixtureRuntimeAudit {
     @SubscribeEvent
     public static void attributes(net.neoforged.neoforge.event.entity.EntityAttributeModificationEvent event) {
         event.add(net.minecraft.world.entity.EntityType.PIG,
-                net.minecraft.core.registries.BuiltInRegistries.ATTRIBUTE.getHolder(ATTRIBUTE).orElseThrow());
+                net.minecraft.core.registries.BuiltInRegistries.ATTRIBUTE.getHolder(ATTRIBUTE).orElseThrow(), 9);
     }
 }

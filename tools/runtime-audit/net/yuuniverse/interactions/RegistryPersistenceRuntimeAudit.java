@@ -74,7 +74,60 @@ public final class RegistryPersistenceRuntimeAudit {
             art.setArt(vanillaArt);
             art.save(reloaded.getKey("painting"));
             check(reloaded.getKey("painting").getString("art").equals("ALBAN"), "vanilla_painting_save_retains_legacy_name");
-            LoggerFactory.getLogger("interactions").info("[REGISTRYPERSISTAUDIT] COMPLETE 10/10");
+            var control = EntityType.PIG.create(event.getServer().overworld());
+            double defaultHealth = control.getAttributeBaseValue(vanillaAttribute);
+            double defaultCustom = control.getAttributeBaseValue(customAttribute);
+            control.discard();
+            check(defaultHealth != vanillaAttribute.value().getDefaultValue()
+                    && defaultCustom != customAttribute.value().getDefaultValue(), "reset_fixture_distinguishes_type_and_registry_defaults");
+            attributes.resetToDefaultValue(vanillaAttribute);
+            check(((LivingEntity) pig.getEntity()).getAttributeBaseValue(vanillaAttribute) == vanillaAttribute.value().getDefaultValue(),
+                    "reset_matches_legacy_attribute_default_health");
+            attributes.resetToDefaultValue(customAttribute);
+            check(((LivingEntity) pig.getEntity()).getAttributeBaseValue(customAttribute) == customAttribute.value().getDefaultValue(),
+                    "reset_uses_attribute_default_despite_modified_type_default");
+            attributes.save(reloaded.getKey("pig"));
+            check(!attributes.hasAttribute(vanillaAttribute) && !attributes.hasAttribute(customAttribute)
+                    && ((java.util.Map<?, ?>) reloaded.getKey("pig").getRaw("attributes")).isEmpty(), "reset_removes_saved_overrides");
+            pig.despawn();
+            if (!pig.spawn(position)) throw new AssertionError("reset respawn failed");
+            check(((LivingEntity) pig.getEntity()).getAttributeBaseValue(vanillaAttribute) == defaultHealth
+                    && ((LivingEntity) pig.getEntity()).getAttributeBaseValue(customAttribute) == defaultCustom,
+                    "respawn_uses_type_defaults_after_override_removal");
+            reloaded.getKey("pig").setRaw("attributes", java.util.Map.of("missing_fixture:generic.attribute", 41.25));
+            attributes.load(reloaded.getKey("pig"));
+            attributes.save(reloaded.getKey("pig"));
+            check(((java.util.Map<?, ?>) reloaded.getKey("pig").getRaw("attributes"))
+                    .get("missing_fixture:generic.attribute").equals(41.25), "missing_attribute_survives_save");
+            reloaded.getKey("painting").setString("art", "missing_fixture:lost_painting");
+            art.load(reloaded.getKey("painting"));
+            art.save(reloaded.getKey("painting"));
+            check(art.getArt() == null && reloaded.getKey("painting").getString("art").equals("missing_fixture:lost_painting"),
+                    "missing_painting_id_survives_save");
+            reloaded.save();
+            var absentReload = new YamlStorage(file.toFile());
+            if (!absentReload.load()) throw new AssertionError("unresolved YAML reload failed");
+            attributes.load(absentReload.getKey("pig"));
+            art.load(absentReload.getKey("painting"));
+            attributes.save(absentReload.getKey("pig"));
+            art.save(absentReload.getKey("painting"));
+            check(((java.util.Map<?, ?>) absentReload.getKey("pig").getRaw("attributes"))
+                    .get("missing_fixture:generic.attribute").equals(41.25)
+                    && absentReload.getKey("painting").getString("art").equals("missing_fixture:lost_painting"),
+                    "missing_registry_values_survive_yaml_reload");
+            attributes.setAttributeValue(customAttribute, 17);
+            attributes.save(absentReload.getKey("pig"));
+            check(((java.util.Map<?, ?>) absentReload.getKey("pig").getRaw("attributes")).size() == 2,
+                    "editing_known_attribute_preserves_missing_entries");
+            art.setArt(customArt);
+            art.save(absentReload.getKey("painting"));
+            check(absentReload.getKey("painting").getString("art").equals("citizens_audit:alban"),
+                    "explicit_painting_selection_replaces_missing_id");
+            art.load(reloaded.getKey("painting"));
+            art.setArt(null);
+            art.save(absentReload.getKey("painting"));
+            check(absentReload.getKey("painting").getString("art").isEmpty(), "explicit_painting_clear_removes_missing_id");
+            LoggerFactory.getLogger("interactions").info("[REGISTRYPERSISTAUDIT] COMPLETE 21/21");
         } catch (Throwable failure) {
             LoggerFactory.getLogger("interactions").error("[REGISTRYPERSISTAUDIT] FAILED", failure);
         } finally {

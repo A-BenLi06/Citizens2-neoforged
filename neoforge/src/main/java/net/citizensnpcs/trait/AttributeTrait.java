@@ -28,6 +28,7 @@ import java.util.Map;
 @TraitName("attributetrait")
 public class AttributeTrait extends Trait {
     private final Map<Holder<Attribute>, Double> attributes = new HashMap<>();
+    private final Map<String, Object> unresolvedAttributes = new HashMap<>();
 
     public AttributeTrait() {
         super("attributetrait");
@@ -44,11 +45,12 @@ public class AttributeTrait extends Trait {
     @Override
     public void load(DataKey key) throws NPCLoadException {
         attributes.clear();
+        unresolvedAttributes.clear();
         for (DataKey sub : key.getRelative("attributes").getSubKeys()) {
             Holder<Attribute> attribute = parse(sub.name());
             if (attribute == null) {
-                // named but unresolvable: say which one rather than dropping it silently
-                Messaging.warn("Unknown attribute '" + sub.name() + "' on NPC", npc, "- ignoring it.");
+                unresolvedAttributes.put(sub.name(), sub.getRaw(""));
+                Messaging.warn("Unknown attribute '" + sub.name() + "' on NPC", npc, "- retaining its stored value.");
                 continue;
             }
             attributes.put(attribute, sub.getDouble(""));
@@ -57,7 +59,7 @@ public class AttributeTrait extends Trait {
 
     @Override
     public void save(DataKey key) {
-        Map<String, Object> saved = new HashMap<>();
+        Map<String, Object> saved = new HashMap<>(unresolvedAttributes);
         for (Map.Entry<Holder<Attribute>, Double> entry : attributes.entrySet()) {
             entry.getKey().unwrapKey().ifPresent(
                     k -> saved.put(k.location().getNamespace().equals("minecraft")

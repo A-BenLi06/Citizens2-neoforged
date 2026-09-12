@@ -24,6 +24,7 @@ import net.neoforged.neoforge.server.ServerLifecycleHooks;
 @TraitName("paintingtrait")
 public class PaintingTrait extends Trait {
     private Holder<PaintingVariant> art;
+    private String unresolvedArt;
 
     public PaintingTrait() {
         super("paintingtrait");
@@ -35,14 +36,17 @@ public class PaintingTrait extends Trait {
 
     @Override
     public void load(DataKey key) throws NPCLoadException {
-        art = parse(key.getString("art"));
+        String stored = key.getString("art");
+        art = parse(stored);
+        unresolvedArt = art == null ? stored : null;
     }
 
     @Override
     public void save(DataKey key) {
-        key.setString("art",
-                art == null ? "" : art.unwrapKey().map(k -> k.location().getNamespace().equals("minecraft")
-                        ? k.location().getPath().toUpperCase(Locale.ROOT) : k.location().toString()).orElse(""));
+        String stored = art == null ? unresolvedArt
+                : art.unwrapKey().map(k -> k.location().getNamespace().equals("minecraft")
+                        ? k.location().getPath().toUpperCase(Locale.ROOT) : k.location().toString()).orElse(null);
+        key.setString("art", stored == null ? "" : stored);
     }
 
     @Override
@@ -54,6 +58,7 @@ public class PaintingTrait extends Trait {
 
     public void setArt(Holder<PaintingVariant> art) {
         this.art = art;
+        unresolvedArt = null;
     }
 
     /**
