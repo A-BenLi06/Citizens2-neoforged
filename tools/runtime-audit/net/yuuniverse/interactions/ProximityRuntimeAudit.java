@@ -20,7 +20,7 @@ public final class ProximityRuntimeAudit {
     private static boolean ran;
     @SubscribeEvent
     public static void tick(ServerTickEvent.Post event) {
-        if (ran || event.getServer().getTickCount() < 45) return;
+        if (ran || net.citizensnpcs.audit.FixtureRuntimeAudit.elapsedTicks(event.getServer()) < 45) return;
         ran = true;
         var registry = CitizensAPI.createAnonymousNPCRegistry(new MemoryNPCDataStore());
         var npc = registry.createNPC(EntityType.PIG, "ProximityAudit");

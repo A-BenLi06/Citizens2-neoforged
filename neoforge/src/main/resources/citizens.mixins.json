@@ -4,6 +4,7 @@
   "package": "net.citizensnpcs.mixin",
   "compatibilityLevel": "JAVA_21",
   "mixins": [
+    "BlockAttachedEntityMixin",
     "ChunkMapMixin",
     "LivingEntitySoundMixin",
     "MobSoundMixin",

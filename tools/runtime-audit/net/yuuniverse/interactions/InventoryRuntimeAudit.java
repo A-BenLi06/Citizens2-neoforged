@@ -37,7 +37,7 @@ public final class InventoryRuntimeAudit {
 
     @SubscribeEvent
     public static void tick(ServerTickEvent.Post event) {
-        if (ran || event.getServer().getTickCount() < 70) return;
+        if (ran || net.citizensnpcs.audit.FixtureRuntimeAudit.elapsedTicks(event.getServer()) < 70) return;
         ran = true;
         Session session = null;
         Session replacement = null;

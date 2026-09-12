@@ -21,7 +21,7 @@ public final class MovementRuntimeAudit {
     private static boolean ran;
     @SubscribeEvent
     public static void tick(ServerTickEvent.Post event) {
-        if (ran || event.getServer().getTickCount() < 50) return;
+        if (ran || net.citizensnpcs.audit.FixtureRuntimeAudit.elapsedTicks(event.getServer()) < 50) return;
         ran = true;
         Session session = null;
         Session replacement = null;

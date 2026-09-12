@@ -20,7 +20,7 @@ public final class OptionDisplayRuntimeAudit {
 
     @SubscribeEvent
     public static void tick(ServerTickEvent.Post event) {
-        if (ran || event.getServer().getTickCount() < 75) return;
+        if (ran || net.citizensnpcs.audit.FixtureRuntimeAudit.elapsedTicks(event.getServer()) < 75) return;
         ran = true;
         Session session = null;
         try {
@@ -131,7 +131,39 @@ public final class OptionDisplayRuntimeAudit {
             check(output.get(2).toFlatList().stream().anyMatch(part -> part.getStyle().getClickEvent() != null
                     && part.getStyle().getClickEvent().getValue().equals("/interactions skipdialogue")),
                     "separate_heading_preserves_next_button");
-            LoggerFactory.getLogger("interactions").info("[OPTIONDISPLAYAUDIT] COMPLETE 16/16");
+            session.end(false);
+            output.clear();
+            settings.set(new DialogueSettings(false, false, false, List.of(), false, true, true, false));
+            line.showName = false;
+            line.text.clear();
+            line.text.add("""
+                    json:{"text":"Hello %player%","color":"gold","extra":[{"text":" json: link","clickEvent":{"action":"suggest_command","value":"/help %player%"},"hoverEvent":{"action":"show_text","contents":{"text":"For %player%"}}}]}
+                    """.strip());
+            session = new Session(engine, story, dialogue, player, null);
+            session.tick();
+            check(output.size() == 1 && output.get(0).getString().equals("Hello DisplayAudit json: link"),
+                    "json_dialogue_expands_player_without_literal_serialization");
+            check(output.get(0).toFlatList().stream().anyMatch(part -> part.getStyle().getColor() != null
+                    && part.getStyle().getColor().getValue() == net.minecraft.ChatFormatting.GOLD.getColor()),
+                    "json_dialogue_preserves_color");
+            check(output.get(0).toFlatList().stream().anyMatch(part -> part.getStyle().getClickEvent() != null
+                    && part.getStyle().getClickEvent().getValue().equals("/help DisplayAudit")), "json_dialogue_preserves_click");
+            check(output.get(0).toFlatList().stream().anyMatch(part -> part.getStyle().getHoverEvent() != null
+                    && part.getStyle().getHoverEvent().getValue(HoverEvent.Action.SHOW_TEXT).getString().equals("For DisplayAudit")),
+                    "json_dialogue_preserves_hover");
+            session.end(false);
+            output.clear();
+            line.text.add("json:{broken");
+            player.getInventory().clearContent();
+            player.getInventory().add(new net.minecraft.world.item.ItemStack(Items.PAPER, 2));
+            line.actions.add("remove_item: %checkitem_remove_mat:minecraft:paper,amt:1%");
+            line.actions.add("player_command_as_op: give @s minecraft:diamond 1");
+            session = new Session(engine, story, dialogue, player, null);
+            session.tick();
+            check(session.isFinished() && player.getInventory().countItem(Items.PAPER) == 2
+                    && player.getInventory().countItem(Items.DIAMOND) == 0, "invalid_json_ends_before_payment_and_reward");
+            check(output.isEmpty(), "invalid_json_prevents_partial_dialogue_output");
+            LoggerFactory.getLogger("interactions").info("[OPTIONDISPLAYAUDIT] COMPLETE 22/22");
         } catch (Throwable failure) {
             LoggerFactory.getLogger("interactions").error("[OPTIONDISPLAYAUDIT] FAILED", failure);
         } finally {

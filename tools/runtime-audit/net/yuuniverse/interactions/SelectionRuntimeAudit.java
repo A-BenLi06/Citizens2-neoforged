@@ -27,7 +27,7 @@ public final class SelectionRuntimeAudit {
     private static boolean ran;
     @SubscribeEvent
     public static void tick(ServerTickEvent.Post event) {
-        if (ran || event.getServer().getTickCount() < 80) return;
+        if (ran || net.citizensnpcs.audit.FixtureRuntimeAudit.elapsedTicks(event.getServer()) < 80) return;
         ran = true;
         Session session = null;
         ServerPlayer player = null;

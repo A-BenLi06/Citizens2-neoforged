@@ -19,6 +19,31 @@ public final class Text {
     private Text() {
     }
 
+    /** Expands JSON string values after parsing so placeholder text cannot change the component structure. */
+    public static Component json(String raw, ServerPlayer player) {
+        var tree = com.google.gson.JsonParser.parseString(raw);
+        var expanded = expandJson(tree, player);
+        Component result = Component.Serializer.fromJson(expanded.toString(),
+                player == null ? net.minecraft.core.RegistryAccess.EMPTY : player.registryAccess());
+        if (result == null) throw new IllegalArgumentException("Expected a chat component");
+        return result;
+    }
+
+    private static com.google.gson.JsonElement expandJson(com.google.gson.JsonElement value, ServerPlayer player) {
+        if (value.isJsonObject()) {
+            var result = new com.google.gson.JsonObject();
+            value.getAsJsonObject().entrySet().forEach(entry -> result.add(entry.getKey(), expandJson(entry.getValue(), player)));
+            return result;
+        }
+        if (value.isJsonArray()) {
+            var result = new com.google.gson.JsonArray();
+            value.getAsJsonArray().forEach(entry -> result.add(expandJson(entry, player)));
+            return result;
+        }
+        return value.isJsonPrimitive() && value.getAsJsonPrimitive().isString()
+                ? new com.google.gson.JsonPrimitive(placeholders(value.getAsString(), player)) : value;
+    }
+
     /** Parses a legacy {@code &}-coded string into a component, keeping colours and styles as they run. */
     public static Component legacy(String raw) {
         if (raw == null || raw.isEmpty())

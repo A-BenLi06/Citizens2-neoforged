@@ -20,7 +20,7 @@ public final class SentinelRuntimeAudit {
 
     @SubscribeEvent
     public static void tick(ServerTickEvent.Post event) {
-        if (ran || event.getServer().getTickCount() < 25) return;
+        if (ran || net.citizensnpcs.audit.FixtureRuntimeAudit.elapsedTicks(event.getServer()) < 25) return;
         ran = true;
         var registry = CitizensAPI.createAnonymousNPCRegistry(new MemoryNPCDataStore());
         var npc = registry.createNPC(EntityType.PIG, "SentinelAudit");

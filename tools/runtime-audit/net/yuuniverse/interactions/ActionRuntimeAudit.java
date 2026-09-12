@@ -19,7 +19,7 @@ public final class ActionRuntimeAudit {
 
     @SubscribeEvent
     public static void tick(ServerTickEvent.Post event) {
-        if (ran || event.getServer().getTickCount() < 20) return;
+        if (ran || net.citizensnpcs.audit.FixtureRuntimeAudit.elapsedTicks(event.getServer()) < 20) return;
         ran = true;
         try {
             var player = new FakePlayer(event.getServer().overworld(),

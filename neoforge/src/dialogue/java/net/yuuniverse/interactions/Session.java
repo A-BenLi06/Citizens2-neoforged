@@ -86,7 +86,7 @@ public class Session {
         selectedOption = next;
         // Legacy redraw clears the prior selection display; rendering must not execute dialogue actions again.
         for (int i = 0; i < 13; i++) player.sendSystemMessage(Component.empty());
-        if (completedLine != null) renderLine(completedLine);
+        if (completedLine != null && !renderLine(completedLine)) return false;
         renderOptions();
         return true;
     }
@@ -212,7 +212,7 @@ public class Session {
         }
         current = line;
         ticksOnLine = 0;
-        renderLine(line);
+        if (!renderLine(line)) return;
         if (!engine.actions().runAll(line.actions, player, npcName())) {
             end(false);
             return;
@@ -223,26 +223,39 @@ public class Session {
         }
     }
 
-    private void renderLine(Conversation.Line line) {
+    private boolean renderLine(Conversation.Line line) {
+        List<Component> rendered = new ArrayList<>();
+        try {
+            for (String raw : line.textOrEmpty()) rendered.add(renderText(raw));
+        } catch (RuntimeException failure) {
+            org.slf4j.LoggerFactory.getLogger("interactions").error("Could not render {} / {} / {}",
+                    conversation.source, node.key, line.key, failure);
+            end(false);
+            return false;
+        }
         if (engine.settings().useEmptySpaces()) player.sendSystemMessage(Component.empty());
         if (line.showName && !conversation.name.isEmpty()) {
             Component heading = engine.messages().speakerName(conversation.name);
             if (!heading.getString().isEmpty()) player.sendSystemMessage(heading);
         }
-        for (String raw : line.textOrEmpty()) {
-            String text = Text.placeholders(raw, player);
-            MutableComponent message = Component.empty();
-            int nextMarker = text.indexOf("%next%");
-            if (nextMarker >= 0) {
-                message.append(Text.legacy(text.substring(0, nextMarker)));
-                message.append(engine.messages().nextLabel().copy().withStyle(style -> style
-                        .withClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/interactions skipdialogue"))
-                        .withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, engine.messages().nextTooltip()))));
-            } else {
-                message.append(Text.legacy(text));
-            }
-            player.sendSystemMessage(message);
+        rendered.forEach(player::sendSystemMessage);
+        return true;
+    }
+
+    private Component renderText(String raw) {
+        if (raw.startsWith("json:")) return Text.json(raw.substring("json:".length()), player);
+        String text = Text.placeholders(raw, player);
+        MutableComponent message = Component.empty();
+        int nextMarker = text.indexOf("%next%");
+        if (nextMarker >= 0) {
+            message.append(Text.legacy(text.substring(0, nextMarker)));
+            message.append(engine.messages().nextLabel().copy().withStyle(style -> style
+                    .withClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/interactions skipdialogue"))
+                    .withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, engine.messages().nextTooltip()))));
+        } else {
+            message.append(Text.legacy(text));
         }
+        return message;
     }
 
     private String progressKey(String nodeKey, String lineKey) {

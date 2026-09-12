@@ -133,6 +133,8 @@ public class MCNavigationStrategy extends AbstractPathStrategy {
         }
         if (!issued) {
             issued = true;
+            // The first request is deferred; physics may have reset the spawn-time ground flag in between.
+            mob.setOnGround(true);
             if (!pathIssuer.test(mob)) {
                 // vanilla could not produce a path at all, which is the only genuine failure here
                 setCancelReason(CancelReason.STUCK);
@@ -156,9 +158,6 @@ public class MCNavigationStrategy extends AbstractPathStrategy {
     private float prepare() {
         if (mob == null)
             return -1;
-        // vanilla will not compute a path while the mob is airborne, and a just-spawned NPC has not landed yet. Upstream
-        // forces the same flag for the same reason; nudging the entity with a move does not reliably fix it.
-        mob.setOnGround(true);
         mob.getNavigation().getNodeEvaluator().setCanOpenDoors(parameters.hasExaminer(DoorExaminer.class));
         float old = mob.getPathfindingMalus(PathType.WATER);
         if (parameters.avoidWater() && old >= 0) {

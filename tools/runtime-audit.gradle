@@ -24,7 +24,8 @@ allprojects {
                     def passed = (log =~ /\[NPCTEST\] PASS ([\w-]+)/).collect { it[1] }.toSet()
                     def missing = p.file('../tools/runtime-audit-expected.txt').readLines('UTF-8')
                             .findAll { !it.isBlank() && !log.contains(it) }
-                    if (log.contains('[NPCTEST] FAIL') || log.contains('[ACTIONAUDIT] FAILED')
+                    if (log.contains('[FIXTUREAUDIT] FAILED') || log.contains('[HANGINGAUDIT] FAILED') || log.contains('[NAVSTARTAUDIT] FAILED')
+                            || log.contains('[NPCTEST] FAIL') || log.contains('[ACTIONAUDIT] FAILED')
                             || log.contains('[SENTINELAUDIT] FAILED') || log.contains('[NATIVEAPIAUDIT] FAILED')
                             || log.contains('[SHOPAUDIT] FAILED') || log.contains('[RADIUSAUDIT] FAILED')
                             || log.contains('[PROXIMITYAUDIT] FAILED') || log.contains('[MOVEMENTAUDIT] FAILED')

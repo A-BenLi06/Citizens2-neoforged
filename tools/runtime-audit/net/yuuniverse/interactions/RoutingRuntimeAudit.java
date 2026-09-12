@@ -16,7 +16,7 @@ public final class RoutingRuntimeAudit {
 
     @SubscribeEvent
     public static void tick(ServerTickEvent.Post event) {
-        if (ran || event.getServer().getTickCount() < 65) return;
+        if (ran || net.citizensnpcs.audit.FixtureRuntimeAudit.elapsedTicks(event.getServer()) < 65) return;
         ran = true;
         Session session = null;
         try {

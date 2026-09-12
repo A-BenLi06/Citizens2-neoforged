@@ -15,7 +15,7 @@ public final class DialogueRadiusRuntimeAudit {
     private static boolean ran;
     @SubscribeEvent
     public static void tick(ServerTickEvent.Post event) {
-        if (ran || event.getServer().getTickCount() < 40) return;
+        if (ran || net.citizensnpcs.audit.FixtureRuntimeAudit.elapsedTicks(event.getServer()) < 40) return;
         ran = true;
         try {
             var level = event.getServer().overworld();

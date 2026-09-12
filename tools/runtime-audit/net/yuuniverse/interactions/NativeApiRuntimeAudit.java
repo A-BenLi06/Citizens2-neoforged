@@ -23,7 +23,7 @@ public final class NativeApiRuntimeAudit {
 
     @SubscribeEvent
     public static void tick(ServerTickEvent.Post event) {
-        if (ran || event.getServer().getTickCount() < 30) return;
+        if (ran || net.citizensnpcs.audit.FixtureRuntimeAudit.elapsedTicks(event.getServer()) < 30) return;
         ran = true;
         boolean lookDefault = Setting.DEFAULT_LOOK_CLOSE.asBoolean();
         var registry = CitizensAPI.createAnonymousNPCRegistry(new MemoryNPCDataStore());

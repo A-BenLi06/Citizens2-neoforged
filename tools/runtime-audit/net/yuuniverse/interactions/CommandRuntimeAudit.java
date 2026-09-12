@@ -27,7 +27,7 @@ public final class CommandRuntimeAudit {
 
     @SubscribeEvent
     public static void tick(ServerTickEvent.Post event) {
-        if (ran || event.getServer().getTickCount() < 55) return;
+        if (ran || net.citizensnpcs.audit.FixtureRuntimeAudit.elapsedTicks(event.getServer()) < 55) return;
         ran = true;
         Session session = null;
         Session replacement = null;

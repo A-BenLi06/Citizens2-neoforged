@@ -22,7 +22,7 @@ public final class SkipRuntimeAudit {
 
     @SubscribeEvent
     public static void tick(ServerTickEvent.Post event) {
-        if (ran || event.getServer().getTickCount() < 60) return;
+        if (ran || net.citizensnpcs.audit.FixtureRuntimeAudit.elapsedTicks(event.getServer()) < 60) return;
         ran = true;
         var controller = new InteractionsMod();
         NeoForge.EVENT_BUS.unregister(controller);

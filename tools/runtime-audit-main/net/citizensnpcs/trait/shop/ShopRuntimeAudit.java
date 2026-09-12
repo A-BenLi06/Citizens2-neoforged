@@ -19,7 +19,7 @@ public final class ShopRuntimeAudit {
 
     @SubscribeEvent
     public static void tick(ServerTickEvent.Post event) {
-        if (ran || event.getServer().getTickCount() < 35) return;
+        if (ran || net.citizensnpcs.audit.FixtureRuntimeAudit.elapsedTicks(event.getServer()) < 35) return;
         ran = true;
         EconomyProvider previous = EconomyProvider.getProvider();
         try {

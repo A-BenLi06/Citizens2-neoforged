@@ -16,6 +16,28 @@ import org.junit.jupiter.api.io.TempDir;
 /** Acceptance probes kept separate from the default suite: these expose open parity defects. */
 public class LegacyParityAuditTest {
     @Test
+    void jsonDialoguePreservesNestedComponentsAndLiteralMarker() {
+        var component = Text.json("[{\"text\":\"json: literal \"},{\"text\":\"second\",\"bold\":true}]", null);
+        assertEquals("json: literal second", component.getString());
+        assertTrue(component.toFlatList().stream().anyMatch(part -> part.getStyle().isBold()));
+    }
+
+    @Test
+    void jsonDialogueRejectsInvalidComponent() {
+        assertThrows(RuntimeException.class, () -> Text.json("{broken", null));
+        assertThrows(RuntimeException.class, () -> Text.json("null", null));
+    }
+
+    @Test
+    void jsonDialogueReadsLegacyHoverValue() {
+        var component = Text.json("""
+                {"text":"Hover","hoverEvent":{"action":"show_text","value":[{"text":"Legacy "},{"text":"tooltip","bold":true}]}}
+                """, null);
+        assertEquals("Legacy tooltip", component.getStyle().getHoverEvent()
+                .getValue(net.minecraft.network.chat.HoverEvent.Action.SHOW_TEXT).getString());
+    }
+
+    @Test
     void speakerFormatLoadsAndInvalidReloadRetainsSnapshot() throws Exception {
         Path file = directory.resolve("speaker.yml");
         Files.writeString(file, "nameFormat: '&6[%name%]'\n");
