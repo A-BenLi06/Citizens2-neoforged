@@ -108,13 +108,14 @@ public class InteractionsMod implements Session.Engine {
         progress.saveDirty();
     }
 
-    /** Right-clicking an NPC starts its conversation, which is what {@code conversation_start_click_type} said. */
+    /** Applies the configured right-click mode before starting or skipping dialogue. */
     @SubscribeEvent
     public void onRightClick(NPCRightClickEvent event) {
         NPC npc = event.getNPC();
         ServerPlayer player = event.getClicker();
         if (npc == null || player == null || actions == null)
             return;
+        if (!settings.startClick().permits(player.isShiftKeyDown())) return;
         Conversation conversation = library.forNpc(npc.getId());
         if (conversation == null) {
             // 15 of the migrated files trigger on the NPC's name rather than its id

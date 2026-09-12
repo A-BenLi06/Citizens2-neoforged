@@ -16,6 +16,26 @@ import org.junit.jupiter.api.io.TempDir;
 /** Acceptance probes kept separate from the default suite: these expose open parity defects. */
 public class LegacyParityAuditTest {
     @Test
+    void startClickModesDistinguishSneaking() {
+        assertTrue(ConversationStartClick.RIGHT_CLICK.permits(false));
+        assertFalse(ConversationStartClick.RIGHT_CLICK.permits(true));
+        assertFalse(ConversationStartClick.SHIFT_RIGHT_CLICK.permits(false));
+        assertTrue(ConversationStartClick.SHIFT_RIGHT_CLICK.permits(true));
+        assertTrue(ConversationStartClick.ALL_RIGHT_CLICK.permits(false));
+        assertTrue(ConversationStartClick.ALL_RIGHT_CLICK.permits(true));
+    }
+
+    @Test
+    void invalidClickModeRetainsPreviousSettings() throws Exception {
+        Path file = directory.resolve("click.yml");
+        Files.writeString(file, "conversation_start_click_type: SHIFT_RIGHT_CLICK\n");
+        var settings = DialogueSettings.load(file.toFile(), DialogueSettings.DEFAULT);
+        assertEquals(ConversationStartClick.SHIFT_RIGHT_CLICK, settings.startClick());
+        Files.writeString(file, "conversation_start_click_type: invalid\n");
+        assertEquals(settings, DialogueSettings.load(file.toFile(), settings));
+    }
+
+    @Test
     void selectionSettingsValidateModeAndOverflow() throws Exception {
         Path file = directory.resolve("selection.yml");
         Files.writeString(file, "selectable_options: true\nselectable_options_mode: SCROLL\nselectable_options_restart_on_overflow: false\n");

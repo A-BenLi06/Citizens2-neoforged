@@ -13,7 +13,7 @@ import org.yaml.snakeyaml.Yaml;
 /** Reads supported legacy global settings without rewriting unknown settings. */
 public record DialogueSettings(boolean allowChat, boolean allowMobDamage, boolean allowCommands,
         List<String> commandsWhitelist, boolean skipDialogueOnNpcClick, boolean allowInventoryInteract,
-        boolean clickableOptions, boolean useEmptySpaces, SelectionSettings selection) {
+        boolean clickableOptions, boolean useEmptySpaces, SelectionSettings selection, ConversationStartClick startClick) {
     public static final DialogueSettings DEFAULT = new DialogueSettings(false, false);
 
     public DialogueSettings(boolean allowChat, boolean allowMobDamage) {
@@ -44,6 +44,13 @@ public record DialogueSettings(boolean allowChat, boolean allowMobDamage, boolea
         commandsWhitelist = List.copyOf(commandsWhitelist);
     }
 
+    public DialogueSettings(boolean allowChat, boolean allowMobDamage, boolean allowCommands, List<String> whitelist,
+            boolean skipDialogueOnNpcClick, boolean allowInventoryInteract, boolean clickableOptions, boolean useEmptySpaces,
+            SelectionSettings selection) {
+        this(allowChat, allowMobDamage, allowCommands, whitelist, skipDialogueOnNpcClick, allowInventoryInteract,
+                clickableOptions, useEmptySpaces, selection, ConversationStartClick.RIGHT_CLICK);
+    }
+
     public boolean permitsCommand(String command) {
         if (allowCommands) return true;
         // This command carries dialogue option clicks, which must remain usable while commands are restricted.
@@ -69,7 +76,9 @@ public record DialogueSettings(boolean allowChat, boolean allowMobDamage, boolea
                     new SelectionSettings(flag(values, "selectable_options", true),
                             SelectionSettings.Mode.valueOf(String.valueOf(values.containsKey("selectable_options_mode")
                                     ? values.get("selectable_options_mode") : "MOVE").toUpperCase(Locale.ROOT)),
-                            flag(values, "selectable_options_restart_on_overflow", true)));
+                            flag(values, "selectable_options_restart_on_overflow", true)),
+                    ConversationStartClick.valueOf(String.valueOf(values.containsKey("conversation_start_click_type")
+                            ? values.get("conversation_start_click_type") : "RIGHT_CLICK").toUpperCase(Locale.ROOT)));
         } catch (Exception failure) {
             LoggerFactory.getLogger("interactions").error("Could not load {}; retaining previous dialogue settings", file, failure);
             return previous;

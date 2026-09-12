@@ -115,9 +115,32 @@ public final class ProximityRuntimeAudit {
             player.setPos(0, -58, 0);
             controller.pollProximity(player, registry);
             check(sessions.isEmpty(), "air_start_disabled_blocks_entry");
+            story.canBeStartedOnAir = true;
+            player.setPos(2, -60, 0);
+            for (ConversationStartClick mode : ConversationStartClick.values()) {
+                settingsField.set(controller, new DialogueSettings(false, false, false, java.util.List.of(), false, true,
+                        true, true, SelectionSettings.DEFAULT, mode));
+                for (boolean sneaking : new boolean[] { false, true }) {
+                    player.setShiftKeyDown(sneaking);
+                    controller.onRightClick(new net.citizensnpcs.api.event.NPCRightClickEvent(npc, player));
+                    check(sessions.containsKey(player.getUUID()) == mode.permits(sneaking),
+                            "click_mode_" + mode.name().toLowerCase(java.util.Locale.ROOT) + "_sneaking_" + sneaking);
+                    Session started = sessions.remove(player.getUUID());
+                    if (started != null) started.end(false);
+                }
+            }
+            settingsField.set(controller, new DialogueSettings(false, false, false, java.util.List.of(), false, true,
+                    true, true, SelectionSettings.DEFAULT, ConversationStartClick.SHIFT_RIGHT_CLICK));
+            player.setShiftKeyDown(false);
+            player.setPos(4, -60, 0);
+            controller.pollProximity(player, registry);
+            player.setPos(2, -60, 0);
+            controller.pollProximity(player, registry);
+            check(sessions.containsKey(player.getUUID()), "proximity_entry_ignores_click_mode");
+            sessions.remove(player.getUUID()).end(false);
             Files.delete(folder.resolve("entry.yml"));
             Files.delete(folder);
-            LoggerFactory.getLogger("interactions").info("[PROXIMITYAUDIT] COMPLETE 14/14");
+            LoggerFactory.getLogger("interactions").info("[PROXIMITYAUDIT] COMPLETE 21/21");
         } catch (Throwable failure) {
             LoggerFactory.getLogger("interactions").error("[PROXIMITYAUDIT] FAILED", failure);
         } finally {
