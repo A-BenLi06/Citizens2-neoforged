@@ -45,7 +45,8 @@ def commands(sources):
         for match in re.finditer(r"@Command\s*\((.*?)\)\s*(?=@|public|protected)", text, re.S):
             block = match.group(1)
             def strings(field):
-                found = re.search(field + r"\s*=\s*\{(.*?)\}", block, re.S)
+                # Java accepts both {"name"} and "name" for array-valued annotation members.
+                found = re.search(r"\b" + field + r'\s*=\s*(\{.*?\}|"(?:\\.|[^"\\])*")', block, re.S)
                 return re.findall(r'"([^"]*)"', found.group(1)) if found else []
             for alias in strings("aliases"):
                 for modifier in strings("modifiers"):

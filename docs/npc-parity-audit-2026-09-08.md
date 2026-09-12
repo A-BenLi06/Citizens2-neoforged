@@ -4,6 +4,8 @@ Audit date: 2026-09-08, UTC+08:00. **Acceptance result: FAIL — feature parity 
 
 This records the initial audit of the working tree, old Arclight plugin snapshot, and deployed NeoForge installation. Production jars and data have not been replaced. The findings below describe the audit baseline; subsequent repairs are tracked separately in the next section and in `walkthrough.md`.
 
+For the consolidated current state, see [the September 13 status report](npc-parity-status-2026-09-13.md). Its refreshed scanner counts scalar Java annotation values as well as arrays: `moveto` was omitted from both earlier command inventories, so the corrected totals are 193 upstream and 155 port, with the same missing-command list. The original F01–F18 table below describes the starting findings, not their current disposition.
+
 ## Repair status — 2026-09-10, UTC+08:00
 
 - `2f7c3ea`: persistent conversation-scoped cooldowns (legacy values are **start timestamps**, not expiry times), lossless player YAML updates, saved-dialogue predicates, randomized dialogue selection, option requirement rechecks, choices beyond nine, and registry-based sound resolution.
