@@ -25,6 +25,7 @@ allprojects {
                     def missing = p.file('../tools/runtime-audit-expected.txt').readLines('UTF-8')
                             .findAll { !it.isBlank() && !log.contains(it) }
                     if (log.contains('[FIXTUREAUDIT] FAILED') || log.contains('[HANGINGAUDIT] FAILED') || log.contains('[NAVSTARTAUDIT] FAILED')
+                            || log.contains('[REGISTRYPERSISTAUDIT] FAILED')
                             || log.contains('[NPCTEST] FAIL') || log.contains('[ACTIONAUDIT] FAILED')
                             || log.contains('[SENTINELAUDIT] FAILED') || log.contains('[NATIVEAPIAUDIT] FAILED')
                             || log.contains('[SHOPAUDIT] FAILED') || log.contains('[RADIUSAUDIT] FAILED')

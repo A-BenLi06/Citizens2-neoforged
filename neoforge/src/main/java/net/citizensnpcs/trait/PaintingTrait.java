@@ -41,7 +41,8 @@ public class PaintingTrait extends Trait {
     @Override
     public void save(DataKey key) {
         key.setString("art",
-                art == null ? "" : art.unwrapKey().map(k -> k.location().getPath().toUpperCase(Locale.ROOT)).orElse(""));
+                art == null ? "" : art.unwrapKey().map(k -> k.location().getNamespace().equals("minecraft")
+                        ? k.location().getPath().toUpperCase(Locale.ROOT) : k.location().toString()).orElse(""));
     }
 
     @Override

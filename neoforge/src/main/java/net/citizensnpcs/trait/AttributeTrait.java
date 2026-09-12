@@ -57,11 +57,14 @@ public class AttributeTrait extends Trait {
 
     @Override
     public void save(DataKey key) {
-        key.removeKey("attributes");
+        Map<String, Object> saved = new HashMap<>();
         for (Map.Entry<Holder<Attribute>, Double> entry : attributes.entrySet()) {
             entry.getKey().unwrapKey().ifPresent(
-                    k -> key.setDouble("attributes." + bukkitNameOf(k.location()), entry.getValue()));
+                    k -> saved.put(k.location().getNamespace().equals("minecraft")
+                            ? bukkitNameOf(k.location()) : k.location().toString(), entry.getValue()));
         }
+        // Registry paths can contain dots; preserve them as literal map keys, not DataKey path separators.
+        key.setRaw("attributes", saved);
     }
 
     @Override
@@ -105,7 +108,7 @@ public class AttributeTrait extends Trait {
             return null;
         String upper = raw.toUpperCase(Locale.ROOT);
         for (ResourceLocation id : BuiltInRegistries.ATTRIBUTE.keySet()) {
-            if (bukkitNameOf(id).equals(upper))
+            if (id.getNamespace().equals("minecraft") && bukkitNameOf(id).equals(upper))
                 return BuiltInRegistries.ATTRIBUTE.getHolder(id).map(h -> (Holder<Attribute>) h).orElse(null);
         }
         ResourceLocation id = ResourceLocation.tryParse(raw.toLowerCase(Locale.ROOT));
