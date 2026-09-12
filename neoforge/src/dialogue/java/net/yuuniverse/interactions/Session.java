@@ -224,13 +224,14 @@ public class Session {
     }
 
     private void renderLine(Conversation.Line line) {
+        if (engine.settings().useEmptySpaces()) player.sendSystemMessage(Component.empty());
+        if (line.showName && !conversation.name.isEmpty()) {
+            Component heading = engine.messages().speakerName(conversation.name);
+            if (!heading.getString().isEmpty()) player.sendSystemMessage(heading);
+        }
         for (String raw : line.textOrEmpty()) {
             String text = Text.placeholders(raw, player);
             MutableComponent message = Component.empty();
-            if (line.showName && !conversation.name.isEmpty()) {
-                message.append(Text.legacy(conversation.name)).append(Component.literal(": ")
-                        .withStyle(Style.EMPTY.withColor(ChatFormatting.GRAY)));
-            }
             int nextMarker = text.indexOf("%next%");
             if (nextMarker >= 0) {
                 message.append(Text.legacy(text.substring(0, nextMarker)));

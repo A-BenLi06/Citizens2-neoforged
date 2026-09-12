@@ -16,6 +16,18 @@ import org.junit.jupiter.api.io.TempDir;
 /** Acceptance probes kept separate from the default suite: these expose open parity defects. */
 public class LegacyParityAuditTest {
     @Test
+    void speakerFormatLoadsAndInvalidReloadRetainsSnapshot() throws Exception {
+        Path file = directory.resolve("speaker.yml");
+        Files.writeString(file, "nameFormat: '&6[%name%]'\n");
+        var messages = DialogueMessages.load(file.toFile(), DialogueMessages.DEFAULT);
+        assertEquals("[Guide]", messages.speakerName("Guide").getString());
+        Files.writeString(file, "nameFormat: [invalid]\n");
+        assertEquals(messages, DialogueMessages.load(file.toFile(), messages));
+        Files.writeString(file, "nameFormat: ''\n");
+        assertEquals("", DialogueMessages.load(file.toFile(), messages).speakerName("Guide").getString());
+    }
+
+    @Test
     void startClickModesDistinguishSneaking() {
         assertTrue(ConversationStartClick.RIGHT_CLICK.permits(false));
         assertFalse(ConversationStartClick.RIGHT_CLICK.permits(true));

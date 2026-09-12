@@ -87,7 +87,51 @@ public final class OptionDisplayRuntimeAudit {
                     && output.get(output.size() - 1).getString().equals("Click an option or enter its number in chat."),
                     "default_spacing_and_click_prompt");
             check(session.chooseByText("First DisplayAudit"), "typed_text_matches_expanded_player_name");
-            LoggerFactory.getLogger("interactions").info("[OPTIONDISPLAYAUDIT] COMPLETE 10/10");
+            session.end(false);
+            output.clear();
+            settings.set(new DialogueSettings(false, false, false, List.of(), false, true, true, false));
+            messages.set(new DialogueMessages(null, null, null, null, null, null, null, "&6[%name%]"));
+            story.name = "Guide";
+            var dialogue = new Conversation.Node("speaker");
+            var line = new Conversation.Line();
+            line.text.addAll(List.of("First line", "Second line"));
+            line.time = 100;
+            dialogue.lines.add(line);
+            session = new Session(engine, story, dialogue, player, null);
+            session.tick();
+            check(output.stream().map(Component::getString).toList().equals(List.of("[Guide]", "First line", "Second line")),
+                    "speaker_heading_once_before_multiline_body");
+            check(output.get(0).toFlatList().stream().anyMatch(part -> part.getStyle().getColor() != null
+                    && part.getStyle().getColor().getValue() == net.minecraft.ChatFormatting.GOLD.getColor()),
+                    "speaker_heading_preserves_configured_color");
+            session.end(false);
+            output.clear();
+            line.showName = false;
+            session = new Session(engine, story, dialogue, player, null);
+            session.tick();
+            check(output.stream().map(Component::getString).toList().equals(List.of("First line", "Second line")),
+                    "show_name_false_omits_heading");
+            session.end(false);
+            output.clear();
+            line.showName = true;
+            messages.set(new DialogueMessages(null, null, null, null, null, null, null, ""));
+            session = new Session(engine, story, dialogue, player, null);
+            session.tick();
+            check(output.size() == 2 && output.get(0).getString().equals("First line"), "empty_name_format_suppresses_heading");
+            session.end(false);
+            output.clear();
+            messages.set(DialogueMessages.DEFAULT);
+            settings.set(DialogueSettings.DEFAULT);
+            line.text.clear();
+            line.text.add("Continue %next%");
+            session = new Session(engine, story, dialogue, player, null);
+            session.tick();
+            check(output.size() == 3 && output.get(0).getString().isEmpty()
+                    && output.get(1).getString().equals("Guide :"), "dialogue_spacing_precedes_default_speaker_heading");
+            check(output.get(2).toFlatList().stream().anyMatch(part -> part.getStyle().getClickEvent() != null
+                    && part.getStyle().getClickEvent().getValue().equals("/interactions skipdialogue")),
+                    "separate_heading_preserves_next_button");
+            LoggerFactory.getLogger("interactions").info("[OPTIONDISPLAYAUDIT] COMPLETE 16/16");
         } catch (Throwable failure) {
             LoggerFactory.getLogger("interactions").error("[OPTIONDISPLAYAUDIT] FAILED", failure);
         } finally {

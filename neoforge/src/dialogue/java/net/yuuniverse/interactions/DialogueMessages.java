@@ -13,7 +13,7 @@ import org.yaml.snakeyaml.Yaml;
 
 /** Supported legacy message overrides; absent entries use translatable English fallbacks. */
 public record DialogueMessages(String nextText, String nextHover, String optionsFormat, String clickableOptionHover,
-        List<String> optionsMainFormat, String selectableNormal, String selectableSelected) {
+        List<String> optionsMainFormat, String selectableNormal, String selectableSelected, String nameFormat) {
     public static final DialogueMessages DEFAULT = new DialogueMessages(null, null);
 
     public DialogueMessages(String nextText, String nextHover) {
@@ -27,6 +27,18 @@ public record DialogueMessages(String nextText, String nextHover, String options
 
     public DialogueMessages {
         if (optionsMainFormat != null) optionsMainFormat = List.copyOf(optionsMainFormat);
+    }
+
+    public DialogueMessages(String nextText, String nextHover, String optionsFormat, String clickableOptionHover,
+            List<String> optionsMainFormat, String selectableNormal, String selectableSelected) {
+        this(nextText, nextHover, optionsFormat, clickableOptionHover, optionsMainFormat, selectableNormal,
+                selectableSelected, null);
+    }
+
+    public Component speakerName(String name) {
+        return nameFormat == null
+                ? Component.translatableWithFallback("interactions.dialogue.speaker", "%s :", Text.legacy(name))
+                : Text.legacy(nameFormat.replace("%name%", name));
     }
 
     public Component optionLabel(int number, String text, ServerPlayer player) {
@@ -75,7 +87,8 @@ public record DialogueMessages(String nextText, String nextHover, String options
             }
             return new DialogueMessages(message(values, "nextDialogueText"), message(values, "nextDialogueHover"),
                     message(values, "optionsFormat"), message(values, "clickableOptionHover"), layout,
-                    message(values, "selectableOptionsFormatNormal"), message(values, "selectableOptionsFormatSelected"));
+                    message(values, "selectableOptionsFormatNormal"), message(values, "selectableOptionsFormatSelected"),
+                    message(values, "nameFormat"));
         } catch (Exception failure) {
             LoggerFactory.getLogger("interactions").error("Could not load {}; retaining previous dialogue messages", file, failure);
             return previous;
