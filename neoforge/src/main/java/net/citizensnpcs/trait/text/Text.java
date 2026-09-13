@@ -3,9 +3,11 @@ package net.citizensnpcs.trait.text;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
+import java.util.Set;
 import java.util.UUID;
 import java.util.regex.Pattern;
 
@@ -20,6 +22,7 @@ import net.citizensnpcs.api.util.DataKey;
 import net.citizensnpcs.api.util.Durations;
 import net.citizensnpcs.api.util.EntityUtil;
 import net.citizensnpcs.api.util.Paginator;
+import net.citizensnpcs.api.util.Messaging;
 import net.citizensnpcs.api.util.Placeholders;
 import net.citizensnpcs.trait.HologramTrait;
 import net.citizensnpcs.util.Util;
@@ -29,21 +32,13 @@ import net.minecraft.server.level.ServerPlayer;
 /**
  * The lines an NPC says — on right-click, or to players who walk close by.
  * <p>
- * The chat formatting itself lives in {@code CitizensNPC.speak}, driven by the {@code npc.chat.format.*} settings, so
- * what a player sees is byte-for-byte what upstream produces for the same config.
- * <p>
- * Two pieces are not here yet and are noted rather than silently dropped:
- * <ul>
- * <li>{@code getEditor()} — the in-game {@code /npc text} editor is built on Bukkit's Conversations API, which has no
- * Minecraft equivalent and needs rewriting on top of chat input capture. Every other way of editing text (the command
- * with explicit arguments) works.</li>
- * <li>{@code <item:…>} lines inside speech bubbles show as literal text, since {@link HologramTrait} does not render the
- * inline item syntax yet.</li>
- * </ul>
+ * Chat formatting lives in {@code CitizensNPC.speak}, driven by the {@code npc.chat.format.*} settings. Editing uses
+ * native chat prompts. Inline {@code <item:…>} speech-bubble lines still require item rendering in {@link HologramTrait}.
  */
 @TraitName("text")
 public class Text extends Trait {
     private final Map<UUID, Long> cooldowns = new HashMap<>();
+    private final Set<TextEditor> editors = new HashSet<>();
     private int currentIndex;
     @Persist
     private int delay = -1;
@@ -83,8 +78,17 @@ public class Text extends Trait {
         text.set(index, newText);
     }
 
+    public TextEditor getEditor(ServerPlayer player) { return new TextEditor(player, this); }
+    void editorStarted(TextEditor editor) { editors.add(editor); }
+    void editorStopped(TextEditor editor) { editors.remove(editor); }
+
+    @Override
+    public void onRemove() {
+        for (TextEditor editor : List.copyOf(editors)) editor.close();
+    }
+
     String getPageText(int page) {
-        Paginator paginator = new Paginator().header("Current Texts");
+        Paginator paginator = new Paginator().header(Messaging.tr("citizens.editors.text.text-list-header") + " " + npc.getName());
         for (int i = 0; i < text.size(); i++) {
             paginator.addLine("<green>" + i + " <gray>- <yellow>" + text.get(i));
         }
@@ -116,6 +120,9 @@ public class Text extends Trait {
     public double getRange() {
         return range;
     }
+
+    public int getDelay() { return delay; }
+    public String getItemInHandPattern() { return itemInHandPattern; }
 
     @Override
     public void load(DataKey key) {
@@ -152,6 +159,7 @@ public class Text extends Trait {
         if (!npc.isSpawned() || !talkClose || text.isEmpty())
             return;
         for (ServerPlayer player : EntityUtil.getNearbyVisiblePlayers(npc.getEntity(), range)) {
+            if (player.distanceToSqr(npc.getEntity()) > range * range) continue;
             talk(player);
         }
     }
@@ -165,11 +173,13 @@ public class Text extends Trait {
     }
 
     public boolean sendPage(CommandSourceStack sender, int page) {
-        Paginator paginator = new Paginator().header("Current Texts").enablePageSwitcher("/npc text page $page");
+        Paginator paginator = new Paginator().header(Messaging.tr("citizens.editors.text.text-list-header") + " " + npc.getName())
+                .enablePageSwitcher("/npc text page $page");
         for (int i = 0; i < text.size(); i++) {
-            paginator.addLine(text.get(i) + " <green>(<click:suggest_command:edit " + i
-                    + " ><yellow>edit</click>) (<hover:show_text:Remove this text><click:run_command:/npc text remove "
-                    + i + "><red>-</click></hover>)");
+            paginator.addLine("<green>" + i + " <gray>- " + text.get(i) + " <green>(<click:suggest_command:edit " + i
+                    + " ><yellow>" + Messaging.tr("citizens.editors.text.edit-button")
+                    + "</click>) (<hover:show_text:" + Messaging.tr("citizens.editors.text.remove-tooltip")
+                    + "><click:run_command:/npc text remove " + i + "><red>-</click></hover>)");
         }
         return paginator.sendPage(sender, page);
     }
@@ -243,6 +253,7 @@ public class Text extends Trait {
     }
 
     private void talk(ServerPlayer player) {
+        if (realisticLooker && !player.hasLineOfSight(npc.getEntity())) return;
         Long cooldown = cooldowns.get(player.getUUID());
         if (cooldown != null) {
             if (System.currentTimeMillis() < cooldown)

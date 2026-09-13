@@ -332,9 +332,7 @@ public abstract class AbstractNPC implements NPC {
         if (trait != null) {
             NeoForge.EVENT_BUS.post(new NPCRemoveTraitEvent(this, trait));
             clearSaveData.add("traits." + trait.getName());
-            if (trait.isRunImplemented()) {
-                runnables.remove(trait);
-            }
+            runnables.remove(trait);
             EventBusUtil.unregister(trait);
             trait.onRemove(RemoveReason.REMOVAL);
         }

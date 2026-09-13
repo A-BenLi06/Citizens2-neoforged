@@ -105,7 +105,7 @@ public class Util {
             if (id == null) {
                 continue;
             }
-            if (BuiltInRegistries.ITEM.get(id) == held.getItem())
+            if (BuiltInRegistries.ITEM.containsKey(id) && BuiltInRegistries.ITEM.get(id) == held.getItem())
                 return true;
         }
         return false;

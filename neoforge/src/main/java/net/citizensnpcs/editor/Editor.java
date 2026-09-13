@@ -1,12 +1,13 @@
 package net.citizensnpcs.editor;
 
-import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
 
 import net.citizensnpcs.api.event.NPCRightClickEvent;
 import net.citizensnpcs.api.npc.NPC;
 import net.citizensnpcs.api.util.Messaging;
+import net.citizensnpcs.api.util.ChatPrompts;
 import net.citizensnpcs.util.Messages;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
@@ -16,6 +17,7 @@ import net.neoforged.neoforge.common.NeoForge;
 import net.minecraft.world.entity.Entity;
 import net.neoforged.neoforge.event.ServerChatEvent;
 import net.neoforged.neoforge.event.entity.player.PlayerInteractEvent;
+import net.neoforged.neoforge.event.entity.player.PlayerEvent;
 
 /**
  * A mode a player is put into to configure an NPC by interacting with the world: clicking the NPC to equip it, or
@@ -81,13 +83,21 @@ public abstract class Editor {
         return EDITING.containsKey(player.getUUID());
     }
 
+    public static Editor getEditor(ServerPlayer player) {
+        return EDITING.get(player.getUUID());
+    }
+
     public static void enterOrLeave(ServerPlayer player, Editor editor) {
         if (editor == null)
             return;
         Editor existing = EDITING.get(player.getUUID());
         if (existing == null) {
             EDITING.put(player.getUUID(), editor);
-            editor.begin();
+            try { editor.begin(); }
+            catch (RuntimeException | Error failure) {
+                leave(player, editor);
+                throw failure;
+            }
         } else if (existing.getClass() == editor.getClass()) {
             leave(player);
         } else {
@@ -102,11 +112,15 @@ public abstract class Editor {
         }
     }
 
+    /** An abandonment callback must not close a different editor opened since it was registered. */
+    public static void leave(ServerPlayer player, Editor expected) {
+        if (EDITING.remove(player.getUUID(), expected)) expected.end();
+    }
+
     public static void leaveAll() {
-        for (Editor editor : EDITING.values()) {
-            editor.end();
+        for (Map.Entry<UUID, Editor> entry : new java.util.ArrayList<>(EDITING.entrySet())) {
+            if (EDITING.remove(entry.getKey(), entry.getValue())) entry.getValue().end();
         }
-        EDITING.clear();
     }
 
     /** Registered once at startup; there is no per-editor registration to leak. */
@@ -119,13 +133,18 @@ public abstract class Editor {
         public void onChat(ServerChatEvent event) {
             ServerPlayer player = event.getPlayer();
             Editor editor = EDITING.get(player.getUUID());
-            if (editor == null)
+            if (editor == null || ChatPrompts.isActive(player))
                 return;
             String message = event.getRawText();
             // chat arrives off the server thread; anything the editor does with it must happen on-thread
             if (editor.onChat(player, message)) {
                 event.setCanceled(true);
             }
+        }
+
+        @SubscribeEvent
+        public void onQuit(PlayerEvent.PlayerLoggedOutEvent event) {
+            if (event.getEntity() instanceof ServerPlayer player) leave(player);
         }
 
         @SubscribeEvent
@@ -177,5 +196,5 @@ public abstract class Editor {
         }
     }
 
-    private static final Map<UUID, Editor> EDITING = new HashMap<>();
+    private static final Map<UUID, Editor> EDITING = new ConcurrentHashMap<>();
 }

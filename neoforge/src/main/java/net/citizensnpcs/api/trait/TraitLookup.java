@@ -82,6 +82,7 @@ public interface TraitLookup {
         @Override
         public Trait remove(int typeId) {
             Trait trait = traits[typeId];
+            traits[typeId] = null;
             sig[typeId >>> 6] &= ~(1L << (typeId & 63));
             return trait;
         }

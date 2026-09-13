@@ -1,8 +1,9 @@
 package net.citizensnpcs.api.util;
 
-import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.function.Consumer;
 
 import net.citizensnpcs.api.CitizensAPI;
 import net.minecraft.server.level.ServerPlayer;
@@ -35,15 +36,27 @@ public class ChatPrompts {
     public static void abandon(ServerPlayer player) {
         ChatPromptSession session = SESSIONS.remove(player.getUUID());
         if (session != null) {
+            session.end();
             session.runAbandonCallback();
         }
     }
 
-    public static void abandonAll() {
-        for (ChatPromptSession session : new java.util.ArrayList<>(SESSIONS.values())) {
+    /** Ends only this session, preserving any replacement that has already been opened. */
+    public static void abandon(ChatPromptSession session) {
+        if (session != null && SESSIONS.remove(session.getPlayer().getUUID(), session)) {
+            session.end();
             session.runAbandonCallback();
         }
-        SESSIONS.clear();
+    }
+
+    public static boolean isActive(ChatPromptSession session) {
+        return session != null && SESSIONS.get(session.getPlayer().getUUID()) == session;
+    }
+
+    public static void abandonAll() {
+        for (ChatPromptSession session : new java.util.ArrayList<>(SESSIONS.values())) {
+            abandon(session);
+        }
     }
 
     public static ChatPromptSession begin(ServerPlayer player, ChatPrompt first) {
@@ -51,12 +64,45 @@ public class ChatPrompts {
     }
 
     public static ChatPromptSession begin(ServerPlayer player, ChatPrompt first, Map<String, Object> initial) {
+        return begin(player, first, initial, null);
+    }
+
+    /** Configures ownership/abandonment handlers before publishing the session or rendering its first prompt. */
+    public static ChatPromptSession begin(ServerPlayer player, ChatPrompt first, Map<String, Object> initial,
+            Consumer<ChatPromptSession> configure) {
         if (first == null)
             return null;
         ChatPromptSession session = new ChatPromptSession(player, first, initial);
-        SESSIONS.put(player.getUUID(), session);
-        ask(session, first);
+        if (configure != null) configure.accept(session);
+        ChatPromptSession previous = SESSIONS.put(player.getUUID(), session);
+        if (previous != null) {
+            previous.end();
+            previous.runAbandonCallback();
+        }
+        try {
+            refresh(session);
+        } catch (RuntimeException | Error failure) {
+            abandon(session);
+            throw failure;
+        }
         return session;
+    }
+
+    /** Supplies command-button input through the same prompt chain as ordinary chat. */
+    public static boolean acceptInput(ServerPlayer player, String input) {
+        ChatPromptSession session = SESSIONS.get(player.getUUID());
+        if (session == null) return false;
+        if (CitizensAPI.getScheduler().isOnOwnerThread()) handle(session, input);
+        else CitizensAPI.getScheduler().runTask(() -> handle(session, input));
+        return true;
+    }
+
+    /** Redraws the current prompt after a direct editor command. */
+    public static void refresh(ChatPromptSession session) {
+        if (!isActive(session)) return;
+        if (session.isEnded()) { abandon(session); return; }
+        ask(session, session.getCurrent());
+        if (session.isEnded()) abandon(session);
     }
 
     /** Registered once at startup; there is nothing per-conversation to register or leak. */
@@ -72,8 +118,9 @@ public class ChatPrompts {
     }
 
     private static void handle(ChatPromptSession session, String input) {
+        if (!isActive(session)) return;
         if (session.isEscape(input)) {
-            abandon(session.getPlayer());
+            abandon(session);
             return;
         }
         ChatPrompt next;
@@ -82,15 +129,19 @@ public class ChatPrompts {
         } catch (Throwable ex) {
             Messaging.severe("Error in chat prompt");
             ex.printStackTrace();
-            abandon(session.getPlayer());
+            abandon(session);
             return;
         }
         if (next == null || session.isEnded()) {
-            abandon(session.getPlayer());
+            abandon(session);
             return;
         }
         session.setCurrent(next);
-        ask(session, next);
+        try { refresh(session); }
+        catch (RuntimeException | Error failure) {
+            abandon(session);
+            Messaging.severe("Error rendering chat prompt", failure.getMessage());
+        }
     }
 
     private static class Dispatcher {
@@ -112,9 +163,9 @@ public class ChatPrompts {
 
         @SubscribeEvent
         public void onQuit(PlayerEvent.PlayerLoggedOutEvent event) {
-            SESSIONS.remove(event.getEntity().getUUID());
+            if (event.getEntity() instanceof ServerPlayer player) abandon(player);
         }
     }
 
-    private static final Map<UUID, ChatPromptSession> SESSIONS = new HashMap<>();
+    private static final Map<UUID, ChatPromptSession> SESSIONS = new ConcurrentHashMap<>();
 }

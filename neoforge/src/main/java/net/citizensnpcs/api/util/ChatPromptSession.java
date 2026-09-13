@@ -18,7 +18,7 @@ public class ChatPromptSession {
     private boolean ended;
     private final Set<String> escapes = new HashSet<>();
     private Runnable onAbandon;
-    private final ServerPlayer player;
+    private ServerPlayer player;
 
     ChatPromptSession(ServerPlayer player, ChatPrompt first, Map<String, Object> initial) {
         this.player = player;
@@ -63,6 +63,11 @@ public class ChatPromptSession {
     }
 
     public ServerPlayer getPlayer() {
+        // Bukkit's Player wrapper follows respawn; the native server replaces the ServerPlayer instance.
+        if (player.isRemoved() && player.getServer() != null) {
+            ServerPlayer replacement = player.getServer().getPlayerList().getPlayer(player.getUUID());
+            if (replacement != null && !replacement.isRemoved()) player = replacement;
+        }
         return player;
     }
 
@@ -86,7 +91,7 @@ public class ChatPromptSession {
         return current;
     }
 
-    boolean isEnded() {
+    public boolean isEnded() {
         return ended;
     }
 
