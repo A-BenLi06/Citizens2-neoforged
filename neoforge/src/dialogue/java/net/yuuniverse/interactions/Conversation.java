@@ -34,6 +34,7 @@ public class Conversation {
     public double endRadius = 5;
     public int cooldownSeconds;
     public boolean canBeStartedOnAir;
+    public HologramSettings hologram = HologramSettings.DEFAULT;
     /** The file this came from, for diagnostics. */
     public String source = "";
 

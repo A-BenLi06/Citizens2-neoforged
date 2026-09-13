@@ -119,6 +119,7 @@ public final class ConversationLibrary {
         conversation.endRadius = dbl(root.get("end_conversation_radius"), 5);
         conversation.cooldownSeconds = (int) dbl(root.get("cooldown"), 0);
         conversation.canBeStartedOnAir = bool(root.get("can_be_started_on_air"), false);
+        conversation.hologram = HologramSettings.read(root.get("hologram_dialogues"));
 
         for (Object entry : list(root.get("starts_with"))) {
             Matcher matcher = STARTS_WITH_ID.matcher(String.valueOf(entry));

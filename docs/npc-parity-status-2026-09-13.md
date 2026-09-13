@@ -2,7 +2,9 @@
 
 Initial audit timestamp: 2026-09-13 01:47:09 +08:00 (UTC+08:00).
 
-Current summary updated: 2026-09-14 00:46:27 +08:00 (UTC+08:00).
+Current summary updated: 2026-09-14 02:45:11 +08:00 (UTC+08:00).
+
+Latest dialogue-display follow-up: [boss bars and private holograms](dialogue-displays-parity-2026-09-14.md) implements the enabled legacy BossBar settings/titles/progress and per-conversation holographic text. It verifies per-player packet privacy, cleanup and respawn rebinding. Physical-client rendering remains a separate acceptance item.
 
 Latest permission-shop follow-up: [permanent permission transactions](permission-shop-parity-2026-09-14.md) connects Paradigm writing, restores signed global rule handling, adds provider-ID-based rollback and checks shop execution failures. Permanent permission rewards/costs and their editor capability are now implemented. The expanded actual-provider suite passes 101 checks, including 33 shop checks and writer restart persistence.
 
@@ -22,6 +24,7 @@ This section includes the follow-ups after the detailed historical snapshot belo
 |---|---|
 | Dialogue behavior | Persistent conversation cooldowns, remembered-dialogue conditions, randomized eligible lines, conditional/terminal routing, manual progression, tenth choices and MOVE/SCROLL/sneak selection; configurable presentation and JSON components. |
 | Dialogue safety and entry | Live permission/air/radius/click gates, movement and input restrictions, requirement rechecks, preflight and observable action failures, registry-based sounds and vanilla command-root resolution. |
+| Dialogue displays | Configurable private BossBars, speaking/option titles, timed progress, private holographic dialogue bodies, offsets, cleanup and rebinding to the current player after respawn. |
 | Economic integration | Native Citizens payments/refunds and Yuuniverse Economy-owned dialogue shop APIs; explicit currencies, precision, and known offline account resolution. This is not a claim that every original economic product/service has been recreated. |
 | Camera integration | CmdCam is the selected provider. All four referenced scenes were located in the original overworld/End data and exercised through the real-provider fixture. |
 | Native NPC behavior | Persistent sneaking/default traits, Sentinel health/regeneration, hanging-entity and navigation-start fixes, registry identity preservation, and restored native speech parameters. |
@@ -35,7 +38,7 @@ This section includes the follow-ups after the detailed historical snapshot belo
 | Group/temporary permission mutations | The 263 `manuadd` actions need a working GroupManager-to-Paradigm replacement/primary-group bridge. Externally visible temporary grants remain unavailable. Permanent permission writing and world/dimension membership queries are implemented. Paradigm's own 2.4.2b CLI still rejects wildcard/Unicode permission arguments; two referenced group names still need reconciliation. |
 | Quests | Quest service/progress/delivery, nine `questadmin` actions and six quest placeholder references remain without a replacement integration. |
 | Saved items | Thirteen referenced `meta.internal` payloads remain undecoded. Original item IDs 6, 15 and 144 are absent despite 21 action references. |
-| Dialogue presentation/configuration | Forty-one holographic-dialogue configurations and the enabled dialogue BossBar still lack implementations. Typewriter/ActionBar, incoming-chat restoration, remaining mounted-player policies and most message/config keys remain incomplete. |
+| Dialogue presentation/configuration | BossBar and private holographic dialogue are implemented. Typewriter/ActionBar, incoming-chat restoration, remaining mounted-player policies and most message/config keys remain incomplete. Physical-client appearance and complete modpack rendering are still acceptance work. |
 | Dialogue authoring/actions | Original create/edit/delete/start/stop/reset/list/influence workflows, inline options/interruption actions and eleven additional original action verbs are still absent. |
 | Native command surface | The missing 1.21.1 command list below still contains 37 `/npc` names/aliases (35 groups). Dedicated text/display/entity configuration and remaining parameters are not restored merely by having their trait classes or permission nodes. |
 | Native behavior/API | Swimming switch application, live slime-size changes, tablist defaults, default player step height, item holograms, the full text parser, anvil-style text entry and 24 reference API event names remain open. |
@@ -45,7 +48,7 @@ This section includes the follow-ups after the detailed historical snapshot belo
 
 The unresolved source identifiers are shops `金城银行存款` / `风巽贵金属积存赎回` and accounts `VerticalYeti503` / `Santoesia`. Their destinations/UUIDs have not been guessed.
 
-Current validation: 101 real-provider/restart permission/group/shop checks, 18 no-provider checks, 148 ordinary tests, 44 removal checks, 107 NPC assertions, 223 runtime probes and 40 dialogue unit cases pass for the permission-shop follow-up. Normal jars exclude the test probes. Production Citizens/Interactions hash checks in the earlier permission batch matched the original audited deployment; no local repair has been deployed by this task.
+Current display validation: 45 dedicated checks, 148 ordinary tests, 44 removal checks, 107 NPC assertions, 223 runtime probes and 48 dialogue unit cases pass. The earlier permission-shop follow-up passed 101 actual-provider/restart checks and 18 no-provider checks; its unchanged bridge retains that separate evidence. Normal jars exclude the test probes. No local repair has been deployed by this task.
 
 The following sections preserve the September 13 01:47 detailed audit for source evidence. Its then-current implementation/hash table and then-open service/removal rows are historical; use the current delta/gaps above and linked follow-ups for today's disposition.
 

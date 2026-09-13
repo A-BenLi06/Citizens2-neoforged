@@ -13,7 +13,8 @@ import org.yaml.snakeyaml.Yaml;
 
 /** Supported legacy message overrides; absent entries use translatable English fallbacks. */
 public record DialogueMessages(String nextText, String nextHover, String optionsFormat, String clickableOptionHover,
-        List<String> optionsMainFormat, String selectableNormal, String selectableSelected, String nameFormat) {
+        List<String> optionsMainFormat, String selectableNormal, String selectableSelected, String nameFormat,
+        String bossBarConversation, String bossBarSelectOption) {
     public static final DialogueMessages DEFAULT = new DialogueMessages(null, null);
 
     public DialogueMessages(String nextText, String nextHover) {
@@ -27,6 +28,25 @@ public record DialogueMessages(String nextText, String nextHover, String options
 
     public DialogueMessages {
         if (optionsMainFormat != null) optionsMainFormat = List.copyOf(optionsMainFormat);
+    }
+
+    public DialogueMessages(String nextText, String nextHover, String optionsFormat, String clickableOptionHover,
+            List<String> optionsMainFormat, String selectableNormal, String selectableSelected, String nameFormat) {
+        this(nextText, nextHover, optionsFormat, clickableOptionHover, optionsMainFormat, selectableNormal,
+                selectableSelected, nameFormat, null, null);
+    }
+
+    public Component bossBarTitle(String name, boolean waiting) {
+        String displayName = name.replace("{centered}", "");
+        String format = waiting ? bossBarSelectOption : bossBarConversation;
+        if (format != null) return Text.legacy(format.replace("%name%", displayName));
+        Component conversation = Component.translatableWithFallback("interactions.bossbar.conversation",
+                "Currently in a conversation with: %s", Text.legacy(displayName))
+                .withStyle(net.minecraft.ChatFormatting.YELLOW);
+        if (!waiting) return conversation;
+        return conversation.copy().append(Component.literal(" - ").withStyle(net.minecraft.ChatFormatting.DARK_GRAY))
+                .append(Component.translatableWithFallback("interactions.bossbar.select_option", "Select an Option!")
+                        .withStyle(net.minecraft.ChatFormatting.AQUA));
     }
 
     public DialogueMessages(String nextText, String nextHover, String optionsFormat, String clickableOptionHover,
@@ -88,7 +108,8 @@ public record DialogueMessages(String nextText, String nextHover, String options
             return new DialogueMessages(message(values, "nextDialogueText"), message(values, "nextDialogueHover"),
                     message(values, "optionsFormat"), message(values, "clickableOptionHover"), layout,
                     message(values, "selectableOptionsFormatNormal"), message(values, "selectableOptionsFormatSelected"),
-                    message(values, "nameFormat"));
+                    message(values, "nameFormat"), message(values, "bossBarTitleConversation"),
+                    message(values, "bossBarTitleSelectOption"));
         } catch (Exception failure) {
             LoggerFactory.getLogger("interactions").error("Could not load {}; retaining previous dialogue messages", file, failure);
             return previous;

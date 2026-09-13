@@ -26,9 +26,11 @@ import net.minecraft.world.entity.Entity;
  */
 public class Session {
     private final Conversation conversation;
-    private final ServerPlayer player;
+    private ServerPlayer player;
     private final Entity npc;
     private final Engine engine;
+    private final DialogueBossBar bossBar;
+    private final DialogueHologram hologram;
 
     private Conversation.Node node;
     private List<Conversation.Line> lineOrder;
@@ -50,6 +52,8 @@ public class Session {
         this.node = node;
         this.player = player;
         this.npc = npc;
+        bossBar = new DialogueBossBar(player, engine.settings().bossBar());
+        hologram = new DialogueHologram(player, npc);
         lineOrder = node.orderedLines(player.getRandom());
         DialogueMovement.begin(this);
         DialogueCommands.begin(this);
@@ -113,6 +117,18 @@ public class Session {
     public void tick() {
         if (finished)
             return;
+        if (player.isRemoved()) {
+            ServerPlayer replacement = player.getServer().getPlayerList().getPlayer(player.getUUID());
+            if (replacement == null || replacement == player || replacement.isRemoved()) {
+                end(false);
+                return;
+            }
+            // Bukkit's Player wrapper follows respawn; NeoForge replaces ServerPlayer. Keep the same conversation
+            // and clocks, then validate the new player before sending any display back to the connection.
+            player = replacement;
+            bossBar.rebind(replacement);
+            hologram.rebind(replacement);
+        }
         if (npc != null && (npc.isRemoved() || npc.level() != player.level()
                 || conversation.isOutsideEndRadius(npc.distanceToSqr(player)))) {
             // walked away: the old plugin ends the conversation rather than talking to nobody
@@ -122,6 +138,8 @@ public class Session {
         if (conversation.slowEffect) {
             player.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SLOWDOWN, 40, 2, false, false, false));
         }
+        bossBar.refresh(engine.settings().bossBar(), engine.messages(), conversation.name);
+        hologram.refreshViewer();
         if (pendingChoice != null) {
             Conversation.Option selected = pendingChoice;
             pendingChoice = null;
@@ -151,7 +169,9 @@ public class Session {
             }
             return;
         }
-        if (skipRequested || (current.time != -1 && ++ticksOnLine >= Math.max(1, (int) Math.round(current.time * 20)))) {
+        boolean complete = skipRequested || (current.time != -1 && ++ticksOnLine >= Math.max(1, (int) Math.round(current.time * 20)));
+        bossBar.elapsed(ticksOnLine);
+        if (complete) {
             skipRequested = false;
             if (!engine.actions().runAll(current.lastActions, player, npcName())) {
                 end(false);
@@ -213,6 +233,8 @@ public class Session {
         current = line;
         ticksOnLine = 0;
         if (!renderLine(line)) return;
+        bossBar.line(line.time);
+        bossBar.refresh(engine.settings().bossBar(), engine.messages(), conversation.name);
         if (!engine.actions().runAll(line.actions, player, npcName())) {
             end(false);
             return;
@@ -225,8 +247,18 @@ public class Session {
 
     private boolean renderLine(Conversation.Line line) {
         List<Component> rendered = new ArrayList<>();
+        List<Component> floating = new ArrayList<>();
         try {
-            for (String raw : line.textOrEmpty()) rendered.add(renderText(raw));
+            for (String raw : line.textOrEmpty()) {
+                rendered.add(renderText(raw));
+                if (conversation.hologram.enabled()) {
+                    String text = raw.startsWith("json:") ? raw : Text.placeholders(raw, player);
+                    text = text.replace("%next%", "").replace("{centered}", "");
+                    floating.add(text.startsWith("json:") ? Text.json(text.substring("json:".length()), player)
+                            : Text.legacy(text));
+                }
+            }
+            hologram.show(floating, conversation.hologram);
         } catch (RuntimeException failure) {
             org.slf4j.LoggerFactory.getLogger("interactions").error("Could not render {} / {} / {}",
                     conversation.source, node.key, line.key, failure);
@@ -312,6 +344,8 @@ public class Session {
             return;
         }
         awaitingChoice = true;
+        bossBar.options();
+        bossBar.refresh(engine.settings().bossBar(), engine.messages(), conversation.name);
         selectedOption = 0;
         selectionDelay = 0;
         renderOptions();
@@ -412,6 +446,16 @@ public class Session {
         if (finished)
             return;
         finished = true;
+        try {
+            bossBar.close();
+        } catch (RuntimeException failure) {
+            org.slf4j.LoggerFactory.getLogger("interactions").warn("Could not remove dialogue boss bar", failure);
+        }
+        try {
+            hologram.close();
+        } catch (RuntimeException failure) {
+            org.slf4j.LoggerFactory.getLogger("interactions").warn("Could not remove dialogue hologram", failure);
+        }
         DialogueMovement.end(this);
         DialogueCommands.end(this);
         DialogueInventory.end(this);
