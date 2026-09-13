@@ -1,10 +1,49 @@
 # NPC parity status and changes since the initial audit
 
-Audit timestamp: 2026-09-13 01:47:09 +08:00 (UTC+08:00).
+Initial audit timestamp: 2026-09-13 01:47:09 +08:00 (UTC+08:00).
 
-Further native-command follow-up: [removal and undo parity](npc-removal-parity-2026-09-13.md) restores target/filter resolution, ownership, history, temporary snapshots and true dispatcher failures. Its dedicated checks and the existing regression suite pass. External permission-node registration/provider integration remains open.
+Current summary updated: 2026-09-13 21:48:40 +08:00 (UTC+08:00).
 
-Later implementation follow-up: [CmdCam and Yuuniverse Economy bridges](native-service-bridges-2026-09-13.md). That work connects the identified camera provider, adds native shop APIs, and corrects a further economic-format gap: 2,276 of 2,277 old eco actions select a currency and many recipients are offline. The table below records the earlier audit snapshot; the linked follow-up and walkthrough contain the subsequent results.
+Latest follow-up: [native permission integration](npc-permission-parity-2026-09-13.md) restores NeoForge node registration and exact names, connects Paradigm runtime permission checks with live contexts, repairs inherited group queries, canonical selection permissions and help aliases, and hardens flag execution/local attachment lifetime. The real-provider/restart run passes 58 checks and the absent-provider run passes 17. Group mutation, permission writing, external temporary grants and dimension-scoped group membership queries remain open.
+
+Further native-command follow-up: [removal and undo parity](npc-removal-parity-2026-09-13.md) restores target/filter resolution, ownership, history, temporary snapshots and true dispatcher failures. Its dedicated checks and the existing regression suite pass.
+
+Later implementation follow-up: [CmdCam and Yuuniverse Economy bridges](native-service-bridges-2026-09-13.md). That work connects the identified camera provider, adds native shop APIs, and corrects a further economic-format gap: 2,276 of 2,277 old eco actions select a currency and many recipients are offline. The detailed historical sections after the current summary retain the earlier snapshot; the linked follow-ups and walkthrough contain subsequent results.
+
+## Current delta from the initial implementation
+
+This section includes the follow-ups after the detailed historical snapshot below. Starting work is still measured from `f8ede13`; NPC creation, migrated NPC identities, skins, basic navigation, the initial traits and the initial dialogue engine already existed then.
+
+| Area | What has now been added or repaired |
+|---|---|
+| Dialogue behavior | Persistent conversation cooldowns, remembered-dialogue conditions, randomized eligible lines, conditional/terminal routing, manual progression, tenth choices and MOVE/SCROLL/sneak selection; configurable presentation and JSON components. |
+| Dialogue safety and entry | Live permission/air/radius/click gates, movement and input restrictions, requirement rechecks, preflight and observable action failures, registry-based sounds and vanilla command-root resolution. |
+| Economic integration | Native Citizens payments/refunds and Yuuniverse Economy-owned dialogue shop APIs; explicit currencies, precision, and known offline account resolution. This is not a claim that every original economic product/service has been recreated. |
+| Camera integration | CmdCam is the selected provider. All four referenced scenes were located in the original overworld/End data and exercised through the real-provider fixture. |
+| Native NPC behavior | Persistent sneaking/default traits, Sentinel health/regeneration, hanging-entity and navigation-start fixes, registry identity preservation, and restored native speech parameters. |
+| Removal and undo | ID/UUID/name/owner/world/entity targeting, ownership enforcement, temporary NPC snapshots, collision-safe/retryable undo and actual command failure propagation. |
+| Permissions | Registered NeoForge nodes with correct names, real non-OP Paradigm grants/revocations, live contextual/dynamic permission checks, inherited group queries, selection permissions and local attachment lifetime; additional execution checks for permission-restricted flags. |
+
+## Current remaining gaps
+
+| Area | Still missing or unresolved after the follow-ups |
+|---|---|
+| Permission mutations | The 263 `manuadd` actions need a working GroupManager-to-Paradigm replacement/primary-group bridge. `PermissionWriter`, externally visible temporary grants and world/dimension-scoped group membership queries remain unavailable. Paradigm's own 2.4.2b CLI also rejects wildcard/Unicode permission arguments. |
+| Quests | Quest service/progress/delivery, nine `questadmin` actions and six quest placeholder references remain without a replacement integration. |
+| Saved items | Thirteen referenced `meta.internal` payloads remain undecoded. Original item IDs 6, 15 and 144 are absent despite 21 action references. |
+| Dialogue presentation/configuration | Forty-one holographic-dialogue configurations and the enabled dialogue BossBar still lack implementations. Typewriter/ActionBar, incoming-chat restoration, remaining mounted-player policies and most message/config keys remain incomplete. |
+| Dialogue authoring/actions | Original create/edit/delete/start/stop/reset/list/influence workflows, inline options/interruption actions and eleven additional original action verbs are still absent. |
+| Native command surface | The missing 1.21.1 command list below still contains 37 `/npc` names/aliases (35 groups). Dedicated text/display/entity configuration and remaining parameters are not restored merely by having their trait classes or permission nodes. |
+| Native behavior/API | Swimming switch application, live slime-size changes, tablist defaults, default player step height, item holograms, the full text parser, anvil-style text entry and 24 reference API event names remain open. |
+| Sentinel | Full `/sentinel` administration, ranged combat/ammunition, richer target/ignore policies, guarding, damage/armor, avoidance and death/drop/XP behavior remain partial or missing. |
+| Other command/service compatibility | Full Essentials healing, obsolete item-NBT/component and nested/plugin command semantics remain separate work. Two legacy shop identifiers and two offline recipient identities still need confirmation; the service bridge deliberately does not invent them. |
+| Deployment/acceptance | Production deployment, migration/review of the old Interactions config/messages, physical client verification and complete modpack acceptance remain outstanding. The staged service-bridge manifest for `bc47082` predates removal and permissions work. |
+
+The unresolved source identifiers are shops `金城银行存款` / `风巽贵金属积存赎回` and accounts `VerticalYeti503` / `Santoesia`. Their destinations/UUIDs have not been guessed.
+
+Current validation: 58 real-provider/restart permission checks, 17 no-provider checks, 44 removal checks, 107 NPC assertions, 223 runtime probes, 40 dialogue unit cases and 131 ordinary tests all pass. Normal jars exclude the test probes. Production Citizens/Interactions hash checks in this batch still match the original audited deployment; no local repair has been deployed by this task.
+
+The following sections preserve the September 13 01:47 detailed audit for source evidence. Its then-current implementation/hash table and then-open service/removal rows are historical; use the current delta/gaps above and linked follow-ups for today's disposition.
 
 **Verdict: the local port is substantially safer and more capable than at the start of this work, but it still does not reproduce the complete Citizens/Interactions/Sentinel stack. Several configured old-server workflows remain unavailable. This is not merely a remaining client-testing problem.**
 

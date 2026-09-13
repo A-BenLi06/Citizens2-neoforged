@@ -116,6 +116,12 @@ tasks.named('test', Test).configure {
 
 // Expand gradle.properties into neoforge.mods.toml
 tasks.named('processResources', ProcessResources).configure {
+    // Reuse the original permission declarations instead of maintaining another list in Java. This is metadata
+    // under Citizens' resource directory, not a Bukkit plugin descriptor at the root of the NeoForge jar.
+    from('../main/src/main/resources/plugin.yml') {
+        into 'citizens'
+        rename { 'permissions.yml' }
+    }
     def replacements = [
             minecraft_version      : minecraft_version,
             minecraft_version_range: minecraft_version_range,

@@ -2,6 +2,7 @@ package net.citizensnpcs;
 
 import net.citizensnpcs.util.LuckPermsGroups;
 import net.citizensnpcs.util.ParadigmGroups;
+import net.citizensnpcs.util.ParadigmPermissions;
 import net.citizensnpcs.api.npc.templates.TemplateRegistry;
 import net.citizensnpcs.commands.TemplateCommands;
 import net.citizensnpcs.api.exception.NPCLoadException;
@@ -40,6 +41,7 @@ import net.citizensnpcs.api.npc.SimpleNPCDataStore;
 import net.citizensnpcs.api.trait.TraitFactory;
 import net.citizensnpcs.api.util.ChatPrompts;
 import net.citizensnpcs.api.util.Messaging;
+import net.citizensnpcs.api.util.PermissionUtil;
 import net.citizensnpcs.api.util.Storage;
 import net.citizensnpcs.api.util.Translator;
 import net.citizensnpcs.api.util.YamlStorage;
@@ -59,6 +61,8 @@ import net.citizensnpcs.npc.CitizensTraitFactory;
 import net.citizensnpcs.npc.ai.CitizensNavigator;
 import net.citizensnpcs.trait.ChunkTicketTrait;
 import net.minecraft.server.MinecraftServer;
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.neoforged.bus.api.EventPriority;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.ModContainer;
@@ -72,6 +76,7 @@ import net.neoforged.neoforge.event.server.ServerStartingEvent;
 import net.neoforged.neoforge.event.server.ServerStoppedEvent;
 import net.neoforged.neoforge.event.server.ServerStoppingEvent;
 import net.neoforged.neoforge.event.tick.ServerTickEvent;
+import net.neoforged.neoforge.server.permission.events.PermissionGatherEvent;
 
 /**
  * Mod entry point, and the {@link CitizensPlugin} implementation the API resolves against.
@@ -113,6 +118,12 @@ public class Citizens implements CitizensPlugin {
         version = modContainer.getModInfo().getVersion().toString();
         dataFolder = FMLPaths.CONFIGDIR.get().resolve(MOD_ID).toFile();
         NeoForge.EVENT_BUS.register(this);
+        PermissionUtil.registerDefaults();
+        for (String permission : List.of("citizens.ignore-owner", "citizens.npc.admin", "citizens.npc.remove.all",
+                "citizens.npc.limit.0", "citizens.npc.command.ignoreerrors.globalnused",
+                "citizens.npc.shop.editor.actions.edit-permission", "citizens.npc.shop.editor.actions.edit-condition")) {
+            PermissionUtil.register(permission);
+        }
         // RegisterCommandsEvent fires while the server is being constructed, before any of our start hooks, so the
         // command classes have to be scanned now or the Brigadier nodes would be built from an empty manager
         commands.setInjector(new Injector(this));
@@ -351,6 +362,22 @@ public class Citizens implements CitizensPlugin {
     }
 
     @SubscribeEvent
+    public void onGatherPermissions(PermissionGatherEvent.Nodes event) {
+        for (var type : BuiltInRegistries.ENTITY_TYPE.keySet()) {
+            PermissionUtil.register("citizens.npc.create." + type.getPath());
+            PermissionUtil.register("citizens.npc.controllable." + type.getPath());
+        }
+        for (var node : PermissionUtil.getRegisteredNodes()) event.addNodes(node);
+    }
+
+    @SubscribeEvent(priority = EventPriority.LOWEST)
+    public void onPermissionServicesReady(ServerStartedEvent event) {
+        // Provider services need to finish starting before their API availability is checked.
+        ParadigmPermissions.install();
+        if (PermissionUtil.getGroupResolver() == null && !LuckPermsGroups.install()) ParadigmGroups.install();
+    }
+
+    @SubscribeEvent
     public void onRegisterCommands(RegisterCommandsEvent event) {
         commandRegistry.register(event.getDispatcher());
     }
@@ -358,6 +385,9 @@ public class Citizens implements CitizensPlugin {
     @SubscribeEvent
     public void onServerStopping(ServerStoppingEvent event) {
         enabled = false;
+        ParadigmPermissions.uninstall();
+        ParadigmGroups.uninstall();
+        PermissionUtil.clearTemporary();
         net.citizensnpcs.util.YuuniverseEconomy.uninstall();
         Editor.leaveAll();
         ChatPrompts.abandonAll();

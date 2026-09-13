@@ -2,6 +2,9 @@ package net.citizensnpcs.util;
 
 import java.lang.reflect.Method;
 import java.util.Collection;
+import java.util.ArrayDeque;
+import java.util.HashSet;
+import java.util.List;
 import java.util.Locale;
 import java.util.Set;
 import java.util.UUID;
@@ -27,9 +30,9 @@ import net.neoforged.fml.ModList;
  * Paradigm, and with it absent {@link #install} does nothing. Paradigm is separately licensed (CC-BY-NC-ND-4.0); calling
  * its published API at runtime neither bundles nor modifies it.
  * <p>
- * Membership comes from {@code PermissionService.metadata(uuid)}, whose {@code resolvedGroups()} already includes
- * inherited groups, so a player in a group that inherits the one being asked about answers true — which is what an
- * administrator writing a guard rule expects.
+ * Membership starts with {@code PermissionService.metadata(uuid)}. Paradigm 2.4.2b's {@code resolvedGroups()}
+ * contains assignments, not the complete ancestor graph, so parent groups are read from its public group-info API.
+ * Its UUID metadata uses server/network contexts; it does not expose dimension-scoped group membership.
  */
 public final class ParadigmGroups {
     private static final String MOD_ID = "paradigm";
@@ -40,6 +43,8 @@ public final class ParadigmGroups {
     private static Method metadata;
     private static Method resolvedGroups;
     private static Method primaryGroup;
+    private static Method services, handler, groupInfo, inherits;
+    private static GroupResolver installed;
     /** So a broken lookup is reported once per player rather than once per tick. */
     private static final Set<UUID> WARNED = ConcurrentHashMap.newKeySet();
 
@@ -74,15 +79,30 @@ public final class ParadigmGroups {
             Class<?> meta = Class.forName("eu.avalanche7.paradigm.api.PlayerPermissionMeta");
             resolvedGroups = meta.getMethod("resolvedGroups");
             primaryGroup = meta.getMethod("primaryGroup");
+            services = Class.forName("eu.avalanche7.paradigm.Paradigm").getMethod("getServices");
+            handler = Class.forName("eu.avalanche7.paradigm.core.Services").getMethod("getPermissionsHandler");
+            groupInfo = Class.forName("eu.avalanche7.paradigm.modules.permissions.PermissionsHandler")
+                    .getMethod("getPermissionGroupInfo", String.class);
+            inherits = Class.forName("eu.avalanche7.paradigm.modules.permissions.PermissionAPI$GroupInfo")
+                    .getMethod("inherits");
         } catch (Throwable ex) {
             Messaging.severe("Paradigm is installed but its API could not be reached, so NPC group checks stay"
                     + " unresolved:", ex);
             permissions = null;
             return false;
         }
-        PermissionUtil.setGroupResolver(new Resolver());
+        WARNED.clear();
+        installed = new Resolver();
+        PermissionUtil.setGroupResolver(installed);
         Messaging.log("Group checks are resolving through Paradigm.");
         return true;
+    }
+
+    public static void uninstall() {
+        if (installed != null && PermissionUtil.getGroupResolver() == installed) PermissionUtil.setGroupResolver(null);
+        installed = null;
+        permissions = null;
+        WARNED.clear();
     }
 
     /** @return whether any enum constant in the collection has this name */
@@ -112,6 +132,29 @@ public final class ParadigmGroups {
         return false;
     }
 
+    static boolean matchesIncludingParents(Collection<?> resolved, Object primary, String group, ParentLookup parents)
+            throws ReflectiveOperationException {
+        if (matches(resolved, primary, group)) return true;
+        ArrayDeque<String> pending = new ArrayDeque<>();
+        if (primary != null) pending.add(primary.toString());
+        if (resolved != null) for (Object value : resolved) if (value != null) pending.add(value.toString());
+        Set<String> seen = new HashSet<>();
+        String wanted = group.trim().toLowerCase(Locale.ROOT);
+        while (!pending.isEmpty()) {
+            String name = pending.removeFirst().trim().toLowerCase(Locale.ROOT);
+            if (name.isEmpty() || !seen.add(name)) continue;
+            if (wanted.equals(name)) return true;
+            Collection<?> ancestors = parents.get(name);
+            if (ancestors != null) for (Object ancestor : ancestors) if (ancestor != null) pending.add(ancestor.toString());
+        }
+        return false;
+    }
+
+    @FunctionalInterface
+    interface ParentLookup {
+        Collection<?> get(String group) throws ReflectiveOperationException;
+    }
+
     private static class Resolver implements GroupResolver {
         @Override
         public Boolean inGroup(ServerPlayer player, String group) {
@@ -125,8 +168,14 @@ public final class ParadigmGroups {
                 if (meta == null)
                     return null;
                 Object resolved = resolvedGroups.invoke(meta);
-                return matches(resolved instanceof Collection<?> ? (Collection<?>) resolved : null,
-                        primaryGroup.invoke(meta), group);
+                Object provider = handler.invoke(services.invoke(null));
+                return matchesIncludingParents(resolved instanceof Collection<?> ? (Collection<?>) resolved : null,
+                        primaryGroup.invoke(meta), group, name -> {
+                            Object info = groupInfo.invoke(provider, name);
+                            if (info == null) return List.of();
+                            Object parents = inherits.invoke(info);
+                            return parents instanceof Collection<?> collection ? collection : List.of();
+                        });
             } catch (Throwable ex) {
                 // "cannot say" rather than "no" - the only safe answer for a guard deciding whether someone is an enemy
                 if (WARNED.add(player.getUUID())) {

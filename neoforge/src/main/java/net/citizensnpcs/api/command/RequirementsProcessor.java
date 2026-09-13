@@ -34,7 +34,7 @@ public class RequirementsProcessor implements CommandAnnotationProcessor {
 
         // --id and --uuid let a command act on an NPC other than the selected one, for anybody allowed to select
         boolean canRedefineSelected = (context.hasValueFlag("uuid") || context.hasValueFlag("id"))
-                && PermissionUtil.hasPermission(sender, "npc.select");
+                && PermissionUtil.hasPermission(sender, "citizens.npc.select");
         String error = Messaging.tr(CommandMessages.MUST_HAVE_SELECTED);
         if (canRedefineSelected) {
             if (context.hasValueFlag("uuid")) {

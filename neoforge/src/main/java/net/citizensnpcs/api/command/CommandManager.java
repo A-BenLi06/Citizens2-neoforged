@@ -81,6 +81,7 @@ import net.minecraft.world.phys.Vec3;
 public class CommandManager {
     private final Map<Class<? extends Annotation>, CommandAnnotationProcessor> annotationProcessors = new HashMap<>();
     private final Map<String, CommandInfo> commands = new HashMap<>();
+    private final Map<String, String> helpPermissions = new HashMap<>();
     private TimeUnit defaultDurationUnits;
     private Injector injector;
     private Function<Command, String> translationPrefixProvider;
@@ -162,6 +163,11 @@ public class CommandManager {
             }
         }
         methodArgs[0] = context;
+
+        for (InjectedCommandArgument argument : info.methodArguments.values()) {
+            if (argument.permission != null && Arrays.stream(argument.names).anyMatch(context::hasValueFlag)
+                    && !PermissionUtil.hasPermission(sender, argument.permission)) throw new NoPermissionsException();
+        }
 
         for (Annotation annotation : info.annotations) {
             CommandAnnotationProcessor processor = annotationProcessors.get(annotation.annotationType());
@@ -269,7 +275,8 @@ public class CommandManager {
     }
 
     private void executeHelp(String[] args, CommandSourceStack sender) throws CommandException {
-        if (!PermissionUtil.hasPermission(sender, "citizens." + args[0] + ".help"))
+        String permission = helpPermissions.getOrDefault(args[0], "citizens." + args[0] + ".help");
+        if (!PermissionUtil.hasPermission(sender, permission))
             throw new NoPermissionsException();
         int page = 1;
         try {
@@ -509,6 +516,7 @@ public class CommandManager {
                 continue;
             }
             Command cmd = method.getAnnotation(Command.class);
+            if (!cmd.permission().isEmpty()) PermissionUtil.register(cmd.permission());
             CommandInfo info = new CommandInfo(cmd, (instance, args) -> method.invoke(instance, args));
 
             info.instance = obj;
@@ -543,13 +551,20 @@ public class CommandManager {
             for (int i = 0; i < parameters.length; i++) {
                 for (Annotation ann : parameters[i].getAnnotations()) {
                     if (ann instanceof Flag) {
-                        info.addFlagAnnotation(i, parameterTypes[i], (Flag) ann);
+                        Flag flag = (Flag) ann;
+                        if (!flag.permission().isEmpty()) PermissionUtil.register(flag.permission());
+                        info.addFlagAnnotation(i, parameterTypes[i], flag);
                     } else if (ann instanceof Arg) {
                         info.addArgAnnotation(i, parameterTypes[i], (Arg) ann);
                     }
                 }
             }
             for (String alias : cmd.aliases()) {
+                // Bukkit dispatches aliases under the primary command name. The native Brigadier roots must
+                // share that permission too, so /wp and /waypoints do not require separate help grants.
+                String helpPermission = "citizens." + cmd.aliases()[0].toLowerCase(Locale.ROOT) + ".help";
+                helpPermissions.putIfAbsent(alias.toLowerCase(Locale.ROOT), helpPermission);
+                PermissionUtil.register(helpPermission);
                 for (String modifier : cmd.modifiers()) {
                     commands.put(alias + " " + modifier, info);
                 }

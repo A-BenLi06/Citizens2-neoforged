@@ -5,6 +5,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 
 import org.junit.jupiter.api.Test;
 
@@ -43,5 +44,18 @@ public class ParadigmGroupsTest {
     @Test
     public void aNullEntryInTheListIsSkipped() {
         assertTrue(ParadigmGroups.matches(Arrays.asList(null, "udays_crime"), null, "udays_crime"));
+    }
+
+    @Test
+    public void parentsAreExpandedBeyondTheMetadataAssignments() throws ReflectiveOperationException {
+        Map<String, List<String>> graph = Map.of("child", List.of("parent"), "parent", List.of("ancestor"));
+        assertTrue(ParadigmGroups.matchesIncludingParents(List.of("child"), null, "ANCESTOR", graph::get));
+        assertFalse(ParadigmGroups.matchesIncludingParents(List.of("child"), null, "unrelated", graph::get));
+    }
+
+    @Test
+    public void parentCyclesAndMissingGroupsDoNotLoop() throws ReflectiveOperationException {
+        Map<String, List<String>> graph = Map.of("child", List.of("parent", "missing"), "parent", List.of("child"));
+        assertFalse(ParadigmGroups.matchesIncludingParents(List.of("child"), null, "unrelated", graph::get));
     }
 }

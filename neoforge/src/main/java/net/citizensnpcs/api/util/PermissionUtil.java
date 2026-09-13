@@ -1,16 +1,18 @@
 package net.citizensnpcs.api.util;
 
 import java.util.Collection;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
 import net.minecraft.commands.CommandSourceStack;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.Entity;
 import net.neoforged.neoforge.server.permission.PermissionAPI;
+import net.neoforged.neoforge.server.permission.nodes.PermissionDynamicContext;
+import net.neoforged.neoforge.server.permission.nodes.PermissionDynamicContextKey;
 import net.neoforged.neoforge.server.permission.nodes.PermissionNode;
 import net.neoforged.neoforge.server.permission.nodes.PermissionTypes;
 
@@ -21,13 +23,9 @@ import net.neoforged.neoforge.server.permission.nodes.PermissionTypes;
  * platform ships {@link PermissionAPI}, which resolves nodes that must be registered up-front during
  * {@code PermissionGatherEvent.Nodes}, and falls back to operator levels when no permission mod is installed.
  * <p>
- * Behaviour here:
- * <ul>
- * <li>a non-player source (console, command block, rcon) passes every check, as it does on Bukkit
- * <li>a permission string that has been {@link #register registered} as a node is resolved through
- * {@link PermissionAPI}
- * <li>anything else falls back to the operator level, so an unconfigured server still behaves sensibly
- * </ul>
+ * Registered nodes resolve through the selected NeoForge handler. A {@link PermissionResolver} can also answer
+ * arbitrary permission strings from saved shops, command traits and conversations. Explicit decisions precede
+ * the upstream defaults; source elevation is supplied to the default resolver, never OR-ed over a backend denial.
  * Group queries have no platform equivalent, so they go through a pluggable {@link GroupResolver} — see
  * {@link #setGroupResolver}. With none installed {@link #inGroup} returns null, the same "unknown" result upstream
  * produces when Vault is absent, which callers already handle.
@@ -37,24 +35,60 @@ public class PermissionUtil {
     }
 
     public static boolean hasPermission(CommandSourceStack source, String permission) {
-        if (source == null)
+        if (source == null || permission == null || permission.isBlank())
             return false;
         ServerPlayer player = source.getEntity() instanceof ServerPlayer ? (ServerPlayer) source.getEntity() : null;
         if (player == null)
             // console, command blocks and rcon are unrestricted, matching Bukkit's ConsoleCommandSender
             return true;
-        return hasPermission(player, permission) || source.hasPermission(FALLBACK_OP_LEVEL);
+        return hasPermission(player, permission,
+                player.hasPermissions(FALLBACK_OP_LEVEL) || source.hasPermission(FALLBACK_OP_LEVEL));
     }
 
     public static boolean hasPermission(ServerPlayer player, String permission) {
-        if (player == null || permission == null)
+        return hasPermission(player, permission, player != null && player.hasPermissions(FALLBACK_OP_LEVEL));
+    }
+
+    private static boolean hasPermission(ServerPlayer player, String permission, boolean operator) {
+        if (player == null || permission == null || permission.isBlank())
             return false;
-        if (isTemporarilyGranted(player, permission))
-            return true;
+        permission = PermissionDefaults.normalize(permission);
+        Boolean temporary = temporaryPermission(player, permission);
+        if (temporary != null) return temporary;
         PermissionNode<Boolean> node = NODES.get(permission);
-        if (node != null)
-            return Boolean.TRUE.equals(PermissionAPI.getPermission(player, node));
-        return player.hasPermissions(FALLBACK_OP_LEVEL);
+        // Nodes declared after gathering cannot be handed to PermissionAPI until the next server lifecycle.
+        if (node != null && PermissionAPI.getRegisteredNodes().contains(node))
+            return Boolean.TRUE.equals(PermissionAPI.getPermission(player, node, OPERATOR.createContext(operator)));
+        Boolean explicit = queryExplicit(player, permission);
+        return explicit != null ? explicit : resolveDefault(player, permission, operator);
+    }
+
+    private static Boolean queryExplicit(ServerPlayer player, String permission) {
+        PermissionResolver resolver = permissionResolver;
+        return resolver == null || player == null ? null : resolver.check(player, permission);
+    }
+
+    private static boolean resolveDefault(ServerPlayer player, String permission, boolean operator) {
+        for (PermissionDefaults.Parent parent : DEFAULTS.parents(permission)) {
+            Boolean explicit = queryExplicit(player, parent.permission());
+            if (explicit != null) return parent.inherit(explicit);
+        }
+        return DEFAULTS.fallback(permission, operator);
+    }
+
+    /** Optional tri-state bridge for names that are not known when NeoForge gathers nodes. */
+    @FunctionalInterface
+    public interface PermissionResolver {
+        /** @return an authoritative grant/denial, or null when no rule is defined */
+        Boolean check(ServerPlayer player, String permission);
+    }
+
+    public static void setPermissionResolver(PermissionResolver resolver) {
+        permissionResolver = resolver;
+    }
+
+    public static PermissionResolver getPermissionResolver() {
+        return permissionResolver;
     }
 
     /** Upstream signature: true if the entity holds any one of {@code permissions}. */
@@ -131,13 +165,22 @@ public class PermissionUtil {
         if (player == null || permissions == null || permissions.isEmpty())
             return () -> {
             };
+        List<String> names = permissions.stream().filter(p -> p != null && !p.isBlank())
+                .map(PermissionDefaults::normalize).toList();
+        if (names.isEmpty()) return () -> {};
         UUID uuid = player.getUUID();
         Map<String, Integer> granted = TEMPORARY.computeIfAbsent(uuid, id -> new ConcurrentHashMap<>());
-        for (String permission : permissions) {
+        for (String permission : names) {
             granted.merge(permission, 1, Integer::sum);
         }
         TemporaryPermissionGranter granter = temporaryPermissionGranter;
-        Attachment delegate = granter == null ? null : granter.grant(player, permissions);
+        Attachment delegate;
+        try {
+            delegate = granter == null ? null : granter.grant(player, names);
+        } catch (RuntimeException | Error failure) {
+            revokeTemporary(uuid, granted, names);
+            throw failure;
+        }
         return new Attachment() {
             private boolean removed;
 
@@ -146,15 +189,7 @@ public class PermissionUtil {
                 if (removed)
                     return;
                 removed = true;
-                Map<String, Integer> held = TEMPORARY.get(uuid);
-                if (held != null) {
-                    for (String permission : permissions) {
-                        held.compute(permission, (p, count) -> count == null || count <= 1 ? null : count - 1);
-                    }
-                    if (held.isEmpty()) {
-                        TEMPORARY.remove(uuid);
-                    }
-                }
+                revokeTemporary(uuid, granted, names);
                 if (delegate != null) {
                     delegate.remove();
                 }
@@ -162,14 +197,32 @@ public class PermissionUtil {
         };
     }
 
-    private static boolean isTemporarilyGranted(ServerPlayer player, String permission) {
+    private static Boolean temporaryPermission(ServerPlayer player, String permission) {
         Map<String, Integer> granted = TEMPORARY.get(player.getUUID());
-        return granted != null && granted.containsKey(permission);
+        if (granted == null) return null;
+        if (granted.containsKey(permission)) return true;
+        for (PermissionDefaults.Parent parent : DEFAULTS.parents(permission)) {
+            if (granted.containsKey(parent.permission())) return parent.value();
+        }
+        return null;
+    }
+
+    private static void revokeTemporary(UUID player, Map<String, Integer> held, Collection<String> permissions) {
+        if (TEMPORARY.get(player) != held) return;
+        for (String permission : permissions) {
+            held.compute(permission, (p, count) -> count == null || count <= 1 ? null : count - 1);
+        }
+        if (held.isEmpty()) TEMPORARY.remove(player, held);
     }
 
     /** Drops any grants held by a player, called when they log out so nothing is left behind. */
     public static void clearTemporary(UUID player) {
         TEMPORARY.remove(player);
+    }
+
+    /** Releases local attachments between dedicated or integrated server lifecycles. */
+    public static void clearTemporary() {
+        TEMPORARY.clear();
     }
 
     public static void setTemporaryPermissionGranter(TemporaryPermissionGranter granter) {
@@ -239,26 +292,38 @@ public class PermissionUtil {
      *            a dotted permission string, e.g. {@code citizens.npc.create}
      */
     public static PermissionNode<Boolean> register(String permission) {
-        return NODES.computeIfAbsent(permission,
-                p -> new PermissionNode<>(ResourceLocation.fromNamespaceAndPath("citizens", toNodePath(p)),
-                        PermissionTypes.BOOLEAN,
-                        (player, playerUUID, context) -> player != null && player.hasPermissions(FALLBACK_OP_LEVEL)));
+        String name = PermissionDefaults.normalize(permission);
+        int dot = name.indexOf('.');
+        if (dot <= 0 || dot == name.length() - 1)
+            throw new IllegalArgumentException("A NeoForge permission node needs a dotted name: " + permission);
+        return NODES.computeIfAbsent(name, p -> new PermissionNode<>(p.substring(0, dot), p.substring(dot + 1),
+                PermissionTypes.BOOLEAN, (player, playerUUID, context) -> {
+                    boolean operator = player != null && player.hasPermissions(FALLBACK_OP_LEVEL);
+                    for (PermissionDynamicContext<?> value : context) {
+                        if (OPERATOR.equals(value.getDynamic())) operator = Boolean.TRUE.equals(value.getValue());
+                    }
+                    return resolveDefault(player, p, operator);
+                }, OPERATOR));
+    }
+
+    /** Called before gathering, in addition to the command/flag declarations discovered by CommandManager. */
+    public static void registerDefaults() {
+        DEFAULTS.permissions().forEach(PermissionUtil::register);
     }
 
     /** All nodes declared so far, for handing to {@code PermissionGatherEvent.Nodes#addNodes}. */
     public static Collection<PermissionNode<Boolean>> getRegisteredNodes() {
-        return NODES.values();
-    }
-
-    /** ResourceLocation paths accept {@code [a-z0-9_.-/]}, so only the case and stray characters need fixing. */
-    private static String toNodePath(String permission) {
-        return permission.toLowerCase(java.util.Locale.ROOT).replaceAll("[^a-z0-9_./-]", "_");
+        return List.copyOf(NODES.values());
     }
 
     private static final int FALLBACK_OP_LEVEL = 2;
+    private static final PermissionDefaults DEFAULTS = PermissionDefaults.bundled();
+    private static final PermissionDynamicContextKey<Boolean> OPERATOR = new PermissionDynamicContextKey<>(
+            Boolean.class, "citizens_operator", Object::toString);
     private static final Map<UUID, Map<String, Integer>> TEMPORARY = new ConcurrentHashMap<>();
     private static volatile TemporaryPermissionGranter temporaryPermissionGranter;
     private static volatile PermissionWriter permissionWriter;
     private static volatile GroupResolver groupResolver;
+    private static volatile PermissionResolver permissionResolver;
     private static final Map<String, PermissionNode<Boolean>> NODES = new ConcurrentHashMap<>();
 }
