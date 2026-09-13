@@ -2,9 +2,11 @@
 
 Initial audit timestamp: 2026-09-13 01:47:09 +08:00 (UTC+08:00).
 
-Current summary updated: 2026-09-14 05:11:50 +08:00 (UTC+08:00).
+Current summary updated: 2026-09-14 05:57:46 +08:00 (UTC+08:00).
 
-Latest entity-command follow-up: [native entity configuration](entity-command-parity-2026-09-14.md) restores 28 command groups / 30 names, strict argument validation and registry-backed values. It also fixes default traits overwriting the selected NPC type, panda rolling, live slime sizing and preservation of unresolved provider IDs. The dedicated isolated fixture passes 190 checks. Seven 1.21.1 `/npc` names remain absent.
+Latest presentation-command follow-up: [native displays, interaction, BossBars and effects](presentation-command-parity-2026-09-14.md) adds six configuration commands and the missing Interaction trait. It repairs display text/transform preservation, BossBar viewer updates, empty quoted arguments, literal saved map keys and malformed translation fallback. The expanded entity fixture passes 285 checks. The remaining 1.21.1 `/npc` name from the command inventory is `text`.
+
+Previous entity-command follow-up: [native entity configuration](entity-command-parity-2026-09-14.md) restored 28 command groups / 30 names, strict argument validation and registry-backed values. It also fixed default traits overwriting the selected NPC type, panda rolling, live slime sizing and preservation of unresolved provider IDs. Its 190 checks are retained in the expanded fixture above.
 
 Latest dialogue-display follow-up: [boss bars and private holograms](dialogue-displays-parity-2026-09-14.md) implements the enabled legacy BossBar settings/titles/progress and per-conversation holographic text. It verifies per-player packet privacy, cleanup and respawn rebinding. Physical-client rendering remains a separate acceptance item.
 
@@ -30,7 +32,7 @@ This section includes the follow-ups after the detailed historical snapshot belo
 | Economic integration | Native Citizens payments/refunds and Yuuniverse Economy-owned dialogue shop APIs; explicit currencies, precision, and known offline account resolution. This is not a claim that every original economic product/service has been recreated. |
 | Camera integration | CmdCam is the selected provider. All four referenced scenes were located in the original overworld/End data and exercised through the real-provider fixture. |
 | Native NPC behavior | Persistent sneaking/default traits, Sentinel health/regeneration, hanging-entity and navigation-start fixes, registry identity preservation, and restored native speech parameters. |
-| Native entity commands | 28 configuration groups / 30 names, type/ownership/permission checks, strict typed input, registry-backed values and aliases; preserved creation/copy entity type, live slime sizing and actual panda rolling. |
+| Native configuration commands | 34 groups / 36 names covering mob variants, display/interaction properties, native NPC BossBars and potion effects; type/ownership/permission checks, strict input, registry-backed values and aliases. Also repaired entity-type preservation, live slime sizing, panda rolling, authored display text, partial transformations and literal saved map keys. |
 | Removal and undo | ID/UUID/name/owner/world/entity targeting, ownership enforcement, temporary NPC snapshots, collision-safe/retryable undo and actual command failure propagation. |
 | Permissions | Registered NeoForge nodes with correct names, real non-OP Paradigm grants/revocations, live contextual/dynamic permission checks and group queries, selection/help permissions and local attachment lifetime; checked flag execution and reversible permanent permission shop trades. |
 
@@ -43,15 +45,15 @@ This section includes the follow-ups after the detailed historical snapshot belo
 | Saved items | Thirteen referenced `meta.internal` payloads remain undecoded. Original item IDs 6, 15 and 144 are absent despite 21 action references. |
 | Dialogue presentation/configuration | BossBar and private holographic dialogue are implemented. Typewriter/ActionBar, incoming-chat restoration, remaining mounted-player policies and most message/config keys remain incomplete. Physical-client appearance and complete modpack rendering are still acceptance work. |
 | Dialogue authoring/actions | Original create/edit/delete/start/stop/reset/list/influence workflows, inline options/interruption actions and eleven additional original action verbs are still absent. |
-| Native command surface | Seven 1.21.1 `/npc` names remain: `text`, `bossbar`, `display`, `itemdisplay`, `textdisplay`, `interaction`, `potioneffect`. The new entity commands reduce the historical list below by 30 names. Other command parameters and parameterized cloud particle syntax still need work. |
-| Native behavior/API | Swimming switch application, tablist defaults, default player step height, item holograms, the full text parser, anvil-style text entry and 24 reference API event names remain open. Live slime-size changes are now implemented. |
+| Native command surface | `/npc text` is the remaining 1.21.1 `/npc` name from the source inventory. The two command batches reduce the historical list below by 36 names. Waypoint HPA debugging aliases, other command parameters and parameterized cloud particle syntax remain open. |
+| Native behavior/API | Swimming switch application, tablist defaults, default player step height, item holograms, the full text parser, anvil-style text entry and 24 reference API event names remain open. The potion-effect loader still drops unavailable mod-effect IDs. Live slime sizing and display text/transform retention are now implemented. |
 | Sentinel | Full `/sentinel` administration, ranged combat/ammunition, richer target/ignore policies, guarding, damage/armor, avoidance and death/drop/XP behavior remain partial or missing. |
 | Other command/service compatibility | Full Essentials healing, obsolete item-NBT/component and nested/plugin command semantics remain separate work. Two legacy shop identifiers and two offline recipient identities still need confirmation; the service bridge deliberately does not invent them. |
 | Deployment/acceptance | Production deployment, migration/review of the old Interactions config/messages, physical client verification and complete modpack acceptance remain outstanding. The staged service-bridge manifest for `bc47082` predates removal and permissions work. |
 
 The unresolved source identifiers are shops `金城银行存款` / `风巽贵金属积存赎回` and accounts `VerticalYeti503` / `Santoesia`. Their destinations/UUIDs have not been guessed.
 
-Current entity-command validation: 190 dedicated checks, 152 ordinary tests, 44 removal checks, 107 NPC assertions, 223 runtime probes, 48 dialogue unit cases, 101 actual-provider/restart permission checks and 18 no-provider checks pass. The unchanged dialogue display implementation retains its earlier 45-check evidence. Normal jars exclude the test probes. No local repair has been deployed by this task.
+Current validation: 285 entity-command checks, 45 dialogue-display checks, 163 ordinary tests, 44 removal checks, 107 NPC assertions, 223 runtime probes, 48 dialogue unit cases, 101 actual-provider/restart permission checks and 18 no-provider checks pass. Normal jars exclude the test probes. No local repair has been deployed by this task.
 
 The following sections preserve the September 13 01:47 detailed audit for source evidence. Its then-current implementation/hash table and then-open service/removal rows are historical; use the current delta/gaps above and linked follow-ups for today's disposition.
 

@@ -414,7 +414,7 @@
   "citizens.commands.npc.pose.removed" : "姿态已删除.",
   "citizens.commands.npc.potioneffects.description" : "管理药水效果",
   "citizens.commands.npc.potioneffects.effect-added" : "药水效果 [[{0}]] 已添加到 [[{1}]].",
-  "citizens.commands.npc.potioneffects.effect-removed" : "药水效果 [[{{0}}]] 已从 [[{1}]] 删除.",
+  "citizens.commands.npc.potioneffects.effect-removed" : "药水效果 [[{0}]] 已从 [[{1}]] 删除.",
   "citizens.commands.npc.potioneffects.help" : "管理 NPC 具有的药水效果。药水效果可以是 [[临时的]] (添加后会被删除的) 或者 [[持久化的]] (每次生成 NPC 时都会添加的已命名的效果). <br>你可以使用参数 -t 来添加一个临时的效果，或者提供一个名字作为一个持久化的效果的名字. <br>将持续时间设置为 -1 或者使用参数 -i 使效果无限持续。",
   "citizens.commands.npc.powered.description" : "切换苦力怕 NPC 是否被充能",
   "citizens.commands.npc.powered.set" : "[[{0}]] 现在已充能.",

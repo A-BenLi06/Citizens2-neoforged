@@ -6,6 +6,8 @@ import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.world.effect.MobEffectInstance;
+import net.minecraft.world.effect.MobEffect;
+import net.minecraft.world.effect.MobEffectCategory;
 import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.animal.CatVariant;
 import net.minecraft.world.entity.animal.FrogVariant;
@@ -27,5 +29,6 @@ public final class EntityCommandRegistryRuntimeAudit {
                 poi -> false, poi -> false, ImmutableSet.of(), ImmutableSet.of(), SoundEvents.VILLAGER_WORK_FARMER));
         event.register(Registries.POTION, id("potion"), () -> new Potion(new MobEffectInstance(MobEffects.LUCK, 1200)));
         event.register(Registries.PARTICLE_TYPE, id("particle"), () -> new SimpleParticleType(false));
+        event.register(Registries.MOB_EFFECT, id("effect"), () -> new MobEffect(MobEffectCategory.BENEFICIAL, 0x123456) { });
     }
 }

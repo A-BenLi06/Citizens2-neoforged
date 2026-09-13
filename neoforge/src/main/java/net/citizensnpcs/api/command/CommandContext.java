@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
@@ -37,9 +38,9 @@ import net.minecraft.world.phys.Vec3;
 /**
  * Parsed form of a command invocation — positional arguments, {@code --flag value} pairs and {@code -abc} switches.
  * <p>
- * The parsing is upstream's, carried over unchanged: it is where {@code /npc create Bob --at 1,2,3 --type zombie -bstu}
- * gets its shape, including quoted arguments, brace-delimited JSON and multi-word values. Only the pieces that touch the
- * platform are different:
+ * The parsing follows upstream: it is where {@code /npc create Bob --at 1,2,3 --type zombie -bstu}
+ * gets its shape, including quoted arguments, brace-delimited JSON and multi-word values. Explicitly quoted empty values
+ * remain distinct from tokens collapsed during parsing. The platform-specific pieces are:
  * <ul>
  * <li>The sender is a {@link CommandSourceStack}, which already unifies player, command block and console — so upstream's
  * three-way branch on sender type collapses into asking the source for its position and level.
@@ -114,7 +115,7 @@ public class CommandContext {
 
             if (i + 1 < args.length && length > 2 && VALUE_FLAG.matcher(args[i]).matches()) {
                 int inner = i + 1;
-                while (args[inner].length() == 0) {
+                while (args[inner].length() == 0 && !isquoted[inner]) {
                     // later args may have been quoted
                     if (++inner >= args.length) {
                         inner = -1;
@@ -122,10 +123,11 @@ public class CommandContext {
                     }
                 }
                 if (inner != -1) {
-                    valueFlags.put(args[i].toLowerCase().substring(2), args[inner]);
+                    valueFlags.put(args[i].toLowerCase(Locale.ROOT).substring(2), args[inner]);
                     if (clearFlags) {
                         args[i] = "";
                         args[inner] = "";
+                        isquoted[inner] = false;
                     }
                 }
             } else if (FLAG.matcher(args[i]).matches()) {
@@ -136,9 +138,9 @@ public class CommandContext {
             }
         }
         List<String> copied = new ArrayList<>();
-        for (String arg : args) {
-            arg = arg.trim();
-            if (arg.isEmpty())
+        for (i = 0; i < args.length; i++) {
+            String arg = isquoted[i] ? args[i] : args[i].trim();
+            if (arg.isEmpty() && !isquoted[i])
                 continue;
 
             copied.add(arg);

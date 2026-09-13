@@ -129,6 +129,7 @@ public class Citizens implements CitizensPlugin {
         commands.setInjector(new Injector(this));
         commands.register(NPCCommands.class);
         commands.register(net.citizensnpcs.commands.EntityTraitCommands.class);
+        commands.register(net.citizensnpcs.commands.PresentationTraitCommands.class);
         commands.register(TraitCommands.class);
         commands.register(EditorCommands.class);
         commands.register(WaypointCommands.class);

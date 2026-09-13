@@ -11,6 +11,7 @@ import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
@@ -29,6 +30,7 @@ import com.google.common.primitives.Primitives;
 import net.citizensnpcs.api.util.DataKey;
 import net.citizensnpcs.api.util.Location;
 import net.citizensnpcs.api.util.Messaging;
+import net.citizensnpcs.api.util.MemoryDataKey;
 import net.citizensnpcs.api.util.RegistryUtil;
 import net.minecraft.core.Rotations;
 import net.minecraft.network.chat.Component;
@@ -642,19 +644,25 @@ public class PersistenceLoader {
         } else if (Map.class.isAssignableFrom(field.getType())) {
             @SuppressWarnings("unchecked")
             Map<Object, Object> map = (Map<Object, Object>) fieldValue;
-            root.removeKey(field.key);
+            Map<String, Object> encoded = new LinkedHashMap<>();
             for (Map.Entry<Object, Object> entry : map.entrySet()) {
                 String mapKey = "";
                 String registryKey = entry.getKey() == null ? null : RegistryUtil.keyOf(entry.getKey());
                 if (registryKey != null) {
-                    // '.' is the DataKey path separator, so it cannot survive in a key name
+                    // Retain the reference format's registry-key escaping for existing saved maps.
                     mapKey = registryKey.replace('.', ',');
                 } else {
                     mapKey = String.valueOf(entry.getKey());
                 }
-                String key = createRelativeKey(field.key, mapKey);
-                serialiseValue(field, root.getRelative(key), entry.getValue());
+                // Map keys are literal names, not DataKey paths. Encode each scalar or structured value in an isolated
+                // container, then store the resulting map together so a key such as "effect.saved" stays one key.
+                DataKey value = new MemoryDataKey().getRelative("value");
+                serialiseValue(field, value, entry.getValue());
+                Object raw = value.getRaw("");
+                if (raw != null) encoded.put(mapKey, raw);
             }
+            if (encoded.isEmpty()) root.removeKey(field.key);
+            else root.setRaw(field.key, encoded);
         } else if (float[].class.isAssignableFrom(field.getType())) {
             float[] floats = (float[]) fieldValue;
             root.removeKey(field.key);

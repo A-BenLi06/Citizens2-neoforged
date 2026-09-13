@@ -554,10 +554,18 @@ public class CitizensNPC extends AbstractNPC {
         if (entity == null)
             return;
         if (entity instanceof Display.TextDisplay display) {
-            // a text display shows real text rather than a nameplate, so the name goes into its text field instead
+            // A rendered hologram component or explicitly authored text takes priority over the fallback NPC name.
             Object component = data().get(NPC.Metadata.TEXT_DISPLAY_COMPONENT);
+            var textTrait = getCosmeticEntity() == entity
+                    ? getTraitNullable(net.citizensnpcs.trait.versioned.TextDisplayTrait.class) : null;
             display.setText(component instanceof net.minecraft.network.chat.Component text ? text
-                    : Messaging.minecraftComponentFromRawMessage(getFullName()));
+                    : textTrait != null && textTrait.getText() != null
+                            ? net.citizensnpcs.api.util.TextParser.parse(textTrait.getText())
+                            : Messaging.minecraftComponentFromRawMessage(getFullName()));
+            return;
+        }
+        if (entity instanceof net.minecraft.world.entity.Interaction) {
+            entity.setCustomName(null);
             return;
         }
         entity.setCustomName(coloredNameComponentCache instanceof net.minecraft.network.chat.Component

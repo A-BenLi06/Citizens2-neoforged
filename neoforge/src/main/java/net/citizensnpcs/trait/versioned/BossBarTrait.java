@@ -2,9 +2,11 @@ package net.citizensnpcs.trait.versioned;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Set;
 import java.util.function.Supplier;
 
 import com.google.common.primitives.Doubles;
@@ -15,12 +17,12 @@ import net.citizensnpcs.api.persistence.Persist;
 import net.citizensnpcs.api.trait.Trait;
 import net.citizensnpcs.api.trait.TraitName;
 import net.citizensnpcs.api.util.DataKey;
-import net.citizensnpcs.api.util.EntityUtil;
 import net.citizensnpcs.api.util.PermissionUtil;
 import net.citizensnpcs.api.util.Placeholders;
 import net.citizensnpcs.api.util.TextParser;
 import net.minecraft.server.level.ServerBossEvent;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.BossEvent;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.attributes.Attributes;
@@ -166,15 +168,8 @@ public class BossBarTrait extends Trait {
         ServerBossEvent bar = getBar();
         if (bar == null)
             return;
-        if (track != null && !track.isEmpty()) {
-            if (!applyTracking(bar))
-                return;
-        }
         bar.setName(TextParser.parse(title));
         bar.setVisible(visible);
-        if (progressProvider != null) {
-            bar.setProgress(progressProvider.get().floatValue());
-        }
         if (style != null) {
             bar.setOverlay(style);
         }
@@ -185,38 +180,50 @@ public class BossBarTrait extends Trait {
         bar.setPlayBossMusic(flags.contains(BarFlag.PLAY_BOSS_MUSIC));
         bar.setCreateWorldFog(flags.contains(BarFlag.CREATE_FOG));
 
-        bar.removeAllPlayers();
-        for (ServerPlayer player : EntityUtil.getNearbyVisiblePlayers(npc.getEntity(),
-                range > 0 ? range : Setting.BOSSBAR_RANGE.asInt())) {
-            if (viewPermission != null && !PermissionUtil.hasPermission(player, viewPermission)) {
-                continue;
+        Set<ServerPlayer> viewers = new HashSet<>();
+        double distance = range > 0 ? range : Setting.BOSSBAR_RANGE.asInt();
+        if (npc.getEntity().level() instanceof ServerLevel level) {
+            for (ServerPlayer player : level.players()) {
+                if (player == npc.getEntity() || player.distanceToSqr(npc.getEntity()) > distance * distance) continue;
+                if (viewPermission != null && !viewPermission.isEmpty() && !PermissionUtil.hasPermission(player, viewPermission)) continue;
+                viewers.add(player);
             }
-            bar.addPlayer(player);
         }
+        for (ServerPlayer previous : List.copyOf(bar.getPlayers())) {
+            if (!viewers.contains(previous)) bar.removePlayer(previous);
+        }
+        for (ServerPlayer player : viewers) bar.addPlayer(player);
+
+        // A failed placeholder must not freeze visibility, permission revocation or viewer cleanup.
+        if (track != null && !track.isEmpty()) applyTracking(bar);
+        if (progressProvider != null) applyProgress(bar, progressProvider.get());
     }
 
     /**
-     * @return false when the tracked variable did not resolve to a number, in which case the rest of the update is
-     *         skipped so a transient placeholder failure does not blank the bar
+     * @return false when tracking cannot supply finite progress; retain only the previous progress in that case
      */
     private boolean applyTracking(ServerBossEvent bar) {
         if (track.equalsIgnoreCase("health")) {
             if (npc.getEntity() instanceof LivingEntity living) {
                 double max = living.getAttributeValue(Attributes.MAX_HEALTH);
-                bar.setProgress(max <= 0 ? 0 : (float) (living.getHealth() / max));
+                applyProgress(bar, max <= 0 ? 0 : living.getHealth() / max);
             }
             return true;
         }
         String replaced = Placeholders.replace(track,
                 npc.getEntity() instanceof ServerPlayer player ? player : null);
         Double number = Doubles.tryParse(replaced);
-        if (number == null)
+        if (number == null || !Double.isFinite(number))
             return false;
         if (number >= 1 && number <= 100) {
             number /= 100.0;
         }
-        bar.setProgress((float) Math.max(0, Math.min(1, number)));
+        applyProgress(bar, number);
         return true;
+    }
+
+    private static void applyProgress(ServerBossEvent bar, Double number) {
+        if (number != null && Double.isFinite(number)) bar.setProgress((float) Math.max(0, Math.min(1, number)));
     }
 
     public void setColor(BossEvent.BossBarColor color) {
@@ -257,8 +264,14 @@ public class BossBarTrait extends Trait {
 
     /** Accepts either spelling; vanilla's default overlay for an empty or unrecognised value. */
     public static BossEvent.BossBarOverlay parseStyle(String raw) {
+        BossEvent.BossBarOverlay parsed = parseStyleStrict(raw);
+        return parsed == null ? BossEvent.BossBarOverlay.PROGRESS : parsed;
+    }
+
+    /** Null for an unknown command value; saved data can still use the forgiving parser above. */
+    public static BossEvent.BossBarOverlay parseStyleStrict(String raw) {
         if (raw == null || raw.isEmpty())
-            return BossEvent.BossBarOverlay.PROGRESS;
+            return null;
         String upper = raw.toUpperCase(Locale.ROOT);
         for (Map.Entry<BossEvent.BossBarOverlay, String> entry : BUKKIT_STYLE_NAMES.entrySet()) {
             if (entry.getValue().equals(upper))
@@ -267,8 +280,13 @@ public class BossBarTrait extends Trait {
         try {
             return BossEvent.BossBarOverlay.valueOf(upper);
         } catch (IllegalArgumentException ex) {
-            return BossEvent.BossBarOverlay.PROGRESS;
+            return null;
         }
+    }
+
+    public static List<String> styleNames() {
+        return java.util.stream.Stream.concat(java.util.Arrays.stream(BossEvent.BossBarOverlay.values()).map(Enum::name),
+                BUKKIT_STYLE_NAMES.values().stream()).distinct().sorted().toList();
     }
 
     public static BarFlag parseFlag(String raw) {

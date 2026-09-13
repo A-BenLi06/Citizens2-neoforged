@@ -92,6 +92,7 @@ import net.citizensnpcs.trait.versioned.FoxTrait;
 import net.citizensnpcs.trait.versioned.FrogTrait;
 import net.citizensnpcs.trait.versioned.GoatTrait;
 import net.citizensnpcs.trait.versioned.ItemDisplayTrait;
+import net.citizensnpcs.trait.versioned.InteractionTrait;
 import net.citizensnpcs.trait.versioned.LlamaTrait;
 import net.citizensnpcs.trait.versioned.MushroomCowTrait;
 import net.citizensnpcs.trait.versioned.PandaTrait;
@@ -173,6 +174,7 @@ public class CitizensTraitFactory implements TraitFactory {
         registerTrait(TraitInfo.create(HomeTrait.class));
         registerTrait(TraitInfo.create(Inventory.class));
         registerTrait(TraitInfo.create(ItemDisplayTrait.class));
+        registerTrait(TraitInfo.create(InteractionTrait.class));
         registerTrait(TraitInfo.create(ItemFrameTrait.class));
         registerTrait(TraitInfo.create(LeashedTrait.class));
         registerTrait(TraitInfo.create(LlamaTrait.class));

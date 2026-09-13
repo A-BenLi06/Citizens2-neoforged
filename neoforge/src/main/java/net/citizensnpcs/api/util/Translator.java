@@ -41,7 +41,20 @@ public class Translator {
     }
 
     private String format(String key, Locale locale, Object... msg) {
-        return getFormatter(translate(key, locale)).format(msg);
+        String translated = translate(key, locale);
+        try {
+            return getFormatter(translated).format(msg);
+        } catch (IllegalArgumentException failure) {
+            String fallback = baseTranslations.get(key);
+            if (fallback == null || fallback.equals(translated)) throw failure;
+            // A malformed editable message must not turn an already completed command into a reported failure.
+            // Keep the server's language for other keys and report the broken override once, without rewriting it.
+            Messaging.warn("Invalid translation format for", key, "in", defaultLocale,
+                    "- using the base message:", failure.getMessage());
+            String result = getFormatter(fallback).format(msg);
+            translations.put(key, fallback);
+            return result;
+        }
     }
 
     private MessageFormat getFormatter(String unreplaced) {

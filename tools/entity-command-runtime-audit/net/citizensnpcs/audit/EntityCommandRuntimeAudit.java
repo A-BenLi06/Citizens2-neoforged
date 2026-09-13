@@ -138,6 +138,7 @@ public final class EntityCommandRuntimeAudit {
             aliasesAndValidation();
             customRegistries();
             unresolvedValues();
+            PresentationCommandRuntimeAudit.run(server, actor);
             warden = npc(EntityType.WARDEN, "Warden");
             warden.spawn(new Location(level, 3, -60, 53)); select(source, warden);
             ok(source, "npc warden anger " + actor.getUUID() + " 100"); ((net.citizensnpcs.api.npc.AbstractNPC) warden).update();
@@ -336,5 +337,5 @@ public final class EntityCommandRuntimeAudit {
             return (SpellcasterIllager.IllagerSpell) method.invoke(entity);
         } catch (ReflectiveOperationException failure) { throw new IllegalStateException(failure); }
     }
-    private static void check(boolean value, String name) { if (!value) throw new AssertionError(name); passed++; LoggerFactory.getLogger("citizens").info("[ENTITYCOMMANDAUDIT] PASS {}", name); }
+    static void check(boolean value, String name) { if (!value) throw new AssertionError(name); passed++; LoggerFactory.getLogger("citizens").info("[ENTITYCOMMANDAUDIT] PASS {}", name); }
 }

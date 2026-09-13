@@ -103,12 +103,11 @@ public class DisplayTrait extends Trait {
             display.setWidth(width);
         }
         if (offset != null || scale != null || leftRotation != null || rightRotation != null) {
-            // vanilla offers no getter for the current transform, so the whole thing is rebuilt from the fields that
-            // were configured, with vanilla's own defaults for the rest
-            display.setTransformation(new Transformation(offset == null ? new Vector3f() : new Vector3f(offset),
-                    leftRotation == null ? null : new Quaternionf(leftRotation),
-                    scale == null ? new Vector3f(1, 1, 1) : new Vector3f(scale),
-                    rightRotation == null ? null : new Quaternionf(rightRotation)));
+            Transformation current = Display.createTransformation(display.getEntityData());
+            display.setTransformation(new Transformation(offset == null ? current.getTranslation() : new Vector3f(offset),
+                    leftRotation == null ? current.getLeftRotation() : new Quaternionf(leftRotation),
+                    scale == null ? current.getScale() : new Vector3f(scale),
+                    rightRotation == null ? current.getRightRotation() : new Quaternionf(rightRotation)));
         }
         if (viewRange != null) {
             display.setViewRange(viewRange);
