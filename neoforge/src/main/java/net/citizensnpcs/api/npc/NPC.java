@@ -344,6 +344,12 @@ public interface NPC extends Agent, Cloneable {
      */
     public void save(DataKey key);
 
+    /** Serializes an in-memory copy/undo snapshot, including NPCs excluded from persistent storage.
+     * Implementations may override this without changing the persistence policy of {@link #save(DataKey)}. */
+    default void saveSnapshot(DataKey key) {
+        save(key);
+    }
+
     public void scheduleUpdate(NPCUpdate update);
 
     /**

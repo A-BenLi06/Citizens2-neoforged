@@ -7,6 +7,7 @@ import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.ListMultimap;
 
 import net.citizensnpcs.api.npc.NPCSelector;
+import net.citizensnpcs.api.command.exception.CommandException;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.world.entity.Entity;
 
@@ -32,11 +33,12 @@ public class CommandHistory {
         return entity == null ? null : entity.getUUID();
     }
 
-    public boolean undo(CommandSourceStack sender) {
+    public boolean undo(CommandSourceStack sender) throws CommandException {
         List<CommandHistoryItem> hist = history.get(keyOf(sender));
         if (hist.isEmpty())
             return false;
-        hist.remove(hist.size() - 1).undo(sender, selector);
+        hist.get(hist.size() - 1).undo(sender, selector);
+        hist.remove(hist.size() - 1);
         return true;
     }
 }

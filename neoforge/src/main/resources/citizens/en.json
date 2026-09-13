@@ -677,6 +677,7 @@
   "citizens.commands.npc.type.set": "[[{0}]]''s type set to [[{1}]].",
   "citizens.commands.npc.undo.description": "Undoes the last action (currently only create/remove supported)",
   "citizens.commands.npc.undo.help": "",
+  "citizens.commands.npc.undo.id-conflict": "Cannot restore NPC [[{0}]]: its ID or UUID is already in use.",
   "citizens.commands.npc.undo.successful": "Undo successful.",
   "citizens.commands.npc.undo.unsuccessful": "No commands to undo.",
   "citizens.commands.npc.useitem.description": "Sets an NPC to  be using their held items",

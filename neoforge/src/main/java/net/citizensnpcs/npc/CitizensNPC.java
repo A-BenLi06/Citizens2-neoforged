@@ -269,14 +269,11 @@ public class CitizensNPC extends AbstractNPC {
     /**
      * Persists the navigator's own parameters alongside the NPC, under a {@code navigator} subkey.
      * <p>
-     * The {@code SHOULD_SAVE} check is repeated here rather than relying on {@code super.save} returning early, because
-     * that early return is invisible from this side.
+     * The base class enforces persistent-save policy; snapshots also include these parameters.
      */
     @Override
-    public void save(DataKey root) {
-        super.save(root);
-        if (!data().get(NPC.Metadata.SHOULD_SAVE, true))
-            return;
+    protected void saveState(DataKey root, boolean strict) {
+        super.saveState(root, strict);
         navigator.save(root.getRelative("navigator"));
     }
 

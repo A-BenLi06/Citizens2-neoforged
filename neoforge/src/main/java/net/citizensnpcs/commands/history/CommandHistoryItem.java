@@ -1,9 +1,10 @@
 package net.citizensnpcs.commands.history;
 
 import net.citizensnpcs.api.npc.NPCSelector;
+import net.citizensnpcs.api.command.exception.CommandException;
 import net.minecraft.commands.CommandSourceStack;
 
 /** One undoable step, recorded so that {@code /npc undo} can put it back. */
 public interface CommandHistoryItem {
-    void undo(CommandSourceStack sender, NPCSelector selector);
+    void undo(CommandSourceStack sender, NPCSelector selector) throws CommandException;
 }

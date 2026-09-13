@@ -9,10 +9,20 @@ import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.suggestion.Suggestions;
 import com.mojang.brigadier.suggestion.SuggestionsBuilder;
+import com.mojang.brigadier.exceptions.CommandSyntaxException;
+import com.mojang.brigadier.exceptions.SimpleCommandExceptionType;
 
 import net.citizensnpcs.api.CitizensAPI;
 import net.citizensnpcs.api.command.CommandManager;
+import net.citizensnpcs.api.command.CommandMessages;
+import net.citizensnpcs.api.command.exception.CommandException;
+import net.citizensnpcs.api.command.exception.CommandUsageException;
+import net.citizensnpcs.api.command.exception.ServerCommandException;
+import net.citizensnpcs.api.command.exception.UnhandledCommandException;
+import net.citizensnpcs.api.command.exception.WrappedCommandException;
 import net.citizensnpcs.api.npc.NPC;
+import net.citizensnpcs.api.util.Messaging;
+import net.citizensnpcs.api.util.TextParser;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
 
@@ -49,11 +59,31 @@ public class CommandRegistry {
         }
     }
 
-    private int run(CommandSourceStack source, String root, String[] args) {
+    private int run(CommandSourceStack source, String root, String[] args) throws CommandSyntaxException {
         NPC selected = CitizensAPI.getDefaultNPCSelector().getSelected(source);
         // command methods are (CommandContext, sender, NPC); the manager fills the context slot itself, so the sender
         // and the selected NPC are what it needs from here
-        return commands.executeSafe(root, args, source, source, selected) ? 1 : 0;
+        try {
+            // executeSafe reports whether an invocation was handled, even when it failed. Brigadier needs the outcome.
+            commands.execute(root, args, source, source, selected);
+            return 1;
+        } catch (CommandException failure) {
+            String message = failure.getMessage();
+            if (failure instanceof ServerCommandException) message = Messaging.tr(CommandMessages.MUST_BE_INGAME);
+            else if (failure instanceof UnhandledCommandException) message = Messaging.tr(CommandMessages.UNKNOWN_COMMAND);
+            else if (failure instanceof WrappedCommandException) {
+                if (failure.getCause() instanceof NumberFormatException) message = Messaging.tr(CommandMessages.INVALID_NUMBER);
+                else {
+                    (failure.getCause() == null ? failure : failure.getCause()).printStackTrace();
+                    message = Messaging.tr(CommandMessages.REPORT_ERROR);
+                }
+            } else if (failure instanceof CommandUsageException usage) {
+                message = (message == null || message.isBlank() ? "" : message + "\n")
+                        + java.util.Objects.toString(usage.getUsage(), "");
+            }
+            if (message == null || message.isBlank()) message = Messaging.tr(CommandMessages.REPORT_ERROR);
+            throw new SimpleCommandExceptionType(TextParser.parse(Messaging.convertLegacyCodes(message))).create();
+        }
     }
 
     private CompletableFuture<Suggestions> suggest(CommandContext<CommandSourceStack> ctx, SuggestionsBuilder builder,

@@ -127,9 +127,9 @@ public abstract class AbstractNPC implements NPC {
 
     @Override
     public NPC copy() {
-        NPC copy = registry.createNPC(getOrAddTrait(MobType.class).getType(), getRawName());
         DataKey key = new MemoryDataKey();
-        save(key);
+        saveSnapshot(key);
+        NPC copy = registry.createNPC(getOrAddTrait(MobType.class).getType(), getRawName());
         copy.load(key);
 
         for (Trait trait : copy.getTraits()) {
@@ -377,7 +377,18 @@ public abstract class AbstractNPC implements NPC {
     public void save(DataKey root) {
         if (!metadata.get(NPC.Metadata.SHOULD_SAVE, true))
             return;
+        saveState(root, false);
+        clearSaveData.clear();
+    }
 
+    @Override
+    public void saveSnapshot(DataKey root) {
+        saveState(root, true);
+    }
+
+    /** A strict snapshot must succeed before a destructive operation can rely on it. */
+    protected void saveState(DataKey root, boolean strict) {
+        Set<String> pendingRemoval = Sets.newHashSet(clearSaveData);
         metadata.saveTo(root.getRelative("metadata"));
         root.setString("name", name);
         root.setString("uuid", uuid.toString());
@@ -391,13 +402,14 @@ public abstract class AbstractNPC implements NPC {
         Set<String> traitNames = Splitter.on(',').omitEmptyStrings().splitToStream(root.getString("traitnames"))
                 .collect(Collectors.toSet());
         traits.forEach(trait -> {
-            clearSaveData.remove("traits." + trait.getName());
+            pendingRemoval.remove("traits." + trait.getName());
             traitNames.add(trait.getName());
 
             DataKey traitKey = root.getRelative("traits." + trait.getName());
             try {
                 trait.save(traitKey);
             } catch (Throwable t) {
+                if (strict) throw new IllegalStateException("Could not snapshot trait " + trait.getName(), t);
                 Messaging.severe("Saving trait", trait, "failed for NPC", this);
                 t.printStackTrace();
                 return;
@@ -405,19 +417,19 @@ public abstract class AbstractNPC implements NPC {
             try {
                 PersistenceLoader.save(trait, traitKey);
             } catch (Throwable t) {
+                if (strict) throw new IllegalStateException("Could not snapshot trait " + trait.getName(), t);
                 Messaging.severe("PersistenceLoader failed saving trait", trait, "for NPC", this);
                 t.printStackTrace();
                 return;
             }
         });
-        for (String clear : clearSaveData) {
+        for (String clear : pendingRemoval) {
             if (clear.startsWith("traits.")) {
                 traitNames.remove(clear.replace("traits.", ""));
             }
             root.removeKey(clear);
         }
         root.setString("traitnames", Joiner.on(',').join(traitNames));
-        clearSaveData.clear();
     }
 
     @Override

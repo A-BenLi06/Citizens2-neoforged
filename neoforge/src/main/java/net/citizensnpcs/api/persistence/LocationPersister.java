@@ -5,6 +5,11 @@ import java.math.RoundingMode;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
+import java.util.LinkedHashSet;
+import java.util.UUID;
+import java.io.DataInputStream;
+import java.io.IOException;
+import java.nio.file.Files;
 import java.util.concurrent.ConcurrentHashMap;
 
 import net.citizensnpcs.api.util.DataKey;
@@ -15,6 +20,9 @@ import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.dimension.DimensionType;
+import net.minecraft.world.level.storage.LevelResource;
 import net.neoforged.neoforge.server.ServerLifecycleHooks;
 
 /**
@@ -120,6 +128,51 @@ public class LocationPersister implements Persister<Location> {
             return overworld;
         }
         return null;
+    }
+
+    /** Resolves a command target without the saved-data overworld fallback.
+     * Unknown or ambiguous names match nothing. Legacy Bukkit UUIDs require an existing uid.dat. */
+    public static ServerLevel resolveStrict(String worldId) {
+        MinecraftServer server = ServerLifecycleHooks.getCurrentServer();
+        if (server == null || worldId == null || worldId.isBlank()) return null;
+        String requested = worldId.replace('\\', '/').toLowerCase(Locale.ROOT);
+        if (requested.contains(":")) {
+            for (ServerLevel level : server.getAllLevels()) {
+                if (level.dimension().location().toString().equals(requested)) return level;
+            }
+            return null;
+        }
+        var root = server.getWorldPath(LevelResource.ROOT).toAbsolutePath().normalize();
+        String folder = root.getFileName().toString().toLowerCase(Locale.ROOT);
+        UUID legacyId;
+        try { legacyId = UUID.fromString(worldId); }
+        catch (IllegalArgumentException notUuid) { legacyId = null; }
+        Set<ServerLevel> matches = new LinkedHashSet<>();
+        for (ServerLevel level : server.getAllLevels()) {
+            var id = level.dimension().location();
+            var directory = DimensionType.getStorageFolder(level.dimension(), root);
+            String relative = root.relativize(directory).toString().replace('\\', '/').toLowerCase(Locale.ROOT);
+            String legacyFolder = folder + (relative.isEmpty() ? "" : "/" + relative);
+            String bukkitFolder = level.dimension() == Level.NETHER ? folder + "_nether"
+                    : level.dimension() == Level.END ? folder + "_the_end" : folder;
+            if (id.getPath().equals(requested) || id.toString().equals(LEGACY_WORLD_NAMES.get(requested))
+                    || legacyFolder.equals(requested)
+                    || (level.dimension() == Level.OVERWORLD || level.dimension() == Level.NETHER || level.dimension() == Level.END)
+                            && bukkitFolder.equals(requested)) matches.add(level);
+            if (legacyId != null) {
+                var file = directory.resolve("uid.dat");
+                try {
+                    if (Files.isRegularFile(file) && Files.size(file) == 16) {
+                        try (var input = new DataInputStream(Files.newInputStream(file))) {
+                            if (legacyId.equals(new UUID(input.readLong(), input.readLong()))) matches.add(level);
+                        }
+                    }
+                } catch (IOException failure) {
+                    Messaging.debug("Could not read legacy world identity", file, failure.getMessage());
+                }
+            }
+        }
+        return matches.size() == 1 ? matches.iterator().next() : null;
     }
 
     /**

@@ -2,6 +2,8 @@
 
 Audit timestamp: 2026-09-13 01:47:09 +08:00 (UTC+08:00).
 
+Further native-command follow-up: [removal and undo parity](npc-removal-parity-2026-09-13.md) restores target/filter resolution, ownership, history, temporary snapshots and true dispatcher failures. Its dedicated checks and the existing regression suite pass. External permission-node registration/provider integration remains open.
+
 Later implementation follow-up: [CmdCam and Yuuniverse Economy bridges](native-service-bridges-2026-09-13.md). That work connects the identified camera provider, adds native shop APIs, and corrects a further economic-format gap: 2,276 of 2,277 old eco actions select a currency and many recipients are offline. The table below records the earlier audit snapshot; the linked follow-up and walkthrough contain the subsequent results.
 
 **Verdict: the local port is substantially safer and more capable than at the start of this work, but it still does not reproduce the complete Citizens/Interactions/Sentinel stack. Several configured old-server workflows remain unavailable. This is not merely a remaining client-testing problem.**

@@ -44,7 +44,7 @@ public class NPCCommandSelector implements ChatPrompt {
     public NPCCommandSelector(Callback callback, CommandSourceStack sender, List<NPC> possible) {
         this.callback = callback;
         this.sender = sender;
-        this.choices = possible;
+        this.choices = List.copyOf(possible);
     }
 
     @Override
@@ -54,12 +54,18 @@ public class NPCCommandSelector implements ChatPrompt {
             Messaging.sendErrorTr(sender, CommandMessages.INVALID_NUMBER);
             return this;
         }
-        if (choices.stream().noneMatch(npc -> npc.getId() == id.intValue())) {
+        NPC choice = choices.stream().filter(npc -> npc.getId() == id.intValue()).findFirst().orElse(null);
+        if (choice == null) {
             Messaging.sendErrorTr(sender, Messages.SELECTION_PROMPT_INVALID_CHOICE, id);
             return this;
         }
+        NPC target = choice.getOwningRegistry().getByUniqueId(choice.getUniqueId());
+        if (target == null || target.getId() != choice.getId()) {
+            Messaging.sendErrorTr(sender, Messages.NPC_NOT_FOUND);
+            return this;
+        }
         try {
-            callback.run(CitizensAPI.getNPCRegistry().getById(id));
+            callback.run(target);
         } catch (ServerCommandException ex) {
             Messaging.sendErrorTr(sender, CommandMessages.MUST_BE_INGAME);
         } catch (CommandUsageException ex) {
@@ -93,15 +99,16 @@ public class NPCCommandSelector implements ChatPrompt {
      */
     public static void startWithCallback(Callback callback, NPCRegistry registry, CommandSourceStack sender,
             CommandContext args, String raw) throws CommandException {
-        try {
-            callback.run(registry.getByUniqueIdGlobal(UUID.fromString(raw)));
+        UUID uuid;
+        try { uuid = UUID.fromString(raw); }
+        catch (IllegalArgumentException notUuid) { uuid = null; }
+        if (uuid != null) {
+            callback.run(registry.getByUniqueIdGlobal(uuid));
             return;
-        } catch (IllegalArgumentException ex) {
-            // not a uuid, try the other two forms
         }
         Integer id = Ints.tryParse(raw);
         if (id != null) {
-            callback.run(registry.getById(id));
+            callback.run(id < 0 ? null : registry.getById(id));
             return;
         }
         double range = args.hasValueFlag("range") ? Math.abs(args.getFlagDouble("range")) : -1;
@@ -135,6 +142,6 @@ public class NPCCommandSelector implements ChatPrompt {
             }
             throw new CommandException(Messages.SELECTION_PROMPT_INVALID_CHOICE, ids.toString());
         }
-        ChatPrompts.begin(player, new NPCCommandSelector(callback, sender, possible));
+        ChatPrompts.begin(player, new NPCCommandSelector(callback, sender, possible)).withEscapeSequences("exit");
     }
 }

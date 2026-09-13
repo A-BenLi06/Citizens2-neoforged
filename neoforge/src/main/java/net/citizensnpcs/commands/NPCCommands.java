@@ -1544,7 +1544,7 @@ public class NPCCommands {
             permission = "citizens.npc.undo")
     @Requirements
     public void undo(CommandContext args, CommandSourceStack sender, NPC npc,
-            @Arg(value = 1, completions = "all") String action) {
+            @Arg(value = 1, completions = "all") String action) throws CommandException {
         if ("all".equalsIgnoreCase(action)) {
             while (history().undo(sender)) {
             }
@@ -2832,27 +2832,105 @@ public class NPCCommands {
 
     @Command(
             aliases = { "npc" },
-            usage = "remove (all)",
+            usage = "remove (all|id|uuid|name|--owner owner|--eid entity-uuid|--world world)",
             desc = "",
             modifiers = { "remove", "rem" },
             min = 1,
-            max = 2,
-            permission = "citizens.npc.remove")
+            max = 2)
     @Requirements
-    public void remove(CommandContext args, CommandSourceStack sender, NPC npc) throws CommandException {
-        if (args.argsLength() > 1 && args.getString(1).equalsIgnoreCase("all")) {
-            if (!PermissionUtil.hasPermission(sender, "citizens.npc.remove.all"))
+    public void remove(CommandContext args, CommandSourceStack sender, NPC npc, @Flag("owner") String owner,
+            @Flag("eid") UUID eid, @Flag("world") String world,
+            @Arg(value = 1, completions = "all") String action) throws CommandException {
+        NPCRegistry registry = CitizensAPI.getNPCRegistry();
+        if (owner != null) {
+            boolean serverOwned = owner.equalsIgnoreCase("server");
+            UUID ownerId = null;
+            if (!serverOwned) {
+                try { ownerId = UUID.fromString(owner); }
+                catch (IllegalArgumentException notUuid) {
+                    var online = sender.getServer().getPlayerList().getPlayerByName(owner);
+                    if (online != null) ownerId = online.getUUID();
+                    else if (sender.getServer().getProfileCache() != null)
+                        ownerId = sender.getServer().getProfileCache().get(owner).map(profile -> profile.getId()).orElse(null);
+                }
+            }
+            var candidates = new ArrayList<NPC>();
+            registry.forEach(candidates::add);
+            for (NPC candidate : candidates) {
+                Owner ownership = candidate.getOrAddTrait(Owner.class);
+                boolean matches = serverOwned ? ownership.getOwnerId() == null
+                        : ownerId != null && ownership.isOwnedBy(ownerId);
+                if (matches && ownership.isOwnedBy(sender)) removeWithHistory(sender, candidate);
+            }
+            Messaging.sendTr(sender, Messages.NPCS_REMOVED);
+            return;
+        }
+        if (world != null) {
+            var level = net.citizensnpcs.api.persistence.LocationPersister.resolveStrict(world);
+            if (level == null) throw new CommandException(Messages.WORLD_NOT_FOUND, world);
+            var candidates = new ArrayList<NPC>();
+            registry.forEach(candidates::add);
+            for (NPC candidate : candidates) {
+                Location location = candidate.getStoredLocation();
+                if (location != null && location.getWorld() == level
+                        && candidate.getOrAddTrait(Owner.class).isOwnedBy(sender)) removeWithHistory(sender, candidate);
+            }
+            Messaging.sendTr(sender, Messages.NPCS_REMOVED);
+            return;
+        }
+        if (eid != null) {
+            NPC found = null;
+            for (var level : sender.getServer().getAllLevels()) {
+                Entity entity = level.getEntity(eid);
+                if (entity != null) { found = registry.getNPC(entity); break; }
+            }
+            if (found == null || !found.getOrAddTrait(Owner.class).isOwnedBy(sender))
+                throw new CommandException(Messages.NPC_NOT_FOUND);
+            String name = found.getName();
+            int id = found.getId();
+            removeWithHistory(sender, found);
+            Messaging.sendTr(sender, Messages.NPC_REMOVED, name, id);
+            return;
+        }
+        if ("all".equalsIgnoreCase(action)) {
+            if (!PermissionUtil.hasPermission(sender, "citizens.admin.remove.all")
+                    && !PermissionUtil.hasPermission(sender, "citizens.admin")
+                    && !PermissionUtil.hasPermission(sender, "citizens.npc.remove.all"))
                 throw new NoPermissionsException();
-            CitizensAPI.getNPCRegistry().deregisterAll();
+            var snapshots = new ArrayList<RemoveNPCHistoryItem>();
+            registry.forEach(candidate -> snapshots.add(new RemoveNPCHistoryItem(candidate)));
+            snapshots.forEach(snapshot -> history().add(sender, snapshot));
+            NPC selected = CitizensAPI.getDefaultNPCSelector().getSelected(sender);
+            if (selected != null && selected.getOwningRegistry() == registry)
+                CitizensAPI.getDefaultNPCSelector().deselect(sender);
+            registry.deregisterAll();
             Messaging.sendTr(sender, Messages.REMOVED_ALL_NPCS);
             return;
         }
-        if (npc == null)
-            throw new CommandException(CommandMessages.MUST_HAVE_SELECTED);
-        String name = npc.getName();
-        npc.destroy();
-        CitizensAPI.getDefaultNPCSelector().deselect(sender);
-        Messaging.sendTr(sender, Messages.NPC_REMOVED, name);
+        NPCCommandSelector.Callback remove = target -> {
+            if (target == null) throw new CommandException(Messages.NPC_NOT_FOUND);
+            if (!target.getOrAddTrait(Owner.class).isOwnedBy(sender))
+                throw new CommandException(CommandMessages.MUST_BE_OWNER);
+            if (!PermissionUtil.hasPermission(sender, "citizens.npc.remove")
+                    && !PermissionUtil.hasPermission(sender, "citizens.admin")) throw new NoPermissionsException();
+            String name = target.getName();
+            int id = target.getId();
+            removeWithHistory(sender, target);
+            Messaging.sendTr(sender, Messages.NPC_REMOVED, name, id);
+        };
+        if (action != null) NPCCommandSelector.startWithCallback(remove, registry, sender, args, action);
+        else {
+            if (npc == null) throw new CommandException(CommandMessages.MUST_HAVE_SELECTED);
+            remove.run(npc);
+        }
+    }
+
+    private void removeWithHistory(CommandSourceStack sender, NPC npc) {
+        var snapshot = new RemoveNPCHistoryItem(npc);
+        history().add(sender, snapshot);
+        if (CitizensAPI.getDefaultNPCSelector().getSelected(sender) == npc)
+            CitizensAPI.getDefaultNPCSelector().deselect(sender);
+        npc.destroy(sender);
     }
 
     @Command(
