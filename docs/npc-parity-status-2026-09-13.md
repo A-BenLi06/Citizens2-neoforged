@@ -2,11 +2,13 @@
 
 Initial audit timestamp: 2026-09-13 01:47:09 +08:00 (UTC+08:00).
 
-Current summary updated: 2026-09-13 22:48:05 +08:00 (UTC+08:00).
+Current summary updated: 2026-09-14 00:46:27 +08:00 (UTC+08:00).
+
+Latest permission-shop follow-up: [permanent permission transactions](permission-shop-parity-2026-09-14.md) connects Paradigm writing, restores signed global rule handling, adds provider-ID-based rollback and checks shop execution failures. Permanent permission rewards/costs and their editor capability are now implemented. The expanded actual-provider suite passes 101 checks, including 33 shop checks and writer restart persistence.
 
 Latest group-service follow-up: [contextual groups and GroupManager requirements](group-services-parity-2026-09-13.md). World/dimension membership queries, inherited contextual groups, revocation and timed expiry now pass real-provider checks (65 total). Primary-group replacement remains unsupported by the installed provider model; the follow-up documents the required capability and two missing group definitions.
 
-Previous native permission follow-up: [native permission integration](npc-permission-parity-2026-09-13.md) restored NeoForge node registration and exact names, connected Paradigm runtime permission checks with live contexts, repaired inherited group queries, canonical selection permissions and help aliases, and hardened flag execution/local attachment lifetime. Its 58 real-provider/restart cases are retained in the expanded 65-case group suite. Group mutation, permission writing and external temporary grants remain open.
+Previous native permission follow-up: [native permission integration](npc-permission-parity-2026-09-13.md) restored NeoForge node registration and exact names, connected Paradigm runtime permission checks with live contexts, repaired inherited group queries, canonical selection permissions and help aliases, and hardened flag execution/local attachment lifetime. Its cases are retained in the expanded provider suite. Group mutation and external temporary grants remain open.
 
 Further native-command follow-up: [removal and undo parity](npc-removal-parity-2026-09-13.md) restores target/filter resolution, ownership, history, temporary snapshots and true dispatcher failures. Its dedicated checks and the existing regression suite pass.
 
@@ -24,13 +26,13 @@ This section includes the follow-ups after the detailed historical snapshot belo
 | Camera integration | CmdCam is the selected provider. All four referenced scenes were located in the original overworld/End data and exercised through the real-provider fixture. |
 | Native NPC behavior | Persistent sneaking/default traits, Sentinel health/regeneration, hanging-entity and navigation-start fixes, registry identity preservation, and restored native speech parameters. |
 | Removal and undo | ID/UUID/name/owner/world/entity targeting, ownership enforcement, temporary NPC snapshots, collision-safe/retryable undo and actual command failure propagation. |
-| Permissions | Registered NeoForge nodes with correct names, real non-OP Paradigm grants/revocations, live contextual/dynamic permission checks, inherited group queries, selection permissions and local attachment lifetime; additional execution checks for permission-restricted flags. |
+| Permissions | Registered NeoForge nodes with correct names, real non-OP Paradigm grants/revocations, live contextual/dynamic permission checks and group queries, selection/help permissions and local attachment lifetime; checked flag execution and reversible permanent permission shop trades. |
 
 ## Current remaining gaps
 
 | Area | Still missing or unresolved after the follow-ups |
 |---|---|
-| Permission mutations | The 263 `manuadd` actions need a working GroupManager-to-Paradigm replacement/primary-group bridge. `PermissionWriter` and externally visible temporary grants remain unavailable. World/dimension membership queries are now implemented. Paradigm's own 2.4.2b CLI also rejects wildcard/Unicode permission arguments; two referenced group names still need reconciliation. |
+| Group/temporary permission mutations | The 263 `manuadd` actions need a working GroupManager-to-Paradigm replacement/primary-group bridge. Externally visible temporary grants remain unavailable. Permanent permission writing and world/dimension membership queries are implemented. Paradigm's own 2.4.2b CLI still rejects wildcard/Unicode permission arguments; two referenced group names still need reconciliation. |
 | Quests | Quest service/progress/delivery, nine `questadmin` actions and six quest placeholder references remain without a replacement integration. |
 | Saved items | Thirteen referenced `meta.internal` payloads remain undecoded. Original item IDs 6, 15 and 144 are absent despite 21 action references. |
 | Dialogue presentation/configuration | Forty-one holographic-dialogue configurations and the enabled dialogue BossBar still lack implementations. Typewriter/ActionBar, incoming-chat restoration, remaining mounted-player policies and most message/config keys remain incomplete. |
@@ -43,7 +45,7 @@ This section includes the follow-ups after the detailed historical snapshot belo
 
 The unresolved source identifiers are shops `金城银行存款` / `风巽贵金属积存赎回` and accounts `VerticalYeti503` / `Santoesia`. Their destinations/UUIDs have not been guessed.
 
-Current validation: 65 real-provider/restart permission/group checks, 17 no-provider checks and 131 ordinary tests pass for the group follow-up. The earlier complete regression also passed 44 removal checks, 107 NPC assertions, 223 runtime probes and 40 dialogue unit cases. Normal jars exclude the test probes. Production Citizens/Interactions hash checks in the permission batch matched the original audited deployment; no local repair has been deployed by this task.
+Current validation: 101 real-provider/restart permission/group/shop checks, 18 no-provider checks, 148 ordinary tests, 44 removal checks, 107 NPC assertions, 223 runtime probes and 40 dialogue unit cases pass for the permission-shop follow-up. Normal jars exclude the test probes. Production Citizens/Interactions hash checks in the earlier permission batch matched the original audited deployment; no local repair has been deployed by this task.
 
 The following sections preserve the September 13 01:47 detailed audit for source evidence. Its then-current implementation/hash table and then-open service/removal rows are historical; use the current delta/gaps above and linked follow-ups for today's disposition.
 

@@ -20,6 +20,7 @@ public final class ParadigmPermissions {
     }
 
     public static void install() {
+        ParadigmPermissionWriter.install();
         if (installed != null || PermissionUtil.getPermissionResolver() != null
                 || !ModList.get().isLoaded("paradigm")
                 || !"paradigm:internal".equals(String.valueOf(PermissionAPI.getActivePermissionHandler()))) return;
@@ -36,6 +37,7 @@ public final class ParadigmPermissions {
     }
 
     public static void uninstall() {
+        ParadigmPermissionWriter.uninstall();
         if (installed != null && PermissionUtil.getPermissionResolver() == installed)
             PermissionUtil.setPermissionResolver(null);
         installed = null;

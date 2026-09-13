@@ -240,21 +240,50 @@ public class PermissionUtil {
      */
     public static boolean addPermission(ServerPlayer player, String permission) {
         PermissionWriter writer = permissionWriter;
-        return writer != null && writer.add(player, permission);
+        return writer != null && writer.isAvailable() && writer.add(player, permission);
     }
 
     public static boolean removePermission(ServerPlayer player, String permission) {
         PermissionWriter writer = permissionWriter;
-        return writer != null && writer.remove(player, permission);
+        return writer != null && writer.isAvailable() && writer.remove(player, permission);
     }
 
     /** Whether permissions can be granted at all, i.e. whether a {@link PermissionWriter} is installed. */
     public static boolean canWritePermissions() {
-        return permissionWriter != null;
+        PermissionWriter writer = permissionWriter;
+        return writer != null && writer.isAvailable();
+    }
+
+    /** Whether the provider supports the reversible changes required by a shop trade. */
+    public static boolean canWriteReversiblePermissions() {
+        PermissionWriter writer = permissionWriter;
+        return writer != null && writer.isAvailable() && writer.supportsReversibleChanges();
     }
 
     public static void setPermissionWriter(PermissionWriter writer) {
         permissionWriter = writer;
+    }
+
+    public static PermissionWriter getPermissionWriter() {
+        return permissionWriter;
+    }
+
+    /** Prepares a reversible global permission change without applying it; null means unsupported/unavailable. */
+    public static PermissionChange preparePermissionChange(ServerPlayer player, Collection<String> permissions,
+            boolean grant) {
+        PermissionWriter writer = permissionWriter;
+        return writer == null || !writer.isAvailable() || !writer.supportsReversibleChanges()
+                ? null : writer.prepare(player, permissions, grant);
+    }
+
+    /** A single-use change. A failed apply must compensate its own partial writes before propagating the failure. */
+    public interface PermissionChange {
+        boolean isPossible();
+
+        void apply();
+
+        /** Idempotent; a failed rollback may be retried without repeating its successful parts. */
+        void rollback();
     }
 
     /** Bridge to a permission mod that can persist permission changes. */
@@ -262,6 +291,22 @@ public class PermissionUtil {
         boolean add(ServerPlayer player, String permission);
 
         boolean remove(ServerPlayer player, String permission);
+
+        default boolean isAvailable() {
+            return true;
+        }
+
+        default boolean supportsReversibleChanges() {
+            return false;
+        }
+
+        /**
+         * Shop trades need provider-owned receipts, not an unconditional inverse add/remove. Basic writers remain
+         * usable through add/remove; they must implement this capability before being used in reversible trades.
+         */
+        default PermissionChange prepare(ServerPlayer player, Collection<String> permissions, boolean grant) {
+            return null;
+        }
 
         /**
          * @return whether the player holds the permission according to the mod, which may differ from

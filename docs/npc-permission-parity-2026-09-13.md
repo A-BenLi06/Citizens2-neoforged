@@ -4,6 +4,8 @@ Implementation follow-up for 2026-09-13 (UTC+08:00), after `d01d3ca`.
 
 Later follow-up: [contextual group queries](group-services-parity-2026-09-13.md) resolves the world/dimension membership limitation recorded below and documents the remaining primary-group and permission-writing requirements.
 
+Subsequent follow-up: [permission shop transactions](permission-shop-parity-2026-09-14.md) installs a permanent writer with reversible changes and checked shop outcomes. Temporary external attachments and primary-group replacement remain separate gaps.
+
 ## Changes
 
 Previously `PermissionUtil.register()` was never called and no Citizens nodes were submitted to `PermissionGatherEvent.Nodes`. Its node constructor also produced names such as `citizens.citizens.npc.create` and replaced `*` with `_`. Ordinary players consequently fell back to operator checks despite permission-provider grants.

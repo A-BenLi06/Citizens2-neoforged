@@ -1,6 +1,6 @@
 # Permission integration audit
 
-This opt-in fixture exercises actual Citizens commands, shops, dialogue entry and the selected NeoForge permission handler. Its classes belong to the `interactions` test source set and are not included in normal release builds.
+This opt-in fixture exercises actual Citizens commands, shops, dialogue entry and the selected NeoForge permission handler. Its controller belongs to the `interactions` source set; the permission-shop callback helper is added to `main` only by the opt-in init script. Neither is included in normal release builds.
 
 Prepare and run from the repository root / `neoforge` directory with JDK 21:
 
@@ -21,7 +21,9 @@ Ordinary grants/revocations use Paradigm's actual administrative commands. Its 2
 
 The fixture also checks world/dimension-scoped group membership, inherited contextual parents, revocation and actual temporary-group expiry. It continues ticking during the expiry wait.
 
-The fixture queues a barrier on the provider's single storage executor after cleanup and continues ticking until it completes. Immediate shutdown after a burst of mutations can cancel pending provider jobs. The audit must not mistake a clean Minecraft exit for completed persistence. The Gradle gate rejects missing completion markers, explicit failures and runs over three minutes. A first successful run has 64 checks; a subsequent run has 65, including the saved grant. The fallback run has 17 checks.
+The permission-shop helper exercises the actual menu callback with provider assignment IDs and a controlled wallet. It verifies successful purchases, compensation, direct permission costs, inherited rights, opposite-polarity rules, contextual/temporary preservation, signed rules and unsupported editor capabilities. A separate witness is created through the native permission writer and checked on a later boot. Fault injection for partial mutations/receipt recovery is in `ParadigmPermissionWriterTest`.
+
+The fixture queues a barrier on the provider's single storage executor after cleanup and continues ticking until it completes. Immediate shutdown after a burst of mutations can cancel pending provider jobs. The audit must not mistake a clean Minecraft exit for completed persistence. The Gradle gate rejects missing completion markers, explicit failures and runs over three minutes. A fresh fixture has 100 checks; subsequent runs have 101, including the original saved grant. The writer witness is either created or verified in one additional check on each run. The fallback run has 18 checks.
 
 After running opt-in probes, perform the normal build and verify that jars contain no `RuntimeAudit` classes:
 

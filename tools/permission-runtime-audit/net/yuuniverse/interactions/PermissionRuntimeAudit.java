@@ -167,6 +167,8 @@ public final class PermissionRuntimeAudit {
             if (provider) withProvider();
             else {
                 check(PermissionUtil.getPermissionResolver() == null, "absent_provider_has_no_reflective_dependency");
+                check(!PermissionUtil.canWritePermissions() && PermissionUtil.getPermissionWriter() == null,
+                        "absent_provider_does_not_advertise_permission_writing");
                 check(!PermissionUtil.hasPermission(alice, "interactions.start.unregistered-story"), "dynamic_fallback_denies_non_operator");
                 check(PermissionUtil.hasPermission(elevated, "interactions.start.unregistered-story"), "dynamic_fallback_honors_source_elevation");
                 server.getPlayerList().op(bob.getGameProfile());
@@ -303,14 +305,17 @@ public final class PermissionRuntimeAudit {
             check(!PermissionAPI.getRegisteredNodes().contains(late) && PermissionUtil.hasPermission(alice, late.getNodeName()),
                     "late_declaration_uses_provider_without_unregistered_api_exception");
 
+            passed += net.citizensnpcs.trait.shop.PermissionShopRuntimeAudit.run(alice);
             contexts();
             dialogue();
             var resolver = PermissionUtil.getPermissionResolver();
             ParadigmPermissions.uninstall();
             check(PermissionUtil.getPermissionResolver() == null, "shutdown_releases_owned_permission_resolver");
+            check(PermissionUtil.getPermissionWriter() == null, "shutdown_releases_owned_permission_writer");
             ParadigmPermissions.install();
             check(PermissionUtil.getPermissionResolver() != null && PermissionUtil.getPermissionResolver() != resolver
                     && PermissionUtil.hasPermission(alice, late.getNodeName()), "bridge_reconnects_to_live_provider");
+            check(PermissionUtil.canWritePermissions(), "permission_writer_reconnects_to_live_provider");
 
             Path persisted = Path.of("permission-audit-persistence.txt");
             AuditPlayer witness = player("PermissionPersist", UUID.nameUUIDFromBytes("citizens-permission-persistence".getBytes(StandardCharsets.UTF_8)));
@@ -319,6 +324,14 @@ public final class PermissionRuntimeAudit {
             } else {
                 permit(witness, "permissionaudit.persisted");
                 Files.writeString(persisted, "PermissionPersist has a persistent provider grant. Re-run to verify after restart.\n");
+            }
+            Path writerPersisted = Path.of("permission-audit-writer-persistence.txt");
+            if (Files.exists(writerPersisted)) {
+                var permanent = PermissionUtil.preparePermissionChange(witness, List.of("permissionaudit.writer-persisted"), false);
+                check(permanent != null && permanent.isPossible(), "writer_created_global_grant_survives_server_restart");
+            } else {
+                check(PermissionUtil.addPermission(witness, "permissionaudit.writer-persisted"), "writer_creates_permanent_restart_witness");
+                Files.writeString(writerPersisted, "Created through Citizens' permanent permission writer. Verify after restart.\n");
             }
             ok(console, "paradigm group user remove " + alice.getUUID() + " " + childGroup);
             ok(console, "paradigm group remove " + childGroup);

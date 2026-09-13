@@ -2,6 +2,8 @@
 
 Updated 2026-09-13 22:48:05 +08:00 (UTC+08:00), after `d11bb9c`.
 
+Later follow-up: [permanent permission shop transactions](permission-shop-parity-2026-09-14.md) implements the native writer and corrects the unchecked shop mutation/rollback behavior recorded below. Independent primary-group replacement and external temporary attachments remain open.
+
 ## Implemented contextual membership queries
 
 Paradigm's versioned `metadata(UUID)` result omits world/dimension-scoped assignments. Its public `getPlayerPermissionInfo(UUID).groupAssignments()` retains the assignment context, expiry and group name. Citizens now combines the provider's ordinary/default/server memberships with matching live assignments, then follows the actual parent-group graph.

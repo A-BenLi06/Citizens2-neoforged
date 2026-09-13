@@ -23,9 +23,8 @@ import net.minecraft.world.item.Items;
  * A cost or reward paid in permissions — a shop that sells an unlock, or one that only serves players who already hold a
  * permission.
  * <p>
- * Upstream writes permissions through Vault. Nothing on NeoForge can write them, so this goes through
- * {@link PermissionUtil.PermissionWriter}; with none installed the action reports impossible rather than pretending to
- * have granted something, and the editor hides the button entirely.
+ * Upstream writes permissions through Vault. The port uses {@link PermissionUtil.PermissionWriter} and its reversible
+ * change capability. Without that capability the action is unavailable and the editor hides the button.
  */
 public class PermissionAction extends NPCShopAction {
     @Persist
@@ -58,53 +57,33 @@ public class PermissionAction extends NPCShopAction {
 
     @Override
     public Transaction grant(NPCShopStorage storage, Entity entity, InventoryMultiplexer inventory, int repeats) {
-        if (!(entity instanceof ServerPlayer player))
-            return Transaction.fail();
-        if (!PermissionUtil.canWritePermissions())
-            return unavailable();
-        return Transaction.create(() -> true, () -> {
-            for (String permission : permissions) {
-                PermissionUtil.addPermission(player, resolve(permission, player));
-            }
-        }, () -> {
-            for (String permission : permissions) {
-                PermissionUtil.removePermission(player, resolve(permission, player));
-            }
-        });
+        return change(entity, true);
     }
 
     @Override
     public Transaction take(NPCShopStorage storage, Entity entity, InventoryMultiplexer inventory, int repeats) {
+        return change(entity, false);
+    }
+
+    private Transaction change(Entity entity, boolean grant) {
         if (!(entity instanceof ServerPlayer player))
             return Transaction.fail();
-        if (!PermissionUtil.canWritePermissions())
+        if (!PermissionUtil.canWriteReversiblePermissions())
             return unavailable();
-        return Transaction.create(() -> {
-            for (String permission : permissions) {
-                if (!PermissionUtil.hasPermission(player, resolve(permission, player)))
-                    return false;
-            }
-            return true;
-        }, () -> {
-            for (String permission : permissions) {
-                PermissionUtil.removePermission(player, resolve(permission, player));
-            }
-        }, () -> {
-            for (String permission : permissions) {
-                PermissionUtil.addPermission(player, resolve(permission, player));
-            }
-        });
+        // Resolve once: an edited list or a changing placeholder must not redirect compensation to another node.
+        List<String> resolved = permissions.stream().map(permission -> resolve(permission, player)).toList();
+        PermissionUtil.PermissionChange change = PermissionUtil.preparePermissionChange(player, resolved, grant);
+        return change == null ? unavailable() : Transaction.create(change::isPossible, change::apply, change::rollback);
     }
 
     private static String resolve(String permission, ServerPlayer player) {
         return Placeholders.replace(permission, player);
     }
 
-    /** No permission mod can write permissions, so this cost cannot be met - and must not be waived. */
+    /** A trade cannot consume payment when the permission provider cannot supply a reversible change. */
     private static Transaction unavailable() {
         return Transaction.create(() -> {
-            Messaging.severe("An NPC shop uses permissions but nothing can write them;"
-                    + " a permission mod must call PermissionUtil.setPermissionWriter");
+            Messaging.severe("An NPC shop requires reversible permission changes, but no compatible provider is available");
             return false;
         }, () -> {
         }, () -> {
@@ -169,7 +148,8 @@ public class PermissionAction extends NPCShopAction {
     public static class PermissionActionGUI implements GUI {
         @Override
         public boolean canUse(ServerPlayer entity) {
-            return PermissionUtil.hasPermission(entity, "citizens.npc.shop.editor.actions.edit-permission");
+            return PermissionUtil.canWriteReversiblePermissions()
+                    && PermissionUtil.hasPermission(entity, "citizens.npc.shop.editor.actions.edit-permission");
         }
 
         @Override
