@@ -196,6 +196,18 @@ public final class Actions {
             line = LegacyCommand.normalize(rewritten, name -> root.getChild(name) != null);
             parts = line.split("\\s+");
         }
+        if (parts[0].equals("shop")) {
+            var shopRoot = root.getChild("shop");
+            boolean nativeSubcommand = parts.length > 1 && shopRoot != null
+                    && shopRoot.getChild(parts[1]) instanceof com.mojang.brigadier.tree.LiteralCommandNode<?>;
+            var shopId = LegacyCommand.singleArgument(line);
+            if (!nativeSubcommand && shopId.isPresent()) {
+                if (asConsole)
+                    throw new IllegalArgumentException("Opening a system shop requires a player command source");
+                economy.systemShop(shopId.get(), player, validate);
+                return;
+            }
+        }
         CommandSourceStack source = asConsole ? server.createCommandSourceStack()
                 : player.createCommandSourceStack().withPermission(4);
         if (server.getCommands().getDispatcher().getRoot().getChild(parts[0]) == null) {
@@ -207,6 +219,8 @@ public final class Actions {
             throw new IllegalArgumentException("Invalid dialogue command: " + line, error);
         if (com.mojang.brigadier.context.ContextChain.tryFlatten(parsed.getContext().build(line)).isEmpty())
             throw new IllegalArgumentException("Incomplete dialogue command: " + line);
+        if (parts[0].equals("cam-server") && parts.length > 1 && parts[1].equals("start"))
+            CmdCamBridge.validateStart(parsed.getContext().build(line));
         if (validate) return;
         boolean[] outcome = { false, false };
         source = source.withCallback((success, result) -> {

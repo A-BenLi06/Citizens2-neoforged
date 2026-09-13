@@ -1,0 +1,27 @@
+// Optional integration with real economy and camera providers, in a separate local fixture.
+allprojects {
+    afterEvaluate { p ->
+        if (p.extensions.findByName('neoForge') == null) return
+        def fixture = p.file('../artifacts/service-audit-server')
+        p.sourceSets.dialogue.java.srcDir(p.file('../tools/service-runtime-audit'))
+        p.sourceSets.dialogue.compileClasspath += p.files(
+                new File(fixture, 'mods/economy.jar'), new File(fixture, 'mods/cmdcam.jar'),
+                new File(fixture, 'mods/creativecore.jar'))
+        p.neoForge.runs.named('server') { gameDirectory = fixture }
+        p.tasks.named('prepareServerRun') {
+            doLast {
+                for (name in ['economy', 'cmdcam', 'creativecore']) {
+                    if (!new File(fixture, "mods/${name}.jar").isFile())
+                        throw new GradleException("Prepare the real ${name} provider in the service-audit fixture")
+                }
+            }
+        }
+        p.tasks.named('runServer') {
+            doLast {
+                def log = new File(fixture, 'logs/latest.log').getText('UTF-8')
+                if (log.contains('[SERVICEAUDIT] FAILED') || !log.contains('[SERVICEAUDIT] COMPLETE'))
+                    throw new GradleException('Service bridge audit failed or incomplete; inspect isolated latest.log')
+            }
+        }
+    }
+}

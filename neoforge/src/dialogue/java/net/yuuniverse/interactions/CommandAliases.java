@@ -8,7 +8,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.LinkedHashMap;
 import java.util.Locale;
 import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
+import java.util.Set;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -29,16 +29,15 @@ import org.yaml.snakeyaml.Yaml;
  */
 public final class CommandAliases {
     private static final Logger LOGGER = LoggerFactory.getLogger("interactions");
-    private static final Map<String, String> TEMPLATES = new ConcurrentHashMap<>();
+    private static volatile Map<String, String> templates = Map.of();
+    private static final Set<String> NATIVE_SERVICES = Set.of("shop", "cam-server");
 
     /** What the migrated dialogues call, and the best-known replacement on this server. */
     private static final String[][] SEED = {
             { "manuadd", "paradigm permissions group add {player} {2}" },
             { "manudel", "paradigm permissions group remove {player} {2}" },
             { "heal", "effect give {player} minecraft:instant_health 1 10 true" },
-            { "questadmin", "" },
-            { "shop", "" },
-            { "cam-server", "" } };
+            { "questadmin", "" } };
 
     private CommandAliases() {
     }
@@ -50,7 +49,7 @@ public final class CommandAliases {
         String[] parts = line.trim().split("\\s+");
         if (parts.length == 0)
             return line;
-        String template = TEMPLATES.get(parts[0].toLowerCase(Locale.ROOT));
+        String template = templates.get(parts[0].toLowerCase(Locale.ROOT));
         if (template == null)
             return line;
         if (template.isBlank())
@@ -64,7 +63,6 @@ public final class CommandAliases {
 
     @SuppressWarnings("unchecked")
     public static void load(File file) {
-        TEMPLATES.clear();
         if (!file.isFile()) {
             write(file);
         }
@@ -72,22 +70,33 @@ public final class CommandAliases {
             LoaderOptions options = new LoaderOptions();
             options.setCodePointLimit(1024 * 1024);
             Object loaded = new Yaml(options).load(reader);
-            if (loaded instanceof Map) {
-                for (Map.Entry<String, Object> entry : ((Map<String, Object>) loaded).entrySet()) {
-                    TEMPLATES.put(entry.getKey().toLowerCase(Locale.ROOT),
-                            entry.getValue() == null ? "" : String.valueOf(entry.getValue()).trim());
-                }
+            if (!(loaded instanceof Map<?, ?> values)) {
+                throw new IllegalArgumentException("Expected a command alias map");
             }
+            Map<String, String> updated = new LinkedHashMap<>();
+            for (Map.Entry<?, ?> entry : values.entrySet()) {
+                if (!(entry.getKey() instanceof String name)
+                        || entry.getValue() != null && !(entry.getValue() instanceof String)) {
+                    throw new IllegalArgumentException("Expected command names and string alias templates");
+                }
+                name = name.toLowerCase(Locale.ROOT);
+                String template = entry.getValue() == null ? "" : ((String) entry.getValue()).trim();
+                // Older generated files marked these services unavailable before their providers were connected.
+                // Explicit replacement templates still take precedence; missing providers fail action preflight.
+                if (!template.isBlank() || !NATIVE_SERVICES.contains(name)) updated.put(name, template);
+            }
+            templates = Map.copyOf(updated);
         } catch (Exception ex) {
-            LOGGER.error("Could not read {}: {}", file.getName(), ex.toString());
+            LOGGER.error("Could not read {}; retaining previous command aliases: {}", file.getName(), ex.toString());
+            return;
         }
         Map<String, String> dropped = new LinkedHashMap<>();
-        TEMPLATES.forEach((name, template) -> {
+        templates.forEach((name, template) -> {
             if (template.isBlank()) {
                 dropped.put(name, template);
             }
         });
-        LOGGER.info("{} command alias(es) in effect, {} of them unavailable.", TEMPLATES.size(), dropped.size());
+        LOGGER.info("{} command alias(es) in effect, {} of them unavailable.", templates.size(), dropped.size());
     }
 
     private static void write(File file) {

@@ -259,6 +259,41 @@ public class LegacyParityAuditTest {
     Path directory;
 
     @Test
+    void retiredNativeServicePlaceholdersPassThroughWithoutRewritingTheFile() throws Exception {
+        Path file = directory.resolve("native-aliases.yml");
+        String text = "shop: ''\ncam-server: ''\nquestadmin: ''\ncustom: 'say {1}'\n";
+        Files.writeString(file, text);
+        CommandAliases.load(file.toFile());
+        assertEquals("shop 商店", CommandAliases.rewrite("shop 商店", "Player"));
+        assertEquals("cam-server start intro Player", CommandAliases.rewrite("cam-server start intro Player", "Player"));
+        assertEquals("", CommandAliases.rewrite("questadmin start example", "Player"));
+        assertEquals("say hello", CommandAliases.rewrite("custom hello", "Player"));
+        assertEquals(text, Files.readString(file));
+    }
+
+    @Test
+    void explicitServiceAliasesSurviveAndMalformedReloadRetainsTheSnapshot() throws Exception {
+        Path file = directory.resolve("custom-aliases.yml");
+        Files.writeString(file, "shop: 'market {1}'\ncam-server: 'camera {1} {2} {3}'\n");
+        CommandAliases.load(file.toFile());
+        assertEquals("market blocks", CommandAliases.rewrite("shop blocks", "Player"));
+        assertEquals("camera start intro Player", CommandAliases.rewrite("cam-server start intro Player", "Player"));
+        Files.writeString(file, "shop: 'changed'\ninvalid: [nested]\n");
+        CommandAliases.load(file.toFile());
+        assertEquals("market blocks", CommandAliases.rewrite("shop blocks", "Player"));
+    }
+
+    @Test
+    void legacyShopIdsKeepUnicodeQuotedSpacesAndEscapes() {
+        assertEquals(java.util.Optional.of("商店"), LegacyCommand.singleArgument("shop 商店"));
+        assertEquals(java.util.Optional.of("A shop"), LegacyCommand.singleArgument("shop \"A shop\""));
+        assertEquals(java.util.Optional.of("A\"shop"), LegacyCommand.singleArgument("shop \"A\\\"shop\""));
+        assertEquals(java.util.Optional.empty(), LegacyCommand.singleArgument("shop"));
+        assertEquals(java.util.Optional.empty(), LegacyCommand.singleArgument("shop blocks buy stone 2"));
+        assertThrows(IllegalArgumentException.class, () -> LegacyCommand.singleArgument("shop \"unfinished"));
+    }
+
+    @Test
     void legacyPlingSoundKeepsTheUnderscoreInsideNoteBlock() {
         assertEquals("minecraft:block.note_block.pling", Actions.soundId("BLOCK_NOTE_BLOCK_PLING").toString());
     }
