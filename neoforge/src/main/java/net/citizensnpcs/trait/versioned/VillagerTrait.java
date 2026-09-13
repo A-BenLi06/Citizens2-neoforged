@@ -28,6 +28,7 @@ public class VillagerTrait extends Trait {
     @Persist
     private int level = 1;
     private VillagerType type;
+    private String unresolvedType;
 
     public VillagerTrait() {
         super("villagertrait");
@@ -43,13 +44,15 @@ public class VillagerTrait extends Trait {
 
     @Override
     public void load(DataKey key) throws NPCLoadException {
-        type = parse(key.getString("type"));
+        String raw = key.getString("type");
+        type = parse(raw);
+        unresolvedType = type == null && !raw.isEmpty() ? raw : null;
     }
 
     @Override
     public void save(DataKey key) {
-        key.setString("type",
-                type == null ? "" : BuiltInRegistries.VILLAGER_TYPE.getKey(type).getPath().toUpperCase(Locale.ROOT));
+        key.setString("type", unresolvedType != null ? unresolvedType
+                : type == null ? "" : BuiltInRegistries.VILLAGER_TYPE.getKey(type).toString());
     }
 
     /**
@@ -87,6 +90,7 @@ public class VillagerTrait extends Trait {
     }
 
     public void setType(VillagerType type) {
+        unresolvedType = null;
         this.type = type;
     }
 }

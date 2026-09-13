@@ -21,6 +21,7 @@ import net.minecraft.world.entity.animal.frog.Frog;
 @TraitName("frogtrait")
 public class FrogTrait extends Trait {
     private Holder<FrogVariant> variant;
+    private String unresolvedVariant;
 
     public FrogTrait() {
         super("frogtrait");
@@ -32,13 +33,16 @@ public class FrogTrait extends Trait {
 
     @Override
     public void load(DataKey key) throws NPCLoadException {
-        variant = parse(key.getString("variant"));
+        String raw = key.getString("variant");
+        ResourceLocation id = ResourceLocation.tryParse(raw.toLowerCase(Locale.ROOT));
+        unresolvedVariant = !raw.isEmpty() && (id == null || !BuiltInRegistries.FROG_VARIANT.containsKey(id)) ? raw : null;
+        variant = parse(raw);
     }
 
     @Override
     public void save(DataKey key) {
-        key.setString("variant",
-                getVariant().unwrapKey().map(k -> k.location().getPath().toUpperCase(Locale.ROOT)).orElse(""));
+        key.setString("variant", unresolvedVariant != null ? unresolvedVariant
+                : getVariant().unwrapKey().map(k -> k.location().toString()).orElse(""));
     }
 
     @SuppressWarnings("unchecked")
@@ -64,6 +68,7 @@ public class FrogTrait extends Trait {
     }
 
     public void setVariant(Holder<FrogVariant> variant) {
+        unresolvedVariant = null;
         this.variant = variant == null ? defaultVariant() : variant;
     }
 }

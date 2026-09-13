@@ -128,6 +128,7 @@ public class Citizens implements CitizensPlugin {
         // command classes have to be scanned now or the Brigadier nodes would be built from an empty manager
         commands.setInjector(new Injector(this));
         commands.register(NPCCommands.class);
+        commands.register(net.citizensnpcs.commands.EntityTraitCommands.class);
         commands.register(TraitCommands.class);
         commands.register(EditorCommands.class);
         commands.register(WaypointCommands.class);

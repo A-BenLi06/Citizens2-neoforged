@@ -30,6 +30,7 @@ public class CatTrait extends Trait {
     @Persist
     private boolean sitting = false;
     private Holder<CatVariant> type;
+    private String unresolvedType;
 
     public CatTrait() {
         super("cattrait");
@@ -53,12 +54,16 @@ public class CatTrait extends Trait {
 
     @Override
     public void load(DataKey key) throws NPCLoadException {
-        type = parse(key.getString("type"));
+        String raw = key.getString("type");
+        ResourceLocation id = ResourceLocation.tryParse(raw.toLowerCase(Locale.ROOT));
+        unresolvedType = !raw.isEmpty() && (id == null || !BuiltInRegistries.CAT_VARIANT.containsKey(id)) ? raw : null;
+        type = parse(raw);
     }
 
     @Override
     public void save(DataKey key) {
-        key.setString("type", getType().unwrapKey().map(k -> k.location().getPath().toUpperCase(Locale.ROOT)).orElse(""));
+        key.setString("type", unresolvedType != null ? unresolvedType
+                : getType().unwrapKey().map(k -> k.location().toString()).orElse(""));
     }
 
     public static Holder<CatVariant> parse(String raw) {
@@ -103,6 +108,7 @@ public class CatTrait extends Trait {
     }
 
     public void setType(Holder<CatVariant> type) {
+        unresolvedType = null;
         this.type = type == null ? defaultVariant() : type;
     }
 }

@@ -65,7 +65,7 @@ public class PandaTrait extends Trait {
             panda.setHiddenGene(hiddenGene);
         }
         panda.sit(sitting);
-        panda.setOnBack(rolling);
+        panda.roll(rolling);
         panda.sneeze(sneezing);
         panda.eat(eating);
     }

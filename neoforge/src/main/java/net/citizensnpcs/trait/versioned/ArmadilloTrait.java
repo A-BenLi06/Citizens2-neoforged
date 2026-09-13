@@ -39,8 +39,13 @@ public class ArmadilloTrait extends Trait {
     }
 
     public static Armadillo.ArmadilloState parse(String raw) {
+        Armadillo.ArmadilloState parsed = parseStrict(raw);
+        return parsed == null ? Armadillo.ArmadilloState.IDLE : parsed;
+    }
+
+    public static Armadillo.ArmadilloState parseStrict(String raw) {
         if (raw == null || raw.isEmpty())
-            return Armadillo.ArmadilloState.IDLE;
+            return null;
         String upper = raw.toUpperCase(Locale.ROOT);
         Armadillo.ArmadilloState legacy = LEGACY_NAMES.get(upper);
         if (legacy != null)
@@ -48,8 +53,13 @@ public class ArmadilloTrait extends Trait {
         try {
             return Armadillo.ArmadilloState.valueOf(upper);
         } catch (IllegalArgumentException ex) {
-            return Armadillo.ArmadilloState.IDLE;
+            return null;
         }
+    }
+
+    public static java.util.List<String> stateNames() {
+        return java.util.stream.Stream.concat(java.util.Arrays.stream(Armadillo.ArmadilloState.values()).map(Enum::name),
+                LEGACY_NAMES.keySet().stream()).distinct().sorted().toList();
     }
 
     @Override

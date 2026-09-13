@@ -26,6 +26,7 @@ public class VillagerProfession extends Trait {
     // fully qualified throughout: this class deliberately shares its simple name with upstream's trait, which in turn
     // took it from Bukkit's enum, so the vanilla registry type of the same name cannot be imported
     private net.minecraft.world.entity.npc.VillagerProfession profession = DEFAULT;
+    private String unresolvedProfession;
 
     public VillagerProfession() {
         super("profession");
@@ -37,10 +38,10 @@ public class VillagerProfession extends Trait {
 
     @Override
     public void load(DataKey key) throws NPCLoadException {
-        net.minecraft.world.entity.npc.VillagerProfession parsed = parse(key.getString(""));
-        if (parsed == null)
-            throw new NPCLoadException("Invalid profession.");
-        profession = parsed;
+        String raw = key.getString("");
+        net.minecraft.world.entity.npc.VillagerProfession parsed = parse(raw);
+        unresolvedProfession = parsed == null && !raw.isEmpty() ? raw : null;
+        profession = parsed == null ? DEFAULT : parsed;
     }
 
     /**
@@ -86,10 +87,12 @@ public class VillagerProfession extends Trait {
 
     @Override
     public void save(DataKey key) {
-        key.setString("", BuiltInRegistries.VILLAGER_PROFESSION.getKey(profession).getPath().toUpperCase(Locale.ROOT));
+        key.setString("", unresolvedProfession != null ? unresolvedProfession
+                : BuiltInRegistries.VILLAGER_PROFESSION.getKey(profession).toString());
     }
 
     public void setProfession(net.minecraft.world.entity.npc.VillagerProfession profession) {
+        unresolvedProfession = null;
         this.profession = profession == null ? DEFAULT : profession;
         onSpawn();
     }

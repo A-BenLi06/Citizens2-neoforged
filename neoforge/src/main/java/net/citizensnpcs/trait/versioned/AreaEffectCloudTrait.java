@@ -39,6 +39,8 @@ public class AreaEffectCloudTrait extends Trait {
     @Persist
     private Float radiusPerTick;
     private Holder<Potion> type;
+    private String unresolvedParticle;
+    private String unresolvedPotion;
 
     public AreaEffectCloudTrait() {
         super("areaeffectcloudtrait");
@@ -70,16 +72,19 @@ public class AreaEffectCloudTrait extends Trait {
 
     @Override
     public void load(DataKey key) throws NPCLoadException {
-        particle = parseParticle(key.getString("particle"));
-        type = parsePotion(key.getString("type"));
+        String rawParticle = key.getString("particle"), rawPotion = key.getString("type");
+        particle = parseParticle(rawParticle);
+        type = parsePotion(rawPotion);
+        unresolvedParticle = particle == null && !rawParticle.isEmpty() ? rawParticle : null;
+        unresolvedPotion = type == null && !rawPotion.isEmpty() ? rawPotion : null;
     }
 
     @Override
     public void save(DataKey key) {
-        key.setString("particle", particle == null ? ""
-                : BuiltInRegistries.PARTICLE_TYPE.getKey(particle.getType()).getPath().toUpperCase(Locale.ROOT));
-        key.setString("type",
-                type == null ? "" : type.unwrapKey().map(k -> k.location().getPath().toUpperCase(Locale.ROOT)).orElse(""));
+        key.setString("particle", unresolvedParticle != null ? unresolvedParticle : particle == null ? ""
+                : BuiltInRegistries.PARTICLE_TYPE.getKey(particle.getType()).toString());
+        key.setString("type", unresolvedPotion != null ? unresolvedPotion
+                : type == null ? "" : type.unwrapKey().map(k -> k.location().toString()).orElse(""));
     }
 
     @Override
@@ -138,10 +143,12 @@ public class AreaEffectCloudTrait extends Trait {
     }
 
     public void setParticle(ParticleOptions particle) {
+        unresolvedParticle = null;
         this.particle = particle;
     }
 
     public void setPotionType(Holder<Potion> type) {
+        unresolvedPotion = null;
         this.type = type;
     }
 

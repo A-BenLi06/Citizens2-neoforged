@@ -39,6 +39,9 @@ public @interface Command {
     /** Whether at least one flag or value flag is required. */
     boolean requiresFlags() default false;
 
+    /** Reject unknown value flags and invalid typed inputs before executing an annotated command. */
+    boolean strictArguments() default false;
+
     /** Usage line shown when the command is used wrongly. */
     String usage() default "";
 

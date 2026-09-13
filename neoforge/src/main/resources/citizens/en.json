@@ -1,5 +1,9 @@
 {
   "citizens.changed-implementation": "Citizens implementation changed, disabling plugin.",
+  "citizens.commands.invalid-value": "Invalid value for [[{0}]]: [[{1}]].",
+  "citizens.commands.unknown-flag": "Unknown flag: [[{0}]].",
+  "citizens.commands.requirements.must-be-spawned": "The NPC must be spawned.",
+  "citizens.commands.npc.entity.action": "NPC [[{0}]]: [[{1}]].",
   "citizens.commands.citizens.description": "Show basic plugin information",
   "citizens.commands.citizens.help": "",
   "citizens.commands.citizens.reload.description": "Load Citizens fresh from disk, without saving first",

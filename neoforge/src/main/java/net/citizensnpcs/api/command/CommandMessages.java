@@ -8,10 +8,13 @@ public class CommandMessages {
     public static final String ID_NOT_FOUND = "citizens.commands.id-not-found";
     public static final String INVALID_LOCATION = "citizens.commands.invalid-location";
     public static final String INVALID_NUMBER = "citizens.commands.invalid-number";
+    public static final String INVALID_VALUE = "citizens.commands.invalid-value";
+    public static final String UNKNOWN_FLAG = "citizens.commands.unknown-flag";
     public static final String MISSING_TRAIT = "citizens.commands.requirements.missing-required-trait";
     public static final String MUST_BE_INGAME = "citizens.commands.requirements.must-be-ingame";
     public static final String MUST_BE_OWNER = "citizens.commands.requirements.must-be-owner";
     public static final String MUST_HAVE_SELECTED = "citizens.commands.requirements.must-have-selected";
+    public static final String MUST_BE_SPAWNED = "citizens.commands.requirements.must-be-spawned";
     public static final String NO_PERMISSION = "citizens.commands.requirements.missing-permission";
     public static final String PLAYER_NOT_FOUND_FOR_SPAWN = "citizens.commands.npc.create.no-player-for-spawn";
     public static final String REPORT_ERROR = "citizens.commands.console-error";

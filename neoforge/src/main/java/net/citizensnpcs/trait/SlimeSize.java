@@ -38,5 +38,6 @@ public class SlimeSize extends Trait {
 
     public void setSize(int size) {
         this.size = size;
+        onSpawn();
     }
 }

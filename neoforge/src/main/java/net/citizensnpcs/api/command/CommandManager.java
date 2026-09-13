@@ -164,6 +164,13 @@ public class CommandManager {
         }
         methodArgs[0] = context;
 
+        if (cmd.strictArguments()) {
+            for (String flag : context.getValueFlags().keySet()) {
+                if (!info.valueFlags().contains(flag) && !flag.equals("id") && !flag.equals("uuid"))
+                    throw new CommandException(CommandMessages.UNKNOWN_FLAG, "--" + flag);
+            }
+        }
+
         for (InjectedCommandArgument argument : info.methodArguments.values()) {
             if (argument.permission != null && Arrays.stream(argument.names).anyMatch(context::hasValueFlag)
                     && !PermissionUtil.hasPermission(sender, argument.permission)) throw new NoPermissionsException();
@@ -180,9 +187,22 @@ public class CommandManager {
                 InjectedCommandArgument argument = entry.getValue();
                 Object val = argument.getInput(context);
                 if (val != null) {
-                    val = argument.validator != null
-                            ? argument.validator.validate(context, sender, npc, val.toString())
-                            : coerce(argument.paramType, val.toString(), context, sender);
+                    String raw = val.toString();
+                    try {
+                        if (cmd.strictArguments() && (argument.paramType == Boolean.class || argument.paramType == boolean.class)
+                                && !raw.equalsIgnoreCase("true") && !raw.equalsIgnoreCase("false"))
+                            throw new IllegalArgumentException("Expected a boolean");
+                        val = argument.validator != null
+                                ? argument.validator.validate(context, sender, npc, raw)
+                                : coerce(argument.paramType, raw, context, sender);
+                        if (cmd.strictArguments() && (val == null || val instanceof Double number && !Double.isFinite(number)
+                                || val instanceof Float number && !Float.isFinite(number)))
+                            throw new IllegalArgumentException("Invalid typed argument");
+                    } catch (IllegalArgumentException failure) {
+                        if (!cmd.strictArguments()) throw failure;
+                        String name = argument.names.length == 0 ? Integer.toString(argument.index) : "--" + argument.names[0];
+                        throw new CommandException(CommandMessages.INVALID_VALUE, name, raw);
+                    }
                 }
                 methodArgs[entry.getKey()] = val;
             }
@@ -654,7 +674,7 @@ public class CommandManager {
         private Collection<String> calculateValueFlags() {
             valueFlags = new HashSet<>();
             for (InjectedCommandArgument instance : methodArguments.values()) {
-                instance.getValueFlag().ifPresent(flag -> valueFlags.add(flag));
+                valueFlags.addAll(Arrays.asList(instance.names));
             }
             valueFlags.addAll(Arrays.asList(commandAnnotation.valueFlags()));
             return valueFlags;

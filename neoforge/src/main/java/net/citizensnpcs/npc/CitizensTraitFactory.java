@@ -279,7 +279,9 @@ public class CitizensTraitFactory implements TraitFactory {
     @SubscribeEvent
     public void onNPCCreate(NPCCreateEvent event) {
         for (TraitInfo info : defaultTraits) {
-            event.getNPC().addTrait(info.tryCreateInstance());
+            // The registry has already initialized required traits (notably the requested entity type). Defaults
+            // fill missing traits; replacing an initialized MobType here would turn unspawned NPCs into players.
+            if (!event.getNPC().hasTrait(info.getTraitClass())) event.getNPC().addTrait(info.tryCreateInstance());
         }
     }
 
