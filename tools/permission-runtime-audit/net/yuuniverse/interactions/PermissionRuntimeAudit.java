@@ -97,9 +97,16 @@ public final class PermissionRuntimeAudit {
             if (state == null) {
                 state = new State(server);
                 state.run();
+                deadline = server.getTickCount() + 400;
+            }
+            if (!state.closed) {
+                if (!state.completeDelayedChecks()) {
+                    if (server.getTickCount() > deadline) throw new AssertionError("Delayed permission checks timed out");
+                    return;
+                }
                 state.close();
                 state.drainStorage();
-                deadline = server.getTickCount() + 400;
+                deadline = server.getTickCount() + 1200;
                 return;
             }
             if (!state.drained.isDone()) {
@@ -130,6 +137,8 @@ public final class PermissionRuntimeAudit {
         CommandSourceStack source, elevated, console;
         boolean isolated, closed;
         final CompletableFuture<Void> drained = new CompletableFuture<>();
+        String expiryGroup;
+        long expiryCheckAt;
 
         State(MinecraftServer server) { this.server = server; level = server.overworld(); }
 
@@ -318,9 +327,25 @@ public final class PermissionRuntimeAudit {
             for (String node : List.of("citizens.npc.select", "citizens.npc.create", "citizens.npc.create.villager",
                     "permissionaudit.command", "permissionaudit.flag", late.getNodeName())) remove(alice, node);
             providerMutation("removePermissionFromPlayer", new Class<?>[] {UUID.class, String.class}, alice.getUUID(), dynamic);
+            expiryGroup = "permission_expiry_" + UUID.randomUUID().toString().substring(0, 8);
+            ok(console, "paradigm group add " + expiryGroup);
+            ok(console, "paradigm group user add " + alice.getUUID() + " " + expiryGroup
+                    + " --context dimension=minecraft:overworld --expires 1s");
+            check(Boolean.TRUE.equals(PermissionUtil.inGroup(Set.of(expiryGroup), alice)), "temporary_context_group_is_active_before_expiry");
+            expiryCheckAt = System.nanoTime() + java.util.concurrent.TimeUnit.SECONDS.toNanos(2);
         }
 
         void contexts() throws Exception {
+            String dimensionGroup = "permission_dimension_" + UUID.randomUUID().toString().substring(0, 8);
+            String worldGroup = "permission_world_" + UUID.randomUUID().toString().substring(0, 8);
+            String contextParent = "permission_context_parent_" + UUID.randomUUID().toString().substring(0, 8);
+            for (String group : List.of(dimensionGroup, worldGroup, contextParent)) ok(console, "paradigm group add " + group);
+            ok(console, "paradigm group parent add " + dimensionGroup + " " + contextParent);
+            ok(console, "paradigm group user add " + alice.getUUID() + " " + dimensionGroup + " --context dimension=minecraft:overworld");
+            ok(console, "paradigm group user add " + alice.getUUID() + " " + worldGroup + " --context world=minecraft:overworld");
+            check(Boolean.TRUE.equals(PermissionUtil.inGroup(Set.of(dimensionGroup), alice))
+                    && Boolean.TRUE.equals(PermissionUtil.inGroup(Set.of(worldGroup), alice)), "world_and_dimension_group_assignments_match_online_context");
+            check(Boolean.TRUE.equals(PermissionUtil.inGroup(Set.of(contextParent), alice)), "contextual_group_inherits_parent_membership");
             permit(alice, "permissionaudit.dimension", " --context dimension=minecraft:overworld");
             permit(alice, "permissionaudit.world", " --context world=minecraft:overworld");
             permit(alice, "citizens.npc.follow.others", " --context dimension=minecraft:overworld");
@@ -336,11 +361,14 @@ public final class PermissionRuntimeAudit {
                     && PermissionUtil.hasPermission(alice, "permissionaudit.network")
                     && !PermissionUtil.hasPermission(alice, "permissionaudit.wrong-server"), "provider_resolves_server_and_network_contexts");
             alice.teleportTo(server.getLevel(Level.NETHER), 1, 64, 1, Set.of(), 0, 0);
+            check(Boolean.FALSE.equals(PermissionUtil.inGroup(Set.of(dimensionGroup, worldGroup, contextParent), alice)),
+                    "dimension_change_rejects_out_of_context_groups_and_parents");
             check(!PermissionUtil.hasPermission(alice, "permissionaudit.dimension")
                     && !PermissionUtil.hasPermission(alice, "permissionaudit.world"), "live_dimension_change_revokes_contextual_grants");
             check(!PermissionUtil.hasPermission(alice, "citizens.npc.follow.others"), "registered_node_updates_after_dimension_change");
             check(!PermissionUtil.hasPermission(elevated, "permissionaudit.context-denial"), "contextual_denial_overrides_global_grant_and_source_default");
             alice.teleportTo(level, 1, -60, 1, Set.of(), 0, 0);
+            check(Boolean.TRUE.equals(PermissionUtil.inGroup(Set.of(contextParent), alice)), "returning_dimension_restores_contextual_parent_membership");
             check(PermissionUtil.hasPermission(alice, "permissionaudit.dimension"), "returning_dimension_restores_contextual_grant");
             remove(alice, "permissionaudit.dimension", " --context dimension=minecraft:overworld");
             remove(alice, "permissionaudit.world", " --context world=minecraft:overworld");
@@ -350,6 +378,20 @@ public final class PermissionRuntimeAudit {
             remove(alice, "permissionaudit.server", " --context server=current");
             remove(alice, "permissionaudit.network", " --context network=current");
             remove(alice, "permissionaudit.wrong-server", " --context server=permission-audit-unrelated-server");
+            ok(console, "paradigm group user remove " + alice.getUUID() + " " + dimensionGroup + " --context dimension=minecraft:overworld");
+            ok(console, "paradigm group user remove " + alice.getUUID() + " " + worldGroup + " --context world=minecraft:overworld");
+            check(Boolean.FALSE.equals(PermissionUtil.inGroup(Set.of(dimensionGroup, worldGroup, contextParent), alice)),
+                    "contextual_group_revocation_takes_effect_immediately");
+            for (String group : List.of(dimensionGroup, worldGroup, contextParent)) ok(console, "paradigm group remove " + group);
+        }
+
+        boolean completeDelayedChecks() throws Exception {
+            if (expiryGroup == null) return true;
+            if (System.nanoTime() < expiryCheckAt) return false;
+            check(Boolean.FALSE.equals(PermissionUtil.inGroup(Set.of(expiryGroup), alice)), "expired_context_group_is_no_longer_membership");
+            ok(console, "paradigm group remove " + expiryGroup);
+            expiryGroup = null;
+            return true;
         }
 
         @SuppressWarnings("unchecked")

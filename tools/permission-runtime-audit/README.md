@@ -19,7 +19,9 @@ Coverage includes exact command and flag registration, wildcard identity, entity
 
 Ordinary grants/revocations use Paradigm's actual administrative commands. Its 2.4.2b NeoForge `STRING` argument is implemented as Brigadier `word()`, rejecting wildcard and Unicode names even when quoted. The fixture therefore creates those particular rules through its public `PermissionsHandler` mutation methods. The boolean on these methods means **denied**, not allowed. No provider jar, private field or database is patched. This is not evidence that those names work through that provider version's CLI.
 
-The fixture queues a barrier on the provider's single storage executor after cleanup and continues ticking until it completes. Immediate shutdown after a burst of mutations can cancel pending provider jobs. The audit must not mistake a clean Minecraft exit for completed persistence. The Gradle gate rejects missing completion markers, explicit failures and runs over three minutes. A first successful run has 57 checks; a subsequent run has 58, including the saved grant. The fallback run has 17 checks.
+The fixture also checks world/dimension-scoped group membership, inherited contextual parents, revocation and actual temporary-group expiry. It continues ticking during the expiry wait.
+
+The fixture queues a barrier on the provider's single storage executor after cleanup and continues ticking until it completes. Immediate shutdown after a burst of mutations can cancel pending provider jobs. The audit must not mistake a clean Minecraft exit for completed persistence. The Gradle gate rejects missing completion markers, explicit failures and runs over three minutes. A first successful run has 64 checks; a subsequent run has 65, including the saved grant. The fallback run has 17 checks.
 
 After running opt-in probes, perform the normal build and verify that jars contain no `RuntimeAudit` classes:
 

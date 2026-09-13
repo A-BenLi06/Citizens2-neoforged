@@ -2,9 +2,11 @@
 
 Initial audit timestamp: 2026-09-13 01:47:09 +08:00 (UTC+08:00).
 
-Current summary updated: 2026-09-13 21:48:40 +08:00 (UTC+08:00).
+Current summary updated: 2026-09-13 22:48:05 +08:00 (UTC+08:00).
 
-Latest follow-up: [native permission integration](npc-permission-parity-2026-09-13.md) restores NeoForge node registration and exact names, connects Paradigm runtime permission checks with live contexts, repairs inherited group queries, canonical selection permissions and help aliases, and hardens flag execution/local attachment lifetime. The real-provider/restart run passes 58 checks and the absent-provider run passes 17. Group mutation, permission writing, external temporary grants and dimension-scoped group membership queries remain open.
+Latest group-service follow-up: [contextual groups and GroupManager requirements](group-services-parity-2026-09-13.md). World/dimension membership queries, inherited contextual groups, revocation and timed expiry now pass real-provider checks (65 total). Primary-group replacement remains unsupported by the installed provider model; the follow-up documents the required capability and two missing group definitions.
+
+Previous native permission follow-up: [native permission integration](npc-permission-parity-2026-09-13.md) restored NeoForge node registration and exact names, connected Paradigm runtime permission checks with live contexts, repaired inherited group queries, canonical selection permissions and help aliases, and hardened flag execution/local attachment lifetime. Its 58 real-provider/restart cases are retained in the expanded 65-case group suite. Group mutation, permission writing and external temporary grants remain open.
 
 Further native-command follow-up: [removal and undo parity](npc-removal-parity-2026-09-13.md) restores target/filter resolution, ownership, history, temporary snapshots and true dispatcher failures. Its dedicated checks and the existing regression suite pass.
 
@@ -28,7 +30,7 @@ This section includes the follow-ups after the detailed historical snapshot belo
 
 | Area | Still missing or unresolved after the follow-ups |
 |---|---|
-| Permission mutations | The 263 `manuadd` actions need a working GroupManager-to-Paradigm replacement/primary-group bridge. `PermissionWriter`, externally visible temporary grants and world/dimension-scoped group membership queries remain unavailable. Paradigm's own 2.4.2b CLI also rejects wildcard/Unicode permission arguments. |
+| Permission mutations | The 263 `manuadd` actions need a working GroupManager-to-Paradigm replacement/primary-group bridge. `PermissionWriter` and externally visible temporary grants remain unavailable. World/dimension membership queries are now implemented. Paradigm's own 2.4.2b CLI also rejects wildcard/Unicode permission arguments; two referenced group names still need reconciliation. |
 | Quests | Quest service/progress/delivery, nine `questadmin` actions and six quest placeholder references remain without a replacement integration. |
 | Saved items | Thirteen referenced `meta.internal` payloads remain undecoded. Original item IDs 6, 15 and 144 are absent despite 21 action references. |
 | Dialogue presentation/configuration | Forty-one holographic-dialogue configurations and the enabled dialogue BossBar still lack implementations. Typewriter/ActionBar, incoming-chat restoration, remaining mounted-player policies and most message/config keys remain incomplete. |
@@ -41,7 +43,7 @@ This section includes the follow-ups after the detailed historical snapshot belo
 
 The unresolved source identifiers are shops `金城银行存款` / `风巽贵金属积存赎回` and accounts `VerticalYeti503` / `Santoesia`. Their destinations/UUIDs have not been guessed.
 
-Current validation: 58 real-provider/restart permission checks, 17 no-provider checks, 44 removal checks, 107 NPC assertions, 223 runtime probes, 40 dialogue unit cases and 131 ordinary tests all pass. Normal jars exclude the test probes. Production Citizens/Interactions hash checks in this batch still match the original audited deployment; no local repair has been deployed by this task.
+Current validation: 65 real-provider/restart permission/group checks, 17 no-provider checks and 131 ordinary tests pass for the group follow-up. The earlier complete regression also passed 44 removal checks, 107 NPC assertions, 223 runtime probes and 40 dialogue unit cases. Normal jars exclude the test probes. Production Citizens/Interactions hash checks in the permission batch matched the original audited deployment; no local repair has been deployed by this task.
 
 The following sections preserve the September 13 01:47 detailed audit for source evidence. Its then-current implementation/hash table and then-open service/removal rows are historical; use the current delta/gaps above and linked follow-ups for today's disposition.
 

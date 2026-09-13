@@ -3,12 +3,14 @@ package net.citizensnpcs.util;
 import java.lang.reflect.Method;
 import java.util.Collection;
 import java.util.ArrayDeque;
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.function.Supplier;
 
 import net.citizensnpcs.api.util.Messaging;
 import net.citizensnpcs.api.util.PermissionUtil;
@@ -32,7 +34,8 @@ import net.neoforged.fml.ModList;
  * <p>
  * Membership starts with {@code PermissionService.metadata(uuid)}. Paradigm 2.4.2b's {@code resolvedGroups()}
  * contains assignments, not the complete ancestor graph, so parent groups are read from its public group-info API.
- * Its UUID metadata uses server/network contexts; it does not expose dimension-scoped group membership.
+ * Its UUID metadata uses server/network contexts. World/dimension assignments are read from its public user-info
+ * API and matched by the provider's own context resolver, so moving between dimensions immediately changes membership.
  */
 public final class ParadigmGroups {
     private static final String MOD_ID = "paradigm";
@@ -45,6 +48,7 @@ public final class ParadigmGroups {
     private static Method primaryGroup;
     private static Method services, handler, groupInfo, inherits;
     private static GroupResolver installed;
+    private static ContextualMemberships contextualMemberships;
     /** So a broken lookup is reported once per player rather than once per tick. */
     private static final Set<UUID> WARNED = ConcurrentHashMap.newKeySet();
 
@@ -85,6 +89,7 @@ public final class ParadigmGroups {
                     .getMethod("getPermissionGroupInfo", String.class);
             inherits = Class.forName("eu.avalanche7.paradigm.modules.permissions.PermissionAPI$GroupInfo")
                     .getMethod("inherits");
+            contextualMemberships = new ContextualMemberships();
         } catch (Throwable ex) {
             Messaging.severe("Paradigm is installed but its API could not be reached, so NPC group checks stay"
                     + " unresolved:", ex);
@@ -102,6 +107,7 @@ public final class ParadigmGroups {
         if (installed != null && PermissionUtil.getGroupResolver() == installed) PermissionUtil.setGroupResolver(null);
         installed = null;
         permissions = null;
+        contextualMemberships = null;
         WARNED.clear();
     }
 
@@ -169,7 +175,10 @@ public final class ParadigmGroups {
                     return null;
                 Object resolved = resolvedGroups.invoke(meta);
                 Object provider = handler.invoke(services.invoke(null));
-                return matchesIncludingParents(resolved instanceof Collection<?> ? (Collection<?>) resolved : null,
+                List<Object> groups = new ArrayList<>();
+                if (resolved instanceof Collection<?> collection) groups.addAll(collection);
+                groups.addAll(contextualMemberships.groups(provider, player));
+                return matchesIncludingParents(groups,
                         primaryGroup.invoke(meta), group, name -> {
                             Object info = groupInfo.invoke(provider, name);
                             if (info == null) return List.of();
@@ -183,6 +192,67 @@ public final class ParadigmGroups {
                 }
                 return null;
             }
+        }
+    }
+
+    /** Public provider APIs retain the context/expiry information that the small UUID metadata facade omits. */
+    private static final class ContextualMemberships {
+        private final Method userInfo, groupAssignments, value, expired, denied, contexts, match, matches;
+        private final Method platform, wrapPlayer, resolveContext;
+        private final Object contextResolver;
+
+        ContextualMemberships() throws ReflectiveOperationException {
+            Class<?> serviceType = Class.forName("eu.avalanche7.paradigm.core.Services");
+            Class<?> handlerType = Class.forName("eu.avalanche7.paradigm.modules.permissions.PermissionsHandler");
+            Class<?> assignment = Class.forName("eu.avalanche7.paradigm.modules.permissions.PermissionAssignment");
+            Class<?> contextSet = Class.forName("eu.avalanche7.paradigm.modules.permissions.context.PermissionContextSet");
+            userInfo = handlerType.getMethod("getPlayerPermissionInfo", UUID.class);
+            groupAssignments = Class.forName("eu.avalanche7.paradigm.modules.permissions.PermissionAPI$UserInfo")
+                    .getMethod("groupAssignments");
+            value = assignment.getMethod("value");
+            expired = assignment.getMethod("expired");
+            denied = assignment.getMethod("denied");
+            contexts = assignment.getMethod("contexts");
+            match = contextSet.getMethod("match", contextSet);
+            matches = Class.forName("eu.avalanche7.paradigm.modules.permissions.context.PermissionContextMatchResult")
+                    .getMethod("matches");
+            platform = serviceType.getMethod("getPlatformAdapter");
+            wrapPlayer = Class.forName("eu.avalanche7.paradigm.platform.Interfaces.IPlatformAdapter")
+                    .getMethod("wrapPlayer", Object.class);
+            Method storage = serviceType.getMethod("getStorageService");
+            Method storageContext = Class.forName("eu.avalanche7.paradigm.storage.StorageService").getMethod("context");
+            Method identity = Class.forName("eu.avalanche7.paradigm.storage.identity.StorageContext")
+                    .getMethod("serverIdentity");
+            Class<?> resolver = Class.forName("eu.avalanche7.paradigm.modules.permissions.context.PermissionContextResolver");
+            contextResolver = resolver.getConstructor(Supplier.class).newInstance((Supplier<Object>) () -> {
+                try {
+                    return identity.invoke(storageContext.invoke(storage.invoke(services.invoke(null))));
+                } catch (ReflectiveOperationException failure) {
+                    throw new IllegalStateException("Could not resolve Paradigm server identity", failure);
+                }
+            });
+            resolveContext = resolver.getMethod("resolve",
+                    Class.forName("eu.avalanche7.paradigm.platform.Interfaces.IPlayer"));
+        }
+
+        Collection<String> groups(Object provider, ServerPlayer player) throws ReflectiveOperationException {
+            Object wrapped = wrapPlayer.invoke(platform.invoke(services.invoke(null)), player);
+            if (wrapped == null) throw new IllegalStateException("Paradigm could not resolve the online player");
+            Object activeContext = resolveContext.invoke(contextResolver, wrapped);
+            Object info = userInfo.invoke(provider, player.getUUID());
+            if (info == null) throw new IllegalStateException("Paradigm returned no user permission information");
+            Object assignments = groupAssignments.invoke(info);
+            if (!(assignments instanceof Collection<?> values))
+                throw new IllegalStateException("Paradigm returned invalid group assignments");
+            List<String> active = new ArrayList<>();
+            for (Object assignment : values) {
+                if (Boolean.TRUE.equals(expired.invoke(assignment)) || Boolean.TRUE.equals(denied.invoke(assignment))) continue;
+                Object required = contexts.invoke(assignment);
+                if (!Boolean.TRUE.equals(matches.invoke(match.invoke(required, activeContext)))) continue;
+                String name = (String) value.invoke(assignment);
+                if (name != null && !name.isBlank() && groupInfo.invoke(provider, name) != null) active.add(name);
+            }
+            return active;
         }
     }
 }
