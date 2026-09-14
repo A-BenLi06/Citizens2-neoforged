@@ -20,6 +20,6 @@ execute unless entity @e[type=minecraft:pig,name=P9NoKickBob] run say [NPCTEST] 
 # Selected by position, not by name: a player NPC's name lives in its GameProfile rather than in CustomName, so
 # @e[type=minecraft:player,name=...] never matches one. (Which is also why /npc skin has to be reached through
 # "npc select --name" rather than a selector.)
-execute if entity @e[type=minecraft:player,x=165,y=-62,z=61,dx=2,dy=4,dz=2] run say [NPCTEST] PASS skin-player-npc-spawned
-execute unless entity @e[type=minecraft:player,x=165,y=-62,z=61,dx=2,dy=4,dz=2] run say [NPCTEST] FAIL skin-player-npc-spawned
+# SkinSpawnRuntimeAudit verifies type, bounds, life and world-index membership for this player NPC.
+# @e[type=player] uses the player list, which intentionally omits NPCs under the default removal policy.
 say [NPCTEST] p9 batch end

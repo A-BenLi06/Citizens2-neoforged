@@ -49,24 +49,22 @@ public final class SkinPacketTracker {
         NPC mirroring = entity.getNPC();
         if (mirroring != null && mirroring.hasTrait(MirrorTrait.class)
                 && mirroring.getTraitNullable(MirrorTrait.class).isEnabled()) {
-            // every viewer needs a different profile, so this cannot be one broadcast. Players out of range are included
-            // too: the entry they get is unlisted and refers to an entity they will be tracking soon anyway.
-            for (ServerPlayer viewer : level.players()) {
+            // Each actual viewer needs a different profile. Sending to the whole dimension would leave stale profile
+            // entries on clients that never tracked this NPC and will never receive its stop-tracking cleanup.
+            for (ServerPlayer viewer : level.getChunkSource().chunkMap.getPlayersWatching(entity)) {
                 send(entity, viewer, EnumSet.of(Action.ADD_PLAYER, Action.UPDATE_LISTED));
             }
         } else {
-            sendToTracking(level, entity, new ClientboundPlayerInfoUpdatePacket(
-                    EnumSet.of(Action.ADD_PLAYER, Action.UPDATE_LISTED), List.of(entity)));
+            sendToTracking(level, entity, packet(entity, EnumSet.of(Action.ADD_PLAYER, Action.UPDATE_LISTED)));
         }
 
         NPC npc = entity.getNPC();
         if (npc == null || npc.shouldRemoveFromTabList()) {
-            // the entry has to exist long enough for the client to read the profile off it, so the removal is
-            // deferred to the next tick rather than sent back-to-back
+            // Retain the skin profile and reassert the live listed policy after the configured refresh delay.
+            // A later explicit show operation must not be undone by this earlier refresh.
             net.citizensnpcs.api.CitizensAPI.getScheduler().runTaskLater(() -> {
                 if (!entity.isRemoved()) {
-                    sendToTracking(level, entity, new ClientboundPlayerInfoUpdatePacket(
-                            EnumSet.of(Action.UPDATE_LISTED), List.of(entity)));
+                    sendToTracking(level, entity, packet(entity, EnumSet.of(Action.UPDATE_LISTED)));
                 }
             }, Setting.TABLIST_REMOVE_PACKET_DELAY.asTicks());
         }
@@ -87,16 +85,12 @@ public final class SkinPacketTracker {
      * sending player info" and dropping it. Without this the NPC exists on the server, reports itself as spawned, and is
      * simply never drawn.
      * <p>
-     * {@link Action#UPDATE_LISTED} is sent only when the NPC is meant to appear in the tab list. The entry itself exists
-     * either way and carries the skin, so an unlisted NPC renders normally without the add-then-remove sequence
-     * {@link #respawn} needs for a profile change.
+     * The entry always carries explicit listed state. An unlisted entry still supplies its skin to the player entity.
      */
     public static void sendTo(EntityHumanNPC entity, ServerPlayer viewer) {
         if (entity == null || entity.isRemoved() || viewer == null)
             return;
-        NPC npc = entity.getNPC();
-        send(entity, viewer, npc == null || npc.shouldRemoveFromTabList() ? EnumSet.of(Action.ADD_PLAYER)
-                : EnumSet.of(Action.ADD_PLAYER, Action.UPDATE_LISTED));
+        send(entity, viewer, EnumSet.of(Action.ADD_PLAYER, Action.UPDATE_LISTED));
     }
 
     /**
@@ -110,7 +104,7 @@ public final class SkinPacketTracker {
     }
 
     /**
-     * Shows or hides the NPC's tab-list entry, for {@code /npc playerlist}.
+     * Shows or hides the NPC's client tab-list entry. The Java world-player-list setting is independent.
      * <p>
      * The entry has to exist for the client to read the skin off it, so hiding means "listed = false" rather than removing
      * the entry outright.
@@ -120,10 +114,9 @@ public final class SkinPacketTracker {
             return;
         NPC npc = entity.getNPC();
         if (npc != null) {
-            npc.data().setPersistent(NPC.Metadata.REMOVE_FROM_PLAYERLIST, !listed);
+            npc.data().setPersistent(NPC.Metadata.REMOVE_FROM_TABLIST, !listed);
         }
-        sendToTracking(level, entity, new ClientboundPlayerInfoUpdatePacket(EnumSet.of(Action.UPDATE_LISTED),
-                List.of(entity)));
+        sendToTracking(level, entity, packet(entity, EnumSet.of(Action.UPDATE_LISTED)));
     }
 
     /**
@@ -146,15 +139,24 @@ public final class SkinPacketTracker {
         }
         GameProfile mirrored = mirroredProfile(entity, viewer);
         if (mirrored == null) {
-            viewer.connection.send(new ClientboundPlayerInfoUpdatePacket(actions, List.of(entity)));
+            viewer.connection.send(packet(entity, actions));
             return;
         }
         entity.setProfileOverride(mirrored);
         try {
-            viewer.connection.send(new ClientboundPlayerInfoUpdatePacket(actions, List.of(entity)));
+            viewer.connection.send(packet(entity, actions));
         } finally {
             entity.setProfileOverride(null);
         }
+    }
+
+    private static ClientboundPlayerInfoUpdatePacket packet(EntityHumanNPC entity, EnumSet<Action> actions) {
+        ClientboundPlayerInfoUpdatePacket result = new ClientboundPlayerInfoUpdatePacket(actions, List.of(entity));
+        var entry = result.entries().getFirst();
+        boolean listed = entity.getNPC() != null && !entity.getNPC().shouldRemoveFromTabList();
+        result.entries = List.of(new ClientboundPlayerInfoUpdatePacket.Entry(entry.profileId(), entry.profile(), listed,
+                entry.latency(), entry.gameMode(), entry.displayName(), entry.chatSession()));
+        return result;
     }
 
     /**

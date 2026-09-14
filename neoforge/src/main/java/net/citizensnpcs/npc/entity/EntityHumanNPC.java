@@ -17,6 +17,9 @@ import net.minecraft.server.network.CommonListenerCookie;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.player.ChatVisiblity;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.entity.MoverType;
+import net.minecraft.world.phys.Vec3;
+import net.minecraft.core.SectionPos;
 
 /**
  * A player NPC: a real {@link ServerPlayer} with no client behind it.
@@ -79,6 +82,19 @@ public class EntityHumanNPC extends ServerPlayer {
         return npc;
     }
 
+    /** Applies the Java world-player-list setting independently of the client's tab-list visibility. */
+    public void updatePlayerListMembership() {
+        if (npc == null || isRemoved()) return;
+        ServerLevel level = serverLevel();
+        boolean remove = npc.shouldRemoveFromPlayerList();
+        boolean included = level.players().contains(this);
+        if (included != remove) return;
+        if (remove) level.players().remove(this);
+        else level.players().add(this);
+        level.getChunkSource().chunkMap.updatePlayerStatus(this, !remove);
+        level.updateSleepingPlayerList();
+    }
+
     /**
      * The client settings a player NPC starts with.
      * <p>
@@ -98,7 +114,16 @@ public class EntityHumanNPC extends ServerPlayer {
             return;
         }
         super.tick();
-        // ServerPlayer.tick does not run the mob AI path; the NPC's own per-tick work is driven by
-        // Citizens.onServerTick, matching how the generic mob controller is driven
+        // Real players receive their base/physics tick through the network listener. An NPC has no ticking client
+        // connection, so run that part here. Default NPCs must not inherit Player.tick's automatic pickup/hunger/healing.
+        super.baseTick();
+        if (!isPassenger() && (npc.getNavigator().isNavigating() || !isNoGravity() && !npc.isFlyable())) {
+            if (npc.isFlyable()) move(MoverType.SELF, getDeltaMovement());
+            else travel(Vec3.ZERO);
+        }
+        if (npc.useMinecraftAI()) getFoodData().tick(this);
+        updatePlayerListMembership();
+        if (!npc.shouldRemoveFromPlayerList() && !getLastSectionPos().equals(SectionPos.of(this)))
+            serverLevel().getChunkSource().move(this);
     }
 }

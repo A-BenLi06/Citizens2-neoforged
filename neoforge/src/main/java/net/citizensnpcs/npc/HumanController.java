@@ -56,6 +56,8 @@ public class HumanController extends AbstractEntityController {
         super.spawn(at, added -> {
             if (!added) {
                 Messaging.debug("Level rejected player NPC at", at);
+            } else if (getEntity() instanceof EntityHumanNPC human) {
+                human.updatePlayerListMembership();
             }
             callback.accept(added);
         });

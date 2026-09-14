@@ -129,6 +129,7 @@ public class Settings {
         DEFAULT_TEXT_DELAY_MAX("npc.text.default-random-text-delay-max", "10s"),
         DEFAULT_TEXT_DELAY_MIN("npc.text.default-random-text-delay-min", "5s"),
         DEFAULT_TEXT_SPEECH_BUBBLE_DURATION("npc.text.speech-bubble-ticks", "npc.text.speech-bubble-duration", "50t"),
+        DISABLE_TABLIST("npc.tablist.disable", true),
         ERROR_COLOUR("general.color-scheme.message-error", "<red>"),
         FOLLOW_ACROSS_WORLDS("npc.follow.teleport-across-worlds", false),
         HIGHLIGHT_COLOUR("general.color-scheme.message-highlight", "<yellow>"),
@@ -163,6 +164,7 @@ public class Settings {
         NPC_SKIN_FETCH_DEFAULT("npc.skins.try-fetch-default-skin", true),
         NPC_SKIN_USE_LATEST("npc.skins.use-latest-by-default", false),
         NPC_SKIN_VIEW_DISTANCE("npc.skins.view-distance", 100),
+        NPC_WATER_SPEED_MODIFIER("npc.movement.water-speed-modifier", 1.15F),
         // Upstream prefixes these CITIZENS_PATHFINDER_* to tell its own pathfinder apart from Minecraft's, which has no
         // settings of its own. The config paths keep the "citizens" segment so an existing config.yml still reads.
         PATHFINDER_CHECK_BOUNDING_BOXES("npc.pathfinding.citizens.check-bounding-boxes", false),
@@ -174,6 +176,7 @@ public class Settings {
         PATHFINDER_TYPE("npc.pathfinding.pathfinder-type", "MINECRAFT"),
         PLACEHOLDER_SKIN_UPDATE_FREQUENCY("npc.skins.placeholder-update-frequency-ticks",
                 "npc.skins.placeholder-update-frequency", "5m"),
+        REMOVE_PLAYERS_FROM_PLAYER_LIST("npc.player.remove-from-list", true),
         RESET_FORMATTING_ON_COLOR_CHANGE("general.reset-formatting-on-color-change", false),
         SERVER_OWNS_NPCS("npc.server-ownership", false),
         SHOP_DEFAULT_ITEM_SETTINGS("npc.shops.default-item", defaultShopItemSettings()),

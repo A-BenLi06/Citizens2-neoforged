@@ -1044,7 +1044,7 @@ public class NPCCommands {
         }
         npc.data().setPersistent(NPC.Metadata.REMOVE_FROM_PLAYERLIST, remove);
         if (npc.isSpawned() && npc.getEntity() instanceof EntityHumanNPC human) {
-            SkinPacketTracker.setListed(human, !remove);
+            human.updatePlayerListMembership();
         }
         Messaging.sendTr(sender, remove ? Messages.REMOVED_FROM_PLAYERLIST : Messages.ADDED_TO_PLAYERLIST,
                 npc.getName());
@@ -1054,12 +1054,13 @@ public class NPCCommands {
             aliases = { "npc" },
             usage = "swim (--set [true|false])",
             desc = "",
+            strictArguments = true,
             modifiers = { "swim" },
             min = 1,
             max = 1,
             permission = "citizens.npc.swim")
     public void swim(CommandContext args, CommandSourceStack sender, NPC npc, @Flag("set") Boolean set) {
-        boolean swim = set != null ? set : !npc.data().get(NPC.Metadata.SWIM, true);
+        boolean swim = set != null ? set : !net.citizensnpcs.npc.ai.NPCSwimming.isEnabled(npc, sender.getLevel());
         npc.data().setPersistent(NPC.Metadata.SWIM, swim);
         Messaging.sendTr(sender, swim ? Messages.SWIM_SET : Messages.SWIM_UNSET, npc.getName());
     }

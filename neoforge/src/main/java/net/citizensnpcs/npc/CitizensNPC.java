@@ -36,6 +36,8 @@ import net.citizensnpcs.api.util.EntityUtil;
 import net.citizensnpcs.api.util.Location;
 import net.citizensnpcs.api.util.Messaging;
 import net.citizensnpcs.npc.ai.CitizensNavigator;
+import net.citizensnpcs.npc.ai.NPCSwimming;
+import net.citizensnpcs.trait.AttributeTrait;
 import net.citizensnpcs.trait.DisguiseTrait;
 import net.citizensnpcs.trait.HologramTrait;
 import net.citizensnpcs.trait.HologramTrait.HologramRenderer;
@@ -49,6 +51,9 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.Mob;
+import net.minecraft.world.entity.ai.attributes.Attributes;
+import net.minecraft.world.entity.animal.horse.AbstractHorse;
+import net.minecraft.server.level.ServerPlayer;
 import net.neoforged.neoforge.common.NeoForge;
 
 /**
@@ -60,8 +65,7 @@ import net.neoforged.neoforge.common.NeoForge;
  * indirection existed to bridge CraftBukkit's per-version remapped internals, which NeoForge already gives us
  * directly.</li>
  * <li>Metadata tagging via Bukkit's {@code setMetadata} is replaced by {@link NPCRegistries}.</li>
- * <li>Trait-driven behaviour that is not ported yet (packet NPCs, holograms, scoreboards, skin layers) is marked
- * {@code TODO(P6)} at the exact call site rather than silently dropped, so the follow-up is mechanical.</li>
+ * <li>Traits and native entity controllers own appearance/state; remaining platform work is marked at its call site.</li>
  * </ul>
  */
 public class CitizensNPC extends AbstractNPC {
@@ -321,14 +325,12 @@ public class CitizensNPC extends AbstractNPC {
 
     @Override
     public boolean shouldRemoveFromPlayerList() {
-        // TODO(P8): default comes from the remove-players-from-player-list config key
-        return data().get(NPC.Metadata.REMOVE_FROM_PLAYERLIST, true);
+        return data().get(NPC.Metadata.REMOVE_FROM_PLAYERLIST, Setting.REMOVE_PLAYERS_FROM_PLAYER_LIST.asBoolean());
     }
 
     @Override
     public boolean shouldRemoveFromTabList() {
-        // TODO(P8): default comes from the disable-tablist config key
-        return data().get(NPC.Metadata.REMOVE_FROM_TABLIST, true);
+        return data().get(NPC.Metadata.REMOVE_FROM_TABLIST, Setting.DISABLE_TABLIST.asBoolean());
     }
 
     @Override
@@ -366,7 +368,7 @@ public class CitizensNPC extends AbstractNPC {
         }
         getOrAddTrait(CurrentLocation.class).setLocation(location);
         entityController.create(location, this);
-        // TODO(P6): SkinLayers - upstream enables every skin layer here unless the trait overrides it
+        // Player controllers initialize all skin layers; SkinLayers applies explicit overrides during trait spawning.
 
         traits.forEach(trait -> {
             try {
@@ -423,7 +425,12 @@ public class CitizensNPC extends AbstractNPC {
                 // a name too long or too colourful for a vanilla nameplate is drawn as a hologram instead
                 addTrait(HologramTrait.class);
             }
-            // TODO(P6): scoreboard team, step height and flyable state follow here upstream
+            if (entity instanceof ServerPlayer || entity instanceof AbstractHorse) {
+                AttributeTrait attributes = getTraitNullable(AttributeTrait.class);
+                var stepHeight = ((LivingEntity) entity).getAttribute(Attributes.STEP_HEIGHT);
+                if (stepHeight != null && (attributes == null || !attributes.hasAttribute(Attributes.STEP_HEIGHT)))
+                    stepHeight.setBaseValue(1);
+            }
 
             Messaging.debug("Spawned", this, "SpawnReason." + reason);
             if (callback != null) {
@@ -455,6 +462,7 @@ public class CitizensNPC extends AbstractNPC {
                 return;
 
             Entity entity = getEntity();
+            if (entity instanceof net.citizensnpcs.npc.entity.EntityHumanNPC human) human.updatePlayerListMembership();
             if (data().has(NPC.Metadata.AGGRESSIVE) && entity instanceof Mob) {
                 ((Mob) entity).setAggressive(data().get(NPC.Metadata.AGGRESSIVE, false));
             }
@@ -480,8 +488,10 @@ public class CitizensNPC extends AbstractNPC {
             }
             updateCustomNameVisibility();
             navigator.run();
+            // Native Citizens strategies write velocity directly; apply water adjustments after that write.
+            NPCSwimming.update(this, entity);
             updateScoreboard();
-            // TODO(P6): swimming, packet updates and held-item state
+            // TODO(P6): packet updates and held-item state
 
             updateCounter++;
         } catch (Exception ex) {
