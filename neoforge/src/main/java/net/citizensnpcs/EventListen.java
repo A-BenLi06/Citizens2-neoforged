@@ -444,6 +444,14 @@ public class EventListen {
         PermissionUtil.clearTemporary(event.getEntity().getUUID());
     }
 
+    @SubscribeEvent(priority = net.neoforged.bus.api.EventPriority.LOWEST)
+    public void onItemPickup(net.neoforged.neoforge.event.entity.player.ItemEntityPickupEvent.Pre event) {
+        NPC itemNPC = net.citizensnpcs.npc.NPCRegistries.lookup(event.getItemEntity());
+        NPC collector = net.citizensnpcs.npc.NPCRegistries.lookup(event.getPlayer());
+        if (itemNPC != null || collector != null && !collector.data().get(NPC.Metadata.PICKUP_ITEMS, false))
+            event.setCanPickup(net.neoforged.neoforge.common.util.TriState.FALSE);
+    }
+
     /**
      * Raises {@link NPCSeenByPlayerEvent} when a player comes into range of an NPC.
      * <p>

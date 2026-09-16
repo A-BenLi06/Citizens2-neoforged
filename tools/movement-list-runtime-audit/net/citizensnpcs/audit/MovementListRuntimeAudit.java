@@ -247,6 +247,8 @@ public final class MovementListRuntimeAudit {
             check(pig.getEntity().isInWater() && fish.getEntity().isInWater() && waterHuman.getEntity().isInWater(), "native_water_flags_update_for_mob_and_player_npcs");
             impulse(pig, new Vec3(0.1, -0.2, 0.3));
             check(vectorClose(pig.getEntity().getDeltaMovement(), new Vec3(0.1, -0.16, 0.3)), "explicit_land_swim_adds_reference_impulse");
+            impulse(pig, new Vec3(0.1, -0.2, 0.3), false);
+            check(vectorClose(pig.getEntity().getDeltaMovement(), new Vec3(0.1, -0.2, 0.3)), "failed_buoyancy_chance_keeps_native_velocity");
             impulse(fish, Vec3.ZERO);
             check(vectorClose(fish.getEntity().getDeltaMovement(), new Vec3(0, 0.02, 0)), "aquatic_swim_uses_reference_lower_impulse");
             pig.data().setPersistent(NPC.Metadata.SWIM, false); impulse(pig, Vec3.ZERO);
@@ -267,16 +269,43 @@ public final class MovementListRuntimeAudit {
             pig.getNavigator().setTarget(params -> new ControlledPath(up) {
                 @Override public boolean update() { pig.getEntity().setDeltaMovement(0.1, -0.2, 0.3); return false; }
             });
-            Util.getFastRandom().setSeed(0); ((AbstractNPC) pig).update();
-            check(vectorClose(pig.getEntity().getDeltaMovement(), new Vec3(0.2, -0.36, 0.6)), "navigation_cannot_overwrite_water_speed_adjustment");
+            ((AbstractNPC) pig).update();
+            // This assertion concerns navigation/scaling order; either native buoyancy roll is valid.
+            // The exact triggered and untriggered impulses are independently checked above.
+            Vec3 actual = pig.getEntity().getDeltaMovement();
+            check(vectorClose(actual, new Vec3(0.2, -0.36, 0.6)) || vectorClose(actual, new Vec3(0.2, -0.4, 0.6)),
+                    "navigation_cannot_overwrite_water_speed_adjustment");
             pig.getNavigator().cancelNavigation(); pig.getOrAddTrait(Gravity.class).setHasGravity(true);
             pig.data().remove(NPC.Metadata.WATER_SPEED_MODIFIER); Setting.NPC_WATER_SPEED_MODIFIER.set(oldWater);
             pig.getEntity().setDeltaMovement(Vec3.ZERO); fish.getEntity().setDeltaMovement(Vec3.ZERO);
         }
 
-        void impulse(NPC npc, Vec3 start) {
-            npc.getEntity().setDeltaMovement(start); Util.getFastRandom().setSeed(0);
-            NPCSwimming.update(npc, npc.getEntity());
+        void impulse(NPC npc, Vec3 start) throws Exception { impulse(npc, start, true); }
+
+        void impulse(NPC npc, Vec3 start, boolean trigger) throws Exception {
+            npc.getEntity().setDeltaMovement(start);
+            // XORShiftRNG ignores Random.setSeed(long). Scope a known 160-bit state to this synchronous probe,
+            // using its own reentrant lock and restoring every word afterward. No product RNG hook is needed.
+            var random = Util.getFastRandom();
+            var lockField = random.getClass().getDeclaredField("lock"); lockField.setAccessible(true);
+            var lock = (java.util.concurrent.locks.ReentrantLock) lockField.get(random);
+            java.lang.reflect.Field[] fields = new java.lang.reflect.Field[5]; int[] previous = new int[5];
+            for (int i = 0; i < fields.length; i++) {
+                fields[i] = random.getClass().getDeclaredField("state" + (i + 1)); fields[i].setAccessible(true);
+            }
+            lock.lock();
+            try {
+                for (int i = 0; i < fields.length; i++) previous[i] = fields[i].getInt(random);
+                try {
+                    int[] state = {1, 2, 3, 4, trigger ? 5 : 8_200_000};
+                    for (int i = 0; i < fields.length; i++) fields[i].setInt(random, state[i]);
+                    if ((random.nextFloat() <= 0.85F) != trigger) throw new AssertionError("Invalid RNG fixture state");
+                    for (int i = 0; i < fields.length; i++) fields[i].setInt(random, state[i]);
+                    NPCSwimming.update(npc, npc.getEntity());
+                } finally {
+                    for (int i = 0; i < fields.length; i++) fields[i].setInt(random, previous[i]);
+                }
+            } finally { lock.unlock(); }
         }
 
         void stepHeight() {

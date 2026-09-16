@@ -462,6 +462,7 @@ public class CitizensNPC extends AbstractNPC {
                 return;
 
             Entity entity = getEntity();
+            if (entity instanceof Mob mob) mob.setCanPickUpLoot(data().get(NPC.Metadata.PICKUP_ITEMS, false));
             if (entity instanceof net.citizensnpcs.npc.entity.EntityHumanNPC human) human.updatePlayerListMembership();
             if (data().has(NPC.Metadata.AGGRESSIVE) && entity instanceof Mob) {
                 ((Mob) entity).setAggressive(data().get(NPC.Metadata.AGGRESSIVE, false));

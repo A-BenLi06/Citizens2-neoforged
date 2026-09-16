@@ -10,6 +10,8 @@ import net.citizensnpcs.api.util.Messaging;
 import net.citizensnpcs.npc.entity.EntityHumanNPC;
 import net.citizensnpcs.npc.skin.Skin;
 import net.citizensnpcs.trait.SkinTrait;
+import net.citizensnpcs.api.trait.trait.Equipment;
+import net.citizensnpcs.api.trait.trait.Inventory;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.Entity;
 
@@ -29,6 +31,14 @@ public class HumanController extends AbstractEntityController {
         ServerLevel level = at.getWorld();
         if (level == null)
             throw new IllegalStateException("cannot create an NPC entity in an unloaded level");
+
+        // The original player wrapper attaches Inventory before spawning. Seed a newly attached inventory from an
+        // existing Equipment hand so older saves without an inventory trait do not lose their held item.
+        if (!npc.hasTrait(Inventory.class)) {
+            Inventory inventory = npc.getOrAddTrait(Inventory.class);
+            Equipment equipment = npc.getTraitNullable(Equipment.class);
+            if (equipment != null) inventory.setItem(0, equipment.get(Equipment.EquipmentSlot.HAND));
+        }
 
         String name = npc.getName();
         String profileName = name.length() > 16 ? name.substring(0, 16) : name;

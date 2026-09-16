@@ -4,6 +4,7 @@
   "citizens.commands.unknown-flag": "Unknown flag: [[{0}]].",
   "citizens.commands.requirements.must-be-spawned": "The NPC must be spawned.",
   "citizens.commands.npc.entity.action": "NPC [[{0}]]: [[{1}]].",
+  "citizens.inventory.title": "{0}''s Inventory",
   "citizens.editors.text.not-active": "Open the NPC text editor before editing its text.",
   "citizens.editors.text.target-unavailable": "The NPC or text trait being edited is no longer available.",
   "citizens.editors.text.target-mismatch": "The text editor is bound to a different NPC. Close it before editing the requested NPC.",

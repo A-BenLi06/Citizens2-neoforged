@@ -122,7 +122,7 @@ public class Equipment extends Trait {
     @Override
     public void onAttach() {
         npc.scheduleUpdate(NPCUpdate.PACKET);
-        run();
+        captureEquipment();
     }
 
     /**
@@ -194,8 +194,15 @@ public class Equipment extends Trait {
 
     @Override
     public void run() {
+        if (npc.isUpdating(NPCUpdate.PACKET)) captureEquipment();
+    }
+
+    @Override
+    public void onDespawn() { captureEquipment(); }
+
+    private void captureEquipment() {
         Entity entity = npc.getEntity();
-        if (!(entity instanceof LivingEntity living) || !npc.isUpdating(NPCUpdate.PACKET))
+        if (!(entity instanceof LivingEntity living))
             return;
         // read back what the entity actually has, so gear picked up or changed by other code is persisted
         if (entity instanceof EnderMan enderman) {
@@ -221,6 +228,7 @@ public class Equipment extends Trait {
 
     @Override
     public void save(DataKey key) {
+        if (npc.isSpawned()) captureEquipment();
         for (EquipmentSlot slot : EquipmentSlot.values()) {
             String name = slot.name().toLowerCase(Locale.ROOT);
             saveOrRemove(key.getRelative(name), equipment[slot.getIndex()]);

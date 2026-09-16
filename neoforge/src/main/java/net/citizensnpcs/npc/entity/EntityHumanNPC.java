@@ -18,6 +18,7 @@ import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.player.ChatVisiblity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.MoverType;
+import net.minecraft.world.entity.Entity;
 import net.minecraft.world.phys.Vec3;
 import net.minecraft.core.SectionPos;
 
@@ -122,6 +123,16 @@ public class EntityHumanNPC extends ServerPlayer {
             else travel(Vec3.ZERO);
         }
         if (npc.useMinecraftAI()) getFoodData().tick(this);
+        if (npc.data().get(NPC.Metadata.PICKUP_ITEMS, false) && isAlive() && !isSpectator()) {
+            if (takeXpDelay > 0) takeXpDelay--;
+            var reach = isPassenger() && !getVehicle().isRemoved()
+                    ? getBoundingBox().minmax(getVehicle().getBoundingBox()).inflate(1, 0, 1)
+                    : getBoundingBox().inflate(1, 0.5, 1);
+            for (Entity nearby : level().getEntities(this, reach)) {
+                if (!nearby.isRemoved() && NPCRegistries.lookup(nearby) == null) nearby.playerTouch(this);
+            }
+        }
+        detectEquipmentUpdates();
         updatePlayerListMembership();
         if (!npc.shouldRemoveFromPlayerList() && !getLastSectionPos().equals(SectionPos.of(this)))
             serverLevel().getChunkSource().move(this);

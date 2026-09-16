@@ -1015,13 +1015,16 @@ public class NPCCommands {
             aliases = { "npc" },
             usage = "pickupitems (--set [true|false])",
             desc = "",
+            strictArguments = true,
             modifiers = { "pickupitems" },
             min = 1,
             max = 1,
             permission = "citizens.npc.pickupitems")
     public void pickupitems(CommandContext args, CommandSourceStack sender, NPC npc, @Flag("set") Boolean set) {
-        boolean pickup = set == null ? !npc.data().get(NPC.Metadata.PICKUP_ITEMS, !npc.isProtected()) : set;
+        boolean pickup = set == null ? !npc.data().get(NPC.Metadata.PICKUP_ITEMS, false) : set;
         npc.data().setPersistent(NPC.Metadata.PICKUP_ITEMS, pickup);
+        if (npc.getEntity() instanceof net.minecraft.world.entity.Mob mob) mob.setCanPickUpLoot(pickup);
+        if (pickup && npc.getEntity() instanceof net.minecraft.world.entity.LivingEntity) npc.getOrAddTrait(Equipment.class);
         Messaging.sendTr(sender, pickup ? Messages.PICKUP_ITEMS_SET : Messages.PICKUP_ITEMS_UNSET, npc.getName());
     }
 
@@ -3849,6 +3852,7 @@ public class NPCCommands {
         ItemStack remaining = stack.copy();
         for (int pass = 0; pass < 2 && !remaining.isEmpty(); pass++) {
             for (int slot = 0; slot < container.getContainerSize() && !remaining.isEmpty(); slot++) {
+                if (!container.canPlaceItem(slot, remaining)) continue;
                 ItemStack existing = container.getItem(slot);
                 if (pass == 0) {
                     if (existing.isEmpty() || !ItemStack.isSameItemSameComponents(existing, remaining)) {

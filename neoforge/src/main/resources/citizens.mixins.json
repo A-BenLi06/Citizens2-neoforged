@@ -9,7 +9,8 @@
     "LivingEntitySoundMixin",
     "MobSoundMixin",
     "ServerEntityMixin",
-    "ServerPlayerMixin"
+    "ServerPlayerMixin",
+    "SleepStatusMixin"
   ],
   "injectors": {
     "defaultRequire": 1

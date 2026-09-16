@@ -71,6 +71,11 @@ public class MobEntityController extends AbstractEntityController {
                     clearGoals(mob);
                 }
                 mob.setPersistenceRequired();
+                mob.setCanPickUpLoot(npc.data().get(NPC.Metadata.PICKUP_ITEMS, false));
+            }
+            if (entity instanceof ItemEntity item) {
+                item.setNeverPickUp();
+                item.setUnlimitedLifetime();
             }
         }
         return entity;
