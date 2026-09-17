@@ -106,6 +106,7 @@ public class InteractionsMod implements Session.Engine {
         }
         sessions.clear();
         proximityEntries.clear();
+        if (actions != null) actions.reset(true);
         progress.saveDirty();
     }
 
@@ -200,6 +201,7 @@ public class InteractionsMod implements Session.Engine {
 
     @SubscribeEvent
     public void onServerTick(ServerTickEvent.Post event) {
+        if (actions != null) actions.tick(event.getServer());
         if (actions != null && event.getServer().getTickCount() % 20 == 0) {
             for (ServerPlayer player : event.getServer().getPlayerList().getPlayers()) {
                 pollProximity(player, CitizensAPI.getNPCRegistry());
@@ -255,6 +257,7 @@ public class InteractionsMod implements Session.Engine {
         if (session != null) {
             session.end(false);
         }
+        if (actions != null && event.getEntity() instanceof ServerPlayer player) actions.cancel(player);
         progress.saveDirty();
     }
 
@@ -281,6 +284,7 @@ public class InteractionsMod implements Session.Engine {
             }
             sessions.clear();
             proximityEntries.clear();
+            if (actions != null) actions.reset(false);
             progress.saveDirty();
             ItemAliases.load(new File(dataFolder, "item-aliases.yml"));
             CommandAliases.load(new File(dataFolder, "command-aliases.yml"));

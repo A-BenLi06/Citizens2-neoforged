@@ -1,16 +1,16 @@
 package net.yuuniverse.interactions;
 
 import net.minecraft.network.chat.Component;
-import net.minecraft.network.protocol.game.ClientboundSetActionBarTextPacket;
 import net.minecraft.server.level.ServerPlayer;
 
 /** Private conversation status, refreshed every second and immediately when the phase/title changes. */
 final class DialogueActionBar {
     private ServerPlayer player;
+    private final ActionBarDisplays displays;
     private Component title;
     private int ticks;
 
-    DialogueActionBar(ServerPlayer player) { this.player = player; }
+    DialogueActionBar(ServerPlayer player, ActionBarDisplays displays) { this.player = player; this.displays = displays; }
 
     void rebind(ServerPlayer replacement) { player = replacement; ticks = 20; }
 
@@ -25,12 +25,12 @@ final class DialogueActionBar {
     }
 
     void close() {
-        if (title != null) send(Component.empty());
+        if (title != null) displays.closeStatus(this, player);
         title = null;
         ticks = 0;
     }
 
     private void send(Component message) {
-        if (player.connection != null) player.connection.send(new ClientboundSetActionBarTextPacket(message));
+        displays.status(this, player, message);
     }
 }

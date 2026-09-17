@@ -30,42 +30,128 @@ public final class Actions {
 
     private final ItemLibrary items;
     private final Economy economy;
+    private final List<PendingBatch> batches = new java.util.ArrayList<>();
+    private final ActionBarDisplays actionBars = new ActionBarDisplays();
+    private long tick;
+    private boolean accepting = true;
 
     public Actions(ItemLibrary items, Economy economy) {
         this.items = items;
         this.economy = economy;
     }
 
+    /** Compatibility entry point returning acceptance. Use executeAll to observe delayed completion. */
     public boolean runAll(List<String> actions, ServerPlayer player, Component npcName) {
-        return process(actions, player, npcName, true);
+        return executeAll(actions, player, npcName).accepted();
+    }
+
+    public ActionExecution executeAll(List<String> actions, ServerPlayer player, Component npcName) {
+        var result = new ActionExecution();
+        if (!accepting) { result.finish(ActionExecution.Result.CANCELLED); return result; }
+        try {
+            var batch = new PendingBatch(List.copyOf(actions), new ActionPlayer(player), npcName, result);
+            prepare(batch.remaining(), player, npcName);
+            batches.add(batch);
+            batch.resume(player);
+        } catch (Exception failure) {
+            reportFailure(actions, player, failure);
+            result.finish(ActionExecution.Result.FAILED);
+        }
+        batches.removeIf(batch -> !batch.result.pending());
+        return result;
     }
 
     public boolean validateAll(List<String> actions, ServerPlayer player, Component npcName) {
-        return process(actions, player, npcName, false);
-    }
-
-    private boolean process(List<String> actions, ServerPlayer player, Component npcName, boolean execute) {
-        if (actions.isEmpty()) return true;
         try {
-            var inventory = player.getInventory();
-            var payments = new CheckItem.PaymentPlan(java.util.stream.IntStream.range(0, inventory.getContainerSize())
-                    .mapToObj(inventory::getItem).toList());
-            ActionBatch.run(actions, action -> {
-                run(action, player, npcName, true, payments);
-                return () -> {
-                    if (execute) run(action, player, npcName, false, payments);
-                };
-            });
+            prepare(actions, player, npcName);
             return true;
-        } catch (Exception ex) {
-            LOGGER.error("Dialogue action batch failed for {}: {}", player.getUUID(), actions, ex);
-            player.sendSystemMessage(Component.translatableWithFallback("interactions.action.failed",
-                    "This conversation could not complete an action. Please contact a server administrator."));
+        } catch (Exception failure) {
+            reportFailure(actions, player, failure);
             return false;
         }
     }
 
-    private void run(String raw, ServerPlayer player, Component npcName, boolean validate, CheckItem.PaymentPlan payments) {
+    private void prepare(List<String> actions, ServerPlayer player, Component npcName) {
+        if (actions.isEmpty()) return;
+        var inventory = player.getInventory();
+        var payments = new CheckItem.PaymentPlan(java.util.stream.IntStream.range(0, inventory.getContainerSize())
+                .mapToObj(inventory::getItem).toList());
+        for (String action : actions) run(action, player, npcName, true, payments);
+    }
+
+    private static void reportFailure(List<String> actions, ServerPlayer player, Exception failure) {
+        LOGGER.error("Dialogue action batch failed for {}: {}", player.getUUID(), actions, failure);
+        player.sendSystemMessage(Component.translatableWithFallback("interactions.action.failed",
+                "This conversation could not complete an action. Please contact a server administrator."));
+    }
+
+    /** Advance once per server tick, independently of any session's dialogue timer. */
+    void tick(MinecraftServer server) {
+        if (!accepting) return;
+        tick++;
+        for (PendingBatch batch : List.copyOf(batches)) {
+            if (!batch.result.pending()) continue;
+            ServerPlayer player = batch.player.resolve();
+            if (player == null || player.getServer() != server) batch.result.finish(ActionExecution.Result.CANCELLED);
+            else if (tick >= batch.due) {
+                try {
+                    // Inventory, providers, permissions and placeholders may have changed while waiting.
+                    prepare(batch.remaining(), player, batch.npcName);
+                    batch.resume(player);
+                } catch (Exception failure) {
+                    reportFailure(batch.remaining(), player, failure);
+                    batch.result.finish(ActionExecution.Result.FAILED);
+                }
+            }
+        }
+        batches.removeIf(batch -> !batch.result.pending());
+        actionBars.tick(tick);
+    }
+
+    void cancel(ServerPlayer player) {
+        for (PendingBatch batch : List.copyOf(batches))
+            if (batch.player.matches(player)) batch.result.finish(ActionExecution.Result.CANCELLED);
+        batches.removeIf(batch -> !batch.result.pending());
+        actionBars.cancel(player);
+    }
+
+    /** Reload/shutdown are cancellation boundaries; no queued old configuration can run afterward. */
+    void reset(boolean shutdown) {
+        accepting = false;
+        try {
+            for (PendingBatch batch : List.copyOf(batches)) batch.result.finish(ActionExecution.Result.CANCELLED);
+            batches.clear();
+            actionBars.clear();
+        } finally { accepting = !shutdown; }
+    }
+
+    ActionBarDisplays actionBars() { return actionBars; }
+
+    private final class PendingBatch {
+        final List<String> actions;
+        final ActionPlayer player;
+        final Component npcName;
+        final ActionExecution result;
+        int index;
+        long due;
+
+        PendingBatch(List<String> actions, ActionPlayer player, Component npcName, ActionExecution result) {
+            this.actions = actions; this.player = player; this.npcName = npcName; this.result = result;
+        }
+
+        List<String> remaining() { return actions.subList(index, actions.size()); }
+
+        void resume(ServerPlayer target) {
+            while (result.pending() && index < actions.size()) {
+                long delay = run(actions.get(index++), target, npcName, false, null);
+                if (delay >= 0) { due = tick + Math.max(1, delay); return; }
+            }
+            if (result.pending()) result.finish(ActionExecution.Result.SUCCEEDED);
+        }
+    }
+
+    /** @return wait ticks, or -1 for an immediate action */
+    private long run(String raw, ServerPlayer player, Component npcName, boolean validate, CheckItem.PaymentPlan payments) {
         if (raw == null || player == null)
             throw new IllegalArgumentException("Missing action or player");
         String action = Text.placeholders(raw.trim(), player);
@@ -76,6 +162,16 @@ public final class Actions {
         String verb = action.substring(0, colon).trim().toLowerCase(Locale.ROOT);
         String body = action.substring(colon + 1).trim();
         switch (verb) {
+            case "wait", "wait_ticks" -> {
+                int delay = ActionArguments.integer(body, 0, Integer.MAX_VALUE);
+                return verb.equals("wait") ? delay * 20L : delay;
+            }
+            case "actionbar" -> {
+                var fields = ActionArguments.fields(body, 2, 2);
+                Component text = Text.legacy(fields.getFirst());
+                int duration = ActionArguments.integer(fields.get(1), -1, Integer.MAX_VALUE);
+                if (!validate) actionBars.action(player, text, duration, tick);
+            }
             case "playsound" -> playSound(body, player, validate, false);
             case "playsound_resource_pack" -> playSound(body, player, validate, true);
             case "stopsound" -> stopSound(body, player, validate, false);
@@ -101,6 +197,7 @@ public final class Actions {
             case "player_command" -> command(body, player, CommandActor.PLAYER, validate);
             default -> throw new IllegalArgumentException("Unknown dialogue action verb: " + verb);
         }
+        return -1;
     }
 
     /** {@code playsound: BLOCK_NOTE_BLOCK_PLING;10;0.1} - a Bukkit Sound name, then volume and pitch. */

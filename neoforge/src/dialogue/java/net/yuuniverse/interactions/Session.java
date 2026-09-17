@@ -47,6 +47,9 @@ public class Session {
     private String choiceView;
     private static final java.util.regex.Pattern OPTION_MARKER = java.util.regex.Pattern.compile("%option_([^%]*)%");
     private boolean finished;
+    private int pendingActions;
+    private boolean actionsFailed;
+    private String completionKey;
     private Conversation.Option pendingChoice;
     private boolean skipRequested;
     private int selectedOption;
@@ -60,7 +63,7 @@ public class Session {
         this.npc = npc;
         bossBar = new DialogueBossBar(player, engine.settings().bossBar());
         hologram = new DialogueHologram(player, npc);
-        actionBar = new DialogueActionBar(player);
+        actionBar = new DialogueActionBar(player, engine.actions().actionBars());
         lineOrder = node.orderedLines(player.getRandom());
         DialogueMovement.begin(this);
         DialogueCommands.begin(this);
@@ -163,7 +166,7 @@ public class Session {
                 return;
             }
             if (!Conditions.all(selected.requires, player, engine.progress())
-                    || !engine.actions().runAll(selected.actions, player, npcName())) {
+                    || !startActions(selected.actions, null)) {
                 end(false);
                 return;
             }
@@ -186,7 +189,7 @@ public class Session {
         if (complete) {
             skipRequested = false;
             writer = null;
-            if (!engine.actions().runAll(current.lastActions, player, npcName())) {
+            if (!startActions(current.lastActions, null)) {
                 end(false);
                 return;
             }
@@ -254,14 +257,39 @@ public class Session {
         if (!renderLine(line, true)) return;
         bossBar.line(line.time);
         bossBar.refresh(engine.settings().bossBar(), engine.messages(), conversation.name);
-        if (!engine.actions().runAll(line.actions, player, npcName())) {
+        if (!startActions(line.actions, line.saveToPlayer ? progressKey(node.key, line.key) : null)) {
             end(false);
             return;
         }
-        if (line.saveToPlayer) {
-            engine.progress().markSeen(player.getUUID(), player.getGameProfile().getName(),
-                    progressKey(node.key, line.key));
-        }
+    }
+
+    /** Timers/routes continue while batches wait, but saved progress depends on their actual outcome. */
+    private boolean startActions(List<String> actions, String savedLine) {
+        pendingActions++;
+        ActionExecution execution = engine.actions().executeAll(actions, player, npcName());
+        execution.whenComplete(result -> {
+            pendingActions--;
+            if (result != ActionExecution.Result.SUCCEEDED) {
+                actionsFailed = true;
+                if (!finished) end(false);
+                return;
+            }
+            try {
+                if (savedLine != null) engine.progress().markSeen(player.getUUID(), player.getGameProfile().getName(), savedLine);
+                recordCompletion();
+            } catch (RuntimeException failure) {
+                actionsFailed = true;
+                org.slf4j.LoggerFactory.getLogger("interactions").error("Could not record dialogue progress for {}", conversation.source, failure);
+                if (!finished) end(false);
+            }
+        });
+        return execution.accepted() && !finished;
+    }
+
+    private void recordCompletion() {
+        if (completionKey == null || pendingActions != 0 || actionsFailed) return;
+        engine.progress().markSeen(player.getUUID(), player.getGameProfile().getName(), completionKey);
+        completionKey = null;
     }
 
     private boolean renderLine(Conversation.Line line) {
@@ -556,8 +584,8 @@ public class Session {
             player.removeEffect(MobEffects.MOVEMENT_SLOWDOWN);
         }
         if (completed && conversation.saveProgress) {
-            engine.progress().markSeen(player.getUUID(), player.getGameProfile().getName(),
-                    progressKey(node.key, "completed"));
+            completionKey = progressKey(node.key, "completed");
+            recordCompletion();
         }
         if (!completed && !node.interruptActions.isEmpty()) {
             // End ownership first: interrupt commands may reenter the controller or teleport the player.

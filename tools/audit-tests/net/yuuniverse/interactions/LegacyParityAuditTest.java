@@ -324,25 +324,39 @@ public class LegacyParityAuditTest {
     }
 
     @Test
-    void missingRewardIsDiscoveredBeforeAnyPaymentRuns() {
-        var executed = new java.util.ArrayList<String>();
-        assertThrows(IllegalArgumentException.class, () -> ActionBatch.run(java.util.List.of("payment", "missingReward"),
-                action -> {
-                    if (action.equals("missingReward")) throw new IllegalArgumentException("Missing item");
-                    return () -> executed.add(action);
-                }));
-        assertTrue(executed.isEmpty());
+    void acceptedBatchDoesNotNotifyCompletionWhilePending() {
+        var batch = new ActionExecution();
+        var results = new java.util.ArrayList<ActionExecution.Result>();
+        batch.whenComplete(results::add);
+        assertTrue(batch.accepted());
+        assertTrue(batch.pending());
+        assertTrue(results.isEmpty());
+        batch.finish(ActionExecution.Result.SUCCEEDED);
+        assertEquals(java.util.List.of(ActionExecution.Result.SUCCEEDED), results);
+        assertFalse(batch.pending());
     }
 
     @Test
-    void failedPaymentStopsRewardsAndLaterActions() {
-        var executed = new java.util.ArrayList<String>();
-        assertThrows(IllegalStateException.class, () -> ActionBatch.run(java.util.List.of("payment", "reward"),
-                action -> () -> {
-                    if (action.equals("payment")) throw new IllegalStateException("Debit rejected");
-                    executed.add(action);
-                }));
-        assertTrue(executed.isEmpty());
+    void cancelledBatchCannotLaterReportSuccessAndLateListenersSeeCancellation() {
+        var batch = new ActionExecution();
+        var results = new java.util.ArrayList<ActionExecution.Result>();
+        batch.whenComplete(results::add);
+        batch.finish(ActionExecution.Result.CANCELLED);
+        batch.finish(ActionExecution.Result.SUCCEEDED);
+        batch.whenComplete(results::add);
+        assertFalse(batch.accepted());
+        assertEquals(java.util.List.of(ActionExecution.Result.CANCELLED, ActionExecution.Result.CANCELLED), results);
+    }
+
+    @Test
+    void brokenCompletionObserverDoesNotSuppressOtherObservers() {
+        var batch = new ActionExecution();
+        var results = new java.util.ArrayList<ActionExecution.Result>();
+        batch.whenComplete(result -> { throw new IllegalStateException("Observer failure"); });
+        batch.whenComplete(results::add);
+        batch.finish(ActionExecution.Result.CANCELLED);
+        batch.whenComplete(results::add);
+        assertEquals(java.util.List.of(ActionExecution.Result.CANCELLED, ActionExecution.Result.CANCELLED), results);
     }
 
     @Test

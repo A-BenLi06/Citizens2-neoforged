@@ -62,6 +62,8 @@ import org.slf4j.LoggerFactory;
 public final class DialogueDisplayRuntimeAudit {
     private static boolean forced, finished;
     private static int passed;
+    private static State state;
+    private static ScheduledActionRuntimeAudit scheduled;
 
     @SubscribeEvent
     public static void tick(ServerTickEvent.Post event) {
@@ -74,16 +76,24 @@ public final class DialogueDisplayRuntimeAudit {
             }
             return;
         }
-        finished = true;
-        State state = new State(server);
         try {
-            state.run();
-            LoggerFactory.getLogger("interactions").info("[DIALOGUEDISPLAYAUDIT] COMPLETE {} checks", passed);
+            if (state == null) {
+                state = new State(server);
+                state.run();
+                scheduled = new ScheduledActionRuntimeAudit(server, state::player);
+                scheduled.start();
+            } else if (scheduled.tick(event)) {
+                finished = true;
+                LoggerFactory.getLogger("interactions").info("[DIALOGUEDISPLAYAUDIT] COMPLETE {} checks", passed);
+            }
         } catch (Throwable failure) {
+            finished = true;
             LoggerFactory.getLogger("interactions").error("[DIALOGUEDISPLAYAUDIT] FAILED", failure);
         } finally {
-            try { state.close(); } catch (Throwable failure) { LoggerFactory.getLogger("interactions").error("[DIALOGUEDISPLAYAUDIT] FAILED cleanup", failure); }
-            server.halt(false);
+            if (finished) {
+                try { if (state != null) state.close(); } catch (Throwable failure) { LoggerFactory.getLogger("interactions").error("[DIALOGUEDISPLAYAUDIT] FAILED cleanup", failure); }
+                server.halt(false);
+            }
         }
     }
 
@@ -563,7 +573,11 @@ public final class DialogueDisplayRuntimeAudit {
         }
 
         AuditPlayer player(String name) {
-            var player = new AuditPlayer(server, level, name); players.add(player); player.setPos(1, -60, 1);
+            return player(name, UUID.randomUUID());
+        }
+
+        AuditPlayer player(String name, UUID uuid) {
+            var player = new AuditPlayer(server, level, name, uuid); players.add(player); player.setPos(1, -60, 1);
             var connection = new Connection(PacketFlow.SERVERBOUND);
             player.channel = new EmbeddedChannel(new ChannelInitializer<Channel>() {
                 @Override protected void initChannel(Channel channel) {
@@ -655,7 +669,7 @@ public final class DialogueDisplayRuntimeAudit {
         final List<Packet<?>> packets = new ArrayList<>();
         final List<Component> chat = new ArrayList<>();
         final Map<UUID, Component> bars = new HashMap<>();
-        AuditPlayer(MinecraftServer server, ServerLevel level, String name) { super(server, level, new GameProfile(UUID.randomUUID(), name), ClientInformation.createDefault()); }
+        AuditPlayer(MinecraftServer server, ServerLevel level, String name, UUID uuid) { super(server, level, new GameProfile(uuid, name), ClientInformation.createDefault()); }
         void capture(Packet<?> packet) {
             if (packet instanceof ClientboundBundlePacket bundle) { bundle.subPackets().forEach(this::capture); return; }
             packets.add(packet);
