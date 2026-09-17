@@ -181,16 +181,21 @@ public final class PresentationTraitCommands {
             }
             case "list" -> {
                 PotionEffectsTrait trait = npc.getTraitNullable(PotionEffectsTrait.class);
-                if (trait == null || trait.getPersistentEffects().isEmpty())
+                if (trait == null || trait.getPersistentEffects().isEmpty() && trait.getUnresolvedEffectTypes().isEmpty())
                     Messaging.sendTr(sender, "citizens.commands.npc.potioneffects.list-empty", npc.getName());
-                else for (Map.Entry<String, MobEffectInstance> entry : trait.getPersistentEffects().entrySet().stream()
+                else {
+                    for (Map.Entry<String, MobEffectInstance> entry : trait.getPersistentEffects().entrySet().stream()
                         .sorted(Map.Entry.comparingByKey()).toList())
-                    Messaging.sendTr(sender, "citizens.commands.npc.potioneffects.list-entry", entry.getKey(), entry.getValue());
+                        Messaging.sendTr(sender, "citizens.commands.npc.potioneffects.list-entry", entry.getKey(), entry.getValue());
+                    for (Map.Entry<String, String> entry : trait.getUnresolvedEffectTypes().entrySet().stream()
+                            .sorted(Map.Entry.comparingByKey()).toList())
+                        Messaging.sendTr(sender, "citizens.commands.npc.potioneffects.list-unavailable", entry.getKey(), entry.getValue());
+                }
             }
             case "remove" -> {
                 if (name == null || name.isBlank()) throw new CommandUsageException();
                 PotionEffectsTrait trait = npc.getTraitNullable(PotionEffectsTrait.class);
-                if (trait == null || !trait.getPersistentEffects().containsKey(name))
+                if (trait == null || !trait.hasPersistentEffect(name))
                     throw new CommandException("citizens.commands.npc.potioneffects.not-found", name, npc.getName());
                 trait.removePersistentEffect(name);
                 Messaging.sendTr(sender, Messages.POTION_EFFECT_REMOVED, name, npc.getName());

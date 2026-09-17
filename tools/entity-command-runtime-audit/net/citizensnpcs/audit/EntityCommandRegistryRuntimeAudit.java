@@ -30,5 +30,7 @@ public final class EntityCommandRegistryRuntimeAudit {
         event.register(Registries.POTION, id("potion"), () -> new Potion(new MobEffectInstance(MobEffects.LUCK, 1200)));
         event.register(Registries.PARTICLE_TYPE, id("particle"), () -> new SimpleParticleType(false));
         event.register(Registries.MOB_EFFECT, id("effect"), () -> new MobEffect(MobEffectCategory.BENEFICIAL, 0x123456) { });
+        if (Boolean.getBoolean("citizens.audit.effectProvider"))
+            event.register(Registries.MOB_EFFECT, id("returning_effect"), () -> new MobEffect(MobEffectCategory.BENEFICIAL, 0x654321) { });
     }
 }

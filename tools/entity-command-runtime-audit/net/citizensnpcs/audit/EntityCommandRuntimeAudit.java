@@ -322,7 +322,6 @@ public final class EntityCommandRuntimeAudit {
     private static class Actor extends ServerPlayer {
         EmbeddedChannel channel;
         Actor(MinecraftServer server, ServerLevel level) { super(server, level, new GameProfile(UUID.randomUUID(), "EntityAudit"), ClientInformation.createDefault()); }
-        @Override public void sendSystemMessage(Component message) { }
     }
     private static boolean cloudMatches(Entity entity) {
         var cloud = (net.minecraft.world.entity.AreaEffectCloud) entity;

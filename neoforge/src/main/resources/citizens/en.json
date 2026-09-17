@@ -1,4 +1,5 @@
 {
+  "citizens.commands.npc.potioneffects.list-unavailable": "[[{0}]]: unavailable effect type [[{1}]] (saved definition retained)",
   "citizens.changed-implementation": "Citizens implementation changed, disabling plugin.",
   "citizens.commands.invalid-value": "Invalid value for [[{0}]]: [[{1}]].",
   "citizens.commands.unknown-flag": "Unknown flag: [[{0}]].",

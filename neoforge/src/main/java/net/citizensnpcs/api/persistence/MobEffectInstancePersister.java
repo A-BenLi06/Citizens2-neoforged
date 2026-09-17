@@ -18,16 +18,21 @@ import net.minecraft.world.effect.MobEffectInstance;
 public class MobEffectInstancePersister implements Persister<MobEffectInstance> {
     @Override
     public MobEffectInstance create(DataKey root) {
+        MobEffectInstance instance = tryCreate(root);
+        if (instance == null && root.keyExists())
+            Messaging.warn("Cannot instantiate unavailable potion effect type '" + root.getString("type") + "'.");
+        return instance;
+    }
+
+    /** Returns null for an unavailable type, allowing owners to retain its stored definition for a later load. */
+    public MobEffectInstance tryCreate(DataKey root) {
         if (!root.keyExists())
             return null;
         String raw = root.getString("type");
         ResourceLocation id = raw == null || raw.isEmpty() ? null : ResourceLocation.tryParse(raw);
         Holder<MobEffect> effect = id == null ? null
                 : BuiltInRegistries.MOB_EFFECT.getHolder(id).map(h -> (Holder<MobEffect>) h).orElse(null);
-        if (effect == null) {
-            Messaging.warn("Unknown potion effect type '" + raw + "', dropping the effect.");
-            return null;
-        }
+        if (effect == null) return null;
         return new MobEffectInstance(effect, root.getInt("duration"), root.getInt("amplifier"),
                 root.getBoolean("ambient"), root.getBoolean("particles"), root.getBoolean("icon"));
     }

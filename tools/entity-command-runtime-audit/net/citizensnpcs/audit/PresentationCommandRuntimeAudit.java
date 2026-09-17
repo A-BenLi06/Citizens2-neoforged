@@ -3,7 +3,9 @@ package net.citizensnpcs.audit;
 import static net.citizensnpcs.audit.EntityCommandRuntimeAudit.check;
 
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 import org.joml.Quaternionf;
@@ -19,11 +21,13 @@ import io.netty.channel.embedded.EmbeddedChannel;
 import net.citizensnpcs.api.CitizensAPI;
 import net.citizensnpcs.api.npc.AbstractNPC;
 import net.citizensnpcs.api.npc.NPC;
+import net.citizensnpcs.api.persistence.PersistenceLoader;
 import net.citizensnpcs.api.trait.trait.Owner;
 import net.citizensnpcs.api.trait.trait.Spawned;
 import net.citizensnpcs.api.util.Location;
 import net.citizensnpcs.api.util.MemoryDataKey;
 import net.citizensnpcs.api.util.PermissionUtil;
+import net.citizensnpcs.api.util.YamlStorage;
 import net.citizensnpcs.trait.versioned.BossBarTrait;
 import net.citizensnpcs.trait.versioned.DisplayTrait;
 import net.citizensnpcs.trait.versioned.InteractionTrait;
@@ -36,6 +40,7 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.protocol.game.ClientboundBossEventPacket;
 import net.minecraft.network.protocol.game.ClientboundBundlePacket;
+import net.minecraft.network.protocol.game.ClientboundSystemChatPacket;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerBossEvent;
 import net.minecraft.server.level.ServerPlayer;
@@ -56,7 +61,8 @@ public final class PresentationCommandRuntimeAudit {
     public static void run(MinecraftServer server, ServerPlayer player) throws Exception {
         State state = new State(server, player);
         try {
-            state.display(); state.textAndItems(); state.interaction(); state.potions(); state.bossbar(); state.rejections();
+            state.display(); state.textAndItems(); state.interaction(); state.potions(); state.unavailablePotions();
+            state.effectProviderRecovery(); state.bossbar(); state.rejections();
         } finally { state.close(); }
     }
 
@@ -67,6 +73,7 @@ public final class PresentationCommandRuntimeAudit {
         final List<NPC> created = new ArrayList<>();
         final List<PermissionUtil.Attachment> permissions = new ArrayList<>();
         final List<ClientboundBossEventPacket> barPackets = new ArrayList<>();
+        final List<String> messages = new ArrayList<>();
         final EmbeddedChannel channel;
 
         State(MinecraftServer server, ServerPlayer player) {
@@ -84,6 +91,7 @@ public final class PresentationCommandRuntimeAudit {
         void capture(Object message) {
             if (message instanceof ClientboundBundlePacket bundle) bundle.subPackets().forEach(this::capture);
             else if (message instanceof ClientboundBossEventPacket packet) barPackets.add(packet);
+            else if (message instanceof ClientboundSystemChatPacket packet) messages.add(packet.content().getString());
         }
 
         void display() throws Exception {
@@ -237,6 +245,109 @@ public final class PresentationCommandRuntimeAudit {
                     .parse("npc potioneffect add --type citizens_entity_audit:", source)).get().getList();
             check(suggestions.stream().anyMatch(value -> value.getText().contains(EntityCommandRegistryRuntimeAudit.id("effect").toString())),
                     "potion_custom_registry_completion_keeps_namespace");
+        }
+
+        Map<String, Object> effectData(String type) {
+            return new LinkedHashMap<>(Map.of("type", type, "duration", 700, "amplifier", 3,
+                    "ambient", true, "particles", false, "icon", true));
+        }
+
+        @SuppressWarnings("unchecked")
+        void unavailablePotions() throws Exception {
+            String missing = "missing_provider:effect";
+            Map<String, Object> opaque = effectData(missing);
+            var extension = new ArrayList<>(List.of(new LinkedHashMap<>(Map.of("literal.key", "preserved"))));
+            opaque.put("extension", extension);
+            Map<String, Object> raw = new LinkedHashMap<>();
+            raw.put("missing.效果", opaque); raw.put("invalid.id", effectData("Invalid: Effect ID"));
+            raw.put("malformed", "unparsed record"); raw.put("known", effectData("minecraft:luck"));
+            MemoryDataKey input = new MemoryDataKey(new LinkedHashMap<>(Map.of("persistent", raw)));
+            NPC npc = create(EntityType.PIG, "UnavailableEffects");
+            PotionEffectsTrait trait = npc.getOrAddTrait(PotionEffectsTrait.class);
+            check(PersistenceLoader.load(trait, input) == trait, "unavailable_effect_does_not_fail_trait_load");
+            check(trait.getPersistentEffects().size() == 1 && trait.getUnresolvedEffectTypes().size() == 3
+                    && missing.equals(trait.getUnresolvedEffectTypes().get("missing.效果")), "unavailable_effects_keep_names_and_ids_separate_from_native_instances");
+            MemoryDataKey before = snapshot(npc);
+            check(before.getRaw("traits.potioneffects.persistent").equals(raw), "unavailable_effect_raw_definitions_survive_snapshot");
+            extension.getFirst().put("literal.key", "changed by caller"); opaque.put("duration", 1);
+            check(snapshot(npc).getRaw("traits.potioneffects.persistent").equals(before.getRaw("traits.potioneffects.persistent")),
+                    "unavailable_effect_definitions_are_deep_copied_on_load");
+            ((Map<String, Object>) ((Map<?, ?>) before.getRaw("traits.potioneffects.persistent")).get("missing.效果")).put("duration", 2);
+            check(((Map<?, ?>) ((Map<?, ?>) snapshot(npc).getRaw("traits.potioneffects.persistent")).get("missing.效果")).get("duration").equals(700),
+                    "snapshot_edit_cannot_mutate_retained_effect_definition");
+            NPC copy = npc.copy();
+            check(snapshot(copy).getRaw("traits.potioneffects").equals(snapshot(npc).getRaw("traits.potioneffects")),
+                    "unavailable_effects_survive_npc_copy"); copy.destroy();
+            YamlStorage disk = new YamlStorage(new java.io.File("effect-audit/unknown-effects.yml"));
+            npc.saveSnapshot(disk.getKey("npc")); disk.save();
+            YamlStorage reload = new YamlStorage(new java.io.File("effect-audit/unknown-effects.yml"));
+            check(reload.load(), "unavailable_effect_file_reloads");
+            NPC restored = create(EntityType.PIG, "RestoredEffects"); restored.load(reload.getKey("npc"));
+            // YamlStorage represents lists as indexed maps internally; compare with the storage's loaded form.
+            check(snapshot(restored).getRaw("traits.potioneffects").equals(reload.getKey("npc").getRaw("traits.potioneffects")),
+                    "unavailable_effects_survive_actual_yaml_and_npc_load");
+            YamlStorage resaved = new YamlStorage(new java.io.File("effect-audit/unknown-effects-resaved.yml"));
+            restored.saveSnapshot(resaved.getKey("npc")); resaved.save();
+            YamlStorage documentBefore = new YamlStorage(new java.io.File("effect-audit/unknown-effects.yml"), null, false);
+            YamlStorage documentAfter = new YamlStorage(new java.io.File("effect-audit/unknown-effects-resaved.yml"), null, false);
+            check(documentBefore.load() && documentAfter.load()
+                    && documentBefore.getKey("npc").getRaw("traits.potioneffects").equals(documentAfter.getKey("npc").getRaw("traits.potioneffects")),
+                    "unavailable_effect_yaml_keeps_nested_lists_and_literal_keys_after_resave");
+            spawn(restored, "unavailable_potions");
+            check(((LivingEntity) restored.getEntity()).getActiveEffects().size() == 1
+                    && ((LivingEntity) restored.getEntity()).hasEffect(MobEffects.LUCK), "unavailable_effects_do_not_apply_a_fallback_effect");
+            restored.despawn(); spawn(restored, "unavailable_potions_respawn");
+            check(restored.getOrAddTrait(PotionEffectsTrait.class).getUnresolvedEffectTypes().size() == 3,
+                    "unavailable_definitions_survive_spawn_and_respawn");
+            select(source, npc); channel.runPendingTasks(); messages.clear(); ok(source, "npc potioneffect list"); channel.runPendingTasks();
+            check(messages.stream().anyMatch(text -> text.contains("missing.效果") && text.contains(missing))
+                    && messages.stream().anyMatch(text -> text.contains("invalid.id")), "potion_list_reports_retained_unavailable_names_and_ids");
+            var unchanged = snapshot(npc).getRaw("traits.potioneffects");
+            bad(source, "npc potioneffect add --name missing.效果 --type missing_provider:effect");
+            check(snapshot(npc).getRaw("traits.potioneffects").equals(unchanged), "invalid_replacement_preserves_unavailable_definition");
+            ok(source, "npc potioneffect remove --name invalid.id");
+            check(!trait.hasPersistentEffect("invalid.id") && trait.hasPersistentEffect("missing.效果"), "remove_command_can_delete_unavailable_definition");
+            ok(source, "npc potioneffect add --name missing.效果 --type speed --duration 99");
+            check(!trait.getUnresolvedEffectTypes().containsKey("missing.效果")
+                    && trait.getPersistentEffects().get("missing.效果").getDuration() == 99, "add_command_replaces_unavailable_definition");
+            trait.getPersistentEffects().compute("malformed", (name, old) -> new MobEffectInstance(MobEffects.LUCK, 20));
+            check(!trait.getUnresolvedEffectTypes().containsKey("malformed"), "native_map_api_replacement_clears_unavailable_definition");
+            trait.getPersistentEffects().clear(); trait.removePersistentEffect("known");
+            MemoryDataKey cleared = snapshot(npc);
+            check(!cleared.keyExists("traits.potioneffects.persistent"), "removed_effects_do_not_resurrect_on_save");
+            PersistenceLoader.load(trait, input); PersistenceLoader.load(trait, new MemoryDataKey());
+            check(trait.getPersistentEffects().isEmpty() && trait.getUnresolvedEffectTypes().isEmpty(), "reload_replaces_previous_effect_state");
+        }
+
+        void effectProviderRecovery() {
+            var id = EntityCommandRegistryRuntimeAudit.id("returning_effect");
+            boolean available = Boolean.getBoolean("citizens.audit.effectProvider");
+            check(BuiltInRegistries.MOB_EFFECT.containsKey(id) == available, "effect_provider_mode_matches_native_registry");
+            YamlStorage disk = new YamlStorage(new java.io.File("effect-audit/provider-recovery.yml"));
+            NPC npc = create(EntityType.PIG, "ReturningEffect");
+            PotionEffectsTrait trait = npc.getOrAddTrait(PotionEffectsTrait.class);
+            if (!available) {
+                var data = new MemoryDataKey(new LinkedHashMap<>(Map.of("persistent", Map.of("returning.effect", effectData(id.toString())))));
+                PersistenceLoader.load(trait, data);
+                check(trait.getUnresolvedEffectTypes().containsKey("returning.effect"), "absent_provider_definition_retained_before_restart");
+                npc.saveSnapshot(disk.getKey("npc")); disk.save();
+                check(disk.load(), "absent_provider_definition_written_for_restart");
+            } else {
+                check(disk.load() && disk.getKey("npc.traits.potioneffects.persistent").hasSubKeys(), "previous_process_saved_provider_definition_exists");
+                npc.load(disk.getKey("npc")); trait = npc.getOrAddTrait(PotionEffectsTrait.class);
+                var effect = trait.getPersistentEffects().get("returning.effect");
+                check(effect != null && effect.getEffect().unwrapKey().orElseThrow().location().equals(id)
+                        && effect.getDuration() == 700 && effect.getAmplifier() == 3 && effect.isAmbient() && !effect.isVisible() && effect.showIcon(),
+                        "returning_provider_restores_exact_saved_id_parameters_and_flags");
+                check(trait.getUnresolvedEffectTypes().isEmpty(), "returning_provider_definition_resolves_without_stale_unavailable_record");
+                spawn(npc, "returning_provider_effect");
+                var live = ((LivingEntity) npc.getEntity()).getEffect(effect.getEffect());
+                check(live != null && live.getDuration() == 700 && live.getAmplifier() == 3,
+                        "returning_provider_effect_applies_to_native_entity");
+                npc.despawn(); spawn(npc, "returning_provider_effect_respawn");
+                check(((LivingEntity) npc.getEntity()).getEffect(effect.getEffect()).getDuration() == 700,
+                        "returning_provider_effect_retains_template_on_respawn");
+            }
         }
 
         void bossbar() throws Exception {
