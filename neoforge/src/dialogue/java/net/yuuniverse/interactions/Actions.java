@@ -7,11 +7,13 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import net.minecraft.commands.CommandSourceStack;
+import net.minecraft.core.Holder;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.protocol.game.ClientboundSetTitleTextPacket;
 import net.minecraft.network.protocol.game.ClientboundSetTitlesAnimationPacket;
 import net.minecraft.network.protocol.game.ClientboundSetSubtitleTextPacket;
+import net.minecraft.network.protocol.game.ClientboundStopSoundPacket;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
@@ -74,35 +76,59 @@ public final class Actions {
         String verb = action.substring(0, colon).trim().toLowerCase(Locale.ROOT);
         String body = action.substring(colon + 1).trim();
         switch (verb) {
-            case "playsound" -> playSound(body, player, validate);
-            case "title" -> { if (!validate) title(body, player); }
+            case "playsound" -> playSound(body, player, validate, false);
+            case "playsound_resource_pack" -> playSound(body, player, validate, true);
+            case "stopsound" -> stopSound(body, player, validate, false);
+            case "stopsound_resource_pack" -> stopSound(body, player, validate, true);
+            case "title" -> title(body, player, validate);
             case "teleport" -> teleport(body, player, validate);
             case "give_potion_effect" -> potion(body, player, validate);
+            case "remove_potion_effect" -> {
+                var effect = effect(body);
+                if (!validate) player.removeEffect(effect);
+            }
+            case "firework" -> {
+                var firework = FireworkAction.parse(body);
+                if (!validate) firework.spawn(player);
+            }
             case "remove_item" -> {
                 if (validate) payments.reserve(body);
                 else if (!CheckItem.consume(body, player))
                     throw new IllegalStateException("Required items unavailable: " + body);
             }
-            case "console_command" -> command(body, player, true, validate);
-            case "player_command_as_op" -> command(body, player, false, validate);
+            case "console_command" -> command(body, player, CommandActor.CONSOLE, validate);
+            case "player_command_as_op" -> command(body, player, CommandActor.OPERATOR, validate);
+            case "player_command" -> command(body, player, CommandActor.PLAYER, validate);
             default -> throw new IllegalArgumentException("Unknown dialogue action verb: " + verb);
         }
     }
 
     /** {@code playsound: BLOCK_NOTE_BLOCK_PLING;10;0.1} - a Bukkit Sound name, then volume and pitch. */
-    private void playSound(String body, ServerPlayer player, boolean validate) {
-        List<String> parts = Text.semicolons(body);
-        ResourceLocation id = soundId(parts.get(0));
-        SoundEvent sound = id == null ? null : BuiltInRegistries.SOUND_EVENT.getOptional(id).orElse(null);
-        if (sound == null) {
-            throw new IllegalArgumentException("Unknown dialogue sound: " + parts.get(0));
-        }
+    private void playSound(String body, ServerPlayer player, boolean validate, boolean resourcePack) {
+        List<String> parts = ActionArguments.fields(body, 3, 3);
+        ResourceLocation id = requireSound(parts.getFirst(), resourcePack);
+        Holder<SoundEvent> sound = resourcePack ? Holder.direct(SoundEvent.createVariableRangeEvent(id))
+                : BuiltInRegistries.SOUND_EVENT.getHolder(id).orElseThrow();
+        float volume = ActionArguments.floating(parts.get(1));
+        float pitch = ActionArguments.floating(parts.get(2));
+        if (volume < 0 || pitch < 0) throw new IllegalArgumentException("Negative dialogue sound volume or pitch");
         if (validate) return;
-        float volume = parts.size() > 1 ? floatOr(parts.get(1), 1) : 1;
-        float pitch = parts.size() > 2 ? floatOr(parts.get(2), 1) : 1;
         player.connection.send(new net.minecraft.network.protocol.game.ClientboundSoundPacket(
-                BuiltInRegistries.SOUND_EVENT.wrapAsHolder(sound), SoundSource.MASTER, player.getX(), player.getY(),
+                sound, SoundSource.MASTER, player.getX(), player.getY(),
                 player.getZ(), volume, pitch, player.level().getRandom().nextLong()));
+    }
+
+    private void stopSound(String body, ServerPlayer player, boolean validate, boolean resourcePack) {
+        boolean all = !resourcePack && body.equals("all");
+        ResourceLocation id = all ? null : requireSound(body, resourcePack);
+        if (!validate) player.connection.send(new ClientboundStopSoundPacket(id, all ? null : SoundSource.MASTER));
+    }
+
+    private static ResourceLocation requireSound(String name, boolean resourcePack) {
+        ResourceLocation id = resourcePack ? ResourceLocation.tryParse(name.trim()) : soundId(name);
+        if (name.isBlank() || id == null || !resourcePack && !BuiltInRegistries.SOUND_EVENT.containsKey(id))
+            throw new IllegalArgumentException("Unknown or invalid dialogue sound: " + name);
+        return id;
     }
 
     /** A Bukkit sound constant is the registry path in upper case with dots as underscores. */
@@ -117,61 +143,71 @@ public final class Actions {
     }
 
     /** {@code title: 20;80;20;&6&lHeader;&fSubtitle} - fade in, stay, fade out, then the two lines. */
-    private void title(String body, ServerPlayer player) {
-        List<String> parts = Text.semicolons(body);
-        int in = parts.size() > 0 ? (int) floatOr(parts.get(0), 10) : 10;
-        int stay = parts.size() > 1 ? (int) floatOr(parts.get(1), 70) : 70;
-        int out = parts.size() > 2 ? (int) floatOr(parts.get(2), 20) : 20;
-        String header = parts.size() > 3 ? parts.get(3) : "";
-        String sub = parts.size() > 4 ? String.join(";", parts.subList(4, parts.size())) : "";
+    private void title(String body, ServerPlayer player, boolean validate) {
+        List<String> parts = ActionArguments.fields(body, 5, Integer.MAX_VALUE);
+        int in = ActionArguments.integer(parts.get(0), -1, Integer.MAX_VALUE);
+        int stay = ActionArguments.integer(parts.get(1), -1, Integer.MAX_VALUE);
+        int out = ActionArguments.integer(parts.get(2), -1, Integer.MAX_VALUE);
+        String header = parts.get(3);
+        String sub = String.join(";", parts.subList(4, parts.size()));
+        Component title = Text.legacy(header.equals("none") ? "" : header);
+        Component subtitle = Text.legacy(sub.equals("none") ? "" : sub);
+        if (validate) return;
         player.connection.send(new ClientboundSetTitlesAnimationPacket(in, stay, out));
-        player.connection.send(new ClientboundSetTitleTextPacket(Text.legacy(header)));
-        player.connection.send(new ClientboundSetSubtitleTextPacket(Text.legacy(sub)));
+        player.connection.send(new ClientboundSetSubtitleTextPacket(subtitle));
+        player.connection.send(new ClientboundSetTitleTextPacket(title));
     }
 
     /** {@code teleport: uDays;1666;86;-545;90;90} - a Bukkit world name, coordinates, then yaw and pitch. */
     private void teleport(String body, ServerPlayer player, boolean validate) {
-        List<String> parts = Text.semicolons(body);
-        if (parts.size() < 4) {
-            throw new IllegalArgumentException("Dialogue teleport needs world;x;y;z: " + body);
-        }
+        List<String> parts = ActionArguments.fields(body, 6, 6);
         ServerLevel level = Worlds.resolve(player.getServer(), parts.get(0));
         if (level == null) {
             throw new IllegalArgumentException("Unknown dialogue world: " + parts.get(0));
         }
-        double x = floatOr(parts.get(1), player.getX());
-        double y = floatOr(parts.get(2), player.getY());
-        double z = floatOr(parts.get(3), player.getZ());
-        float yaw = parts.size() > 4 ? floatOr(parts.get(4), player.getYRot()) : player.getYRot();
-        float pitch = parts.size() > 5 ? floatOr(parts.get(5), player.getXRot()) : player.getXRot();
+        double x = ActionArguments.decimal(parts.get(1));
+        double y = ActionArguments.decimal(parts.get(2));
+        double z = ActionArguments.decimal(parts.get(3));
+        float yaw = ActionArguments.floating(parts.get(4));
+        float pitch = ActionArguments.floating(parts.get(5));
         if (!validate) player.teleportTo(level, x, y, z, yaw, pitch);
     }
 
-    /** {@code give_potion_effect: BLINDNESS;30;5;true} - effect, seconds, amplifier, then whether particles hide. */
+    /** {@code give_potion_effect: BLINDNESS;30;5;true} - effect, ticks, one-based level, optional particles. */
     private void potion(String body, ServerPlayer player, boolean validate) {
-        List<String> parts = Text.semicolons(body);
-        ResourceLocation id = ResourceLocation.tryParse(parts.get(0).trim().toLowerCase(Locale.ROOT).indexOf(':') >= 0
-                ? parts.get(0).trim().toLowerCase(Locale.ROOT)
-                : "minecraft:" + parts.get(0).trim().toLowerCase(Locale.ROOT));
-        MobEffect effect = id == null ? null : BuiltInRegistries.MOB_EFFECT.getOptional(id).orElse(null);
-        if (effect == null) {
-            throw new IllegalArgumentException("Unknown dialogue potion effect: " + parts.get(0));
-        }
-        int seconds = parts.size() > 1 ? (int) floatOr(parts.get(1), 10) : 10;
-        int amplifier = parts.size() > 2 ? (int) floatOr(parts.get(2), 0) : 0;
-        boolean hidden = parts.size() > 3 && Boolean.parseBoolean(parts.get(3).trim());
-        if (!validate) player.addEffect(new MobEffectInstance(BuiltInRegistries.MOB_EFFECT.wrapAsHolder(effect), seconds * 20,
-                amplifier, false, !hidden, !hidden));
+        List<String> parts = ActionArguments.fields(body, 3, 4);
+        var effect = effect(parts.getFirst());
+        int ticks = ActionArguments.integer(parts.get(1), -1, Integer.MAX_VALUE);
+        int level = ActionArguments.integer(parts.get(2), 1, MobEffectInstance.MAX_AMPLIFIER + 1);
+        boolean particles = parts.size() < 4 || ActionArguments.bool(parts.get(3));
+        if (!validate) player.addEffect(new MobEffectInstance(effect, ticks, level - 1, false, particles, particles));
     }
 
-    /**
-     * Runs a command, intercepting the two that belonged to plugins this server does not have.
-     *
-     * @param asConsole
-     *            true for {@code console_command}; {@code player_command_as_op} runs with the player as the source but
-     *            at operator level, which is what the old plugin did
-     */
-    private void command(String body, ServerPlayer player, boolean asConsole, boolean validate) {
+    private static Holder<MobEffect> effect(String name) {
+        String value = name.trim().toLowerCase(Locale.ROOT);
+        // Names changed between Bukkit's legacy API and the native registry. Namespaced IDs remain literal.
+        value = switch (value) {
+            case "slow" -> "slowness";
+            case "fast_digging" -> "haste";
+            case "slow_digging" -> "mining_fatigue";
+            case "increase_damage" -> "strength";
+            case "heal" -> "instant_health";
+            case "harm" -> "instant_damage";
+            case "jump" -> "jump_boost";
+            case "confusion" -> "nausea";
+            case "damage_resistance" -> "resistance";
+            default -> value;
+        };
+        ResourceLocation id = ResourceLocation.tryParse(value);
+        MobEffect effect = id == null ? null : BuiltInRegistries.MOB_EFFECT.getOptional(id).orElse(null);
+        if (name.isBlank() || effect == null) throw new IllegalArgumentException("Unknown dialogue potion effect: " + name);
+        return BuiltInRegistries.MOB_EFFECT.wrapAsHolder(effect);
+    }
+
+    private enum CommandActor { CONSOLE, OPERATOR, PLAYER }
+
+    /** Ordinary player commands use the dispatcher and its real permission checks, including after alias expansion. */
+    private void command(String body, ServerPlayer player, CommandActor actor, boolean validate) {
         MinecraftServer server = player.getServer();
         if (server == null)
             throw new IllegalStateException("Dialogue player has no server");
@@ -179,11 +215,11 @@ public final class Actions {
         String line = LegacyCommand.normalize(body, name -> root.getChild(name) != null);
         String[] parts = line.split("\\s+");
         String head = parts[0].toLowerCase(Locale.ROOT);
-        if (head.equals("si") && parts.length >= 3 && parts[1].equalsIgnoreCase("give")) {
+        if (actor != CommandActor.PLAYER && head.equals("si") && parts.length >= 3 && parts[1].equalsIgnoreCase("give")) {
             giveSavedItem(parts, player, validate);
             return;
         }
-        if (head.equals("eco") || head.equals("balance") || head.equals("money")) {
+        if (actor != CommandActor.PLAYER && (head.equals("eco") || head.equals("balance") || head.equals("money"))) {
             if (economy.handle(parts, player, validate))
                 return;
         }
@@ -196,20 +232,23 @@ public final class Actions {
             line = LegacyCommand.normalize(rewritten, name -> root.getChild(name) != null);
             parts = line.split("\\s+");
         }
-        if (parts[0].equals("shop")) {
+        if (actor != CommandActor.PLAYER && parts[0].equals("shop")) {
             var shopRoot = root.getChild("shop");
             boolean nativeSubcommand = parts.length > 1 && shopRoot != null
                     && shopRoot.getChild(parts[1]) instanceof com.mojang.brigadier.tree.LiteralCommandNode<?>;
             var shopId = LegacyCommand.singleArgument(line);
             if (!nativeSubcommand && shopId.isPresent()) {
-                if (asConsole)
+                if (actor == CommandActor.CONSOLE)
                     throw new IllegalArgumentException("Opening a system shop requires a player command source");
                 economy.systemShop(shopId.get(), player, validate);
                 return;
             }
         }
-        CommandSourceStack source = asConsole ? server.createCommandSourceStack()
-                : player.createCommandSourceStack().withPermission(4);
+        CommandSourceStack source = switch (actor) {
+            case CONSOLE -> server.createCommandSourceStack();
+            case OPERATOR -> player.createCommandSourceStack().withPermission(4);
+            case PLAYER -> player.createCommandSourceStack();
+        };
         if (server.getCommands().getDispatcher().getRoot().getChild(parts[0]) == null) {
             throw new IllegalArgumentException("Unknown dialogue command: " + parts[0]);
         }
@@ -251,11 +290,4 @@ public final class Actions {
         }
     }
 
-    private static float floatOr(String raw, double fallback) {
-        try {
-            return Float.parseFloat(raw.trim());
-        } catch (Exception ex) {
-            return (float) fallback;
-        }
-    }
 }

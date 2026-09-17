@@ -100,6 +100,7 @@ public final class DialogueDisplayRuntimeAudit {
             if (!Files.exists(Path.of("dialogue-display-audit-fixture.txt")) || CitizensAPI.getNPCRegistry().iterator().hasNext())
                 throw new AssertionError("Display audit requires its own empty fixture");
             alice = player("DisplayAlice"); bob = player("DisplayBob");
+            NativeActionRuntimeAudit.run(alice, bob);
             npc = EntityType.VILLAGER.create(level); npc.setPos(3, -60, 1);
             var engine = new EngineState();
             Conversation story = story();
@@ -649,7 +650,7 @@ public final class DialogueDisplayRuntimeAudit {
     private static Object field(Object object, String name) throws Exception { var field = object.getClass().getDeclaredField(name); field.setAccessible(true); return field.get(object); }
     private static void check(boolean value, String name) { if (!value) throw new AssertionError(name); passed++; LoggerFactory.getLogger("interactions").info("[DIALOGUEDISPLAYAUDIT] PASS {}", name); }
 
-    private static final class AuditPlayer extends ServerPlayer {
+    static final class AuditPlayer extends ServerPlayer {
         EmbeddedChannel channel;
         final List<Packet<?>> packets = new ArrayList<>();
         final List<Component> chat = new ArrayList<>();
@@ -667,6 +668,7 @@ public final class DialogueDisplayRuntimeAudit {
             });
         }
         void pump() { channel.runPendingTasks(); }
+        void advanceEffects() { super.tickEffects(); }
         void clear() { pump(); packets.clear(); chat.clear(); }
         List<String> actionBars() { pump(); return packets.stream().filter(ClientboundSetActionBarTextPacket.class::isInstance)
                 .map(ClientboundSetActionBarTextPacket.class::cast).map(packet -> packet.text().getString()).toList(); }

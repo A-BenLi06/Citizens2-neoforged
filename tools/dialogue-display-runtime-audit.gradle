@@ -14,7 +14,8 @@ allprojects {
             timeout = java.time.Duration.ofMinutes(3)
             doLast {
                 def log = new File(fixture, 'logs/latest.log').getText('UTF-8')
-                if (log.contains('[DIALOGUEDISPLAYAUDIT] FAILED') || !log.contains('[DIALOGUEDISPLAYAUDIT] COMPLETE'))
+                if (log.contains('[DIALOGUEDISPLAYAUDIT] FAILED') || !log.contains('[DIALOGUEDISPLAYAUDIT] COMPLETE')
+                        || !log.contains('[NATIVEACTIONAUDIT] COMPLETE'))
                     throw new GradleException('Dialogue display audit failed or incomplete')
             }
         }
