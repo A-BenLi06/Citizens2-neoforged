@@ -29,6 +29,8 @@ import net.minecraft.network.protocol.game.ClientboundAddEntityPacket;
 import net.minecraft.network.protocol.game.ClientboundBossEventPacket;
 import net.minecraft.network.protocol.game.ClientboundBundlePacket;
 import net.minecraft.network.protocol.game.ClientboundRemoveEntitiesPacket;
+import net.minecraft.network.protocol.game.ClientboundSetActionBarTextPacket;
+import net.minecraft.network.protocol.game.ClientboundSystemChatPacket;
 import net.minecraft.network.protocol.game.GameProtocols;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ClientInformation;
@@ -44,6 +46,7 @@ import net.minecraft.world.entity.decoration.ArmorStand;
 import net.minecraft.world.flag.FeatureFlags;
 import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.item.Items;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.common.NeoForge;
@@ -151,11 +154,137 @@ public final class DialogueDisplayRuntimeAudit {
             a.end(false); check(holograms(a).isEmpty(), "display_cleanup_is_idempotent");
 
             timed();
+            writing();
+            statusBar();
+            writingRespawn();
             offsetsAndFailures();
             controllerCleanup();
             bob.setPos(30, -60, 1); b.tick(); bob.pump();
             check(b.isFinished() && holograms(b).isEmpty() && bar(b) == null, "range_exit_clears_displays");
             respawn();
+        }
+
+        void writing() throws Exception {
+            var engine = new EngineState(); engine.settings = animated(WriteDialogueSettings.Mode.CHARACTER, 2, true);
+            Conversation story = story(); var line = story.first().lines.getFirst();
+            line.time = -1; line.text.clear(); line.text.add("&aA😀 %next%");
+            line.actions.add("player_command_as_op: give @s minecraft:paper 1");
+            line.lastActions.add("player_command_as_op: give @s minecraft:diamond 1");
+            alice.getInventory().clearContent();
+            Session session = session(engine, story, alice); alice.clear(); bob.clear(); session.tick(); alice.pump(); bob.pump();
+            check(alice.chat.size() >= 21 && alice.chat.get(20).getString().equals("A")
+                    && alice.chat.subList(0, 19).stream().allMatch(c -> c.getString().isEmpty()),
+                    "writer_starts_one_character_with_nineteen_blank_lines_and_heading");
+            check(alice.actionBars().equals(List.of("Status: Speaker")) && bob.actionBars().isEmpty() && bob.chat.isEmpty(),
+                    "writer_and_actionbar_packets_are_private");
+            check(holograms(session).getFirst().getCustomName().getString().equals("A😀 "), "hologram_keeps_full_body_independent_of_chat_animation");
+            check(alice.getInventory().countItem(Items.PAPER) == 1, "writer_initial_actions_execute_once");
+            alice.clear(); session.tick(); alice.pump();
+            check(alice.chat.isEmpty(), "writer_respects_intermediate_delay_tick");
+            session.tick(); alice.pump();
+            check(alice.chat.getLast().getString().equals("A😀"), "writer_sends_complete_unicode_codepoint");
+            alice.clear();
+            check(session.skipDialogue(false) && !session.skipDialogue(false), "skip_during_writing_is_queued_once");
+            session.tick(); session.tick(); alice.pump();
+            check(session.isAwaitingChoice() && alice.getInventory().countItem(Items.DIAMOND) == 1
+                    && alice.getInventory().countItem(Items.PAPER) == 1, "skip_during_writing_completes_actions_without_replaying_initial_actions");
+            check(alice.actionBars().getLast().equals("Pick: Speaker"), "options_switch_actionbar_immediately");
+            alice.clear(); session.cycleSelection(1, System.currentTimeMillis()); alice.pump();
+            check(alice.chat.stream().anyMatch(c -> c.getString().equals("A😀 [Next →]")), "selection_redraw_uses_full_completed_text");
+            alice.clear(); for (int i = 0; i < 25; i++) session.tick(); alice.pump();
+            check(alice.chat.isEmpty() && alice.getInventory().countItem(Items.DIAMOND) == 1, "writer_cannot_overwrite_options_or_repeat_rewards");
+            session.choose(1); alice.clear(); session.tick(); alice.pump();
+            check(alice.actionBars().getLast().equals("Status: Speaker") && alice.chat.getLast().getString().equals("A"),
+                    "next_node_starts_fresh_writer_and_speaking_status");
+            session.end(false); alice.clear(); for (int i = 0; i < 30; i++) session.tick(); alice.pump();
+            check(alice.chat.isEmpty() && alice.actionBars().isEmpty(), "ended_session_sends_no_delayed_frames_or_status");
+
+            var fast = new EngineState(); fast.settings = animated(WriteDialogueSettings.Mode.WORD, 1, false);
+            Conversation words = story(); var wordLine = words.first().lines.getFirst();
+            wordLine.time = -1; wordLine.showName = false; wordLine.text.clear();
+            wordLine.text.addAll(List.of("  One  two", "", "Tail %next%"));
+            Session wordSession = session(fast, words, alice); alice.clear(); wordSession.tick(); alice.pump();
+            check(alice.chat.size() == 20 && alice.chat.getLast().getString().equals("  One"), "word_mode_preserves_leading_spaces_and_show_name_false");
+            alice.clear(); wordSession.tick(); alice.pump();
+            check(alice.chat.getLast().getString().equals("  One  two"), "word_mode_preserves_repeated_spaces");
+            for (int i = 0; i < 5; i++) wordSession.tick(); alice.pump();
+            check(alice.chat.getLast().getString().equals("Tail [Next →]") && alice.chat.getLast().toFlatList().stream()
+                    .anyMatch(c -> c.getStyle().getClickEvent() != null && c.getStyle().getHoverEvent() != null),
+                    "multiline_writer_finishes_with_functional_next_control");
+            alice.clear(); for (int i = 0; i < 40; i++) wordSession.tick(); alice.pump();
+            check(alice.chat.isEmpty() && !wordSession.isAwaitingChoice() && !wordSession.isFinished(), "writer_completion_does_not_complete_manual_dialogue");
+            wordSession.end(false);
+
+            Conversation timed = story(); timed.first().lines.getFirst().time = 0.1;
+            var slow = new EngineState(); slow.settings = animated(WriteDialogueSettings.Mode.CHARACTER, 50, true);
+            Session expires = session(slow, timed, alice); expires.tick(); expires.tick(); expires.tick(); expires.tick();
+            check(expires.isAwaitingChoice(), "dialogue_timer_does_not_wait_for_slow_writer");
+            alice.clear(); for (int i = 0; i < 55; i++) expires.tick(); alice.pump();
+            check(alice.chat.isEmpty(), "timed_completion_cancels_writer_before_it_can_erase_options"); expires.end(false);
+
+            Conversation sequential = story(); sequential.first().options.clear();
+            sequential.first().lines.getFirst().time = 0.05;
+            var second = new Conversation.Line(); second.time = -1; second.text.add("Second %next%"); sequential.first().lines.add(second);
+            Session lines = session(slow, sequential, alice); lines.tick(); lines.tick(); alice.clear(); lines.tick(); alice.pump();
+            check(alice.chat.getLast().getString().equals("S"), "next_sequential_line_replaces_unfinished_writer"); lines.end(false);
+
+            Conversation invalid = story(); invalid.first().lines.getFirst().text.add("json:{broken");
+            Session failure = session(engine, invalid, alice); alice.clear(); failure.tick(); failure.tick(); alice.pump();
+            check(failure.isFinished() && alice.actionBars().isEmpty() && holograms(failure).isEmpty(), "invalid_animated_text_never_leaks_a_status_or_writer");
+
+            Conversation rejected = story(); rejected.first().lines.getFirst().lastActions.add("player_command_as_op: clear @s minecraft:emerald 1");
+            Session actionFailure = session(engine, rejected, alice); actionFailure.tick(); alice.clear();
+            actionFailure.skipDialogue(false); actionFailure.tick(); alice.pump();
+            check(actionFailure.isFinished() && alice.actionBars().equals(List.of("")) && field(actionFailure, "writer") == null,
+                    "failed_completion_action_cancels_writer_and_clears_status");
+        }
+
+        void statusBar() throws Exception {
+            var engine = new EngineState(); engine.settings = animated(WriteDialogueSettings.Mode.WORD, 2, true);
+            Conversation story = story(); story.first().lines.getFirst().time = -1;
+            Session session = session(engine, story, alice); alice.clear(); session.tick(); alice.pump();
+            check(alice.actionBars().equals(List.of("Status: Speaker")), "actionbar_uses_conversation_title_during_speech");
+            alice.clear(); for (int i = 0; i < 19; i++) session.tick(); alice.pump();
+            check(alice.actionBars().isEmpty(), "actionbar_does_not_send_every_tick");
+            session.tick(); alice.pump(); check(alice.actionBars().equals(List.of("Status: Speaker")), "actionbar_refreshes_at_twenty_ticks");
+            engine.settings = animated(WriteDialogueSettings.Mode.WORD, 2, false); alice.clear(); session.tick(); alice.pump();
+            check(alice.actionBars().equals(List.of("")), "disabling_actionbar_clears_existing_status");
+            alice.clear(); session.tick(); alice.pump(); check(alice.actionBars().isEmpty(), "disabled_actionbar_does_not_repeatedly_clear_other_hud_text");
+            engine.settings = animated(WriteDialogueSettings.Mode.WORD, 2, true); session.tick(); alice.pump();
+            check(alice.actionBars().equals(List.of("Status: Speaker")), "reenabling_actionbar_uses_current_phase");
+            Conversation other = story(); other.name = "Other";
+            Session parallel = session(engine, other, bob); bob.clear(); parallel.tick(); bob.pump();
+            check(bob.actionBars().equals(List.of("Status: Other")), "simultaneous_actionbars_use_each_session_title");
+            bob.clear();
+            alice.clear(); session.end(false); session.end(false); alice.pump();
+            check(alice.actionBars().equals(List.of("")), "actionbar_end_cleanup_is_idempotent");
+            check(bob.actionBars().isEmpty() && !parallel.isFinished(), "ending_one_actionbar_does_not_clear_another_players_status");
+            parallel.end(false);
+
+            Session dimension = session(engine, story, alice); dimension.tick();
+            alice.teleportTo(server.getLevel(Level.NETHER), 1, 64, 1, Set.of(), 0, 0); alice.clear(); dimension.tick(); alice.pump();
+            check(dimension.isFinished() && alice.actionBars().equals(List.of("")) && field(dimension, "writer") == null,
+                    "dimension_exit_cancels_writer_and_actionbar");
+            alice.teleportTo(level, 1, -60, 1, Set.of(), 0, 0);
+        }
+
+        void writingRespawn() throws Exception {
+            AuditPlayer viewer = player("WritingRespawn");
+            var engine = new EngineState(); engine.settings = animated(WriteDialogueSettings.Mode.CHARACTER, 1, true);
+            Conversation story = story(); story.first().lines.getFirst().time = -1;
+            story.first().lines.getFirst().text.clear(); story.first().lines.getFirst().text.add("ABC %next%");
+            Session session = session(engine, story, viewer); session.tick(); viewer.clear();
+            ServerPlayer replacement = server.getPlayerList().respawn(viewer, false, Entity.RemovalReason.KILLED);
+            replacement.setPos(1, -60, 1); session.tick(); viewer.pump();
+            check(session.player() == replacement && viewer.chat.getLast().getString().equals("AB"), "respawn_preserves_writer_position_on_new_player");
+            check(viewer.actionBars().getLast().equals("Status: Speaker"), "respawn_resends_actionbar_to_replacement_connection");
+            replacement.setPos(30, -60, 1); viewer.clear(); session.tick(); viewer.pump();
+            check(session.isFinished() && viewer.actionBars().equals(List.of("")) && viewer.chat.isEmpty(), "range_exit_cancels_writer_and_clears_actionbar");
+            AuditPlayer distant = player("WritingDistant");
+            Session invalid = session(engine, story, distant); invalid.tick(); distant.clear();
+            ServerPlayer outside = server.getPlayerList().respawn(distant, false, Entity.RemovalReason.KILLED);
+            outside.setPos(30, -60, 1); invalid.tick(); distant.pump();
+            check(invalid.isFinished() && distant.actionBars().equals(List.of("")), "invalid_respawn_clears_owned_status_without_resending_it");
         }
 
         void timed() throws Exception {
@@ -219,17 +348,21 @@ public final class DialogueDisplayRuntimeAudit {
         void controllerCleanup() throws Exception {
             var controller = new InteractionsMod(); NeoForge.EVENT_BUS.unregister(controller);
             Map<UUID, Session> managed = (Map<UUID, Session>) field(controller, "sessions");
-            Session first = session(new EngineState(), story(), alice); first.tick(); managed.put(alice.getUUID(), first);
+            var engine = new EngineState(); engine.settings = animated(WriteDialogueSettings.Mode.CHARACTER, 2, true);
+            Session first = session(engine, story(), alice); first.tick(); managed.put(alice.getUUID(), first); alice.clear();
             controller.onLogout(new PlayerEvent.PlayerLoggedOutEvent(alice));
             check(first.isFinished() && bar(first) == null && holograms(first).isEmpty() && managed.isEmpty(), "logout_controller_closes_owned_displays");
-            Session reload = session(new EngineState(), story(), alice); reload.tick(); managed.put(alice.getUUID(), reload);
+            alice.pump(); check(alice.actionBars().equals(List.of("")) && field(first, "writer") == null, "logout_clears_actionbar_and_pending_writer");
+            Session reload = session(engine, story(), alice); reload.tick(); managed.put(alice.getUUID(), reload); alice.clear();
             controller.onRegisterCommands(new RegisterCommandsEvent(server.getCommands().getDispatcher(), Commands.CommandSelection.DEDICATED,
                     CommandBuildContext.simple(server.registryAccess(), FeatureFlags.DEFAULT_FLAGS)));
             server.getCommands().getDispatcher().execute("interactions reload", server.createCommandSourceStack().withPermission(4));
             check(reload.isFinished() && bar(reload) == null && holograms(reload).isEmpty() && managed.isEmpty(), "reload_controller_closes_owned_displays");
-            Session stop = session(new EngineState(), story(), alice); stop.tick(); managed.put(alice.getUUID(), stop);
+            alice.pump(); check(alice.actionBars().equals(List.of("")) && field(reload, "writer") == null, "reload_clears_actionbar_and_pending_writer");
+            Session stop = session(engine, story(), alice); stop.tick(); managed.put(alice.getUUID(), stop); alice.clear();
             controller.onServerStopping(new ServerStoppingEvent(server));
             check(stop.isFinished() && bar(stop) == null && holograms(stop).isEmpty() && managed.isEmpty(), "shutdown_controller_closes_owned_displays");
+            alice.pump(); check(alice.actionBars().equals(List.of("")) && field(stop, "writer") == null, "shutdown_clears_actionbar_and_pending_writer");
         }
 
         void respawn() throws Exception {
@@ -300,10 +433,15 @@ public final class DialogueDisplayRuntimeAudit {
                 ConversationStartClick.RIGHT_CLICK, bar);
     }
 
+    private static DialogueSettings animated(WriteDialogueSettings.Mode mode, int delay, boolean actionBar) {
+        return new DialogueSettings(false, false, false, List.of(), true, true, true, false, SelectionSettings.DEFAULT,
+                ConversationStartClick.RIGHT_CLICK, BossBarSettings.DEFAULT, actionBar, new WriteDialogueSettings(true, mode, delay));
+    }
+
     private static final class EngineState implements Session.Engine {
         DialogueSettings settings = DialogueDisplayRuntimeAudit.settings(BossBarSettings.DEFAULT);
         final DialogueMessages messages = new DialogueMessages(null, null, null, null, null, null, null, null,
-                "Talk: %name%", "Choose: %name%");
+                "Talk: %name%", "Choose: %name%", "Status: %name%", "Pick: %name%");
         final Actions actions = new Actions(new ItemLibrary(), new Economy());
         final ProgressStore progress = new ProgressStore(new java.io.File("config/display-audit-players"));
         public DialogueSettings settings() { return settings; }
@@ -330,10 +468,10 @@ public final class DialogueDisplayRuntimeAudit {
         final List<Component> chat = new ArrayList<>();
         final Map<UUID, Component> bars = new HashMap<>();
         AuditPlayer(MinecraftServer server, ServerLevel level, String name) { super(server, level, new GameProfile(UUID.randomUUID(), name), ClientInformation.createDefault()); }
-        @Override public void sendSystemMessage(Component message) { chat.add(message); }
         void capture(Packet<?> packet) {
             if (packet instanceof ClientboundBundlePacket bundle) { bundle.subPackets().forEach(this::capture); return; }
             packets.add(packet);
+            if (packet instanceof ClientboundSystemChatPacket system && !system.overlay()) chat.add(system.content());
             if (packet instanceof ClientboundBossEventPacket boss) boss.dispatch(new ClientboundBossEventPacket.Handler() {
                 public void add(UUID id, Component name, float progress, BossEvent.BossBarColor color, BossEvent.BossBarOverlay style,
                         boolean darken, boolean music, boolean fog) { bars.put(id, name); }
@@ -343,6 +481,8 @@ public final class DialogueDisplayRuntimeAudit {
         }
         void pump() { channel.runPendingTasks(); }
         void clear() { pump(); packets.clear(); chat.clear(); }
+        List<String> actionBars() { pump(); return packets.stream().filter(ClientboundSetActionBarTextPacket.class::isInstance)
+                .map(ClientboundSetActionBarTextPacket.class::cast).map(packet -> packet.text().getString()).toList(); }
         Set<Integer> spawnIds() { pump(); return packets.stream().filter(ClientboundAddEntityPacket.class::isInstance)
                 .map(ClientboundAddEntityPacket.class::cast).map(ClientboundAddEntityPacket::getId).collect(java.util.stream.Collectors.toSet()); }
         Set<Integer> removedIds() { pump(); return packets.stream().filter(ClientboundRemoveEntitiesPacket.class::isInstance)

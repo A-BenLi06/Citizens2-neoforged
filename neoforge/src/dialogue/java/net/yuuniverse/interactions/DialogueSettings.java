@@ -14,7 +14,7 @@ import org.yaml.snakeyaml.Yaml;
 public record DialogueSettings(boolean allowChat, boolean allowMobDamage, boolean allowCommands,
         List<String> commandsWhitelist, boolean skipDialogueOnNpcClick, boolean allowInventoryInteract,
         boolean clickableOptions, boolean useEmptySpaces, SelectionSettings selection, ConversationStartClick startClick,
-        BossBarSettings bossBar) {
+        BossBarSettings bossBar, boolean actionBar, WriteDialogueSettings writeDialogues) {
     public static final DialogueSettings DEFAULT = new DialogueSettings(false, false);
 
     public DialogueSettings(boolean allowChat, boolean allowMobDamage) {
@@ -43,6 +43,14 @@ public record DialogueSettings(boolean allowChat, boolean allowMobDamage, boolea
 
     public DialogueSettings {
         commandsWhitelist = List.copyOf(commandsWhitelist);
+        java.util.Objects.requireNonNull(writeDialogues, "writeDialogues");
+    }
+
+    public DialogueSettings(boolean allowChat, boolean allowMobDamage, boolean allowCommands, List<String> whitelist,
+            boolean skipDialogueOnNpcClick, boolean allowInventoryInteract, boolean clickableOptions, boolean useEmptySpaces,
+            SelectionSettings selection, ConversationStartClick startClick, BossBarSettings bossBar) {
+        this(allowChat, allowMobDamage, allowCommands, whitelist, skipDialogueOnNpcClick, allowInventoryInteract,
+                clickableOptions, useEmptySpaces, selection, startClick, bossBar, false, WriteDialogueSettings.DEFAULT);
     }
 
     public DialogueSettings(boolean allowChat, boolean allowMobDamage, boolean allowCommands, List<String> whitelist,
@@ -87,7 +95,8 @@ public record DialogueSettings(boolean allowChat, boolean allowMobDamage, boolea
                             flag(values, "selectable_options_restart_on_overflow", true)),
                     ConversationStartClick.valueOf(String.valueOf(values.containsKey("conversation_start_click_type")
                             ? values.get("conversation_start_click_type") : "RIGHT_CLICK").toUpperCase(Locale.ROOT)),
-                    BossBarSettings.read(values.get("boss_bar")));
+                    BossBarSettings.read(values.get("boss_bar")), flag(values, "action_bar"),
+                    WriteDialogueSettings.read(values.get("write_dialogues")));
         } catch (Exception failure) {
             LoggerFactory.getLogger("interactions").error("Could not load {}; retaining previous dialogue settings", file, failure);
             return previous;

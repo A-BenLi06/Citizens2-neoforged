@@ -14,7 +14,7 @@ import org.yaml.snakeyaml.Yaml;
 /** Supported legacy message overrides; absent entries use translatable English fallbacks. */
 public record DialogueMessages(String nextText, String nextHover, String optionsFormat, String clickableOptionHover,
         List<String> optionsMainFormat, String selectableNormal, String selectableSelected, String nameFormat,
-        String bossBarConversation, String bossBarSelectOption) {
+        String bossBarConversation, String bossBarSelectOption, String actionBarConversation, String actionBarSelectOption) {
     public static final DialogueMessages DEFAULT = new DialogueMessages(null, null);
 
     public DialogueMessages(String nextText, String nextHover) {
@@ -31,21 +31,36 @@ public record DialogueMessages(String nextText, String nextHover, String options
     }
 
     public DialogueMessages(String nextText, String nextHover, String optionsFormat, String clickableOptionHover,
+            List<String> optionsMainFormat, String selectableNormal, String selectableSelected, String nameFormat,
+            String bossBarConversation, String bossBarSelectOption) {
+        this(nextText, nextHover, optionsFormat, clickableOptionHover, optionsMainFormat, selectableNormal,
+                selectableSelected, nameFormat, bossBarConversation, bossBarSelectOption, null, null);
+    }
+
+    public Component actionBarTitle(String name, boolean waiting) {
+        return statusTitle(name, waiting, actionBarConversation, actionBarSelectOption, "actionbar");
+    }
+
+    public DialogueMessages(String nextText, String nextHover, String optionsFormat, String clickableOptionHover,
             List<String> optionsMainFormat, String selectableNormal, String selectableSelected, String nameFormat) {
         this(nextText, nextHover, optionsFormat, clickableOptionHover, optionsMainFormat, selectableNormal,
                 selectableSelected, nameFormat, null, null);
     }
 
     public Component bossBarTitle(String name, boolean waiting) {
+        return statusTitle(name, waiting, bossBarConversation, bossBarSelectOption, "bossbar");
+    }
+
+    private static Component statusTitle(String name, boolean waiting, String speaking, String selecting, String channel) {
         String displayName = name.replace("{centered}", "");
-        String format = waiting ? bossBarSelectOption : bossBarConversation;
+        String format = waiting ? selecting : speaking;
         if (format != null) return Text.legacy(format.replace("%name%", displayName));
-        Component conversation = Component.translatableWithFallback("interactions.bossbar.conversation",
+        Component conversation = Component.translatableWithFallback("interactions." + channel + ".conversation",
                 "Currently in a conversation with: %s", Text.legacy(displayName))
                 .withStyle(net.minecraft.ChatFormatting.YELLOW);
         if (!waiting) return conversation;
         return conversation.copy().append(Component.literal(" - ").withStyle(net.minecraft.ChatFormatting.DARK_GRAY))
-                .append(Component.translatableWithFallback("interactions.bossbar.select_option", "Select an Option!")
+                .append(Component.translatableWithFallback("interactions." + channel + ".select_option", "Select an Option!")
                         .withStyle(net.minecraft.ChatFormatting.AQUA));
     }
 
@@ -109,7 +124,8 @@ public record DialogueMessages(String nextText, String nextHover, String options
                     message(values, "optionsFormat"), message(values, "clickableOptionHover"), layout,
                     message(values, "selectableOptionsFormatNormal"), message(values, "selectableOptionsFormatSelected"),
                     message(values, "nameFormat"), message(values, "bossBarTitleConversation"),
-                    message(values, "bossBarTitleSelectOption"));
+                    message(values, "bossBarTitleSelectOption"), message(values, "actionBarTitleConversation"),
+                    message(values, "actionBarTitleSelectOption"));
         } catch (Exception failure) {
             LoggerFactory.getLogger("interactions").error("Could not load {}; retaining previous dialogue messages", file, failure);
             return previous;

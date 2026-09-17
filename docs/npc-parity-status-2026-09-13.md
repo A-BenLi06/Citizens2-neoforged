@@ -2,7 +2,9 @@
 
 Initial audit timestamp: 2026-09-13 01:47:09 +08:00 (UTC+08:00).
 
-Current summary updated: 2026-09-18 00:14:49 +08:00 (UTC+08:00).
+Current summary updated: 2026-09-18 00:31:33 +08:00 (UTC+08:00).
+
+Latest dialogue-writing follow-up: [typewriter and ActionBar status](dialogue-writing-parity-2026-09-18.md) restores CHARACTER/WORD chat animation, tick delays and independent speaking/option status titles. Session timing and rewards remain independent of animation; writer/status cleanup includes real respawn and option redraw. The expanded display fixture passes 84 checks and the dialogue unit suite passes 55 cases. The follow-up documents corrections to the original status-title and task-lifecycle defects.
 
 Latest effect-persistence follow-up: [unavailable potion effects](potion-effect-retention-parity-2026-09-18.md) preserves unavailable effect definitions through copies, file saves and reloads, supports listing/removing/replacing them, and restores the exact native effect when its provider returns. Consecutive isolated launches pass 308 checks with the returning provider absent and 313 with it present; these runs include the prior entity-command coverage.
 
@@ -36,7 +38,7 @@ This section includes the follow-ups after the detailed historical snapshot belo
 |---|---|
 | Dialogue behavior | Persistent conversation cooldowns, remembered-dialogue conditions, randomized eligible lines, conditional/terminal routing, manual progression, tenth choices and MOVE/SCROLL/sneak selection; configurable presentation and JSON components. |
 | Dialogue safety and entry | Live permission/air/radius/click gates, movement and input restrictions, requirement rechecks, preflight and observable action failures, registry-based sounds and vanilla command-root resolution. |
-| Dialogue displays | Configurable private BossBars, speaking/option titles, timed progress, private holographic dialogue bodies, offsets, cleanup and rebinding to the current player after respawn. |
+| Dialogue displays | Configurable private BossBars, speaking/option titles, timed progress, private holographic dialogue bodies, offsets, CHARACTER/WORD chat animation and ActionBar status with cleanup and rebinding to the current player after respawn. |
 | Economic integration | Native Citizens payments/refunds and Yuuniverse Economy-owned dialogue shop APIs; explicit currencies, precision, and known offline account resolution. This is not a claim that every original economic product/service has been recreated. |
 | Camera integration | CmdCam is the selected provider. All four referenced scenes were located in the original overworld/End data and exercised through the real-provider fixture. |
 | Native NPC behavior | Persistent sneaking/default traits, Sentinel health/regeneration, hanging-entity and navigation-start fixes, registry identity preservation, and restored native speech parameters. |
@@ -55,7 +57,7 @@ This section includes the follow-ups after the detailed historical snapshot belo
 | Group/temporary permission mutations | The 263 `manuadd` actions need a working GroupManager-to-Paradigm replacement/primary-group bridge. Externally visible temporary grants remain unavailable. Permanent permission writing and world/dimension membership queries are implemented. Paradigm's own 2.4.2b CLI still rejects wildcard/Unicode permission arguments; two referenced group names still need reconciliation. |
 | Quests | Quest service/progress/delivery, nine `questadmin` actions and six quest placeholder references remain without a replacement integration. |
 | Saved items | Thirteen referenced `meta.internal` payloads remain undecoded. Original item IDs 6, 15 and 144 are absent despite 21 action references. |
-| Dialogue presentation/configuration | BossBar and private holographic dialogue are implemented. Typewriter/ActionBar, incoming-chat restoration, remaining mounted-player policies and most message/config keys remain incomplete. Physical-client appearance and complete modpack rendering are still acceptance work. |
+| Dialogue presentation/configuration | BossBar, private holographic dialogue, typewriter chat and ActionBar status are implemented. Incoming-chat restoration, remaining mounted-player policies and many message/config keys remain incomplete. Physical-client appearance and complete modpack rendering are still acceptance work. |
 | Dialogue authoring/actions | Original create/edit/delete/start/stop/reset/list/influence workflows, inline options/interruption actions and eleven additional original action verbs are still absent. |
 | Native command surface | All 37 historically missing 1.21.1 `/npc` names have entry points. Waypoint HPA debugging aliases, other command parameters and parameterized cloud particle syntax remain open. The source inventory is 192 port / 193 reference pairs with seven port-only pairs and eight omissions, including six later-version features. |
 | Native behavior/API | Item holograms, the full text parser, anvil-style text entry and 24 reference API event names remain open. Unavailable effect definitions now survive persistence and restore when their provider returns; actual modpack availability/rendering remains separate. Opt-in pickup, live inventory/gear snapshots and original sleep-ignore calculations are implemented; physical bed/client time-skip acceptance, mounted pickup reach testing and other clientless-player behavior remain separate work. Swimming, player/list defaults, live slime sizing and display text/transform retention are implemented for the verified paths. |
@@ -65,7 +67,7 @@ This section includes the follow-ups after the detailed historical snapshot belo
 
 The unresolved source identifiers are shops `金城银行存款` / `风巽贵金属积存赎回` and accounts `VerticalYeti503` / `Santoesia`. Their destinations/UUIDs have not been guessed.
 
-Latest effect-persistence validation passes 308 entity checks with the returning provider absent, 313 with it present, 107 NPC assertions, 223 runtime probes, 44 removal checks and 166 ordinary tests. These provider runs overlap and include the previous 285 entity checks. The preceding pickup/sleep batch also verified 64 pickup/inventory/sleep checks, 81 movement/player-list checks, 80 text-editor checks, 45 dialogue-display checks, 48 dialogue unit cases, 101 actual-provider/restart permission checks and 18 no-provider checks; those unrelated dedicated suites were not rerun for this effect-only change. Normal jars exclude the test probes. No local repair has been deployed by this task.
+Latest dialogue-writing validation passes 84 display checks, 55 dialogue unit tests, 107 NPC assertions, 223 runtime probes and 166 ordinary tests on NeoForge 21.1.248. Normal build passes and release jars exclude the test probes. Previous effect-persistence validation passed 308 entity checks with the returning provider absent and 313 with it present (overlapping suites including the preceding 285 checks), plus 44 removal checks. Earlier dedicated evidence also covers 64 pickup/inventory/sleep checks, 81 movement/player-list checks, 80 text-editor checks, 101 actual-provider/restart permission checks and 18 no-provider checks. Those unrelated dedicated suites were not rerun for this dialogue change. No local repair has been deployed by this task.
 
 The following sections preserve the September 13 01:47 detailed audit for source evidence. Its then-current implementation/hash table and then-open service/removal rows are historical; use the current delta/gaps above and linked follow-ups for today's disposition.
 

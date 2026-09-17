@@ -31,6 +31,8 @@ public class Session {
     private final Engine engine;
     private final DialogueBossBar bossBar;
     private final DialogueHologram hologram;
+    private final DialogueActionBar actionBar;
+    private DialogueWriter writer;
 
     private Conversation.Node node;
     private List<Conversation.Line> lineOrder;
@@ -54,6 +56,7 @@ public class Session {
         this.npc = npc;
         bossBar = new DialogueBossBar(player, engine.settings().bossBar());
         hologram = new DialogueHologram(player, npc);
+        actionBar = new DialogueActionBar(player);
         lineOrder = node.orderedLines(player.getRandom());
         DialogueMovement.begin(this);
         DialogueCommands.begin(this);
@@ -115,6 +118,11 @@ public class Session {
 
     /** Called every tick while the session is running. */
     public void tick() {
+        advanceSession();
+        if (!finished) actionBar.tick(engine.settings().actionBar(), engine.messages(), conversation.name, awaitingChoice);
+    }
+
+    private void advanceSession() {
         if (finished)
             return;
         if (player.isRemoved()) {
@@ -128,6 +136,7 @@ public class Session {
             player = replacement;
             bossBar.rebind(replacement);
             hologram.rebind(replacement);
+            actionBar.rebind(replacement);
         }
         if (npc != null && (npc.isRemoved() || npc.level() != player.level()
                 || conversation.isOutsideEndRadius(npc.distanceToSqr(player)))) {
@@ -173,6 +182,7 @@ public class Session {
         bossBar.elapsed(ticksOnLine);
         if (complete) {
             skipRequested = false;
+            writer = null;
             if (!engine.actions().runAll(current.lastActions, player, npcName())) {
                 end(false);
                 return;
@@ -180,6 +190,9 @@ public class Session {
             completedLine = current;
             current = null;
             ticksOnLine = 0;
+        } else if (writer != null) {
+            List<Component> frame = writer.tick();
+            if (frame != null) sendChat(current, frame, true);
         }
     }
 
@@ -232,7 +245,7 @@ public class Session {
         }
         current = line;
         ticksOnLine = 0;
-        if (!renderLine(line)) return;
+        if (!renderLine(line, true)) return;
         bossBar.line(line.time);
         bossBar.refresh(engine.settings().bossBar(), engine.messages(), conversation.name);
         if (!engine.actions().runAll(line.actions, player, npcName())) {
@@ -246,6 +259,10 @@ public class Session {
     }
 
     private boolean renderLine(Conversation.Line line) {
+        return renderLine(line, false);
+    }
+
+    private boolean renderLine(Conversation.Line line, boolean animate) {
         List<Component> rendered = new ArrayList<>();
         List<Component> floating = new ArrayList<>();
         try {
@@ -266,12 +283,24 @@ public class Session {
             return false;
         }
         if (engine.settings().useEmptySpaces()) player.sendSystemMessage(Component.empty());
+        if (animate && engine.settings().writeDialogues().enabled() && !rendered.isEmpty()) {
+            writer = new DialogueWriter(rendered, engine.settings().writeDialogues());
+            List<Component> frame = writer.tick();
+            if (frame != null) sendChat(line, frame, true);
+        } else {
+            sendChat(line, rendered, false);
+        }
+        return true;
+    }
+
+    private void sendChat(Conversation.Line line, List<Component> rendered, boolean clear) {
+        // The original chat animation replaces its visible frame by sending nineteen empty chat lines.
+        if (clear) for (int i = 0; i < 19; i++) player.sendSystemMessage(Component.empty());
         if (line.showName && !conversation.name.isEmpty()) {
             Component heading = engine.messages().speakerName(conversation.name);
             if (!heading.getString().isEmpty()) player.sendSystemMessage(heading);
         }
         rendered.forEach(player::sendSystemMessage);
-        return true;
     }
 
     private Component renderText(String raw) {
@@ -302,6 +331,7 @@ public class Session {
         lineOrder = node.orderedLines(player.getRandom());
         lineIndex = 0;
         current = null;
+        writer = null;
         completedLine = null;
         ticksOnLine = 0;
     }
@@ -446,6 +476,12 @@ public class Session {
         if (finished)
             return;
         finished = true;
+        writer = null;
+        try {
+            actionBar.close();
+        } catch (RuntimeException failure) {
+            org.slf4j.LoggerFactory.getLogger("interactions").warn("Could not clear dialogue action bar", failure);
+        }
         try {
             bossBar.close();
         } catch (RuntimeException failure) {
