@@ -10,6 +10,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.mojang.brigadier.arguments.IntegerArgumentType;
+import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 
 import net.citizensnpcs.api.CitizensAPI;
@@ -265,15 +266,12 @@ public class InteractionsMod implements Session.Engine {
             Session session = player == null ? null : sessions.get(player.getUUID());
             return session != null && session.skipDialogue(false) ? 1 : 0;
         }));
-        root.then(Commands.literal("choose").then(Commands.argument("option", IntegerArgumentType.integer(1))
-                .executes(context -> {
-                    ServerPlayer player = context.getSource().getPlayer();
-                    Session session = player == null ? null : sessions.get(player.getUUID());
-                    if (session == null || !session.choose(IntegerArgumentType.getInteger(context, "option"))) {
-                        return 0;
-                    }
-                    return 1;
-                })));
+        for (String command : java.util.List.of("choose", "useoption")) {
+            root.then(Commands.literal(command).then(Commands.argument("option", IntegerArgumentType.integer(1))
+                    .executes(context -> choose(context, null))
+                    .then(Commands.argument("view", StringArgumentType.word())
+                            .executes(context -> choose(context, StringArgumentType.getString(context, "view"))))));
+        }
         root.then(Commands.literal("reload").requires(source -> source.hasPermission(3)).executes(context -> {
             settings = DialogueSettings.load(new File(dataFolder, "config.yml"), settings);
             messages = DialogueMessages.load(new File(dataFolder, "messages.yml"), messages);
@@ -301,6 +299,12 @@ public class InteractionsMod implements Session.Engine {
             return 1;
         }));
         event.getDispatcher().register(root);
+    }
+
+    private int choose(com.mojang.brigadier.context.CommandContext<CommandSourceStack> context, String view) {
+        ServerPlayer player = context.getSource().getPlayer();
+        Session session = player == null ? null : sessions.get(player.getUUID());
+        return session != null && session.choose(IntegerArgumentType.getInteger(context, "option"), view) ? 1 : 0;
     }
 
     /** @return whether Citizens can be reached, so a broken install says so rather than doing nothing */

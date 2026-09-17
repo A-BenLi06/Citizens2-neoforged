@@ -42,6 +42,10 @@ public class Session {
     private Conversation.Line completedLine;
     private boolean awaitingChoice;
     private List<Conversation.Option> offered = new ArrayList<>();
+    private List<Conversation.Option> inlineOptions = List.of();
+    private boolean inlineLine;
+    private String choiceView;
+    private static final java.util.regex.Pattern OPTION_MARKER = java.util.regex.Pattern.compile("%option_([^%]*)%");
     private boolean finished;
     private Conversation.Option pendingChoice;
     private boolean skipRequested;
@@ -80,8 +84,10 @@ public class Session {
     }
 
     private boolean selectable() {
-        return !finished && awaitingChoice && conversation.blockMovement && engine.settings().selection().enabled();
+        return !finished && awaitingChoice && selectionEnabled();
     }
+
+    private boolean selectionEnabled() { return conversation.blockMovement && engine.settings().selection().enabled(); }
 
     boolean cycleSelection(int direction, long now) {
         if (!selectable() || direction == 0 || now < selectionDelay) return false;
@@ -94,7 +100,7 @@ public class Session {
         // Legacy redraw clears the prior selection display; rendering must not execute dialogue actions again.
         for (int i = 0; i < 13; i++) player.sendSystemMessage(Component.empty());
         if (completedLine != null && !renderLine(completedLine)) return false;
-        renderOptions();
+        if (!inlineLine) renderOptions();
         return true;
     }
 
@@ -133,10 +139,7 @@ public class Session {
             }
             // Bukkit's Player wrapper follows respawn; NeoForge replaces ServerPlayer. Keep the same conversation
             // and clocks, then validate the new player before sending any display back to the connection.
-            player = replacement;
-            bossBar.rebind(replacement);
-            hologram.rebind(replacement);
-            actionBar.rebind(replacement);
+            rebind(replacement);
         }
         if (npc != null && (npc.isRemoved() || npc.level() != player.level()
                 || conversation.isOutsideEndRadius(npc.distanceToSqr(player)))) {
@@ -245,6 +248,9 @@ public class Session {
         }
         current = line;
         ticksOnLine = 0;
+        inlineLine = node.optionsInDialogue && (node.randomDialogue || lineIndex == lineOrder.size());
+        inlineOptions = inlineLine ? eligible(optionsAfter(line)) : List.of();
+        choiceView = inlineLine ? java.util.UUID.randomUUID().toString() : null;
         if (!renderLine(line, true)) return;
         bossBar.line(line.time);
         bossBar.refresh(engine.settings().bossBar(), engine.messages(), conversation.name);
@@ -265,14 +271,13 @@ public class Session {
     private boolean renderLine(Conversation.Line line, boolean animate) {
         List<Component> rendered = new ArrayList<>();
         List<Component> floating = new ArrayList<>();
+        List<Component> controls = new ArrayList<>();
         try {
             for (String raw : line.textOrEmpty()) {
-                rendered.add(renderText(raw));
+                if (!raw.startsWith("json:") && !visibleOptionRow(Text.placeholders(raw, player))) continue;
+                rendered.add(renderText(raw, false, controls));
                 if (conversation.hologram.enabled()) {
-                    String text = raw.startsWith("json:") ? raw : Text.placeholders(raw, player);
-                    text = text.replace("%next%", "").replace("{centered}", "");
-                    floating.add(text.startsWith("json:") ? Text.json(text.substring("json:".length()), player)
-                            : Text.legacy(text));
+                    floating.add(renderText(raw.replace("{centered}", ""), true, new ArrayList<>()));
                 }
             }
             hologram.show(floating, conversation.hologram);
@@ -284,7 +289,7 @@ public class Session {
         }
         if (engine.settings().useEmptySpaces()) player.sendSystemMessage(Component.empty());
         if (animate && engine.settings().writeDialogues().enabled() && !rendered.isEmpty()) {
-            writer = new DialogueWriter(rendered, engine.settings().writeDialogues());
+            writer = new DialogueWriter(rendered, engine.settings().writeDialogues(), controls);
             List<Component> frame = writer.tick();
             if (frame != null) sendChat(line, frame, true);
         } else {
@@ -303,20 +308,45 @@ public class Session {
         rendered.forEach(player::sendSystemMessage);
     }
 
-    private Component renderText(String raw) {
+    private Component renderText(String raw, boolean floating, List<Component> controls) {
+        if (floating) raw = raw.replace("%next%", "");
         if (raw.startsWith("json:")) return Text.json(raw.substring("json:".length()), player);
         String text = Text.placeholders(raw, player);
-        MutableComponent message = Component.empty();
-        int nextMarker = text.indexOf("%next%");
-        if (nextMarker >= 0) {
-            message.append(Text.legacy(text.substring(0, nextMarker)));
-            message.append(engine.messages().nextLabel().copy().withStyle(style -> style
-                    .withClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/interactions skipdialogue"))
-                    .withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, engine.messages().nextTooltip()))));
-        } else {
-            message.append(Text.legacy(text));
-        }
-        return message;
+        return Text.legacy(text, marker -> {
+            Component control;
+            if (marker.equals("%next%")) {
+                control = floating ? Component.empty() : engine.messages().nextLabel().copy().withStyle(style -> style
+                        .withClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/interactions skipdialogue"))
+                        .withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, engine.messages().nextTooltip())));
+            } else if (OPTION_MARKER.matcher(marker).matches()) {
+                int index = optionIndex(marker);
+                control = index < inlineOptions.size() ? optionLabel(inlineOptions, index, !floating, choiceView) : Component.empty();
+            } else return null;
+            controls.add(control);
+            return control;
+        });
+    }
+
+    private boolean visibleOptionRow(String text) {
+        var matcher = OPTION_MARKER.matcher(text);
+        boolean marker = false, visible = false;
+        while (matcher.find()) { marker = true; visible |= optionIndex(matcher.group()) < inlineOptions.size(); }
+        return !marker || visible;
+    }
+
+    private static int optionIndex(String marker) {
+        int number = Integer.parseInt(marker.substring("%option_".length(), marker.length() - 1));
+        if (number < 1) throw new IllegalArgumentException("Inline option numbers must be positive: " + marker);
+        return number - 1;
+    }
+
+    private List<Conversation.Option> eligible(List<Conversation.Option> options) {
+        return options.stream().filter(option -> Conditions.all(option.requires, player, engine.progress())).toList();
+    }
+
+    private List<Conversation.Option> optionsAfter(Conversation.Line line) {
+        if (line.startOptions != null) return conversation.node(line.startOptions).options;
+        return line.startConversation == null ? node.options : List.of();
     }
 
     private String progressKey(String nodeKey, String lineKey) {
@@ -332,6 +362,10 @@ public class Session {
         lineIndex = 0;
         current = null;
         writer = null;
+        inlineLine = false;
+        inlineOptions = List.of();
+        choiceView = null;
+        selectedOption = 0;
         completedLine = null;
         ticksOnLine = 0;
     }
@@ -363,12 +397,7 @@ public class Session {
     }
 
     private void offerOptionsOrEnd(List<Conversation.Option> options) {
-        offered = new ArrayList<>();
-        for (Conversation.Option option : options) {
-            if (Conditions.all(option.requires, player, engine.progress())) {
-                offered.add(option);
-            }
-        }
+        offered = eligible(options);
         if (offered.isEmpty()) {
             end(true);
             return;
@@ -378,24 +407,35 @@ public class Session {
         bossBar.refresh(engine.settings().bossBar(), engine.messages(), conversation.name);
         selectedOption = 0;
         selectionDelay = 0;
-        renderOptions();
+        inlineLine = node.optionsInDialogue && completedLine != null;
+        inlineOptions = inlineLine ? offered : List.of();
+        choiceView = inlineLine ? java.util.UUID.randomUUID().toString() : null;
+        if (inlineLine) {
+            // Refresh after completion actions/requirements. Preview controls cannot select a different filtered option.
+            for (int i = 0; i < 13; i++) player.sendSystemMessage(Component.empty());
+            renderLine(completedLine);
+        } else renderOptions();
+    }
+
+    private Component optionLabel(List<Conversation.Option> options, int index, boolean interactive, String view) {
+        Conversation.Option option = options.get(index);
+        int number = index + 1;
+        MutableComponent message = (selectionEnabled()
+                ? engine.messages().selectableLabel(number, option.text, index == selectedOption, player)
+                : engine.messages().optionLabel(number, option.text, player)).copy();
+        if (interactive && !selectionEnabled() && engine.settings().clickableOptions()) {
+            String command = "/interactions choose " + number + (view == null ? "" : " " + view);
+            message.withStyle(style -> style.withClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, command))
+                    .withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, engine.messages().optionTooltip(number, player))));
+        }
+        return message;
     }
 
     private void renderOptions() {
         if (engine.settings().useEmptySpaces()) player.sendSystemMessage(Component.empty());
         List<Component> rendered = new ArrayList<>();
         for (int i = 0; i < offered.size(); i++) {
-            Conversation.Option option = offered.get(i);
-            final int number = i + 1;
-            String command = "/interactions choose " + number;
-            MutableComponent message = (selectable()
-                    ? engine.messages().selectableLabel(number, option.text, i == selectedOption, player)
-                    : engine.messages().optionLabel(number, option.text, player)).copy();
-            if (!selectable() && engine.settings().clickableOptions()) {
-                message.withStyle(style -> style.withClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, command))
-                        .withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, engine.messages().optionTooltip(number, player))));
-            }
-            rendered.add(message);
+            rendered.add(optionLabel(offered, i, true, null));
         }
         List<String> layout = engine.messages().optionsMainFormat();
         if (layout != null) {
@@ -461,12 +501,19 @@ public class Session {
 
     /** @return true when the choice was valid */
     public boolean choose(int oneBased) {
-        if (!awaitingChoice || oneBased < 1 || oneBased > offered.size())
+        return choose(oneBased, null);
+    }
+
+    /** A view token binds inline clicks to the displayed, filtered option list; typed choices need no token. */
+    public boolean choose(int oneBased, String view) {
+        if (finished || !awaitingChoice || oneBased < 1 || oneBased > offered.size()
+                || view != null && !view.equals(choiceView))
             return false;
         Conversation.Option option = offered.get(oneBased - 1);
         if (!Conditions.all(option.requires, player, engine.progress()))
             return false;
         awaitingChoice = false;
+        choiceView = null;
         // Execute from tick, outside the /interactions choose command's execution queue.
         pendingChoice = option;
         return true;
@@ -476,6 +523,10 @@ public class Session {
         if (finished)
             return;
         finished = true;
+        if (player.isRemoved() && player.getServer() != null) {
+            ServerPlayer replacement = player.getServer().getPlayerList().getPlayer(player.getUUID());
+            if (replacement != null && replacement != player && !replacement.isRemoved()) rebind(replacement);
+        }
         writer = null;
         try {
             actionBar.close();
@@ -499,6 +550,8 @@ public class Session {
         skipRequested = false;
         pendingChoice = null;
         awaitingChoice = false;
+        inlineOptions = List.of();
+        choiceView = null;
         if (conversation.slowEffect) {
             player.removeEffect(MobEffects.MOVEMENT_SLOWDOWN);
         }
@@ -506,10 +559,26 @@ public class Session {
             engine.progress().markSeen(player.getUUID(), player.getGameProfile().getName(),
                     progressKey(node.key, "completed"));
         }
+        if (!completed && !node.interruptActions.isEmpty()) {
+            // End ownership first: interrupt commands may reenter the controller or teleport the player.
+            try {
+                engine.actions().runAll(List.copyOf(node.interruptActions), player, npcName());
+            } catch (RuntimeException failure) {
+                org.slf4j.LoggerFactory.getLogger("interactions").error("Could not execute interrupt actions for {} / {}",
+                        conversation.source, node.key, failure);
+            }
+        }
     }
 
     private Component npcName() {
         return Text.legacy(conversation.name);
+    }
+
+    private void rebind(ServerPlayer replacement) {
+        player = replacement;
+        bossBar.rebind(replacement);
+        hologram.rebind(replacement);
+        actionBar.rebind(replacement);
     }
 
     /** What a session needs from the mod, kept as an interface so the session is testable on its own. */

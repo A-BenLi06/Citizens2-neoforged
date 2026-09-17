@@ -77,8 +77,9 @@ public final class Conditions {
             // remove_item action may. The migrated files do use the removing spelling inside requires.
             return CheckItem.holds(inner.replace("checkitem_remove_", "checkitem_"), player) ? "yes" : "no";
         }
-        if (inner.equals("player") || inner.equals("player_name"))
-            return player.getGameProfile().getName();
-        return null;
+        // A single native placeholder is resolvable; partially expanding an unknown/provider expression is not.
+        if (player == null || body.indexOf('%', 1) != body.length() - 1) return null;
+        String expanded = Text.placeholders(body, player);
+        return expanded.equals(body) ? null : expanded;
     }
 }

@@ -46,6 +46,11 @@ public final class Text {
 
     /** Parses a legacy {@code &}-coded string into a component, keeping colours and styles as they run. */
     public static Component legacy(String raw) {
+        return legacy(raw, marker -> null);
+    }
+
+    /** Substitutes recognized percent markers without reparsing components or losing surrounding legacy style. */
+    static Component legacy(String raw, java.util.function.Function<String, Component> controls) {
         if (raw == null || raw.isEmpty())
             return Component.empty();
         MutableComponent result = Component.empty();
@@ -53,6 +58,19 @@ public final class Text {
         Style style = Style.EMPTY;
         for (int i = 0; i < raw.length(); i++) {
             char c = raw.charAt(i);
+            if (c == '%') {
+                int end = raw.indexOf('%', i + 1);
+                Component control = end < 0 ? null : controls.apply(raw.substring(i, end + 1));
+                if (control != null) {
+                    if (buffer.length() > 0) {
+                        result.append(Component.literal(buffer.toString()).withStyle(style));
+                        buffer.setLength(0);
+                    }
+                    result.append(Component.empty().setStyle(style).append(control));
+                    i = end;
+                    continue;
+                }
+            }
             if ((c == '&' || c == '§') && i + 1 < raw.length()) {
                 ChatFormatting format = ChatFormatting.getByCode(Character.toLowerCase(raw.charAt(i + 1)));
                 if (format != null) {

@@ -2,7 +2,9 @@
 
 Initial audit timestamp: 2026-09-13 01:47:09 +08:00 (UTC+08:00).
 
-Current summary updated: 2026-09-18 00:31:33 +08:00 (UTC+08:00).
+Current summary updated: 2026-09-18 00:51:38 +08:00 (UTC+08:00).
+
+Latest inline/interruption follow-up: [inline choices and interruption actions](dialogue-inline-interrupt-parity-2026-09-18.md) restores node-scoped inline controls, original `useoption` input, current-view validation and interruption action batches. It preserves text around multiple controls, refreshes filtered choices after completion actions and targets the correct player after immediate respawn/termination. The expanded display fixture passes 127 checks and the dialogue unit suite passes 60 cases.
 
 Latest dialogue-writing follow-up: [typewriter and ActionBar status](dialogue-writing-parity-2026-09-18.md) restores CHARACTER/WORD chat animation, tick delays and independent speaking/option status titles. Session timing and rewards remain independent of animation; writer/status cleanup includes real respawn and option redraw. The expanded display fixture passes 84 checks and the dialogue unit suite passes 55 cases. The follow-up documents corrections to the original status-title and task-lifecycle defects.
 
@@ -36,7 +38,7 @@ This section includes the follow-ups after the detailed historical snapshot belo
 
 | Area | What has now been added or repaired |
 |---|---|
-| Dialogue behavior | Persistent conversation cooldowns, remembered-dialogue conditions, randomized eligible lines, conditional/terminal routing, manual progression, tenth choices and MOVE/SCROLL/sneak selection; configurable presentation and JSON components. |
+| Dialogue behavior | Persistent conversation cooldowns, remembered-dialogue conditions, randomized eligible lines, conditional/terminal routing, manual progression, tenth choices and MOVE/SCROLL/sneak selection; inline options with current-view validation, original useoption input and current-node interruption actions; configurable presentation and JSON components. |
 | Dialogue safety and entry | Live permission/air/radius/click gates, movement and input restrictions, requirement rechecks, preflight and observable action failures, registry-based sounds and vanilla command-root resolution. |
 | Dialogue displays | Configurable private BossBars, speaking/option titles, timed progress, private holographic dialogue bodies, offsets, CHARACTER/WORD chat animation and ActionBar status with cleanup and rebinding to the current player after respawn. |
 | Economic integration | Native Citizens payments/refunds and Yuuniverse Economy-owned dialogue shop APIs; explicit currencies, precision, and known offline account resolution. This is not a claim that every original economic product/service has been recreated. |
@@ -58,7 +60,7 @@ This section includes the follow-ups after the detailed historical snapshot belo
 | Quests | Quest service/progress/delivery, nine `questadmin` actions and six quest placeholder references remain without a replacement integration. |
 | Saved items | Thirteen referenced `meta.internal` payloads remain undecoded. Original item IDs 6, 15 and 144 are absent despite 21 action references. |
 | Dialogue presentation/configuration | BossBar, private holographic dialogue, typewriter chat and ActionBar status are implemented. Incoming-chat restoration, remaining mounted-player policies and many message/config keys remain incomplete. Physical-client appearance and complete modpack rendering are still acceptance work. |
-| Dialogue authoring/actions | Original create/edit/delete/start/stop/reset/list/influence workflows, inline options/interruption actions and eleven additional original action verbs are still absent. |
+| Dialogue authoring/actions | Inline options and current-node interruption actions are implemented. Original create/edit/delete/start/stop/reset/list/influence workflows and eleven additional original action verbs are still absent. |
 | Native command surface | All 37 historically missing 1.21.1 `/npc` names have entry points. Waypoint HPA debugging aliases, other command parameters and parameterized cloud particle syntax remain open. The source inventory is 192 port / 193 reference pairs with seven port-only pairs and eight omissions, including six later-version features. |
 | Native behavior/API | Item holograms, the full text parser, anvil-style text entry and 24 reference API event names remain open. Unavailable effect definitions now survive persistence and restore when their provider returns; actual modpack availability/rendering remains separate. Opt-in pickup, live inventory/gear snapshots and original sleep-ignore calculations are implemented; physical bed/client time-skip acceptance, mounted pickup reach testing and other clientless-player behavior remain separate work. Swimming, player/list defaults, live slime sizing and display text/transform retention are implemented for the verified paths. |
 | Sentinel | Full `/sentinel` administration, ranged combat/ammunition, richer target/ignore policies, guarding, damage/armor, avoidance and death/drop/XP behavior remain partial or missing. |
@@ -67,7 +69,7 @@ This section includes the follow-ups after the detailed historical snapshot belo
 
 The unresolved source identifiers are shops `金城银行存款` / `风巽贵金属积存赎回` and accounts `VerticalYeti503` / `Santoesia`. Their destinations/UUIDs have not been guessed.
 
-Latest dialogue-writing validation passes 84 display checks, 55 dialogue unit tests, 107 NPC assertions, 223 runtime probes and 166 ordinary tests on NeoForge 21.1.248. Normal build passes and release jars exclude the test probes. Previous effect-persistence validation passed 308 entity checks with the returning provider absent and 313 with it present (overlapping suites including the preceding 285 checks), plus 44 removal checks. Earlier dedicated evidence also covers 64 pickup/inventory/sleep checks, 81 movement/player-list checks, 80 text-editor checks, 101 actual-provider/restart permission checks and 18 no-provider checks. Those unrelated dedicated suites were not rerun for this dialogue change. No local repair has been deployed by this task.
+Latest inline/interruption validation passes 127 display checks, 60 dialogue unit tests, 107 NPC assertions, 223 runtime probes and 166 ordinary tests on NeoForge 21.1.248. Normal build passes and release jars exclude the test probes. Previous effect-persistence validation passed 308 entity checks with the returning provider absent and 313 with it present (overlapping suites including the preceding 285 checks), plus 44 removal checks. Earlier dedicated evidence also covers 64 pickup/inventory/sleep checks, 81 movement/player-list checks, 80 text-editor checks, 101 actual-provider/restart permission checks and 18 no-provider checks. Those unrelated dedicated suites were not rerun for this dialogue change. No local repair has been deployed by this task.
 
 The following sections preserve the September 13 01:47 detailed audit for source evidence. Its then-current implementation/hash table and then-open service/removal rows are historical; use the current delta/gaps above and linked follow-ups for today's disposition.
 

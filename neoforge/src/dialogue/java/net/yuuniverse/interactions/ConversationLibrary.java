@@ -154,6 +154,8 @@ public final class ConversationLibrary {
     private Conversation.Node parseNode(String key, Map<String, Object> raw) {
         Conversation.Node node = new Conversation.Node(key);
         node.randomDialogue = bool(raw.get("random_dialogue"), false);
+        node.optionsInDialogue = bool(raw.get("options_in_dialogue"), false);
+        for (Object action : list(raw.get("interrupt_actions"))) node.interruptActions.add(String.valueOf(action));
         Object dialogue = raw.get("dialogue");
         if (dialogue instanceof Map) {
             for (Map.Entry<String, Object> line : sortedByKey((Map<String, Object>) dialogue).entrySet()) {

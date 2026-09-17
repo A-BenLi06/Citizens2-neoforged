@@ -157,6 +157,9 @@ public final class DialogueDisplayRuntimeAudit {
             writing();
             statusBar();
             writingRespawn();
+            inlineChoices();
+            inlineSelectionAndRoutes();
+            interruptions();
             offsetsAndFailures();
             controllerCleanup();
             bob.setPos(30, -60, 1); b.tick(); bob.pump();
@@ -287,6 +290,173 @@ public final class DialogueDisplayRuntimeAudit {
             check(invalid.isFinished() && distant.actionBars().equals(List.of("")), "invalid_respawn_clears_owned_status_without_resending_it");
         }
 
+        @SuppressWarnings("unchecked")
+        void inlineChoices() throws Exception {
+            var engine = new EngineState();
+            engine.messages = new DialogueMessages(null, null, "[%number%] %text%", "Choose %option%", List.of("Separate menu", "%options%"));
+            Conversation story = inlineStory(); story.blockMovement = false;
+            var node = story.first(); var line = node.lines.getFirst();
+            line.text.clear(); line.text.addAll(List.of("Intro", "Before %option_1% | %option_2% after", "%option_3%", "Done %next% suffix"));
+            node.options.clear();
+            var hidden = new Conversation.Option(); hidden.text = "Hidden"; hidden.requires.add("yes == no"); node.options.add(hidden);
+            var temporary = new Conversation.Option(); temporary.text = "Temporary"; temporary.requires.add("%player_level% == 0"); node.options.add(temporary);
+            var stable = new Conversation.Option(); stable.text = "Stable %player%"; stable.actions.add("player_command_as_op: give @s minecraft:emerald 1"); node.options.add(stable);
+            line.lastActions.add("player_command_as_op: experience add @s 1 levels");
+            node.interruptActions.add("player_command_as_op: give @s minecraft:diamond 1");
+            alice.experienceLevel = 0; alice.getInventory().clearContent();
+            var controller = new InteractionsMod(); NeoForge.EVENT_BUS.unregister(controller);
+            controller.onRegisterCommands(new RegisterCommandsEvent(server.getCommands().getDispatcher(), Commands.CommandSelection.DEDICATED,
+                    CommandBuildContext.simple(server.registryAccess(), FeatureFlags.DEFAULT_FLAGS)));
+            Map<UUID, Session> managed = (Map<UUID, Session>) field(controller, "sessions");
+            Session session = session(engine, story, alice); managed.put(alice.getUUID(), session); alice.clear(); session.tick(); alice.pump();
+            check(alice.chat.stream().anyMatch(c -> c.getString().equals("Before [1] Temporary | [2] Stable DisplayAlice after")),
+                    "inline_preview_uses_filtered_positions_and_preserves_multiple_markers_and_suffix");
+            check(alice.chat.stream().noneMatch(c -> c.getString().contains("%option_") || c.getString().contains("Hidden")),
+                    "unavailable_inline_rows_do_not_leak_markers_or_hidden_options");
+            check(alice.chat.stream().anyMatch(c -> c.getString().equals("Done [Next →] suffix")), "next_control_preserves_following_text");
+            check(holograms(session).stream().anyMatch(h -> h.getCustomName().getString().contains("[1] Temporary | [2] Stable DisplayAlice")),
+                    "inline_hologram_displays_resolved_option_labels");
+            String preview = choices(alice).getFirst();
+            check(server.getCommands().getDispatcher().execute(preview.substring(1), alice.createCommandSourceStack()) == 0,
+                    "inline_preview_click_cannot_bypass_line_completion");
+            check(!DialogueCommands.isBlocked(alice.getUUID(), preview.substring(1)), "view_bound_choice_is_allowed_through_command_restrictions");
+            session.skipDialogue(false); session.tick(); alice.clear(); session.tick(); alice.pump();
+            check(session.isAwaitingChoice() && session.offeredCount() == 1 && alice.experienceLevel == 1,
+                    "inline_options_refresh_after_completion_actions_change_requirements");
+            check(alice.chat.stream().anyMatch(c -> c.getString().equals("Before [1] Stable DisplayAlice |  after"))
+                    && alice.chat.stream().noneMatch(c -> c.getString().contains("Separate menu")), "inline_ready_phase_redraws_body_without_separate_menu");
+            check(server.getCommands().getDispatcher().execute(preview.substring(1), alice.createCommandSourceStack()) == 0,
+                    "stale_preview_cannot_select_a_different_option_after_renumbering");
+            String ready = choices(alice).getFirst();
+            check(!ready.equals(preview) && server.getCommands().getDispatcher().execute(ready.substring(1), alice.createCommandSourceStack()) == 1,
+                    "current_inline_packet_command_selects_the_displayed_option");
+            check(server.getCommands().getDispatcher().execute(ready.substring(1), alice.createCommandSourceStack()) == 0,
+                    "inline_double_click_cannot_queue_twice");
+            session.tick();
+            check(session.isFinished() && alice.getInventory().countItem(Items.EMERALD) == 1
+                    && alice.getInventory().countItem(Items.DIAMOND) == 0, "normal_inline_completion_rewards_once_without_interrupt_actions");
+
+            line.lastActions.clear();
+            Session alias = session(engine, story, alice); managed.put(alice.getUUID(), alias);
+            alias.tick(); alias.skipDialogue(false); alias.tick(); alias.tick();
+            check(server.getCommands().getDispatcher().execute("interactions useoption 1", alice.createCommandSourceStack()) == 1,
+                    "original_useoption_alias_selects_current_inline_choice"); alias.tick();
+
+            stable.requires.add("%player_level% == 1");
+            Session revoked = session(engine, story, alice); revoked.tick(); revoked.skipDialogue(false); revoked.tick(); revoked.tick();
+            alice.experienceLevel = 2;
+            check(!revoked.choose(1), "inline_choice_rechecks_requirements_at_input");
+            check(!Conditions.all(List.of("%external_%player_level%% == %external_2%"), alice),
+                    "partly_resolved_unknown_placeholder_cannot_satisfy_a_condition");
+            alice.experienceLevel = 1; check(revoked.chooseByText("1"), "inline_choices_remain_available_through_typed_numbers");
+            alice.experienceLevel = 2; int emeralds = alice.getInventory().countItem(Items.EMERALD); revoked.tick();
+            check(revoked.isFinished() && alice.getInventory().countItem(Items.EMERALD) == emeralds
+                    && alice.getInventory().countItem(Items.DIAMOND) == 1, "revoked_pending_choice_interrupts_without_option_reward");
+            managed.clear();
+        }
+
+        void inlineSelectionAndRoutes() throws Exception {
+            var engine = new EngineState(); engine.settings = animated(WriteDialogueSettings.Mode.CHARACTER, 1, true);
+            engine.messages = new DialogueMessages(null, null, "[%number%] %text%", null, List.of("Separate menu", "%options%"),
+                    "N%number% %text%", "S%number% %text%");
+            Conversation story = inlineStory(); var line = story.first().lines.getFirst();
+            line.text.clear(); line.text.addAll(List.of("%option_1%", "%option_2%")); line.time = 0.05;
+            Session session = session(engine, story, alice); alice.clear(); session.tick(); alice.pump();
+            check(alice.chat.getLast().getString().equals("S1 Next"), "nonclickable_inline_selection_is_an_atomic_writer_control");
+            session.tick(); session.tick(); alice.clear(); session.cycleSelection(1, System.currentTimeMillis()); alice.pump();
+            check(alice.chat.stream().anyMatch(c -> c.getString().equals("N1 Next"))
+                    && alice.chat.stream().anyMatch(c -> c.getString().equals("S2 Stop")) && choices(alice).isEmpty(),
+                    "movement_selection_redraws_inline_highlight_without_click_events");
+            check(alice.chat.stream().noneMatch(c -> c.getString().equals("Separate menu")), "inline_selection_does_not_duplicate_options_block");
+            alice.clear(); for (int i = 0; i < 25; i++) session.tick(); alice.pump();
+            check(alice.chat.isEmpty(), "inline_selection_redraw_does_not_restart_writer");
+            check(session.confirmSelection(), "inline_sneak_confirmation_queues_selected_option"); session.tick();
+            check(session.isFinished(), "inline_selected_terminal_option_ends_normally");
+
+            var plain = new EngineState();
+            Conversation routed = inlineStory(); routed.blockMovement = false;
+            var target = new Conversation.Node("elsewhere"); routed.nodes.put(target.key, target);
+            for (int i = 1; i <= 10; i++) { var option = new Conversation.Option(); option.text = "Target " + i; target.options.add(option); }
+            target.options.get(9).actions.add("player_command_as_op: give @s minecraft:gold_ingot 1");
+            var routedLine = routed.first().lines.getFirst(); routedLine.startOptions = target.key; routedLine.time = 0.05;
+            routedLine.text.clear(); routedLine.text.add("%option_10%");
+            Session route = session(plain, routed, alice); alice.clear(); route.tick(); alice.pump();
+            check(alice.chat.stream().anyMatch(c -> c.getString().equals("[10] Target 10")), "inline_start_options_resolves_target_node_and_tenth_option");
+            route.tick(); route.tick(); check(route.choose(10), "inline_target_option_can_be_selected"); route.tick();
+            check(alice.getInventory().countItem(Items.GOLD_INGOT) == 1, "inline_start_options_executes_target_reward");
+
+            Conversation skipped = inlineStory(); skipped.blockMovement = false;
+            skipped.first().lines.getFirst().time = 0.05;
+            var excluded = new Conversation.Line(); excluded.requires.add("yes == no"); excluded.text.add("Excluded"); skipped.first().lines.add(excluded);
+            Session fallback = session(plain, skipped, alice); fallback.tick(); fallback.tick(); alice.clear(); fallback.tick(); alice.pump();
+            check(fallback.isAwaitingChoice() && !choices(alice).isEmpty(), "skipped_terminal_line_uses_last_completed_body_for_inline_options"); fallback.end(false);
+
+            Conversation random = inlineStory(); random.blockMovement = false; random.first().randomDialogue = true;
+            var alternate = new Conversation.Line(); alternate.time = 0.05; alternate.text.add("Other %option_1%"); random.first().lines.add(alternate);
+            Session randomized = session(plain, random, alice); alice.clear(); randomized.tick(); alice.pump();
+            check(!choices(alice).isEmpty(), "random_dialogue_previews_its_inline_options"); randomized.end(false);
+
+            Conversation invalid = inlineStory(); invalid.first().lines.getFirst().text.clear(); invalid.first().lines.getFirst().text.add("%option_0%");
+            invalid.first().lines.getFirst().actions.add("player_command_as_op: give @s minecraft:iron_ingot 1");
+            Session malformed = session(plain, invalid, alice); malformed.tick();
+            check(malformed.isFinished() && alice.getInventory().countItem(Items.IRON_INGOT) == 0,
+                    "invalid_inline_index_fails_before_initial_rewards");
+        }
+
+        void interruptions() throws Exception {
+            var engine = new EngineState(); engine.settings = animated(WriteDialogueSettings.Mode.CHARACTER, 2, true);
+            Conversation story = story(); story.first().interruptActions.add("player_command_as_op: give @s minecraft:paper 1");
+            story.first().lines.getFirst().lastActions.add("player_command_as_op: give @s minecraft:emerald 1");
+            alice.getInventory().clearContent();
+            Session cancelled = session(engine, story, alice); cancelled.tick(); cancelled.end(false); cancelled.end(false); cancelled.tick();
+            check(alice.getInventory().countItem(Items.PAPER) == 1 && alice.getInventory().countItem(Items.EMERALD) == 0,
+                    "interrupt_actions_execute_once_without_line_completion_actions");
+            check(!DialogueCommands.isBlocked(alice.getUUID(), "say test") && bar(cancelled) == null && holograms(cancelled).isEmpty(),
+                    "interrupt_end_releases_owned_controls_and_displays");
+            Session waiting = session(engine, story, alice); waiting.tick(); waiting.skipDialogue(false); waiting.tick(); waiting.tick(); waiting.end(false);
+            check(alice.getInventory().countItem(Items.PAPER) == 2 && alice.getInventory().countItem(Items.EMERALD) == 1,
+                    "interrupt_while_choosing_does_not_repeat_completed_last_actions");
+            Session beforeTick = session(engine, story, alice); beforeTick.end(false);
+            check(alice.getInventory().countItem(Items.PAPER) == 3, "interrupt_before_first_tick_uses_current_node");
+
+            Conversation routed = story(); routed.first().interruptActions.add("player_command_as_op: give @s minecraft:iron_ingot 1");
+            routed.first().lines.getFirst().startConversation = "conversation2";
+            routed.node("conversation2").interruptActions.add("player_command_as_op: give @s minecraft:diamond 1");
+            Session next = session(engine, routed, alice); next.tick(); next.skipDialogue(false); next.tick(); next.tick(); next.end(false);
+            check(alice.getInventory().countItem(Items.IRON_INGOT) == 0 && alice.getInventory().countItem(Items.DIAMOND) == 1,
+                    "interrupt_actions_follow_current_node_after_routing");
+
+            Conversation recursive = story();
+            Session reentrant = session(engine, recursive, alice);
+            server.getCommands().getDispatcher().register(Commands.literal("audit_interrupt_reenter").executes(context -> {
+                reentrant.end(false); return 1;
+            }));
+            recursive.first().interruptActions.addAll(List.of("console_command: audit_interrupt_reenter", "player_command_as_op: give @s minecraft:paper 1"));
+            reentrant.tick(); reentrant.end(false);
+            check(alice.getInventory().countItem(Items.PAPER) == 4, "interrupt_command_reentrancy_cannot_repeat_actions");
+
+            Conversation invalid = story(); invalid.first().interruptActions.addAll(List.of("player_command_as_op: give @s minecraft:paper 1", "missing_verb: invalid"));
+            Session bad = session(engine, invalid, alice); bad.tick(); bad.end(false);
+            check(bad.isFinished() && bar(bad) == null && alice.getInventory().countItem(Items.PAPER) == 4,
+                    "invalid_interrupt_batch_is_preflighted_and_cleanup_still_completes");
+
+            Conversation teleport = story(); teleport.first().interruptActions.add("teleport: minecraft:overworld;1;-60;2;0;0");
+            Session freed = session(engine, teleport, alice); freed.tick(); freed.end(false);
+            check(alice.getZ() == 2, "interrupt_teleport_runs_after_movement_restrictions_are_released"); alice.setPos(1, -60, 1);
+
+            Session range = session(engine, story, alice); range.tick(); alice.setPos(30, -60, 1); range.tick();
+            check(range.isFinished() && alice.getInventory().countItem(Items.PAPER) == 5, "range_exit_runs_current_interrupt_actions"); alice.setPos(1, -60, 1);
+
+            AuditPlayer old = player("InterruptRespawn");
+            Conversation respawnStory = story(); respawnStory.first().interruptActions.add("player_command_as_op: give @s minecraft:gold_ingot 1");
+            Session respawn = session(engine, respawnStory, old); respawn.tick(); old.clear();
+            ServerPlayer replacement = server.getPlayerList().respawn(old, false, Entity.RemovalReason.KILLED);
+            respawn.end(false); old.pump();
+            check(respawn.player() == replacement && replacement.getInventory().countItem(Items.GOLD_INGOT) == 1
+                    && old.getInventory().countItem(Items.GOLD_INGOT) == 0, "interrupt_before_next_tick_targets_replacement_player_after_respawn");
+            check(old.actionBars().equals(List.of("")), "interrupt_after_respawn_clears_existing_status_without_refresh");
+        }
+
         void timed() throws Exception {
             var engine = new EngineState();
             engine.settings = settings(new BossBarSettings(true, BossEvent.BossBarColor.RED, BossEvent.BossBarOverlay.PROGRESS, true));
@@ -349,20 +519,25 @@ public final class DialogueDisplayRuntimeAudit {
             var controller = new InteractionsMod(); NeoForge.EVENT_BUS.unregister(controller);
             Map<UUID, Session> managed = (Map<UUID, Session>) field(controller, "sessions");
             var engine = new EngineState(); engine.settings = animated(WriteDialogueSettings.Mode.CHARACTER, 2, true);
-            Session first = session(engine, story(), alice); first.tick(); managed.put(alice.getUUID(), first); alice.clear();
+            Conversation interrupted = story(); interrupted.first().interruptActions.add("player_command_as_op: give @s minecraft:copper_ingot 1");
+            alice.getInventory().clearContent();
+            Session first = session(engine, interrupted, alice); first.tick(); managed.put(alice.getUUID(), first); alice.clear();
             controller.onLogout(new PlayerEvent.PlayerLoggedOutEvent(alice));
             check(first.isFinished() && bar(first) == null && holograms(first).isEmpty() && managed.isEmpty(), "logout_controller_closes_owned_displays");
             alice.pump(); check(alice.actionBars().equals(List.of("")) && field(first, "writer") == null, "logout_clears_actionbar_and_pending_writer");
-            Session reload = session(engine, story(), alice); reload.tick(); managed.put(alice.getUUID(), reload); alice.clear();
+            check(alice.getInventory().countItem(Items.COPPER_INGOT) == 1, "logout_runs_current_node_interrupt_actions");
+            Session reload = session(engine, interrupted, alice); reload.tick(); managed.put(alice.getUUID(), reload); alice.clear();
             controller.onRegisterCommands(new RegisterCommandsEvent(server.getCommands().getDispatcher(), Commands.CommandSelection.DEDICATED,
                     CommandBuildContext.simple(server.registryAccess(), FeatureFlags.DEFAULT_FLAGS)));
             server.getCommands().getDispatcher().execute("interactions reload", server.createCommandSourceStack().withPermission(4));
             check(reload.isFinished() && bar(reload) == null && holograms(reload).isEmpty() && managed.isEmpty(), "reload_controller_closes_owned_displays");
             alice.pump(); check(alice.actionBars().equals(List.of("")) && field(reload, "writer") == null, "reload_clears_actionbar_and_pending_writer");
-            Session stop = session(engine, story(), alice); stop.tick(); managed.put(alice.getUUID(), stop); alice.clear();
+            check(alice.getInventory().countItem(Items.COPPER_INGOT) == 2, "reload_runs_current_node_interrupt_actions");
+            Session stop = session(engine, interrupted, alice); stop.tick(); managed.put(alice.getUUID(), stop); alice.clear();
             controller.onServerStopping(new ServerStoppingEvent(server));
             check(stop.isFinished() && bar(stop) == null && holograms(stop).isEmpty() && managed.isEmpty(), "shutdown_controller_closes_owned_displays");
             alice.pump(); check(alice.actionBars().equals(List.of("")) && field(stop, "writer") == null, "shutdown_clears_actionbar_and_pending_writer");
+            check(alice.getInventory().countItem(Items.COPPER_INGOT) == 3, "shutdown_runs_current_node_interrupt_actions");
         }
 
         void respawn() throws Exception {
@@ -440,7 +615,7 @@ public final class DialogueDisplayRuntimeAudit {
 
     private static final class EngineState implements Session.Engine {
         DialogueSettings settings = DialogueDisplayRuntimeAudit.settings(BossBarSettings.DEFAULT);
-        final DialogueMessages messages = new DialogueMessages(null, null, null, null, null, null, null, null,
+        DialogueMessages messages = new DialogueMessages(null, null, null, null, null, null, null, null,
                 "Talk: %name%", "Choose: %name%", "Status: %name%", "Pick: %name%");
         final Actions actions = new Actions(new ItemLibrary(), new Economy());
         final ProgressStore progress = new ProgressStore(new java.io.File("config/display-audit-players"));
@@ -459,6 +634,18 @@ public final class DialogueDisplayRuntimeAudit {
         return result;
     }
     private static Set<Integer> ids(List<ArmorStand> entities) { return entities.stream().map(Entity::getId).collect(java.util.stream.Collectors.toSet()); }
+    private static List<String> choices(AuditPlayer player) {
+        player.pump();
+        return player.chat.stream().flatMap(c -> c.toFlatList().stream()).map(c -> c.getStyle().getClickEvent())
+                .filter(java.util.Objects::nonNull).map(net.minecraft.network.chat.ClickEvent::getValue)
+                .filter(command -> command.startsWith("/interactions choose ")).distinct().toList();
+    }
+    private static Conversation inlineStory() {
+        Conversation story = story(); story.first().optionsInDialogue = true;
+        story.first().options.getFirst().startConversation = null;
+        var line = story.first().lines.getFirst(); line.time = -1; line.text.clear();
+        line.text.addAll(List.of("%option_1%", "%option_2%", "%next%")); return story;
+    }
     private static Object field(Object object, String name) throws Exception { var field = object.getClass().getDeclaredField(name); field.setAccessible(true); return field.get(object); }
     private static void check(boolean value, String name) { if (!value) throw new AssertionError(name); passed++; LoggerFactory.getLogger("interactions").info("[DIALOGUEDISPLAYAUDIT] PASS {}", name); }
 

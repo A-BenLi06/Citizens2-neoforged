@@ -14,7 +14,13 @@ final class DialogueWriter {
     private int row, end, wait;
 
     DialogueWriter(List<Component> text, WriteDialogueSettings settings) {
-        this.rows = text.stream().map(Row::new).toList();
+        this(text, settings, List.of());
+    }
+
+    DialogueWriter(List<Component> text, WriteDialogueSettings settings, List<Component> controls) {
+        var atoms = java.util.Collections.newSetFromMap(new java.util.IdentityHashMap<Component, Boolean>());
+        atoms.addAll(controls);
+        this.rows = text.stream().map(value -> new Row(value, atoms)).toList();
         this.settings = settings;
     }
 
@@ -37,14 +43,17 @@ final class DialogueWriter {
         final Component original;
         final List<Run> runs = new ArrayList<>();
         final StringBuilder text = new StringBuilder();
+        final java.util.Set<Component> atoms;
 
-        Row(Component value) { original = value.copy(); append(original, Style.EMPTY); }
+        Row(Component value, java.util.Set<Component> atoms) {
+            original = value.copy(); this.atoms = atoms; append(value, Style.EMPTY);
+        }
 
         private void append(Component value, Style inherited) {
             Style style = value.getStyle().applyTo(inherited);
             var click = style.getClickEvent();
-            if (click != null && click.getValue().equals("/interactions skipdialogue")) {
-                // A next control must appear whole, including its client-translatable label and hover text.
+            if (atoms.contains(value) || click != null && click.getValue().equals("/interactions skipdialogue")) {
+                // Controls appear whole, including non-clickable movement-selection labels.
                 atomic(value.copy().setStyle(style));
                 return;
             }

@@ -65,6 +65,10 @@ public class Conversation {
         public final List<Option> options = new ArrayList<>();
         /** {@code random_dialogue: true} plays one line of the run rather than all of them in order. */
         public boolean randomDialogue;
+        /** Render the terminal dialogue's %option_N% controls instead of a separate options block. */
+        public boolean optionsInDialogue;
+        /** Run once if this node's session ends abnormally, including logout and shutdown. */
+        public final List<String> interruptActions = new ArrayList<>();
 
         public Node(String key) {
             this.key = key;

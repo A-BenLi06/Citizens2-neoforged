@@ -71,6 +71,7 @@ public record DialogueSettings(boolean allowChat, boolean allowMobDamage, boolea
         if (allowCommands) return true;
         // This command carries dialogue option clicks, which must remain usable while commands are restricted.
         if (command.equals("interactions choose") || command.startsWith("interactions choose ")) return true;
+        if (command.equals("interactions useoption") || command.startsWith("interactions useoption ")) return true;
         if (command.equals("interactions skipdialogue")) return true;
         String legacyInput = "/" + command.toLowerCase(Locale.ROOT);
         return commandsWhitelist.stream().anyMatch(legacyInput::startsWith);
