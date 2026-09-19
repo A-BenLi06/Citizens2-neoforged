@@ -65,6 +65,7 @@ public final class DialogueDisplayRuntimeAudit {
     private static State state;
     private static ScheduledActionRuntimeAudit scheduled;
     private static InfluenceRuntimeAudit influence;
+    private static WorldResolutionRuntimeAudit worlds;
 
     @SubscribeEvent
     public static void tick(ServerTickEvent.Post event) {
@@ -85,11 +86,16 @@ public final class DialogueDisplayRuntimeAudit {
                 scheduled.start();
                 influence = new InfluenceRuntimeAudit(server, state::player);
                 influence.start();
+            } else if (worlds != null) {
+                if (worlds.tick(event)) {
+                    finished = true;
+                    LoggerFactory.getLogger("interactions").info("[DIALOGUEDISPLAYAUDIT] COMPLETE {} checks", passed);
+                }
             } else {
                 boolean influenceDone = influence.tick(event);
                 if (scheduled.tick(event) && influenceDone) {
-                    finished = true;
-                    LoggerFactory.getLogger("interactions").info("[DIALOGUEDISPLAYAUDIT] COMPLETE {} checks", passed);
+                    worlds = new WorldResolutionRuntimeAudit(server, state::player);
+                    worlds.start();
                 }
             }
         } catch (Throwable failure) {
@@ -97,6 +103,7 @@ public final class DialogueDisplayRuntimeAudit {
             LoggerFactory.getLogger("interactions").error("[DIALOGUEDISPLAYAUDIT] FAILED", failure);
         } finally {
             if (finished) {
+                try { if (worlds != null) worlds.close(); } catch (Throwable failure) { LoggerFactory.getLogger("interactions").error("[DIALOGUEDISPLAYAUDIT] FAILED world cleanup", failure); }
                 try { if (state != null) state.close(); } catch (Throwable failure) { LoggerFactory.getLogger("interactions").error("[DIALOGUEDISPLAYAUDIT] FAILED cleanup", failure); }
                 server.halt(false);
             }

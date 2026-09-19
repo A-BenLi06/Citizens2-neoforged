@@ -183,7 +183,11 @@ public final class Actions {
             throw new IllegalArgumentException("Dialogue action has no verb: " + raw);
         }
         String verb = action.substring(0, colon).trim().toLowerCase(Locale.ROOT);
-        String body = action.substring(colon + 1).trim();
+        String body = action.substring(colon + 1);
+        if (verb.equals("teleport")) {
+            // The legacy separator includes one space; any further world-name whitespace is significant.
+            if (body.startsWith(" ")) body = body.substring(1);
+        } else body = body.trim();
         switch (verb) {
             case "influence" -> {
                 if (influence == null) throw new IllegalStateException("Influence service is unavailable");

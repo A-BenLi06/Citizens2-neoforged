@@ -16,4 +16,12 @@ if (Test-Path -LiteralPath $properties) {
 }
 Set-Content -LiteralPath (Join-Path $fixture 'eula.txt') -Encoding utf8 -Value 'eula=true'
 Set-Content -LiteralPath (Join-Path $fixture 'dialogue-display-audit-fixture.txt') -Encoding utf8 -Value 'Isolated dialogue presentation audit. Do not copy production NPC/player data here.'
+$worldPack = Join-Path $fixture 'display-world/datapacks/dialogue-world-audit'
+New-Item -ItemType Directory -Force -Path $worldPack | Out-Null
+Set-Content -LiteralPath (Join-Path $worldPack 'pack.mcmeta') -Encoding utf8 -Value '{"pack":{"pack_format":48,"description":"Isolated dialogue world-resolution fixture"}}'
+foreach ($worldNamespace in @('auditworlds', 'otherworlds')) {
+    $worldDefinitions = Join-Path $worldPack "data/$worldNamespace/dimension"
+    New-Item -ItemType Directory -Force -Path $worldDefinitions | Out-Null
+    Set-Content -LiteralPath (Join-Path $worldDefinitions 'island.json') -Encoding utf8 -Value '{"type":"minecraft:overworld","generator":{"type":"minecraft:flat","settings":{"biome":"minecraft:plains","layers":[{"block":"minecraft:bedrock","height":1},{"block":"minecraft:dirt","height":2},{"block":"minecraft:grass_block","height":1}],"structure_overrides":[]}}}'
+}
 Write-Output "Prepared $fixture"

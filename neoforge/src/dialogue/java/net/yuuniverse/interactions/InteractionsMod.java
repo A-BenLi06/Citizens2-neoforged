@@ -93,6 +93,8 @@ public class InteractionsMod implements Session.Engine {
         economy.install();
         ItemAliases.load(new File(dataFolder, "item-aliases.yml"));
         CommandAliases.load(new File(dataFolder, "command-aliases.yml"));
+        Worlds.clear();
+        Worlds.load(new File(dataFolder, "world-aliases.yml"));
         items.load(new File(dataFolder, "items.yml"), event.getServer().registryAccess());
         actions = new Actions(items, economy, influence);
         library.load(new File(dataFolder, "conversations"));
@@ -111,6 +113,7 @@ public class InteractionsMod implements Session.Engine {
         sessions.clear();
         proximityEntries.clear();
         if (actions != null) actions.reset(true);
+        Worlds.clear();
         progress.saveDirty();
     }
 
@@ -293,6 +296,10 @@ public class InteractionsMod implements Session.Engine {
             progress.saveDirty();
             ItemAliases.load(new File(dataFolder, "item-aliases.yml"));
             CommandAliases.load(new File(dataFolder, "command-aliases.yml"));
+            if (!Worlds.load(new File(dataFolder, "world-aliases.yml"))) {
+                context.getSource().sendFailure(Component.translatableWithFallback("interactions.world_aliases.reload_failed",
+                        "Could not reload world aliases; the previous mappings are still active. Check the server log."));
+            }
             items.load(new File(dataFolder, "items.yml"), server.registryAccess());
             library.load(new File(dataFolder, "conversations"));
             progress.loadAll();
