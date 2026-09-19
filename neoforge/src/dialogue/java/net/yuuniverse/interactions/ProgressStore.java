@@ -62,9 +62,19 @@ public final class ProgressStore {
                     throw new IOException("Player record must be a YAML mapping");
                 Map<String, Object> record = new LinkedHashMap<>();
                 map.forEach((key, value) -> record.put(String.valueOf(key), value));
-                for (String field : List.of("saved_dialogues", "cooldowns")) {
+                for (String field : List.of("saved_dialogues", "cooldowns", "influence")) {
                     if (record.get(field) != null && !(record.get(field) instanceof List<?>))
                         throw new IOException(field + " must be a YAML list");
+                }
+                Set<String> influenceKeys = new LinkedHashSet<>();
+                for (Object value : values(record, "influence")) {
+                    if (!(value instanceof String entry)) throw new IOException("Influence entries must be strings");
+                    int split = entry.lastIndexOf(';');
+                    if (split < 1) throw new IOException("Invalid influence entry: " + entry);
+                    String key = entry.substring(0, split);
+                    requireInfluenceKey(key);
+                    Integer.parseInt(entry.substring(split + 1));
+                    if (!influenceKeys.add(key)) throw new IOException("Duplicate influence key: " + key);
                 }
                 records.put(uuid, record);
             } catch (Exception ex) {
@@ -78,6 +88,34 @@ public final class ProgressStore {
 
     public synchronized boolean isReadable(UUID player) {
         return !unreadable.contains(player);
+    }
+
+    static void requireInfluenceKey(String conversation) {
+        if (conversation == null || conversation.isBlank() || conversation.indexOf(';') >= 0)
+            throw new IllegalArgumentException("Invalid influence conversation key: " + conversation);
+    }
+
+    public synchronized int getInfluence(UUID player, String conversation) {
+        requireInfluenceKey(conversation);
+        if (!isReadable(player)) throw new IllegalStateException("Dialogue progress is unreadable for " + player);
+        for (Object value : values(records.get(player), "influence")) {
+            String entry = (String) value;
+            int split = entry.lastIndexOf(';');
+            if (entry.substring(0, split).equals(conversation)) return Integer.parseInt(entry.substring(split + 1));
+        }
+        return 0;
+    }
+
+    synchronized int changeInfluence(UUID player, String name, String conversation,
+            java.util.function.IntUnaryOperator operation) {
+        int result = operation.applyAsInt(getInfluence(player, conversation));
+        Map<String, Object> record = writable(player, name);
+        List<Object> influence = new ArrayList<>(values(record, "influence"));
+        influence.removeIf(value -> ((String) value).substring(0, ((String) value).lastIndexOf(';')).equals(conversation));
+        influence.add(conversation + ";" + result);
+        record.put("influence", influence);
+        dirty.add(player);
+        return result;
     }
 
     public synchronized boolean hasSeen(UUID player, String key) {

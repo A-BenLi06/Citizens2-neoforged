@@ -80,6 +80,14 @@ public final class ConversationLibrary {
         return byNpcId.get(id);
     }
 
+    public Conversation byId(String id) {
+        return all.stream().filter(conversation -> conversation.id().equals(id)).findFirst().orElse(null);
+    }
+
+    public List<String> ids() {
+        return all.stream().map(Conversation::id).sorted().toList();
+    }
+
     /** @return the conversation triggered by an NPC's name, for the {@code NPC named …} form */
     public Conversation forNpcName(String name) {
         return name == null ? null : byNpcName.get(name.toLowerCase(java.util.Locale.ROOT));

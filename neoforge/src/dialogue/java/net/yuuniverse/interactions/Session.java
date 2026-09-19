@@ -245,7 +245,7 @@ public class Session {
         }
         List<String> wholeLine = new ArrayList<>(line.actions);
         wholeLine.addAll(line.lastActions);
-        if (!engine.actions().validateAll(wholeLine, player, npcName())) {
+        if (!engine.actions().validateAll(wholeLine, player, npcName(), conversation.id())) {
             end(false);
             return;
         }
@@ -266,7 +266,7 @@ public class Session {
     /** Timers/routes continue while batches wait, but saved progress depends on their actual outcome. */
     private boolean startActions(List<String> actions, String savedLine) {
         pendingActions++;
-        ActionExecution execution = engine.actions().executeAll(actions, player, npcName());
+        ActionExecution execution = engine.actions().executeAll(actions, player, npcName(), conversation.id());
         execution.whenComplete(result -> {
             pendingActions--;
             if (result != ActionExecution.Result.SUCCEEDED) {
@@ -302,7 +302,7 @@ public class Session {
         List<Component> controls = new ArrayList<>();
         try {
             for (String raw : line.textOrEmpty()) {
-                if (!raw.startsWith("json:") && !visibleOptionRow(Text.placeholders(raw, player))) continue;
+                if (!raw.startsWith("json:") && !visibleOptionRow(Text.placeholders(raw, player, engine.progress()))) continue;
                 rendered.add(renderText(raw, false, controls));
                 if (conversation.hologram.enabled()) {
                     floating.add(renderText(raw.replace("{centered}", ""), true, new ArrayList<>()));
@@ -338,8 +338,8 @@ public class Session {
 
     private Component renderText(String raw, boolean floating, List<Component> controls) {
         if (floating) raw = raw.replace("%next%", "");
-        if (raw.startsWith("json:")) return Text.json(raw.substring("json:".length()), player);
-        String text = Text.placeholders(raw, player);
+        if (raw.startsWith("json:")) return Text.json(raw.substring("json:".length()), player, engine.progress());
+        String text = Text.placeholders(raw, player, engine.progress());
         return Text.legacy(text, marker -> {
             Component control;
             if (marker.equals("%next%")) {
@@ -449,12 +449,12 @@ public class Session {
         Conversation.Option option = options.get(index);
         int number = index + 1;
         MutableComponent message = (selectionEnabled()
-                ? engine.messages().selectableLabel(number, option.text, index == selectedOption, player)
-                : engine.messages().optionLabel(number, option.text, player)).copy();
+                ? engine.messages().selectableLabel(number, option.text, index == selectedOption, player, engine.progress())
+                : engine.messages().optionLabel(number, option.text, player, engine.progress())).copy();
         if (interactive && !selectionEnabled() && engine.settings().clickableOptions()) {
             String command = "/interactions choose " + number + (view == null ? "" : " " + view);
             message.withStyle(style -> style.withClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, command))
-                    .withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, engine.messages().optionTooltip(number, player))));
+                    .withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, engine.messages().optionTooltip(number, player, engine.progress()))));
         }
         return message;
     }
@@ -470,7 +470,7 @@ public class Session {
             for (String line : layout) {
                 // Legacy layout lines containing the marker expand to the whole option list.
                 if (line.contains("%options%")) rendered.forEach(player::sendSystemMessage);
-                else player.sendSystemMessage(Text.legacy(Text.placeholders(line, player)));
+                else player.sendSystemMessage(Text.legacy(Text.placeholders(line, player, engine.progress())));
             }
         } else {
             rendered.forEach(player::sendSystemMessage);
@@ -516,7 +516,7 @@ public class Session {
         String needle = text.toLowerCase(java.util.Locale.ROOT);
         int match = -1;
         for (int i = 0; i < offered.size(); i++) {
-            String plain = Text.plain(Text.legacy(Text.placeholders(offered.get(i).text, player)))
+            String plain = Text.plain(Text.legacy(Text.placeholders(offered.get(i).text, player, engine.progress())))
                     .toLowerCase(java.util.Locale.ROOT);
             if (plain.contains(needle)) {
                 if (match >= 0)
@@ -590,7 +590,7 @@ public class Session {
         if (!completed && !node.interruptActions.isEmpty()) {
             // End ownership first: interrupt commands may reenter the controller or teleport the player.
             try {
-                engine.actions().runAll(List.copyOf(node.interruptActions), player, npcName());
+                engine.actions().runAll(List.copyOf(node.interruptActions), player, npcName(), conversation.id());
             } catch (RuntimeException failure) {
                 org.slf4j.LoggerFactory.getLogger("interactions").error("Could not execute interrupt actions for {} / {}",
                         conversation.source, node.key, failure);

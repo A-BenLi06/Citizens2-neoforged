@@ -64,6 +64,7 @@ public final class DialogueDisplayRuntimeAudit {
     private static int passed;
     private static State state;
     private static ScheduledActionRuntimeAudit scheduled;
+    private static InfluenceRuntimeAudit influence;
 
     @SubscribeEvent
     public static void tick(ServerTickEvent.Post event) {
@@ -82,9 +83,14 @@ public final class DialogueDisplayRuntimeAudit {
                 state.run();
                 scheduled = new ScheduledActionRuntimeAudit(server, state::player);
                 scheduled.start();
-            } else if (scheduled.tick(event)) {
-                finished = true;
-                LoggerFactory.getLogger("interactions").info("[DIALOGUEDISPLAYAUDIT] COMPLETE {} checks", passed);
+                influence = new InfluenceRuntimeAudit(server, state::player);
+                influence.start();
+            } else {
+                boolean influenceDone = influence.tick(event);
+                if (scheduled.tick(event) && influenceDone) {
+                    finished = true;
+                    LoggerFactory.getLogger("interactions").info("[DIALOGUEDISPLAYAUDIT] COMPLETE {} checks", passed);
+                }
             }
         } catch (Throwable failure) {
             finished = true;

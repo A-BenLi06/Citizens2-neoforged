@@ -77,25 +77,37 @@ public record DialogueMessages(String nextText, String nextHover, String options
     }
 
     public Component optionLabel(int number, String text, ServerPlayer player) {
+        return optionLabel(number, text, player, null);
+    }
+
+    public Component optionLabel(int number, String text, ServerPlayer player, ProgressStore progress) {
         if (optionsFormat == null) return Component.translatableWithFallback("interactions.option.label", "[%s] %s",
-                number, Text.legacy(Text.placeholders(text, player)));
+                number, Text.legacy(Text.placeholders(text, player, progress)));
         return Text.legacy(Text.placeholders(optionsFormat.replace("%number%", Integer.toString(number))
-                .replace("%text%", text), player));
+                .replace("%text%", text), player, progress));
     }
 
     public Component optionTooltip(int number, ServerPlayer player) {
+        return optionTooltip(number, player, null);
+    }
+
+    public Component optionTooltip(int number, ServerPlayer player, ProgressStore progress) {
         if (clickableOptionHover == null) return Component.translatableWithFallback("interactions.option.hover",
                 "Click to choose option %s.", number);
-        return Text.legacy(Text.placeholders(clickableOptionHover.replace("%option%", Integer.toString(number)), player));
+        return Text.legacy(Text.placeholders(clickableOptionHover.replace("%option%", Integer.toString(number)), player, progress));
     }
 
     public Component selectableLabel(int number, String text, boolean selected, ServerPlayer player) {
+        return selectableLabel(number, text, selected, player, null);
+    }
+
+    public Component selectableLabel(int number, String text, boolean selected, ServerPlayer player, ProgressStore progress) {
         String format = selected ? selectableSelected : selectableNormal;
         String body = selected ? Text.plain(Text.legacy(text)) : text;
         if (format != null) return Text.legacy(Text.placeholders(format.replace("%number%", Integer.toString(number))
-                .replace("%text%", body), player));
+                .replace("%text%", body), player, progress));
         return selected ? Component.translatableWithFallback("interactions.option.selected", "» [%s] %s (Sneak to choose)",
-                number, Text.legacy(Text.placeholders(body, player))) : optionLabel(number, body, player);
+                number, Text.legacy(Text.placeholders(body, player, progress))) : optionLabel(number, body, player, progress);
     }
 
     public Component nextLabel() {

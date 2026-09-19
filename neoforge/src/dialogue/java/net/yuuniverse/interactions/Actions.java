@@ -30,14 +30,20 @@ public final class Actions {
 
     private final ItemLibrary items;
     private final Economy economy;
+    private final Influence influence;
     private final List<PendingBatch> batches = new java.util.ArrayList<>();
     private final ActionBarDisplays actionBars = new ActionBarDisplays();
     private long tick;
     private boolean accepting = true;
 
     public Actions(ItemLibrary items, Economy economy) {
+        this(items, economy, null);
+    }
+
+    public Actions(ItemLibrary items, Economy economy, Influence influence) {
         this.items = items;
         this.economy = economy;
+        this.influence = influence;
     }
 
     /** Compatibility entry point returning acceptance. Use executeAll to observe delayed completion. */
@@ -45,12 +51,20 @@ public final class Actions {
         return executeAll(actions, player, npcName).accepted();
     }
 
+    public boolean runAll(List<String> actions, ServerPlayer player, Component npcName, String conversation) {
+        return executeAll(actions, player, npcName, conversation).accepted();
+    }
+
     public ActionExecution executeAll(List<String> actions, ServerPlayer player, Component npcName) {
+        return executeAll(actions, player, npcName, null);
+    }
+
+    public ActionExecution executeAll(List<String> actions, ServerPlayer player, Component npcName, String conversation) {
         var result = new ActionExecution();
         if (!accepting) { result.finish(ActionExecution.Result.CANCELLED); return result; }
         try {
-            var batch = new PendingBatch(List.copyOf(actions), new ActionPlayer(player), npcName, result);
-            prepare(batch.remaining(), player, npcName);
+            var batch = new PendingBatch(List.copyOf(actions), new ActionPlayer(player), npcName, conversation, result);
+            prepare(batch.remaining(), player, npcName, conversation);
             batches.add(batch);
             batch.resume(player);
         } catch (Exception failure) {
@@ -62,8 +76,12 @@ public final class Actions {
     }
 
     public boolean validateAll(List<String> actions, ServerPlayer player, Component npcName) {
+        return validateAll(actions, player, npcName, null);
+    }
+
+    public boolean validateAll(List<String> actions, ServerPlayer player, Component npcName, String conversation) {
         try {
-            prepare(actions, player, npcName);
+            prepare(actions, player, npcName, conversation);
             return true;
         } catch (Exception failure) {
             reportFailure(actions, player, failure);
@@ -71,12 +89,13 @@ public final class Actions {
         }
     }
 
-    private void prepare(List<String> actions, ServerPlayer player, Component npcName) {
+    private void prepare(List<String> actions, ServerPlayer player, Component npcName, String conversation) {
         if (actions.isEmpty()) return;
         var inventory = player.getInventory();
         var payments = new CheckItem.PaymentPlan(java.util.stream.IntStream.range(0, inventory.getContainerSize())
                 .mapToObj(inventory::getItem).toList());
-        for (String action : actions) run(action, player, npcName, true, payments);
+        Influence.Plan plan = influence == null ? null : influence.plan(player.getUUID());
+        for (String action : actions) run(action, player, npcName, conversation, true, payments, plan);
     }
 
     private static void reportFailure(List<String> actions, ServerPlayer player, Exception failure) {
@@ -96,7 +115,7 @@ public final class Actions {
             else if (tick >= batch.due) {
                 try {
                     // Inventory, providers, permissions and placeholders may have changed while waiting.
-                    prepare(batch.remaining(), player, batch.npcName);
+                    prepare(batch.remaining(), player, batch.npcName, batch.conversation);
                     batch.resume(player);
                 } catch (Exception failure) {
                     reportFailure(batch.remaining(), player, failure);
@@ -131,19 +150,21 @@ public final class Actions {
         final List<String> actions;
         final ActionPlayer player;
         final Component npcName;
+        final String conversation;
         final ActionExecution result;
         int index;
         long due;
 
-        PendingBatch(List<String> actions, ActionPlayer player, Component npcName, ActionExecution result) {
+        PendingBatch(List<String> actions, ActionPlayer player, Component npcName, String conversation, ActionExecution result) {
             this.actions = actions; this.player = player; this.npcName = npcName; this.result = result;
+            this.conversation = conversation;
         }
 
         List<String> remaining() { return actions.subList(index, actions.size()); }
 
         void resume(ServerPlayer target) {
             while (result.pending() && index < actions.size()) {
-                long delay = run(actions.get(index++), target, npcName, false, null);
+                long delay = run(actions.get(index++), target, npcName, conversation, false, null, null);
                 if (delay >= 0) { due = tick + Math.max(1, delay); return; }
             }
             if (result.pending()) result.finish(ActionExecution.Result.SUCCEEDED);
@@ -151,10 +172,12 @@ public final class Actions {
     }
 
     /** @return wait ticks, or -1 for an immediate action */
-    private long run(String raw, ServerPlayer player, Component npcName, boolean validate, CheckItem.PaymentPlan payments) {
+    private long run(String raw, ServerPlayer player, Component npcName, String conversation, boolean validate,
+            CheckItem.PaymentPlan payments, Influence.Plan plan) {
         if (raw == null || player == null)
             throw new IllegalArgumentException("Missing action or player");
-        String action = Text.placeholders(raw.trim(), player);
+        String action = plan == null ? Text.placeholders(raw.trim(), player, influence == null ? null : influence.progress())
+                : Text.placeholders(raw.trim(), player, influence.progress(), plan::get);
         int colon = action.indexOf(':');
         if (colon < 0) {
             throw new IllegalArgumentException("Dialogue action has no verb: " + raw);
@@ -162,6 +185,19 @@ public final class Actions {
         String verb = action.substring(0, colon).trim().toLowerCase(Locale.ROOT);
         String body = action.substring(colon + 1).trim();
         switch (verb) {
+            case "influence" -> {
+                if (influence == null) throw new IllegalStateException("Influence service is unavailable");
+                var fields = ActionArguments.fields(body, 2, 2);
+                Influence.Operation operation = switch (fields.getFirst()) {
+                    case "set" -> Influence.Operation.SET;
+                    case "add" -> Influence.Operation.ADD;
+                    case "remove" -> Influence.Operation.REMOVE;
+                    default -> throw new IllegalArgumentException("Unknown influence operation: " + fields.getFirst());
+                };
+                int amount = ActionArguments.integer(fields.get(1), Integer.MIN_VALUE, Integer.MAX_VALUE);
+                if (validate) plan.change(conversation, operation, amount);
+                else influence.change(player, conversation, operation, amount);
+            }
             case "wait", "wait_ticks" -> {
                 int delay = ActionArguments.integer(body, 0, Integer.MAX_VALUE);
                 return verb.equals("wait") ? delay * 20L : delay;
@@ -355,6 +391,12 @@ public final class Actions {
             throw new IllegalArgumentException("Invalid dialogue command: " + line, error);
         if (com.mojang.brigadier.context.ContextChain.tryFlatten(parsed.getContext().build(line)).isEmpty())
             throw new IllegalArgumentException("Incomplete dialogue command: " + line);
+        if (parsed.getContext().build(line).getCommand() instanceof InfluenceCommands.Executor influenceCommand) {
+            try { influenceCommand.validate(parsed.getContext().build(line)); }
+            catch (com.mojang.brigadier.exceptions.CommandSyntaxException failure) {
+                throw new IllegalArgumentException("Invalid influence command: " + line, failure);
+            }
+        }
         if (parts[0].equals("cam-server") && parts.length > 1 && parts[1].equals("start"))
             CmdCamBridge.validateStart(parsed.getContext().build(line));
         if (validate) return;

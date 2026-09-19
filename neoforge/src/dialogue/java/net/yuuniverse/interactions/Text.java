@@ -16,32 +16,39 @@ import net.minecraft.server.level.ServerPlayer;
  * are translated here rather than asking anybody to rewrite 7779 lines of dialogue.
  */
 public final class Text {
+    private static final java.util.regex.Pattern PROGRESS_MARKER =
+            java.util.regex.Pattern.compile("%interactions_(influence|has_dialogue)_([^%]+)%");
     private Text() {
     }
 
     /** Expands JSON string values after parsing so placeholder text cannot change the component structure. */
     public static Component json(String raw, ServerPlayer player) {
+        return json(raw, player, null);
+    }
+
+    public static Component json(String raw, ServerPlayer player, ProgressStore progress) {
         var tree = com.google.gson.JsonParser.parseString(raw);
-        var expanded = expandJson(tree, player);
+        var expanded = expandJson(tree, player, progress);
         Component result = Component.Serializer.fromJson(expanded.toString(),
                 player == null ? net.minecraft.core.RegistryAccess.EMPTY : player.registryAccess());
         if (result == null) throw new IllegalArgumentException("Expected a chat component");
         return result;
     }
 
-    private static com.google.gson.JsonElement expandJson(com.google.gson.JsonElement value, ServerPlayer player) {
+    private static com.google.gson.JsonElement expandJson(com.google.gson.JsonElement value, ServerPlayer player,
+            ProgressStore progress) {
         if (value.isJsonObject()) {
             var result = new com.google.gson.JsonObject();
-            value.getAsJsonObject().entrySet().forEach(entry -> result.add(entry.getKey(), expandJson(entry.getValue(), player)));
+            value.getAsJsonObject().entrySet().forEach(entry -> result.add(entry.getKey(), expandJson(entry.getValue(), player, progress)));
             return result;
         }
         if (value.isJsonArray()) {
             var result = new com.google.gson.JsonArray();
-            value.getAsJsonArray().forEach(entry -> result.add(expandJson(entry, player)));
+            value.getAsJsonArray().forEach(entry -> result.add(expandJson(entry, player, progress)));
             return result;
         }
         return value.isJsonPrimitive() && value.getAsJsonPrimitive().isString()
-                ? new com.google.gson.JsonPrimitive(placeholders(value.getAsString(), player)) : value;
+                ? new com.google.gson.JsonPrimitive(placeholders(value.getAsString(), player, progress)) : value;
     }
 
     /** Parses a legacy {@code &}-coded string into a component, keeping colours and styles as they run. */
@@ -100,12 +107,33 @@ public final class Text {
      * {@link CheckItem} owns them.
      */
     public static String placeholders(String raw, ServerPlayer player) {
+        return placeholders(raw, player, null);
+    }
+
+    public static String placeholders(String raw, ServerPlayer player, ProgressStore progress) {
+        return placeholders(raw, player, progress,
+                progress == null || player == null ? null : key -> progress.getInfluence(player.getUUID(), key));
+    }
+
+    static String placeholders(String raw, ServerPlayer player, ProgressStore progress,
+            java.util.function.ToIntFunction<String> influence) {
         if (raw == null || raw.indexOf('%') < 0)
             return raw;
         String name = player == null ? "" : player.getGameProfile().getName();
         String result = raw.replace("%player%", name).replace("%player_name%", name);
         if (result.contains("%player_level%")) {
             result = result.replace("%player_level%", player == null ? "0" : String.valueOf(player.experienceLevel));
+        }
+        if (player != null && progress != null) {
+            var markers = PROGRESS_MARKER.matcher(result);
+            StringBuilder expanded = new StringBuilder();
+            while (markers.find()) {
+                String value = markers.group(1).equals("influence")
+                        ? Integer.toString(influence.applyAsInt(markers.group(2)))
+                        : Boolean.toString(progress.hasSeen(player.getUUID(), markers.group(2)));
+                markers.appendReplacement(expanded, java.util.regex.Matcher.quoteReplacement(value));
+            }
+            result = markers.appendTail(expanded).toString();
         }
         return result;
     }

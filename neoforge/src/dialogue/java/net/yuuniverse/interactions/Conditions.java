@@ -1,7 +1,6 @@
 package net.yuuniverse.interactions;
 
 import java.util.List;
-import java.util.Locale;
 import java.util.function.Function;
 
 import org.slf4j.Logger;
@@ -12,13 +11,13 @@ import net.minecraft.server.level.ServerPlayer;
 /**
  * Evaluates a {@code requires} entry.
  * <p>
- * Every one in the migrated data has the shape {@code %checkitem_lorecontains:<lore>,amt:N% == yes} - a placeholder
- * compared against a literal. That is the whole condition language those files use, so it is the whole language here.
+ * Supports equality checks and numeric comparisons, including saved dialogue and influence placeholders.
  * Anything unrecognised is reported and treated as "does not hold", which keeps a mistyped condition from handing out
  * goods for free rather than from blocking a purchase; of the two failure directions that is the safe one.
  */
 public final class Conditions {
     private static final Logger LOGGER = LoggerFactory.getLogger("interactions");
+    private static final java.util.regex.Pattern COMPARISON = java.util.regex.Pattern.compile("(==|!=|>=|<=|>|<)");
 
     private Conditions() {
     }
@@ -41,22 +40,42 @@ public final class Conditions {
         if (raw == null)
             return true;
         String expression = raw.trim();
-        int eq = expression.indexOf("==");
-        int ne = expression.indexOf("!=");
-        boolean negated = ne >= 0 && (eq < 0 || ne < eq);
-        int split = negated ? ne : eq;
-        if (split < 0) {
+        var comparison = COMPARISON.matcher(expression);
+        boolean found = false;
+        while (comparison.find()) {
+            // Comparators inside a placeholder (for example an item's lore) are part of its argument.
+            if (expression.substring(0, comparison.start()).chars().filter(value -> value == '%').count() % 2 == 0) {
+                found = true;
+                break;
+            }
+        }
+        if (!found) {
             LOGGER.warn("Dialogue condition has no comparison, so it cannot hold: {}", raw);
             return false;
         }
-        String left = expression.substring(0, split).trim();
-        String right = expression.substring(split + 2).trim().toLowerCase(Locale.ROOT);
+        String left = expression.substring(0, comparison.start()).trim();
+        String right = resolver.apply(expression.substring(comparison.end()).trim());
         String actual = resolver.apply(left);
-        if (actual == null) {
+        if (actual == null || right == null) {
             LOGGER.warn("Dialogue condition uses a placeholder this server cannot answer: {}", left);
             return false;
         }
-        return negated != actual.equalsIgnoreCase(right);
+        String operator = comparison.group();
+        if (operator.equals("==") || operator.equals("!="))
+            return operator.equals("!=") != actual.equalsIgnoreCase(right);
+        try {
+            int order = new java.math.BigDecimal(actual).compareTo(new java.math.BigDecimal(right));
+            return switch (operator) {
+                case ">" -> order > 0;
+                case ">=" -> order >= 0;
+                case "<" -> order < 0;
+                case "<=" -> order <= 0;
+                default -> false;
+            };
+        } catch (NumberFormatException failure) {
+            LOGGER.warn("Dialogue condition requires two finite numbers: {}", raw);
+            return false;
+        }
     }
 
     /**
@@ -79,7 +98,12 @@ public final class Conditions {
         }
         // A single native placeholder is resolvable; partially expanding an unknown/provider expression is not.
         if (player == null || body.indexOf('%', 1) != body.length() - 1) return null;
-        String expanded = Text.placeholders(body, player);
-        return expanded.equals(body) ? null : expanded;
+        try {
+            String expanded = Text.placeholders(body, player, progress);
+            return expanded.equals(body) ? null : expanded;
+        } catch (IllegalArgumentException | IllegalStateException failure) {
+            LOGGER.warn("Could not resolve dialogue condition {}: {}", body, failure.toString());
+            return null;
+        }
     }
 }

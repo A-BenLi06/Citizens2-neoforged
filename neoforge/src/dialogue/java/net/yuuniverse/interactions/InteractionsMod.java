@@ -52,6 +52,7 @@ public class InteractionsMod implements Session.Engine {
     private final ItemLibrary items = new ItemLibrary();
     private final Economy economy = new Economy();
     private final ProgressStore progress = new ProgressStore(new File(dataFolder, "players"));
+    private final Influence influence = new Influence(progress, library);
     private final Map<UUID, Session> sessions = new ConcurrentHashMap<>();
     private final Map<UUID, String> proximityEntries = new HashMap<>();
     private Actions actions;
@@ -60,8 +61,11 @@ public class InteractionsMod implements Session.Engine {
     private int saveCountdown = 600;
 
     public InteractionsMod() {
+        net.citizensnpcs.api.util.PermissionUtil.register("interactions.admin");
         NeoForge.EVENT_BUS.register(this);
     }
+
+    public Influence influence() { return influence; }
 
     @Override
     public Actions actions() {
@@ -90,7 +94,7 @@ public class InteractionsMod implements Session.Engine {
         ItemAliases.load(new File(dataFolder, "item-aliases.yml"));
         CommandAliases.load(new File(dataFolder, "command-aliases.yml"));
         items.load(new File(dataFolder, "items.yml"), event.getServer().registryAccess());
-        actions = new Actions(items, economy);
+        actions = new Actions(items, economy, influence);
         library.load(new File(dataFolder, "conversations"));
         progress.loadAll();
         if (library.size() == 0) {
@@ -264,6 +268,7 @@ public class InteractionsMod implements Session.Engine {
     @SubscribeEvent
     public void onRegisterCommands(RegisterCommandsEvent event) {
         LiteralArgumentBuilder<CommandSourceStack> root = Commands.literal("interactions");
+        InfluenceCommands.register(root, influence, library);
         root.then(Commands.literal("skipdialogue").executes(context -> {
             ServerPlayer player = context.getSource().getPlayer();
             Session session = player == null ? null : sessions.get(player.getUUID());
