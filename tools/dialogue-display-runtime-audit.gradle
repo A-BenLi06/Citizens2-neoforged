@@ -17,7 +17,7 @@ allprojects {
                 if (log.contains('[DIALOGUEDISPLAYAUDIT] FAILED') || !log.contains('[DIALOGUEDISPLAYAUDIT] COMPLETE')
                         || !log.contains('[NATIVEACTIONAUDIT] COMPLETE') || !log.contains('[SCHEDULEDACTIONAUDIT] COMPLETE')
                         || !log.contains('[INFLUENCEAUDIT] COMPLETE') || !log.contains('[WORLDAUDIT] COMPLETE')
-                        || !log.contains('[TRANSFERAUDIT] COMPLETE'))
+                        || !log.contains('[TRANSFERAUDIT] COMPLETE') || !log.contains('[CONDITIONAUDIT] COMPLETE'))
                     throw new GradleException('Dialogue display audit failed or incomplete')
             }
         }

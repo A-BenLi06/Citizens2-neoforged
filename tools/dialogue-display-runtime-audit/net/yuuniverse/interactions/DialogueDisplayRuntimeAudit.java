@@ -89,6 +89,7 @@ public final class DialogueDisplayRuntimeAudit {
                 influence.start();
             } else if (transfers != null) {
                 if (transfers.tick(event)) {
+                    ConditionsRuntimeAudit.run(state.player("ConditionsAlice"), state.player("ConditionsBob"));
                     finished = true;
                     LoggerFactory.getLogger("interactions").info("[DIALOGUEDISPLAYAUDIT] COMPLETE {} checks", passed);
                 }
