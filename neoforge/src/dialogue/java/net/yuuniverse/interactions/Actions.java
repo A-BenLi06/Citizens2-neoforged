@@ -176,16 +176,16 @@ public final class Actions {
             CheckItem.PaymentPlan payments, Influence.Plan plan) {
         if (raw == null || player == null)
             throw new IllegalArgumentException("Missing action or player");
-        String action = plan == null ? Text.placeholders(raw.trim(), player, influence == null ? null : influence.progress())
-                : Text.placeholders(raw.trim(), player, influence.progress(), plan::get);
+        String action = plan == null ? Text.placeholders(raw, player, influence == null ? null : influence.progress())
+                : Text.placeholders(raw, player, influence.progress(), plan::get);
         int colon = action.indexOf(':');
         if (colon < 0) {
             throw new IllegalArgumentException("Dialogue action has no verb: " + raw);
         }
         String verb = action.substring(0, colon).trim().toLowerCase(Locale.ROOT);
         String body = action.substring(colon + 1);
-        if (verb.equals("teleport")) {
-            // The legacy separator includes one space; any further world-name whitespace is significant.
+        if (verb.equals("teleport") || verb.equals("send_to_server")) {
+            // The legacy separator includes one space; destination-name whitespace is otherwise significant.
             if (body.startsWith(" ")) body = body.substring(1);
         } else body = body.trim();
         switch (verb) {
@@ -218,6 +218,11 @@ public final class Actions {
             case "stopsound_resource_pack" -> stopSound(body, player, validate, true);
             case "title" -> title(body, player, validate);
             case "teleport" -> teleport(body, player, validate);
+            case "send_to_server" -> {
+                var request = ServerTransfers.prepare(body);
+                if (validate) ServerTransfers.checkAvailable(player);
+                else ServerTransfers.send(player, request);
+            }
             case "give_potion_effect" -> potion(body, player, validate);
             case "remove_potion_effect" -> {
                 var effect = effect(body);

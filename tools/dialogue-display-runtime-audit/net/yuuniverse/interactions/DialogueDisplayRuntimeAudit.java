@@ -66,6 +66,7 @@ public final class DialogueDisplayRuntimeAudit {
     private static ScheduledActionRuntimeAudit scheduled;
     private static InfluenceRuntimeAudit influence;
     private static WorldResolutionRuntimeAudit worlds;
+    private static ServerTransferRuntimeAudit transfers;
 
     @SubscribeEvent
     public static void tick(ServerTickEvent.Post event) {
@@ -86,10 +87,15 @@ public final class DialogueDisplayRuntimeAudit {
                 scheduled.start();
                 influence = new InfluenceRuntimeAudit(server, state::player);
                 influence.start();
-            } else if (worlds != null) {
-                if (worlds.tick(event)) {
+            } else if (transfers != null) {
+                if (transfers.tick(event)) {
                     finished = true;
                     LoggerFactory.getLogger("interactions").info("[DIALOGUEDISPLAYAUDIT] COMPLETE {} checks", passed);
+                }
+            } else if (worlds != null) {
+                if (worlds.tick(event)) {
+                    transfers = new ServerTransferRuntimeAudit(server, state::proxyPlayer);
+                    transfers.start();
                 }
             } else {
                 boolean influenceDone = influence.tick(event);
@@ -103,6 +109,7 @@ public final class DialogueDisplayRuntimeAudit {
             LoggerFactory.getLogger("interactions").error("[DIALOGUEDISPLAYAUDIT] FAILED", failure);
         } finally {
             if (finished) {
+                try { if (transfers != null) transfers.close(); } catch (Throwable failure) { LoggerFactory.getLogger("interactions").error("[DIALOGUEDISPLAYAUDIT] FAILED transfer cleanup", failure); }
                 try { if (worlds != null) worlds.close(); } catch (Throwable failure) { LoggerFactory.getLogger("interactions").error("[DIALOGUEDISPLAYAUDIT] FAILED world cleanup", failure); }
                 try { if (state != null) state.close(); } catch (Throwable failure) { LoggerFactory.getLogger("interactions").error("[DIALOGUEDISPLAYAUDIT] FAILED cleanup", failure); }
                 server.halt(false);
@@ -590,6 +597,14 @@ public final class DialogueDisplayRuntimeAudit {
         }
 
         AuditPlayer player(String name, UUID uuid) {
+            return player(name, uuid, ConnectionType.NEOFORGE);
+        }
+
+        AuditPlayer proxyPlayer(String name, UUID uuid) {
+            return player(name, uuid, ConnectionType.OTHER);
+        }
+
+        private AuditPlayer player(String name, UUID uuid, ConnectionType connectionType) {
             var player = new AuditPlayer(server, level, name, uuid); players.add(player); player.setPos(1, -60, 1);
             var connection = new Connection(PacketFlow.SERVERBOUND);
             player.channel = new EmbeddedChannel(new ChannelInitializer<Channel>() {
@@ -603,8 +618,13 @@ public final class DialogueDisplayRuntimeAudit {
                     });
                 }
             });
-            NetworkRegistry.configureMockConnection(connection);
-            var cookie = new CommonListenerCookie(player.getGameProfile(), 0, ClientInformation.createDefault(), false, ConnectionType.NEOFORGE);
+            if (connectionType == ConnectionType.NEOFORGE) NetworkRegistry.configureMockConnection(connection);
+            else {
+                net.neoforged.neoforge.network.registration.ChannelAttributes.setPayloadSetup(connection,
+                        net.neoforged.neoforge.network.registration.NetworkPayloadSetup.empty());
+                net.neoforged.neoforge.network.registration.ChannelAttributes.setConnectionType(connection, connectionType);
+            }
+            var cookie = new CommonListenerCookie(player.getGameProfile(), 0, ClientInformation.createDefault(), false, connectionType);
             connection.setupOutboundProtocol(GameProtocols.CLIENTBOUND_TEMPLATE.bind(RegistryFriendlyByteBuf.decorator(server.registryAccess(), cookie.connectionType())));
             server.getPlayerList().placeNewPlayer(connection, player, cookie); return player;
         }

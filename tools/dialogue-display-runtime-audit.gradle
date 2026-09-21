@@ -16,7 +16,8 @@ allprojects {
                 def log = new File(fixture, 'logs/latest.log').getText('UTF-8')
                 if (log.contains('[DIALOGUEDISPLAYAUDIT] FAILED') || !log.contains('[DIALOGUEDISPLAYAUDIT] COMPLETE')
                         || !log.contains('[NATIVEACTIONAUDIT] COMPLETE') || !log.contains('[SCHEDULEDACTIONAUDIT] COMPLETE')
-                        || !log.contains('[INFLUENCEAUDIT] COMPLETE') || !log.contains('[WORLDAUDIT] COMPLETE'))
+                        || !log.contains('[INFLUENCEAUDIT] COMPLETE') || !log.contains('[WORLDAUDIT] COMPLETE')
+                        || !log.contains('[TRANSFERAUDIT] COMPLETE'))
                     throw new GradleException('Dialogue display audit failed or incomplete')
             }
         }
