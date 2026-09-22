@@ -35,30 +35,28 @@ import net.minecraft.server.network.Filterable;
  * <p>
  * Two things in the real data need care. Lore entries are sometimes written with a trailing comma inside the string
  * ({@code '{"text":"10 UDT"},'}), which is not valid JSON and has to be tolerated. And 13 of the 140 entries carry an
- * {@code internal} Base64 blob of Bukkit's own serialisation, which cannot be read outside Bukkit - those yield the item
- * without whatever that blob added, and say so once at load.
+ * {@code internal} Base64 blob of compressed Minecraft NBT. Its versioned item data and provider-specific components
+ * must be migrated before the saved item is usable.
  */
 public final class ItemLibrary {
     private static final Logger LOGGER = LoggerFactory.getLogger("interactions");
 
-    private final Map<String, ItemStack> items = new HashMap<>();
-    private int unreadable;
+    private Map<String, ItemStack> items = Map.of();
 
     @SuppressWarnings("unchecked")
     public void load(File file, RegistryAccess registries) {
-        items.clear();
-        unreadable = 0;
         if (!file.isFile()) {
-            LOGGER.warn("No saved-item database at {} - \"si give\" actions will do nothing.", file);
+            LOGGER.warn("No saved-item database at {}; retaining {} loaded item(s).", file, items.size());
             return;
         }
         Map<String, Object> root;
         LoaderOptions options = new LoaderOptions();
+        options.setAllowDuplicateKeys(false);
         options.setCodePointLimit(32 * 1024 * 1024);
         try (InputStreamReader reader = new InputStreamReader(new FileInputStream(file), StandardCharsets.UTF_8)) {
             Object loaded = new Yaml(options).load(reader);
             if (!(loaded instanceof Map)) {
-                LOGGER.error("Saved-item database {} is not a map; no items loaded.", file.getName());
+                LOGGER.error("Saved-item database {} is not a map; retaining loaded items.", file.getName());
                 return;
             }
             root = (Map<String, Object>) loaded;
@@ -66,19 +64,25 @@ public final class ItemLibrary {
             LOGGER.error("Could not read the saved-item database {}: {}", file.getName(), ex.toString());
             return;
         }
+        Map<String, ItemStack> loadedItems = new HashMap<>();
+        int unavailable = 0;
         for (Map.Entry<String, Object> entry : root.entrySet()) {
             if (!(entry.getValue() instanceof Map))
                 continue;
             Object item = ((Map<String, Object>) entry.getValue()).get("item");
             if (!(item instanceof Map))
                 continue;
-            ItemStack stack = build((Map<String, Object>) item, registries, entry.getKey());
-            if (stack != null && !stack.isEmpty()) {
-                items.put(String.valueOf(entry.getKey()), stack);
+            try {
+                ItemStack stack = build((Map<String, Object>) item, registries, String.valueOf(entry.getKey()));
+                if (stack != null && !stack.isEmpty()) loadedItems.put(String.valueOf(entry.getKey()), stack);
+                else unavailable++;
+            } catch (RuntimeException failure) {
+                unavailable++;
+                LOGGER.warn("Saved item {} is unavailable: {}", entry.getKey(), failure.toString());
             }
         }
-        LOGGER.info("Loaded {} saved item(s){}.", items.size(),
-                unreadable == 0 ? "" : ", " + unreadable + " carrying Bukkit-serialised data that cannot be read here");
+        items = Map.copyOf(loadedItems);
+        LOGGER.info("Loaded {} saved item(s); {} unavailable definition(s).", items.size(), unavailable);
     }
 
     /** @return a fresh copy of the saved item, or null when that id is not in the database */
@@ -112,7 +116,10 @@ public final class ItemLibrary {
             return stack;
         Map<String, Object> meta = (Map<String, Object>) metaRaw;
         if (meta.containsKey("internal")) {
-            unreadable++;
+            if (!(meta.get("internal") instanceof String encoded) || !(item.get("v") instanceof Number version)
+                    || version.doubleValue() != version.intValue())
+                throw new IllegalArgumentException("Internal item NBT requires its integer data version");
+            stack = LegacyItemData.convert(key, LegacyItemData.decode(encoded), version.intValue(), registries);
         }
         Component name = json(meta.get("display-name"), registries);
         if (name != null) {

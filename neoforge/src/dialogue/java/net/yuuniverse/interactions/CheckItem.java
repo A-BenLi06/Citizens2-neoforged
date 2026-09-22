@@ -87,7 +87,10 @@ public final class CheckItem {
 
     /** @return true when the player holds at least {@code amount} matching items (does not remove anything) */
     public static boolean holds(String expansion, ServerPlayer player) {
-        Query query = Query.parse(expansion);
+        return holds(Query.parse(expansion), player);
+    }
+
+    static boolean holds(Query query, ServerPlayer player) {
         return query != null && player != null && count(player, query) >= query.amount;
     }
 
@@ -142,7 +145,7 @@ public final class CheckItem {
             case MATERIAL_CONTAINS:
                 return id(stack).contains(query.needle.toLowerCase(Locale.ROOT));
             case MATERIAL_EXACT:
-                return id(stack).equals(normaliseId(query.needle));
+                return id(stack).equals(query.needle);
             default:
                 return false;
         }
@@ -158,8 +161,8 @@ public final class CheckItem {
      * <p>
      * The namespace cannot be found by taking the text before the first underscore, because namespaces contain
      * underscores themselves - that reading turns the second example into {@code refurbished:furniture_package}, which
-     * exists nowhere. Every split point is tried instead and the one the registry knows wins; an id that matches nothing
-     * anywhere is returned as vanilla so the caller can report it by its real name.
+     * exists nowhere. Match registered identities against the original Arclight material spelling, which also strips
+     * punctuation. Ambiguity requires an explicit alias; an unknown name is returned as vanilla for diagnostics.
      */
     static String normaliseId(String raw) {
         String value = raw.trim().toLowerCase(Locale.ROOT);
@@ -170,16 +173,27 @@ public final class CheckItem {
             return alias;
         if (BuiltInRegistries.ITEM.containsKey(ResourceLocation.fromNamespaceAndPath("minecraft", value)))
             return "minecraft:" + value;
-        for (int i = value.indexOf('_'); i > 0; i = value.indexOf('_', i + 1)) {
-            String namespace = value.substring(0, i);
-            String path = value.substring(i + 1);
-            if (!ResourceLocation.isValidNamespace(namespace) || !ResourceLocation.isValidPath(path)) {
-                continue;
-            }
-            if (BuiltInRegistries.ITEM.containsKey(ResourceLocation.fromNamespaceAndPath(namespace, path)))
-                return namespace + ":" + path;
-        }
+        ResourceLocation match = legacyMaterial(value, BuiltInRegistries.ITEM.keySet());
+        if (match != null) return match.toString();
         return "minecraft:" + value;
+    }
+
+    /** Arclight removes punctuation after replacing the namespace separator, e.g. mts:mts.jerrycan. */
+    static String legacyMaterialName(ResourceLocation key) {
+        String name = key.getNamespace().equals("minecraft") ? key.getPath() : key.toString();
+        return name.replace(':', '_').replaceAll("\\W", "").toLowerCase(Locale.ROOT);
+    }
+
+    static ResourceLocation legacyMaterial(String value, Iterable<ResourceLocation> keys) {
+        ResourceLocation match = null;
+        for (ResourceLocation key : keys) {
+            if (legacyMaterialName(key).equals(value) || key.toString().replace(':', '_').equals(value)) {
+                if (match != null && !match.equals(key))
+                    throw new IllegalArgumentException("Ambiguous legacy item material: " + value);
+                match = key;
+            }
+        }
+        return match;
     }
 
     private enum Kind {
@@ -238,7 +252,8 @@ public final class CheckItem {
                 }
                 rest = rest.substring(0, amt);
             }
-            query.needle = rest;
+            // Resolve once per query, rather than rescanning the item registry for every inventory slot.
+            query.needle = query.kind == Kind.MATERIAL_EXACT ? normaliseId(rest) : rest;
             return query;
         }
     }

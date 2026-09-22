@@ -139,8 +139,9 @@ public final class Conditions {
                 return null;
             if (inner.startsWith("checkitem_")) {
                 // Unsupported/malformed predicates must not become a successful "== no".
-                if (CheckItem.Query.parse(inner) == null) return null;
-                return CheckItem.holds(inner, player) ? "yes" : "no";
+                var query = CheckItem.Query.parse(inner);
+                if (query == null) return null;
+                return CheckItem.holds(query, player) ? "yes" : "no";
             }
             String expanded = Text.placeholders(token, player, progress);
             return expanded.equals(token) ? null : expanded;
