@@ -1,6 +1,6 @@
 # NPC parity status and changes since the initial audit
 
-> Scope correction — 2026-09-22 19:29:16 +08:00 (UTC+08:00): the user requires a Citizens port integrated with the existing NeoForge ecosystem. See [the current scope and verified replacement candidates](neoforge-ecosystem-replacements-2026-09-22.md). The full plugin-stack parity gaps below are historical comparison evidence; full Interactions, Sentinel, Quests, GroupManager, EssentialsX and PlaceholderAPI replication is no longer an acceptance requirement for Citizens.
+> Scope correction — 2026-09-22 19:43:17 +08:00 (UTC+08:00): the user requires a Citizens port integrated with the existing NeoForge ecosystem, including the already developed Yuuniverse Interactions and Yuuniverse Economy. Retain those providers; evaluate replacements for uncovered external capabilities. See [the current scope and verified replacement candidates](neoforge-ecosystem-replacements-2026-09-22.md). The full plugin-stack parity gaps below are historical comparison evidence; full Interactions, Sentinel, Quests, GroupManager, EssentialsX and PlaceholderAPI replication is no longer an acceptance requirement for Citizens.
 
 Initial audit timestamp: 2026-09-13 01:47:09 +08:00 (UTC+08:00).
 
