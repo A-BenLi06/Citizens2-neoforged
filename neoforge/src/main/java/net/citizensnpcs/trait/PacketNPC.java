@@ -1,8 +1,8 @@
 package net.citizensnpcs.trait;
 
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
-import java.util.UUID;
 import java.util.function.Consumer;
 
 import net.citizensnpcs.api.CitizensAPI;
@@ -12,7 +12,6 @@ import net.citizensnpcs.api.npc.NPC;
 import net.citizensnpcs.api.npc.RemoveReason;
 import net.citizensnpcs.api.trait.Trait;
 import net.citizensnpcs.api.trait.TraitName;
-import net.citizensnpcs.api.util.EntityUtil;
 import net.citizensnpcs.api.util.Location;
 import net.citizensnpcs.npc.EntityController;
 import net.citizensnpcs.util.EntityPacketTracker;
@@ -23,15 +22,14 @@ import net.minecraft.world.entity.Entity;
  * Makes an NPC exist only as packets: its entity is never added to the world, so vanilla never ticks it, never saves it
  * and never runs collision or AI for it.
  * <p>
- * This is a performance option rather than a behaviour change — a stationary decorative NPC costs a spawn bundle per
- * viewer and nothing else. What a viewer sees is produced by {@link EntityPacketTracker}.
+ * This is useful for decorative NPCs. What a viewer sees is produced by {@link EntityPacketTracker}; Citizens still
+ * updates its traits and reconciles viewers, while the entity does not receive vanilla world ticks.
  * <p>
  * Two differences from upstream, both because this port's structure already covers what upstream needed extra machinery
  * for:
  * <ul>
- * <li>Upstream registers each viewer in a global {@code LocationLookup.PerPlayerMetadata} map keyed by NPC uuid, purely
- * to answer "is this player already linked?". The tracker knows its own linked set, so a field here answers it directly
- * and no {@code LocationLookup} is needed.</li>
+ * <li>The tracker owns viewer membership. Every update reconciles the live player objects, range, dimension and NPC
+ * visibility, so a respawn/relogin cannot leave a stale player object linked under the same UUID.</li>
  * <li>Upstream drives the entity's per-tick update from a {@code PlayerUpdateTask}, because a Bukkit player NPC that is
  * not in the world is never ticked. This port already sweeps every NPC once a tick in {@code Citizens.onServerTick},
  * which is where {@link #run()} is called from, so the task has no purpose here.</li>
@@ -39,7 +37,6 @@ import net.minecraft.world.entity.Entity;
  */
 @TraitName("packet")
 public class PacketNPC extends Trait {
-    private final Set<UUID> linkedPlayers = new HashSet<>();
     private EntityPacketTracker packetTracker;
     private boolean spawned;
 
@@ -56,6 +53,12 @@ public class PacketNPC extends Trait {
         unlinkAll();
     }
 
+    /** Trait replacement calls the no-argument hook; only the replacement may keep tracking the entity. */
+    @Override
+    public void onRemove() {
+        unlinkAll();
+    }
+
     /**
      * @param reason
      *            {@link RemoveReason#REMOVAL} when the trait is being taken off the NPC, in which case the NPC needs a
@@ -64,15 +67,16 @@ public class PacketNPC extends Trait {
      */
     @Override
     public void onRemove(RemoveReason reason) {
-        unlinkAll();
-        if (reason != RemoveReason.REMOVAL || npc.getStoredLocation() == null)
+        if (reason != RemoveReason.REMOVAL || !spawned || npc.getEntity() == null) {
+            unlinkAll();
             return;
+        }
 
-        // the entity never entered the world, so dropping the trait has to put a real one back
+        // Clear the old controller before unlinkAll marks its virtual entity removed. The trait is already detached.
         Location at = npc.getStoredLocation();
-        npc.despawn(DespawnReason.PENDING_RESPAWN);
+        npc.despawn(DespawnReason.REMOVAL);
         CitizensAPI.getScheduler().runTask(() -> {
-            if (!npc.isSpawned()) {
+            if (at != null && npc.getOwningRegistry().getByUniqueId(npc.getUniqueId()) == npc && !npc.isSpawned()) {
                 npc.spawn(at, SpawnReason.RESPAWN);
             }
         });
@@ -83,8 +87,15 @@ public class PacketNPC extends Trait {
         Entity entity = npc.getEntity();
         if (entity == null)
             return;
+        if (entity.level().getEntity(entity.getId()) == entity) {
+            // A live API attachment must first remove the real entity; never track it through two transports.
+            CitizensAPI.getScheduler().runTask(() -> {
+                if (npc.getTraitNullable(PacketNPC.class) == this && npc.getEntity() == entity && npc.isSpawned())
+                    npc.setEntityType(entity.getType());
+            });
+            return;
+        }
         packetTracker = new EntityPacketTracker(entity);
-        linkedPlayers.clear();
         spawned = true;
     }
 
@@ -92,13 +103,29 @@ public class PacketNPC extends Trait {
     public void run() {
         if (!spawned || packetTracker == null || npc.getEntity() == null)
             return;
-        int range = npc.data().get(NPC.Metadata.TRACKING_RANGE, 64);
-        for (ServerPlayer nearby : EntityUtil.getNearbyVisiblePlayers(npc.getEntity(), range)) {
-            if (linkedPlayers.add(nearby.getUUID())) {
-                packetTracker.link(nearby);
-            }
+        Entity entity = npc.getEntity();
+        int range = Math.max(0, npc.data().get(NPC.Metadata.TRACKING_RANGE, 64));
+        var box = entity.getBoundingBox().inflate(range);
+        // Spectators and invisible players can see entities. This is viewer eligibility, not NPC target selection.
+        List<ServerPlayer> viewers = entity.getServer().getPlayerList().getPlayers().stream()
+                .filter(player -> player != entity && player.connection != null && !player.hasDisconnected()
+                        && player.level() == entity.level() && box.intersects(player.getBoundingBox())
+                        && !CitizensAPI.getNPCRegistry().isNPC(player) && visibleTo(player)).toList();
+        for (ServerPlayer linked : packetTracker.getLinked()) {
+            if (viewers.stream().noneMatch(player -> player == linked)) packetTracker.unlink(linked);
         }
+        for (ServerPlayer viewer : viewers) packetTracker.link(viewer);
         packetTracker.run();
+    }
+
+    private boolean visibleTo(ServerPlayer player) {
+        Set<NPC> visited = new HashSet<>();
+        for (NPC current = npc; current != null;) {
+            if (!visited.add(current) || current.isHiddenFrom(player) || !current.isSpawned()) return false;
+            ClickRedirectTrait redirect = current.getTraitNullable(ClickRedirectTrait.class);
+            current = redirect == null ? null : redirect.getRedirectToNPC();
+        }
+        return true;
     }
 
     /**
@@ -106,14 +133,19 @@ public class PacketNPC extends Trait {
      * adding it to the level.
      */
     public EntityController wrap(EntityController controller) {
-        return controller instanceof PacketController ? controller : new PacketController(controller);
+        return new PacketController(unwrap(controller));
+    }
+
+    /** Strip a retired trait's wrapper before selecting the current spawn transport. */
+    public static EntityController unwrap(EntityController controller) {
+        while (controller instanceof PacketController packet) controller = packet.base;
+        return controller;
     }
 
     private void unlinkAll() {
         if (packetTracker != null) {
             packetTracker.unlinkAll(null);
         }
-        linkedPlayers.clear();
         spawned = false;
     }
 

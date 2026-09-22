@@ -367,6 +367,10 @@ public class CitizensNPC extends AbstractNPC {
             location.setY(surface.getY());
         }
         getOrAddTrait(CurrentLocation.class).setLocation(location);
+        // Trait load/attachment order must not choose a different transport than the current trait set.
+        entityController = PacketNPC.unwrap(entityController);
+        PacketNPC packet = getTraitNullable(PacketNPC.class);
+        if (packet != null) entityController = packet.wrap(entityController);
         entityController.create(location, this);
         // Player controllers initialize all skin layers; SkinLayers applies explicit overrides during trait spawning.
 

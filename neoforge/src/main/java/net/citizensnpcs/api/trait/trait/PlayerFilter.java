@@ -41,11 +41,11 @@ public class PlayerFilter extends Trait {
     private final Set<UUID> viewingPlayers = Sets.newHashSet();
 
     public PlayerFilter() {
-        super("playerfilter");
+        this(null, null);
     }
 
     public PlayerFilter(BiConsumer<ServerPlayer, Entity> hideFunction, BiConsumer<ServerPlayer, Entity> viewFunction) {
-        this();
+        super("playerfilter");
         this.filter = p -> {
             if (applyRange != -1 && npc.isSpawned()) {
                 Entity entity = npc.getEntity();
