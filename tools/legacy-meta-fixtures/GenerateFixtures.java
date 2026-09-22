@@ -12,6 +12,9 @@ import com.google.common.collect.ImmutableMap;
 import org.bukkit.configuration.serialization.ConfigurationSerializable;
 import org.bukkit.configuration.serialization.SerializableAs;
 import org.bukkit.util.io.BukkitObjectOutputStream;
+import org.bukkit.Color;
+import org.bukkit.potion.PotionEffect;
+import org.bukkit.potion.PotionEffectType;
 
 /** Run only with the original Bukkit/Guava jars; emits synthetic maps through the actual Bukkit stream writer. */
 public class GenerateFixtures {
@@ -20,6 +23,13 @@ public class GenerateFixtures {
         private final Map<String, Object> values;
         Meta(Map<String, Object> values) { this.values = values; }
         @Override public Map<String, Object> serialize() { return values; }
+    }
+
+    @SerializableAs("PotionEffect")
+    public static class EffectFields implements ConfigurationSerializable {
+        private final Map<String, Object> fields;
+        EffectFields(Map<String, Object> fields) { this.fields = fields; }
+        @Override public Map<String, Object> serialize() { return fields; }
     }
 
     public static void main(String[] args) throws Exception {
@@ -48,6 +58,25 @@ public class GenerateFixtures {
         // Avoid JDK-version-specific immutable collection proxies in this legacy collection fixture.
         linked.put("b", new ArrayList<>(List.of("same", "same")));
         write(output, "collections", Map.of("meta-type", "UNSPECIFIC", "payload", linked));
+        write(output, "leather", Map.of("meta-type", "LEATHER_ARMOR", "color", Color.fromRGB(0x123456),
+                "ItemFlags", new ArrayList<>(List.of("HIDE_DYE"))));
+        Map<String, Object> trim = new LinkedHashMap<>(); trim.put("material", "minecraft:gold"); trim.put("pattern", "minecraft:sentry");
+        write(output, "trimmed", Map.of("meta-type", "ARMOR", "trim", trim, "ItemFlags", new ArrayList<>(List.of("HIDE_ARMOR_TRIM"))));
+        write(output, "colored-trimmed", Map.of("meta-type", "COLORABLE_ARMOR", "color", Color.fromRGB(0x654321), "trim", trim));
+        write(output, "writable", Map.of("meta-type", "BOOK", "pages", ImmutableList.of("{\"text\":\"literal JSON\"}", "Line one\nLine two &a<red>")));
+        write(output, "written", Map.of("meta-type", "BOOK_SIGNED", "title", "Migration notes", "author", "Narrator", "generation", 2,
+                "resolved", false, "pages", ImmutableList.of("{\"text\":\"First page\",\"color\":\"gold\",\"clickEvent\":{\"action\":\"change_page\",\"value\":\"2\"}}", "§bSecond\nline")));
+        write(output, "recipes", Map.of("meta-type", "KNOWLEDGE_BOOK", "Recipes", new ArrayList<>(List.of("minecraft:crafting_table", "audit:unavailable_recipe"))));
+        write(output, "potion", Map.of("meta-type", "POTION", "potion-type", "minecraft:long_swiftness", "custom-color", Color.fromRGB(0x336699),
+                "custom-effects", ImmutableList.of(new PotionEffect(PotionEffectType.SPEED, 123, 2, true, false, true),
+                        new PotionEffect(PotionEffectType.NIGHT_VISION, -1, 0, false, true, false)),
+                "ItemFlags", new ArrayList<>(List.of("HIDE_POTION_EFFECTS"))));
+        write(output, "potion-defaults", Map.of("meta-type", "POTION", "custom-effects", ImmutableList.of(new EffectFields(Map.of("effect", 1, "duration", 40, "amplifier", 0)))));
+        write(output, "unknown-effect", Map.of("meta-type", "POTION", "custom-effects", ImmutableList.of(new EffectFields(Map.of("effect", 9001, "duration", 40, "amplifier", 0)))));
+        write(output, "bad-effect-level", Map.of("meta-type", "POTION", "custom-effects", ImmutableList.of(new EffectFields(Map.of("effect", 1, "duration", 40, "amplifier", 300)))));
+        write(output, "missing-trim", Map.of("meta-type", "ARMOR", "trim", new LinkedHashMap<>(Map.of("material", "missing:material", "pattern", "minecraft:sentry"))));
+        write(output, "oversize-book", Map.of("meta-type", "BOOK", "pages", ImmutableList.of("x".repeat(1025))));
+        write(output, "latent-book-fields", Map.of("meta-type", "BOOK", "pages", ImmutableList.of("notes"), "author", "pending author"));
     }
 
     private static void write(Path dir, String name, Map<String, Object> map) throws Exception {

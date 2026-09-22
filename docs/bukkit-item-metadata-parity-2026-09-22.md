@@ -2,6 +2,8 @@
 
 Implementation base: `e3533c7`. Target: Minecraft 1.21.1 / NeoForge 21.1.248.
 
+Follow-up: [armor, book and potion metadata](bukkit-item-subtypes-parity-2026-09-22.md) extends subtype support and validation. Counts and remaining subtype examples below describe this earlier stream-decoder batch.
+
 ## Source format and native conversion
 
 Citizens 2.0.32 writes `meta.encoded-meta`; newer versions also use scalar `meta`. The Base64 bytes form a Java serialization stream containing `org.bukkit.util.io.Wrapper` around ItemMeta's serialized map. The wrapper adds the `==: ItemMeta` alias. Guava immutable maps/lists use serialized forms, including an inherited immutable bimap form for a one-entry map. This is distinct from ItemEdit's gzip NBT payload.

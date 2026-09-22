@@ -35,12 +35,12 @@ import net.minecraft.util.Unit;
 
 /** Complete conversion of recognized Bukkit metadata fields; an unsupported field rejects the entire definition. */
 final class LegacyBukkitMeta {
-    private static final Map<String, String> ENCHANTMENT_NAMES = enchantmentNames();
+    private static final Map<String, String> ENCHANTMENT_NAMES = aliases("legacy-enchantment-names.properties");
     private static final Style RESET = Style.EMPTY.withBold(false).withItalic(false).withUnderlined(false)
             .withStrikethrough(false).withObfuscated(false);
     private static final Pattern LEGACY_URL = Pattern.compile("(?:(?:https?)://)?(?:[-\\w_.]{2,}\\.[a-z]{2,4}.*?(?=[.?!,;:]?(?:[§ \\n]|$)))", Pattern.CASE_INSENSITIVE);
     private static final Set<String> BASE_FIELDS = Set.of("==", "meta-type", "display-name", "lore",
-            "custom-model-data", "Damage", "repair-cost", "Unbreakable", "enchants", "ItemFlags", "stored-enchants");
+            "custom-model-data", "Damage", "repair-cost", "Unbreakable", "enchants", "ItemFlags");
 
     private LegacyBukkitMeta() { }
 
@@ -48,12 +48,11 @@ final class LegacyBukkitMeta {
         Map<String, Object> meta = LegacyBukkitData.read(encoded);
         if (!"ItemMeta".equals(meta.get("=="))) throw invalid("Expected ItemMeta serialization alias");
         String type = string(meta.get("meta-type"));
-        if (!Set.of("UNSPECIFIC", "ARMOR", "ENCHANTED").contains(type))
-            throw invalid("Unsupported metadata type: " + type);
+        Set<String> specialFields = LegacyBukkitMetaTypes.fields(type);
         if (type.equals("ENCHANTED") && !(original.getItem() instanceof EnchantedBookItem))
             throw invalid("Enchanted-book metadata requires an enchanted book");
-        if (meta.containsKey("stored-enchants") && !type.equals("ENCHANTED")) throw invalid("Unexpected stored enchantments");
-        for (String key : meta.keySet()) if (!BASE_FIELDS.contains(key)) throw invalid("Unsupported metadata field: " + key);
+        for (String key : meta.keySet()) if (!BASE_FIELDS.contains(key) && !specialFields.contains(key))
+            throw invalid("Unsupported metadata field for " + type + ": " + key);
         ItemStack stack = original.copy();
         if (meta.containsKey("display-name")) stack.set(DataComponents.CUSTOM_NAME, text(string(meta.get("display-name")), registries));
         if (meta.containsKey("lore")) {
@@ -71,6 +70,7 @@ final class LegacyBukkitMeta {
         }
         if (meta.containsKey("enchants")) enchantments(stack, DataComponents.ENCHANTMENTS, meta.get("enchants"), registries);
         if (meta.containsKey("stored-enchants")) enchantments(stack, DataComponents.STORED_ENCHANTMENTS, meta.get("stored-enchants"), registries);
+        LegacyBukkitMetaTypes.apply(type, meta, stack, registries);
         if (meta.containsKey("ItemFlags")) {
             for (Object value : list(meta.get("ItemFlags"))) {
                 switch (string(value)) {
@@ -119,7 +119,7 @@ final class LegacyBukkitMeta {
         stack.set(type, type.codecOrThrow().parse(ops, tag).getOrThrow(LegacyBukkitMeta::invalid));
     }
 
-    private static Component text(String raw, HolderLookup.Provider registries) {
+    static Component text(String raw, HolderLookup.Provider registries) {
         try {
             Component json = Component.Serializer.fromJson(raw, registries);
             if (json != null) return json;
@@ -167,10 +167,10 @@ final class LegacyBukkitMeta {
         if (end < text.length()) result.append(Component.literal(text.substring(end)).withStyle(style));
     }
 
-    private static Map<String, String> enchantmentNames() {
+    static Map<String, String> aliases(String resource) {
         Properties properties = new Properties();
-        try (InputStream input = LegacyBukkitMeta.class.getResourceAsStream("/citizens/legacy-enchantment-names.properties")) {
-            if (input == null) throw new IllegalStateException("Missing legacy enchantment names");
+        try (InputStream input = LegacyBukkitMeta.class.getResourceAsStream("/citizens/" + resource)) {
+            if (input == null) throw new IllegalStateException("Missing legacy mapping: " + resource);
             properties.load(input);
         } catch (IOException failure) { throw new ExceptionInInitializerError(failure); }
         Map<String, String> result = new LinkedHashMap<>();

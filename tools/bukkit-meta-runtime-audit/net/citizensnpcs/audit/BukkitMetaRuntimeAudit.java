@@ -117,6 +117,89 @@ public final class BukkitMetaRuntimeAudit {
             StoredItems<Integer> stored = new StoredItems<>(); check(stored.load(0, key) == null && stored.contains(0), name + "_unavailable");
             stored.save(0, key, null); check(before.equals(key.getRaw("")), name + "_retained");
         }
+        specialTypes(server);
+    }
+
+    private static void specialTypes(MinecraftServer server) throws Exception {
+        for (String[] sample : List.of(new String[]{"leather", "leather_chestplate"}, new String[]{"leather", "leather_horse_armor"},
+                new String[]{"trimmed", "iron_chestplate"}, new String[]{"colored-trimmed", "leather_chestplate"},
+                new String[]{"writable", "writable_book"}, new String[]{"written", "written_book"}, new String[]{"recipes", "knowledge_book"},
+                new String[]{"potion", "potion"}, new String[]{"potion", "splash_potion"}, new String[]{"potion", "lingering_potion"}, new String[]{"potion", "tipped_arrow"})) {
+            DataKey key = item(sample[0], sample[1]); Object before = key.copy().getRaw("");
+            ItemStack stack = ItemStorage.loadItemStack(key); String label = sample[0] + "_" + sample[1];
+            check(stack != null && !stack.isEmpty(), label + "_available");
+            check(before.equals(key.getRaw("")), label + "_source_preserved");
+            ItemStorage.saveItem(key, stack); check(ItemStack.matches(stack, ItemStorage.loadItemStack(key)), label + "_native_round_trip");
+        }
+        ItemStack leather = ItemStorage.loadItemStack(item("leather", "leather_chestplate"));
+        check(leather.get(DataComponents.DYED_COLOR).rgb() == 0x123456 && !leather.get(DataComponents.DYED_COLOR).showInTooltip(), "actual_rgb_and_dye_tooltip");
+        ItemStack trimmed = ItemStorage.loadItemStack(item("trimmed", "iron_chestplate"));
+        var trim = trimmed.get(DataComponents.TRIM);
+        check(trim.material().unwrapKey().orElseThrow().location().toString().equals("minecraft:gold")
+                && trim.pattern().unwrapKey().orElseThrow().location().toString().equals("minecraft:sentry"), "actual_trim_registry_holders");
+        var trimData = DataComponents.TRIM.codecOrThrow().encodeStart(server.registryAccess().createSerializationContext(NbtOps.INSTANCE), trim).getOrThrow();
+        check(!((net.minecraft.nbt.CompoundTag) trimData).getBoolean("show_in_tooltip"), "trim_tooltip_hidden");
+        ItemStack colored = ItemStorage.loadItemStack(item("colored-trimmed", "leather_chestplate"));
+        check(colored.get(DataComponents.DYED_COLOR).rgb() == 0x654321 && colored.has(DataComponents.TRIM), "color_and_trim_coexist");
+
+        var registry = CitizensAPI.createNamedNPCRegistry("bukkit-meta-types", new net.citizensnpcs.api.npc.MemoryNPCDataStore());
+        NPC npc = registry.createNPC(EntityType.ZOMBIE, "TypedMetadata");
+        try {
+            npc.getOrAddTrait(net.citizensnpcs.api.trait.trait.Equipment.class).set(
+                    net.citizensnpcs.api.trait.trait.Equipment.EquipmentSlot.CHESTPLATE, colored);
+            check(npc.spawn(new Location(server.overworld(), 2, -60, 1)), "colored_trim_npc_spawn");
+            check(ItemStack.matches(colored, ((net.minecraft.world.entity.LivingEntity) npc.getEntity()).getItemBySlot(net.minecraft.world.entity.EquipmentSlot.CHEST)),
+                    "native_entity_wears_exact_colored_trim");
+            NPC copy = npc.copy();
+            try { check(ItemStack.matches(colored, copy.getOrAddTrait(net.citizensnpcs.api.trait.trait.Equipment.class).get(
+                    net.citizensnpcs.api.trait.trait.Equipment.EquipmentSlot.CHESTPLATE)), "copied_equipment_keeps_typed_components"); }
+            finally { copy.destroy(); }
+        } finally { npc.destroy(); }
+
+        ItemStack potion = ItemStorage.loadItemStack(item("potion", "potion"));
+        var contents = potion.get(DataComponents.POTION_CONTENTS);
+        check(contents.potion().orElseThrow().unwrapKey().orElseThrow().location().toString().equals("minecraft:long_swiftness")
+                && contents.customColor().orElseThrow() == 0x336699 && contents.customEffects().size() == 2, "potion_base_color_and_effects");
+        var speed = contents.customEffects().getFirst();
+        check(speed.getEffect().equals(net.minecraft.world.effect.MobEffects.MOVEMENT_SPEED) && speed.getDuration() == 123
+                && speed.getAmplifier() == 2 && speed.isAmbient() && !speed.isVisible() && speed.showIcon(), "potion_custom_effect_flags");
+        var cow = EntityType.COW.create(server.overworld()); cow.setPos(3, -60, 1); server.overworld().addFreshEntity(cow);
+        try {
+            ItemStack remainder = potion.getItem().finishUsingItem(potion.copy(), server.overworld(), cow);
+            check(ItemStack.matches(potion, remainder), "native_nonplayer_potion_use_keeps_stack");
+            var actual = cow.getEffect(net.minecraft.world.effect.MobEffects.MOVEMENT_SPEED);
+            check(actual != null && actual.getDuration() == 123 && actual.getAmplifier() == 2
+                    && !actual.isVisible() && actual.showIcon(), "native_consumption_applies_custom_effect");
+            var night = cow.getEffect(net.minecraft.world.effect.MobEffects.NIGHT_VISION);
+            check(night != null && night.isInfiniteDuration() && !night.showIcon(), "native_consumption_preserves_infinite_effect");
+            ItemStack tipped = ItemStorage.loadItemStack(item("potion", "tipped_arrow"));
+            var arrow = new net.minecraft.world.entity.projectile.Arrow(server.overworld(), cow, tipped, new ItemStack(Items.BOW));
+            check(arrow.getColor() == 0x336699, "native_arrow_reads_custom_potion_color"); arrow.discard();
+        } finally { cow.discard(); }
+        var player = new net.neoforged.neoforge.common.util.FakePlayer(server.overworld(),
+                new com.mojang.authlib.GameProfile(java.util.UUID.randomUUID(), "MetaAudit"));
+        player.setPos(3, -60, 1);
+        try {
+            ItemStack consumed = potion.copy();
+            ItemStack bottle = potion.getItem().finishUsingItem(consumed, server.overworld(), player);
+            check(consumed.isEmpty() && bottle.is(Items.GLASS_BOTTLE) && bottle.getCount() == 1,
+                    "native_player_potion_consumption_returns_bottle");
+            var actual = player.getEffect(net.minecraft.world.effect.MobEffects.MOVEMENT_SPEED);
+            check(actual != null && actual.getDuration() == 123 && actual.getAmplifier() == 2
+                    && !actual.isVisible() && actual.showIcon(), "native_player_consumption_applies_custom_effect");
+        } finally { player.removeAllEffects(); player.discard(); }
+        ItemStack signed = ItemStorage.loadItemStack(item("written", "written_book"));
+        var book = signed.get(DataComponents.WRITTEN_BOOK_CONTENT);
+        var resolved = book.resolve(server.createCommandSourceStack(), null);
+        check(resolved != null && resolved.resolved() && resolved.getPages(false).getFirst().getStyle().getClickEvent().getValue().equals("2")
+                && resolved.getPages(false).get(1).getString().equals("Second\nline"), "native_signed_book_resolution_keeps_pages");
+
+        for (var invalid : java.util.Map.of("unknown-effect", "potion", "bad-effect-level", "potion", "missing-trim", "iron_chestplate",
+                "oversize-book", "writable_book", "latent-book-fields", "writable_book", "written", "stone").entrySet()) {
+            DataKey key = item(invalid.getKey(), invalid.getValue()); Object before = key.copy().getRaw("");
+            StoredItems<Integer> stored = new StoredItems<>(); check(stored.load(0, key) == null && stored.contains(0), invalid.getKey() + "_typed_unavailable");
+            stored.save(0, key, null); check(before.equals(key.getRaw("")), invalid.getKey() + "_typed_retained");
+        }
     }
 
     private static DataKey item(String name, String type) throws Exception {
