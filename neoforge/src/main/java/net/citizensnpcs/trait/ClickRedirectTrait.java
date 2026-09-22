@@ -52,6 +52,12 @@ public class ClickRedirectTrait extends Trait {
         redirectTo = uuid.isEmpty() ? null : CitizensAPI.getNPCRegistry().getByUniqueIdGlobal(UUID.fromString(uuid));
     }
 
+    @Override
+    public void onRemove() {
+        if (redirectTo != null && redirectTo.hasTrait(PlayerFilter.class))
+            redirectTo.getTrait(PlayerFilter.class).removeChildNPC(npc);
+    }
+
     /** The parent may gain a {@link PlayerFilter} after this trait was attached; pick it up when it does. */
     @TraitEventHandler
     private void onTraitAdd(NPCAddTraitEvent event) {

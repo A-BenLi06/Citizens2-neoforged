@@ -4,7 +4,9 @@
 
 Initial audit timestamp: 2026-09-13 01:47:09 +08:00 (UTC+08:00).
 
-Current summary updated: 2026-09-22 20:03:00 +08:00 (UTC+08:00).
+Current summary updated: 2026-09-22 20:22:11 +08:00 (UTC+08:00).
+
+Latest Citizens presentation follow-up: [native item holograms](item-holograms-parity-2026-09-22.md) replaces literal item markup with native item/point-anchor helpers or an explicit item display. Registry-backed syntax, item/text edits, tracking, copies, temporary expiry, save/load and cleanup pass 101 real-tick checks. Final validation passes 217 ordinary tests (including four new parser cases), the existing 80-check text-editor fixture, 62 removal checks, 107 NPC assertions and 223 general probes. Release/source jars exclude probes/fixtures. Evidence: `artifacts/item-hologram-validation-summary.json`. Physical-client rendering and packet holograms remain separate acceptance work.
 
 Latest Citizens persistence follow-up: [firework items](firework-item-metadata-parity-2026-09-22.md) restores serialized rockets/stars and older structured rockets, with exact shape identities, colors, trail/twinkle and flight power. Native crafting, entity persistence, expiry/damage and unavailable-record retention pass in the expanded 280-check metadata fixture.
 
@@ -86,6 +88,7 @@ This section includes the follow-ups after the detailed historical snapshot belo
 | Unavailable effect definitions | Missing registry IDs and raw definitions survive copy/save/reload without substitute effects. Administrators can list/remove/replace them, and the exact standard effect parameters resolve and apply after the provider returns. |
 | Native configuration commands | 35 groups / 37 names covering mob variants, display/interaction properties, native NPC BossBars, potion effects and text editing; requirements, strict input, registry-backed values and aliases. Also repaired entity-type preservation, live slime sizing, panda rolling, display text/transforms and literal saved map keys. |
 | Native text editing | Chat/command add/edit/remove, pagination, speech settings and item filters, target/ownership/permission revalidation, private input, respawn rebinding and cleanup. Removed traits are no longer returned by lookup or executed again during removal. |
+| Item holograms | Native items or item displays, registry/component syntax and legacy material/color forms; parent tracking/click contracts, item/text switching, safe unavailable lines, copied/persisted lines and helper/filter cleanup. |
 | Removal and undo | ID/UUID/name/owner/world/entity targeting, ownership enforcement, temporary NPC snapshots, collision-safe/retryable undo and actual command failure propagation. |
 | Permissions | Registered NeoForge nodes with correct names, real non-OP Paradigm grants/revocations, live contextual/dynamic permission checks and group queries, selection/help permissions and local attachment lifetime; checked flag execution and reversible permanent permission shop trades. |
 
@@ -93,7 +96,7 @@ This section includes the follow-ups after the detailed historical snapshot belo
 
 | Area | Still missing or unresolved after the follow-ups |
 |---|---|
-| NPC presentation and lifecycle | Item holograms currently render literal markup and are the next concrete implementation priority. Full text-parser features and anvil-style entry also remain open. Packet hologram behavior requires its own investigation and evidence. |
+| NPC presentation and lifecycle | Native item holograms now have parser and real-tick lifecycle coverage. Physical-client item models/interpolation remain open. Full text-parser features and anvil-style entry also remain open; packet hologram behavior requires its own investigation and evidence. |
 | Commands and native behavior | All 37 historically missing 1.21.1 `/npc` names have entry points. Other command parameters, parameterized cloud particles and waypoint debugging aliases remain candidates for behavior-level review. Verify actual NPC behavior instead of using declaration counts as completion gates. |
 | Persistence and migration | Supported items/effects retain unavailable definitions safely. Remaining ItemMeta profiles/attributes/containers/persistent data, opaque NBT, structured special types and pre-flattening material identities need supported native conversions when required by content. Firework rockets/stars are now covered. |
 | Native extension contracts | Implement contracts consumed by retained integrations, including owned NPC placeholders through Paradigm's registration API where needed. The 24 absent reference event names are an investigation inventory; they do not by themselves require 24 Bukkit-shaped wrappers. |
@@ -122,7 +125,7 @@ The preceding saved-item validation passed 72 actual-provider checks, 39 conditi
 
 The following sections preserve the September 13 01:47 detailed audit for source evidence. Its then-current implementation/hash table and then-open service/removal rows are historical; use the current delta/gaps above and linked follow-ups for today's disposition.
 
-**Current disposition: Citizens core implementation and retained-stack acceptance remain open, with item holograms a confirmed next core gap. The earlier complete Citizens/Interactions/Sentinel replication criterion is superseded by the user's ecosystem scope.**
+**Current disposition: native item holograms are implemented for the tested server paths. Further Citizens core contracts and retained-stack/client acceptance remain open. The earlier complete Citizens/Interactions/Sentinel replication criterion is superseded by the user's ecosystem scope.**
 
 ## Comparison boundaries
 
@@ -323,4 +326,4 @@ The consolidated report is based on the corrected `tools/audit_npc_parity.py` in
 - `artifacts/legacy-interactions-maincommand-status.txt` and `artifacts/legacy-actionutils-status.txt`: original administration and action dispatch.
 - `walkthrough.md`: dated implementation decisions, failures and validation history.
 
-The historical repair order has been superseded: finish the current item-persistence batch, implement confirmed Citizens core gaps beginning with item holograms, add only the retained/selected providers' needed native contracts, then validate the combined client/modpack workflows. Historical command, service and API inventories remain evidence, not an instruction to rebuild every plugin.
+The historical repair order has been superseded. Firework persistence and native item holograms are now implemented; continue investigating concrete Citizens presentation/lifecycle gaps and the retained providers' needed native contracts, then validate the combined client/modpack workflows. Historical command, service and API inventories remain evidence, not an instruction to rebuild every plugin.

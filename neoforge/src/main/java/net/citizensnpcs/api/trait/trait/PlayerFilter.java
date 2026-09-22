@@ -80,6 +80,10 @@ public class PlayerFilter extends Trait {
         children.add(npc.getUniqueId());
     }
 
+    public void removeChildNPC(NPC npc) {
+        children.remove(npc.getUniqueId());
+    }
+
     /**
      * Manages NPC hiding using the given permissions group
      */
