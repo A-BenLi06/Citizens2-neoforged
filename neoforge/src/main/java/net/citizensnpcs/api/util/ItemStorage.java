@@ -51,8 +51,9 @@ import net.neoforged.neoforge.server.ServerLifecycleHooks;
  * setting {@code edited: true} makes the name and lore there win over what is in {@code nbt} on the next load.
  * <p>
  * <b>Legacy format.</b> Saves written by the Bukkit plugin use {@code type}/{@code amount}/{@code durability} plus a
- * base64 {@code meta} blob. The blob is a Java-serialised CraftBukkit {@code ItemMeta} and cannot be read without
- * CraftBukkit on the classpath, so migration is partial: item id, count, damage, display name and lore are recovered;
+ * base64 {@code meta} blob (older saves use {@code meta.encoded-meta}). Bukkit's object stream stores a wrapper around
+ * the serialized ItemMeta map. The built-in migration does not decode that map yet: item id, count, damage, display
+ * name and lore are recovered;
  * enchantments, custom model data, skull textures, attribute modifiers and any other meta are not. A warning naming the
  * item is logged whenever a blob is dropped. Migrated entries are rewritten in the current format the next time the
  * owning object is saved.
@@ -76,8 +77,17 @@ public class ItemStorage {
         return stack;
     }
 
+    /**
+     * Writes a complete native encoding, or throws before changing the existing record if encoding fails. Propagating
+     * the failure also lets strict NPC snapshots prevent removal when an item cannot be preserved.
+     */
     public static void saveItem(DataKey key, ItemStack item) {
-        // the legacy keys are cleared unconditionally so a migrated entry does not keep stale data around
+        Tag encoded = null;
+        if (item != null && !item.isEmpty()) {
+            encoded = ItemStack.CODEC.encodeStart(ops(), item).getOrThrow(message -> new IllegalStateException(
+                    "Could not serialise item at " + key.getPath() + ": " + message));
+        }
+        // Only clear old fields once the replacement has been encoded completely (or explicitly removed).
         key.removeKey("type");
         key.removeKey("type_key");
         key.removeKey("type_namespace");
@@ -94,14 +104,6 @@ public class ItemStorage {
         if (item == null || item.isEmpty()) {
             key.removeKey("nbt");
             key.removeKey("editable_components");
-            return;
-        }
-        RegistryOps<Tag> ops = ops();
-        Tag encoded = ItemStack.CODEC.encodeStart(ops, item).result().orElse(null);
-        if (encoded == null) {
-            // strict: a partial encode would silently drop components, so write nothing and say so
-            Messaging.severe("Could not serialise item " + item + " at " + key.getPath()
-                    + "; it was not saved. This usually means a data component could not be resolved.");
             return;
         }
         key.setString("nbt", encoded.toString());
@@ -150,7 +152,11 @@ public class ItemStorage {
             return null;
         try {
             CompoundTag tag = TagParser.parseTag(snbt);
-            return ItemStack.CODEC.parse(ops(), tag).resultOrPartial(Messaging::severe).orElse(null);
+            var result = ItemStack.CODEC.parse(ops(), tag);
+            result.error().ifPresent(error -> Messaging.severe(
+                    "Could not read item at " + root.getPath() + ": " + error.message()));
+            // A partial stack may have lost a provider component; it must never become a usable item.
+            return result.result().orElse(null);
         } catch (CommandSyntaxException e) {
             Messaging.severe("Malformed item NBT at " + root.getPath() + ": " + e.getMessage());
             return null;
@@ -308,8 +314,8 @@ public class ItemStorage {
     /**
      * Installs a decoder for the base64 {@code meta} blob in legacy Bukkit saves.
      * <p>
-     * The blob is a Java-serialised CraftBukkit {@code ItemMeta} and cannot be read without CraftBukkit on the
-     * classpath, so the built-in migration drops it and warns. A reader registered here — one that substitutes a
+     * The blob is a Java-serialized wrapper around an {@code ItemMeta} map; the built-in migration does not decode it
+     * and warns. A reader registered here — one that substitutes a
      * stand-in for {@code org.bukkit.util.io.Wrapper} to recover the underlying {@code meta.serialize()} map, then maps
      * it onto data components — restores enchantments and the rest without any change to this class.
      * <p>

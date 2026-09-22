@@ -139,8 +139,8 @@ public class Inventory extends Trait {
     public void save(DataKey key) {
         if (npc.isSpawned()) readBack();
         for (int slot = 0; slot < contents.length; slot++) {
-            key.removeKey(String.valueOf(slot));
-            if (contents[slot] != null) ItemStorage.saveItem(key.getRelative(String.valueOf(slot)), contents[slot]);
+            if (contents[slot] == null || contents[slot].isEmpty()) key.removeKey(String.valueOf(slot));
+            else ItemStorage.saveItem(key.getRelative(String.valueOf(slot)), contents[slot]);
         }
     }
 

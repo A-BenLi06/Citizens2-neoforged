@@ -21,10 +21,12 @@ import net.citizensnpcs.api.persistence.LocationPersister;
 import net.citizensnpcs.api.trait.Trait;
 import net.citizensnpcs.api.trait.TraitInfo;
 import net.citizensnpcs.api.trait.trait.CurrentLocation;
+import net.citizensnpcs.api.trait.trait.Inventory;
 import net.citizensnpcs.api.trait.trait.Owner;
 import net.citizensnpcs.api.trait.trait.Spawned;
 import net.citizensnpcs.api.util.ChatPrompts;
 import net.citizensnpcs.api.util.DataKey;
+import net.citizensnpcs.api.util.ItemStorage;
 import net.citizensnpcs.api.util.Location;
 import net.citizensnpcs.api.util.MemoryDataKey;
 import net.citizensnpcs.api.util.PermissionUtil;
@@ -33,6 +35,7 @@ import net.citizensnpcs.trait.SneakTrait;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.component.DataComponents;
 import net.minecraft.network.Connection;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.chat.Component;
@@ -45,6 +48,8 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.server.network.CommonListenerCookie;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
 import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.dimension.DimensionType;
@@ -344,6 +349,41 @@ public final class RemovalRuntimeAudit {
             reject(a, "npc remove " + broken.getId());
             check(exists(broken), "failed_snapshot_prevents_destruction");
             broken.removeTrait(BrokenSnapshot.class);
+
+            NPC itemOwner = npc(registry, alice.getUUID(), "ItemSnapshot", null);
+            var inventory = itemOwner.getOrAddTrait(Inventory.class);
+            ItemStack validItem = ItemStorage.parseItemStack("minecraft:diamond_sword[enchantments={levels:{'minecraft:sharpness':3}}]", 1);
+            if (validItem.isEmpty()) throw new AssertionError("Native enchantment fixture failed to parse");
+            validItem.set(DataComponents.CUSTOM_NAME, Component.literal("Snapshot sword"));
+            inventory.setContents(new ItemStack[] {validItem});
+            var inventoryKey = new MemoryDataKey();
+            inventory.save(inventoryKey);
+            check(ItemStack.matches(validItem, ItemStorage.loadItemStack(inventoryKey.getRelative("0"))),
+                    "native_enchantment_components_round_trip_with_live_registries");
+            Object savedInventory = inventoryKey.copy().getRaw("");
+            ItemStack invalidItem = new ItemStack(Items.DIAMOND_SWORD);
+            invalidItem.set(DataComponents.DAMAGE, -1);
+            inventory.setContents(new ItemStack[] {invalidItem});
+            boolean failed = false;
+            try { inventory.save(inventoryKey); } catch (IllegalStateException expected) { failed = true; }
+            check(failed && savedInventory.equals(inventoryKey.getRaw("")), "failed_inventory_encode_keeps_previous_slot_record");
+            reject(a, "npc remove " + itemOwner.getId());
+            check(exists(itemOwner), "invalid_item_encoding_prevents_npc_destruction");
+            boolean copyFailed = false;
+            try { itemOwner.copy(); } catch (IllegalStateException expected) { copyFailed = true; }
+            check(copyFailed, "invalid_item_encoding_prevents_incomplete_npc_copy");
+            inventory.setContents(new ItemStack[] {validItem});
+            UUID itemOwnerId = itemOwner.getUniqueId();
+            ok(a, "npc remove " + itemOwner.getId());
+            check(!exists(itemOwner), "corrected_item_allows_removal_retry");
+            ok(a, "npc undo");
+            NPC itemRestored = registry.getByUniqueId(itemOwnerId);
+            check(itemRestored != null && ItemStack.matches(validItem,
+                    itemRestored.getOrAddTrait(Inventory.class).getContents()[0]), "undo_retains_exact_native_item_components");
+            var restoredInventory = itemRestored.getOrAddTrait(Inventory.class);
+            restoredInventory.setContents(new ItemStack[0]);
+            restoredInventory.save(inventoryKey);
+            check(!inventoryKey.keyExists("0"), "explicit_inventory_clear_removes_the_saved_slot");
 
             var callbacks = new AtomicInteger();
             try {

@@ -4,10 +4,13 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.io.File;
 import java.nio.file.Path;
+import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
@@ -144,5 +147,65 @@ public class ItemStorageTest {
         assertNotNull(loaded);
         assertEquals("Renamed", loaded.get(DataComponents.CUSTOM_NAME).getString());
         assertFalse(key.getBoolean("editable_components.edited", true), "flag is cleared once applied");
+    }
+
+    @Test
+    public void failedNativeEncodingPreservesCompletePreviousRecord() {
+        for (boolean legacy : List.of(false, true)) {
+            DataKey key = new MemoryDataKey().getRelative("item");
+            if (legacy) {
+                key.setString("type", "diamond_sword");
+                key.setInt("amount", 1);
+                key.setString("meta.encoded-meta", "original encoded metadata");
+            } else {
+                ItemStorage.saveItem(key, new ItemStack(Items.DIAMOND));
+            }
+            key.setString("editable_components.display_name", "pending edit");
+            key.setBoolean("editable_components.edited", true);
+            key.setString("provider.value", "retained");
+            Object before = key.copy().getRaw("");
+            ItemStack invalid = new ItemStack(Items.DIAMOND_SWORD);
+            invalid.set(DataComponents.DAMAGE, -1);
+            AtomicInteger hooks = new AtomicInteger();
+            ItemStorage.setHooks((root, stack) -> hooks.incrementAndGet(), null);
+            try {
+                assertThrows(IllegalStateException.class, () -> ItemStorage.saveItem(key, invalid));
+                assertEquals(before, key.getRaw(""));
+                assertEquals(0, hooks.get(), "failed encoding does not publish a serialise event");
+            } finally {
+                ItemStorage.setHooks(null, null);
+            }
+        }
+    }
+
+    @Test
+    public void invalidNativeComponentsDoNotBecomePartialItems() {
+        for (String components : List.of("{'minecraft:damage':-1}", "{'missing:component':{value:1}}",
+                "{'minecraft:damage':'invalid'}")) {
+            DataKey key = new MemoryDataKey().getRelative("item");
+            key.setString("nbt", "{id:'minecraft:diamond_sword',count:1,components:" + components + "}");
+            key.setString("editable_components.display_name", "pending edit");
+            key.setBoolean("editable_components.edited", true);
+            Object before = key.copy().getRaw("");
+            assertNull(ItemStorage.loadItemStack(key));
+            assertEquals(before, key.getRaw(""), "failed read does not consume edits or change the source");
+        }
+    }
+
+    @Test
+    public void successfulReplacementAndExplicitRemovalStillClearOldFields() {
+        DataKey key = new MemoryDataKey().getRelative("item");
+        key.setString("type_key", "stone");
+        key.setString("meta.encoded-meta", "old data");
+        key.setString("provider.value", "retained");
+        ItemStorage.saveItem(key, new ItemStack(Items.GOLD_INGOT, 2));
+        assertFalse(key.keyExists("type_key"));
+        assertFalse(key.keyExists("meta"));
+        assertEquals(2, ItemStorage.loadItemStack(key).getCount());
+        assertEquals("retained", key.getString("provider.value"));
+        ItemStorage.saveItem(key, null);
+        assertFalse(key.keyExists("nbt"));
+        assertFalse(key.keyExists("editable_components"));
+        assertEquals("retained", key.getString("provider.value"));
     }
 }
