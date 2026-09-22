@@ -18,6 +18,10 @@ import net.citizensnpcs.api.gui.Menu;
 import net.citizensnpcs.api.gui.MenuContext;
 import net.citizensnpcs.api.event.NPCDeathEvent;
 import net.citizensnpcs.api.persistence.Persist;
+import net.citizensnpcs.api.persistence.Persistable;
+import net.citizensnpcs.api.util.DataKey;
+import net.citizensnpcs.api.util.Messaging;
+import net.citizensnpcs.api.util.StoredItems;
 import net.citizensnpcs.api.trait.Trait;
 import net.citizensnpcs.api.trait.TraitEventHandler;
 import net.citizensnpcs.api.trait.TraitName;
@@ -68,6 +72,7 @@ public class DropsTrait extends Trait {
     public static class DropsGUI extends InventoryMenuPage {
         private final Map<Integer, Double> chances = new HashMap<>();
         private Container container;
+        private boolean unavailable;
         private DropsTrait trait;
 
         private DropsGUI() {
@@ -81,6 +86,12 @@ public class DropsTrait extends Trait {
         @Override
         public void initialise(MenuContext ctx) {
             container = ctx.getContainer();
+            unavailable = trait.drops.stream().anyMatch(ItemDrop::isUnavailable);
+            if (unavailable) {
+                ctx.getSlot(0).setItemStack(new ItemStack(Items.BARRIER), Messaging.tr("citizens.items.unavailable"),
+                        Messaging.tr("citizens.items.unavailable-edit"));
+                return;
+            }
             int k = 0;
             for (int i = 1; i < 5; i += 2) {
                 for (int j = 0; j < 9; j++) {
@@ -107,6 +118,7 @@ public class DropsTrait extends Trait {
 
         @Override
         public void onClick(InventoryMenuSlot slot, CitizensInventoryClickEvent event) {
+            if (unavailable) { event.setCancelled(true); return; }
             // the barrier rows are the chance controls; the rows above them are the player's to fill
             if (!slot.getCurrentItemNonNull().isEmpty() && slot.getCurrentItemNonNull().is(Items.BARRIER))
                 return;
@@ -121,6 +133,7 @@ public class DropsTrait extends Trait {
 
         @Override
         public void onClose(ServerPlayer player) {
+            if (unavailable) return;
             List<ItemDrop> drops = new ArrayList<>();
             for (int i = 0; i < 5; i += 2) {
                 for (int j = 0; j < 9; j++) {
@@ -137,11 +150,11 @@ public class DropsTrait extends Trait {
     }
 
     /** One entry: what to drop, and how likely it is. */
-    public static class ItemDrop {
+    public static class ItemDrop implements Persistable {
         @Persist
         double chance;
-        @Persist
         ItemStack drop;
+        private final StoredItems<String> stored = new StoredItems<>();
 
         public ItemDrop() {
         }
@@ -158,5 +171,9 @@ public class DropsTrait extends Trait {
         public ItemStack getDrop() {
             return drop;
         }
+
+        public boolean isUnavailable() { return stored.contains("drop"); }
+        @Override public void load(DataKey root) { drop = stored.load("drop", root.getRelative("drop")); }
+        @Override public void save(DataKey root) { stored.save("drop", root.getRelative("drop"), drop); }
     }
 }

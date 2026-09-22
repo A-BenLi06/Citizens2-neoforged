@@ -10,7 +10,7 @@ import net.citizensnpcs.api.trait.Trait;
 import net.citizensnpcs.api.trait.TraitName;
 import net.citizensnpcs.api.trait.trait.Equipment.EquipmentSlot;
 import net.citizensnpcs.api.util.DataKey;
-import net.citizensnpcs.api.util.ItemStorage;
+import net.citizensnpcs.api.util.StoredItems;
 import net.citizensnpcs.api.util.Messaging;
 import net.citizensnpcs.api.util.TextParser;
 import net.minecraft.network.chat.Component;
@@ -33,6 +33,7 @@ import net.minecraft.world.item.ItemStack;
 @TraitName("inventory")
 public class Inventory extends Trait {
     private ItemStack[] contents = new ItemStack[SIZE];
+    private final StoredItems<Integer> stored = new StoredItems<>();
     private boolean syncingHand;
     private InventoryView view;
     private final Set<ServerPlayer> viewers = new HashSet<>();
@@ -42,6 +43,7 @@ public class Inventory extends Trait {
     /** Empty slots use null for API and stored-data compatibility. */
     public ItemStack[] getContents() { readBack(); return contents; }
     public Container getInventoryView() { return view; }
+    public Set<Integer> getUnresolvedSlots() { return stored.keys(); }
 
     @Override
     public void onAttach() {
@@ -51,9 +53,10 @@ public class Inventory extends Trait {
     @Override
     public void load(DataKey key) throws NPCLoadException {
         contents = new ItemStack[SIZE];
+        stored.clear();
         for (DataKey slotKey : key.getIntegerSubKeys()) {
             int slot = Integer.parseInt(slotKey.name());
-            if (slot >= 0 && slot < contents.length) contents[slot] = ItemStorage.loadItemStack(slotKey);
+            if (slot >= 0 && slot < contents.length) contents[slot] = stored.load(slot, slotKey);
         }
     }
 
@@ -139,12 +142,12 @@ public class Inventory extends Trait {
     public void save(DataKey key) {
         if (npc.isSpawned()) readBack();
         for (int slot = 0; slot < contents.length; slot++) {
-            if (contents[slot] == null || contents[slot].isEmpty()) key.removeKey(String.valueOf(slot));
-            else ItemStorage.saveItem(key.getRelative(String.valueOf(slot)), contents[slot]);
+            stored.save(slot, key.getRelative(String.valueOf(slot)), contents[slot]);
         }
     }
 
     public void setContents(ItemStack[] newContents) {
+        stored.clear();
         contents = new ItemStack[SIZE];
         for (int i = 0; i < contents.length && i < newContents.length; i++) contents[i] = copy(newContents[i]);
         pushToEntity();
@@ -161,6 +164,7 @@ public class Inventory extends Trait {
 
     public void setItem(int slot, ItemStack item) {
         if (slot < 0 || slot >= contents.length) throw new IndexOutOfBoundsException("Inventory slot " + slot);
+        stored.clear(slot);
         contents[slot] = copy(item);
         Container destination = getEntityContainer();
         if (destination != null && slot < destination.getContainerSize()) destination.setItem(slot, nonnull(item).copy());
@@ -188,7 +192,7 @@ public class Inventory extends Trait {
     /** Equipment writes the native hand itself. This notification must not replace a horse's saddle slot. */
     void setItemInHand(ItemStack item) {
         int slot = handSlot();
-        if (slot >= 0) contents[slot] = copy(item);
+        if (slot >= 0) { stored.clear(slot); contents[slot] = copy(item); }
     }
 
     private static ItemStack copy(ItemStack item) { return item == null || item.isEmpty() ? null : item.copy(); }

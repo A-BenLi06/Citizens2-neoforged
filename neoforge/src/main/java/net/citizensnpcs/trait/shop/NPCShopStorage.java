@@ -8,6 +8,7 @@ import java.util.stream.Collectors;
 
 import net.citizensnpcs.api.gui.InventoryMenuPage;
 import net.citizensnpcs.api.persistence.Persist;
+import net.citizensnpcs.api.util.StoredItemList;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.item.ItemStack;
 
@@ -36,8 +37,10 @@ public class NPCShopStorage {
     }
 
     public boolean canAdd(int n) {
-        return inventorySizeLimit == -1 || inventory.size() + n < inventorySizeLimit;
+        return !hasUnavailableItems() && (inventorySizeLimit == -1 || inventory.size() + n < inventorySizeLimit);
     }
+
+    public boolean hasUnavailableItems() { return !unlimited && StoredItemList.hasUnavailable(inventory); }
 
     public double getBalance() {
         return balance;
@@ -86,6 +89,7 @@ public class NPCShopStorage {
     public void transact(Consumer<ItemStack[]> action, int additional) {
         if (unlimited)
             return;
+        if (hasUnavailableItems()) throw new IllegalStateException("Shop stock contains unavailable item definitions");
         ItemStack[] items = new ItemStack[inventory.size() + Math.max(0, additional)];
         for (int i = 0; i < items.length; i++) {
             items[i] = i < inventory.size() ? inventory.get(i) : ItemStack.EMPTY;

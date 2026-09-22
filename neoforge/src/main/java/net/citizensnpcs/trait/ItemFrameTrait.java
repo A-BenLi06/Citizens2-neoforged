@@ -8,6 +8,7 @@ import net.citizensnpcs.api.persistence.Persist;
 import net.citizensnpcs.api.trait.Trait;
 import net.citizensnpcs.api.trait.TraitName;
 import net.citizensnpcs.api.util.DataKey;
+import net.citizensnpcs.api.util.StoredItems;
 import net.minecraft.core.Direction;
 import net.minecraft.world.entity.decoration.ItemFrame;
 import net.minecraft.world.item.ItemStack;
@@ -24,8 +25,8 @@ public class ItemFrameTrait extends Trait {
     private Direction facing = Direction.NORTH;
     @Persist
     private Boolean fixed;
-    @Persist
     private ItemStack item;
+    private final StoredItems<String> stored = new StoredItems<>();
     private FrameRotation rotation = FrameRotation.NONE;
     @Persist
     private boolean visible = true;
@@ -46,6 +47,8 @@ public class ItemFrameTrait extends Trait {
         return item;
     }
 
+    public boolean hasUnresolvedItem() { return stored.contains("item"); }
+
     public FrameRotation getRotation() {
         return rotation;
     }
@@ -56,12 +59,14 @@ public class ItemFrameTrait extends Trait {
 
     @Override
     public void load(DataKey key) throws NPCLoadException {
+        item = stored.load("item", key.getRelative("item"));
         facing = parseFacing(key.getString("facing"));
         rotation = parseRotation(key.getString("rotation"));
     }
 
     @Override
     public void save(DataKey key) {
+        stored.save("item", key.getRelative("item"), item);
         key.setString("facing", facing == null ? "" : facing.name());
         key.setString("rotation", rotation == null ? "" : rotation.name());
     }
@@ -93,6 +98,7 @@ public class ItemFrameTrait extends Trait {
     }
 
     public void setItem(ItemStack item) {
+        stored.clear();
         this.item = item;
     }
 

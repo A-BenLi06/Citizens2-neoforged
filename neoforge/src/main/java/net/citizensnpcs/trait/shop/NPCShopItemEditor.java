@@ -87,6 +87,8 @@ public class NPCShopItemEditor extends InventoryMenuPage {
         this.ctx = ctx;
         if (modified.display != null) {
             ctx.getSlot(9 * 4 + 4).setItemStack(modified.getDisplayItem(null));
+        } else if (modified.hasUnresolvedDisplay()) {
+            ctx.getSlot(9 * 4 + 4).setItemStack(new ItemStack(Items.BARRIER), Messaging.tr("citizens.items.unavailable"));
         }
         ctx.getSlot(9 * 4 + 7).setItemStack(new ItemStack(Items.APPLE), "Reset purchase history",
                 modified.purchases.size() + " purchases");
@@ -196,7 +198,7 @@ public class NPCShopItemEditor extends InventoryMenuPage {
 
     @Override
     public void onClose(ServerPlayer who) {
-        if (base != null && base.display == null) {
+        if (base != null && base.display == null && !base.hasUnresolvedDisplay()) {
             base = null;
         }
         callback.accept(base);

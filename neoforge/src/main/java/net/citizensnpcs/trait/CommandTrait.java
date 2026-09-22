@@ -36,7 +36,7 @@ import net.citizensnpcs.api.trait.Trait;
 import net.citizensnpcs.api.trait.TraitName;
 import net.citizensnpcs.api.util.DataKey;
 import net.citizensnpcs.api.util.Durations;
-import net.citizensnpcs.api.util.ItemStorage;
+import net.citizensnpcs.api.util.StoredItemList;
 import net.citizensnpcs.api.util.Messaging;
 import net.citizensnpcs.api.util.PermissionUtil;
 import net.citizensnpcs.api.util.Placeholders;
@@ -100,6 +100,10 @@ public class CommandTrait extends Trait {
     }
 
     private Transaction chargeCommandCosts(ServerPlayer player, Hand hand, NPCCommand command) {
+        if (StoredItemList.hasUnavailable(command.itemCost)) {
+            Messaging.send(player.createCommandSourceStack(), Messaging.tr("citizens.items.unavailable"));
+            return Transaction.fail();
+        }
         if (PermissionUtil.hasPermission(player, "citizens.npc.command.ignoreerrors.*"))
             return Transaction.success();
         Collection<Transaction> txns = new ArrayList<>();
@@ -133,6 +137,10 @@ public class CommandTrait extends Trait {
     }
 
     private Transaction chargeGlobalCommandCosts(ServerPlayer player, Hand hand) {
+        if (StoredItemList.hasUnavailable(itemRequirements)) {
+            Messaging.send(player.createCommandSourceStack(), Messaging.tr("citizens.items.unavailable"));
+            return Transaction.fail();
+        }
         if (PermissionUtil.hasPermission(player, "citizens.npc.command.ignoreerrors.*"))
             return Transaction.success();
         Collection<Transaction> txns = new ArrayList<>();
@@ -284,6 +292,11 @@ public class CommandTrait extends Trait {
         NPCCommandDispatchEvent event = new NPCCommandDispatchEvent(npc, player).callEvent();
         if (event.isCanceled())
             return;
+        if (commands.values().stream().anyMatch(command -> (command.hand == hand || command.hand == Hand.BOTH)
+                && StoredItemList.hasUnavailable(command.itemCost))) {
+            Messaging.send(player.createCommandSourceStack(), Messaging.tr("citizens.items.unavailable"));
+            return;
+        }
         Transaction global = chargeGlobalCommandCosts(player, hand);
         if (!global.isPossible())
             return;
@@ -550,6 +563,7 @@ public class CommandTrait extends Trait {
     @Menu(title = "Drag items for requirements", type = InventoryType.CHEST, dimensions = { 5, 9 })
     public static class ItemRequirementGUI extends InventoryMenuPage {
         private Container container;
+        private boolean unavailable;
         private int id = -1;
         private CommandTrait trait;
 
@@ -570,6 +584,12 @@ public class CommandTrait extends Trait {
         public void initialise(MenuContext ctx) {
             container = ctx.getContainer();
             List<ItemStack> source = id == -1 ? trait.itemRequirements : trait.commands.get(id).itemCost;
+            unavailable = StoredItemList.hasUnavailable(source);
+            if (unavailable) {
+                ctx.getSlot(0).setItemStack(new ItemStack(net.minecraft.world.item.Items.BARRIER),
+                        Messaging.tr("citizens.items.unavailable"), Messaging.tr("citizens.items.unavailable-edit"));
+                return;
+            }
             int slot = 0;
             for (ItemStack stack : source) {
                 if (slot >= container.getContainerSize()) {
@@ -582,11 +602,12 @@ public class CommandTrait extends Trait {
         @Override
         public void onClick(InventoryMenuSlot slot, CitizensInventoryClickEvent event) {
             // the whole point of this page is that the player can move items in and out of it freely
-            event.setCancelled(false);
+            event.setCancelled(unavailable);
         }
 
         @Override
         public void onClose(ServerPlayer player) {
+            if (unavailable) return;
             List<ItemStack> requirements = new ArrayList<>();
             for (int i = 0; i < container.getContainerSize(); i++) {
                 ItemStack stack = container.getItem(i);
@@ -767,10 +788,7 @@ public class CommandTrait extends Trait {
             for (DataKey key : root.getRelative("permissions").getIntegerSubKeys()) {
                 perms.add(key.getString(""));
             }
-            List<ItemStack> items = new ArrayList<>();
-            for (DataKey key : root.getRelative("itemCost").getIntegerSubKeys()) {
-                items.add(ItemStorage.loadItemStack(key));
-            }
+            List<ItemStack> items = StoredItemList.load(root.getRelative("itemCost"));
             return new NPCCommand(Integer.parseInt(root.name()), root.getString("command"),
                     Hand.valueOf(root.getString("hand")), root.getBoolean("player", false),
                     root.getBoolean("op", false), root.getInt("cooldown", 0), perms, root.getInt("n", 0),
@@ -817,10 +835,7 @@ public class CommandTrait extends Trait {
             for (int i = 0; i < instance.perms.size(); i++) {
                 root.setString("permissions." + i, instance.perms.get(i));
             }
-            root.removeKey("itemCost");
-            for (int i = 0; i < instance.itemCost.size(); i++) {
-                ItemStorage.saveItem(root.getRelative("itemCost." + i), instance.itemCost.get(i));
-            }
+            StoredItemList.save(instance.itemCost, root.getRelative("itemCost"));
         }
     }
 

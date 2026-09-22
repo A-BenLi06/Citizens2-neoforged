@@ -27,10 +27,13 @@ The dispatcher checks verify that expected Citizens failures become Brigadier
 failures and stop later dialogue actions. The public `executeSafe` handled-result
 contract is separate from this dispatcher outcome.
 
-The fixture has 51 checks. Seven item-persistence checks exercise native enchantment
+The fixture has 62 checks. Seven item-persistence checks exercise native enchantment
 components with live registries, failed inventory encoding without deleting the old
 slot, snapshot failure blocking removal and copying, retry after fixing the item,
 exact item restoration through undo, and explicit clearing of an inventory slot.
+Eleven recovery checks cover unavailable global/per-command costs before any payment,
+retained cost definitions, cost/action/stock editor opening and closing, repaired
+payments, and actual scheduled rewards on the following server tick.
 
 The runner requires a completion marker and no failure marker, and has a three-minute
 task timeout if the subscriber is absent or a startup check hangs. The subscriber

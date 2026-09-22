@@ -18,6 +18,9 @@ import net.citizensnpcs.api.event.NPCRemoveByCommandSenderEvent;
 import net.citizensnpcs.api.npc.NPC;
 import net.citizensnpcs.api.npc.NPCRegistry;
 import net.citizensnpcs.api.persistence.LocationPersister;
+import net.citizensnpcs.api.persistence.PersistenceLoader;
+import net.citizensnpcs.api.gui.MenuContext;
+import net.citizensnpcs.api.gui.InventoryMenuSlot;
 import net.citizensnpcs.api.trait.Trait;
 import net.citizensnpcs.api.trait.TraitInfo;
 import net.citizensnpcs.api.trait.trait.CurrentLocation;
@@ -32,6 +35,10 @@ import net.citizensnpcs.api.util.MemoryDataKey;
 import net.citizensnpcs.api.util.PermissionUtil;
 import net.citizensnpcs.commands.NPCCommandSelector;
 import net.citizensnpcs.trait.SneakTrait;
+import net.citizensnpcs.trait.CommandTrait;
+import net.citizensnpcs.trait.shop.ItemAction;
+import net.citizensnpcs.trait.shop.InventoryViewer;
+import net.citizensnpcs.trait.shop.NPCShopStorage;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
 import net.minecraft.core.BlockPos;
@@ -50,6 +57,7 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
+import net.minecraft.world.SimpleContainer;
 import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.dimension.DimensionType;
@@ -114,6 +122,7 @@ public final class RemovalRuntimeAudit {
         final List<AuditPlayer> players = new ArrayList<>();
         final List<PermissionUtil.Attachment> grants = new ArrayList<>();
         final AtomicReference<NPC> chosen = new AtomicReference<>();
+        final AtomicInteger recoveredItemRewards = new AtomicInteger();
         final RemovalRecorder recorder = new RemovalRecorder();
         final TraitInfo brokenInfo = TraitInfo.create(BrokenSnapshot.class).withName("removalauditfailure");
         boolean isolated;
@@ -145,6 +154,8 @@ public final class RemovalRuntimeAudit {
             steps.add(() -> {
                 NPC restored = registry.getByUniqueId(spawnedRestore);
                 if (restored == null || !restored.isSpawned()) return false;
+                if (recoveredItemRewards.get() < 2) return false;
+                check(recoveredItemRewards.get() == 2, "only_repaired_item_costs_dispatch_scheduled_rewards");
                 check(restored.getEntity().isShiftKeyDown()
                         && Math.abs(restored.getNavigator().getDefaultParameters().speedModifier() - 1.75F) < 0.0001,
                         "undo_restores_spawned_entity_traits_and_navigation");
@@ -384,6 +395,54 @@ public final class RemovalRuntimeAudit {
             restoredInventory.setContents(new ItemStack[0]);
             restoredInventory.save(inventoryKey);
             check(!inventoryKey.keyExists("0"), "explicit_inventory_clear_removes_the_saved_slot");
+
+            var itemRewards = recoveredItemRewards;
+            server.getCommands().getDispatcher().register(Commands.literal("itemrecoveryreward").executes(ctx -> itemRewards.incrementAndGet()));
+            for (String itemPath : List.of("itemRequirements.0", "commands.0.itemCost.0")) {
+                NPC costNpc = npc(registry, alice.getUUID(), "ItemCostRecovery", null);
+                var costs = costNpc.getOrAddTrait(CommandTrait.class);
+                costs.addCommand(new CommandTrait.NPCCommandBuilder("itemrecoveryreward", CommandTrait.Hand.RIGHT).experienceCost(2));
+                costs.setExperienceCost(3);
+                DataKey definition = new MemoryDataKey(); PersistenceLoader.save(costs, definition);
+                definition.setString(itemPath + ".nbt", "{id:'missing:cost',count:1}");
+                PersistenceLoader.load(costs, definition);
+                int beforeReward = itemRewards.get(); alice.setExperienceLevels(20);
+                costs.dispatch(alice, CommandTrait.Hand.RIGHT);
+                check(itemRewards.get() == beforeReward && alice.experienceLevel == 20,
+                        "unavailable_item_precedes_all_command_payments_" + itemPath);
+                DataKey savedCosts = new MemoryDataKey(); PersistenceLoader.save(costs, savedCosts);
+                check(definition.getRaw(itemPath).equals(savedCosts.getRaw(itemPath)), "unavailable_command_cost_is_persisted_" + itemPath);
+                var editor = itemPath.startsWith("itemRequirements") ? new CommandTrait.ItemRequirementGUI(costs)
+                        : new CommandTrait.ItemRequirementGUI(costs, 0);
+                var editorContext = new MenuContext(null, new InventoryMenuSlot[45], new SimpleContainer(45), "audit");
+                editor.initialise(editorContext); editor.onClose(alice);
+                var afterEditor = new MemoryDataKey(); PersistenceLoader.save(costs, afterEditor);
+                check(savedCosts.getRaw(itemPath).equals(afterEditor.getRaw(itemPath)), "opening_cost_editor_keeps_unavailable_definition_" + itemPath);
+                ItemStorage.saveItem(savedCosts.getRelative(itemPath), new ItemStack(Items.DIAMOND));
+                PersistenceLoader.load(costs, savedCosts); alice.getInventory().setItem(0, new ItemStack(Items.DIAMOND, 3));
+                costs.dispatch(alice, CommandTrait.Hand.RIGHT);
+                check(alice.experienceLevel == 15
+                        && alice.getInventory().getItem(0).getCount() == 2, "repaired_cost_executes_with_exact_payments_" + itemPath
+                        + "_reward=" + (itemRewards.get() - beforeReward) + "_levels=" + alice.experienceLevel
+                        + "_items=" + alice.getInventory().getItem(0).getCount());
+                costNpc.destroy();
+            }
+            DataKey missingAction = new MemoryDataKey(); missingAction.setString("items.0.nbt", "{id:'missing:reward',count:1}");
+            ItemAction itemAction = PersistenceLoader.load(ItemAction.class, missingAction);
+            var editCallbacks = new AtomicInteger();
+            var actionEditor = new ItemAction.ItemActionEditor(itemAction, result -> editCallbacks.incrementAndGet());
+            actionEditor.initialise(new MenuContext(null, new InventoryMenuSlot[36], new SimpleContainer(36), "audit"));
+            actionEditor.onClose(alice);
+            var actionSaved = new MemoryDataKey(); PersistenceLoader.save(itemAction, actionSaved);
+            check(editCallbacks.get() == 0 && missingAction.getRaw("items").equals(actionSaved.getRaw("items")),
+                    "opening_action_editor_keeps_unavailable_definition");
+            DataKey missingStock = new MemoryDataKey(); missingStock.setRaw("inventory", missingAction.getRaw("items"));
+            NPCShopStorage shopStock = PersistenceLoader.load(NPCShopStorage.class, missingStock);
+            var stockEditor = new InventoryViewer(shopStock);
+            stockEditor.initialise(new MenuContext(null, new InventoryMenuSlot[36], new SimpleContainer(36), "audit"));
+            stockEditor.onClose(alice);
+            var stockSaved = new MemoryDataKey(); PersistenceLoader.save(shopStock, stockSaved);
+            check(missingStock.getRaw("inventory").equals(stockSaved.getRaw("inventory")), "opening_stock_editor_keeps_unavailable_definition");
 
             var callbacks = new AtomicInteger();
             try {

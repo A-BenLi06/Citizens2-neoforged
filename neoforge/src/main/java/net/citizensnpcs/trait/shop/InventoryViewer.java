@@ -10,6 +10,8 @@ import net.citizensnpcs.api.gui.InventoryMenuPage;
 import net.citizensnpcs.api.gui.InventoryMenuSlot;
 import net.citizensnpcs.api.gui.Menu;
 import net.citizensnpcs.api.gui.MenuContext;
+import net.citizensnpcs.api.util.Messaging;
+import net.citizensnpcs.api.util.StoredItemList;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
@@ -21,6 +23,7 @@ import net.minecraft.world.item.Items;
 public class InventoryViewer extends InventoryMenuPage {
     private MenuContext ctx;
     private NPCShopStorage storage;
+    private boolean unavailable;
 
     public InventoryViewer() {
     }
@@ -33,6 +36,12 @@ public class InventoryViewer extends InventoryMenuPage {
     public void initialise(MenuContext ctx) {
         this.ctx = ctx;
         List<ItemStack> inventory = storage.getInventory();
+        unavailable = StoredItemList.hasUnavailable(inventory);
+        if (unavailable) {
+            ctx.getSlot(0).setItemStack(new ItemStack(Items.BARRIER), Messaging.tr("citizens.items.unavailable"),
+                    Messaging.tr("citizens.items.unavailable-edit"));
+            return;
+        }
         for (int i = 0; i < 3 * 9; i++) {
             InventoryMenuSlot slot = ctx.getSlot(i);
             slot.clear();
@@ -60,6 +69,7 @@ public class InventoryViewer extends InventoryMenuPage {
 
     @Override
     public void onClose(ServerPlayer player) {
+        if (unavailable) return;
         List<ItemStack> items = new ArrayList<>();
         for (int i = 0; i < 3 * 9; i++) {
             ItemStack stack = ctx.getSlot(i).getCurrentItem();

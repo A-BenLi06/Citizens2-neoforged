@@ -1,4 +1,6 @@
 {
+  "citizens.items.unavailable": "One or more saved items are unavailable.",
+  "citizens.items.unavailable-edit": "Restore the required item provider or repair the saved item definitions before editing this list.",
   "citizens.commands.npc.potioneffects.list-unavailable": "[[{0}]]: unavailable effect type [[{1}]] (saved definition retained)",
   "citizens.changed-implementation": "Citizens implementation changed, disabling plugin.",
   "citizens.commands.invalid-value": "Invalid value for [[{0}]]: [[{1}]].",

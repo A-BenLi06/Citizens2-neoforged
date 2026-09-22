@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Set;
 
 import com.google.common.collect.Maps;
 import com.mojang.datafixers.util.Pair;
@@ -18,6 +19,7 @@ import net.citizensnpcs.api.trait.TraitEventHandler;
 import net.citizensnpcs.api.trait.TraitName;
 import net.citizensnpcs.api.util.DataKey;
 import net.citizensnpcs.api.util.ItemStorage;
+import net.citizensnpcs.api.util.StoredItems;
 import net.minecraft.network.protocol.game.ClientboundSetEquipmentPacket;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
@@ -51,6 +53,8 @@ import net.neoforged.neoforge.common.NeoForge;
 public class Equipment extends Trait {
     private final ItemStack[] cosmetic = new ItemStack[8];
     private final ItemStack[] equipment = new ItemStack[8];
+    private final StoredItems<EquipmentSlot> stored = new StoredItems<>();
+    private final StoredItems<EquipmentSlot> storedCosmetic = new StoredItems<>();
 
     public Equipment() {
         super("equipment");
@@ -95,6 +99,9 @@ public class Equipment extends Trait {
         return equipment;
     }
 
+    public Set<EquipmentSlot> getUnresolvedSlots() { return stored.keys(); }
+    public Set<EquipmentSlot> getUnresolvedCosmeticSlots() { return storedCosmetic.keys(); }
+
     /**
      * Get all of the equipment as a {@link Map}.
      */
@@ -108,14 +115,11 @@ public class Equipment extends Trait {
 
     @Override
     public void load(DataKey key) throws NPCLoadException {
+        stored.clear(); storedCosmetic.clear();
         for (EquipmentSlot slot : EquipmentSlot.values()) {
             String name = slot.name().toLowerCase(Locale.ROOT);
-            if (key.keyExists(name)) {
-                equipment[slot.getIndex()] = ItemStorage.loadItemStack(key.getRelative(name));
-            }
-            if (key.keyExists("cosmetic_" + name)) {
-                cosmetic[slot.getIndex()] = ItemStorage.loadItemStack(key.getRelative("cosmetic_" + name));
-            }
+            equipment[slot.getIndex()] = stored.load(slot, key.getRelative(name));
+            cosmetic[slot.getIndex()] = storedCosmetic.load(slot, key.getRelative("cosmetic_" + name));
         }
     }
 
@@ -231,16 +235,8 @@ public class Equipment extends Trait {
         if (npc.isSpawned()) captureEquipment();
         for (EquipmentSlot slot : EquipmentSlot.values()) {
             String name = slot.name().toLowerCase(Locale.ROOT);
-            saveOrRemove(key.getRelative(name), equipment[slot.getIndex()]);
-            saveOrRemove(key.getRelative("cosmetic_" + name), cosmetic[slot.getIndex()]);
-        }
-    }
-
-    private void saveOrRemove(DataKey key, ItemStack item) {
-        if (item != null && !item.isEmpty()) {
-            ItemStorage.saveItem(key, item);
-        } else if (key.keyExists("")) {
-            key.removeKey("");
+            stored.save(slot, key.getRelative(name), equipment[slot.getIndex()]);
+            storedCosmetic.save(slot, key.getRelative("cosmetic_" + name), cosmetic[slot.getIndex()]);
         }
     }
 
@@ -255,6 +251,7 @@ public class Equipment extends Trait {
     public void set(EquipmentSlot eslot, ItemStack item) {
         NeoForge.EVENT_BUS.post(new NPCChangeEquipmentEvent(npc, eslot, item));
         int slot = eslot.getIndex();
+        stored.clear(eslot);
         item = clone(item);
         equipment[slot] = item;
         if (slot == 0 && npc.hasTrait(Inventory.class)) {
@@ -313,6 +310,7 @@ public class Equipment extends Trait {
      * Set the cosmetic equipment in the given slot. Viewers see this in place of an unequipped slot.
      */
     public void setCosmetic(EquipmentSlot slot, ItemStack stack) {
+        storedCosmetic.clear(slot);
         cosmetic[slot.getIndex()] = clone(stack);
         broadcastCosmetic();
     }

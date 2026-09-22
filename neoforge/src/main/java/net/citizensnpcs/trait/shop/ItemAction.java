@@ -17,6 +17,7 @@ import net.citizensnpcs.api.gui.Menu;
 import net.citizensnpcs.api.gui.MenuContext;
 import net.citizensnpcs.api.persistence.Persist;
 import net.citizensnpcs.api.util.ItemStorage;
+import net.citizensnpcs.api.util.StoredItemList;
 import net.citizensnpcs.api.util.Messaging;
 import net.citizensnpcs.api.util.PermissionUtil;
 import net.citizensnpcs.util.InventoryMultiplexer;
@@ -48,6 +49,14 @@ public class ItemAction extends NPCShopAction {
         setItems(items);
     }
 
+    @Override public ItemAction clone() {
+        ItemAction result = (ItemAction) super.clone();
+        result.items = items instanceof StoredItemList stored ? stored.copy()
+                : items.stream().map(item -> item == null ? null : item.copy()).collect(Collectors.toCollection(ArrayList::new));
+        result.metaFilter = new ArrayList<>(metaFilter);
+        return result;
+    }
+
     /** Whether there is room to hand over {@code items.size() * repeats} stacks. */
     private boolean canAccept(InventoryMultiplexer im, int repeats) {
         int free = 0;
@@ -61,6 +70,7 @@ public class ItemAction extends NPCShopAction {
 
     @Override
     public String describe() {
+        if (hasUnavailableItems()) return Messaging.tr("citizens.items.unavailable");
         if (items.size() == 1)
             return stringify(items.get(0));
         String description = items.size() + " items";
@@ -76,6 +86,7 @@ public class ItemAction extends NPCShopAction {
 
     @Override
     public int getMaxRepeats(Entity entity, InventoryMultiplexer im) {
+        if (hasUnavailableItems()) return 0;
         ItemStack[] inventory = im.getInventory();
         List<Integer> req = items.stream().map(ItemStack::getCount).collect(Collectors.toList());
         List<Integer> has = items.stream().map(i -> 0).collect(Collectors.toList());
@@ -127,6 +138,7 @@ public class ItemAction extends NPCShopAction {
 
     @Override
     public Transaction grant(NPCShopStorage storage, Entity entity, InventoryMultiplexer im, int repeats) {
+        if (hasUnavailableItems() || storage.hasUnavailableItems()) return Transaction.fail();
         return Transaction.create(() -> (storage.isUnlimited() || takeItems(storage.getContents(), repeats, false))
                 && canAccept(im, repeats), () -> {
                     storage.transact(inventory -> takeItems(inventory, repeats, true));
@@ -139,6 +151,7 @@ public class ItemAction extends NPCShopAction {
 
     @Override
     public Transaction take(NPCShopStorage storage, Entity entity, InventoryMultiplexer im, int repeats) {
+        if (hasUnavailableItems() || storage.hasUnavailableItems()) return Transaction.fail();
         return Transaction.create(() -> (storage.isUnlimited() || storage.canAdd(items.size() * repeats))
                 && takeItems(im.getInventory(), repeats, false), () -> {
                     storage.transact(inventory -> giveItems(inventory, repeats), items.size() * repeats);
@@ -151,6 +164,10 @@ public class ItemAction extends NPCShopAction {
 
     private static boolean isEmpty(ItemStack stack) {
         return stack == null || stack.isEmpty();
+    }
+
+    private boolean hasUnavailableItems() {
+        return StoredItemList.hasUnavailable(items) || items.stream().anyMatch(ItemAction::isEmpty);
     }
 
     private static final String NEWLINE = "\n";
@@ -225,7 +242,7 @@ public class ItemAction extends NPCShopAction {
         // warns now, while the editor is open, if the filter names something the item does not have - rather than
         // silently never matching anything once the shop is in use
         for (ItemStack item : items) {
-            metaMatches(item, item, metaFilter);
+            if (!isEmpty(item)) metaMatches(item, item, metaFilter);
         }
     }
 
@@ -271,6 +288,7 @@ public class ItemAction extends NPCShopAction {
         private ItemAction base;
         private Consumer<NPCShopAction> callback;
         private MenuContext ctx;
+        private boolean unavailable;
 
         public ItemActionEditor() {
         }
@@ -283,6 +301,12 @@ public class ItemAction extends NPCShopAction {
         @Override
         public void initialise(MenuContext ctx) {
             this.ctx = ctx;
+            unavailable = base.hasUnavailableItems();
+            if (unavailable) {
+                ctx.getSlot(0).setItemStack(new ItemStack(net.minecraft.world.item.Items.BARRIER),
+                        Messaging.tr("citizens.items.unavailable"), Messaging.tr("citizens.items.unavailable-edit"));
+                return;
+            }
             for (int i = 0; i < 3 * 9; i++) {
                 InventoryMenuSlot slot = ctx.getSlot(i);
                 slot.clear();
@@ -309,6 +333,7 @@ public class ItemAction extends NPCShopAction {
 
         @Override
         public void onClose(ServerPlayer player) {
+            if (unavailable) return;
             List<ItemStack> items = new ArrayList<>();
             for (int i = 0; i < 3 * 9; i++) {
                 ItemStack stack = ctx.getSlot(i).getCurrentItem();

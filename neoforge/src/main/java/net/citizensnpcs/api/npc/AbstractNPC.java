@@ -40,7 +40,7 @@ import net.citizensnpcs.api.trait.TraitLookup;
 import net.citizensnpcs.api.trait.TraitLookup.ArrayTraitLookup;
 import net.citizensnpcs.api.trait.trait.MobType;
 import net.citizensnpcs.api.util.DataKey;
-import net.citizensnpcs.api.util.ItemStorage;
+import net.citizensnpcs.api.util.StoredItems;
 import net.citizensnpcs.api.util.MemoryDataKey;
 import net.citizensnpcs.api.util.Messaging;
 import net.citizensnpcs.api.util.Placeholders;
@@ -58,6 +58,8 @@ public abstract class AbstractNPC implements NPC {
     private boolean namePlaceholderRewrites;
     private final BehaviorController goalController = new SimpleBehaviorController();
     private final int id;
+    private final StoredItems<String> storedItems = new StoredItems<>();
+    private boolean hasStoredItemProvider;
     private Supplier<ItemStack> itemProvider = () -> {
         Item id = data().has(NPC.Metadata.ITEM_ID)
                 ? (Item) RegistryUtil.get(Item.class, data().<String> get(NPC.Metadata.ITEM_ID))
@@ -273,9 +275,11 @@ public abstract class AbstractNPC implements NPC {
     @Override
     public void load(final DataKey root) {
         setNameInternal(root.getString("name"));
+        storedItems.clear();
+        hasStoredItemProvider = root.keyExists("itemprovider");
         if (root.keyExists("itemprovider")) {
-            ItemStack item = ItemStorage.loadItemStack(root.getRelative("itemprovider"));
-            setItemProvider(() -> item.copy());
+            ItemStack item = storedItems.load("itemprovider", root.getRelative("itemprovider"));
+            itemProvider = () -> item == null ? ItemStack.EMPTY : item.copy();
         }
         metadata.loadFrom(root.getRelative("metadata"));
 
@@ -391,9 +395,14 @@ public abstract class AbstractNPC implements NPC {
         root.setString("name", name);
         root.setString("uuid", uuid.toString());
 
-        if (data().has(NPC.Metadata.ITEM_ID)) {
+        if (data().has(NPC.Metadata.ITEM_ID) || hasStoredItemProvider) {
             ItemStack stack = itemProvider.get();
-            ItemStorage.saveItem(root.getRelative("itemprovider"), stack);
+            storedItems.save("itemprovider", root.getRelative("itemprovider"), stack);
+            if (hasStoredItemProvider && !storedItems.contains("itemprovider") && (stack == null || stack.isEmpty())) {
+                // An explicitly empty supplier must survive reload instead of reactivating the metadata/default supplier.
+                root.getRelative("itemprovider").setString("nbt", ItemStack.OPTIONAL_CODEC
+                        .encodeStart(net.minecraft.nbt.NbtOps.INSTANCE, ItemStack.EMPTY).getOrThrow().toString());
+            }
         } else {
             root.removeKey("itemprovider");
         }
@@ -432,6 +441,8 @@ public abstract class AbstractNPC implements NPC {
 
     @Override
     public void setItemProvider(Supplier<ItemStack> provider) {
+        storedItems.clear();
+        hasStoredItemProvider = true;
         this.itemProvider = provider;
         ItemStack stack = provider.get();
         if (stack != null && !stack.isEmpty()) {

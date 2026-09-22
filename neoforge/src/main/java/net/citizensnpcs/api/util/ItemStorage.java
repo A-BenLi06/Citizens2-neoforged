@@ -52,11 +52,9 @@ import net.neoforged.neoforge.server.ServerLifecycleHooks;
  * <p>
  * <b>Legacy format.</b> Saves written by the Bukkit plugin use {@code type}/{@code amount}/{@code durability} plus a
  * base64 {@code meta} blob (older saves use {@code meta.encoded-meta}). Bukkit's object stream stores a wrapper around
- * the serialized ItemMeta map. The built-in migration does not decode that map yet: item id, count, damage, display
- * name and lore are recovered;
- * enchantments, custom model data, skull textures, attribute modifiers and any other meta are not. A warning naming the
- * item is logged whenever a blob is dropped. Migrated entries are rewritten in the current format the next time the
- * owning object is saved.
+ * the serialized ItemMeta map. The built-in migration does not decode that map yet. Such records remain unavailable
+ * unless a registered reader handles their metadata completely. Plain item id/count/damage/name/lore records migrate
+ * directly. Owners can use {@link StoredItems} to retain unavailable definitions until a later load or explicit edit.
  */
 public class ItemStorage {
     private ItemStorage() {
@@ -67,15 +65,33 @@ public class ItemStorage {
      *         rather than an empty stack so that callers can distinguish "no item" from "air"
      */
     public static ItemStack loadItemStack(DataKey root) {
-        ItemStack stack = root.keyExists("nbt") ? loadCurrent(root) : loadLegacy(root);
-        if (stack == null || stack.isEmpty())
-            return null;
-        applyEditableComponents(root, stack);
-        if (deserialiseHook != null) {
-            deserialiseHook.accept(root, stack);
-        }
-        return stack;
+        return readItem(root).stack();
     }
+
+    /** Distinguishes an empty slot from a definition whose item/provider/metadata cannot currently be loaded. */
+    public static ReadResult readItem(DataKey root) {
+        Object raw = root.getRaw("");
+        if (raw == null || raw instanceof Map<?, ?> map && map.isEmpty()) return new ReadResult(null, false);
+        if (!root.keyExists("nbt")) {
+            String type = legacyType(root);
+            if (type.equalsIgnoreCase("air") || type.equalsIgnoreCase("minecraft:air")) return new ReadResult(null, false);
+        }
+        try {
+            ItemStack stack = root.keyExists("nbt") ? loadCurrent(root) : loadLegacy(root);
+            if (stack == null) return new ReadResult(null, true);
+            if (stack.isEmpty()) return new ReadResult(null, false);
+            boolean edited = root.keyExists("editable_components.edited") && root.getBoolean("editable_components.edited");
+            applyEditableComponents(root.copy(), stack);
+            if (deserialiseHook != null) deserialiseHook.accept(root, stack);
+            if (edited) root.setBoolean("editable_components.edited", false);
+            return new ReadResult(stack, false);
+        } catch (RuntimeException failure) {
+            Messaging.warn("Unavailable item at " + root.getPath() + ": " + failure);
+            return new ReadResult(null, true);
+        }
+    }
+
+    public record ReadResult(ItemStack stack, boolean unavailable) { }
 
     /**
      * Writes a complete native encoding, or throws before changing the existing record if encoding fails. Propagating
@@ -152,7 +168,7 @@ public class ItemStorage {
             return null;
         try {
             CompoundTag tag = TagParser.parseTag(snbt);
-            var result = ItemStack.CODEC.parse(ops(), tag);
+            var result = ItemStack.OPTIONAL_CODEC.parse(ops(), tag);
             result.error().ifPresent(error -> Messaging.severe(
                     "Could not read item at " + root.getPath() + ": " + error.message()));
             // A partial stack may have lost a provider component; it must never become a usable item.
@@ -168,12 +184,7 @@ public class ItemStorage {
      * javadoc for what does not.
      */
     private static ItemStack loadLegacy(DataKey root) {
-        String raw;
-        if (root.keyExists("type_key")) {
-            raw = root.getString("type_namespace", "minecraft") + ":" + root.getString("type_key");
-        } else {
-            raw = root.getString("type", root.getString("id"));
-        }
+        String raw = legacyType(root);
         if (raw == null || raw.isEmpty())
             return null;
 
@@ -182,12 +193,14 @@ public class ItemStorage {
             return null;
         Item item = BuiltInRegistries.ITEM.get(id);
         if (item == null || item == net.minecraft.world.item.Items.AIR) {
-            Messaging.warn("Dropping unknown legacy item type '" + raw + "' at " + root.getPath());
+            Messaging.warn("Unavailable legacy item type '" + raw + "' at " + root.getPath());
             return null;
         }
-        ItemStack stack = new ItemStack(item, Math.max(1, root.getInt("amount", 1)));
+        int amount = root.keyExists("amount") ? root.getInt("amount") : 1;
+        if (amount <= 0) throw new IllegalArgumentException("Invalid legacy item amount: " + amount);
+        ItemStack stack = new ItemStack(item, amount);
 
-        int damage = root.getInt("durability", root.getInt("data", 0));
+        int damage = root.keyExists("durability") ? root.getInt("durability") : root.getInt("data");
         if (damage > 0 && stack.isDamageableItem()) {
             stack.set(DataComponents.DAMAGE, damage);
         }
@@ -199,24 +212,32 @@ public class ItemStorage {
         if (root.keyExists("editable_components.lore")) {
             stack.set(DataComponents.LORE, new ItemLore(parseLore(root.getString("editable_components.lore"))));
         }
+        if (root.keyExists("enchantments") || root.keyExists("mdata"))
+            throw new IllegalArgumentException("Legacy structured item metadata requires migration");
         if (root.keyExists("meta")) {
             LegacyItemMetaReader reader = legacyItemMetaReader;
             boolean handled = false;
             if (reader != null) {
                 try {
-                    handled = reader.apply(root.getString("meta"), stack);
+                    String encoded = root.keyExists("meta.encoded-meta") ? root.getString("meta.encoded-meta") : root.getString("meta");
+                    handled = reader.apply(encoded, stack);
                 } catch (Throwable t) {
                     Messaging.severe("Legacy item meta reader failed at " + root.getPath() + ": " + t);
                 }
             }
             if (!handled) {
-                Messaging.warn("Migrated legacy item '" + raw + "' at " + root.getPath()
-                        + " but could not read its Bukkit item meta: enchantments, custom model data, skull textures"
-                        + " and attribute modifiers were dropped. Re-set the item to restore them, or install a"
-                        + " LegacyItemMetaReader (see ItemStorage#setLegacyItemMetaReader).");
+                Messaging.warn("Unavailable legacy item '" + raw + "' at " + root.getPath()
+                        + ": its Bukkit item metadata could not be read completely.");
+                return null;
             }
         }
         return stack;
+    }
+
+    private static String legacyType(DataKey root) {
+        if (root.keyExists("type_key"))
+            return (root.keyExists("type_namespace") ? root.getString("type_namespace") : "minecraft") + ":" + root.getString("type_key");
+        return root.keyExists("type") ? root.getString("type") : root.getString("id");
     }
 
     /**
@@ -349,7 +370,7 @@ public class ItemStorage {
          *            the raw {@code meta} value as stored by the Bukkit plugin
          * @param stack
          *            the partially migrated stack, to be mutated in place
-         * @return true if the blob was understood; false to fall back to the "meta dropped" warning
+         * @return true if the metadata was applied completely; false to keep the item unavailable
          */
         boolean apply(String base64, ItemStack stack);
     }

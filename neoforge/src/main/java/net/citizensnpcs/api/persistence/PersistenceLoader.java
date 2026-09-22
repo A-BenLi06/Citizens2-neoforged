@@ -32,6 +32,7 @@ import net.citizensnpcs.api.util.Location;
 import net.citizensnpcs.api.util.Messaging;
 import net.citizensnpcs.api.util.MemoryDataKey;
 import net.citizensnpcs.api.util.RegistryUtil;
+import net.citizensnpcs.api.util.StoredItemList;
 import net.minecraft.core.Rotations;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
@@ -206,6 +207,8 @@ public class PersistenceLoader {
             }
             deserialiseMap(map, root, field);
             value = map;
+        } else if (List.class.isAssignableFrom(type) && field.delegate instanceof ItemStackPersister) {
+            value = StoredItemList.load(root.getRelative(field.key));
         } else if (Collection.class.isAssignableFrom(type)) {
             List<Object> list = (List<Object>) (!List.class.isAssignableFrom(collectionType) ? new ArrayList<>()
                     : collectionType.newInstance());
@@ -632,7 +635,10 @@ public class PersistenceLoader {
             root.removeKey(field.key);
             return;
         }
-        if (Collection.class.isAssignableFrom(field.getType())) {
+        if (fieldValue instanceof List<?> items && field.delegate instanceof ItemStackPersister) {
+            @SuppressWarnings("unchecked") List<ItemStack> stacks = (List<ItemStack>) items;
+            StoredItemList.save(stacks, root.getRelative(field.key));
+        } else if (Collection.class.isAssignableFrom(field.getType())) {
             Collection<?> collection = (Collection<?>) fieldValue;
             root.removeKey(field.key);
             int i = 0;

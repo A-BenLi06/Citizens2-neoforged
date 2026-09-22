@@ -121,7 +121,6 @@ public class ItemStorageTest {
         DataKey key = storage.getKey("item");
         key.setString("type", "diamond_sword");
         key.setInt("amount", 1);
-        key.setString("meta", "b64blob");
 
         ItemStack migrated = ItemStorage.loadItemStack(key);
         assertNotNull(migrated);
@@ -130,6 +129,20 @@ public class ItemStorageTest {
         assertFalse(key.keyExists("type"), "legacy keys must not survive a re-save");
         assertFalse(key.keyExists("meta"));
         assertTrue(key.keyExists("nbt"));
+    }
+
+    @Test
+    public void unreadableLegacyMetadataNeverCreatesADegradedItem() {
+        for (String path : List.of("meta", "meta.encoded-meta", "enchantments.sharpness")) {
+            DataKey key = new MemoryDataKey().getRelative("item");
+            key.setString("type_key", "diamond_sword");
+            key.setInt("amount", 1);
+            key.setString(path, "unreadable");
+            Object original = key.copy().getRaw("");
+            assertTrue(ItemStorage.readItem(key).unavailable());
+            assertNull(ItemStorage.loadItemStack(key));
+            assertEquals(original, key.getRaw(""));
+        }
     }
 
     @Test

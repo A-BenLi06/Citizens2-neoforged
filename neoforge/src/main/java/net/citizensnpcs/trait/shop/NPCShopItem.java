@@ -18,6 +18,9 @@ import net.citizensnpcs.api.expr.ExpressionEngine.ExpressionCompileException;
 import net.citizensnpcs.api.expr.ExpressionScope;
 import net.citizensnpcs.api.gui.MenuItems;
 import net.citizensnpcs.api.persistence.Persist;
+import net.citizensnpcs.api.persistence.Persistable;
+import net.citizensnpcs.api.util.DataKey;
+import net.citizensnpcs.api.util.StoredItems;
 import net.citizensnpcs.api.util.Messaging;
 import net.citizensnpcs.api.util.Placeholders;
 import net.citizensnpcs.trait.shop.NPCShopAction.Transaction;
@@ -28,7 +31,7 @@ import net.minecraft.world.item.ItemStack;
 /**
  * One thing a shop sells: what it looks like, what it costs, what the buyer gets, and how often it may be bought.
  */
-public class NPCShopItem implements Cloneable {
+public class NPCShopItem implements Cloneable, Persistable {
     @Persist
     String alreadyPurchasedMessage;
     @Persist
@@ -39,8 +42,8 @@ public class NPCShopItem implements Cloneable {
     String costMessage;
     private List<String> defaultLore = List.of();
     private String defaultName;
-    @Persist
     ItemStack display;
+    private StoredItems<String> stored = new StoredItems<>();
     @Persist
     int globalTimesPurchasable;
     @Persist
@@ -161,6 +164,8 @@ public class NPCShopItem implements Cloneable {
     public NPCShopItem clone() {
         try {
             NPCShopItem dup = (NPCShopItem) super.clone();
+            dup.stored = stored.copy();
+            dup.display = display == null ? null : display.copy();
             dup.cost = new ArrayList<>();
             for (NPCShopAction src : cost) {
                 dup.cost.add(src.clone());
@@ -323,6 +328,7 @@ public class NPCShopItem implements Cloneable {
     }
 
     public void setDisplayItem(ItemStack itemstack) {
+        stored.clear();
         display = itemstack == null || itemstack.isEmpty() ? null : itemstack.copy();
         if (display == null)
             return;
@@ -346,4 +352,8 @@ public class NPCShopItem implements Cloneable {
 
     private static final Pattern PLACEHOLDER_REGEX = Pattern.compile("<(cost|result|times_purchasable)>",
             Pattern.CASE_INSENSITIVE);
+
+    public boolean hasUnresolvedDisplay() { return stored.contains("display"); }
+    @Override public void load(DataKey root) { display = stored.load("display", root.getRelative("display")); }
+    @Override public void save(DataKey root) { stored.save("display", root.getRelative("display"), display); }
 }
