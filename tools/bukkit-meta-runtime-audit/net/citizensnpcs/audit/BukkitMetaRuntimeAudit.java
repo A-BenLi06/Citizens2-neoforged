@@ -118,6 +118,79 @@ public final class BukkitMetaRuntimeAudit {
             stored.save(0, key, null); check(before.equals(key.getRaw("")), name + "_retained");
         }
         specialTypes(server);
+        structuredItems(server);
+    }
+
+    private static void structuredItems(MinecraftServer server) throws Exception {
+        var source = new YamlStorage(Path.of(System.getProperty("citizens.audit.legacyMetaFixtures"), "structured.yml").toFile());
+        check(source.load(), "structured_fixture_loaded");
+        for (String name : List.of("common", "enchanted", "stored", "leather", "writable", "written", "potion", "uncraftable")) {
+            DataKey key = source.getKey(name).copy(); Object before = key.copy().getRaw("");
+            ItemStack stack = ItemStorage.loadItemStack(key);
+            check(stack != null && !stack.isEmpty(), "structured_" + name + "_available");
+            check(before.equals(key.getRaw("")), "structured_" + name + "_source_unchanged");
+            ItemStorage.saveItem(key, stack);
+            check(!key.keyExists("meta") && !key.keyExists("enchantments") && ItemStack.matches(stack, ItemStorage.loadItemStack(key)),
+                    "structured_" + name + "_native_resave");
+        }
+        var enchants = server.registryAccess().registryOrThrow(Registries.ENCHANTMENT);
+        var sharpness = enchants.getHolderOrThrow(Enchantments.SHARPNESS);
+        ItemStack blade = ItemStorage.loadItemStack(source.getKey("enchanted"));
+        check(blade.get(DataComponents.ENCHANTMENTS).getLevel(sharpness) == 5
+                && blade.get(DataComponents.ENCHANTMENTS).getLevel(enchants.getHolderOrThrow(Enchantments.MENDING)) == 1,
+                "structured_enchantments_resolve_native_holders");
+        check(blade.getHoverName().getString().equals("Structured blade"), "structured_name_coexists_with_enchantments");
+        var rootOnly = source.getKey("enchanted").copy(); rootOnly.removeKey("meta");
+        check(ItemStorage.loadItemStack(rootOnly).get(DataComponents.ENCHANTMENTS).getLevel(sharpness) == 5, "structured_root_enchantments_without_meta");
+        check(ItemStorage.loadItemStack(source.getKey("stored")).get(DataComponents.STORED_ENCHANTMENTS).getLevel(sharpness) == 3,
+                "structured_stored_enchantment_holders");
+        var dye = ItemStorage.loadItemStack(source.getKey("leather")).get(DataComponents.DYED_COLOR);
+        check(dye.rgb() == 0x123456 && !dye.showInTooltip(), "structured_dye_and_tooltip");
+        ItemStack potion = ItemStorage.loadItemStack(source.getKey("potion"));
+        var contents = potion.get(DataComponents.POTION_CONTENTS);
+        check(contents.potion().orElseThrow().unwrapKey().orElseThrow().location().toString().equals("minecraft:long_swiftness")
+                && contents.customEffects().size() == 2, "structured_extended_potion_and_replaced_effect");
+        var cow = EntityType.COW.create(server.overworld());
+        try {
+            potion.getItem().finishUsingItem(potion.copy(), server.overworld(), cow);
+            var speed = cow.getEffect(net.minecraft.world.effect.MobEffects.MOVEMENT_SPEED);
+            check(speed != null && speed.getDuration() == 123 && speed.getAmplifier() == 2 && speed.isVisible() && speed.showIcon(),
+                    "structured_native_potion_effect_application");
+        } finally { cow.discard(); }
+
+        var registry = CitizensAPI.createNamedNPCRegistry("structured-items", new net.citizensnpcs.api.npc.MemoryNPCDataStore());
+        NPC npc = registry.createNPC(EntityType.ZOMBIE, "StructuredItems");
+        try {
+            npc.getOrAddTrait(Inventory.class).setItem(0, blade);
+            check(npc.spawn(new Location(server.overworld(), 2, -60, 1)), "structured_npc_spawn");
+            npc.despawn(DespawnReason.RELOAD);
+            NPC copy = npc.copy();
+            try { check(ItemStack.matches(blade, copy.getOrAddTrait(Inventory.class).getContents()[0]), "structured_npc_copy_preserves_enchantments"); }
+            finally { copy.destroy(); }
+        } finally { npc.destroy(); }
+
+        for (String invalid : List.of("unknown", "bad-index", "bad-boolean", "bad-integer", "bad-potion", "bad-effect",
+                "bad-subtypes", "bad-nested", "latent-book", "material-data", "unsupported", "unknown-enchantment", "duplicate-enchantments")) {
+            DataKey key = source.getKey(invalid).copy(); Object before = key.copy().getRaw("");
+            StoredItems<Integer> stored = new StoredItems<>(); check(stored.load(0, key) == null && stored.contains(0), "structured_" + invalid + "_unavailable");
+            stored.save(0, key, null); check(before.equals(key.getRaw("")), "structured_" + invalid + "_retained");
+        }
+        var potionMappings = new java.util.Properties();
+        try (var input = BukkitMetaRuntimeAudit.class.getResourceAsStream("/citizens/legacy-potion-data.properties")) { potionMappings.load(input); }
+        for (String combination : potionMappings.stringPropertyNames()) {
+            String[] parts = combination.split("\\.");
+            DataKey key = new MemoryDataKey(); key.setString("type", "potion"); key.setString("meta.potion.data.type", parts[0]);
+            key.setBoolean("meta.potion.data.extended", Boolean.parseBoolean(parts[1]));
+            key.setBoolean("meta.potion.data.upgraded", Boolean.parseBoolean(parts[2]));
+            ItemStack stack = ItemStorage.loadItemStack(key); check(stack != null, "structured_original_potion_combination_" + combination);
+        }
+        var effectMappings = new java.util.Properties();
+        try (var input = BukkitMetaRuntimeAudit.class.getResourceAsStream("/citizens/legacy-potion-effect-names.properties")) { effectMappings.load(input); }
+        for (String name : effectMappings.stringPropertyNames()) {
+            DataKey key = new MemoryDataKey(); key.setString("type", "potion"); key.setString("meta.potion.effects.0.type", name);
+            key.setInt("meta.potion.effects.0.duration", 40); key.setInt("meta.potion.effects.0.amplifier", 0);
+            check(ItemStorage.loadItemStack(key) != null, "structured_original_effect_name_" + name);
+        }
     }
 
     private static void specialTypes(MinecraftServer server) throws Exception {

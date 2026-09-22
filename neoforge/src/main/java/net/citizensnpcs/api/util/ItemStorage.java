@@ -55,6 +55,8 @@ import net.neoforged.neoforge.server.ServerLifecycleHooks;
  * the serialized ItemMeta map. The built-in reader converts recognized fields completely; unsupported metadata stays
  * unavailable. A registered reader can replace this conversion. Owners can use {@link StoredItems} to retain
  * unavailable definitions until a later load or explicit edit.
+ * Older map-based metadata and root enchantments use a separate structured reader. It normalizes recognized fields
+ * into native components; unsupported material data, fields or registry identities keep the whole item unavailable.
  */
 public class ItemStorage {
     private ItemStorage() {
@@ -180,8 +182,7 @@ public class ItemStorage {
     }
 
     /**
-     * One-way migration read of the Bukkit plugin's format. Recovers what survives without CraftBukkit; see the class
-     * javadoc for what does not.
+     * One-way migration read of recognized Bukkit stream and older Citizens structured formats.
      */
     private static ItemStack loadLegacy(DataKey root) {
         String raw = legacyType(root);
@@ -212,14 +213,21 @@ public class ItemStorage {
         if (!root.keyExists("meta") && root.keyExists("editable_components.lore")) {
             stack.set(DataComponents.LORE, new ItemLore(parseLore(root.getString("editable_components.lore"))));
         }
-        if (root.keyExists("enchantments") || root.keyExists("mdata"))
-            throw new IllegalArgumentException("Legacy structured item metadata requires migration");
+        if (root.keyExists("mdata"))
+            throw new IllegalArgumentException("Legacy material data requires migration");
+        MinecraftServer server = ServerLifecycleHooks.getCurrentServer();
+        HolderLookup.Provider registries = server == null ? RegistryAccess.EMPTY : server.registryAccess();
+        if (!root.keyExists("meta") || root.getRaw("meta") instanceof Map<?, ?> && !root.keyExists("meta.encoded-meta")) {
+            if (root.keyExists("meta") || root.keyExists("enchantments"))
+                return LegacyStructuredItems.read(root, stack, registries);
+            return stack;
+        }
         if (root.keyExists("meta")) {
             LegacyItemMetaReader reader = legacyItemMetaReader;
             String encoded = root.keyExists("meta.encoded-meta") ? root.getString("meta.encoded-meta") : root.getString("meta");
             if (reader == null) {
-                MinecraftServer server = ServerLifecycleHooks.getCurrentServer();
-                return LegacyBukkitMeta.read(encoded, stack, server == null ? RegistryAccess.EMPTY : server.registryAccess());
+                // Original encoded ItemMeta replaces the earlier root enchantments and structured fields.
+                return LegacyBukkitMeta.read(encoded, stack, registries);
             }
             boolean handled = false;
             if (reader != null) {

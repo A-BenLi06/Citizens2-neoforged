@@ -1,0 +1,114 @@
+# Synthetic records matching Citizens 2.0.32 ItemStorage's inspected DataKey reader.
+common:
+  type_key: diamond_sword
+  amount: 2
+  durability: 11
+  meta:
+    custommodel: 217
+    repaircost: 4
+    unbreakable: true
+    displayname: '{"text":"literal name"}'
+    lore:
+      '10': 'tenth &a<red>'
+      '2': '§aSecond'
+      '0': "First\nline"
+    flags:
+      '0': HIDE_UNBREAKABLE
+      '1': HIDE_ATTRIBUTES
+enchanted:
+  type: diamond_sword
+  enchantments:
+    DAMAGE_ALL: 5
+    mending: 1
+  meta:
+    displayname: '§6Structured blade'
+    flags: { '0': HIDE_ENCHANTS }
+stored:
+  type: enchanted_book
+  meta:
+    enchantmentstorage: { DAMAGE_ALL: 3 }
+leather:
+  type: leather_chestplate
+  meta:
+    armor: { color: 1193046 }
+    flags: { '0': HIDE_DYE }
+writable:
+  type: writable_book
+  meta:
+    book:
+      pages: { '3': 'second', '0': '{"text":"literal page"}' }
+      title: ''
+      author: ''
+written:
+  type: written_book
+  meta:
+    book:
+      title: Legacy notes
+      author: Narrator
+      pages:
+        '10': "§bLast\nline"
+        '2': '{"text":"literal page"}'
+        '0': '§6First'
+potion:
+  type: potion
+  meta:
+    potion:
+      data: { type: SPEED, extended: true, upgraded: false }
+      effects:
+        '0': { type: SPEED, duration: 20, amplifier: 0, ambient: false }
+        '8': { type: speed, duration: 123, amplifier: 2, ambient: true }
+        '3': { type: NIGHT_VISION, duration: -1, amplifier: 0, ambient: false }
+uncraftable:
+  type: potion
+  meta:
+    potion:
+      data: { type: UNCRAFTABLE, extended: false, upgraded: false }
+unknown:
+  type: stone
+  meta: { future-field: keep this }
+bad-index:
+  type: stone
+  meta:
+    lore: { '01': first, '1': duplicate }
+bad-boolean:
+  type: stone
+  meta: { unbreakable: perhaps }
+bad-integer:
+  type: stone
+  meta: { custommodel: 1.5 }
+bad-potion:
+  type: potion
+  meta:
+    potion:
+      data: { type: SPEED, extended: true, upgraded: true }
+bad-effect:
+  type: potion
+  meta:
+    potion:
+      effects: { '0': { type: missing_effect, duration: 40, amplifier: 0 } }
+bad-subtypes:
+  type: leather_chestplate
+  meta:
+    armor: { color: 1193046 }
+    book: { pages: { '0': wrong type } }
+bad-nested:
+  type: leather_chestplate
+  meta:
+    armor: { color: 1193046, extra: keep }
+latent-book:
+  type: writable_book
+  meta:
+    book: { author: pending author }
+material-data:
+  type: stone
+  mdata: 1
+unsupported:
+  type: stone
+  meta:
+    attributes: { original: keep }
+unknown-enchantment:
+  type: diamond_sword
+  enchantments: { missing:enchantment: 2 }
+duplicate-enchantments:
+  type: diamond_sword
+  enchantments: { DAMAGE_ALL: 2, sharpness: 5 }

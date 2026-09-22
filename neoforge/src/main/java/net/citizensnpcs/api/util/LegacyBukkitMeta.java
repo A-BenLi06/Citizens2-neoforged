@@ -45,7 +45,10 @@ final class LegacyBukkitMeta {
     private LegacyBukkitMeta() { }
 
     static ItemStack read(String encoded, ItemStack original, HolderLookup.Provider registries) {
-        Map<String, Object> meta = LegacyBukkitData.read(encoded);
+        return read(LegacyBukkitData.read(encoded), original, registries);
+    }
+
+    static ItemStack read(Map<String, Object> meta, ItemStack original, HolderLookup.Provider registries) {
         if (!"ItemMeta".equals(meta.get("=="))) throw invalid("Expected ItemMeta serialization alias");
         String type = string(meta.get("meta-type"));
         Set<String> specialFields = LegacyBukkitMetaTypes.fields(type);
@@ -124,6 +127,10 @@ final class LegacyBukkitMeta {
             Component json = Component.Serializer.fromJson(raw, registries);
             if (json != null) return json;
         } catch (RuntimeException ignored) { }
+        return legacyText(raw);
+    }
+
+    static Component legacyText(String raw) {
         // Bukkit's older plain strings use section-sign formatting. Ampersands and Citizens markup stay literal.
         MutableComponent result = Component.empty(); StringBuilder run = new StringBuilder(); Style style = Style.EMPTY;
         for (int i = 0; i < raw.length(); i++) {

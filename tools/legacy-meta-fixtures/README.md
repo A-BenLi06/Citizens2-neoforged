@@ -22,3 +22,16 @@ Repeat generation in a different output directory with Guava 25.1-jre to verify 
 Subtype evidence, including the expanded 97-check live metadata fixture, is recorded in `artifacts/bukkit-types-validation-summary.json` and `docs/bukkit-item-subtypes-parity-2026-09-22.md`. The earlier eleven-case standalone stream results are historical evidence; the subtype follow-up exercises its new retained samples through unit tests and the native server fixture.
 
 No Bukkit or Guava compatibility shims are shipped. The production decoder parses bounded data records and never calls Java object deserialization, loads a named stream class, substitutes a class descriptor, or executes a stream object's callbacks. Unsupported graph shapes and metadata fields remain unavailable through the existing retention API.
+
+## Older structured records and potion mappings
+
+`structured.yml` has 21 synthetic DataKey records matching the original Citizens 2.0.32 reader. These are YAML maps, not Java serialization streams, and do not go through `GenerateFixtures` or `ReadFixture`. Unit and live-server tests cover their native conversion or retained unavailability. The original NPC save has no metadata-bearing records, so these are not production extraction samples.
+
+`GeneratePotionMappings.java` invokes the actual original `PotionData` validation and `CraftPotionUtil.fromBukkit` offline, enumerating 43 valid potion combinations. It also extracts 33 original Bukkit effect constant names/IDs, independently checked against `CraftPotionEffectType.getName` bytecode. Regenerate with the original Arclight 1.20.1 and Guava 31.1-jre paths from the earlier instructions:
+
+```powershell
+& "$jdk/bin/javac.exe" -cp $writerClasspath -d artifacts/legacy-meta-fixture-classes tools/legacy-meta-fixtures/GeneratePotionMappings.java
+& "$jdk/bin/java.exe" -cp "artifacts/legacy-meta-fixture-classes;$writerClasspath" GeneratePotionMappings artifacts/legacy-structured-mappings
+```
+
+The resulting `legacy-potion-data.properties` and `legacy-potion-effect-names.properties` correspond to the resource tables shipped under `neoforge/src/main/resources/citizens/`. Unknown/modded names and impossible combinations remain unavailable; source IDs never refer to modern registry positions. See `docs/structured-item-metadata-parity-2026-09-22.md` and `artifacts/structured-items-validation-summary.json` for current evidence. No old server is started by the generator.
