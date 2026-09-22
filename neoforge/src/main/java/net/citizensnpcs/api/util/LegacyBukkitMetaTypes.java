@@ -18,6 +18,8 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.network.Filterable;
 import net.minecraft.tags.ItemTags;
 import net.minecraft.world.item.ArmorItem;
+import net.minecraft.world.item.FireworkRocketItem;
+import net.minecraft.world.item.FireworkStarItem;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.KnowledgeBookItem;
 import net.minecraft.world.item.PotionItem;
@@ -25,6 +27,8 @@ import net.minecraft.world.item.TippedArrowItem;
 import net.minecraft.world.item.WritableBookItem;
 import net.minecraft.world.item.WrittenBookItem;
 import net.minecraft.world.item.component.DyedItemColor;
+import net.minecraft.world.item.component.FireworkExplosion;
+import net.minecraft.world.item.component.Fireworks;
 import net.minecraft.world.item.component.WritableBookContent;
 import net.minecraft.world.item.component.WrittenBookContent;
 
@@ -36,8 +40,11 @@ final class LegacyBukkitMetaTypes {
             Map.entry("COLORABLE_ARMOR", Set.of("color", "trim")), Map.entry("BOOK", Set.of("pages")),
             Map.entry("BOOK_SIGNED", Set.of("pages", "title", "author", "generation", "resolved")),
             Map.entry("KNOWLEDGE_BOOK", Set.of("Recipes")),
-            Map.entry("POTION", Set.of("potion-type", "custom-color", "custom-effects")));
+            Map.entry("POTION", Set.of("potion-type", "custom-color", "custom-effects")),
+            Map.entry("FIREWORK", Set.of("power", "firework-effects")),
+            Map.entry("FIREWORK_EFFECT", Set.of("firework-effect")));
     private static final Map<String, String> EFFECT_IDS = LegacyBukkitMeta.aliases("legacy-potion-effect-ids.properties");
+    private static final Map<String, String> FIREWORK_SHAPES = LegacyBukkitMeta.aliases("legacy-firework-shapes.properties");
 
     private LegacyBukkitMetaTypes() { }
     static Set<String> fields(String type) {
@@ -72,6 +79,19 @@ final class LegacyBukkitMetaTypes {
                 stack.set(DataComponents.RECIPES, recipes);
             }
             case "POTION" -> potion(meta, stack, registries);
+            case "FIREWORK" -> {
+                require(stack.getItem() instanceof FireworkRocketItem, "Rocket metadata requires a firework rocket");
+                int power = integer(meta.getOrDefault("power", 0));
+                require(power >= 0 && power <= 127, "Invalid legacy firework power");
+                List<FireworkExplosion> effects = new ArrayList<>();
+                for (Object effect : list(meta.getOrDefault("firework-effects", List.of()))) effects.add(firework(effect));
+                stack.set(DataComponents.FIREWORKS, new Fireworks(power, effects));
+            }
+            case "FIREWORK_EFFECT" -> {
+                require(stack.getItem() instanceof FireworkStarItem, "Explosion metadata requires a firework star");
+                if (meta.containsKey("firework-effect")) stack.set(DataComponents.FIREWORK_EXPLOSION, firework(meta.get("firework-effect")));
+                else stack.remove(DataComponents.FIREWORK_EXPLOSION);
+            }
             default -> { }
         }
     }
@@ -128,6 +148,23 @@ final class LegacyBukkitMetaTypes {
         if (color.containsKey("ALPHA")) channel(color.get("ALPHA"));
         // CraftMetaLeatherArmor and CraftMetaPotion call Color.asRGB(); their native tags do not use alpha.
         return channel(color.get("RED")) << 16 | channel(color.get("GREEN")) << 8 | channel(color.get("BLUE"));
+    }
+
+    private static FireworkExplosion firework(Object raw) {
+        Map<?, ?> effect = map(raw, Set.of("==", "type", "colors", "fade-colors", "trail", "flicker"));
+        require("Firework".equals(effect.get("==")), "Expected Firework wrapper");
+        String shape = FIREWORK_SHAPES.get(string(effect.get("type")));
+        require(shape != null, "Unknown legacy firework shape");
+        JsonObject data = new JsonObject(); data.addProperty("shape", shape);
+        for (String field : List.of("colors", "fade-colors")) {
+            JsonArray colors = new JsonArray();
+            for (Object entry : list(effect.get(field))) colors.add(color(entry));
+            require(!field.equals("colors") || !colors.isEmpty(), "Firework effect requires a color");
+            data.add(field.equals("colors") ? "colors" : "fade_colors", colors);
+        }
+        require(effect.containsKey("trail") && effect.containsKey("flicker"), "Missing firework flags");
+        data.addProperty("has_trail", bool(effect, "trail", false)); data.addProperty("has_twinkle", bool(effect, "flicker", false));
+        return FireworkExplosion.CODEC.parse(JsonOps.INSTANCE, data).getOrThrow(LegacyBukkitMetaTypes::invalid);
     }
     private static int channel(Object value) { int channel = integer(value); require(channel >= 0 && channel <= 255, "Invalid color channel"); return channel; }
     private static <T> void component(ItemStack stack, DataComponentType<T> type, JsonElement data, HolderLookup.Provider registries) {

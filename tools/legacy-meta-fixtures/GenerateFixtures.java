@@ -13,6 +13,7 @@ import org.bukkit.configuration.serialization.ConfigurationSerializable;
 import org.bukkit.configuration.serialization.SerializableAs;
 import org.bukkit.util.io.BukkitObjectOutputStream;
 import org.bukkit.Color;
+import org.bukkit.FireworkEffect;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 
@@ -29,6 +30,13 @@ public class GenerateFixtures {
     public static class EffectFields implements ConfigurationSerializable {
         private final Map<String, Object> fields;
         EffectFields(Map<String, Object> fields) { this.fields = fields; }
+        @Override public Map<String, Object> serialize() { return fields; }
+    }
+
+    @SerializableAs("Firework")
+    public static class FireworkFields implements ConfigurationSerializable {
+        private final Map<String, Object> fields;
+        FireworkFields(Map<String, Object> fields) { this.fields = fields; }
         @Override public Map<String, Object> serialize() { return fields; }
     }
 
@@ -77,6 +85,25 @@ public class GenerateFixtures {
         write(output, "missing-trim", Map.of("meta-type", "ARMOR", "trim", new LinkedHashMap<>(Map.of("material", "missing:material", "pattern", "minecraft:sentry"))));
         write(output, "oversize-book", Map.of("meta-type", "BOOK", "pages", ImmutableList.of("x".repeat(1025))));
         write(output, "latent-book-fields", Map.of("meta-type", "BOOK", "pages", ImmutableList.of("notes"), "author", "pending author"));
+        List<FireworkEffect> fireworks = new ArrayList<>();
+        for (FireworkEffect.Type type : FireworkEffect.Type.values()) fireworks.add(FireworkEffect.builder().with(type)
+                .withColor(Color.fromRGB(0x123456), Color.fromRGB(0xfedcba)).withFade(Color.fromRGB(0x010203))
+                .trail(type.ordinal() % 2 == 0).flicker(type.ordinal() % 2 != 0).build());
+        write(output, "fireworks", Map.of("meta-type", "FIREWORK", "power", 2, "firework-effects", ImmutableList.copyOf(fireworks),
+                "ItemFlags", new ArrayList<>(List.of("HIDE_POTION_EFFECTS"))));
+        FireworkEffect star = FireworkEffect.builder().with(FireworkEffect.Type.STAR).withColor(Color.fromRGB(0xabcdef))
+                .withFade(Color.fromRGB(0x010203)).trail(true).flicker(true).build();
+        write(output, "firework-star", Map.of("meta-type", "FIREWORK_EFFECT", "firework-effect", star));
+        write(output, "empty-firework", Map.of("meta-type", "FIREWORK"));
+        write(output, "empty-firework-star", Map.of("meta-type", "FIREWORK_EFFECT"));
+        write(output, "firework-bad-power", Map.of("meta-type", "FIREWORK", "power", 128));
+        write(output, "firework-too-many", Map.of("meta-type", "FIREWORK", "firework-effects", ImmutableList.copyOf(java.util.Collections.nCopies(257, star))));
+        write(output, "firework-empty-colors", Map.of("meta-type", "FIREWORK_EFFECT", "firework-effect", new FireworkFields(
+                Map.of("type", "BALL", "colors", ImmutableList.of(), "fade-colors", ImmutableList.of(), "trail", false, "flicker", false))));
+        write(output, "firework-unknown-shape", Map.of("meta-type", "FIREWORK_EFFECT", "firework-effect", new FireworkFields(
+                Map.of("type", "UNKNOWN", "colors", ImmutableList.of(Color.RED), "fade-colors", ImmutableList.of(), "trail", false, "flicker", false))));
+        write(output, "firework-bad-field", Map.of("meta-type", "FIREWORK_EFFECT", "firework-effect", new FireworkFields(
+                Map.of("type", "BALL", "colors", ImmutableList.of(Color.RED), "fade-colors", ImmutableList.of(), "trail", false, "flicker", false, "provider-field", "retain"))));
     }
 
     private static void write(Path dir, String name, Map<String, Object> map) throws Exception {

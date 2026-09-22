@@ -21,6 +21,8 @@ Repeat generation in a different output directory with Guava 25.1-jre to verify 
 
 Subtype evidence, including the expanded 97-check live metadata fixture, is recorded in `artifacts/bukkit-types-validation-summary.json` and `docs/bukkit-item-subtypes-parity-2026-09-22.md`. The earlier eleven-case standalone stream results are historical evidence; the subtype follow-up exercises its new retained samples through unit tests and the native server fixture.
 
+The firework follow-up adds nine stream samples covering rockets, stars, empty metadata and invalid powers/counts/colors/shapes/fields. Valid nested values are original Bukkit `FireworkEffect` and `Color` objects; the actual serialized effect alias is `Firework`. `FireworkFields` uses that same explicit alias only for malformed samples. The three records in `structured-fireworks.yml` separately exercise the old Citizens map reader. All five shapes map by identity: the native and Bukkit enum orders differ for BURST/CREEPER. Evidence is in `artifacts/fireworks-validation-summary.json` and `docs/firework-item-metadata-parity-2026-09-22.md`.
+
 No Bukkit or Guava compatibility shims are shipped. The production decoder parses bounded data records and never calls Java object deserialization, loads a named stream class, substitutes a class descriptor, or executes a stream object's callbacks. Unsupported graph shapes and metadata fields remain unavailable through the existing retention API.
 
 ## Older structured records and potion mappings

@@ -17,7 +17,7 @@ import net.minecraft.world.item.WrittenBookItem;
 /** The older Citizens DataKey schema, distinct from Bukkit's serialized ItemMeta map. */
 final class LegacyStructuredItems {
     private static final Set<String> FIELDS = Set.of("custommodel", "flags", "lore", "displayname", "repaircost",
-            "unbreakable", "armor", "book", "potion", "enchantmentstorage");
+            "unbreakable", "armor", "book", "potion", "enchantmentstorage", "firework");
     private static final Map<String, String> POTIONS = LegacyBukkitMeta.aliases("legacy-potion-data.properties");
     private static final Map<String, String> EFFECT_NAMES = LegacyBukkitMeta.aliases("legacy-potion-effect-names.properties");
 
@@ -40,16 +40,15 @@ final class LegacyStructuredItems {
         if (source.containsKey("flags")) meta.put("ItemFlags", indexed(source.get("flags")));
         // Original subtype casts are mutually exclusive. Reject incompatible combinations instead of dropping one.
         int subtypes = 0;
-        for (String field : List.of("armor", "book", "potion", "enchantmentstorage")) if (source.containsKey(field)) subtypes++;
+        for (String field : List.of("armor", "book", "potion", "enchantmentstorage", "firework")) if (source.containsKey(field)) subtypes++;
         require(subtypes <= 1, "Incompatible structured metadata types");
         if (source.containsKey("enchantmentstorage")) {
             meta.put("meta-type", "ENCHANTED"); meta.put("stored-enchants", enchantments(source.get("enchantmentstorage")));
         }
         if (source.containsKey("armor")) {
             Map<?, ?> armor = map(source.get("armor"), Set.of("color"));
-            int rgb = integer(armor.get("color")); require(rgb >= 0 && rgb <= 0xffffff, "Invalid armor RGB");
             meta.put("meta-type", "LEATHER_ARMOR");
-            meta.put("color", Map.of("==", "Color", "RED", rgb >> 16, "GREEN", rgb >> 8 & 255, "BLUE", rgb & 255));
+            meta.put("color", rgb(armor.get("color")));
         }
         if (source.containsKey("book")) {
             Map<?, ?> book = map(source.get("book"), Set.of("pages", "title", "author"));
@@ -66,7 +65,31 @@ final class LegacyStructuredItems {
             }
         }
         if (source.containsKey("potion")) potion(map(source.get("potion"), Set.of("data", "effects")), meta);
+        if (source.containsKey("firework")) {
+            Map<?, ?> rocket = map(source.get("firework"), Set.of("power", "effects"));
+            meta.put("meta-type", "FIREWORK"); meta.put("power", rocket.containsKey("power") ? integer(rocket.get("power")) : 0);
+            List<Object> effects = new ArrayList<>();
+            for (Object raw : indexed(rocket.containsKey("effects") ? rocket.get("effects") : Map.of())) {
+                Map<?, ?> effect = map(raw, Set.of("type", "colors", "fadecolors", "flicker", "trail"));
+                Map<String, Object> converted = new LinkedHashMap<>(); converted.put("==", "Firework");
+                converted.put("type", string(effect.get("type")));
+                converted.put("flicker", bool(effect, "flicker", false)); converted.put("trail", bool(effect, "trail", false));
+                for (String field : List.of("colors", "fadecolors")) {
+                    List<Object> colors = new ArrayList<>();
+                    for (Object color : indexed(effect.containsKey(field) ? effect.get(field) : Map.of()))
+                        colors.add(rgb(map(color, Set.of("rgb")).get("rgb")));
+                    converted.put(field.equals("colors") ? "colors" : "fade-colors", colors);
+                }
+                effects.add(converted);
+            }
+            meta.put("firework-effects", effects);
+        }
         return LegacyBukkitMeta.read(meta, original, registries);
+    }
+
+    private static Map<String, Object> rgb(Object value) {
+        int rgb = integer(value); require(rgb >= 0 && rgb <= 0xffffff, "Invalid RGB color");
+        return Map.of("==", "Color", "RED", rgb >> 16, "GREEN", rgb >> 8 & 255, "BLUE", rgb & 255);
     }
 
     private static void potion(Map<?, ?> potion, Map<String, Object> meta) {

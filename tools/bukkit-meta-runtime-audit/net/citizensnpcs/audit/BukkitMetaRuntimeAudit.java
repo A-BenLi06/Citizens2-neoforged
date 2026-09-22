@@ -119,6 +119,71 @@ public final class BukkitMetaRuntimeAudit {
         }
         specialTypes(server);
         structuredItems(server);
+        fireworks(server);
+    }
+
+    private static void fireworks(MinecraftServer server) throws Exception {
+        for (String[] sample : List.of(new String[]{"fireworks", "firework_rocket"}, new String[]{"firework-star", "firework_star"},
+                new String[]{"empty-firework", "firework_rocket"}, new String[]{"empty-firework-star", "firework_star"})) {
+            DataKey key = item(sample[0], sample[1]); Object before = key.copy().getRaw(""); var stack = ItemStorage.loadItemStack(key);
+            check(stack != null, sample[0] + "_available"); check(before.equals(key.getRaw("")), sample[0] + "_source_unchanged");
+            ItemStorage.saveItem(key, stack); check(ItemStack.matches(stack, ItemStorage.loadItemStack(key)), sample[0] + "_native_resave");
+        }
+        var structured = new YamlStorage(Path.of(System.getProperty("citizens.audit.legacyMetaFixtures"), "structured-fireworks.yml").toFile());
+        check(structured.load(), "structured_firework_fixture_loaded");
+        for (String name : List.of("rocket", "empty")) {
+            DataKey key = structured.getKey(name).copy(); Object before = key.copy().getRaw(""); var stack = ItemStorage.loadItemStack(key);
+            check(stack != null, "structured_firework_" + name + "_available"); check(before.equals(key.getRaw("")), "structured_firework_" + name + "_source_unchanged");
+            ItemStorage.saveItem(key, stack); check(ItemStack.matches(stack, ItemStorage.loadItemStack(key)), "structured_firework_" + name + "_native_resave");
+        }
+        var structuredRocket = ItemStorage.loadItemStack(structured.getKey("rocket")).get(DataComponents.FIREWORKS);
+        check(structuredRocket.flightDuration() == 3 && structuredRocket.explosions().getFirst().shape() == net.minecraft.world.item.component.FireworkExplosion.Shape.BURST
+                && structuredRocket.explosions().getLast().shape() == net.minecraft.world.item.component.FireworkExplosion.Shape.CREEPER,
+                "structured_firework_order_and_flight");
+
+        ItemStack star = ItemStorage.loadItemStack(item("firework-star", "firework_star")); ItemStack beforeStar = star.copy();
+        var rocketRecipe = new net.minecraft.world.item.crafting.FireworkRocketRecipe(net.minecraft.world.item.crafting.CraftingBookCategory.MISC);
+        var input = net.minecraft.world.item.crafting.CraftingInput.of(3, 1, List.of(new ItemStack(Items.PAPER), new ItemStack(Items.GUNPOWDER), star));
+        check(rocketRecipe.matches(input, server.overworld()), "migrated_star_matches_native_rocket_recipe");
+        ItemStack crafted = rocketRecipe.assemble(input, server.registryAccess());
+        check(crafted.is(Items.FIREWORK_ROCKET) && crafted.getCount() == 3 && crafted.get(DataComponents.FIREWORKS).flightDuration() == 1
+                && crafted.get(DataComponents.FIREWORKS).explosions().equals(List.of(star.get(DataComponents.FIREWORK_EXPLOSION))),
+                "native_recipe_carries_exact_migrated_star");
+        var fadeRecipe = new net.minecraft.world.item.crafting.FireworkStarFadeRecipe(net.minecraft.world.item.crafting.CraftingBookCategory.MISC);
+        var fadeInput = net.minecraft.world.item.crafting.CraftingInput.of(2, 1, List.of(star, new ItemStack(Items.BLUE_DYE)));
+        check(fadeRecipe.matches(fadeInput, server.overworld()), "migrated_star_matches_native_fade_recipe");
+        var faded = fadeRecipe.assemble(fadeInput, server.registryAccess()).get(DataComponents.FIREWORK_EXPLOSION);
+        check(faded.shape() == star.get(DataComponents.FIREWORK_EXPLOSION).shape() && faded.hasTrail() && faded.hasTwinkle()
+                && faded.colors().equals(star.get(DataComponents.FIREWORK_EXPLOSION).colors())
+                && faded.fadeColors().getInt(0) == net.minecraft.world.item.DyeColor.BLUE.getFireworkColor(), "native_fade_recipe_preserves_explosion_fields");
+        check(ItemStack.matches(beforeStar, star), "native_recipes_do_not_mutate_star_template");
+
+        ItemStack stack = ItemStorage.loadItemStack(item("fireworks", "firework_rocket"));
+        var rocket = new net.minecraft.world.entity.projectile.FireworkRocketEntity(server.overworld(), 8, -59, 8, stack);
+        var target = EntityType.COW.create(server.overworld()); target.setPos(8, -60, 8);
+        var restored = EntityType.FIREWORK_ROCKET.create(server.overworld());
+        try {
+            check(server.overworld().addFreshEntity(rocket) && server.overworld().addFreshEntity(target), "migrated_rocket_and_target_spawn");
+            check(ItemStack.matches(stack, rocket.getItem()), "native_rocket_keeps_exact_migrated_stack");
+            var tag = new net.minecraft.nbt.CompoundTag(); rocket.addAdditionalSaveData(tag);
+            check(tag.getInt("LifeTime") >= 30 && tag.getInt("LifeTime") <= 41, "native_rocket_flight_uses_migrated_power");
+            restored.readAdditionalSaveData(tag);
+            check(ItemStack.matches(rocket.getItem(), restored.getItem()), "native_rocket_entity_save_load_keeps_effects");
+            float health = target.getHealth(); tag.putInt("Life", 0); tag.putInt("LifeTime", 0); rocket.readAdditionalSaveData(tag); rocket.tick();
+            check(rocket.isRemoved(), "native_rocket_expires_and_explodes");
+            check(target.getHealth() < health, "native_migrated_explosion_damages_target");
+        } finally { rocket.discard(); target.discard(); restored.discard(); }
+
+        for (String[] invalid : List.of(new String[]{"firework-bad-power", "firework_rocket"}, new String[]{"firework-too-many", "firework_rocket"},
+                new String[]{"firework-empty-colors", "firework_star"}, new String[]{"firework-unknown-shape", "firework_star"},
+                new String[]{"firework-bad-field", "firework_star"}, new String[]{"fireworks", "stone"}, new String[]{"firework-star", "firework_rocket"})) {
+            DataKey key = item(invalid[0], invalid[1]); Object before = key.copy().getRaw(""); var stored = new StoredItems<Integer>();
+            check(stored.load(0, key) == null && stored.contains(0), invalid[0] + "_" + invalid[1] + "_retained_unavailable");
+            stored.save(0, key, null); check(before.equals(key.getRaw("")), invalid[0] + "_" + invalid[1] + "_source_retained");
+        }
+        DataKey invalid = structured.getKey("invalid").copy(); Object before = invalid.copy().getRaw(""); var stored = new StoredItems<Integer>();
+        check(stored.load(0, invalid) == null && stored.contains(0), "structured_invalid_firework_unavailable");
+        stored.save(0, invalid, null); check(before.equals(invalid.getRaw("")), "structured_invalid_firework_retained");
     }
 
     private static void structuredItems(MinecraftServer server) throws Exception {

@@ -1,0 +1,28 @@
+# Synthetic records matching the original Citizens structured firework reader.
+rocket:
+  type: firework_rocket
+  amount: 1
+  meta:
+    firework:
+      power: 3
+      effects:
+        '10':
+          type: CREEPER
+          colors: { '0': { rgb: 11259375 } }
+          fadecolors: { '0': { rgb: 66051 } }
+          flicker: true
+        '2':
+          type: BURST
+          colors: { '8': { rgb: 16702650 }, '0': { rgb: 1193046 } }
+          trail: true
+empty:
+  type: firework_rocket
+  meta: { firework: {} }
+invalid:
+  type: firework_rocket
+  meta:
+    firework:
+      effects:
+        '0':
+          type: STAR
+          colors: { '0': { rgb: 1193046, provider-field: retain } }
