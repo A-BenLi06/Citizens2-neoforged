@@ -52,9 +52,9 @@ import net.neoforged.neoforge.server.ServerLifecycleHooks;
  * <p>
  * <b>Legacy format.</b> Saves written by the Bukkit plugin use {@code type}/{@code amount}/{@code durability} plus a
  * base64 {@code meta} blob (older saves use {@code meta.encoded-meta}). Bukkit's object stream stores a wrapper around
- * the serialized ItemMeta map. The built-in migration does not decode that map yet. Such records remain unavailable
- * unless a registered reader handles their metadata completely. Plain item id/count/damage/name/lore records migrate
- * directly. Owners can use {@link StoredItems} to retain unavailable definitions until a later load or explicit edit.
+ * the serialized ItemMeta map. The built-in reader converts recognized fields completely; unsupported metadata stays
+ * unavailable. A registered reader can replace this conversion. Owners can use {@link StoredItems} to retain
+ * unavailable definitions until a later load or explicit edit.
  */
 public class ItemStorage {
     private ItemStorage() {
@@ -204,22 +204,26 @@ public class ItemStorage {
         if (damage > 0 && stack.isDamageableItem()) {
             stack.set(DataComponents.DAMAGE, damage);
         }
-        // editable_components is plain text, so unlike the base64 meta blob it does survive the migration
-        if (root.keyExists("editable_components.display_name")) {
+        // With a metadata blob these are only an editing view; the decoded name/lore remains authoritative until edited.
+        if (!root.keyExists("meta") && root.keyExists("editable_components.display_name")) {
             stack.set(DataComponents.CUSTOM_NAME,
                     Messaging.minecraftComponentFromRawMessage(root.getString("editable_components.display_name")));
         }
-        if (root.keyExists("editable_components.lore")) {
+        if (!root.keyExists("meta") && root.keyExists("editable_components.lore")) {
             stack.set(DataComponents.LORE, new ItemLore(parseLore(root.getString("editable_components.lore"))));
         }
         if (root.keyExists("enchantments") || root.keyExists("mdata"))
             throw new IllegalArgumentException("Legacy structured item metadata requires migration");
         if (root.keyExists("meta")) {
             LegacyItemMetaReader reader = legacyItemMetaReader;
+            String encoded = root.keyExists("meta.encoded-meta") ? root.getString("meta.encoded-meta") : root.getString("meta");
+            if (reader == null) {
+                MinecraftServer server = ServerLifecycleHooks.getCurrentServer();
+                return LegacyBukkitMeta.read(encoded, stack, server == null ? RegistryAccess.EMPTY : server.registryAccess());
+            }
             boolean handled = false;
             if (reader != null) {
                 try {
-                    String encoded = root.keyExists("meta.encoded-meta") ? root.getString("meta.encoded-meta") : root.getString("meta");
                     handled = reader.apply(encoded, stack);
                 } catch (Throwable t) {
                     Messaging.severe("Legacy item meta reader failed at " + root.getPath() + ": " + t);
@@ -335,10 +339,9 @@ public class ItemStorage {
     /**
      * Installs a decoder for the base64 {@code meta} blob in legacy Bukkit saves.
      * <p>
-     * The blob is a Java-serialized wrapper around an {@code ItemMeta} map; the built-in migration does not decode it
-     * and warns. A reader registered here — one that substitutes a
-     * stand-in for {@code org.bukkit.util.io.Wrapper} to recover the underlying {@code meta.serialize()} map, then maps
-     * it onto data components — restores enchantments and the rest without any change to this class.
+     * The blob is a Java-serialized wrapper around an {@code ItemMeta} map. A registered reader replaces the built-in
+     * data-only decoder and must handle the metadata completely. Returning false or throwing keeps the item unavailable.
+     * Passing null restores the built-in reader.
      * <p>
      * Register before any NPC data is loaded, i.e. before {@code ServerStartingEvent} finishes.
      */
