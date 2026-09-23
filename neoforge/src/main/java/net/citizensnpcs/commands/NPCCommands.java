@@ -2251,7 +2251,7 @@ public class NPCCommands {
             throws CommandException {
         if (color != null) {
             ChatFormatting formatting = ChatFormatting.getByName(color.toUpperCase(Locale.ROOT));
-            if (formatting == null || !formatting.isColor())
+            if (formatting == null || formatting.isFormat())
                 throw new CommandException(Messages.GLOWING_COLOR_CANNOT_BE_FORMAT);
             npc.getOrAddTrait(ScoreboardTrait.class).setColor(formatting);
             Messaging.sendTr(sender, Messages.GLOWING_COLOR_SET, npc.getName(), color);

@@ -386,7 +386,7 @@ public class CitizensNPC extends AbstractNPC {
             try {
                 renderer.onPreSpawn(this);
             } catch (RuntimeException | Error failure) {
-                entityController.remove();
+                discardFailedSpawn();
                 throw failure;
             }
         }
@@ -395,7 +395,7 @@ public class CitizensNPC extends AbstractNPC {
         entityController.spawn(location, couldSpawn -> {
             if (!couldSpawn) {
                 Messaging.debug("Retrying spawn of", this, "later, SpawnReason." + reason);
-                entityController.remove();
+                discardFailedSpawn();
                 NeoForge.EVENT_BUS.post(new NPCNeedsRespawnEvent(this, location));
                 data().remove(NPC.Metadata.NPC_SPAWNING_IN_PROGRESS);
                 return;
@@ -405,7 +405,7 @@ public class CitizensNPC extends AbstractNPC {
             NeoForge.EVENT_BUS.post(spawnEvent);
             if (spawnEvent.isCanceled()) {
                 Messaging.debug("Couldn't spawn", this, "SpawnReason." + reason, "due to event cancellation.");
-                entityController.remove();
+                discardFailedSpawn();
                 data().remove(NPC.Metadata.NPC_SPAWNING_IN_PROGRESS);
                 return;
             }
@@ -533,13 +533,16 @@ public class CitizensNPC extends AbstractNPC {
                 : trait.getDisguiseType();
     }
 
-    /**
-     * Refreshes the NPC's fake scoreboard team.
-     * <p>
-     * Unlike upstream this does not wait for the team's metadata key to exist: that key is written <em>by</em>
-     * {@link ScoreboardTrait#update()} on its first run, so gating on it would mean the trait never started. The trait
-     * itself does nothing unless it is attached, so the cost when it is not is one map lookup.
-     */
+    private void discardFailedSpawn() {
+        // Native insertion may already have paired viewers before the spawn event rejects the NPC.
+        ScoreboardTrait scoreboard = getTraitNullable(ScoreboardTrait.class);
+        if (scoreboard != null) {
+            scoreboard.onDespawn(DespawnReason.PENDING_RESPAWN);
+        }
+        entityController.remove();
+    }
+
+    /** Refreshes attached scoreboard traits, including teams not created during pairing. */
     private void updateScoreboard() {
         ScoreboardTrait trait = getTraitNullable(ScoreboardTrait.class);
         if (trait != null) {

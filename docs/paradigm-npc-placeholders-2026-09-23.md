@@ -27,6 +27,8 @@ Normal Paradigm message delivery executes on the server thread, where values rea
 
 This batch exports the four owned values. It does not add inbound Paradigm evaluation to Citizens' `<placeholder>` parser or automatically migrate arbitrary `%PlaceholderAPI%` expressions. Provider-owned economy/quest values still require their selected native service contracts.
 
+Read-only public-API inspection on 2026-09-23 confirms that installed Paradigm 2.4.2b exposes registration through `PlaceholderService` and delivery through `MessageService`, but no format/evaluate method returning resolved text. Calling message delivery or private formatter internals would not provide a supported inbound evaluation adapter. That boundary remains open pending an appropriate public provider contract. The installed jar remains SHA-256 `9547f26740b6c6158078191055863a2ad5f87f5ce34ecf4e837f715486709353`; inspected signatures are recorded in `artifacts/scoreboard-paradigm-public-api.txt`.
+
 ## Validation and limits
 
 The [isolated fixture](../tools/paradigm-placeholder-runtime-audit/README.md) uses a copy of the installed provider jar, synthetic players admitted through the native PlayerList and actual `MessageService.sendPlayerMessage` delivery. It captures native system-chat packets independently of the resolver. The provider-absent fixture verifies optional loading and unchanged Citizens placeholders. Read-only reflection observes Citizens handle cleanup; the provider registry's actual formatter exercises worker-thread context resolution.

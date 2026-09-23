@@ -1,8 +1,9 @@
 package net.citizensnpcs.trait;
 
 import java.util.HashSet;
+import java.util.IdentityHashMap;
+import java.util.Map;
 import java.util.Set;
-import java.util.UUID;
 
 import net.citizensnpcs.Settings.Setting;
 import net.citizensnpcs.api.event.DespawnReason;
@@ -10,11 +11,13 @@ import net.citizensnpcs.api.npc.NPC;
 import net.citizensnpcs.api.persistence.Persist;
 import net.citizensnpcs.api.trait.Trait;
 import net.citizensnpcs.api.trait.TraitName;
+import net.citizensnpcs.api.util.DataKey;
 import net.citizensnpcs.util.Util;
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.protocol.game.ClientboundSetPlayerTeamPacket;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.server.network.ServerGamePacketListenerImpl;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.scores.PlayerTeam;
 import net.minecraft.world.scores.Scoreboard;
@@ -38,14 +41,13 @@ import net.neoforged.neoforge.server.ServerLifecycleHooks;
  */
 @TraitName("scoreboardtrait")
 public class ScoreboardTrait extends Trait {
-    private boolean changed;
     @Persist
     private ChatFormatting color;
     private String lastEntry;
-    private ChatFormatting previousGlowingColor;
+    private long revision;
     private final Scoreboard scoreboard = new Scoreboard();
-    /** Viewers that currently hold this team, so updates and removals reach exactly them. */
-    private final Set<UUID> sentTo = new HashSet<>();
+    /** A client keeps its scoreboard across respawn/dimension changes, but not across new play sessions. */
+    private final Map<ServerGamePacketListenerImpl, Long> sentTo = new IdentityHashMap<>();
     @Persist
     private Set<String> tags = new HashSet<>(Set.of("CITIZENS_NPC"));
     private PlayerTeam team;
@@ -63,12 +65,16 @@ public class ScoreboardTrait extends Trait {
         if (team == null) {
             team = scoreboard.addPlayerTeam(teamName);
         }
+        if (entityName.equals(lastEntry))
+            return;
+        // A properties-only packet cannot change membership. Recreate the client team before adding the new entry.
+        removeFromViewers();
         if (lastEntry != null && !lastEntry.equals(entityName)) {
             scoreboard.removePlayerFromTeam(lastEntry, team);
         }
         scoreboard.addPlayerToTeam(entityName, team);
         lastEntry = entityName;
-        changed = true;
+        revision++;
     }
 
     public ChatFormatting getColor() {
@@ -80,10 +86,23 @@ public class ScoreboardTrait extends Trait {
     }
 
     @Override
+    public void load(DataKey key) {
+        if (color != null && color.isFormat()) {
+            color = null;
+        }
+    }
+
+    @Override
     public void onDespawn(DespawnReason reason) {
-        previousGlowingColor = null;
+        disposeTeam();
+    }
+
+    private void disposeTeam() {
         removeFromViewers();
         npc.data().remove(NPC.Metadata.SCOREBOARD_FAKE_TEAM_NAME);
+        if (team != null) {
+            scoreboard.removePlayerTeam(team);
+        }
         team = null;
         lastEntry = null;
     }
@@ -95,7 +114,6 @@ public class ScoreboardTrait extends Trait {
 
     @Override
     public void onSpawn() {
-        changed = true;
         Entity entity = npc.getEntity();
         entity.getTags().clear();
         entity.getTags().addAll(tags);
@@ -106,7 +124,7 @@ public class ScoreboardTrait extends Trait {
             return;
         ClientboundSetPlayerTeamPacket packet = ClientboundSetPlayerTeamPacket.createRemovePacket(team);
         for (ServerPlayer viewer : onlinePlayers()) {
-            if (sentTo.remove(viewer.getUUID())) {
+            if (sentTo.remove(viewer.connection) != null) {
                 viewer.connection.send(packet);
             }
         }
@@ -114,10 +132,9 @@ public class ScoreboardTrait extends Trait {
     }
 
     public void setColor(ChatFormatting color) {
-        if (color != null && !color.isColor())
+        if (color != null && color.isFormat())
             throw new IllegalArgumentException("team colours must be colours, not formatting codes");
         this.color = color;
-        changed = true;
     }
 
     public void setTags(Set<String> tags) {
@@ -135,13 +152,34 @@ public class ScoreboardTrait extends Trait {
         if (!entity.getTags().equals(tags)) {
             tags = new HashSet<>(entity.getTags());
         }
-        if (!Setting.USE_SCOREBOARD_TEAMS.asBoolean()) {
-            removeFromViewers();
-            npc.data().remove(NPC.Metadata.SCOREBOARD_FAKE_TEAM_NAME);
-            team = null;
-            lastEntry = null;
+        if (!prepareTeam())
             return;
+        MinecraftServer server = ServerLifecycleHooks.getCurrentServer();
+        sentTo.keySet().removeIf(connection -> {
+            ServerPlayer current = server == null ? null
+                    : server.getPlayerList().getPlayer(connection.getPlayer().getUUID());
+            return current == null || current.connection != connection;
+        });
+        for (ServerPlayer viewer : onlinePlayers()) {
+            sendTo(viewer);
         }
+    }
+
+    /** Establishes the current team before native entity/profile pairing, including during NPC spawning. */
+    public void prepareForViewer(ServerPlayer viewer) {
+        if (prepareTeam()) {
+            sendTo(viewer);
+        }
+    }
+
+    private boolean prepareTeam() {
+        if (!Setting.USE_SCOREBOARD_TEAMS.asBoolean()) {
+            disposeTeam();
+            return false;
+        }
+        Entity entity = npc.getEntity();
+        if (entity == null)
+            return false;
         // a player NPC joins by its profile name because that is the entry the client matches; anything else has no
         // name of its own on the client, so its UUID is used. The UUID's string form is cached: building it is 36
         // characters of garbage, and update() runs on every NPC on every tick
@@ -166,40 +204,29 @@ public class ScoreboardTrait extends Trait {
         Team.Visibility visibility = nameVisible ? Team.Visibility.ALWAYS : Team.Visibility.NEVER;
         if (visibility != team.getNameTagVisibility()) {
             team.setNameTagVisibility(visibility);
-            changed = true;
+            revision++;
         }
         Team.CollisionRule collide = npc.data().<Boolean> get(NPC.Metadata.COLLIDABLE, !npc.isProtected())
                 ? Team.CollisionRule.ALWAYS
                 : Team.CollisionRule.NEVER;
         if (collide != team.getCollisionRule()) {
             team.setCollisionRule(collide);
-            changed = true;
+            revision++;
         }
-        if (color != null && color != previousGlowingColor) {
-            team.setColor(color);
-            previousGlowingColor = color;
-            changed = true;
+        ChatFormatting desiredColor = color == null ? ChatFormatting.RESET : color;
+        if (desiredColor != team.getColor()) {
+            team.setColor(desiredColor);
+            revision++;
         }
-        ClientboundSetPlayerTeamPacket add = null;
-        ClientboundSetPlayerTeamPacket update = null;
-        for (ServerPlayer viewer : onlinePlayers()) {
-            if (sentTo.contains(viewer.getUUID())) {
-                if (!changed) {
-                    continue;
-                }
-                if (update == null) {
-                    update = ClientboundSetPlayerTeamPacket.createAddOrModifyPacket(team, false);
-                }
-                viewer.connection.send(update);
-            } else {
-                if (add == null) {
-                    add = ClientboundSetPlayerTeamPacket.createAddOrModifyPacket(team, true);
-                }
-                viewer.connection.send(add);
-                sentTo.add(viewer.getUUID());
-            }
-        }
-        changed = false;
+        return true;
+    }
+
+    private void sendTo(ServerPlayer viewer) {
+        Long sentRevision = sentTo.get(viewer.connection);
+        if (sentRevision != null && sentRevision.longValue() == revision)
+            return;
+        viewer.connection.send(ClientboundSetPlayerTeamPacket.createAddOrModifyPacket(team, sentRevision == null));
+        sentTo.put(viewer.connection, revision);
     }
 
     private Iterable<ServerPlayer> onlinePlayers() {

@@ -14,7 +14,9 @@ import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 
 import net.citizensnpcs.npc.entity.EntityHumanNPC;
+import net.citizensnpcs.npc.NPCRegistries;
 import net.citizensnpcs.npc.skin.SkinPacketTracker;
+import net.citizensnpcs.trait.ScoreboardTrait;
 import net.citizensnpcs.util.HologramMetadata;
 import net.citizensnpcs.util.PacketMounts;
 import net.minecraft.network.protocol.Packet;
@@ -64,11 +66,17 @@ public class ServerEntityMixin {
      * {@code PlayerEvent.StartTracking} — by which point the client has already discarded the NPC. Injecting at the head
      * of {@code sendPairingData} is what puts the profile ahead of the spawn packet.
      * <p>
-     * Non-player NPCs need none of this, which is exactly why they were visible while player NPCs were not.
+     * The NPC's scoreboard team also precedes pairing, so name visibility, collision and glow color are correct on
+     * the first client frame. Teams still reach all online players through the trait's normal update.
      */
     @Inject(method = "sendPairingData", at = @At("HEAD"))
     private void citizens$sendProfileBeforeSpawn(ServerPlayer viewer,
             PacketAndPayloadAcceptor<ClientGamePacketListener> acceptor, CallbackInfo ci) {
+        var npc = NPCRegistries.lookup(entity);
+        ScoreboardTrait scoreboard = npc == null ? null : npc.getTraitNullable(ScoreboardTrait.class);
+        if (scoreboard != null) {
+            scoreboard.prepareForViewer(viewer);
+        }
         if (entity instanceof EntityHumanNPC human) {
             // sent straight down the connection rather than through the acceptor: the acceptor's packets are buffered
             // into the bundle that addPairing sends afterwards, so anything written here arrives first either way, and
