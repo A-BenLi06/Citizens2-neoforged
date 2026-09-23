@@ -1,6 +1,7 @@
 package net.citizensnpcs.api.trait.trait;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -10,7 +11,6 @@ import com.google.common.collect.Maps;
 import com.mojang.datafixers.util.Pair;
 
 import net.citizensnpcs.api.event.NPCEvent;
-import net.citizensnpcs.api.event.NPCSeenByPlayerEvent;
 import net.citizensnpcs.api.exception.NPCLoadException;
 import net.citizensnpcs.api.npc.NPC;
 import net.citizensnpcs.api.npc.NPC.NPCUpdate;
@@ -20,6 +20,8 @@ import net.citizensnpcs.api.trait.TraitName;
 import net.citizensnpcs.api.util.DataKey;
 import net.citizensnpcs.api.util.ItemStorage;
 import net.citizensnpcs.api.util.StoredItems;
+import net.citizensnpcs.trait.PacketNPC;
+import net.citizensnpcs.util.NPCVisibility;
 import net.minecraft.network.protocol.game.ClientboundSetEquipmentPacket;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
@@ -33,6 +35,7 @@ import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.ItemStack;
 import net.neoforged.bus.api.EventPriority;
 import net.neoforged.neoforge.common.NeoForge;
+import net.neoforged.neoforge.event.entity.player.PlayerEvent;
 
 /**
  * Represents an NPC's equipment.
@@ -43,8 +46,7 @@ import net.neoforged.neoforge.common.NeoForge;
  * <b>Cosmetic equipment</b> is what a viewer sees when the NPC is not really wearing anything. Upstream implements it
  * by rewriting outgoing {@code SetEquipment} packets through packetevents; this port has no packetevents, so it sends
  * its own {@link ClientboundSetEquipmentPacket} after vanilla's — last packet wins on the client. The moment a viewer
- * needs it is {@link NPCSeenByPlayerEvent}, which arrives from NeoForge's own tracking event rather than upstream's
- * Mixin-installed entity tracker.
+ * needs it is NeoForge's successful {@link PlayerEvent.StartTracking} notification, after native pairing.
  * <p>
  * {@code null} means "slot empty", matching upstream and {@link ItemStorage}; {@link ItemStack#EMPTY} is only used at
  * the Minecraft boundary, which rejects nulls.
@@ -133,13 +135,14 @@ public class Equipment extends Trait {
      * Sends the cosmetic overlay to a viewer who just started tracking the NPC. Only fires when the NPC has no real
      * equipment to show — with real gear on, that gear is what everyone is meant to see.
      */
-    @TraitEventHandler(priority = EventPriority.LOWEST)
-    private void onSeenByPlayer(NPCSeenByPlayerEvent event) {
-        if (!hasCosmeticOnly())
+    @TraitEventHandler(priority = EventPriority.LOWEST, processor = NPCVisibility.TrackingNPC.class)
+    private void onStartTracking(PlayerEvent.StartTracking event) {
+        if (!(event.getEntity() instanceof ServerPlayer player) || !hasCosmeticOnly()
+                || npc.getEntity() == null || !NPCVisibility.isTracked(npc.getEntity(), player))
             return;
         ClientboundSetEquipmentPacket packet = buildCosmeticPacket();
         if (packet != null) {
-            event.getPlayer().connection.send(packet);
+            player.connection.send(packet);
         }
     }
 
@@ -177,7 +180,12 @@ public class Equipment extends Trait {
             return;
         ClientboundSetEquipmentPacket packet = buildCosmeticPacket();
         if (packet != null) {
-            level.getChunkSource().broadcastAndSend(entity, packet);
+            PacketNPC virtual = npc.getTraitNullable(PacketNPC.class);
+            Collection<ServerPlayer> viewers = PacketNPC.isPacketEntity(entity) ? virtual.getPacketTracker().getLinked()
+                    : level.getChunkSource().chunkMap.getPlayersWatching(entity);
+            for (ServerPlayer viewer : viewers) {
+                if (NPCVisibility.isTracked(entity, viewer)) viewer.connection.send(packet);
+            }
         }
     }
 

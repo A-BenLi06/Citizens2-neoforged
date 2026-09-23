@@ -57,15 +57,14 @@ public class EntityPacketTracker {
     }
 
     /**
-     * Starts showing the entity to a player, sending the spawn bundle immediately.
-     * <p>
-     * {@code unsetRemoved} is needed because an entity that was never added to a level — or that has been discarded once
-     * already — is flagged removed, and {@link ServerEntity} refuses to build pairing data for a removed entity.
+     * Starts showing a live entity to an admitted player, sending the native spawn bundle immediately.
+     * A rejected attempt retains no viewer membership. Discarded entities cannot be revived by a pending link.
      */
     public void link(ServerPlayer player) {
         if (isLinked(player))
             return;
-        entity.unsetRemoved();
+        if (!NPCVisibility.allowPairing(entity, player))
+            return;
         linked.add(player);
         tracker.addPairing(player);
     }

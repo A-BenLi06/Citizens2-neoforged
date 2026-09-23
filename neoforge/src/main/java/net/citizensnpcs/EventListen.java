@@ -25,7 +25,6 @@ import net.citizensnpcs.api.event.SpawnReason;
 import net.neoforged.neoforge.event.entity.living.LivingIncomingDamageEvent;
 import net.citizensnpcs.api.event.NPCLeftClickEvent;
 import net.citizensnpcs.api.event.NPCRightClickEvent;
-import net.citizensnpcs.api.event.NPCSeenByPlayerEvent;
 import net.citizensnpcs.api.util.PermissionUtil;
 import net.citizensnpcs.npc.entity.EntityHumanNPC;
 import net.citizensnpcs.npc.skin.SkinPacketTracker;
@@ -470,13 +469,6 @@ public class EventListen {
     }
 
     /**
-     * Raises {@link NPCSeenByPlayerEvent} when a player comes into range of an NPC.
-     * <p>
-     * Upstream gets this moment by swapping vanilla's {@code ChunkMap.TrackedEntity} for its own subclass via
-     * {@code NMS.replaceTracker()} — the one piece of the port that looked like it would need a Mixin. NeoForge already
-     * fires an event at exactly that point, so the tracker replacement is not needed at all.
-     */
-    /**
      * Applies {@code /npc knockback} and NPC protection to vanilla's knockback.
      * <p>
      * Without this the command was a silent no-op: it writes {@link NPC.Metadata#KNOCKBACK} and nothing read it. Protection
@@ -529,8 +521,7 @@ public class EventListen {
         NPC npc = CitizensAPI.getNPCRegistry().getNPC(event.getTarget());
         if (npc == null)
             return;
-        NeoForge.EVENT_BUS.post(new NPCSeenByPlayerEvent(npc, player));
-        // a hologram line gets the chance to present itself differently to this particular viewer
+        // Pairing succeeded; cancellable admission happens before the native spawn packets.
         if (npc.data().get(NPC.Metadata.HOLOGRAM_RENDERER) instanceof HologramRenderer renderer) {
             renderer.onSeenByPlayer(npc, player);
         }

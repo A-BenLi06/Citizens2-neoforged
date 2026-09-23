@@ -167,8 +167,14 @@ public class PacketNPC extends Trait {
         for (ServerPlayer linked : packetTracker.getLinked()) {
             if (viewers.stream().noneMatch(player -> player == linked)) packetTracker.unlink(linked);
         }
-        for (ServerPlayer viewer : viewers) packetTracker.link(viewer);
-        packetTracker.run();
+        EntityPacketTracker current = packetTracker;
+        for (ServerPlayer viewer : viewers) {
+            // Admission listeners can remove or replace this NPC/trait during any individual link.
+            if (!spawned || packetTracker != current || npc.getEntity() != entity
+                    || npc.getTraitNullable(PacketNPC.class) != this) return;
+            current.link(viewer);
+        }
+        if (spawned && packetTracker == current && npc.getEntity() == entity) current.run();
     }
 
     /**

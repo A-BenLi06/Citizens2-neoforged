@@ -5,12 +5,14 @@ import net.minecraft.server.level.ServerPlayer;
 import net.neoforged.bus.api.ICancellableEvent;
 
 /**
- * Called the first time a player starts tracking an NPC's entity, i.e. when the NPC enters that player's view distance
- * and the server begins sending them entity packets for it.
+ * Called before an eligible player starts tracking an NPC's entity, before viewer membership or pairing packets.
+ * Canceling prevents that tracking attempt, including the player profile and spawn data. A canceled attempt may be
+ * retried by subsequent tracking updates; the decision is not cached. Already paired viewers do not receive this event
+ * again until they leave and reenter tracking. Use the NPC's visibility rules to hide an existing viewer.
  * <p>
- * Upstream raises this from {@code CitizensEntityTracker}, a replacement for vanilla's {@code ChunkMap.TrackedEntity}
- * installed by {@code NMS.replaceTracker()}. NeoForge fires {@code PlayerEvent.StartTracking} for the same moment, so
- * this port needs neither the tracker replacement nor the Mixin it would have required.
+ * Both native world tracking and PacketNPC admission honor this contract. NeoForge's noncancellable
+ * {@code PlayerEvent.StartTracking} remains the notification after successful pairing, suitable for supplemental
+ * per-viewer packets. Native range/chunk eligibility and Citizens visibility rules are checked before admission.
  */
 public class NPCSeenByPlayerEvent extends NPCEvent implements ICancellableEvent {
     private final ServerPlayer player;

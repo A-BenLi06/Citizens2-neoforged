@@ -10,18 +10,19 @@ import java.util.function.BiFunction;
 import com.mojang.datafixers.util.Pair;
 
 import net.citizensnpcs.api.event.DespawnReason;
-import net.citizensnpcs.api.event.NPCSeenByPlayerEvent;
 import net.citizensnpcs.api.event.SpawnReason;
 import net.citizensnpcs.api.persistence.Persist;
 import net.citizensnpcs.api.trait.Trait;
 import net.citizensnpcs.api.trait.TraitEventHandler;
 import net.citizensnpcs.api.trait.TraitName;
+import net.citizensnpcs.util.NPCVisibility;
 import net.minecraft.network.protocol.game.ClientboundSetEquipmentPacket;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.item.ItemStack;
+import net.neoforged.neoforge.event.entity.player.PlayerEvent;
 
 /**
  * Makes a player NPC look like whoever is looking at it: each viewer sees their own skin, and optionally their own name
@@ -73,12 +74,12 @@ public class MirrorTrait extends Trait {
         return mirrorName;
     }
 
-    @TraitEventHandler
-    public void onSeenByPlayer(NPCSeenByPlayerEvent event) {
-        if (event.getNPC() != npc)
-            return;
-        sent.remove(event.getPlayer().getUUID());
-        sendEquipment(event.getPlayer());
+    @TraitEventHandler(processor = NPCVisibility.TrackingNPC.class)
+    public void onStartTracking(PlayerEvent.StartTracking event) {
+        if (event.getEntity() instanceof ServerPlayer player) {
+            sent.remove(player.getUUID());
+            sendEquipment(player);
+        }
     }
 
     @Override
@@ -110,7 +111,8 @@ public class MirrorTrait extends Trait {
     /** Sends this viewer the equipment they should see on the NPC, if it differs from what they were last sent. */
     private void sendEquipment(ServerPlayer viewer) {
         BiFunction<ServerPlayer, EquipmentSlot, ItemStack> function = getEquipmentFunction();
-        if (function == null || !npc.isSpawned() || !isMirroring(viewer))
+        if (function == null || !npc.isSpawned() || !isMirroring(viewer)
+                || !NPCVisibility.isTracked(npc.getEntity(), viewer))
             return;
         List<Pair<EquipmentSlot, ItemStack>> slots = new ArrayList<>(SLOTS.length);
         List<ItemStack> snapshot = new ArrayList<>(SLOTS.length);

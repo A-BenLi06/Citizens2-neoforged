@@ -1,6 +1,7 @@
 package net.citizensnpcs.mixin;
 
 import java.util.List;
+import java.util.Set;
 
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -22,6 +23,15 @@ import net.minecraft.world.entity.Entity;
 public abstract class TrackedEntityMixin implements NPCVisibility.TrackedEntity {
     @Shadow @org.spongepowered.asm.mixin.Final private Entity entity;
     @Shadow public abstract void updatePlayers(List<ServerPlayer> players);
+
+    @WrapOperation(method = "updatePlayer", at = @At(value = "INVOKE",
+            target = "Ljava/util/Set;add(Ljava/lang/Object;)Z"))
+    private boolean citizens$admitViewer(Set<ServerPlayerConnection> viewers, Object connection,
+            Operation<Boolean> original) {
+        ServerPlayer viewer = ((ServerPlayerConnection) connection).getPlayer();
+        if (!viewers.contains(connection) && !NPCVisibility.allowPairing(entity, viewer)) return false;
+        return original.call(viewers, connection);
+    }
 
     @WrapOperation(method = "broadcast", at = @At(value = "INVOKE",
             target = "Lnet/minecraft/server/network/ServerPlayerConnection;send(Lnet/minecraft/network/protocol/Packet;)V"))
