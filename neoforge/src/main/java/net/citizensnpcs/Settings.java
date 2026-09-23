@@ -165,6 +165,7 @@ public class Settings {
         NPC_SKIN_USE_LATEST("npc.skins.use-latest-by-default", false),
         NPC_SKIN_VIEW_DISTANCE("npc.skins.view-distance", 100),
         NPC_WATER_SPEED_MODIFIER("npc.movement.water-speed-modifier", 1.15F),
+        PACKET_HOLOGRAMS("npc.use-packet-holograms", false),
         // Upstream prefixes these CITIZENS_PATHFINDER_* to tell its own pathfinder apart from Minecraft's, which has no
         // settings of its own. The config paths keep the "citizens" segment so an existing config.yml still reads.
         PATHFINDER_CHECK_BOUNDING_BOXES("npc.pathfinding.citizens.check-bounding-boxes", false),

@@ -10,7 +10,9 @@
     "MobSoundMixin",
     "ServerEntityMixin",
     "ServerGamePacketListenerMixin",
+    "ServerLevelPassengerMixin",
     "ServerboundInteractPacketAccessor",
+    "SetPassengersPacketAccessor",
     "ServerPlayerMixin",
     "SleepStatusMixin",
     "TrackedEntityMixin"

@@ -17,6 +17,7 @@ import net.citizensnpcs.api.util.Location;
 import net.citizensnpcs.npc.EntityController;
 import net.citizensnpcs.util.EntityPacketTracker;
 import net.citizensnpcs.util.NPCVisibility;
+import net.citizensnpcs.util.PacketMounts;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.phys.AABB;
@@ -56,6 +57,17 @@ public class PacketNPC extends Trait {
 
     /** Resolve only a live virtual entity already paired to this current, eligible player. */
     public static Entity getInteractionTarget(int entityId, ServerPlayer player) {
+        PacketNPC trait = activeTrait(entityId);
+        return trait != null && trait.packetTracker.isLinked(player) && trait.isViewerEligible(player)
+                ? trait.npc.getEntity() : null;
+    }
+
+    public static boolean isPacketEntity(Entity entity) {
+        PacketNPC trait = activeTrait(entity.getId());
+        return trait != null && trait.npc.getEntity() == entity;
+    }
+
+    private static PacketNPC activeTrait(int entityId) {
         PacketNPC trait = INTERACTION_TARGETS.get(entityId);
         if (trait == null || !trait.spawned || trait.packetTracker == null)
             return null;
@@ -64,10 +76,9 @@ public class PacketNPC extends Trait {
         if (!owner.isSpawned() || owner.getTraitNullable(PacketNPC.class) != trait
                 || owner.getOwningRegistry() == null
                 || owner.getOwningRegistry().getByUniqueId(owner.getUniqueId()) != owner
-                || entity == null || entity.getId() != entityId || entity.isRemoved()
-                || !trait.packetTracker.isLinked(player) || !trait.isViewerEligible(player))
+                || entity == null || entity.getId() != entityId || entity.isRemoved())
             return null;
-        return entity;
+        return trait;
     }
 
     /** Live eligibility for supplemental per-viewer updates between reconciliation ticks. */
@@ -95,7 +106,7 @@ public class PacketNPC extends Trait {
     /** Trait replacement calls the no-argument hook; only the replacement may keep tracking the entity. */
     @Override
     public void onRemove() {
-        unlinkAll();
+        unlinkAll(false);
     }
 
     /**
@@ -148,6 +159,7 @@ public class PacketNPC extends Trait {
         if (!spawned || packetTracker == null || npc.getEntity() == null)
             return;
         Entity entity = npc.getEntity();
+        PacketMounts.position(entity);
         var box = trackingBox(entity);
         // Spectators and invisible players can see entities. This is viewer eligibility, not NPC target selection.
         List<ServerPlayer> viewers = entity.getServer().getPlayerList().getPlayers().stream()
@@ -174,12 +186,17 @@ public class PacketNPC extends Trait {
     }
 
     private void unlinkAll() {
+        unlinkAll(true);
+    }
+
+    private void unlinkAll(boolean discard) {
         if (registeredEntityId != null) {
             INTERACTION_TARGETS.remove(registeredEntityId.intValue(), this);
             registeredEntityId = null;
         }
         if (spawned && packetTracker != null) {
-            packetTracker.unlinkAll(null);
+            if (discard) packetTracker.unlinkAll(null);
+            else packetTracker.unpairAll(null);
         }
         spawned = false;
     }

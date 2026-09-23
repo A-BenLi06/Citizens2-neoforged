@@ -110,18 +110,24 @@ public class EntityPacketTracker {
      *            run for each player that was unlinked, before the entity is discarded
      */
     public void unlinkAll(Consumer<ServerPlayer> callback) {
+        unpairAll(callback);
+        entity.remove(Entity.RemovalReason.DISCARDED);
+    }
+
+    /** Retire a tracker while preserving the entity and its mount relations for a replacement tracker. */
+    public void unpairAll(Consumer<ServerPlayer> callback) {
         for (ServerPlayer player : new ArrayList<>(linked)) {
             unlink(player);
             if (callback != null) {
                 callback.accept(player);
             }
         }
-        entity.remove(Entity.RemovalReason.DISCARDED);
     }
 
     private void broadcast(Packet<?> packet) {
         for (ServerPlayer player : linked) {
-            player.connection.send(HologramMetadata.rewrite(entity, player, packet));
+            Packet<?> projected = PacketMounts.rewrite(entity, player, packet);
+            if (projected != null) player.connection.send(HologramMetadata.rewrite(entity, player, projected));
         }
     }
 }

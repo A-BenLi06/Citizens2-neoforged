@@ -16,6 +16,7 @@ import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import net.citizensnpcs.npc.entity.EntityHumanNPC;
 import net.citizensnpcs.npc.skin.SkinPacketTracker;
 import net.citizensnpcs.util.HologramMetadata;
+import net.citizensnpcs.util.PacketMounts;
 import net.minecraft.network.protocol.Packet;
 import net.minecraft.network.protocol.game.ClientGamePacketListener;
 import net.minecraft.server.level.ServerEntity;
@@ -35,12 +36,19 @@ public class ServerEntityMixin {
             target = "Lnet/minecraft/server/network/ServerGamePacketListenerImpl;send(Lnet/minecraft/network/protocol/Packet;)V"))
     private void citizens$personalizeHologramPairing(ServerGamePacketListenerImpl connection, Packet<?> packet,
             Operation<Void> original) {
-        original.call(connection, HologramMetadata.rewrite(entity, connection.getPlayer(), packet));
+        Packet<?> projected = PacketMounts.pairing(entity, connection.getPlayer(), packet);
+        if (projected != null) original.call(connection, HologramMetadata.rewrite(entity, connection.getPlayer(), projected));
     }
 
     @Inject(method = "removePairing", at = @At("TAIL"))
     private void citizens$forgetHologramViewer(ServerPlayer viewer, CallbackInfo ci) {
         HologramMetadata.forget(entity, viewer);
+    }
+
+    @Inject(method = "removePairing", at = @At(value = "INVOKE",
+            target = "Lnet/neoforged/neoforge/event/EventHooks;onStopEntityTracking(Lnet/minecraft/world/entity/Entity;Lnet/minecraft/world/entity/player/Player;)V"))
+    private void citizens$forgetMountViewerBeforeCallbacks(ServerPlayer viewer, CallbackInfo ci) {
+        PacketMounts.forget(entity, viewer);
     }
 
     /**

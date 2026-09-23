@@ -62,7 +62,7 @@ import net.neoforged.neoforge.server.ServerLifecycleHooks;
  * <p>
  * The {@code <item:…>} syntax uses a native item riding an invisible point entity, or an explicitly supplied
  * {@link ItemDisplayRenderer}. Native registry IDs/components and legacy material/colour forms are supported.
- * {@code npc.use-packet-holograms}, which spawns entities per-viewer through {@code PacketNPC}, remains separate work.
+ * {@code npc.use-packet-holograms} selects {@code PacketNPC} transport for newly created helpers, including item anchors.
  * Where upstream delegates persisted display properties to {@code DisplayTrait} / {@code TextDisplayTrait} via
  * {@code @Persist(reify = true)}, those fields sit directly on {@link TextDisplayRenderer} here. Because that annotation
  * flattens a trait's fields into the renderer's own key, the resulting on-disk shape is the same either way, and the
@@ -796,6 +796,7 @@ public class HologramTrait extends Trait {
                 child.addTrait(new ClickRedirectTrait(parent));
             }
             child.data().set(NPC.Metadata.HOLOGRAM_RENDERER, this);
+            if (Setting.PACKET_HOLOGRAMS.asBoolean()) child.getOrAddTrait(PacketNPC.class);
             if (viewRange != -1) {
                 child.data().set(NPC.Metadata.TRACKING_RANGE, viewRange);
             } else if (parent.data().has(NPC.Metadata.TRACKING_RANGE)) {

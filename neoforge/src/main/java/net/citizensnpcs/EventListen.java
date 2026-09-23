@@ -458,6 +458,7 @@ public class EventListen {
     public void onPlayerQuit(PlayerEvent.PlayerLoggedOutEvent event) {
         PermissionUtil.clearTemporary(event.getEntity().getUUID());
         rightClicks.remove(event.getEntity());
+        if (event.getEntity() instanceof ServerPlayer player) net.citizensnpcs.util.PacketMounts.forget(player);
     }
 
     @SubscribeEvent(priority = net.neoforged.bus.api.EventPriority.LOWEST)

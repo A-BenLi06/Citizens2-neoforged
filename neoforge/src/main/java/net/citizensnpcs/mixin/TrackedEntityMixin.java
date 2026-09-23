@@ -11,6 +11,7 @@ import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 
 import net.citizensnpcs.util.NPCVisibility;
 import net.citizensnpcs.util.HologramMetadata;
+import net.citizensnpcs.util.PacketMounts;
 import net.minecraft.network.protocol.Packet;
 import net.minecraft.server.network.ServerPlayerConnection;
 import net.minecraft.server.level.ServerPlayer;
@@ -26,7 +27,16 @@ public abstract class TrackedEntityMixin implements NPCVisibility.TrackedEntity 
             target = "Lnet/minecraft/server/network/ServerPlayerConnection;send(Lnet/minecraft/network/protocol/Packet;)V"))
     private void citizens$personalizeHologramUpdate(ServerPlayerConnection connection, Packet<?> packet,
             Operation<Void> original) {
-        original.call(connection, HologramMetadata.rewrite(entity, connection.getPlayer(), packet));
+        Packet<?> projected = PacketMounts.rewrite(entity, connection.getPlayer(), packet);
+        if (projected != null) original.call(connection, HologramMetadata.rewrite(entity, connection.getPlayer(), projected));
+    }
+
+    @WrapOperation(method = "broadcastAndSend", at = @At(value = "INVOKE",
+            target = "Lnet/minecraft/server/network/ServerGamePacketListenerImpl;send(Lnet/minecraft/network/protocol/Packet;)V"))
+    private void citizens$projectOwnMounts(net.minecraft.server.network.ServerGamePacketListenerImpl connection,
+            Packet<?> packet, Operation<Void> original) {
+        Packet<?> projected = PacketMounts.rewrite(entity, connection.getPlayer(), packet);
+        if (projected != null) original.call(connection, HologramMetadata.rewrite(entity, connection.getPlayer(), projected));
     }
 
     @Override public void citizens$updateViewers(List<ServerPlayer> players) {
