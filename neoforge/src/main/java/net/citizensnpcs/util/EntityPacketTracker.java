@@ -52,6 +52,10 @@ public class EntityPacketTracker {
         return List.copyOf(linked);
     }
 
+    public boolean isLinked(ServerPlayer player) {
+        return linked.stream().anyMatch(viewer -> viewer == player);
+    }
+
     /**
      * Starts showing the entity to a player, sending the spawn bundle immediately.
      * <p>
@@ -59,7 +63,7 @@ public class EntityPacketTracker {
      * already — is flagged removed, and {@link ServerEntity} refuses to build pairing data for a removed entity.
      */
     public void link(ServerPlayer player) {
-        if (linked.contains(player))
+        if (isLinked(player))
             return;
         entity.unsetRemoved();
         linked.add(player);
@@ -94,7 +98,7 @@ public class EntityPacketTracker {
 
     /** Stops showing the entity to a player, sending the remove packet. */
     public void unlink(ServerPlayer player) {
-        if (linked.remove(player)) {
+        if (linked.removeIf(viewer -> viewer == player)) {
             tracker.removePairing(player);
         }
     }

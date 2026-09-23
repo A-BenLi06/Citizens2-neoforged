@@ -5,9 +5,14 @@ import net.citizensnpcs.api.event.NPCKnockbackEvent;
 import net.neoforged.neoforge.event.entity.living.LivingKnockBackEvent;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+
+import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
+import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.ListMultimap;
+import com.google.common.collect.MapMaker;
 
 import net.citizensnpcs.api.CitizensAPI;
 import net.citizensnpcs.api.event.EntityTargetNPCEvent;
@@ -68,11 +73,20 @@ public class EventListen {
      * Right-clicks arrive as two packets for one click — {@code INTERACT_AT} followed by {@code INTERACT} — so NeoForge
      * fires both {@link PlayerInteractEvent.EntityInteractSpecific} and {@link PlayerInteractEvent.EntityInteract}.
      * Bukkit collapses those into a single {@code PlayerInteractEntityEvent}, and traits are written expecting one click
-     * to mean one event, so the second is dropped by remembering the last one seen.
+     * to mean one event. Keep each player's results for the server tick so interleaved packets cannot repeat a command
+     * or allow vanilla to handle an interaction that Citizens already consumed.
      */
-    private Entity lastClickedEntity;
-    private long lastClickTick = -1;
-    private ServerPlayer lastClicker;
+    // Entity equality uses the numeric ID, which vanilla reuses for a replacement player on respawn.
+    private final Map<ServerPlayer, TickClicks> rightClicks = new MapMaker().weakKeys().makeMap();
+
+    private static class TickClicks {
+        final int tick;
+        final Int2ObjectMap<Boolean> handled = new Int2ObjectOpenHashMap<>();
+
+        TickClicks(int tick) {
+            this.tick = tick;
+        }
+    }
 
     /**
      * NPCs waiting for their chunk to come back, keyed by the chunk they belong to.
@@ -204,9 +218,19 @@ public class EventListen {
         NPC npc = resolveClicked(target);
         if (npc == null)
             return;
-        if (isDuplicate(player, target)) {
+        int tick = player.getServer().getTickCount();
+        TickClicks clicks = rightClicks.get(player);
+        if (clicks == null || clicks.tick != tick) {
+            clicks = new TickClicks(tick);
+            rightClicks.put(player, clicks);
+        }
+        Boolean previous = clicks.handled.get(target.getId());
+        if (previous != null) {
+            if (previous) cancel.accept(InteractionResult.SUCCESS);
             return;
         }
+        // Reserve before event/command dispatch: reentrant callbacks must not dispatch a second Citizens click.
+        clicks.handled.put(target.getId(), Boolean.TRUE);
         NPCRightClickEvent clickEvent = new NPCRightClickEvent(npc, player);
         NeoForge.EVENT_BUS.post(clickEvent);
         if (clickEvent.isCanceled()) {
@@ -222,6 +246,7 @@ public class EventListen {
             // a trait handled the click, so vanilla must not also run its own interaction for it
             cancel.accept(InteractionResult.SUCCESS);
         }
+        clicks.handled.put(target.getId(), Boolean.valueOf(clickEvent.isDelayedCancellation()));
     }
 
     /**
@@ -236,16 +261,6 @@ public class EventListen {
             return null;
         ClickRedirectTrait redirect = npc.getTraitNullable(ClickRedirectTrait.class);
         return redirect != null && redirect.getRedirectToNPC() != null ? redirect.getRedirectToNPC() : npc;
-    }
-
-    private boolean isDuplicate(ServerPlayer player, Entity target) {
-        long tick = player.level().getGameTime();
-        if (tick == lastClickTick && target == lastClickedEntity && player == lastClicker)
-            return true;
-        lastClickTick = tick;
-        lastClickedEntity = target;
-        lastClicker = player;
-        return false;
     }
 
     @SubscribeEvent
@@ -442,6 +457,7 @@ public class EventListen {
     @SubscribeEvent
     public void onPlayerQuit(PlayerEvent.PlayerLoggedOutEvent event) {
         PermissionUtil.clearTemporary(event.getEntity().getUUID());
+        rightClicks.remove(event.getEntity());
     }
 
     @SubscribeEvent(priority = net.neoforged.bus.api.EventPriority.LOWEST)

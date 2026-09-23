@@ -3,6 +3,9 @@ package net.citizensnpcs.trait;
 import java.util.List;
 import java.util.function.Consumer;
 
+import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
+import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
+
 import net.citizensnpcs.api.CitizensAPI;
 import net.citizensnpcs.api.event.DespawnReason;
 import net.citizensnpcs.api.event.SpawnReason;
@@ -37,7 +40,10 @@ import net.minecraft.world.phys.AABB;
  */
 @TraitName("packet")
 public class PacketNPC extends Trait {
+    // Accessed only on the server thread, like NPC lifecycle and incoming interaction handling.
+    private static final Int2ObjectMap<PacketNPC> INTERACTION_TARGETS = new Int2ObjectOpenHashMap<>();
     private EntityPacketTracker packetTracker;
+    private Integer registeredEntityId;
     private boolean spawned;
 
     public PacketNPC() {
@@ -46,6 +52,22 @@ public class PacketNPC extends Trait {
 
     public EntityPacketTracker getPacketTracker() {
         return packetTracker;
+    }
+
+    /** Resolve only a live virtual entity already paired to this current, eligible player. */
+    public static Entity getInteractionTarget(int entityId, ServerPlayer player) {
+        PacketNPC trait = INTERACTION_TARGETS.get(entityId);
+        if (trait == null || !trait.spawned || trait.packetTracker == null)
+            return null;
+        NPC owner = trait.npc;
+        Entity entity = owner.getEntity();
+        if (!owner.isSpawned() || owner.getTraitNullable(PacketNPC.class) != trait
+                || owner.getOwningRegistry() == null
+                || owner.getOwningRegistry().getByUniqueId(owner.getUniqueId()) != owner
+                || entity == null || entity.getId() != entityId || entity.isRemoved()
+                || !trait.packetTracker.isLinked(player) || !trait.isViewerEligible(player))
+            return null;
+        return entity;
     }
 
     /** Live eligibility for supplemental per-viewer updates between reconciliation ticks. */
@@ -92,6 +114,9 @@ public class PacketNPC extends Trait {
         // Clear the old controller before unlinkAll marks its virtual entity removed. The trait is already detached.
         Location at = npc.getStoredLocation();
         npc.despawn(DespawnReason.REMOVAL);
+        // After trait replacement the controller may still belong to the retired trait. This detached instance must
+        // release its own tracker too; it no longer receives the NPC's onDespawn callback.
+        unlinkAll();
         CitizensAPI.getScheduler().runTask(() -> {
             if (at != null && npc.getOwningRegistry().getByUniqueId(npc.getUniqueId()) == npc && !npc.isSpawned()) {
                 npc.spawn(at, SpawnReason.RESPAWN);
@@ -114,6 +139,8 @@ public class PacketNPC extends Trait {
         }
         packetTracker = new EntityPacketTracker(entity);
         spawned = true;
+        registeredEntityId = entity.getId();
+        INTERACTION_TARGETS.put(entity.getId(), this);
     }
 
     @Override
@@ -147,7 +174,11 @@ public class PacketNPC extends Trait {
     }
 
     private void unlinkAll() {
-        if (packetTracker != null) {
+        if (registeredEntityId != null) {
+            INTERACTION_TARGETS.remove(registeredEntityId.intValue(), this);
+            registeredEntityId = null;
+        }
+        if (spawned && packetTracker != null) {
             packetTracker.unlinkAll(null);
         }
         spawned = false;

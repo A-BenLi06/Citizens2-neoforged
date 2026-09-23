@@ -9,6 +9,8 @@
     "LivingEntitySoundMixin",
     "MobSoundMixin",
     "ServerEntityMixin",
+    "ServerGamePacketListenerMixin",
+    "ServerboundInteractPacketAccessor",
     "ServerPlayerMixin",
     "SleepStatusMixin",
     "TrackedEntityMixin"
