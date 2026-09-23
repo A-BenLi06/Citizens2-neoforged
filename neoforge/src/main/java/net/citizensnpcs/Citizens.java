@@ -376,6 +376,7 @@ public class Citizens implements CitizensPlugin {
     public void onPermissionServicesReady(ServerStartedEvent event) {
         // Provider services need to finish starting before their API availability is checked.
         ParadigmPermissions.install();
+        net.citizensnpcs.util.ParadigmPlaceholders.install(event.getServer());
         if (PermissionUtil.getGroupResolver() == null && !LuckPermsGroups.install()) ParadigmGroups.install();
     }
 
@@ -387,6 +388,7 @@ public class Citizens implements CitizensPlugin {
     @SubscribeEvent
     public void onServerStopping(ServerStoppingEvent event) {
         enabled = false;
+        net.citizensnpcs.util.ParadigmPlaceholders.uninstall();
         ParadigmPermissions.uninstall();
         ParadigmGroups.uninstall();
         PermissionUtil.clearTemporary();
@@ -447,6 +449,7 @@ public class Citizens implements CitizensPlugin {
                 }
             }
         }
+        net.citizensnpcs.util.ParadigmPlaceholders.refresh();
     }
 
     @Override
