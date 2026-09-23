@@ -2,6 +2,8 @@
 
 Updated: 2026-09-23 20:17:58 +08:00 (UTC+08:00).
 
+Later follow-up: [Interaction label attachments and mixed passenger traversal](interaction-labels-2026-09-23.md) addresses the native label-height gap identified below. This document retains the original sneaking batch's validation record.
+
 The native metadata path now consumes `HologramRenderer.isSneaking` for each receiving player. It sets or clears only the native shift bit, independently of the renderer's text override. This restores a Citizens renderer contract within the [retained ecosystem scope](neoforge-ecosystem-replacements-2026-09-22.md).
 
 ## Behavior

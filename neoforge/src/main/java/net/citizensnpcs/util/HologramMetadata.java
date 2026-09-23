@@ -12,6 +12,7 @@ import net.citizensnpcs.api.npc.NPC;
 import net.citizensnpcs.api.util.Messaging;
 import net.citizensnpcs.npc.NPCRegistries;
 import net.citizensnpcs.trait.HologramTrait.HologramRenderer;
+import net.citizensnpcs.trait.HologramTrait.InteractionVehicleRenderer;
 import net.citizensnpcs.trait.PacketNPC;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.protocol.Packet;
@@ -20,10 +21,12 @@ import net.minecraft.network.protocol.game.ClientboundAddEntityPacket;
 import net.minecraft.network.protocol.game.ClientboundBundlePacket;
 import net.minecraft.network.protocol.game.ClientboundSetEntityDataPacket;
 import net.minecraft.network.syncher.SynchedEntityData.DataValue;
+import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.Display;
 import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.Interaction;
 
 /** Personalizes native hologram metadata without changing the shared entity or another viewer's packet. */
 public final class HologramMetadata {
@@ -119,7 +122,23 @@ public final class HologramMetadata {
                 values.add(DataValue.create(Entity.DATA_CUSTOM_NAME_VISIBLE, visible));
             }
         }
+        if (entity instanceof Interaction && renderer instanceof InteractionVehicleRenderer) {
+            values.add(sourceValue(entity, source, Interaction.DATA_WIDTH_ID));
+            values.add(sourceValue(entity, source, Interaction.DATA_HEIGHT_ID));
+            // 1.21.1 applies metadata callbacks in packet order. Width/height update the hitbox only; the real pose
+            // must follow them so Entity.refreshDimensions rebuilds the name-tag attachment from the new shape.
+            // Repeating the actual pose is sufficient: assignValues invokes its callback even when it is unchanged.
+            values.add(sourceValue(entity, source, Entity.DATA_POSE));
+        }
         return List.copyOf(values);
+    }
+
+    @SuppressWarnings("unchecked")
+    private static <T> DataValue<T> sourceValue(Entity entity, List<DataValue<?>> source, EntityDataAccessor<T> accessor) {
+        for (DataValue<?> value : source) {
+            if (value.id() == accessor.id()) return (DataValue<T>) value;
+        }
+        return DataValue.create(accessor, entity.getEntityData().get(accessor));
     }
 
     private static void remember(Entity entity, ServerPlayer viewer, List<DataValue<?>> values) {

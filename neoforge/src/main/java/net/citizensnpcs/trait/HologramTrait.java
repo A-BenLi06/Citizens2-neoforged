@@ -629,6 +629,10 @@ public class HologramTrait extends Trait {
             return npc.isSpawned() && npc.getEntity().isShiftKeyDown();
         }
 
+        /** Configure a newly created helper before world insertion or native packet pairing. */
+        default void onPreSpawn(NPC hologram) {
+        }
+
         /**
          * Called when the hologram is first seen by a player.
          */
@@ -674,10 +678,12 @@ public class HologramTrait extends Trait {
     }
 
     /**
-     * An interaction entity mounted on the NPC. In 1.21.1, changing its height updates its hitbox but not the cached
-     * name-tag attachment; height metadata alone cannot position this renderer's label at the requested offset.
+     * A mounted interaction whose native name-tag attachment is positioned above the parent's bounding box.
+     * Its dimensions are initialized before pairing; the metadata overlay refreshes the client's attachments too.
      */
     public static class InteractionVehicleRenderer extends SingleEntityHologramRenderer {
+        private Vector3d lastOffset = new Vector3d();
+
         @Override
         public HologramRenderer copy() {
             return new InteractionVehicleRenderer();
@@ -685,18 +691,32 @@ public class HologramTrait extends Trait {
 
         @Override
         protected NPC createNPC(NPC base, String name, Vector3d offset) {
+            lastOffset = new Vector3d(offset);
             return registry().createNPC(EntityType.INTERACTION, name);
         }
 
         @Override
+        public void onPreSpawn(NPC helper) {
+            ClickRedirectTrait redirect = helper.getTraitNullable(ClickRedirectTrait.class);
+            if (redirect != null && redirect.getRedirectToNPC() != null && redirect.getRedirectToNPC().isSpawned())
+                render0(redirect.getRedirectToNPC(), lastOffset);
+        }
+
+        @Override
         public void render0(NPC npc, Vector3d offset) {
-            if (hologram.getEntity() instanceof Interaction interaction) {
-                // This sizes the click target; 1.21.1 does not refresh the name-tag attachment on height changes.
-                interaction.setWidth(0.01f);
-                interaction.setHeight((float) Math.max(0.01, offset.y));
-                interaction.setResponse(false);
-            }
+            lastOffset = new Vector3d(offset);
             mountOnParent(npc);
+            if (hologram.getEntity() instanceof Interaction interaction) {
+                Entity parent = npc.getEntity();
+                // Native seats vary with entity type, scale, pose and passenger slot. The label's anchor belongs at
+                // the parent's top plus the authored offset, regardless of where vanilla puts this passenger.
+                double ridingY = parent.getPassengerRidingPosition(interaction).y
+                        - interaction.getVehicleAttachmentPoint(parent).y;
+                interaction.setWidth(0.05f);
+                interaction.setHeight((float) (parent.getY() + parent.getBbHeight() + offset.y - ridingY));
+                interaction.setResponse(false);
+                interaction.refreshDimensions();
+            }
         }
     }
 

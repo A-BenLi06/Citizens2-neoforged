@@ -382,6 +382,14 @@ public class CitizensNPC extends AbstractNPC {
                 ex.printStackTrace();
             }
         });
+        if (data().get(NPC.Metadata.HOLOGRAM_RENDERER) instanceof HologramTrait.HologramRenderer renderer) {
+            try {
+                renderer.onPreSpawn(this);
+            } catch (RuntimeException | Error failure) {
+                entityController.remove();
+                throw failure;
+            }
+        }
         data().set(NPC.Metadata.NPC_SPAWNING_IN_PROGRESS, true);
 
         entityController.spawn(location, couldSpawn -> {

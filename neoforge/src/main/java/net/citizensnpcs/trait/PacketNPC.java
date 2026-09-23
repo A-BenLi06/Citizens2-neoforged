@@ -19,6 +19,7 @@ import net.citizensnpcs.util.EntityPacketTracker;
 import net.citizensnpcs.util.NPCVisibility;
 import net.citizensnpcs.util.PacketMounts;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.phys.AABB;
 
@@ -65,6 +66,14 @@ public class PacketNPC extends Trait {
     public static boolean isPacketEntity(Entity entity) {
         PacketNPC trait = activeTrait(entity.getId());
         return trait != null && trait.npc.getEntity() == entity;
+    }
+
+    /** Snapshot virtual roots absent from native level iteration, for traversal of their real passengers. */
+    public static List<Entity> getRootEntities(ServerLevel level) {
+        return INTERACTION_TARGETS.int2ObjectEntrySet().stream()
+                .filter(entry -> activeTrait(entry.getIntKey()) == entry.getValue())
+                .map(entry -> entry.getValue().npc.getEntity())
+                .filter(entity -> entity.level() == level && entity.getVehicle() == null).toList();
     }
 
     private static PacketNPC activeTrait(int entityId) {
