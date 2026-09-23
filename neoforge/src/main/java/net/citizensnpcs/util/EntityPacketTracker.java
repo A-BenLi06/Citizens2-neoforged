@@ -117,7 +117,7 @@ public class EntityPacketTracker {
 
     private void broadcast(Packet<?> packet) {
         for (ServerPlayer player : linked) {
-            player.connection.send(packet);
+            player.connection.send(HologramMetadata.rewrite(entity, player, packet));
         }
     }
 }

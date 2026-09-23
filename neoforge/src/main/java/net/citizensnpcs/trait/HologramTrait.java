@@ -29,6 +29,7 @@ import net.citizensnpcs.api.util.MemoryDataKey;
 import net.citizensnpcs.api.util.Messaging;
 import net.citizensnpcs.api.util.Placeholders;
 import net.citizensnpcs.util.Util;
+import net.citizensnpcs.util.HologramMetadata;
 import net.minecraft.core.particles.BlockParticleOption;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.network.chat.Component;
@@ -583,6 +584,7 @@ public class HologramTrait extends Trait {
                 lastLoc = null;
             }
             renderer.updateText(npc, this.text);
+            HologramMetadata.refresh(renderer);
         }
     }
 
@@ -708,6 +710,7 @@ public class HologramTrait extends Trait {
         @Override
         public void destroy() {
             if (hologram != null) {
+                HologramMetadata.forget(hologram.getEntity());
                 hologram.destroy();
                 hologram = null;
             }
@@ -721,6 +724,11 @@ public class HologramTrait extends Trait {
 
         @Override
         public String getPerPlayerText(NPC npc, ServerPlayer viewer) {
+            // A helper's metadata is sent under its own entity ID, but authored NPC values belong to its parent.
+            if (npc != null && npc.data().get(NPC.Metadata.HOLOGRAM_RENDERER) == this) {
+                ClickRedirectTrait redirect = npc.getTraitNullable(ClickRedirectTrait.class);
+                if (redirect != null && redirect.getRedirectToNPC() != null) npc = redirect.getRedirectToNPC();
+            }
             return text == null ? null
                     : Placeholders.replace(text, viewer == null ? null : viewer.createCommandSourceStack(), npc);
         }

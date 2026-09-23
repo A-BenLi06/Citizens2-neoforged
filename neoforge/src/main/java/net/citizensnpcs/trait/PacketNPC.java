@@ -16,6 +16,7 @@ import net.citizensnpcs.util.EntityPacketTracker;
 import net.citizensnpcs.util.NPCVisibility;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.Entity;
+import net.minecraft.world.phys.AABB;
 
 /**
  * Makes an NPC exist only as packets: its entity is never added to the world, so vanilla never ticks it, never saves it
@@ -45,6 +46,23 @@ public class PacketNPC extends Trait {
 
     public EntityPacketTracker getPacketTracker() {
         return packetTracker;
+    }
+
+    /** Live eligibility for supplemental per-viewer updates between reconciliation ticks. */
+    public boolean isViewerEligible(ServerPlayer player) {
+        Entity entity = npc.getEntity();
+        return entity != null && isViewerEligible(entity, trackingBox(entity), player);
+    }
+
+    private AABB trackingBox(Entity entity) {
+        return entity.getBoundingBox().inflate(Math.max(0, npc.data().get(NPC.Metadata.TRACKING_RANGE, 64)));
+    }
+
+    private boolean isViewerEligible(Entity entity, AABB box, ServerPlayer player) {
+        return player != entity && player.connection != null && !player.hasDisconnected()
+                && entity.getServer().getPlayerList().getPlayer(player.getUUID()) == player
+                && player.level() == entity.level() && box.intersects(player.getBoundingBox())
+                && !CitizensAPI.getNPCRegistry().isNPC(player) && NPCVisibility.isVisible(npc, player);
     }
 
     @Override
@@ -103,13 +121,10 @@ public class PacketNPC extends Trait {
         if (!spawned || packetTracker == null || npc.getEntity() == null)
             return;
         Entity entity = npc.getEntity();
-        int range = Math.max(0, npc.data().get(NPC.Metadata.TRACKING_RANGE, 64));
-        var box = entity.getBoundingBox().inflate(range);
+        var box = trackingBox(entity);
         // Spectators and invisible players can see entities. This is viewer eligibility, not NPC target selection.
         List<ServerPlayer> viewers = entity.getServer().getPlayerList().getPlayers().stream()
-                .filter(player -> player != entity && player.connection != null && !player.hasDisconnected()
-                        && player.level() == entity.level() && box.intersects(player.getBoundingBox())
-                        && !CitizensAPI.getNPCRegistry().isNPC(player) && NPCVisibility.isVisible(npc, player)).toList();
+                .filter(player -> isViewerEligible(entity, box, player)).toList();
         for (ServerPlayer linked : packetTracker.getLinked()) {
             if (viewers.stream().noneMatch(player -> player == linked)) packetTracker.unlink(linked);
         }

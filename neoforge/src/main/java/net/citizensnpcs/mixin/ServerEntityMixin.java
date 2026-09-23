@@ -15,10 +15,13 @@ import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 
 import net.citizensnpcs.npc.entity.EntityHumanNPC;
 import net.citizensnpcs.npc.skin.SkinPacketTracker;
+import net.citizensnpcs.util.HologramMetadata;
+import net.minecraft.network.protocol.Packet;
 import net.minecraft.network.protocol.game.ClientGamePacketListener;
 import net.minecraft.server.level.ServerEntity;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.server.network.ServerGamePacketListenerImpl;
 import net.minecraft.world.entity.Entity;
 import net.neoforged.neoforge.network.bundle.PacketAndPayloadAcceptor;
 
@@ -27,6 +30,18 @@ public class ServerEntityMixin {
     @Shadow
     @Final
     private Entity entity;
+
+    @WrapOperation(method = "addPairing", at = @At(value = "INVOKE",
+            target = "Lnet/minecraft/server/network/ServerGamePacketListenerImpl;send(Lnet/minecraft/network/protocol/Packet;)V"))
+    private void citizens$personalizeHologramPairing(ServerGamePacketListenerImpl connection, Packet<?> packet,
+            Operation<Void> original) {
+        original.call(connection, HologramMetadata.rewrite(entity, connection.getPlayer(), packet));
+    }
+
+    @Inject(method = "removePairing", at = @At("TAIL"))
+    private void citizens$forgetHologramViewer(ServerPlayer viewer, CallbackInfo ci) {
+        HologramMetadata.forget(entity, viewer);
+    }
 
     /**
      * Gives a player NPC its tab-list entry before the client is told the entity exists.
