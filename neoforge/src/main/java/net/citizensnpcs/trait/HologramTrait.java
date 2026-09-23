@@ -347,9 +347,10 @@ public class HologramTrait extends Trait {
             }
             if (updatePosition || nameLine.renderer.getEntities().isEmpty()) {
                 nameLine.render(offset);
-                boolean sneaking = entity.isShiftKeyDown();
-                nameLine.renderer.getEntities().forEach(e -> e.setShiftKeyDown(sneaking));
             }
+            // A flag-only change does not necessarily change the parent's position or dimensions.
+            boolean sneaking = entity.isShiftKeyDown();
+            nameLine.renderer.getEntities().forEach(e -> e.setShiftKeyDown(sneaking));
         }
         for (int i = 0; i < lines.size(); i++) {
             HologramLine line = lines.get(i);
@@ -620,6 +621,10 @@ public class HologramTrait extends Trait {
             return null;
         }
 
+        /**
+         * The helper's shift flag for this viewer. Used for pairing, native metadata updates and the configured
+         * hologram refresh, independently of text. Other entity flags and the shared pose remain unchanged.
+         */
         default boolean isSneaking(NPC npc, ServerPlayer player) {
             return npc.isSpawned() && npc.getEntity().isShiftKeyDown();
         }
@@ -669,8 +674,8 @@ public class HologramTrait extends Trait {
     }
 
     /**
-     * An interaction entity mounted on the NPC. Its nameplate sits where a player's would, so this matches vanilla
-     * nametag placement more closely than the alternatives.
+     * An interaction entity mounted on the NPC. In 1.21.1, changing its height updates its hitbox but not the cached
+     * name-tag attachment; height metadata alone cannot position this renderer's label at the requested offset.
      */
     public static class InteractionVehicleRenderer extends SingleEntityHologramRenderer {
         @Override
@@ -686,7 +691,7 @@ public class HologramTrait extends Trait {
         @Override
         public void render0(NPC npc, Vector3d offset) {
             if (hologram.getEntity() instanceof Interaction interaction) {
-                // the nameplate of an interaction entity floats at its top, so the height carries the offset
+                // This sizes the click target; 1.21.1 does not refresh the name-tag attachment on height changes.
                 interaction.setWidth(0.01f);
                 interaction.setHeight((float) Math.max(0.01, offset.y));
                 interaction.setResponse(false);

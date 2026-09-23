@@ -2,6 +2,8 @@
 
 Updated: 2026-09-23 10:45:32 +08:00 (UTC+08:00).
 
+Later follow-up: [per-viewer sneaking](hologram-sneaking-2026-09-23.md) extends this metadata boundary and the fixture to 179 checks. The results below record the original text batch; current scope and other completed follow-ups are tracked in [the parity status](npc-parity-status-2026-09-13.md).
+
 Hologram text now resolves for the receiving player in both world and packet NPC transports. A viewer's name or provider value is written into a fresh native metadata packet; it never overwrites the shared entity or the packet sent to another viewer. Unchanged templates can refresh dynamic values, and blank viewer-specific names hide their nameplate.
 
 ## Reference and native behavior

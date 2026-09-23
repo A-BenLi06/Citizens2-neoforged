@@ -16,6 +16,7 @@ import net.citizensnpcs.trait.PacketNPC;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.protocol.Packet;
 import net.minecraft.network.protocol.game.ClientGamePacketListener;
+import net.minecraft.network.protocol.game.ClientboundAddEntityPacket;
 import net.minecraft.network.protocol.game.ClientboundBundlePacket;
 import net.minecraft.network.protocol.game.ClientboundSetEntityDataPacket;
 import net.minecraft.network.syncher.SynchedEntityData.DataValue;
@@ -36,8 +37,20 @@ public final class HologramMetadata {
             return packet;
         if (packet instanceof ClientboundBundlePacket bundle) {
             List<Packet<? super ClientGamePacketListener>> packets = new ArrayList<>();
+            boolean hasMetadata = false;
+            for (Packet<? super ClientGamePacketListener> child : bundle.subPackets()) {
+                if (child instanceof ClientboundSetEntityDataPacket metadata && metadata.id() == entity.getId())
+                    hasMetadata = true;
+            }
             for (Packet<? super ClientGamePacketListener> child : bundle.subPackets()) {
                 packets.add(rewriteMetadata(entity, npc, renderer, viewer, child));
+                // Vanilla omits metadata when every shared value is at its default. A viewer override may still
+                // need flags/text, but only after the client has received this entity's spawn.
+                if (!hasMetadata && child instanceof ClientboundAddEntityPacket spawn && spawn.getId() == entity.getId()) {
+                    List<DataValue<?>> values = values(entity, npc, renderer, viewer, List.of());
+                    packets.add(new ClientboundSetEntityDataPacket(entity.getId(), values));
+                    remember(entity, viewer, values);
+                }
             }
             return new ClientboundBundlePacket(packets);
         }
@@ -50,8 +63,7 @@ public final class HologramMetadata {
             HologramRenderer renderer, ServerPlayer viewer, Packet<? super ClientGamePacketListener> packet) {
         if (!(packet instanceof ClientboundSetEntityDataPacket metadata) || metadata.id() != entity.getId())
             return packet;
-        List<DataValue<?>> values = values(entity, npc, renderer, viewer);
-        if (values == null) return packet;
+        List<DataValue<?>> values = values(entity, npc, renderer, viewer, metadata.packedItems());
         List<DataValue<?>> combined = new ArrayList<>(metadata.packedItems());
         combined.removeIf(value -> values.stream().anyMatch(replacement -> replacement.id() == value.id()));
         combined.addAll(values);
@@ -74,23 +86,40 @@ public final class HologramMetadata {
                         : viewer.level() != entity.level() || viewer.hasDisconnected()
                                 || level.getServer().getPlayerList().getPlayer(viewer.getUUID()) != viewer
                                 || !NPCVisibility.isVisible(npc, viewer)) continue;
-                List<DataValue<?>> values = values(entity, npc, renderer, viewer);
-                if (values == null || previous != null && values.equals(previous.get(viewer))) continue;
+                List<DataValue<?>> values = values(entity, npc, renderer, viewer, List.of());
+                if (previous != null && values.equals(previous.get(viewer))) continue;
                 viewer.connection.send(new ClientboundSetEntityDataPacket(entity.getId(), values));
                 remember(entity, viewer, values);
             }
         }
     }
 
-    private static List<DataValue<?>> values(Entity entity, NPC npc, HologramRenderer renderer, ServerPlayer viewer) {
+    private static List<DataValue<?>> values(Entity entity, NPC npc, HologramRenderer renderer, ServerPlayer viewer,
+            List<DataValue<?>> source) {
+        byte flags = entity.getEntityData().get(Entity.DATA_SHARED_FLAGS_ID);
+        for (DataValue<?> value : source) {
+            if (value.id() == Entity.DATA_SHARED_FLAGS_ID.id()) {
+                flags = (Byte) value.value();
+                break;
+            }
+        }
+        int sneakingMask = 1 << Entity.FLAG_SHIFT_KEY_DOWN;
+        flags = (byte) (renderer.isSneaking(npc, viewer) ? flags | sneakingMask : flags & ~sneakingMask);
+        List<DataValue<?>> values = new ArrayList<>();
+        values.add(DataValue.create(Entity.DATA_SHARED_FLAGS_ID, flags));
         String text = renderer.getPerPlayerText(npc, viewer);
-        if (text == null) return null;
-        Component component = Messaging.minecraftComponentFromRawMessage(text);
-        if (entity instanceof Display.TextDisplay)
-            return List.of(DataValue.create(Display.TextDisplay.DATA_TEXT_ID, component));
-        boolean visible = entity.isCustomNameVisible() && !component.getString().isEmpty();
-        return List.of(DataValue.create(Entity.DATA_CUSTOM_NAME, component.getString().isEmpty() ? Optional.empty() : Optional.of(component)),
-                DataValue.create(Entity.DATA_CUSTOM_NAME_VISIBLE, visible));
+        if (text != null) {
+            Component component = Messaging.minecraftComponentFromRawMessage(text);
+            if (entity instanceof Display.TextDisplay) {
+                values.add(DataValue.create(Display.TextDisplay.DATA_TEXT_ID, component));
+            } else {
+                boolean visible = entity.isCustomNameVisible() && !component.getString().isEmpty();
+                values.add(DataValue.create(Entity.DATA_CUSTOM_NAME,
+                        component.getString().isEmpty() ? Optional.empty() : Optional.of(component)));
+                values.add(DataValue.create(Entity.DATA_CUSTOM_NAME_VISIBLE, visible));
+            }
+        }
+        return List.copyOf(values);
     }
 
     private static void remember(Entity entity, ServerPlayer viewer, List<DataValue<?>> values) {

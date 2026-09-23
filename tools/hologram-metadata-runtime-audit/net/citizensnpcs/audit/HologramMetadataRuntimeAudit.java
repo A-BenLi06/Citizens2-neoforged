@@ -64,6 +64,14 @@ public final class HologramMetadataRuntimeAudit {
     private static List<Entity> helpers = List.of(), previous = List.of();
     private static final List<Actor> actors = new ArrayList<>();
     private static final String template = "Hello <player> / <id> / <audit_value>";
+    private static boolean reverseSneaking, customName;
+    private static int nameRenders;
+    private static Entity nameEntity;
+
+    @SubscribeEvent public static void nameRenderer(HologramTrait.HologramRendererCreateEvent event) {
+        if (customName && event.isNameRenderer() && event.getNPC() == parent)
+            event.setRenderer(new StationaryNameRenderer());
+    }
 
     @SubscribeEvent public static void tick(ServerTickEvent.Post event) {
         if (done) return;
@@ -169,6 +177,132 @@ public final class HologramMetadataRuntimeAudit {
                     checkText(bob, helpers.get(2), expected(bob), "respawn_virtual_pairing");
                     previous = helpers; parent.destroy(); parent = null;
                     check(previous.stream().noneMatch(cache()::containsKey), "destroy_releases_entity_cache");
+                }
+                case 13 -> {
+                    customName = true;
+                    parent = registry.createNPC(EntityType.COW, "Stationary name");
+                    parent.data().set(NPC.Metadata.ALWAYS_USE_NAME_HOLOGRAM, true);
+                    hologram = parent.getOrAddTrait(HologramTrait.class);
+                    hologram.addLine("World <player>", new SneakingArmorstand(false, false));
+                    hologram.addLine("Shared null-text name", new SneakingArmorstand(true, true));
+                    hologram.addLine("World display <player>", new SneakingDisplay(false));
+                    hologram.addLine("Packet display <player>", new SneakingDisplay(true));
+                    clear(); check(parent.spawn(new Location(level, 4, -60, 4)), "sneaking_parent_spawn");
+                    parent.getEntity().setNoGravity(true);
+                }
+                case 14 -> {
+                    helpers = List.copyOf(hologram.getHologramEntities());
+                    nameEntity = hologram.getNameEntity();
+                    check(helpers.size() == 4 && nameEntity != null, "sneaking_world_packet_and_name_helpers");
+                    for (Entity helper : helpers) {
+                        check(alice.spawns(helper) == 1 && bob.spawns(helper) == 1, "sneaking_native_pairing_once");
+                        checkSneaking(alice, helper, true, "initial_sneaking");
+                        checkSneaking(bob, helper, false, "initial_standing");
+                        check(!helper.isShiftKeyDown(), "viewer_sneaking_does_not_mutate_entity");
+                    }
+                    checkText(alice, helpers.get(1), "Shared null-text name", "null_override_preserves_shared_name_alice");
+                    checkText(bob, helpers.get(1), "Shared null-text name", "null_override_preserves_shared_name_bob");
+                    checkPacketFlags(level);
+                    clear(); reverseSneaking = true; ordinary.setShiftKeyDown(true);
+                }
+                case 15 -> {
+                    for (Entity helper : helpers) {
+                        checkSneaking(alice, helper, false, "refresh_clears_sneaking");
+                        checkSneaking(bob, helper, true, "refresh_enables_sneaking");
+                        check(helper.getPose() == net.minecraft.world.entity.Pose.STANDING, "viewer_override_preserves_shared_pose");
+                    }
+                    check(texts(alice, helpers.get(1)).isEmpty() && texts(bob, helpers.get(1)).isEmpty(), "null_text_refresh_only_sends_flags");
+                    checkSneaking(alice, ordinary, true, "non_npc_native_flags");
+                    clear();
+                    for (Entity helper : helpers) { helper.setShiftKeyDown(true); helper.setSprinting(true); }
+                }
+                case 16 -> {
+                    for (Entity helper : helpers) {
+                        checkSneaking(alice, helper, false, "native_dirty_clears_shared_sneaking_for_alice");
+                        checkSneaking(bob, helper, true, "native_dirty_keeps_shared_sneaking_for_bob");
+                        check(flags(alice, helper).stream().allMatch(value -> (value & 8) != 0)
+                                && flags(bob, helper).stream().allMatch(value -> (value & 8) != 0), "native_dirty_preserves_sprinting_bit");
+                        check(helper.isShiftKeyDown() && helper.isSprinting(), "native_shared_flags_not_rewritten");
+                    }
+                    clear();
+                }
+                case 17 -> {
+                    check(helpers.stream().allMatch(e -> alice.metadata(e) == 0 && bob.metadata(e) == 0), "unchanged_sneaking_is_not_rebroadcast");
+                    parent.getOrAddTrait(PlayerFilter.class).addPlayer(bob.player.getUUID());
+                    reverseSneaking = false; clear();
+                    for (var renderer : hologram.getHologramRenderers()) net.citizensnpcs.util.HologramMetadata.refresh(renderer);
+                    check(helpers.stream().allMatch(e -> bob.metadata(e) == 0), "same_tick_hidden_viewer_gets_no_flags");
+                }
+                case 18 -> {
+                    for (Entity helper : helpers) {
+                        check(bob.metadata(helper) == 0, "hidden_viewer_gets_no_sneaking_refresh");
+                        checkSneaking(alice, helper, true, "visible_viewer_sneaking_refresh");
+                    }
+                    check(cache().values().stream().noneMatch(v -> ((java.util.Map<?, ?>) v).containsKey(bob.player)), "hidden_sneaking_cache_released");
+                    clear(); parent.removeTrait(PlayerFilter.class);
+                }
+                case 19 -> {
+                    for (Entity helper : helpers) {
+                        check(bob.spawns(helper) == 1, "sneaking_visibility_return_pairs_again");
+                        checkSneaking(bob, helper, false, "sneaking_visibility_return_uses_current_value");
+                    }
+                    clear(); bob.player.setPos(100, -60, 4); reverseSneaking = true;
+                    for (int index : List.of(1, 3)) {
+                        net.citizensnpcs.util.HologramMetadata.refresh(List.copyOf(hologram.getHologramRenderers()).get(index));
+                        check(bob.metadata(helpers.get(index)) == 0, "same_tick_range_exit_gets_no_sneaking_flags");
+                    }
+                }
+                case 20 -> {
+                    for (int index : List.of(1, 3)) check(bob.metadata(helpers.get(index)) == 0, "departed_packet_viewer_gets_no_sneaking_flags");
+                    clear(); bob.player.setPos(8, -60, 4);
+                }
+                case 21 -> {
+                    for (int index : List.of(1, 3)) {
+                        check(bob.spawns(helpers.get(index)) == 1, "sneaking_range_return_pairs_again");
+                        checkSneaking(bob, helpers.get(index), true, "sneaking_range_return_uses_current_value");
+                    }
+                    clear(); toggleStationaryName(true);
+                }
+                case 22 -> {
+                    check(nameEntity.isShiftKeyDown(), "stationary_world_name_inherits_parent_sneaking");
+                    checkSneaking(alice, nameEntity, true, "stationary_world_name_metadata");
+                    clear(); toggleStationaryName(false);
+                }
+                case 23 -> {
+                    check(!nameEntity.isShiftKeyDown(), "stationary_world_name_clears_parent_sneaking");
+                    checkSneaking(bob, nameEntity, false, "stationary_world_name_clear_metadata");
+                    net.citizensnpcs.npc.NPCRegistries.lookup(nameEntity).getOrAddTrait(net.citizensnpcs.trait.PacketNPC.class);
+                    clear();
+                }
+                case 24 -> {
+                    Entity oldName = nameEntity;
+                    nameEntity = hologram.getNameEntity();
+                    check(nameEntity != oldName && !nameEntity.isRemoved() && net.citizensnpcs.trait.PacketNPC.isPacketEntity(nameEntity)
+                            && level.getEntity(nameEntity.getId()) == null, "stationary_name_uses_live_replacement_packet_entity");
+                    clear(); toggleStationaryName(true);
+                }
+                case 25 -> {
+                    checkSneaking(alice, nameEntity, true, "stationary_packet_name_metadata");
+                    clear(); toggleStationaryName(false);
+                }
+                case 26 -> {
+                    checkSneaking(bob, nameEntity, false, "stationary_packet_name_clear_metadata");
+                    previous = new ArrayList<>(helpers); previous.add(nameEntity);
+                    check(parent.despawn(net.citizensnpcs.api.event.DespawnReason.PENDING_RESPAWN), "sneaking_parent_despawn");
+                    check(previous.stream().noneMatch(cache()::containsKey), "sneaking_despawn_releases_all_cache");
+                    clear(); check(parent.spawn(new Location(level, 4, -60, 4)), "sneaking_parent_respawn");
+                    parent.getEntity().setNoGravity(true);
+                }
+                case 27 -> {
+                    helpers = List.copyOf(hologram.getHologramEntities());
+                    check(helpers.stream().noneMatch(previous::contains), "sneaking_respawn_rebuilds_helpers");
+                    for (Entity helper : helpers) {
+                        checkSneaking(alice, helper, false, "sneaking_respawn_alice");
+                        checkSneaking(bob, helper, true, "sneaking_respawn_bob");
+                    }
+                    previous = new ArrayList<>(helpers); previous.add(hologram.getNameEntity());
+                    parent.destroy(); parent = null;
+                    check(previous.stream().noneMatch(cache()::containsKey), "sneaking_destroy_releases_all_cache");
                     LoggerFactory.getLogger("citizens").info("[HOLOGRAMMETADATAAUDIT] COMPLETE {} checks", passed); done = true;
                 }
             }
@@ -184,6 +318,73 @@ public final class HologramMetadataRuntimeAudit {
         @Override protected void configureHologram(NPC child, NPC parent) {
             super.configureHologram(child, parent); child.getOrAddTrait(net.citizensnpcs.trait.PacketNPC.class);
         }
+    }
+    private static boolean sneaking(ServerPlayer viewer) { return (viewer == alice.player) != reverseSneaking; }
+    private static final class SneakingArmorstand extends HologramTrait.ArmorstandRenderer {
+        private final boolean packet, nullText;
+        SneakingArmorstand(boolean packet, boolean nullText) { this.packet = packet; this.nullText = nullText; }
+        @Override protected void configureHologram(NPC child, NPC parent) {
+            super.configureHologram(child, parent);
+            if (packet) child.getOrAddTrait(net.citizensnpcs.trait.PacketNPC.class);
+        }
+        @Override public String getPerPlayerText(NPC npc, ServerPlayer viewer) { return nullText ? null : super.getPerPlayerText(npc, viewer); }
+        @Override public boolean isSneaking(NPC npc, ServerPlayer viewer) { return sneaking(viewer); }
+    }
+    private static final class SneakingDisplay extends HologramTrait.TextDisplayRenderer {
+        private final boolean packet;
+        SneakingDisplay(boolean packet) { this.packet = packet; }
+        @Override protected void configureHologram(NPC child, NPC parent) {
+            super.configureHologram(child, parent);
+            if (packet) child.getOrAddTrait(net.citizensnpcs.trait.PacketNPC.class);
+        }
+        @Override public boolean isSneaking(NPC npc, ServerPlayer viewer) { return sneaking(viewer); }
+    }
+    private static final class StationaryNameRenderer extends HologramTrait.ArmorstandVehicleRenderer {
+        @Override protected void render0(NPC npc, org.joml.Vector3d offset) { nameRenders++; super.render0(npc, offset); }
+    }
+    private static void toggleStationaryName(boolean value) {
+        var position = parent.getEntity().position(); float height = parent.getEntity().getBbHeight();
+        int renders = nameRenders;
+        parent.getEntity().setShiftKeyDown(value); hologram.run();
+        check(nameRenders == renders && parent.getEntity().position().equals(position) && parent.getEntity().getBbHeight() == height,
+                "parent_shift_changes_without_position_or_render");
+    }
+    private static List<Byte> flags(Actor actor, Entity entity) {
+        actor.pump();
+        return actor.packets.stream().filter(p -> p instanceof ClientboundSetEntityDataPacket data && data.id() == entity.getId())
+                .map(p -> (ClientboundSetEntityDataPacket) p).flatMap(p -> p.packedItems().stream())
+                .filter(v -> v.id() == Entity.DATA_SHARED_FLAGS_ID.id()).map(v -> (Byte) v.value()).toList();
+    }
+    private static void checkSneaking(Actor actor, Entity helper, boolean expected, String label) {
+        var values = flags(actor, helper);
+        check(!values.isEmpty() && values.stream().allMatch(v -> ((v & 2) != 0) == expected), label + "_" + helper.getType() + "_" + values);
+    }
+    private static void checkPacketFlags(ServerLevel level) {
+        Entity helper = helpers.get(1);
+        var flags = net.minecraft.network.syncher.SynchedEntityData.DataValue.create(Entity.DATA_SHARED_FLAGS_ID, (byte) 0xff);
+        var name = net.minecraft.network.syncher.SynchedEntityData.DataValue.create(Entity.DATA_CUSTOM_NAME, java.util.Optional.of(Component.literal("Packet-owned name")));
+        var raw = new ClientboundSetEntityDataPacket(helper.getId(), List.of(flags, name));
+        var rewritten = (ClientboundSetEntityDataPacket) net.citizensnpcs.util.HologramMetadata.rewrite(helper, bob.player, raw);
+        var control = EntityType.COW.create(level);
+        control.getEntityData().assignValues(rewritten.packedItems());
+        check(!control.isShiftKeyDown() && control.isInvisible() && control.isSprinting() && control.isSwimming(), "null_text_override_preserves_native_flag_meanings");
+        check(control.getCustomName().getString().equals("Packet-owned name") && rewritten.packedItems().contains(name), "null_text_override_preserves_packet_name");
+        check(raw.packedItems().equals(List.of(flags, name)) && rewritten.packedItems().size() == 2, "flag_rewrite_preserves_input_and_unique_keys");
+        byte changed = (Byte) rewritten.packedItems().stream().filter(v -> v.id() == Entity.DATA_SHARED_FLAGS_ID.id()).findFirst().orElseThrow().value();
+        check(Byte.toUnsignedInt(changed) == 0xfd, "incoming_flags_take_precedence_over_shared_flags");
+        var unrelated = new ClientboundSetEntityDataPacket(ordinary.getId(), List.of(flags));
+        check(net.citizensnpcs.util.HologramMetadata.rewrite(helper, bob.player, unrelated) == unrelated, "other_entity_metadata_is_untouched");
+        check(net.citizensnpcs.util.HologramMetadata.rewrite(ordinary, bob.player, unrelated) == unrelated, "non_npc_metadata_is_untouched");
+        var spawn = alice.packets.stream().filter(p -> p instanceof ClientboundAddEntityPacket add && add.getId() == helper.getId()).findFirst().orElseThrow();
+        var bundle = new ClientboundBundlePacket(List.of((ClientboundAddEntityPacket) spawn));
+        var projected = (ClientboundBundlePacket) net.citizensnpcs.util.HologramMetadata.rewrite(helper, alice.player, bundle);
+        var packets = new ArrayList<Packet<? super ClientGamePacketListener>>(); projected.subPackets().forEach(packets::add);
+        check(packets.size() == 2 && packets.getFirst() == spawn && packets.getLast() instanceof ClientboundSetEntityDataPacket,
+                "default_metadata_pairing_adds_overlay_after_spawn");
+        control.getEntityData().assignValues(((ClientboundSetEntityDataPacket) packets.getLast()).packedItems());
+        check(control.isShiftKeyDown(), "default_metadata_pairing_delivers_sneaking");
+        var original = new ArrayList<Packet<? super ClientGamePacketListener>>(); bundle.subPackets().forEach(original::add);
+        check(original.equals(List.of(spawn)), "pairing_bundle_input_unchanged");
     }
     private static String expected(Actor actor) { return "Hello " + actor.player.getGameProfile().getName() + " / " + parent.getId() + " / " + revision; }
     private static java.util.Map<?, ?> cache() throws ReflectiveOperationException { var field = net.citizensnpcs.util.HologramMetadata.class.getDeclaredField("sent"); field.setAccessible(true); return (java.util.Map<?, ?>) field.get(null); }
