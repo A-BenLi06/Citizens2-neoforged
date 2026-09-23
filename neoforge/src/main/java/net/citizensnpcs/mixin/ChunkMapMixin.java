@@ -1,26 +1,54 @@
 package net.citizensnpcs.mixin;
 
+import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
+import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
+import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
+
+import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
 import net.citizensnpcs.Settings.Setting;
 import net.citizensnpcs.npc.entity.EntityHumanNPC;
+import net.citizensnpcs.util.NPCVisibility;
+import net.minecraft.core.SectionPos;
 import net.minecraft.server.level.ChunkMap;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.entity.Entity;
 import net.minecraft.world.level.ChunkPos;
+import net.minecraft.world.level.entity.EntityAccess;
 
 /**
- * Stops a player NPC from behaving like a client that is standing there.
+ * Integrates NPC visibility with native world tracking and keeps clientless player NPCs out of chunk work.
  * <p>
  * A player-type NPC is a {@link ServerPlayer}, so vanilla counts it as a player everywhere that asks "is anybody near
  * this chunk?" — and vanilla answers that question in three separate ways, which is why this class holds three hooks
  * rather than one.
  */
 @Mixin(ChunkMap.class)
-public class ChunkMapMixin {
+public class ChunkMapMixin implements NPCVisibility.WorldTrackers {
+    @Shadow @Final private Int2ObjectMap<?> entityMap;
+
+    @Override public void citizens$refreshVisibility(Entity entity) {
+        Object tracked = entityMap.get(entity.getId());
+        if (tracked instanceof NPCVisibility.TrackedEntity bridge)
+            bridge.citizens$updateViewers(((ServerLevel) entity.level()).players());
+    }
+
+    /** Refresh every tracked NPC before the native movement/ticking decision and its subsequent broadcasts. */
+    @WrapOperation(method = "tick()V", at = @At(value = "INVOKE",
+            target = "Lnet/minecraft/core/SectionPos;of(Lnet/minecraft/world/level/entity/EntityAccess;)Lnet/minecraft/core/SectionPos;"))
+    private SectionPos citizens$refreshStationaryVisibility(EntityAccess access, Operation<SectionPos> original) {
+        // sendChanges alone misses watched entities outside simulation distance: vanilla skips that call for them.
+        if (access instanceof Entity entity) NPCVisibility.refresh(entity);
+        return original.call(access);
+    }
+
     /**
      * Stops a player NPC from keeping the world around it loaded and ticking.
      * <p>

@@ -4,7 +4,9 @@
 
 Initial audit timestamp: 2026-09-13 01:47:09 +08:00 (UTC+08:00).
 
-Current summary updated: 2026-09-22 20:38:06 +08:00 (UTC+08:00).
+Current summary updated: 2026-09-23 10:29:25 +08:00 (UTC+08:00).
+
+Latest Citizens visibility follow-up: [native world-entity visibility](world-entity-visibility-2026-09-23.md) applies NPC/ancestor filters before native pairing and refreshes stationary NPCs even outside simulation distance. Native range, chunk watch and spawn/remove ownership remain intact. Its 47 checks cover profile/entity suppression, dynamic rules and text/item helpers through actual chunk delivery and tracking. Final gates pass 43 packet checks, 101 item-hologram checks, 62 removal checks, 107 NPC assertions, 223 general probes and 217 ordinary tests. Build and release/source exclusions pass. Evidence: `artifacts/world-visibility-validation-summary.json`. Separate scoreboard packets, seen-event cancellation and physical-client/modpack acceptance remain open.
 
 Latest Citizens packet follow-up: [viewer and controller lifecycle](packet-viewer-lifecycle-2026-09-22.md) reconciles live viewer identity, range, dimension and NPC/parent visibility. It restores packet/real transport transitions through trait attachment/removal/replacement. Its 43 native packet checks include actual respawn, dimension travel, relogin and disconnect. Final gates pass 217 ordinary tests, 101 item-hologram checks, 62 removal checks, 107 NPC assertions and 223 general probes; build and release/source exclusions pass. Evidence: `artifacts/packet-viewer-validation-summary.json`. Packet hologram configuration and per-viewer rendering remain separate work.
 
@@ -92,6 +94,7 @@ This section includes the follow-ups after the detailed historical snapshot belo
 | Native text editing | Chat/command add/edit/remove, pagination, speech settings and item filters, target/ownership/permission revalidation, private input, respawn rebinding and cleanup. Removed traits are no longer returned by lookup or executed again during removal. |
 | Item holograms | Native items or item displays, registry/component syntax and legacy material/color forms; parent tracking/click contracts, item/text switching, safe unavailable lines, copied/persisted lines and helper/filter cleanup. |
 | Packet NPC lifecycle | Live viewer reconciliation, range/world/session transitions, NPC/parent visibility and native unpairing; current-trait controller selection, API attachment/replacement, real-entity restoration and deferred cleanup. |
+| World NPC visibility | Shared NPC/ancestor filters before native pairing; live stationary reconciliation inside/outside simulation distance, including text/item helpers and native player-profile cleanup. Native range/chunk rules and non-NPC behavior remain authoritative. |
 | Removal and undo | ID/UUID/name/owner/world/entity targeting, ownership enforcement, temporary NPC snapshots, collision-safe/retryable undo and actual command failure propagation. |
 | Permissions | Registered NeoForge nodes with correct names, real non-OP Paradigm grants/revocations, live contextual/dynamic permission checks and group queries, selection/help permissions and local attachment lifetime; checked flag execution and reversible permanent permission shop trades. |
 
@@ -99,7 +102,7 @@ This section includes the follow-ups after the detailed historical snapshot belo
 
 | Area | Still missing or unresolved after the follow-ups |
 |---|---|
-| NPC presentation and lifecycle | Native item holograms and packet NPC viewer/controller lifecycles now have real-tick coverage. Packet hologram configuration, per-viewer text and mounted packet hierarchies remain open, as do physical-client models/interpolation. Full text-parser features, anvil-style entry and ordinary world-entity visibility integration also remain work. |
+| NPC presentation and lifecycle | Native item holograms, packet NPC viewer/controller lifecycles and ordinary world-entity visibility now have real-tick coverage. Packet hologram configuration, per-viewer text and mounted packet hierarchies remain open, as do physical-client models/interpolation. Full text-parser features, anvil-style entry, seen-event cancellation semantics and separate scoreboard packet behavior remain work. |
 | Commands and native behavior | All 37 historically missing 1.21.1 `/npc` names have entry points. Other command parameters, parameterized cloud particles and waypoint debugging aliases remain candidates for behavior-level review. Verify actual NPC behavior instead of using declaration counts as completion gates. |
 | Persistence and migration | Supported items/effects retain unavailable definitions safely. Remaining ItemMeta profiles/attributes/containers/persistent data, opaque NBT, structured special types and pre-flattening material identities need supported native conversions when required by content. Firework rockets/stars are now covered. |
 | Native extension contracts | Implement contracts consumed by retained integrations, including owned NPC placeholders through Paradigm's registration API where needed. The 24 absent reference event names are an investigation inventory; they do not by themselves require 24 Bukkit-shaped wrappers. |

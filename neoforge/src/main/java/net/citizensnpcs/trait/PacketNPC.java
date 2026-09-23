@@ -1,8 +1,6 @@
 package net.citizensnpcs.trait;
 
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 import java.util.function.Consumer;
 
 import net.citizensnpcs.api.CitizensAPI;
@@ -15,6 +13,7 @@ import net.citizensnpcs.api.trait.TraitName;
 import net.citizensnpcs.api.util.Location;
 import net.citizensnpcs.npc.EntityController;
 import net.citizensnpcs.util.EntityPacketTracker;
+import net.citizensnpcs.util.NPCVisibility;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.Entity;
 
@@ -110,22 +109,12 @@ public class PacketNPC extends Trait {
         List<ServerPlayer> viewers = entity.getServer().getPlayerList().getPlayers().stream()
                 .filter(player -> player != entity && player.connection != null && !player.hasDisconnected()
                         && player.level() == entity.level() && box.intersects(player.getBoundingBox())
-                        && !CitizensAPI.getNPCRegistry().isNPC(player) && visibleTo(player)).toList();
+                        && !CitizensAPI.getNPCRegistry().isNPC(player) && NPCVisibility.isVisible(npc, player)).toList();
         for (ServerPlayer linked : packetTracker.getLinked()) {
             if (viewers.stream().noneMatch(player -> player == linked)) packetTracker.unlink(linked);
         }
         for (ServerPlayer viewer : viewers) packetTracker.link(viewer);
         packetTracker.run();
-    }
-
-    private boolean visibleTo(ServerPlayer player) {
-        Set<NPC> visited = new HashSet<>();
-        for (NPC current = npc; current != null;) {
-            if (!visited.add(current) || current.isHiddenFrom(player) || !current.isSpawned()) return false;
-            ClickRedirectTrait redirect = current.getTraitNullable(ClickRedirectTrait.class);
-            current = redirect == null ? null : redirect.getRedirectToNPC();
-        }
-        return true;
     }
 
     /**

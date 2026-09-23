@@ -10,7 +10,8 @@
     "MobSoundMixin",
     "ServerEntityMixin",
     "ServerPlayerMixin",
-    "SleepStatusMixin"
+    "SleepStatusMixin",
+    "TrackedEntityMixin"
   ],
   "injectors": {
     "defaultRequire": 1
