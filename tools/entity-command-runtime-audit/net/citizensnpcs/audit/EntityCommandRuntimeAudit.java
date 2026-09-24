@@ -138,6 +138,7 @@ public final class EntityCommandRuntimeAudit {
             aliasesAndValidation();
             customRegistries();
             unresolvedValues();
+            CloudParticleRuntimeAudit.run(server, actor);
             PresentationCommandRuntimeAudit.run(server, actor);
             warden = npc(EntityType.WARDEN, "Warden");
             warden.spawn(new Location(level, 3, -60, 53)); select(source, warden);

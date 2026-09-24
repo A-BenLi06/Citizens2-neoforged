@@ -1048,10 +1048,11 @@ public final class EntityTraitCommands {
     }
     public static class ParticleValue implements FlagValidator<ParticleOptions> {
         public ParticleOptions validate(CommandContext args, CommandSourceStack sender, NPC npc, String input) throws CommandException {
-            Object value = BuiltInRegistries.PARTICLE_TYPE.get(registryId(BuiltInRegistries.PARTICLE_TYPE, input));
-            if (!(value instanceof ParticleOptions particle))
-                throw new CommandException(CommandMessages.INVALID_VALUE, "particle without parameters", input);
-            return particle;
+            try {
+                return AreaEffectCloudTrait.parseParticle(input, sender.getServer().registryAccess());
+            } catch (com.mojang.brigadier.exceptions.CommandSyntaxException | IllegalArgumentException failure) {
+                throw new CommandException(CommandMessages.INVALID_VALUE, "particle", input);
+            }
         }
     }
     public static class ArmadilloStateValue implements FlagValidator<Armadillo.ArmadilloState> {

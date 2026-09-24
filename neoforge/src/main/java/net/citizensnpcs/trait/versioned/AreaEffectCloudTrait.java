@@ -3,19 +3,29 @@ package net.citizensnpcs.trait.versioned;
 import java.util.Locale;
 import java.util.Optional;
 
+import com.mojang.brigadier.StringReader;
+import com.mojang.brigadier.exceptions.CommandSyntaxException;
+
 import net.citizensnpcs.api.exception.NPCLoadException;
 import net.citizensnpcs.api.persistence.Persist;
 import net.citizensnpcs.api.trait.Trait;
 import net.citizensnpcs.api.trait.TraitName;
 import net.citizensnpcs.api.util.DataKey;
 import net.citizensnpcs.api.util.Messaging;
+import net.minecraft.commands.arguments.ParticleArgument;
 import net.minecraft.core.Holder;
+import net.minecraft.core.HolderLookup;
+import net.minecraft.core.RegistryAccess;
 import net.minecraft.core.particles.ParticleOptions;
+import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.NbtOps;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.AreaEffectCloud;
 import net.minecraft.world.item.alchemy.Potion;
 import net.minecraft.world.item.alchemy.PotionContents;
+import net.neoforged.neoforge.server.ServerLifecycleHooks;
 
 /**
  * An area effect cloud NPC's size, lifetime, particle and potion.
@@ -82,7 +92,7 @@ public class AreaEffectCloudTrait extends Trait {
     @Override
     public void save(DataKey key) {
         key.setString("particle", unresolvedParticle != null ? unresolvedParticle : particle == null ? ""
-                : BuiltInRegistries.PARTICLE_TYPE.getKey(particle.getType()).toString());
+                : serializeParticle(particle));
         key.setString("type", unresolvedPotion != null ? unresolvedPotion
                 : type == null ? "" : type.unwrapKey().map(k -> k.location().toString()).orElse(""));
     }
@@ -110,18 +120,43 @@ public class AreaEffectCloudTrait extends Trait {
         }
     }
 
-    /** Accepts a bare name or a full id; null when empty, and warns when the name matches no particle. */
+    /** Loads native particle syntax; unavailable or invalid definitions remain intact in the saved trait. */
     public static ParticleOptions parseParticle(String raw) {
         if (raw == null || raw.isEmpty())
             return null;
-        ResourceLocation id = ResourceLocation.tryParse(raw.toLowerCase(Locale.ROOT));
-        Object particle = id == null ? null : BuiltInRegistries.PARTICLE_TYPE.get(id);
-        if (particle instanceof ParticleOptions options)
-            return options;
-        // a particle that takes parameters (dust, block, item …) is a type without a ready-made options instance, and
-        // Citizens has nowhere to store those parameters
-        Messaging.warn("Cannot use '" + raw + "' as an area effect cloud particle: unknown, or it needs parameters.");
-        return null;
+        try {
+            return parseParticle(raw, registries());
+        } catch (CommandSyntaxException | IllegalArgumentException failure) {
+            Messaging.warn("Cannot use '" + raw + "' as an area effect cloud particle: " + failure.getMessage());
+            return null;
+        }
+    }
+
+    /** Registry-backed vanilla syntax, including each particle type's own options and validation. */
+    public static ParticleOptions parseParticle(String raw, HolderLookup.Provider registries) throws CommandSyntaxException {
+        String input = raw.trim();
+        int options = input.indexOf('{');
+        if (options < 0) options = input.length();
+        // Retain legacy case-insensitive IDs without modifying case-sensitive NBT keys or component text.
+        StringReader reader = new StringReader(input.substring(0, options).toLowerCase(Locale.ROOT) + input.substring(options));
+        ParticleOptions result = ParticleArgument.readParticle(reader, registries);
+        reader.skipWhitespace();
+        if (reader.canRead()) throw CommandSyntaxException.BUILT_IN_EXCEPTIONS.dispatcherUnknownArgument().createWithContext(reader);
+        return result;
+    }
+
+    private static HolderLookup.Provider registries() {
+        var server = ServerLifecycleHooks.getCurrentServer();
+        return server == null ? RegistryAccess.fromRegistryOfRegistries(BuiltInRegistries.REGISTRY) : server.registryAccess();
+    }
+
+    private static String serializeParticle(ParticleOptions particle) {
+        CompoundTag encoded = (CompoundTag) ParticleTypes.CODEC
+                .encodeStart(registries().createSerializationContext(NbtOps.INSTANCE), particle).getOrThrow();
+        String id = encoded.getString("type");
+        encoded.remove("type");
+        // The dispatch codec owns the fields. Store the same id{options} syntax the native command parser accepts.
+        return id + (encoded.isEmpty() ? "" : encoded.toString());
     }
 
     /** Accepts a bare name or a full id; null when empty or unknown. */

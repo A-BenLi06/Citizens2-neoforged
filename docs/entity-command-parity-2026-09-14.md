@@ -24,7 +24,7 @@ The source inventory now contains 185 root/modifier pairs, up from 155 at both `
 - Warden anger accepts a loaded entity UUID or an online player name. Dig/emerge/roar apply native poses and sounds; emerge and roar return to standing after 134 and 84 ticks. Deferred resets check the original entity and pose. Rejected targets/subcommands do not attach a trait.
 - Strict armadillo input accepts the legacy `ROLLING_UP` / `ROLLING_OUT` names while the saved-data parser remains forgiving. Llama chest flags are declared, pufferfish state follows the actual 0–2 native range, and shulker peek is validated as 0–100 before conversion to a byte.
 
-The cloud command supports particles that need no additional parameters. Parameterized dust/block/item particle syntax remains unsupported and is rejected; retaining an unresolved saved ID is not equivalent to rendering it. The legacy upstream cloud shrink-rate setter bug is not reproduced. Registry preservation cannot make an absent provider's content available.
+The initial cloud command supported only particles that need no additional parameters. The [September 24 native particle-options follow-up](cloud-particle-options-2026-09-24.md) adds native parameter syntax and preserves full options through save/load/copy, including API-supplied item components and provider-defined fields. Retaining an unresolved definition is not equivalent to rendering it. The legacy upstream cloud shrink-rate setter bug is not reproduced. Registry preservation cannot make an absent provider's content available.
 
 ## Verification
 
