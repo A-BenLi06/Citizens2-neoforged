@@ -1,6 +1,7 @@
 package net.citizensnpcs.api.gui;
 
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import net.minecraft.world.Container;
@@ -60,7 +61,8 @@ public class CitizensMenuContainer extends AbstractContainerMenu {
     @Override
     public void clicked(int slotId, int button, ClickType clickType, Player player) {
         if (menu != null && !menu.isCurrent(this, player)) return;
-        if (menu == null || clickType != ClickType.PICKUP_ALL && clickType != ClickType.QUICK_MOVE) {
+        if (menu == null || clickType != ClickType.PICKUP_ALL && clickType != ClickType.QUICK_MOVE
+                && clickType != ClickType.QUICK_CRAFT) {
             handleClick(slotId, button, clickType, player);
             return;
         }
@@ -74,10 +76,14 @@ public class CitizensMenuContainer extends AbstractContainerMenu {
     }
 
     private void handleClick(int slotId, int button, ClickType clickType, Player player) {
-        if (menu != null && (clickType == ClickType.PICKUP_ALL || clickType == ClickType.QUICK_MOVE) && quickcraftStatus != 0) {
+        if (menu != null && clickType != ClickType.QUICK_CRAFT && quickcraftStatus != 0) {
             // Native non-drag clicks cancel an unfinished drag without performing another action.
             resetQuickCraft();
             broadcastFullState();
+            return;
+        }
+        if (menu != null && clickType == ClickType.QUICK_CRAFT) {
+            dragClick(slotId, button, player);
             return;
         }
         if (menu == null || slotId < 0 || slotId >= slots.size()) {
@@ -149,6 +155,72 @@ public class CitizensMenuContainer extends AbstractContainerMenu {
                 ItemStack taken = source.safeTake(item.getCount(), cursor.getMaxStackSize() - cursor.getCount(), player);
                 cursor.grow(taken.getCount());
             }
+        }
+    }
+
+    private void dragClick(int slotId, int button, Player player) {
+        int header = getQuickcraftHeader(button);
+        if (header == 1 && (slotId < 0 || slotId >= slots.size())) {
+            resetQuickCraft();
+        } else if (header == 2 && quickcraftStatus == 1 && !getCarried().isEmpty()) {
+            int type = quickcraftType;
+            ItemStack cursor = getCarried();
+            ItemStack original = cursor.copy();
+            List<Slot> targets = List.copyOf(quickcraftSlots);
+            int share = targets.isEmpty() ? 0 : getQuickCraftPlaceCount(quickcraftSlots, type, original);
+            // Finish the native gesture before invoking callbacks, so closing/reentry cannot replay it.
+            resetQuickCraft();
+            if (isValidQuickcraftType(type, player)) {
+                if (targets.size() == 1) {
+                    Slot target = targets.getFirst();
+                    if (target.index >= 0 && target.index < slots.size() && slots.get(target.index) == target) {
+                        // Native one-slot drags are ordinary pickup clicks, including the creative no-op.
+                        if (type == 0 || type == 1) handleClick(target.index, type, ClickType.PICKUP, player);
+                    }
+                } else if (targets.size() > 1 && (type == 2 || original.getCount() >= targets.size())) {
+                    finishDrag(player, targets, type, share, original, cursor);
+                }
+            }
+        } else {
+            // Let Minecraft own start/add admission, duplicate candidates and invalid phase resets.
+            super.clicked(slotId, button, ClickType.QUICK_CRAFT, player);
+        }
+        // Admission has no inventory changes. Correct client prediction once the gesture ends or resets.
+        if (quickcraftStatus == 0 && menu.isCurrent(this, player)) broadcastFullState();
+    }
+
+    private void finishDrag(Player player, List<Slot> targets, int type, int share, ItemStack original, ItemStack cursor) {
+        ItemStack expectedCursor = cursor.copy();
+        for (Slot target : targets) {
+            if (!menu.isCurrent(this, player) || getCarried() != cursor || !ItemStack.matches(expectedCursor, cursor)
+                    || !isValidQuickcraftType(type, player)) return;
+            int index = target.index;
+            if (index < 0 || index >= slots.size() || slots.get(index) != target) return;
+            if (!canItemQuickReplace(target, original, true) || !target.mayPlace(original) || !canDragTo(target)) continue;
+            ItemStack existing = target.getItem();
+            int amount = Math.min(share, Math.min(original.getMaxStackSize(), target.getMaxStackSize(original)) - existing.getCount());
+            if (amount <= 0) continue;
+            if (index < menuSize) {
+                ItemStack beforeItem = existing.copy(), beforeCursor = cursor.copy();
+                InventoryAction action = type == 1 ? InventoryAction.PLACE_ONE
+                        : type == 2 || amount == cursor.getCount() ? InventoryAction.PLACE_ALL : InventoryAction.PLACE_SOME;
+                CitizensInventoryClickEvent event = new CitizensInventoryClickEvent(index,
+                        type == 2 ? MenuClickType.MIDDLE : type == 1 ? MenuClickType.RIGHT : MenuClickType.LEFT,
+                        action, existing.copy(), original.copyWithCount(amount), -1, menu.getViewers(), -1,
+                        player instanceof ServerPlayer viewer ? viewer : null, this);
+                menu.handleClick(event);
+                if (!menu.isCurrent(this, player) || slots.get(index) != target || target.getItem() != existing
+                        || getCarried() != cursor || !ItemStack.matches(beforeItem, existing)
+                        || !ItemStack.matches(beforeCursor, cursor)) return;
+                if (event.isCancelled()) continue;
+                if (!isValidQuickcraftType(type, player) || !target.mayPlace(original) || !canDragTo(target)
+                        || Math.min(original.getMaxStackSize(), target.getMaxStackSize(original)) - existing.getCount() < amount) return;
+            }
+            // Consume each accepted share before notifying the destination's container listeners. A close
+            // callback must return only the remaining cursor, not duplicate an already placed share.
+            cursor.shrink(amount);
+            expectedCursor = cursor.copy();
+            target.setByPlayer(original.copyWithCount(existing.getCount() + amount));
         }
     }
 
@@ -231,6 +303,7 @@ public class CitizensMenuContainer extends AbstractContainerMenu {
 
     @Override
     public void removed(Player player) {
+        resetQuickCraft();
         super.removed(player);
         container.stopOpen(player);
         if (menu != null) {
