@@ -171,6 +171,10 @@ public class CitizensInventoryClickEvent {
             case PICKUP_SOME:
                 stack.setCount(formerAmount - pickupAmount);
                 return stack;
+            case COLLECT_TO_CURSOR:
+                stack.setCount(formerAmount - (pickupAmount >= 0 ? pickupAmount
+                        : Math.min(formerAmount, Math.max(0, cursor.getMaxStackSize() - cursor.getCount()))));
+                return stack;
             case PICKUP_HALF:
                 stack.setCount((int) Math.floor(formerAmount / 2.0));
                 return stack;

@@ -1,5 +1,8 @@
 package net.citizensnpcs.api.gui;
 
+import java.util.HashSet;
+import java.util.Set;
+
 import net.minecraft.world.Container;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.server.level.ServerPlayer;
@@ -15,14 +18,15 @@ import net.minecraft.world.item.ItemStack;
  * <p>
  * This is where the port and upstream differ most. Bukkit hands a plugin an {@code InventoryClickEvent} it can cancel
  * before anything moves; Minecraft has no such hook — {@link #clicked} <em>is</em> the move. So the click is translated
- * into a {@link CitizensInventoryClickEvent}, offered to the menu, and only handed on to {@code super} if nothing
- * cancelled it. A cancelled click is followed by {@link #broadcastFullState()} so the client, which has already predicted
+ * into a {@link CitizensInventoryClickEvent}, offered to the menu before a native move or each bulk-collection source.
+ * A cancelled click is followed by {@link #broadcastFullState()} so the client, which has already predicted
  * the move locally, is put back in step.
  * <p>
  * Several viewers can share one menu, and therefore one {@link Container}: each gets its own container instance over the
  * same backing container, which is how a change made by one viewer shows up for the others.
  */
 public class CitizensMenuContainer extends AbstractContainerMenu {
+    private boolean collecting;
     private final int columns;
     private final Container container;
     private final InventoryMenu menu;
@@ -55,6 +59,27 @@ public class CitizensMenuContainer extends AbstractContainerMenu {
 
     @Override
     public void clicked(int slotId, int button, ClickType clickType, Player player) {
+        if (menu != null && !menu.isCurrent(this, player)) return;
+        if (menu == null || clickType != ClickType.PICKUP_ALL) {
+            handleClick(slotId, button, clickType, player);
+            return;
+        }
+        if (collecting) return;
+        collecting = true;
+        try {
+            handleClick(slotId, button, clickType, player);
+        } finally {
+            collecting = false;
+        }
+    }
+
+    private void handleClick(int slotId, int button, ClickType clickType, Player player) {
+        if (menu != null && clickType == ClickType.PICKUP_ALL && quickcraftStatus != 0) {
+            // Native non-drag clicks cancel an unfinished drag without performing another action.
+            resetQuickCraft();
+            broadcastFullState();
+            return;
+        }
         if (menu == null || slotId < 0 || slotId >= slots.size()) {
             super.clicked(slotId, button, clickType, player);
             return;
@@ -69,20 +94,64 @@ public class CitizensMenuContainer extends AbstractContainerMenu {
         }
         if (!inMenu) {
             // the player's own inventory is theirs to rearrange
-            super.clicked(slotId, button, clickType, player);
+            clickNative(slotId, button, clickType, player);
             return;
         }
         ItemStack current = slots.get(slotId).getItem();
         CitizensInventoryClickEvent event = new CitizensInventoryClickEvent(slotId,
                 MenuClickType.of(clickType, button), actionFor(clickType, button, current, getCarried()),
-                current.copy(), getCarried().copy(), clickType == ClickType.SWAP ? button : -1, menu.getViewers(), -1,
+                current.copy(), getCarried().copy(), clickType == ClickType.SWAP ? button : -1, menu.getViewers(),
+                clickType == ClickType.PICKUP_ALL ? 0 : -1,
                 player instanceof ServerPlayer clicker ? clicker : null, this);
         menu.handleClick(event);
-        if (event.isCancelled()) {
-            broadcastFullState();
+        if (event.isCancelled() || !menu.isCurrent(this, player)) {
+            if (menu.isCurrent(this, player)) broadcastFullState();
             return;
         }
-        super.clicked(slotId, button, clickType, player);
+        clickNative(slotId, button, clickType, player);
+    }
+
+    private void clickNative(int slotId, int button, ClickType clickType, Player player) {
+        if (clickType != ClickType.PICKUP_ALL) {
+            super.clicked(slotId, button, clickType, player);
+            return;
+        }
+        collectToCursor(slotId, button, player);
+        // The vanilla client predicts collection from every matching slot, including locked menu controls.
+        if (menu.isCurrent(this, player)) broadcastFullState();
+    }
+
+    private void collectToCursor(int slotId, int button, Player player) {
+        Slot origin = slots.get(slotId);
+        ItemStack cursor = getCarried();
+        if (cursor.isEmpty() || origin.hasItem() && origin.mayPickup(player)) return;
+        Set<Slot> visited = new HashSet<>();
+        int start = button == 0 ? 0 : slots.size() - 1;
+        int direction = button == 0 ? 1 : -1;
+        // Preserve native direction, partial-stack-first passes, stack compatibility and Slot pickup rules.
+        for (int pass = 0; pass < 2; pass++) {
+            for (int index = start; index >= 0 && index < slots.size() && cursor.getCount() < cursor.getMaxStackSize(); index += direction) {
+                if (!menu.isCurrent(this, player) || getCarried() != cursor) return;
+                Slot source = slots.get(index);
+                ItemStack item = source.getItem();
+                if (item.isEmpty() || !canItemQuickReplace(source, cursor, true) || !source.mayPickup(player)
+                        || !canTakeItemForPickAll(cursor, source) || pass == 0 && item.getCount() == item.getMaxStackSize()) continue;
+                int amount = Math.min(item.getCount(), cursor.getMaxStackSize() - cursor.getCount());
+                if (index < menuSize) {
+                    if (!visited.add(source)) continue;
+                    ItemStack beforeItem = item.copy(), beforeCursor = cursor.copy();
+                    CitizensInventoryClickEvent event = new CitizensInventoryClickEvent(index, MenuClickType.DOUBLE_CLICK,
+                            InventoryAction.COLLECT_TO_CURSOR, item.copy(), cursor.copy(), -1, menu.getViewers(), amount,
+                            player instanceof ServerPlayer viewer ? viewer : null, this);
+                    menu.handleClick(event);
+                    if (!menu.isCurrent(this, player) || getCarried() != cursor || source.getItem() != item
+                            || !ItemStack.matches(beforeCursor, cursor) || !ItemStack.matches(beforeItem, source.getItem())) return;
+                    if (event.isCancelled()) continue;
+                }
+                ItemStack taken = source.safeTake(item.getCount(), cursor.getMaxStackSize() - cursor.getCount(), player);
+                cursor.grow(taken.getCount());
+            }
+        }
     }
 
     public Container getMenuContainer() {

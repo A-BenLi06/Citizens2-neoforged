@@ -98,6 +98,13 @@ public class InventoryMenu implements Runnable {
         return viewers.keySet();
     }
 
+    /** The current page and player session still own this exact container. */
+    boolean isCurrent(CitizensMenuContainer container, Player player) {
+        return page != null && !closing && !transitioning && player instanceof ServerPlayer viewer
+                && !viewer.hasDisconnected() && viewer.containerMenu == container && viewers.get(viewer) == container
+                && viewer.getServer().getPlayerList().getPlayer(viewer.getUUID()) == viewer;
+    }
+
     /** Shows the menu to a player. Several players may share one menu; transitions affect all of them. */
     public void present(ServerPlayer player) {
         if (page == null)
