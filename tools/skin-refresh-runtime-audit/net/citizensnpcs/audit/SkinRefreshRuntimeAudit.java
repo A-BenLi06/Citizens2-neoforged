@@ -57,6 +57,9 @@ public final class SkinRefreshRuntimeAudit {
     private static NPC destroyOnStop, replaceOnStop;
     private static net.citizensnpcs.util.EntityPacketTracker retiredTracker;
     private static PlayerTeam realTeam;
+    private static NPC nameNpc;
+    private static Entity previousNameEntity;
+    private static int nameStep;
 
     @SubscribeEvent public static void seen(NPCSeenByPlayerEvent event) {
         if (humans.contains(event.getNPC()) && denyBob && event.getPlayer() == bob.player) event.setCanceled(true);
@@ -254,7 +257,6 @@ public final class SkinRefreshRuntimeAudit {
                     }
                     var guard = SkinPacketTracker.class.getDeclaredField("refreshing"); guard.setAccessible(true);
                     check(((Set<?>) guard.get(null)).isEmpty(), "refresh_guard_released");
-                    check(realTeam.getPlayers().equals(Set.of("SkinAlice", "SkinBob")), "real_player_team_untouched_by_mirrored_names");
                     check(errors.isEmpty(), "native_packet_replay_consistency_" + errors);
                     for (NPC npc : List.copyOf(humans)) {
                         EntityHumanNPC removed = human(npc); npc.destroy(); clear();
@@ -264,6 +266,9 @@ public final class SkinRefreshRuntimeAudit {
                     nextTick = server.getTickCount() + 30; clear();
                 }
                 case 14 -> {
+                    // Virtual viewers join during normal trait ticks; observe the first pairing on the following tick.
+                    if (!mirrorNameCommands(server, level)) { phase--; nextTick = server.getTickCount() + 1; break; }
+                    check(realTeam.getPlayers().equals(Set.of("SkinAlice", "SkinBob")), "real_player_team_untouched_by_mirrored_names");
                     for (NPC npc : humans) for (Actor actor : actors) check(!actor.info.containsKey(npc.getMinecraftUniqueId()) && actor.updates(npc) == 0, "pending_list_update_cannot_revive_" + actor.name() + npc.getName());
                     check(errors.isEmpty(), "final_packet_consistency_" + errors);
                     LoggerFactory.getLogger("citizens").info("[SKINREFRESHAUDIT] COMPLETE {} checks", passed); done = true;
@@ -314,6 +319,46 @@ public final class SkinRefreshRuntimeAudit {
                 && actor.mounts.getOrDefault(original.get(npc).getId(), List.of()).contains(children.get(npc).getId()), "client_mount_graph_restored_" + actor.name() + npc.getName());
     }
     private static void clear() { for (Actor actor : actors) { actor.pump(); actor.packets.clear(); } }
+    private static boolean mirrorNameCommands(MinecraftServer server, ServerLevel level) throws Exception {
+        boolean virtual = nameStep >= 5;
+        int step = nameStep++ % 5;
+        if (step == 0) {
+            nameNpc = npc(EntityType.PLAYER, virtual ? "NameCmdVirtual" : "NameCmdWorld", virtual);
+            nameNpc.getOrAddTrait(SkinTrait.class).setFetchDefaultSkin(false);
+            spawn(nameNpc, level);
+            return false;
+        }
+        if (step >= 2) {
+            boolean name = step != 3;
+            for (Actor actor : List.of(alice, bob)) {
+                actor.pump(); var entry = actor.rawProfile(nameNpc);
+                check(entry.profile().getId().equals(nameNpc.getMinecraftUniqueId())
+                        && entry.profile().getName().equals(name ? actor.name() : nameNpc.getName()),
+                        "mirror_name_command_initial_profile_" + actor.name() + "_" + virtual + "_" + name);
+                check(!actor.entities.containsKey(previousNameEntity.getId()) && actor.replica(nameNpc) != null
+                        && actor.replica(nameNpc).cached == actor.info.get(nameNpc.getMinecraftUniqueId()),
+                        "mirror_name_command_client_entity_" + actor.name() + "_" + virtual + "_" + name);
+            }
+            check(far.updates(nameNpc) == 0, "mirror_name_command_no_distant_profile_" + virtual + "_" + name);
+        }
+        if (step == 4) {
+            nameNpc.destroy();
+            for (Actor actor : List.of(alice, bob)) {
+                actor.pump();
+                check(!actor.info.containsKey(nameNpc.getMinecraftUniqueId()), "mirror_name_command_cleanup_" + actor.name() + "_" + virtual);
+            }
+            return virtual;
+        }
+        boolean name = step != 2;
+        var source = server.createCommandSourceStack().withPermission(4);
+        CitizensAPI.getDefaultNPCSelector().select(source, nameNpc);
+        previousNameEntity = nameNpc.getEntity(); clear();
+        check(server.getCommands().getDispatcher().execute("npc mirror --name " + name, source) > 0
+                && nameNpc.getTrait(MirrorTrait.class).isEnabled() && nameNpc.getTrait(MirrorTrait.class).mirrorName() == name,
+                "mirror_name_command_sets_option_" + virtual + "_" + name);
+        check(nameNpc.getEntity() != previousNameEntity && previousNameEntity.isRemoved(), "mirror_name_command_replaces_old_entity_" + virtual + "_" + name);
+        return false;
+    }
     private static void equipmentPackets() {
         NPC npc = humans.get(1); MirrorTrait mirror = npc.getTrait(MirrorTrait.class);
         ItemStack source = new ItemStack(Items.GOLD_INGOT);

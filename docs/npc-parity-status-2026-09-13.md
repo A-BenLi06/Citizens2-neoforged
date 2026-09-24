@@ -4,9 +4,11 @@
 
 Initial audit timestamp: 2026-09-13 01:47:09 +08:00 (UTC+08:00).
 
-Current summary updated: 2026-09-24 11:41:00 +08:00 (UTC+08:00).
+Current summary updated: 2026-09-24 19:38:26 +08:00 (UTC+08:00).
 
 Latest Citizens appearance follow-up: [native skin refresh and mirrored equipment](skin-refresh-2026-09-24.md) recreates the client's cached player entity through its owning world/virtual tracker, preserves the server entity/mounts and uses detached per-viewer profiles. Actual pairing/update equipment packets retain mirrored gear, and cleanup before external stop callbacks protects newly replaced trackers. The isolated fixture passes 319 checks, including a source-derived client cache model and a negative control for the old profile-only refresh. Sequential regression passes 312 scoreboard, 108 tracking-admission, 170 mount, 179 metadata, 81 movement/list, 47 visibility and 62 removal checks, 107 NPC assertions, 223 general probes and 217 ordinary tests with zero failures/errors/skips; build and release/source exclusions pass. Evidence: `artifacts/skin-refresh-validation-summary.json`. Real texture services/signatures, physical-client drawing, mirrored-name/team presentation and combined modpack/proxy acceptance remain unverified.
+
+The subsequent mirror-name command correction writes `--name` before enabling/respawning the NPC. Actual on/off/on commands verify the first profile for world and virtual NPCs, increasing the dedicated fixture to 367 checks; 217 ordinary tests, build and release/source exclusions pass again. Evidence: `artifacts/mirror-name-validation-summary.json`. The broader regression counts above belong to the preceding skin-refresh commit.
 
 Previous Citizens lifecycle follow-up: [native scoreboard sessions and membership](scoreboard-lifecycle-2026-09-23.md) prepares teams before profile/entity pairing, keeps delivery revisions per play listener, replaces changed members, disposes private teams and restores null/RESET colors. Global team distribution remains reference-compatible. The isolated native packet-replay fixture passes 312 checks across world/virtual NPCs, filters/range, reconnect, player respawn/dimension travel, commands, trait replacement, canceled spawn/retry and cleanup, with an independent operator team intact. Evidence: `artifacts/scoreboard-validation-summary.json`. Installed Paradigm 2.4.2b has no public text-evaluation method; inbound generic formatting remains an external API boundary. Physical-client drawing, mirrored-name presentation and combined modpack/proxy acceptance remain open.
 

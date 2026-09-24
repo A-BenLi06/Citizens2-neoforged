@@ -2422,8 +2422,8 @@ public class NPCCommands {
             trait.setMirrorEquipment(equipment);
         }
         if (name != null) {
-            trait.setEnabled(true);
             trait.setMirrorName(name);
+            trait.setEnabled(true);
             Messaging.sendTr(sender, name ? Messages.MIRROR_NAME_SET : Messages.MIRROR_NAME_UNSET, npc.getName());
             return;
         }
