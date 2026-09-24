@@ -3,6 +3,8 @@ package net.citizensnpcs.api.gui;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.function.BooleanSupplier;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Supplier;
@@ -19,6 +21,8 @@ import net.minecraft.world.item.ItemStack;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.neoforge.common.NeoForge;
 import net.neoforged.neoforge.event.ServerChatEvent;
+import net.neoforged.neoforge.event.entity.player.PlayerContainerEvent;
+import net.neoforged.neoforge.event.entity.player.PlayerEvent;
 
 /**
  * Ready-made menu pages for the small inputs a configuration GUI keeps needing: a toggle button, a one-of-many picker, a
@@ -203,14 +207,8 @@ public class InputMenus {
         }
     }
 
-    /**
-     * A page that asks for a line of text.
-     * <p>
-     * Upstream opens an anvil and reads what the player types into its rename field. That needs a menu which really is a
-     * vanilla {@code AnvilMenu}, because the rename packet is delivered nowhere else, and is not ported yet — so this page
-     * is recognised by {@link InventoryMenu} and turned into a chat question instead of a container. The flow is the same
-     * from the caller's side: ask, validate, and only leave the page when the value is accepted.
-     */
+    /** A chat input page, also used when an existing value cannot fit the native rename field without data loss. */
+    @Menu(type = InventoryType.ANVIL)
     public static class ChatStringInputPage extends InventoryMenuPage {
         private final Function<String, Boolean> callback;
         private final Supplier<String> initialValue;
@@ -228,20 +226,40 @@ public class InputMenus {
         }
 
         public String getPrompt() {
-            String current = initialValue == null ? null : initialValue.get();
+            return getPrompt(initialValue());
+        }
+
+        String initialValue() {
+            return initialValue == null ? null : initialValue.get();
+        }
+
+        String getPrompt(String current) {
             String heading = title == null || title.isEmpty() ? "Enter a value" : title;
             return current == null ? heading : heading + " [[(currently " + current + ")]]";
         }
 
         @Override
         public void initialise(MenuContext ctx) {
+            if (title != null && !title.isEmpty()) {
+                ctx.setTitle(title);
+            }
         }
     }
 
-    /** Asks for text, and only closes the page when {@code callback} accepts the value. */
+    @Menu(type = InventoryType.ANVIL)
+    static final class StringInputPage extends ChatStringInputPage {
+        private StringInputPage(String title, Supplier<String> initialValue, Function<String, Boolean> callback) {
+            super(title, initialValue, callback);
+        }
+    }
+
+    /**
+     * Opens a native rename field and stays open until the callback accepts. Empty input is null; literal words such as
+     * "null" remain text. Existing values outside the native field's length/character limits use chat to avoid truncation.
+     */
     public static InventoryMenuPage filteredStringSetter(String title, Supplier<String> initialValue,
             Function<String, Boolean> callback) {
-        return new ChatStringInputPage(title, initialValue, callback);
+        return new StringInputPage(title, initialValue, callback);
     }
 
     public static InventoryMenuPage filteredStringSetter(Supplier<String> initialValue,
@@ -252,7 +270,7 @@ public class InputMenus {
     /** Asks for text and always accepts it. */
     public static InventoryMenuPage stringSetter(String title, Supplier<String> initialValue,
             Consumer<String> callback) {
-        return new ChatStringInputPage(title, initialValue, input -> {
+        return new StringInputPage(title, initialValue, input -> {
             callback.accept(input);
             return true;
         });
@@ -289,11 +307,6 @@ public class InputMenus {
 
     /**
      * Asks for a line of text in chat: closes the menu, prompts, waits for the next thing that player says, then reopens.
-     * <p>
-     * Upstream also offers an anvil-based variant that types into the rename field. That needs a menu that really is a
-     * vanilla {@code AnvilMenu}, because the rename packet is only delivered to one, and is not yet ported — so
-     * {@link #stringSetter} routes here too. The chat route is upstream's own fallback, not an invention, and it is fully
-     * functional; only the in-GUI look differs.
      */
     public static void runChatStringSetter(InventoryMenu menu, ServerPlayer player, String description,
             Consumer<String> callback) {
@@ -306,6 +319,14 @@ public class InputMenus {
      */
     static void askOnce(InventoryMenu menu, ServerPlayer player, String description, Consumer<String> callback) {
         ask(menu, player, description, callback, false);
+    }
+
+    /** A page-owned prompt whose lifecycle and literal input semantics are supplied by the menu. */
+    static Runnable prompt(ServerPlayer player, String description, BooleanSupplier active, Consumer<String> callback) {
+        Messaging.send(player.createCommandSourceStack(), description);
+        ChatPrompt prompt = new ChatPrompt(null, player, callback, false, active);
+        NeoForge.EVENT_BUS.register(prompt);
+        return prompt::cancel;
     }
 
     private static void ask(InventoryMenu menu, ServerPlayer player, String description, Consumer<String> callback,
@@ -321,28 +342,62 @@ public class InputMenus {
         private final InventoryMenu menu;
         private final ServerPlayer player;
         private final boolean reopen;
+        private final BooleanSupplier active;
+        private final AtomicBoolean answered = new AtomicBoolean();
+        private volatile boolean cancelled;
 
         private ChatPrompt(InventoryMenu menu, ServerPlayer player, Consumer<String> callback, boolean reopen) {
+            this(menu, player, callback, reopen, () -> true);
+        }
+
+        private ChatPrompt(InventoryMenu menu, ServerPlayer player, Consumer<String> callback, boolean reopen,
+                BooleanSupplier active) {
             this.menu = menu;
             this.player = player;
             this.callback = callback;
             this.reopen = reopen;
+            this.active = active;
         }
 
         @SubscribeEvent
         public void onChat(ServerChatEvent event) {
-            if (event.getPlayer() != player)
+            if (event.getPlayer() != player || cancelled || !answered.compareAndSet(false, true))
                 return;
-            NeoForge.EVENT_BUS.unregister(this);
             event.setCanceled(true);
             String text = event.getRawText();
             // chat arrives off the server thread, so the menu must not be touched until we are back on it
             CitizensAPI.getScheduler().runTask(() -> {
-                callback.accept(text.equals("\"\"") || text.equals("''") || text.equals("null") ? "" : text);
-                if (reopen) {
-                    menu.present(player);
+                try {
+                    if (cancelled || !active.getAsBoolean())
+                        return;
+                    callback.accept(menu == null ? text
+                            : text.equals("\"\"") || text.equals("''") || text.equals("null") ? "" : text);
+                    if (reopen) {
+                        menu.present(player);
+                    }
+                } finally {
+                    cancel();
                 }
             });
+        }
+
+        @SubscribeEvent
+        public void onOpen(PlayerContainerEvent.Open event) {
+            if (menu == null && event.getEntity() == player) {
+                cancel();
+            }
+        }
+
+        @SubscribeEvent
+        public void onLogout(PlayerEvent.PlayerLoggedOutEvent event) {
+            if (event.getEntity() == player) {
+                cancel();
+            }
+        }
+
+        private void cancel() {
+            cancelled = true;
+            NeoForge.EVENT_BUS.unregister(this);
         }
     }
 }

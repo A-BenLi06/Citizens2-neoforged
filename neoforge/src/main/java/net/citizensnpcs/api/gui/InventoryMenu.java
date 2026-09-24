@@ -57,7 +57,9 @@ public class InventoryMenu implements Runnable {
     private PageContext page;
     private final Deque<PageContext> stack = new ArrayDeque<>();
     private boolean transitioning;
-    private final Map<ServerPlayer, CitizensMenuContainer> viewers = new LinkedHashMap<>();
+    private final Map<ServerPlayer, AbstractContainerMenu> viewers = new LinkedHashMap<>();
+    private final Map<ServerPlayer, Runnable> chatPrompts = new HashMap<>();
+    private final Map<ServerPlayer, Object> pendingReturns = new HashMap<>();
 
     private InventoryMenu(InventoryMenuInfo info, InventoryMenuPage instance) {
         transition(info, instance, new HashMap<>());
@@ -69,12 +71,16 @@ public class InventoryMenu implements Runnable {
 
     /** Closes the menu for every viewer. */
     public void close() {
+        pendingReturns.clear();
+        cancelChatPrompts();
         closing = true;
         for (ServerPlayer player : new ArrayList<>(viewers.keySet())) {
             if (page != null) {
                 page.page.onClose(player);
             }
-            player.closeContainer();
+            if (player.containerMenu == viewers.get(player)) {
+                player.closeContainer();
+            }
         }
         viewers.clear();
         closing = false;
@@ -85,11 +91,15 @@ public class InventoryMenu implements Runnable {
 
     /** Closes the menu for one viewer, leaving it open for any others. */
     public void close(ServerPlayer player) {
+        pendingReturns.remove(player);
+        cancelChatPrompt(player);
         if (!viewers.containsKey(player))
             return;
         closing = true;
-        viewers.remove(player);
-        player.closeContainer();
+        AbstractContainerMenu container = viewers.remove(player);
+        if (player.containerMenu == container) {
+            player.closeContainer();
+        }
         closing = false;
     }
 
@@ -98,7 +108,7 @@ public class InventoryMenu implements Runnable {
     }
 
     /** The current page and player session still own this exact container. */
-    boolean isCurrent(CitizensMenuContainer container, Player player) {
+    boolean isCurrent(AbstractContainerMenu container, Player player) {
         return page != null && !closing && !transitioning && player instanceof ServerPlayer viewer
                 && !viewer.hasDisconnected() && viewer.containerMenu == container && viewers.get(viewer) == container
                 && viewer.getServer().getPlayerList().getPlayer(viewer.getUUID()) == viewer;
@@ -109,6 +119,7 @@ public class InventoryMenu implements Runnable {
         if (page == null)
             return;
         openFor(player);
+        pendingReturns.remove(player);
     }
 
     @Override
@@ -162,7 +173,7 @@ public class InventoryMenu implements Runnable {
     }
 
     /** Called by {@link CitizensMenuContainer} when a viewer's screen closes. */
-    void onContainerClosed(CitizensMenuContainer container, Player player) {
+    void onContainerClosed(AbstractContainerMenu container, Player player) {
         if (closing || transitioning || page == null)
             return;
         if (!(player instanceof ServerPlayer serverPlayer) || viewers.get(serverPlayer) != container)
@@ -171,12 +182,28 @@ public class InventoryMenu implements Runnable {
         page.page.onClose(serverPlayer);
         // closing the screen means "go back a page", and popping the last page ends the menu
         transitionBack(serverPlayer);
+        if (page != null) {
+            // ServerPlayer.doCloseContainer resets containerMenu after removed() returns. Reopen on the next tick,
+            // only if no later transition, explicit close, replacement screen or login has superseded this return.
+            PageContext target = page;
+            Object token = new Object();
+            pendingReturns.put(serverPlayer, token);
+            CitizensAPI.getScheduler().runTask(() -> {
+                if (!pendingReturns.remove(serverPlayer, token) || page != target
+                        || serverPlayer.hasDisconnected() || serverPlayer.containerMenu != serverPlayer.inventoryMenu
+                        || serverPlayer.getServer().getPlayerList().getPlayer(serverPlayer.getUUID()) != serverPlayer)
+                    return;
+                present(serverPlayer);
+            });
+        }
     }
 
     /** Resends the open-screen packet so the client redraws the title without losing the container. */
     void updateTitle(String newTitle) {
-        for (Map.Entry<ServerPlayer, CitizensMenuContainer> entry : viewers.entrySet()) {
+        for (Map.Entry<ServerPlayer, AbstractContainerMenu> entry : viewers.entrySet()) {
             AbstractContainerMenu container = entry.getValue();
+            if (container == entry.getKey().inventoryMenu)
+                continue;
             entry.getKey().connection.send(new ClientboundOpenScreenPacket(container.containerId,
                     (MenuType<?>) container.getType(), Messaging.minecraftComponentFromRawMessage(newTitle)));
             container.sendAllDataToRemote();
@@ -209,6 +236,8 @@ public class InventoryMenu implements Runnable {
     private void transitionBack(ServerPlayer closedBy) {
         if (page == null)
             return;
+        pendingReturns.clear();
+        cancelChatPrompts();
         for (ServerPlayer player : new ArrayList<>(viewers.keySet())) {
             page.page.onClose(player);
         }
@@ -222,7 +251,7 @@ public class InventoryMenu implements Runnable {
         if (page == null) {
             closing = true;
             for (ServerPlayer player : new ArrayList<>(viewers.keySet())) {
-                if (player != closedBy) {
+                if (player != closedBy && player.containerMenu == viewers.get(player)) {
                     player.closeContainer();
                 }
             }
@@ -237,6 +266,8 @@ public class InventoryMenu implements Runnable {
     }
 
     private void transition(InventoryMenuInfo info, InventoryMenuPage instance, Map<String, Object> context) {
+        pendingReturns.clear();
+        cancelChatPrompts();
         if (page != null) {
             for (Map.Entry<String, Object> entry : page.ctx.data().entrySet()) {
                 context.putIfAbsent(entry.getKey(), entry.getValue());
@@ -341,10 +372,12 @@ public class InventoryMenu implements Runnable {
 
     private void openFor(ServerPlayer player) {
         PageContext current = page;
+        String initial = current.page instanceof InputMenus.ChatStringInputPage input ? input.initialValue() : null;
         if (current.page instanceof InputMenus.ChatStringInputPage input) {
-            // a text-input page has no container: it asks in chat and returns to the page beneath once accepted
-            askInChat(player, input);
-            return;
+            if (!(input instanceof InputMenus.StringInputPage) || !CitizensAnvilMenu.canRepresent(initial)) {
+                askInChat(player, input, initial);
+                return;
+            }
         }
         int size = current.container.getContainerSize();
         MenuType<?> type = current.type.toMenuType(size);
@@ -352,8 +385,10 @@ public class InventoryMenu implements Runnable {
         MenuProvider provider = new MenuProvider() {
             @Override
             public AbstractContainerMenu createMenu(int containerId, Inventory inventory, Player who) {
-                CitizensMenuContainer container = new CitizensMenuContainer(type, containerId, inventory,
-                        current.container, current.rows, current.columns, InventoryMenu.this);
+                AbstractContainerMenu container = current.page instanceof InputMenus.StringInputPage input
+                        ? new CitizensAnvilMenu(containerId, inventory, InventoryMenu.this, input, initial)
+                        : new CitizensMenuContainer(type, containerId, inventory,
+                                current.container, current.rows, current.columns, InventoryMenu.this);
                 viewers.put(player, container);
                 return container;
             }
@@ -370,18 +405,40 @@ public class InventoryMenu implements Runnable {
      * Runs a text-input page as a chat question. Re-asks until the value is accepted, which is what upstream's anvil page
      * does by staying open.
      */
-    private void askInChat(ServerPlayer player, InputMenus.ChatStringInputPage input) {
-        InputMenus.askOnce(this, player, input.getPrompt(), answer -> {
-            if (!input.accept(answer)) {
-                // rejected: ask again rather than silently dropping the edit
-                askInChat(player, input);
+    private void askInChat(ServerPlayer player, InputMenus.ChatStringInputPage input, String initial) {
+        cancelChatPrompt(player);
+        player.closeContainer();
+        PageContext current = page;
+        viewers.put(player, player.inventoryMenu);
+        Runnable[] registration = new Runnable[1];
+        registration[0] = InputMenus.prompt(player, input.getPrompt(initial),
+                () -> chatPrompts.get(player) == registration[0] && page == current
+                        && isCurrent(player.inventoryMenu, player), answer -> {
+            cancelChatPrompt(player);
+            boolean accepted = input.accept(answer.isEmpty() ? null : answer);
+            if (page != current || !isCurrent(player.inventoryMenu, player))
                 return;
-            }
-            transitionBack();
-            if (page != null) {
-                present(player);
+            if (accepted) {
+                transitionBack();
+            } else {
+                askInChat(player, input, answer);
             }
         });
+        chatPrompts.put(player, registration[0]);
+    }
+
+    private void cancelChatPrompt(ServerPlayer player) {
+        Runnable cancel = chatPrompts.remove(player);
+        if (cancel != null) {
+            cancel.run();
+        }
+    }
+
+    private void cancelChatPrompts() {
+        for (Runnable cancel : chatPrompts.values()) {
+            cancel.run();
+        }
+        chatPrompts.clear();
     }
 
     /**
@@ -446,10 +503,15 @@ public class InventoryMenu implements Runnable {
             return;
         transitioning = true;
         List<ServerPlayer> existing = new ArrayList<>(viewers.keySet());
+        Map<ServerPlayer, AbstractContainerMenu> previous = new HashMap<>(viewers);
         viewers.clear();
         for (ServerPlayer player : existing) {
-            player.closeContainer();
-            if (!player.isRemoved()) {
+            if (player.containerMenu == previous.get(player)) {
+                player.closeContainer();
+            } else {
+                continue;
+            }
+            if (!player.isRemoved() && !player.hasDisconnected()) {
                 openFor(player);
             }
         }
