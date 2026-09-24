@@ -18,6 +18,7 @@ import net.citizensnpcs.npc.NPCRegistries;
 import net.citizensnpcs.npc.skin.SkinPacketTracker;
 import net.citizensnpcs.trait.ScoreboardTrait;
 import net.citizensnpcs.util.HologramMetadata;
+import net.citizensnpcs.util.EquipmentPackets;
 import net.citizensnpcs.util.PacketMounts;
 import net.minecraft.network.protocol.Packet;
 import net.minecraft.network.protocol.game.ClientGamePacketListener;
@@ -39,18 +40,16 @@ public class ServerEntityMixin {
     private void citizens$personalizeHologramPairing(ServerGamePacketListenerImpl connection, Packet<?> packet,
             Operation<Void> original) {
         Packet<?> projected = PacketMounts.pairing(entity, connection.getPlayer(), packet);
-        if (projected != null) original.call(connection, HologramMetadata.rewrite(entity, connection.getPlayer(), projected));
-    }
-
-    @Inject(method = "removePairing", at = @At("TAIL"))
-    private void citizens$forgetHologramViewer(ServerPlayer viewer, CallbackInfo ci) {
-        HologramMetadata.forget(entity, viewer);
+        if (projected != null) original.call(connection, EquipmentPackets.rewrite(entity, connection.getPlayer(),
+                HologramMetadata.rewrite(entity, connection.getPlayer(), projected)));
     }
 
     @Inject(method = "removePairing", at = @At(value = "INVOKE",
             target = "Lnet/neoforged/neoforge/event/EventHooks;onStopEntityTracking(Lnet/minecraft/world/entity/Entity;Lnet/minecraft/world/entity/player/Player;)V"))
-    private void citizens$forgetMountViewerBeforeCallbacks(ServerPlayer viewer, CallbackInfo ci) {
+    private void citizens$forgetViewerBeforeCallbacks(ServerPlayer viewer, CallbackInfo ci) {
         PacketMounts.forget(entity, viewer);
+        HologramMetadata.forget(entity, viewer);
+        if (entity instanceof EntityHumanNPC human) SkinPacketTracker.removeFrom(human, viewer);
     }
 
     /**
@@ -78,9 +77,7 @@ public class ServerEntityMixin {
             scoreboard.prepareForViewer(viewer);
         }
         if (entity instanceof EntityHumanNPC human) {
-            // sent straight down the connection rather than through the acceptor: the acceptor's packets are buffered
-            // into the bundle that addPairing sends afterwards, so anything written here arrives first either way, and
-            // MirrorTrait needs the per-viewer profile swap that SkinPacketTracker does around the send
+            // The acceptor buffers the later spawn bundle; this detached per-viewer profile reaches the client first.
             SkinPacketTracker.sendTo(human, viewer);
         }
     }

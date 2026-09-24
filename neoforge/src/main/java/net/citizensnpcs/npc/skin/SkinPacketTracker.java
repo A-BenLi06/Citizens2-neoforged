@@ -1,8 +1,11 @@
 package net.citizensnpcs.npc.skin;
 
 import java.util.Collection;
+import java.util.Collections;
 import java.util.EnumSet;
+import java.util.IdentityHashMap;
 import java.util.List;
+import java.util.Set;
 
 import net.citizensnpcs.Settings.Setting;
 import com.mojang.authlib.GameProfile;
@@ -11,69 +14,58 @@ import net.citizensnpcs.trait.MirrorTrait;
 import net.citizensnpcs.api.npc.NPC;
 import net.citizensnpcs.api.util.Messaging;
 import net.citizensnpcs.util.SkinProperty;
+import net.citizensnpcs.util.NPCVisibility;
 import net.citizensnpcs.npc.entity.EntityHumanNPC;
 import net.minecraft.network.protocol.game.ClientboundPlayerInfoRemovePacket;
 import net.minecraft.network.protocol.game.ClientboundPlayerInfoUpdatePacket;
 import net.minecraft.network.protocol.game.ClientboundPlayerInfoUpdatePacket.Action;
-import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 
 /**
  * Pushes profile changes for a player NPC out to clients.
  * <p>
- * A vanilla client reads a player's skin from the tab-list entry it was sent, once, when the entry arrives. Mutating the
- * {@link com.mojang.authlib.GameProfile} afterwards changes nothing on screen — the entry has to be removed and re-added
- * for the client to re-read it. That is the whole reason this class exists, and the same reason upstream has its own
- * {@code SkinPacketTracker}.
- * <p>
- * Upstream additionally maintains per-viewer tracking state so it can re-send to one player at a time, which it needs
- * because Bukkit gives it no access to the entity tracker. {@link net.minecraft.server.level.ServerChunkCache#broadcast}
- * does that job here, so only the add/remove sequencing is left.
+ * A vanilla player entity caches its PlayerInfo, whose skin lookup is also cached. Updating the tab-list map alone
+ * leaves that entity holding its old skin. Refresh therefore removes and re-pairs the client entity through its
+ * owning world or virtual tracker. The server entity, inventory and mount relations remain intact.
  */
 public final class SkinPacketTracker {
+    // Only held during synchronous tracking callbacks. Recursive refreshes for the same NPC must not re-enter them.
+    private static final Set<EntityHumanNPC> refreshing = Collections.newSetFromMap(new IdentityHashMap<>());
     private SkinPacketTracker() {
     }
 
     /**
-     * Re-sends the NPC's tab-list entry so that viewers pick up the current profile.
-     * <p>
-     * The NPC is removed from the list again afterwards when it should not be listed, which is the default — an NPC that
-     * lingers in the tab list is the usual complaint about naive skin implementations.
+     * Recreates current viewers' client entities with a fresh profile, using native admission and pairing callbacks.
      */
     public static void respawn(EntityHumanNPC entity) {
-        if (entity == null || entity.isRemoved())
+        if (!isCurrent(entity) || !refreshing.add(entity))
             return;
-        ServerLevel level = (ServerLevel) entity.level();
-
-        sendToTracking(level, entity, new ClientboundPlayerInfoRemovePacket(List.of(entity.getUUID())));
-        NPC mirroring = entity.getNPC();
-        if (mirroring != null && mirroring.hasTrait(MirrorTrait.class)
-                && mirroring.getTraitNullable(MirrorTrait.class).isEnabled()) {
-            // Each actual viewer needs a different profile. Sending to the whole dimension would leave stale profile
-            // entries on clients that never tracked this NPC and will never receive its stop-tracking cleanup.
-            for (ServerPlayer viewer : level.getChunkSource().chunkMap.getPlayersWatching(entity)) {
-                send(entity, viewer, EnumSet.of(Action.ADD_PLAYER, Action.UPDATE_LISTED));
-            }
-        } else {
-            sendToTracking(level, entity, packet(entity, EnumSet.of(Action.ADD_PLAYER, Action.UPDATE_LISTED)));
+        try {
+            NPCVisibility.refreshPairing(entity);
+        } finally {
+            refreshing.remove(entity);
         }
-
-        NPC npc = entity.getNPC();
-        if (npc == null || npc.shouldRemoveFromTabList()) {
+        if (isCurrent(entity) && entity.getNPC().shouldRemoveFromTabList()) {
             // Retain the skin profile and reassert the live listed policy after the configured refresh delay.
             // A later explicit show operation must not be undone by this earlier refresh.
             net.citizensnpcs.api.CitizensAPI.getScheduler().runTaskLater(() -> {
-                if (!entity.isRemoved()) {
-                    sendToTracking(level, entity, packet(entity, EnumSet.of(Action.UPDATE_LISTED)));
+                if (isCurrent(entity)) {
+                    sendToTracking(entity, packet(entity, EnumSet.of(Action.UPDATE_LISTED)));
                 }
             }, Setting.TABLIST_REMOVE_PACKET_DELAY.asTicks());
         }
     }
 
-    private static void sendToTracking(ServerLevel level, EntityHumanNPC entity,
+    private static boolean isCurrent(EntityHumanNPC entity) {
+        return entity != null && !entity.isRemoved() && entity.getNPC() != null
+                && entity.getNPC().getEntity() == entity;
+    }
+
+    private static void sendToTracking(EntityHumanNPC entity,
             net.minecraft.network.protocol.Packet<?> packet) {
-        level.getChunkSource().broadcast(entity, packet);
-        // broadcast reaches viewers but not the NPC's own (nonexistent) client, which is what we want
+        for (ServerPlayer viewer : NPCVisibility.viewers(entity)) {
+            viewer.connection.send(packet);
+        }
     }
 
     /**
@@ -110,13 +102,13 @@ public final class SkinPacketTracker {
      * the entry outright.
      */
     public static void setListed(EntityHumanNPC entity, boolean listed) {
-        if (entity == null || entity.isRemoved() || !(entity.level() instanceof ServerLevel level))
+        if (!isCurrent(entity))
             return;
         NPC npc = entity.getNPC();
         if (npc != null) {
             npc.data().setPersistent(NPC.Metadata.REMOVE_FROM_TABLIST, !listed);
         }
-        sendToTracking(level, entity, packet(entity, EnumSet.of(Action.UPDATE_LISTED)));
+        sendToTracking(entity, packet(entity, EnumSet.of(Action.UPDATE_LISTED)));
     }
 
     /**
@@ -138,23 +130,22 @@ public final class SkinPacketTracker {
                     "actions=" + actions);
         }
         GameProfile mirrored = mirroredProfile(entity, viewer);
-        if (mirrored == null) {
-            viewer.connection.send(packet(entity, actions));
-            return;
-        }
-        entity.setProfileOverride(mirrored);
-        try {
-            viewer.connection.send(packet(entity, actions));
-        } finally {
-            entity.setProfileOverride(null);
-        }
+        viewer.connection.send(packet(entity, actions, mirrored == null ? entity.getGameProfile() : mirrored));
     }
 
     private static ClientboundPlayerInfoUpdatePacket packet(EntityHumanNPC entity, EnumSet<Action> actions) {
+        return packet(entity, actions, entity.getGameProfile());
+    }
+
+    private static ClientboundPlayerInfoUpdatePacket packet(EntityHumanNPC entity, EnumSet<Action> actions,
+            GameProfile profile) {
         ClientboundPlayerInfoUpdatePacket result = new ClientboundPlayerInfoUpdatePacket(actions, List.of(entity));
         var entry = result.entries().getFirst();
+        // Network encoding can happen after the next skin mutation. The packet owns a detached profile snapshot.
+        GameProfile snapshot = new GameProfile(entity.getUUID(), profile.getName());
+        snapshot.getProperties().putAll(profile.getProperties());
         boolean listed = entity.getNPC() != null && !entity.getNPC().shouldRemoveFromTabList();
-        result.entries = List.of(new ClientboundPlayerInfoUpdatePacket.Entry(entry.profileId(), entry.profile(), listed,
+        result.entries = List.of(new ClientboundPlayerInfoUpdatePacket.Entry(entry.profileId(), snapshot, listed,
                 entry.latency(), entry.gameMode(), entry.displayName(), entry.chatSession()));
         return result;
     }

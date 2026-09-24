@@ -103,6 +103,7 @@ public final class ScoreboardRuntimeAudit {
                 case 1 -> {
                     for (boolean packet : List.of(false, true)) for (EntityType<?> type : List.of(EntityType.COW, EntityType.PLAYER)) {
                         NPC npc = registry.createNPC(type, (packet ? "Packet" : "World") + (type == EntityType.PLAYER ? "Player" : "Cow"));
+                        if (type == EntityType.PLAYER) npc.getOrAddTrait(net.citizensnpcs.trait.SkinTrait.class).setFetchDefaultSkin(false);
                         npcs.add(npc); npc.data().set(NPC.Metadata.TRACKING_RANGE, 64);
                         npc.data().set(NPC.Metadata.NAMEPLATE_VISIBLE, false);
                         npc.data().set(NPC.Metadata.COLLIDABLE, false);
@@ -114,7 +115,8 @@ public final class ScoreboardRuntimeAudit {
                 }
                 case 2 -> {
                     for (NPC npc : npcs) {
-                        check(alice.spawns(npc) == 1 && bob.spawns(npc) == 0 && far.spawns(npc) == 0, "native_viewer_eligibility_" + npc.getName());
+                        check(alice.spawns(npc) == 1 && bob.spawns(npc) == 0 && far.spawns(npc) == 0,
+                                "native_viewer_eligibility_" + npc.getName() + " spawns=" + alice.spawns(npc) + "/" + bob.spawns(npc) + "/" + far.spawns(npc));
                         for (Actor actor : actors) {
                             state(actor, npc, ChatFormatting.RED, Team.Visibility.NEVER, Team.CollisionRule.NEVER);
                             check(actor.teamPackets(npc) == 1, "single_initial_add_" + actor.name() + npc.getName());
@@ -400,7 +402,7 @@ public final class ScoreboardRuntimeAudit {
                 if (packet instanceof ClientboundSetPlayerTeamPacket update && update.getName().equals(teamName(npc))
                         && update.getTeamAction() == ClientboundSetPlayerTeamPacket.Action.ADD) team = true;
                 if (packet instanceof ClientboundPlayerInfoUpdatePacket info && info.actions().contains(ClientboundPlayerInfoUpdatePacket.Action.ADD_PLAYER)
-                        && info.entries().stream().anyMatch(e -> e.profileId().equals(npc.getUniqueId())) && !team) return false;
+                        && info.entries().stream().anyMatch(e -> e.profileId().equals(npc.getMinecraftUniqueId())) && !team) return false;
                 if (packet instanceof ClientboundAddEntityPacket add && add.getId() == npc.getEntity().getId()) return team;
             }
             return false;

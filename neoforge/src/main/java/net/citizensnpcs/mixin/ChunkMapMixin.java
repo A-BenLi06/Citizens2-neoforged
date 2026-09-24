@@ -40,6 +40,12 @@ public class ChunkMapMixin implements NPCVisibility.WorldTrackers {
             bridge.citizens$updateViewers(((ServerLevel) entity.level()).players());
     }
 
+    @Override public void citizens$refreshPairing(Entity entity) {
+        Object tracked = entityMap.get(entity.getId());
+        if (tracked instanceof NPCVisibility.TrackedEntity bridge)
+            bridge.citizens$refreshPairing();
+    }
+
     /** Refresh every tracked NPC before the native movement/ticking decision and its subsequent broadcasts. */
     @WrapOperation(method = "tick()V", at = @At(value = "INVOKE",
             target = "Lnet/minecraft/core/SectionPos;of(Lnet/minecraft/world/level/entity/EntityAccess;)Lnet/minecraft/core/SectionPos;"))

@@ -82,8 +82,32 @@ public final class NPCVisibility {
             ((WorldTrackers) level.getChunkSource().chunkMap).citizens$refreshVisibility(entity);
     }
 
+    /** Recreate existing viewers' client entities through their owning tracker, preserving the server entity. */
+    public static void refreshPairing(Entity entity) {
+        NPC npc = NPCRegistries.lookup(entity);
+        if (npc == null || npc.getEntity() != entity || entity.isRemoved()) return;
+        if (PacketNPC.isPacketEntity(entity)) {
+            npc.getTraitNullable(PacketNPC.class).refreshPairing();
+        } else if (entity.level() instanceof ServerLevel level) {
+            ((WorldTrackers) level.getChunkSource().chunkMap).citizens$refreshPairing(entity);
+        }
+    }
+
+    /** Snapshot of current viewers for profile/list updates outside the entity's normal broadcast path. */
+    public static List<ServerPlayer> viewers(Entity entity) {
+        NPC npc = NPCRegistries.lookup(entity);
+        if (npc == null || npc.getEntity() != entity || entity.isRemoved()) return List.of();
+        if (PacketNPC.isPacketEntity(entity)) {
+            return npc.getTraitNullable(PacketNPC.class).getPacketTracker().getLinked().stream()
+                    .filter(viewer -> isTracked(entity, viewer)).toList();
+        }
+        return ((ServerLevel) entity.level()).getChunkSource().chunkMap.getPlayersWatching(entity).stream()
+                .filter(viewer -> isTracked(entity, viewer)).toList();
+    }
+
     public interface WorldTrackers {
         void citizens$refreshVisibility(Entity entity);
+        void citizens$refreshPairing(Entity entity);
     }
 
     /** Trait events concern the tracked target, not the player who receives it. */
@@ -95,5 +119,6 @@ public final class NPCVisibility {
 
     public interface TrackedEntity {
         void citizens$updateViewers(List<ServerPlayer> viewers);
+        void citizens$refreshPairing();
     }
 }

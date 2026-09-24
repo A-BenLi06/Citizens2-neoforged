@@ -27,7 +27,6 @@ import net.citizensnpcs.api.event.NPCLeftClickEvent;
 import net.citizensnpcs.api.event.NPCRightClickEvent;
 import net.citizensnpcs.api.util.PermissionUtil;
 import net.citizensnpcs.npc.entity.EntityHumanNPC;
-import net.citizensnpcs.npc.skin.SkinPacketTracker;
 import net.citizensnpcs.trait.Controllable;
 import net.citizensnpcs.trait.Controllable.MovementController;
 import net.citizensnpcs.trait.CommandTrait;
@@ -498,20 +497,6 @@ public class EventListen {
         event.setStrength(knockback.getStrength());
         event.setRatioX(knockback.getRatioX());
         event.setRatioZ(knockback.getRatioZ());
-    }
-
-    /**
-     * Drops the NPC's tab-list entry when a viewer stops tracking it.
-     * <p>
-     * Unlike the matching add, this one can be an event: {@code removePairing} sends the entity-removal packet before
-     * NeoForge fires this, so the client is already done with the entity. The add has to beat the spawn packet instead,
-     * which is {@code ServerEntityMixin}'s job.
-     */
-    @SubscribeEvent
-    public void onStopTracking(PlayerEvent.StopTracking event) {
-        if (event.getEntity() instanceof ServerPlayer viewer && event.getTarget() instanceof EntityHumanNPC human) {
-            SkinPacketTracker.removeFrom(human, viewer);
-        }
     }
 
     @SubscribeEvent

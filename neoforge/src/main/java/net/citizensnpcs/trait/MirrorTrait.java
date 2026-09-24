@@ -110,23 +110,27 @@ public class MirrorTrait extends Trait {
 
     /** Sends this viewer the equipment they should see on the NPC, if it differs from what they were last sent. */
     private void sendEquipment(ServerPlayer viewer) {
+        if (!npc.isSpawned() || !NPCVisibility.isTracked(npc.getEntity(), viewer)) return;
+        ClientboundSetEquipmentPacket packet = createEquipmentPacket(viewer);
+        if (packet == null) return;
+        List<ItemStack> snapshot = packet.getSlots().stream().map(slot -> slot.getSecond().copy()).toList();
+        List<ItemStack> last = sent.get(viewer.getUUID());
+        if (last != null && sameStacks(last, snapshot)) return;
+        sent.put(viewer.getUUID(), snapshot);
+        viewer.connection.send(packet);
+    }
+
+    /** Fresh per-viewer equipment for native pairing and later updates; shared entity/items remain unchanged. */
+    public ClientboundSetEquipmentPacket createEquipmentPacket(ServerPlayer viewer) {
         BiFunction<ServerPlayer, EquipmentSlot, ItemStack> function = getEquipmentFunction();
-        if (function == null || !npc.isSpawned() || !isMirroring(viewer)
-                || !NPCVisibility.isTracked(npc.getEntity(), viewer))
-            return;
+        if (function == null || !npc.isSpawned() || !isMirroring(viewer)) return null;
         List<Pair<EquipmentSlot, ItemStack>> slots = new ArrayList<>(SLOTS.length);
-        List<ItemStack> snapshot = new ArrayList<>(SLOTS.length);
         for (EquipmentSlot slot : SLOTS) {
             ItemStack stack = function.apply(viewer, slot);
             stack = stack == null ? ItemStack.EMPTY : stack.copy();
             slots.add(Pair.of(slot, stack));
-            snapshot.add(stack);
         }
-        List<ItemStack> last = sent.get(viewer.getUUID());
-        if (last != null && sameStacks(last, snapshot))
-            return;
-        sent.put(viewer.getUUID(), snapshot);
-        viewer.connection.send(new ClientboundSetEquipmentPacket(npc.getEntity().getId(), slots));
+        return new ClientboundSetEquipmentPacket(npc.getEntity().getId(), slots);
     }
 
     private static boolean sameStacks(List<ItemStack> a, List<ItemStack> b) {

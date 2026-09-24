@@ -126,7 +126,8 @@ public class EntityPacketTracker {
     private void broadcast(Packet<?> packet) {
         for (ServerPlayer player : linked) {
             Packet<?> projected = PacketMounts.rewrite(entity, player, packet);
-            if (projected != null) player.connection.send(HologramMetadata.rewrite(entity, player, projected));
+            if (projected != null) player.connection.send(EquipmentPackets.rewrite(entity, player,
+                    HologramMetadata.rewrite(entity, player, projected)));
         }
     }
 }

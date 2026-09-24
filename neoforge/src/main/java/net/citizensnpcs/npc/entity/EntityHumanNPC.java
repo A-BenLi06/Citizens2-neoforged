@@ -55,10 +55,8 @@ public class EntityHumanNPC extends ServerPlayer {
     /**
      * The profile the client is told to draw this NPC with.
      * <p>
-     * Normally the NPC's own, but {@link MirrorTrait} needs each viewer to be sent a different one, and a tab-list entry
-     * captures whatever this returns at the moment the packet is built. An override is therefore set for the length of
-     * one packet — and because a fresh profile object is handed out each time, the packet keeps its own copy and is safe
-     * to serialise later on the network thread.
+     * Normally the NPC's own, with an optional override for integrations. Outgoing skin packets take a detached
+     * snapshot and apply per-viewer mirroring there, without temporarily changing the server entity's profile.
      */
     @Override
     public GameProfile getGameProfile() {

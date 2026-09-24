@@ -56,6 +56,19 @@ public class PacketNPC extends Trait {
         return packetTracker;
     }
 
+    /** Refresh current viewers without replacing the virtual entity or its server-side mount relations. */
+    public void refreshPairing() {
+        Entity entity = npc.getEntity();
+        EntityPacketTracker current = packetTracker;
+        if (entity == null || activeTrait(entity.getId()) != this) return;
+        for (ServerPlayer viewer : current.getLinked()) {
+            if (activeTrait(entity.getId()) != this || packetTracker != current) return;
+            if (!current.isLinked(viewer)) continue;
+            current.unlink(viewer);
+            if (activeTrait(entity.getId()) == this && packetTracker == current) current.link(viewer);
+        }
+    }
+
     /** Resolve only a live virtual entity already paired to this current, eligible player. */
     public static Entity getInteractionTarget(int entityId, ServerPlayer player) {
         PacketNPC trait = activeTrait(entityId);

@@ -27,8 +27,8 @@ import net.minecraft.server.level.ServerPlayer;
  * when neither is set and {@link #fetchDefaultSkin()} is on — the NPC's own name, which is what makes
  * {@code /npc create Notch player} show Notch.
  * <p>
- * Applying a skin means rewriting the entity's {@link GameProfile} and then re-sending its tab-list entry, since a
- * vanilla client only reads the texture once when that entry arrives. {@link SkinPacketTracker} does the re-send.
+ * Applying a skin rewrites the entity's {@link GameProfile}, then refreshes both the profile and client entity through
+ * {@link SkinPacketTracker} so the native client's cached PlayerInfo and skin lookup are replaced.
  * <p>
  * Upstream also carries {@code body}/{@code cape}/{@code elytra} texture patches and a model type for Mannequin NPCs.
  * Mannequins do not exist in 1.21.1, so those fields are left out rather than persisted and ignored.
