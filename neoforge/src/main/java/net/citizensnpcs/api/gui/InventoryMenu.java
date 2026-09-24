@@ -47,9 +47,8 @@ import net.minecraft.world.item.ItemStack;
  * therefore the same as {@code create}, and is kept only so call sites port unchanged.</li>
  * <li>Bukkit lets a plugin swap the inventory a player is looking at. Minecraft ties a container to the screen the client
  * opened, so a transition closes and reopens; the shared {@link Container} carries the items across.</li>
- * <li>Shift-click is simplified: upstream walks the destination inventory firing a handler per candidate slot, which lets
- * a half-merge fire two events. Here the menu side gets one event for the slot it owns, and vanilla's own
- * {@code moveItemStackTo} does the merging. Nothing in Citizens branches on the per-slot half-merge case.</li>
+ * <li>Shift-click callbacks describe each actual menu-side pickup or placement while the native container owns slot
+ * order, stack limits and lifecycle checks.</li>
  * </ul>
  */
 public class InventoryMenu implements Runnable {
@@ -160,65 +159,6 @@ public class InventoryMenu implements Runnable {
             event.setCancelled(true);
             close();
         }
-    }
-
-    /**
-     * A shift-click, which moves an item between the player's inventory and the menu.
-     *
-     * @return whether the move was performed; false means the caller should resync the client
-     */
-    boolean handleShiftClick(CitizensMenuContainer container, int slotId, boolean fromMenu) {
-        if (page == null || transitioning || closing)
-            return false;
-        int menuSize = container.getMenuSize();
-        if (fromMenu) {
-            ItemStack moving = container.getSlot(slotId).getItem();
-            if (moving.isEmpty())
-                return false;
-            CitizensInventoryClickEvent event = new CitizensInventoryClickEvent(slotId, MenuClickType.SHIFT_LEFT,
-                    InventoryAction.MOVE_TO_OTHER_INVENTORY, moving.copy(), ItemStack.EMPTY, -1, getViewers(), -1);
-            handleClick(event);
-            if (event.isCancelled())
-                return false;
-            ItemStack copy = moving.copy();
-            if (!container.moveIntoPlayerInventory(copy))
-                return false;
-            container.getSlot(slotId).set(copy.isEmpty() ? ItemStack.EMPTY : copy);
-            container.broadcastChanges();
-            return true;
-        }
-        ItemStack moving = container.getSlot(slotId).getItem();
-        if (moving.isEmpty())
-            return false;
-        // find the menu slot that would receive it, and let that slot decide
-        Container backing = container.getMenuContainer();
-        for (int i = 0; i < menuSize; i++) {
-            ItemStack existing = backing.getItem(i);
-            boolean stackable = !existing.isEmpty() && ItemStack.isSameItemSameComponents(existing, moving)
-                    && existing.getCount() < existing.getMaxStackSize();
-            if (!existing.isEmpty() && !stackable) {
-                continue;
-            }
-            CitizensInventoryClickEvent event = new CitizensInventoryClickEvent(i, MenuClickType.SHIFT_LEFT,
-                    InventoryAction.PLACE_ALL, existing.copy(), moving.copy(), -1, getViewers(), -1);
-            handleClick(event);
-            if (event.isCancelled())
-                return false;
-            if (existing.isEmpty()) {
-                backing.setItem(i, moving.copy());
-                container.getSlot(slotId).set(ItemStack.EMPTY);
-            } else {
-                int room = existing.getMaxStackSize() - existing.getCount();
-                int moved = Math.min(room, moving.getCount());
-                existing.grow(moved);
-                backing.setItem(i, existing);
-                moving.shrink(moved);
-                container.getSlot(slotId).set(moving.isEmpty() ? ItemStack.EMPTY : moving);
-            }
-            container.broadcastChanges();
-            return true;
-        }
-        return false;
     }
 
     /** Called by {@link CitizensMenuContainer} when a viewer's screen closes. */

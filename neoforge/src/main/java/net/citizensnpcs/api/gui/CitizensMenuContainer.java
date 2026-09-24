@@ -26,7 +26,7 @@ import net.minecraft.world.item.ItemStack;
  * same backing container, which is how a change made by one viewer shows up for the others.
  */
 public class CitizensMenuContainer extends AbstractContainerMenu {
-    private boolean collecting;
+    private boolean transferring;
     private final int columns;
     private final Container container;
     private final InventoryMenu menu;
@@ -60,21 +60,21 @@ public class CitizensMenuContainer extends AbstractContainerMenu {
     @Override
     public void clicked(int slotId, int button, ClickType clickType, Player player) {
         if (menu != null && !menu.isCurrent(this, player)) return;
-        if (menu == null || clickType != ClickType.PICKUP_ALL) {
+        if (menu == null || clickType != ClickType.PICKUP_ALL && clickType != ClickType.QUICK_MOVE) {
             handleClick(slotId, button, clickType, player);
             return;
         }
-        if (collecting) return;
-        collecting = true;
+        if (transferring) return;
+        transferring = true;
         try {
             handleClick(slotId, button, clickType, player);
         } finally {
-            collecting = false;
+            transferring = false;
         }
     }
 
     private void handleClick(int slotId, int button, ClickType clickType, Player player) {
-        if (menu != null && clickType == ClickType.PICKUP_ALL && quickcraftStatus != 0) {
+        if (menu != null && (clickType == ClickType.PICKUP_ALL || clickType == ClickType.QUICK_MOVE) && quickcraftStatus != 0) {
             // Native non-drag clicks cancel an unfinished drag without performing another action.
             resetQuickCraft();
             broadcastFullState();
@@ -86,10 +86,8 @@ public class CitizensMenuContainer extends AbstractContainerMenu {
         }
         boolean inMenu = slotId < menuSize;
         if (clickType == ClickType.QUICK_MOVE) {
-            // shift-click moves between the two inventories, so the menu gets a say about the slot on its own side
-            if (!menu.handleShiftClick(this, slotId, inMenu)) {
-                broadcastFullState();
-            }
+            shiftClick(slotId, button, player);
+            if (menu.isCurrent(this, player)) broadcastFullState();
             return;
         }
         if (!inMenu) {
@@ -154,6 +152,61 @@ public class CitizensMenuContainer extends AbstractContainerMenu {
         }
     }
 
+    private void shiftClick(int slotId, int button, Player player) {
+        if (button != 0 && button != 1) return;
+        Slot source = slots.get(slotId);
+        ItemStack moving = source.getItem();
+        if (moving.isEmpty() || !source.mayPickup(player)) return;
+        boolean fromMenu = slotId < menuSize;
+        int first = fromMenu ? slots.size() - 1 : 0;
+        int end = fromMenu ? menuSize - 1 : menuSize;
+        int direction = fromMenu ? -1 : 1;
+        ItemStack cursor = getCarried();
+        // Native chest transfers merge existing stacks first, then use empty slots. Each menu-side
+        // transfer gets the reference API's actual pickup/placement action and quantity.
+        for (int pass = 0; pass < 2; pass++) {
+            for (int index = first; index != end && !moving.isEmpty(); index += direction) {
+                if (!menu.isCurrent(this, player) || source.getItem() != moving || getCarried() != cursor) return;
+                Slot target = slots.get(index);
+                ItemStack existing = target.getItem();
+                if (pass == 0 ? !moving.isStackable() || existing.isEmpty()
+                        || !ItemStack.isSameItemSameComponents(existing, moving) : !existing.isEmpty()) continue;
+                if (!target.mayPlace(moving)) continue;
+                int amount = Math.min(moving.getCount(), target.getMaxStackSize(moving) - existing.getCount());
+                if (amount <= 0) continue;
+                ItemStack beforeSource = moving.copy(), beforeTarget = existing.copy(), beforeCursor = cursor.copy();
+                boolean all = amount == moving.getCount();
+                InventoryAction action = fromMenu ? (all ? InventoryAction.PICKUP_ALL : InventoryAction.PICKUP_SOME)
+                        : (all ? InventoryAction.PLACE_ALL : InventoryAction.PLACE_SOME);
+                CitizensInventoryClickEvent event = new CitizensInventoryClickEvent(fromMenu ? slotId : index,
+                        MenuClickType.of(ClickType.QUICK_MOVE, button), action,
+                        fromMenu ? moving.copy() : existing.copy(), fromMenu ? cursor.copy() : moving.copyWithCount(amount),
+                        -1, menu.getViewers(), amount, player instanceof ServerPlayer viewer ? viewer : null, this);
+                menu.handleClick(event);
+                // Handlers can change screens, sessions or either inventory. Never apply a stale proposal afterward.
+                if (!menu.isCurrent(this, player) || slots.get(slotId) != source || slots.get(index) != target
+                        || source.getItem() != moving || target.getItem() != existing || getCarried() != cursor
+                        || !ItemStack.matches(beforeSource, moving) || !ItemStack.matches(beforeTarget, existing)
+                        || !ItemStack.matches(beforeCursor, cursor)) return;
+                if (event.isCancelled()) {
+                    if (fromMenu) return;
+                    continue;
+                }
+                if (!source.mayPickup(player) || !target.mayPlace(moving)
+                        || target.getMaxStackSize(moving) - existing.getCount() < amount) return;
+                if (existing.isEmpty()) {
+                    target.setByPlayer(moving.split(amount));
+                } else {
+                    existing.grow(amount);
+                    moving.shrink(amount);
+                    target.setChanged();
+                }
+                if (moving.isEmpty()) source.setByPlayer(ItemStack.EMPTY);
+                else source.setChanged();
+            }
+        }
+    }
+
     public Container getMenuContainer() {
         return container;
     }
@@ -163,8 +216,8 @@ public class CitizensMenuContainer extends AbstractContainerMenu {
     }
 
     /**
-     * Vanilla's shift-click helper, exposed so {@link InventoryMenu} can perform the move once it has decided to allow
-     * it.
+     * Vanilla's direct transfer helper. Callers are responsible for authorizing their own programmatic move;
+     * player shift-clicks use per-slot callbacks in {@link #clicked}.
      */
     public boolean moveIntoPlayerInventory(ItemStack stack) {
         return moveItemStackTo(stack, menuSize, slots.size(), true);
