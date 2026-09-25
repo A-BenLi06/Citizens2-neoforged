@@ -2789,48 +2789,86 @@ public class NPCCommands {
 
     @Command(
             aliases = { "npc" },
-            usage = "pose (--save name|--assume name|--remove name) (--default name)",
+            usage = "pose (page) (--save name|--mirror name|--assume name|--remove name|--default name) (--yaw yaw) (--pitch pitch) (-a -d)",
             desc = "",
+            flags = "ad",
+            valueFlags = { "location", "entitylocation" },
+            strictArguments = true,
             modifiers = { "pose" },
             min = 1,
             max = 2,
             permission = "citizens.npc.pose")
     public void pose(CommandContext args, CommandSourceStack sender, NPC npc, @Flag("save") String save,
-            @Flag("assume") String assume, @Flag("remove") String remove, @Flag("default") String defaultPose)
+            @Flag("mirror") String mirror, @Flag("assume") String assume, @Flag("remove") String remove,
+            @Flag("default") String defaultPose, @Flag("yaw") Float yaw, @Flag("pitch") Float pitch)
             throws CommandException {
-        Poses trait = npc.getOrAddTrait(Poses.class);
+        int operations = 0;
+        for (String name : new String[] { save, mirror, assume, remove, defaultPose }) {
+            if (name == null) continue;
+            if (!Poses.isValidName(name)) throw new CommandException(Messages.INVALID_POSE_NAME);
+            operations++;
+        }
+        if (operations > 1 || args.hasFlag('d') && save == null && mirror == null
+                || (yaw != null || pitch != null) && save == null
+                || args.argsLength() > 1 && (operations > 0 || args.hasFlag('a')))
+            throw new CommandUsageException();
+
+        // Resolve every required direction before mutating the pose collection, including a trailing -a.
+        Location source;
+        try { source = mirror != null || args.hasFlag('a') ? args.getSenderLocation() : null; }
+        catch (IllegalArgumentException invalid) { throw new CommandException(CommandMessages.INVALID_LOCATION); }
+        if ((mirror != null || args.hasFlag('a')) && source == null)
+            throw new CommandException(CommandMessages.MUST_BE_INGAME);
+        Location at = save != null ? npc.getStoredLocation() : source;
         if (save != null) {
-            Location at = args.getSenderLocation();
-            if (at == null)
-                throw new CommandException(CommandMessages.MUST_BE_INGAME);
-            if (!trait.addPose(save, at))
-                throw new CommandException(Messages.POSE_ALREADY_EXISTS, save);
-            Messaging.sendTr(sender, Messages.POSE_ADDED);
+            if (at == null) throw new CommandException(CommandMessages.INVALID_LOCATION);
+            at = at.clone();
+            if (yaw != null) at.setYaw(yaw);
+            if (pitch != null) at.setPitch(pitch);
+        }
+        for (Location direction : new Location[] { at, source }) {
+            if (direction != null && (!Float.isFinite(direction.getYaw()) || !Float.isFinite(direction.getPitch())))
+                throw new CommandException(CommandMessages.INVALID_LOCATION);
+        }
+
+        Poses trait = npc.getTraitNullable(Poses.class);
+        String added = save != null ? save : mirror;
+        if (added != null && trait != null && trait.hasPose(added))
+            throw new CommandException(Messages.POSE_ALREADY_EXISTS, added);
+        String required = defaultPose != null ? defaultPose : assume;
+        if (required != null && (trait == null || !trait.hasPose(required)))
+            throw new CommandException(Messages.POSE_MISSING, required);
+        if (remove != null && trait == null) throw new CommandException(Messages.POSE_MISSING, remove);
+
+        if (operations == 0 && !args.hasFlag('a')) {
+            int page;
+            try { page = args.getInteger(1, 1); }
+            catch (NumberFormatException invalid) { throw new CommandException(CommandMessages.INVALID_VALUE, "page", args.getString(1)); }
+            Paginator paginator = new Paginator().header("Poses").console(sender.getPlayer() == null);
+            int index = 0;
+            if (trait != null) {
+                for (var pose : trait.getPoses().values())
+                    paginator.addLine("<e>" + index++ + "  " + pose.getName() + "  " + pose.getPitch() + " / " + pose.getYaw());
+            }
+            if (!paginator.sendPage(sender, page)) throw new CommandException(CommandMessages.COMMAND_PAGE_MISSING, page);
             return;
         }
-        if (remove != null) {
+
+        trait = npc.getOrAddTrait(Poses.class);
+        if (added != null) {
+            trait.addPose(added, at, args.hasFlag('d'));
+            Messaging.sendTr(sender, Messages.POSE_ADDED);
+        } else if (remove != null) {
             if (!trait.removePose(remove))
                 throw new CommandException(Messages.POSE_MISSING, remove);
             Messaging.sendTr(sender, Messages.POSE_REMOVED);
-            return;
-        }
-        if (assume != null) {
-            if (!trait.hasPose(assume))
-                throw new CommandException(Messages.POSE_MISSING, assume);
+        } else if (assume != null) {
             trait.assumePose(assume);
-            return;
-        }
-        if (defaultPose != null) {
-            if (!trait.hasPose(defaultPose))
-                throw new CommandException(Messages.POSE_MISSING, defaultPose);
+        } else if (defaultPose != null) {
             trait.setDefaultPose(defaultPose);
             Messaging.sendTr(sender, Messages.DEFAULT_POSE_SET, defaultPose);
-            return;
         }
-        Paginator paginator = new Paginator().header("Poses").console(sender.getPlayer() == null);
-        trait.getPoses().values().forEach(pose -> paginator.addLine("<e>- " + pose.getName()));
-        if (!paginator.sendPage(sender, args.getInteger(1, 1)))
-            throw new CommandException(CommandMessages.COMMAND_PAGE_MISSING, args.getInteger(1, 1));
+        if (args.hasFlag('a')) trait.assumePose(source);
     }
 
     @Command(

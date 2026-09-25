@@ -1,7 +1,9 @@
 package net.citizensnpcs.trait;
 
-import java.util.HashMap;
+import java.util.ArrayList;
 import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
 import net.citizensnpcs.api.event.SpawnReason;
@@ -26,6 +28,7 @@ public class Poses extends Trait {
     @Persist
     private String defaultPose;
     private final Map<String, Pose> poses = new LinkedHashMap<>();
+    private final List<String> invalidPoses = new ArrayList<>();
 
     public Poses() {
         super("poses");
@@ -36,10 +39,14 @@ public class Poses extends Trait {
     }
 
     public boolean addPose(String name, Location location, boolean isDefault) {
-        String key = name.toLowerCase();
+        if (!isValidName(name)) throw new IllegalArgumentException("Pose names must be nonblank and cannot contain semicolons");
+        if (location == null) throw new IllegalArgumentException("Pose direction is required");
+        validateAngles(location.getYaw(), location.getPitch());
+        String key = name.toLowerCase(Locale.ROOT);
         if (poses.containsKey(key))
             return false;
         poses.put(key, new Pose(key, location.getPitch(), location.getYaw()));
+        invalidPoses.removeIf(raw -> invalidName(raw).equals(key));
         if (isDefault) {
             defaultPose = key;
         }
@@ -55,15 +62,18 @@ public class Poses extends Trait {
     public void assumePose(String name) {
         if (name == null)
             return;
-        Pose pose = poses.get(name.toLowerCase());
+        Pose pose = poses.get(name.toLowerCase(Locale.ROOT));
         if (pose != null) {
             assumePose(pose.getYaw(), pose.getPitch());
         }
     }
 
     private void assumePose(float yaw, float pitch) {
+        validateAngles(yaw, pitch);
         if (!npc.isSpawned()) {
-            npc.spawn(npc.getStoredLocation(), SpawnReason.COMMAND);
+            Location at = npc.getStoredLocation();
+            if (at == null) return;
+            npc.spawn(at, SpawnReason.COMMAND);
         }
         if (!npc.isSpawned())
             return;
@@ -75,11 +85,11 @@ public class Poses extends Trait {
     }
 
     public Pose getPose(String name) {
-        return name == null ? null : poses.get(name.toLowerCase());
+        return name == null ? null : poses.get(name.toLowerCase(Locale.ROOT));
     }
 
     public Map<String, Pose> getPoses() {
-        return new HashMap<>(poses);
+        return new LinkedHashMap<>(poses);
     }
 
     public boolean hasPose(String name) {
@@ -89,23 +99,28 @@ public class Poses extends Trait {
     @Override
     public void load(DataKey key) throws NPCLoadException {
         poses.clear();
+        invalidPoses.clear();
         for (DataKey sub : key.getRelative("list").getIntegerSubKeys()) {
-            String[] parts = sub.getString("").split(";");
-            if (parts.length < 3) {
-                Messaging.warn("Skipping invalid pose", sub.name(), "on NPC", npc, "- expected name;pitch;yaw");
-                continue;
-            }
+            String raw = sub.getString("");
             try {
-                poses.put(parts[0].toLowerCase(),
-                        new Pose(parts[0], Float.parseFloat(parts[1]), Float.parseFloat(parts[2])));
-            } catch (NumberFormatException e) {
-                Messaging.warn("Skipping invalid pose", sub.name(), "on NPC", npc, "-", e.getMessage());
+                String[] parts = raw.split(";", -1);
+                if (parts.length != 3 || !isValidName(parts[0]))
+                    throw new IllegalArgumentException("Expected name;pitch;yaw");
+                float pitch = Float.parseFloat(parts[1]), yaw = Float.parseFloat(parts[2]);
+                validateAngles(yaw, pitch);
+                poses.put(parts[0].toLowerCase(Locale.ROOT), new Pose(parts[0], pitch, yaw));
+            } catch (IllegalArgumentException e) {
+                invalidPoses.add(raw);
+                Messaging.warn("Retaining inactive invalid pose", sub.name(), "on NPC", npc, "-", e.getMessage());
             }
         }
     }
 
     public boolean removePose(String name) {
-        return name != null && poses.remove(name.toLowerCase()) != null;
+        if (name == null) return false;
+        String key = name.toLowerCase(Locale.ROOT);
+        boolean removed = poses.remove(key) != null;
+        return invalidPoses.removeIf(raw -> invalidName(raw).equals(key)) || removed;
     }
 
     /**
@@ -129,9 +144,22 @@ public class Poses extends Trait {
         for (Pose pose : poses.values()) {
             key.setString("list." + i++, pose.stringValue());
         }
+        for (String raw : invalidPoses) key.setString("list." + i++, raw);
     }
 
     public void setDefaultPose(String name) {
-        defaultPose = name == null ? null : name.toLowerCase();
+        defaultPose = name == null ? null : name.toLowerCase(Locale.ROOT);
+    }
+
+    public static boolean isValidName(String name) {
+        return name != null && !name.isBlank() && name.indexOf(';') < 0;
+    }
+
+    private static String invalidName(String raw) {
+        return raw.split(";", -1)[0].toLowerCase(Locale.ROOT);
+    }
+
+    private static void validateAngles(float yaw, float pitch) {
+        if (!Float.isFinite(yaw) || !Float.isFinite(pitch)) throw new IllegalArgumentException("Pose angles must be finite");
     }
 }
