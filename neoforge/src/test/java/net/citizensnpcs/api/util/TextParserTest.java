@@ -26,20 +26,24 @@ import net.minecraft.network.chat.Style;
  * guarded against.
  */
 public class TextParserTest {
+    @Test
+    public void quotedHoverPreservesNestedTagsAndClosingBrackets() {
+        Component parsed = TextParser.parse("<hover:show_text:'<red>hello > world</red>'>label</hover>");
+        assertEquals("label", parsed.getString());
+        HoverEvent event = stylesOf("<hover:show_text:'<red>hello > world</red>'>label</hover>").get(0).getHoverEvent();
+        assertNotNull(event);
+        Component tooltip = event.getValue(HoverEvent.Action.SHOW_TEXT);
+        assertEquals("hello > world", tooltip.getString());
+    }
+
     /** Flattens a parsed component into (text, style) pairs, one per literal sibling. */
     private static List<Style> stylesOf(String raw) {
         List<Style> styles = new ArrayList<>();
-        collect(TextParser.parse(raw), styles);
+        TextParser.parse(raw).visit((style, text) -> {
+            if (!text.isEmpty()) styles.add(style);
+            return java.util.Optional.empty();
+        }, Style.EMPTY);
         return styles;
-    }
-
-    private static void collect(Component component, List<Style> out) {
-        if (!component.getString().isEmpty() && component.getContents() != net.minecraft.network.chat.contents.PlainTextContents.EMPTY) {
-            out.add(component.getStyle());
-        }
-        for (Component sibling : component.getSiblings()) {
-            collect(sibling, out);
-        }
     }
 
     @Test
@@ -127,8 +131,9 @@ public class TextParserTest {
     }
 
     @Test
-    public void unsupportedMiniMessageTagsStayLiteral() {
-        assertEquals("<selector:@p>x", TextParser.parse("<selector:@p>x").getString());
+    public void selectorPreservesNativeContents() {
+        assertTrue(TextParser.parse("<selector:@p>").getContents()
+                instanceof net.minecraft.network.chat.contents.SelectorContents);
     }
 
     @Test
@@ -155,13 +160,12 @@ public class TextParserTest {
     }
 
     @Test
-    public void toLegacyDegradesHexToNearestColour() {
+    public void toLegacyPreservesHexAndGradientColours() {
         // an exact match must round-trip: ChatFormatting.RED is 0xff5555
         assertEquals("§" + ChatFormatting.RED.getChar() + "red", TextParser.toLegacy("<#ff5555>red"));
 
-        // pure #ff0000 has no exact legacy equivalent; nearest by RGB distance is dark red (0xaa0000, 85² away)
-        // rather than red (0xff5555, 85²+85² away)
-        assertEquals("§" + ChatFormatting.DARK_RED.getChar() + "red", TextParser.toLegacy("<#ff0000>red"));
+        assertEquals("§x§f§f§0§0§0§0red", TextParser.toLegacy("<#ff0000>red"));
+        assertEquals(0xff0000, stylesOf(TextParser.toLegacy("<#ff0000>red")).getFirst().getColor().getValue());
 
         // whatever the colour resolves to, the text itself must never be lost
         String legacy = TextParser.toLegacy("<gradient:#ff0000:#0000ff>abcd</gradient>");
@@ -179,4 +183,72 @@ public class TextParserTest {
         assertEquals("", TextParser.parse("").getString());
         assertNull(TextParser.strip(null));
     }
+    @Test
+    public void insertionAndDecorationNegationPreserveOuterStyle() {
+        List<Style> styles = stylesOf("<b><insert:'a:b'>yes<!b>no</!b>end</insert></b>");
+        assertTrue(styles.getFirst().isBold());
+        assertEquals("a:b", styles.getFirst().getInsertion());
+        assertFalse(styles.get(1).isBold());
+        assertTrue(styles.getLast().isBold());
+    }
+
+    @Test
+    public void csrKeepsEventsAndFontWhileClearingDecorations() {
+        Style style = stylesOf("<click:run_command:/npc list><font:minecraft:uniform><red><b>first<csr>last").getLast();
+        assertFalse(style.isBold());
+        assertEquals("/npc list", style.getClickEvent().getValue());
+        assertEquals("minecraft:uniform", style.getFont().toString());
+        assertEquals(ChatFormatting.RED.getColor().intValue(), style.getColor().getValue());
+    }
+
+    @Test
+    public void unicodeGradientNeverSplitsSurrogatePairs() {
+        String raw = "<gradient:red:blue>😀x</gradient>";
+        assertEquals("😀x", TextParser.parse(raw).getString());
+        assertEquals(2, stylesOf(raw).size());
+    }
+
+    @Test
+    public void nativeKeybindAndTranslationRemainStructured() {
+        assertTrue(TextParser.parse("<key:key.jump>").getContents()
+                instanceof net.minecraft.network.chat.contents.KeybindContents);
+        var translated = TextParser.parse("<lang:chat.type.text:'<red>Name':'Message'>");
+        assertTrue(translated.getContents() instanceof net.minecraft.network.chat.contents.TranslatableContents);
+        var contents = (net.minecraft.network.chat.contents.TranslatableContents) translated.getContents();
+        assertEquals("chat.type.text", contents.getKey());
+        assertEquals(2, contents.getArgs().length);
+        assertEquals("Name", ((Component) contents.getArgs()[0]).getString());
+    }
+
+    @Test
+    public void legacyProjectionResetsColourAndRestoresDecorations() {
+        assertEquals("§cred§rplain", TextParser.toLegacy("<red>red</red>plain"));
+        assertEquals("§lbold§rplain", TextParser.toLegacy("<b>bold</b>plain"));
+    }
+
+    @Test
+    public void actualTextEditorPromptDoesNotLeakNestedHoverMarkup() throws Exception {
+        try (var stream = TextParserTest.class.getResourceAsStream("/citizens/en.json")) {
+            var json = com.google.gson.JsonParser.parseReader(new java.io.InputStreamReader(stream, java.nio.charset.StandardCharsets.UTF_8));
+            String raw = json.getAsJsonObject().get("citizens.editors.text.start-prompt").getAsString();
+            String text = TextParser.parse(raw).getString();
+            assertTrue(text.contains("Add text"));
+            assertFalse(text.contains("Set the talk item"));
+            assertFalse(text.contains("</hover>"));
+            assertFalse(text.contains("<yellow>"));
+        }
+    }
+
+    @Test
+    public void newerProtocolStyleRemainsEditableInsteadOfBeingDiscarded() {
+        String raw = "<shadow:#112233>Text</shadow>";
+        assertEquals(raw, TextParser.parse(raw).getString());
+    }
+
+    @Test
+    public void rejectedNativeClickActionKeepsOriginalInput() {
+        String raw = "<click:open_file:/example>Text</click>";
+        assertEquals(raw, TextParser.parse(raw).getString());
+    }
+
 }

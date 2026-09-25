@@ -34,9 +34,9 @@ import net.minecraft.world.entity.Entity;
 /**
  * Message formatting and delivery.
  * <p>
- * Upstream routes everything through Adventure/MiniMessage and Bukkit's {@code CommandSender}. Here, Adventure is
- * replaced by {@link TextParser} (which understands the subset of the tag syntax Citizens emits) and the recipient type
- * becomes {@link CommandSourceStack}. The internal pipeline is otherwise unchanged: legacy {@code &}/{@code §} codes are
+ * Upstream routes everything through Adventure/MiniMessage and Bukkit's {@code CommandSender}. Here, MiniMessage parses
+ * formatting and {@link TextParser} converts its tree to native components for {@link CommandSourceStack} recipients.
+ * The internal pipeline is otherwise unchanged: legacy {@code &}/{@code §} codes are
  * normalised to {@code <tag>} form by {@link #convertLegacyCodes}, then {@code [[highlight]]} and {@code {{error}}}
  * markers are expanded by {@link #prettify}, and the result is parsed into a Component at send time.
  */
@@ -206,7 +206,7 @@ public class Messaging {
             if (messageColor) {
                 message = prettify(message);
             }
-            sender.sendSystemMessage(TextParser.parse(convertLegacyCodes(message)));
+            sender.sendSystemMessage(TextParser.parse(convertLegacyCodes(message), sender));
         }
     }
 
@@ -242,7 +242,7 @@ public class Messaging {
             if (messageColor) {
                 message = prettify(message);
             }
-            player.sendSystemMessage(TextParser.parse(convertLegacyCodes(message)));
+            player.sendSystemMessage(TextParser.parse(convertLegacyCodes(message), player.createCommandSourceStack()));
         }
     }
 

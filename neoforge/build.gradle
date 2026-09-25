@@ -71,6 +71,20 @@ neoForge {
 
 // Libraries bundled into the mod jar (not present on the vanilla/NeoForge classpath).
 dependencies {
+    // Embed the parser and its complete runtime closure. No Adventure platform/Bukkit adapter is needed.
+    ['adventure-api', 'adventure-key', 'adventure-text-minimessage'].each { library ->
+        jarJar(implementation("net.kyori:$library")) {
+            version { strictly "[${project.adventure_version},5.0)"; prefer project.adventure_version }
+        }
+        additionalRuntimeClasspath "net.kyori:$library:${project.adventure_version}"
+    }
+    ['examination-api', 'examination-string'].each { library ->
+        jarJar(implementation("net.kyori:$library")) {
+            version { strictly '[1.3,2.0)'; prefer '1.3.0' }
+        }
+        additionalRuntimeClasspath "net.kyori:$library:1.3.0"
+    }
+
     jarJar(implementation("org.yaml:snakeyaml")) {
         version {
             strictly "[2.0,3.0)"
