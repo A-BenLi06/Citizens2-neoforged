@@ -2364,48 +2364,132 @@ public class NPCCommands {
 
     @Command(
             aliases = { "npc" },
-            usage = "lookclose (--range range) (-r(andom) -h(eadonly) -p(erplayer) -d(isable while navigating))",
+            usage = "lookclose --range [range] --filter [filter|none] -r[ealistic looking] --randomlook [true|false] --randomlookdelay [duration] --perplayer [true|false] --headonly [true|false] --linkedbody [true|false] --randomswitchtargets [true|false] --randompitchrange [min,max] --randomyawrange [min,max] --disablewhennavigating [true|false] --targetnpcs [true|false]",
             desc = "",
-            flags = "rhpd",
             modifiers = { "lookclose", "look" },
             min = 1,
             max = 1,
+            flags = "rhpd",
+            strictArguments = true,
             permission = "citizens.npc.lookclose")
-    public void lookclose(CommandContext args, CommandSourceStack sender, NPC npc, @Flag("range") Double range)
-            throws CommandException {
+    public void lookclose(CommandContext args, CommandSourceStack sender, NPC npc,
+            @Flag({ "randomlook", "rlook" }) Boolean randomlook, @Flag("range") Double range,
+            @Flag("filter") String filter, @Flag("randomlookdelay") String randomLookDelay,
+            @Flag("randomyawrange") String randomYaw, @Flag("randompitchrange") String randomPitch,
+            @Flag("randomswitchtargets") Boolean randomSwitchTargets, @Flag("headonly") Boolean headonly,
+            @Flag("linkedbody") Boolean linkedbody, @Flag("disablewhennavigating") Boolean disableWhenNavigating,
+            @Flag("perplayer") Boolean perPlayer, @Flag("targetnpcs") Boolean targetNPCs) throws CommandException {
+        // Validate all values before attaching a trait or changing any of its settings.
+        if (range != null && (!Double.isFinite(range) || range < 0))
+            throw new CommandException(CommandMessages.INVALID_VALUE, "--range", range);
+        float[] pitchRange = parseLookRange(randomPitch), yawRange = parseLookRange(randomYaw);
+        Integer delay = null;
+        if (randomLookDelay != null) {
+            try {
+                long ticks = Math.max(1L, Durations.parse(randomLookDelay).toMillis() / 50);
+                delay = Math.toIntExact(ticks);
+            } catch (RuntimeException invalid) {
+                throw new CommandException(CommandMessages.INVALID_VALUE, "--randomlookdelay", randomLookDelay);
+            }
+        }
+        if (filter != null) {
+            try { net.citizensnpcs.api.util.EntityFilters.parse(filter); }
+            catch (IllegalArgumentException invalid) { throw new CommandException(CommandMessages.INVALID_VALUE, "--filter", filter); }
+        }
+        boolean toggle = true;
         LookClose trait = npc.getOrAddTrait(LookClose.class);
+        if (headonly == null && args.hasFlag('h')) headonly = !trait.isHeadOnly();
+        if (perPlayer == null && args.hasFlag('p')) perPlayer = !trait.isPerPlayer();
+        if (disableWhenNavigating == null && args.hasFlag('d')) disableWhenNavigating = !trait.disableWhileNavigating();
+        if (randomlook != null) {
+            trait.setRandomLook(randomlook);
+            Messaging.sendTr(sender, randomlook ? Messages.LOOKCLOSE_RANDOM_SET : Messages.LOOKCLOSE_RANDOM_STOPPED,
+                    npc.getName());
+            toggle = false;
+        }
+        if (filter != null) {
+            trait.setFilter(filter);
+            Messaging.sendTr(sender, Messages.LOOKCLOSE_FILTER_SET, filter);
+            toggle = false;
+        }
+        if (perPlayer != null) {
+            trait.setPerPlayer(perPlayer);
+            Messaging.sendTr(sender, perPlayer ? Messages.LOOKCLOSE_PERPLAYER_SET : Messages.LOOKCLOSE_PERPLAYER_UNSET,
+                    npc.getName());
+            toggle = false;
+        }
+        if (headonly != null) {
+            trait.setHeadOnly(headonly);
+            Messaging.sendTr(sender, headonly ? Messages.HEADONLY_SET : Messages.HEADONLY_UNSET, npc.getName());
+            toggle = false;
+        }
+        if (linkedbody != null) {
+            trait.setLinkedBody(linkedbody);
+            Messaging.sendTr(sender, linkedbody ? Messages.LINKEDBODY_SET : Messages.LINKEDBODY_UNSET, npc.getName());
+            toggle = false;
+        }
+        if (randomSwitchTargets != null) {
+            trait.setRandomlySwitchTargets(randomSwitchTargets);
+            Messaging.sendTr(sender, randomSwitchTargets ? Messages.LOOKCLOSE_RANDOM_TARGET_SWITCH_ENABLED
+                    : Messages.LOOKCLOSE_RANDOM_TARGET_SWITCH_DISABLED, npc.getName());
+            toggle = false;
+        }
+        if (targetNPCs != null) {
+            trait.setTargetNPCs(targetNPCs);
+            Messaging.sendTr(sender,
+                    targetNPCs ? Messages.LOOKCLOSE_TARGET_NPCS_SET : Messages.LOOKCLOSE_TARGET_NPCS_UNSET,
+                    npc.getName());
+            toggle = false;
+        }
+        if (disableWhenNavigating != null) {
+            trait.setDisableWhileNavigating(disableWhenNavigating);
+            Messaging.sendTr(sender, disableWhenNavigating ? Messages.LOOKCLOSE_DISABLE_WHEN_NAVIGATING
+                    : Messages.LOOKCLOSE_ENABLE_WHEN_NAVIGATING, npc.getName());
+            toggle = false;
+        }
         if (range != null) {
             trait.setRange(range);
-            Messaging.sendTr(sender, Messages.LOOKCLOSE_RANGE_SET, range);
-            return;
+            Messaging.sendTr(sender, Messages.LOOKCLOSE_RANGE_SET, npc.getName(), range);
+            toggle = false;
         }
         if (args.hasFlag('r')) {
-            trait.setRandomLook(!trait.isRandomLook());
-            Messaging.sendTr(sender, Messages.LOOKCLOSE_RANDOM_SET, npc.getName(), trait.isRandomLook());
-            return;
+            trait.setRealisticLooking(!trait.isRealisticLooking());
+            Messaging.sendTr(sender, trait.isRealisticLooking() ? Messages.LOOKCLOSE_REALISTIC_LOOK_SET
+                    : Messages.LOOKCLOSE_REALISTIC_LOOK_UNSET, npc.getName());
+            toggle = false;
         }
-        if (args.hasFlag('h')) {
-            trait.setHeadOnly(!trait.isHeadOnly());
-            Messaging.send(sender, "Head-only looking is now " + trait.isHeadOnly() + ".");
-            return;
+        if (delay != null) {
+            trait.setRandomLookDelay(delay);
+            Messaging.sendTr(sender, Messages.LOOKCLOSE_RANDOM_DELAY_SET, npc.getName(), delay);
+            toggle = false;
         }
-        if (args.hasFlag('p')) {
-            trait.setPerPlayer(!trait.isPerPlayer());
-            Messaging.sendTr(sender,
-                    trait.isPerPlayer() ? Messages.LOOKCLOSE_PERPLAYER_SET : Messages.LOOKCLOSE_PERPLAYER_UNSET,
+        if (pitchRange != null) {
+            trait.setRandomLookPitchRange(pitchRange[0], pitchRange[1]);
+            Messaging.sendTr(sender, Messages.LOOKCLOSE_RANDOM_PITCH_RANGE_SET, npc.getName(), randomPitch);
+            toggle = false;
+        }
+        if (yawRange != null) {
+            trait.setRandomLookYawRange(yawRange[0], yawRange[1]);
+            Messaging.sendTr(sender, Messages.LOOKCLOSE_RANDOM_YAW_RANGE_SET, npc.getName(), randomYaw);
+            toggle = false;
+        }
+        if (toggle) {
+            Messaging.sendTr(sender, trait.toggle() ? Messages.LOOKCLOSE_SET : Messages.LOOKCLOSE_STOPPED,
                     npc.getName());
-            return;
         }
-        if (args.hasFlag('d')) {
-            trait.setDisableWhileNavigating(!trait.disableWhileNavigating());
-            Messaging.sendTr(sender,
-                    trait.disableWhileNavigating() ? Messages.LOOKCLOSE_DISABLE_WHEN_NAVIGATING
-                            : Messages.LOOKCLOSE_ENABLE_WHEN_NAVIGATING,
-                    npc.getName());
-            return;
+    }
+
+    private static float[] parseLookRange(String raw) throws CommandException {
+        if (raw == null) return null;
+        try {
+            String[] parts = raw.split(",", -1);
+            if (parts.length != 2) throw new IllegalArgumentException();
+            float min = Float.parseFloat(parts[0]), max = Float.parseFloat(parts[1]);
+            if (!Float.isFinite(min) || !Float.isFinite(max) || min > max) throw new IllegalArgumentException();
+            return new float[] { min, max };
+        } catch (IllegalArgumentException invalid) {
+            throw new CommandException(Messages.ERROR_SETTING_LOOKCLOSE_RANGE, raw);
         }
-        boolean enabled = trait.toggle();
-        Messaging.sendTr(sender, enabled ? Messages.LOOKCLOSE_SET : Messages.LOOKCLOSE_STOPPED, npc.getName());
     }
 
     @Command(

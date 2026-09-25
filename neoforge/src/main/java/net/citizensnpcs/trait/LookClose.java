@@ -13,6 +13,10 @@ import net.citizensnpcs.Settings.Setting;
 import net.citizensnpcs.api.CitizensAPI;
 import net.citizensnpcs.api.event.NPCLookCloseChangeTargetEvent;
 import net.citizensnpcs.api.persistence.Persist;
+import net.citizensnpcs.api.exception.NPCLoadException;
+import net.citizensnpcs.api.util.DataKey;
+import net.citizensnpcs.api.util.EntityFilters;
+import net.citizensnpcs.npc.NPCRegistries;
 import net.citizensnpcs.api.trait.Trait;
 import net.citizensnpcs.api.trait.TraitName;
 import net.citizensnpcs.api.util.Location;
@@ -45,6 +49,7 @@ public class LookClose extends Trait {
     @Persist
     private boolean enableRandomLook = Setting.DEFAULT_RANDOM_LOOK_CLOSE.asBoolean();
     private transient Predicate<Entity> entityFilter;
+    private transient Predicate<Entity> configuredFilter;
     @Persist
     private String filter;
     @Persist("headonly")
@@ -62,6 +67,10 @@ public class LookClose extends Trait {
     private final Map<UUID, PacketRotationSession> sessions = new HashMap<>();
     @Persist("perplayer")
     private boolean perPlayer;
+    @Persist("targetnpcs")
+    private boolean targetNPCs;
+    private RotationTrait.RotationSession randomSession;
+    private long randomRevision;
     /** Rate limiter for the "nobody was targeted" diagnostic; not persisted. */
     private int debugCountdown;
     @Persist
@@ -72,11 +81,11 @@ public class LookClose extends Trait {
     private boolean randomSwitchTargets = false;
     @Persist("realisticlooking")
     private boolean realisticLooking = Setting.DEFAULT_REALISTIC_LOOKING.asBoolean();
-    @Persist("randomlookpitchrange")
-    private float[] randomPitchRange = { -20, 20 };
-    @Persist("randomlookyawrange")
-    private float[] randomYawRange = { -20, 20 };
-    private int t = randomLookDelay;
+    @Persist
+    private float[] randomPitchRange = { 0, 0 };
+    @Persist
+    private float[] randomYawRange = { 0, 360 };
+    private int t;
 
     public LookClose() {
         super("lookclose");
@@ -99,6 +108,7 @@ public class LookClose extends Trait {
                 RotationTrait rotation = npc.getOrAddTrait(RotationTrait.class);
                 Set<UUID> seen = new HashSet<>();
                 for (ServerPlayer player : getNearbyPlayers()) {
+                    if (NPCRegistries.lookup(player) != null) continue;
                     if (!current(entity, expected)) return;
                     PacketRotationSession session = sessions.get(player.getUUID());
                     if (session == null || !session.isActive()) {
@@ -167,7 +177,16 @@ public class LookClose extends Trait {
         Entity entity = npc.getEntity();
         List<ServerPlayer> players = new ArrayList<>();
         if (entity == null) return players;
-        for (ServerPlayer player : List.copyOf(entity.level().getServer().getPlayerList().getPlayers())) {
+        Set<ServerPlayer> candidates = new HashSet<>(entity.level().getServer().getPlayerList().getPlayers());
+        if (targetNPCs && !perPlayer) {
+            for (var registry : CitizensAPI.getNPCRegistries()) {
+                for (var candidate : registry) {
+                    if (candidate.isSpawned() && candidate.getEntity() instanceof ServerPlayer player) candidates.add(player);
+                }
+            }
+        }
+        for (ServerPlayer player : candidates) {
+            if (perPlayer && NPCRegistries.lookup(player) != null) continue;
             if (isValid(player)) players.add(player);
         }
         return players;
@@ -177,15 +196,21 @@ public class LookClose extends Trait {
         if (!(entity instanceof ServerPlayer player) || npc == null || !npc.isSpawned()) return false;
         Entity npcEntity = npc.getEntity();
         if (!eligible(player, npcEntity)) return false;
+        if (configuredFilter != null && (!configuredFilter.test(player) || !eligible(player, npcEntity))) return false;
         return entityFilter == null || entityFilter.test(player) && eligible(player, npcEntity);
     }
 
     private boolean eligible(ServerPlayer player, Entity npcEntity) {
-        return npcEntity != null && !npcEntity.isRemoved() && npc.isSpawned() && npc.getEntity() == npcEntity
-                && player.isAlive() && !player.hasDisconnected() && Double.isFinite(range) && range >= 0
-                && !CitizensAPI.getNPCRegistry().isNPC(player) && player.level() == npcEntity.level()
-                && player.getServer().getPlayerList().getPlayer(player.getUUID()) == player
-                && player.distanceToSqr(npcEntity) <= range * range && !isInvisible(player);
+        if (npcEntity == null || npcEntity.isRemoved() || !npc.isSpawned() || npc.getEntity() != npcEntity
+                || player == npcEntity || !player.isAlive() || player.isRemoved() || !Double.isFinite(range) || range < 0
+                || player.level() != npcEntity.level() || player.distanceToSqr(npcEntity) > range * range || isInvisible(player))
+            return false;
+        var owner = NPCRegistries.lookup(player);
+        if (owner != null) {
+            return targetNPCs && owner != npc && owner.isSpawned() && owner.getEntity() == player
+                    && owner.getOwningRegistry() != null && owner.getOwningRegistry().getByUniqueId(owner.getUniqueId()) == owner;
+        }
+        return !player.hasDisconnected() && player.getServer().getPlayerList().getPlayer(player.getUUID()) == player;
     }
 
     private boolean isInvisible(ServerPlayer player) {
@@ -218,11 +243,14 @@ public class LookClose extends Trait {
     }
 
     private void randomLook() {
+        if (!validRandomRange(randomPitchRange) || !validRandomRange(randomYawRange) || randomLookDelay < 1) return;
         float pitch = isEqual(randomPitchRange) ? randomPitchRange[0]
                 : Util.getFastRandom().doubles(randomPitchRange[0], randomPitchRange[1]).iterator().next().floatValue();
         float yaw = isEqual(randomYawRange) ? randomYawRange[0]
                 : Util.getFastRandom().doubles(randomYawRange[0], randomYawRange[1]).iterator().next().floatValue();
-        npc.getOrAddTrait(RotationTrait.class).getPhysicalSession().rotateToHave(yaw, pitch);
+        randomSession = npc.getOrAddTrait(RotationTrait.class).getPhysicalSession();
+        randomSession.rotateToHave(yaw, pitch);
+        randomRevision = randomSession.revision();
     }
 
     public boolean disableWhileNavigating() {
@@ -238,6 +266,8 @@ public class LookClose extends Trait {
     public void onSpawn() {
         revision++;
         clearTracking();
+        releaseRandom();
+        t = 0;
         removed = false;
     }
 
@@ -247,6 +277,7 @@ public class LookClose extends Trait {
         removed = true;
         revision++;
         clearTracking();
+        releaseRandom();
         if (previous != null) NeoForge.EVENT_BUS.post(new NPCLookCloseChangeTargetEvent(npc, previous, null));
     }
 
@@ -255,6 +286,7 @@ public class LookClose extends Trait {
         removed = true;
         revision++;
         clearTracking();
+        releaseRandom();
     }
 
     private void clearTracking() {
@@ -274,6 +306,12 @@ public class LookClose extends Trait {
         RotationTrait rotation = npc == null ? null : npc.getTraitNullable(RotationTrait.class);
         if (rotation == null) session.end();
         else rotation.releasePacketSession(session);
+    }
+
+    private void releaseRandom() {
+        RotationTrait.RotationSession previous = randomSession;
+        randomSession = null;
+        if (previous != null) previous.cancel(randomRevision);
     }
 
     private void releasePhysical() {
@@ -415,6 +453,87 @@ public class LookClose extends Trait {
 
     public void setRandomLook(boolean randomLook) {
         enableRandomLook = randomLook;
+        if (!randomLook) releaseRandom();
+    }
+
+    public Player getTarget() { return lookingAt; }
+    public boolean isLinkedBody() { return linkedBody; }
+    public boolean targetNPCs() { return targetNPCs; }
+    public boolean isRandomlySwitchingTargets() { return randomSwitchTargets; }
+    public int getRandomLookDelay() { return randomLookDelay; }
+    public float[] getRandomLookPitchRange() { return randomPitchRange.clone(); }
+    public float[] getRandomLookYawRange() { return randomYawRange.clone(); }
+    public String getFilter() { return filter; }
+
+    public void setTargetNPCs(boolean target) {
+        if (targetNPCs == target) return;
+        targetNPCs = target;
+        revision++;
+        clearTracking();
+    }
+
+    public void setFilter(String filter) {
+        Predicate<Entity> compiled = EntityFilters.parse(filter);
+        this.filter = filter;
+        configuredFilter = compiled;
+        revision++;
+        clearTracking();
+    }
+
+    public void setRandomLookDelay(int delay) {
+        if (delay < 1) throw new IllegalArgumentException("Random look delay must be positive");
+        randomLookDelay = delay;
+        t = delay;
+    }
+
+    public void setRandomlySwitchTargets(boolean random) { randomSwitchTargets = random; }
+
+    public void setRandomLookPitchRange(float min, float max) {
+        randomPitchRange = checkedRandomRange(min, max);
+    }
+
+    public void setRandomLookYawRange(float min, float max) {
+        randomYawRange = checkedRandomRange(min, max);
+    }
+
+    private static float[] checkedRandomRange(float min, float max) {
+        float[] range = { min, max };
+        if (!validRandomRange(range)) throw new IllegalArgumentException("Random angles must be finite and ordered");
+        return range;
+    }
+
+    private static boolean validRandomRange(float[] range) {
+        return range != null && range.length == 2 && Float.isFinite(range[0]) && Float.isFinite(range[1]) && range[0] <= range[1];
+    }
+
+    @Override public void load(DataKey key) throws NPCLoadException {
+        revision++;
+        clearTracking();
+        releaseRandom();
+        if (!key.keyExists("randomPitchRange") && key.keyExists("randomlookpitchrange"))
+            randomPitchRange = readRange(key.getRelative("randomlookpitchrange"));
+        if (!key.keyExists("randomYawRange") && key.keyExists("randomlookyawrange"))
+            randomYawRange = readRange(key.getRelative("randomlookyawrange"));
+        // Keep invalid saved text, but never turn a failed filter into an unrestricted target scan.
+        configuredFilter = entity -> false;
+        try { configuredFilter = EntityFilters.parse(filter); }
+        catch (IllegalArgumentException failure) { throw new NPCLoadException(failure.getMessage()); }
+        if (!validRandomRange(randomPitchRange) || !validRandomRange(randomYawRange) || randomLookDelay < 1)
+            throw new NPCLoadException("Invalid saved random look range or delay");
+        t = 0;
+    }
+
+    private static float[] readRange(DataKey key) {
+        List<Float> values = new ArrayList<>();
+        for (DataKey value : key.getIntegerSubKeys()) values.add((float) value.getDouble(""));
+        float[] range = new float[values.size()];
+        for (int i = 0; i < range.length; i++) range[i] = values.get(i);
+        return range;
+    }
+
+    @Override public void save(DataKey key) {
+        key.removeKey("randomlookpitchrange");
+        key.removeKey("randomlookyawrange");
     }
 
     public double getRange() {
