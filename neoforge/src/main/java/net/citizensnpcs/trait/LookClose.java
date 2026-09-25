@@ -23,11 +23,14 @@ import net.citizensnpcs.api.util.Location;
 import net.citizensnpcs.api.util.Messaging;
 import net.citizensnpcs.trait.RotationTrait.PacketRotationSession;
 import net.citizensnpcs.util.Util;
+import net.citizensnpcs.util.ShulkerPeek;
+import net.citizensnpcs.trait.versioned.ShulkerTrait;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.entity.monster.Shulker;
 import net.neoforged.neoforge.common.NeoForge;
 
 /**
@@ -63,6 +66,7 @@ public class LookClose extends Trait {
     private long pausedRevision = -1;
     private RotationTrait.RotationSession physicalSession;
     private long physicalRevision;
+    private ShulkerPeek shulkerPeek;
     /** Per-viewer rotation sessions, one per nearby player, used only in per-player mode. */
     private final Map<UUID, PacketRotationSession> sessions = new HashMap<>();
     @Persist("perplayer")
@@ -315,9 +319,12 @@ public class LookClose extends Trait {
     }
 
     private void releasePhysical() {
+        ShulkerPeek peek = shulkerPeek;
+        shulkerPeek = null;
         RotationTrait.RotationSession previous = physicalSession;
         physicalSession = null;
         if (previous != null) previous.cancel(physicalRevision);
+        if (peek != null) peek.release();
     }
 
     private void releasePause() {
@@ -381,6 +388,22 @@ public class LookClose extends Trait {
         physicalSession = rot.getPhysicalSession();
         physicalSession.rotateToFace(lookingAt);
         physicalRevision = physicalSession.revision();
+        if (entity instanceof Shulker shulker) {
+            if (shulkerPeek == null) {
+                ShulkerTrait configured = npc.getTraitNullable(ShulkerTrait.class);
+                int baseline = configured != null && npc.getCosmeticEntity() == shulker ? configured.getPeek()
+                        : ((ShulkerPeek.Access) shulker).citizens$peek();
+                shulkerPeek = new ShulkerPeek(shulker, baseline);
+            }
+            shulkerPeek.look(entity.distanceToSqr(lookingAt));
+        }
+    }
+
+    /** Keeps configured peek changes as the baseline while the physical look response is active. */
+    public boolean setShulkerPeekBaseline(Shulker entity, int amount) {
+        if (shulkerPeek == null || !shulkerPeek.controls(entity)) return false;
+        shulkerPeek.baseline(amount);
+        return true;
     }
 
     public void setDisableWhileNavigating(boolean disableWhileNavigating) {

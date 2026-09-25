@@ -5,6 +5,8 @@ import java.util.Optional;
 import net.citizensnpcs.api.persistence.Persist;
 import net.citizensnpcs.api.trait.Trait;
 import net.citizensnpcs.api.trait.TraitName;
+import net.citizensnpcs.trait.LookClose;
+import net.citizensnpcs.util.ShulkerPeek;
 import net.minecraft.world.entity.monster.Shulker;
 import net.minecraft.world.item.DyeColor;
 
@@ -19,6 +21,7 @@ public class ShulkerTrait extends Trait {
     @Persist("color")
     private DyeColor color = DyeColor.PURPLE;
     private int lastPeekSet = -1;
+    private Shulker lastEntity;
     @Persist("peek")
     private int peek = 0;
 
@@ -38,7 +41,11 @@ public class ShulkerTrait extends Trait {
     public void onSpawn() {
         // a fresh entity starts closed whatever the stored value was, so force the next run to write it
         lastPeekSet = -1;
+        lastEntity = null;
     }
+
+    @Override public void onDespawn() { lastEntity = null; }
+    @Override public void onRemove() { lastEntity = null; }
 
     @Override
     public void run() {
@@ -47,8 +54,14 @@ public class ShulkerTrait extends Trait {
         }
         if (!(npc.getCosmeticEntity() instanceof Shulker shulker))
             return;
+        if (lastEntity != shulker) {
+            lastEntity = shulker;
+            lastPeekSet = -1;
+        }
         if (peek != lastPeekSet) {
-            shulker.setRawPeekAmount(peek);
+            LookClose look = npc.getTraitNullable(LookClose.class);
+            if (look == null || !look.setShulkerPeekBaseline(shulker, peek))
+                shulker.setRawPeekAmount(ShulkerPeek.clamp(peek));
             lastPeekSet = peek;
         }
         shulker.setVariant(Optional.of(color));
@@ -59,7 +72,12 @@ public class ShulkerTrait extends Trait {
     }
 
     public void setPeek(int peek) {
+        if (peek < 0 || peek > 100) throw new IllegalArgumentException("Peek must be between 0 and 100");
         this.peek = peek;
         lastPeekSet = -1;
+        if (npc != null && npc.getCosmeticEntity() instanceof Shulker shulker) {
+            LookClose look = npc.getTraitNullable(LookClose.class);
+            if (look != null && look.setShulkerPeekBaseline(shulker, peek)) lastPeekSet = peek;
+        }
     }
 }

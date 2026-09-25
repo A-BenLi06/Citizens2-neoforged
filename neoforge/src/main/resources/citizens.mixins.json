@@ -18,6 +18,7 @@
     "SpawnHeadAngleAccessor",
     "ServerPlayerMixin",
     "SleepStatusMixin",
+    "ShulkerPeekMixin",
     "TrackedEntityMixin"
   ],
   "injectors": {
