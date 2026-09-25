@@ -94,6 +94,9 @@ public interface Navigator {
      */
     boolean isPaused();
 
+    /** Monotonic revision of explicit pause requests, including requests that repeat the current value. */
+    long getPauseRevision();
+
     /**
      * Sets whether the navigator is paused and shouldn't process the path for now.
      *

@@ -4,7 +4,9 @@
 
 Initial audit timestamp: 2026-09-13 01:47:09 +08:00 (UTC+08:00).
 
-Current summary updated: 2026-09-25 11:15:19 +08:00 (UTC+08:00).
+Current summary updated: 2026-09-25 11:37:14 +08:00 (UTC+08:00).
+
+Latest Citizens look-close follow-up: [target admission and owned lifecycle](lookclose-lifecycle-2026-09-25.md) applies native eligibility and programmatic filters before physical/private selection, revalidates callbacks, and releases only the trait's own sessions, rotations and navigation pauses. World/virtual viewers receive native rotation restoration, while later owners survive cleanup. Reference configuration defaults and first-command enabling are repaired. The dedicated fixture passes 63 checks; regression passes 81 movement/list, 108 tracking-admission and 43 packet-viewer checks, 107 NPC assertions, 223 general probes and 232 ordinary tests. Build and release/source exclusions pass. Evidence: `artifacts/lookclose-validation-summary.json`. Remaining command/string-filter/NPC-targeting controls, general private-rotation packet behavior and physical-client/modpack acceptance remain separate work.
 
 Latest Citizens command follow-up: [native command dimensions and create validation](native-command-locations-2026-09-25.md) preserves namespaced dimensions and coordinate/rotation fields, uses strict world resolution for command targets and validates locations before creating registries or NPCs. Invalid locations leave existing NPCs and selection unchanged. The dedicated fixture passes 49 checks; regression passes 62 removal checks, 107 NPC assertions, 223 general probes and 232 ordinary tests. Evidence: `artifacts/command-location-validation-summary.json`. Physical-client/modpack/proxy acceptance remains separate work.
 

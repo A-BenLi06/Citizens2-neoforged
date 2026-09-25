@@ -19,6 +19,7 @@ import net.citizensnpcs.api.util.DataKey;
 import net.citizensnpcs.api.util.EntityUtil;
 import net.citizensnpcs.api.util.Location;
 import net.citizensnpcs.util.Util;
+import net.citizensnpcs.util.NPCVisibility;
 import net.minecraft.network.protocol.game.ClientboundMoveEntityPacket;
 import net.minecraft.network.protocol.game.ClientboundRotateHeadPacket;
 import net.minecraft.server.level.ServerPlayer;
@@ -116,6 +117,25 @@ public class RotationTrait extends Trait {
         PacketRotationSession session = packetSessionsByUUID.remove(uuid);
         if (session != null) {
             session.end();
+        }
+    }
+
+    /** Release this exact owner's session and restore native angles for its current viewers. */
+    public void releasePacketSession(PacketRotationSession session) {
+        Entity entity = npc.isSpawned() ? npc.getEntity() : null;
+        var viewers = entity == null ? java.util.List.<ServerPlayer>of() : NPCVisibility.viewers(entity).stream()
+                .filter(viewer -> getPacketSession(viewer) == session).toList();
+        session.end();
+        packetSessions.remove(session);
+        packetSessionsByUUID.values().removeIf(current -> current == session);
+        for (ServerPlayer viewer : viewers) {
+            // A later UUID or general session owns this view; do not reset it when an earlier owner exits.
+            if (getPacketSession(viewer) != null || !NPCVisibility.isTracked(entity, viewer)) continue;
+            viewer.connection.send(new ClientboundMoveEntityPacket.Rot(entity.getId(),
+                    PacketRotationTriple.degreesToByte(entity.getYRot()),
+                    PacketRotationTriple.degreesToByte(entity.getXRot()), entity.onGround()));
+            viewer.connection.send(new ClientboundRotateHeadPacket(entity,
+                    PacketRotationTriple.degreesToByte(entity.getYHeadRot())));
         }
     }
 
@@ -442,12 +462,21 @@ public class RotationTrait extends Trait {
     /** One rotation in progress: where it is aiming, and how far along it is. */
     public class RotationSession {
         private final RotationParams params;
+        private boolean cancelled;
+        private long revision;
         private volatile int t = -1;
         private Supplier<Float> targetPitch = () -> 0F;
         private Supplier<Float> targetYaw = () -> 0F;
 
         RotationSession(RotationParams params) {
             this.params = params;
+        }
+
+        long revision() { return revision; }
+
+        /** A former caller cannot cancel a rotation subsequently issued by another trait. */
+        void cancel(long expected) {
+            if (revision == expected) { t = -1; cancelled = true; }
         }
 
         public float getTargetPitch() {
@@ -467,7 +496,7 @@ public class RotationTrait extends Trait {
         }
 
         public boolean isActive() {
-            return params.persist || t >= 0;
+            return !cancelled && (params.persist || t >= 0);
         }
 
         /** Turns to face an entity — its eyes, if it has any. */
@@ -484,6 +513,8 @@ public class RotationTrait extends Trait {
          * point as it moves, which is what upstream does too.
          */
         public void rotateToFace(Location target) {
+            cancelled = false;
+            revision++;
             t = 0;
             targetPitch = params.lockPitch ? () -> getEyeLocation().getPitch() : () -> {
                 Location from = getEyeLocation();
@@ -502,6 +533,8 @@ public class RotationTrait extends Trait {
 
         /** Turns to a fixed yaw and pitch. */
         public void rotateToHave(float yaw, float pitch) {
+            cancelled = false;
+            revision++;
             t = 0;
             targetYaw = () -> yaw;
             targetPitch = params.lockPitch ? () -> getEyeLocation().getPitch() : () -> pitch;

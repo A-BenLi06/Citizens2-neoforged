@@ -1,0 +1,22 @@
+allprojects {
+    afterEvaluate { p ->
+        if (p.extensions.findByName('neoForge') == null) return
+        def fixture = p.file('../artifacts/lookclose-audit-server')
+        p.sourceSets.main.java.srcDir(p.file('../tools/lookclose-runtime-audit'))
+        p.neoForge.runs.named('server') { gameDirectory = fixture }
+        p.tasks.named('prepareServerRun') {
+            doLast {
+                if (!new File(fixture, 'lookclose-audit-fixture.txt').isFile())
+                    throw new GradleException('Prepare the isolated look-close fixture before running')
+            }
+        }
+        p.tasks.named('runServer') {
+            timeout = java.time.Duration.ofMinutes(3)
+            doLast {
+                def log = new File(fixture, 'logs/latest.log').getText('UTF-8')
+                if (log.contains('[LOOKCLOSEAUDIT] FAILED') || !log.contains('[LOOKCLOSEAUDIT] COMPLETE'))
+                    throw new GradleException('Look-close audit failed or incomplete')
+            }
+        }
+    }
+}

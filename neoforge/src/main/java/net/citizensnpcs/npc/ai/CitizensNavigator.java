@@ -68,6 +68,7 @@ import net.neoforged.neoforge.common.world.chunk.TicketHelper;
  * {@code MINECRAFT}, as upstream, so Citizens A* is opt-in per NPC or per config.
  */
 public class CitizensNavigator implements Navigator, Runnable {
+    private long pauseRevision;
     private ChunkCoord activeTicket;
     private final NavigatorParameters defaultParams = new NavigatorParameters().baseSpeed(UNINITIALISED_SPEED)
             .range(Setting.DEFAULT_PATHFINDING_RANGE.asFloat()).debug(Setting.DEBUG_PATHFINDING.asBoolean())
@@ -177,6 +178,11 @@ public class CitizensNavigator implements Navigator, Runnable {
     @Override
     public boolean isPaused() {
         return paused;
+    }
+
+    @Override
+    public long getPauseRevision() {
+        return pauseRevision;
     }
 
     public void load(DataKey root) {
@@ -299,6 +305,7 @@ public class CitizensNavigator implements Navigator, Runnable {
 
     @Override
     public void setPaused(boolean paused) {
+        pauseRevision++;
         if (paused && isNavigating()) {
             cancelMoveDestination();
         }

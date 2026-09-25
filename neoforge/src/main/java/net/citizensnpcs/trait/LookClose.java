@@ -9,8 +9,6 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.function.Predicate;
 
-import com.google.common.collect.Sets;
-
 import net.citizensnpcs.Settings.Setting;
 import net.citizensnpcs.api.CitizensAPI;
 import net.citizensnpcs.api.event.NPCLookCloseChangeTargetEvent;
@@ -41,11 +39,11 @@ import net.neoforged.neoforge.common.NeoForge;
 @TraitName("lookclose")
 public class LookClose extends Trait {
     @Persist("disablewhilenavigating")
-    private boolean disableWhileNavigating = false;
+    private boolean disableWhileNavigating = Setting.DISABLE_LOOKCLOSE_WHILE_NAVIGATING.asBoolean();
     @Persist("enabled")
-    private boolean enabled = true;
+    private boolean enabled = Setting.DEFAULT_LOOK_CLOSE.asBoolean();
     @Persist
-    private boolean enableRandomLook = false;
+    private boolean enableRandomLook = Setting.DEFAULT_RANDOM_LOOK_CLOSE.asBoolean();
     private transient Predicate<Entity> entityFilter;
     @Persist
     private String filter;
@@ -54,6 +52,12 @@ public class LookClose extends Trait {
     @Persist("linkedbody")
     private boolean linkedBody;
     private Player lookingAt;
+    private boolean updating;
+    private boolean removed;
+    private long revision;
+    private long pausedRevision = -1;
+    private RotationTrait.RotationSession physicalSession;
+    private long physicalRevision;
     /** Per-viewer rotation sessions, one per nearby player, used only in per-player mode. */
     private final Map<UUID, PacketRotationSession> sessions = new HashMap<>();
     @Persist("perplayer")
@@ -79,111 +83,113 @@ public class LookClose extends Trait {
     }
 
     public void findNewTarget() {
-        if (perPlayer) {
-            // every nearby player gets a rotation session of their own, so each of them sees the NPC looking back at
-            // them rather than at whoever happens to be nearest
-            lookingAt = null;
-            RotationTrait rotationTrait = npc.getOrAddTrait(RotationTrait.class);
-            Set<UUID> seen = new HashSet<>();
-            for (ServerPlayer player : getNearbyPlayers()) {
-                PacketRotationSession session = sessions.get(player.getUUID());
-                if (session == null || !session.isActive()) {
-                    session = rotationTrait.createPacketSession(rotationTrait.getGlobalParameters().clone()
-                            .linkedBody(linkedBody).headOnly(headOnly).uuidFilter(player.getUUID()).persist(true));
-                    sessions.put(player.getUUID(), session);
-                }
-                session.getSession().rotateToFace(player);
-                seen.add(player.getUUID());
-            }
-            sessions.keySet().removeIf(uuid -> {
-                if (seen.contains(uuid))
-                    return false;
-                rotationTrait.resetPlayerToPhysicalSession(uuid);
-                return true;
-            });
+        if (updating) return;
+        Entity entity = npc == null ? null : npc.getEntity();
+        long expected = revision;
+        if (!current(entity, expected)) {
+            clearTracking();
             return;
-        } else if (!sessions.isEmpty()) {
-            RotationTrait rotationTrait = npc.getOrAddTrait(RotationTrait.class);
-            for (UUID uuid : sessions.keySet()) {
-                rotationTrait.resetPlayerToPhysicalSession(uuid);
-            }
-            sessions.clear();
         }
-        if (lookingAt != null && !isValid(lookingAt)) {
-            NPCLookCloseChangeTargetEvent event = new NPCLookCloseChangeTargetEvent(npc, lookingAt, null);
-            NeoForge.EVENT_BUS.post(event);
-            if (event.getNewTarget() != null && isValid(event.getNewTarget())) {
-                lookingAt = event.getNewTarget();
-            } else {
+        updating = true;
+        try {
+            if (perPlayer) {
                 lookingAt = null;
-            }
-        }
-        Player old = lookingAt;
-        if (lookingAt == null) {
-            double min = Double.MAX_VALUE;
-            Location npcLoc = npc.getStoredLocation();
-            for (ServerPlayer player : getNearbyPlayers()) {
-                double dist = player.distanceToSqr(npcLoc.getX(), npcLoc.getY(), npcLoc.getZ());
-                if (dist > min)
-                    continue;
-                min = dist;
-                lookingAt = player;
-            }
-        } else if (randomSwitchTargets && t <= 0) {
-            List<ServerPlayer> options = getNearbyPlayers();
-            if (!options.isEmpty()) {
-                lookingAt = options.get(Util.getFastRandom().nextInt(options.size()));
-                t = randomLookDelay;
-            }
-        }
-        if (old != lookingAt) {
-            Messaging.debug("LookClose on NPC", npc.getId(), "target", old == null ? "none" : old.getName().getString(),
-                    "->", lookingAt == null ? "none" : lookingAt.getName().getString());
-            NPCLookCloseChangeTargetEvent event = new NPCLookCloseChangeTargetEvent(npc, old, lookingAt);
-            NeoForge.EVENT_BUS.post(event);
-            if (event.getNewTarget() != null && !isValid(event.getNewTarget()))
+                releasePhysical();
+                releasePause();
+                RotationTrait rotation = npc.getOrAddTrait(RotationTrait.class);
+                Set<UUID> seen = new HashSet<>();
+                for (ServerPlayer player : getNearbyPlayers()) {
+                    if (!current(entity, expected)) return;
+                    PacketRotationSession session = sessions.get(player.getUUID());
+                    if (session == null || !session.isActive()) {
+                        session = rotation.createPacketSession(rotation.getGlobalParameters().clone()
+                                .linkedBody(linkedBody).headOnly(headOnly).uuidFilter(player.getUUID()).persist(true));
+                        sessions.put(player.getUUID(), session);
+                    }
+                    session.getSession().rotateToFace(player);
+                    seen.add(player.getUUID());
+                }
+                if (!current(entity, expected)) return;
+                for (UUID uuid : new ArrayList<>(sessions.keySet())) {
+                    if (!seen.contains(uuid)) releaseSession(sessions.remove(uuid));
+                }
                 return;
-            lookingAt = event.getNewTarget();
+            }
+            releaseSessions();
+            if (lookingAt != null && !isValid(lookingAt)) {
+                Player next = redirected(lookingAt, null);
+                if (!current(entity, expected)) return;
+                lookingAt = next;
+            }
+            Player old = lookingAt, next = old;
+            if (old == null) {
+                double min = Double.MAX_VALUE;
+                for (ServerPlayer player : getNearbyPlayers()) {
+                    double distance = player.distanceToSqr(entity);
+                    if (distance <= min) { min = distance; next = player; }
+                }
+            } else if (randomSwitchTargets && t <= 0) {
+                List<ServerPlayer> options = getNearbyPlayers();
+                options.remove(old);
+                if (!options.isEmpty()) {
+                    next = options.get(Util.getFastRandom().nextInt(options.size()));
+                    t = randomLookDelay;
+                }
+            }
+            if (!current(entity, expected)) return;
+            if (old != next) {
+                next = redirected(old, next);
+                if (!current(entity, expected)) return;
+                lookingAt = next;
+            }
+        } finally {
+            updating = false;
         }
+    }
+
+    private Player redirected(Player old, Player proposed) {
+        NPCLookCloseChangeTargetEvent event = new NPCLookCloseChangeTargetEvent(npc, old, proposed);
+        NeoForge.EVENT_BUS.post(event);
+        Player next = event.getNewTarget();
+        // A null redirect suppresses selection; an invalid redirect cannot introduce an ineligible target.
+        if (next == null) return null;
+        if (isValid(next)) return next;
+        return proposed != null && isValid(proposed) ? proposed : null;
+    }
+
+    private boolean current(Entity entity, long expected) {
+        return !removed && npc != null && npc.isSpawned() && npc.getEntity() == entity && revision == expected
+                && npc.getTraitNullable(LookClose.class) == this && enabled
+                && !(disableWhileNavigating && npc.getNavigator().isNavigating());
     }
 
     private List<ServerPlayer> getNearbyPlayers() {
         Entity entity = npc.getEntity();
-        List<ServerPlayer> online = entity.level().getServer().getPlayerList().getPlayers();
-        if (online.isEmpty())
-            return List.of();
-        // built lazily and squared once: run() calls this on every NPC on every tick, and on all but a handful of them
-        // nobody is in range, so the common answer costs no allocation at all
-        List<ServerPlayer> players = null;
-        double rangeSquared = range * range;
-        for (ServerPlayer player : online) {
-            if (player.level() != entity.level())
-                continue;
-            if (player.distanceToSqr(entity) > rangeSquared)
-                continue;
-            if (CitizensAPI.getNPCRegistry().isNPC(player))
-                continue;
-            if (players == null) {
-                players = new ArrayList<>(4);
-            }
-            players.add(player);
+        List<ServerPlayer> players = new ArrayList<>();
+        if (entity == null) return players;
+        for (ServerPlayer player : List.copyOf(entity.level().getServer().getPlayerList().getPlayers())) {
+            if (isValid(player)) players.add(player);
         }
-        return players == null ? List.of() : players;
+        return players;
     }
 
     private boolean isValid(Player entity) {
-        if (!(entity instanceof ServerPlayer) || !entity.isAlive())
-            return false;
-        ServerPlayer player = (ServerPlayer) entity;
-        if (entityFilter != null && !entityFilter.test(player))
-            return false;
+        if (!(entity instanceof ServerPlayer player) || npc == null || !npc.isSpawned()) return false;
         Entity npcEntity = npc.getEntity();
-        return npcEntity != null && player.level() == npcEntity.level()
+        if (!eligible(player, npcEntity)) return false;
+        return entityFilter == null || entityFilter.test(player) && eligible(player, npcEntity);
+    }
+
+    private boolean eligible(ServerPlayer player, Entity npcEntity) {
+        return npcEntity != null && !npcEntity.isRemoved() && npc.isSpawned() && npc.getEntity() == npcEntity
+                && player.isAlive() && !player.hasDisconnected() && Double.isFinite(range) && range >= 0
+                && !CitizensAPI.getNPCRegistry().isNPC(player) && player.level() == npcEntity.level()
+                && player.getServer().getPlayerList().getPlayer(player.getUUID()) == player
                 && player.distanceToSqr(npcEntity) <= range * range && !isInvisible(player);
     }
 
     private boolean isInvisible(ServerPlayer player) {
-        return player.isSpectator() || player.hasEffect(MobEffects.INVISIBILITY) || !canSee(player);
+        return player.isSpectator() || player.isInvisible() || player.hasEffect(MobEffects.INVISIBILITY) || !canSee(player);
     }
 
     /**
@@ -191,7 +197,7 @@ public class LookClose extends Trait {
      * looking at somebody.
      */
     public boolean canSeeTarget() {
-        return lookingAt instanceof ServerPlayer player && canSee(player);
+        return lookingAt != null && enabled && !removed && isValid(lookingAt);
     }
 
     /**
@@ -223,13 +229,71 @@ public class LookClose extends Trait {
         return disableWhileNavigating;
     }
 
+    @Override
     public void onAttach() {
+        removed = false;
+    }
+
+    @Override
+    public void onSpawn() {
+        revision++;
+        clearTracking();
+        removed = false;
+    }
+
+    @Override
+    public void onDespawn() {
+        Player previous = lookingAt;
+        removed = true;
+        revision++;
+        clearTracking();
+        if (previous != null) NeoForge.EVENT_BUS.post(new NPCLookCloseChangeTargetEvent(npc, previous, null));
+    }
+
+    @Override
+    public void onRemove() {
+        removed = true;
+        revision++;
+        clearTracking();
+    }
+
+    private void clearTracking() {
+        lookingAt = null;
+        releaseSessions();
+        releasePhysical();
+        releasePause();
+    }
+
+    private void releaseSessions() {
+        List<PacketRotationSession> previous = new ArrayList<>(sessions.values());
+        sessions.clear();
+        for (PacketRotationSession session : previous) releaseSession(session);
+    }
+
+    private void releaseSession(PacketRotationSession session) {
+        RotationTrait rotation = npc == null ? null : npc.getTraitNullable(RotationTrait.class);
+        if (rotation == null) session.end();
+        else rotation.releasePacketSession(session);
+    }
+
+    private void releasePhysical() {
+        RotationTrait.RotationSession previous = physicalSession;
+        physicalSession = null;
+        if (previous != null) previous.cancel(physicalRevision);
+    }
+
+    private void releasePause() {
+        long previous = pausedRevision;
+        pausedRevision = -1;
+        if (previous >= 0 && npc.getNavigator().getPauseRevision() == previous && npc.getNavigator().isPaused())
+            npc.getNavigator().setPaused(false);
     }
 
     @Override
     public void run() {
-        if (!npc.isSpawned()) {
-            lookingAt = null;
+        if (updating) return;
+        if (removed || !npc.isSpawned() || npc.getTraitNullable(LookClose.class) != this) {
+            clearTracking();
             return;
         }
         if (enableRandomLook && !npc.getNavigator().isNavigating() && lookingAt == null && t <= 0) {
@@ -239,15 +303,22 @@ public class LookClose extends Trait {
         t--;
 
         if (!enabled || npc.getNavigator().isNavigating() && disableWhileNavigating()) {
-            lookingAt = null;
+            clearTracking();
             return;
         }
+        Entity entity = npc.getEntity();
+        long expected = revision;
         findNewTarget();
+        if (!current(entity, expected)) return;
 
-        if (npc.getNavigator().isNavigating() || npc.getNavigator().isPaused()) {
-            npc.getNavigator().setPaused(lookingAt != null);
+        if (pausedRevision >= 0 && pausedRevision != npc.getNavigator().getPauseRevision()) pausedRevision = -1;
+        if (lookingAt != null && npc.getNavigator().isNavigating()) {
+            npc.getNavigator().setPaused(true);
+            pausedRevision = npc.getNavigator().getPauseRevision();
         }
         if (lookingAt == null) {
+            releasePhysical();
+            releasePause();
             // the state worth reporting when an operator says "it does not look at me": somebody is close enough, and
             // yet no target was taken. Rate-limited because run() is every tick on every NPC, and gated on the debug
             // flag before the scan rather than inside Messaging.debug, so a server with debug off pays nothing for it
@@ -269,40 +340,61 @@ public class LookClose extends Trait {
         // snapping to it
         RotationTrait rot = npc.getOrAddTrait(RotationTrait.class);
         rot.getGlobalParameters().headOnly(headOnly).linkedBody(linkedBody);
-        rot.getPhysicalSession().rotateToFace(lookingAt);
+        physicalSession = rot.getPhysicalSession();
+        physicalSession.rotateToFace(lookingAt);
+        physicalRevision = physicalSession.revision();
     }
 
     public void setDisableWhileNavigating(boolean disableWhileNavigating) {
+        if (this.disableWhileNavigating == disableWhileNavigating) return;
         this.disableWhileNavigating = disableWhileNavigating;
+        revision++;
+        if (disableWhileNavigating) clearTracking();
     }
 
     public void setEnabled(boolean enabled) {
+        if (this.enabled == enabled) return;
         this.enabled = enabled;
+        revision++;
+        if (!enabled) clearTracking();
     }
 
     public void setEntityFilter(Predicate<Entity> filter) {
         entityFilter = filter;
+        revision++;
     }
 
     public void setHeadOnly(boolean headOnly) {
+        if (this.headOnly == headOnly) return;
         this.headOnly = headOnly;
+        revision++;
+        releaseSessions();
     }
 
     public void setLinkedBody(boolean linkedBody) {
+        if (this.linkedBody == linkedBody) return;
         this.linkedBody = linkedBody;
+        revision++;
+        releaseSessions();
     }
 
     public void setPerPlayer(boolean perPlayer) {
+        if (this.perPlayer == perPlayer) return;
         this.perPlayer = perPlayer;
+        revision++;
+        clearTracking();
     }
 
     public void setRange(double range) {
+        if (!Double.isFinite(range) || range < 0) throw new IllegalArgumentException("Look range must be finite and nonnegative");
         this.range = range;
+        revision++;
     }
 
     /** Enables line-of-sight checks when picking a target. More computationally expensive. */
     public void setRealisticLooking(boolean realistic) {
         realisticLooking = realistic;
+        revision++;
     }
 
     public boolean isRealisticLooking() {
@@ -334,10 +426,7 @@ public class LookClose extends Trait {
     }
 
     public boolean toggle() {
-        enabled = !enabled;
-        if (!enabled) {
-            lookingAt = null;
-        }
+        setEnabled(!enabled);
         return enabled;
     }
 }

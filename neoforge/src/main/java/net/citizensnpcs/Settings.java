@@ -129,6 +129,7 @@ public class Settings {
         DEFAULT_TEXT_DELAY_MAX("npc.text.default-random-text-delay-max", "10s"),
         DEFAULT_TEXT_DELAY_MIN("npc.text.default-random-text-delay-min", "5s"),
         DEFAULT_TEXT_SPEECH_BUBBLE_DURATION("npc.text.speech-bubble-ticks", "npc.text.speech-bubble-duration", "50t"),
+        DISABLE_LOOKCLOSE_WHILE_NAVIGATING("npc.default.look-close.disable-while-navigating", true),
         DISABLE_TABLIST("npc.tablist.disable", true),
         ERROR_COLOUR("general.color-scheme.message-error", "<red>"),
         FOLLOW_ACROSS_WORLDS("npc.follow.teleport-across-worlds", false),
