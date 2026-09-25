@@ -13,6 +13,9 @@
     "ServerLevelPassengerMixin",
     "ServerboundInteractPacketAccessor",
     "SetPassengersPacketAccessor",
+    "RotationEntityIdAccessor",
+    "RotationAnglesAccessor",
+    "SpawnHeadAngleAccessor",
     "ServerPlayerMixin",
     "SleepStatusMixin",
     "TrackedEntityMixin"

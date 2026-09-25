@@ -172,6 +172,8 @@ import net.citizensnpcs.api.util.Durations;
 import net.citizensnpcs.util.Anchor;
 import net.citizensnpcs.util.Messages;
 import net.citizensnpcs.util.Util;
+import net.citizensnpcs.util.NPCVisibility;
+import net.citizensnpcs.util.RotationPackets;
 import net.citizensnpcs.util.StringHelper;
 import net.citizensnpcs.api.util.TeleportCause;
 import net.minecraft.ChatFormatting;
@@ -3405,9 +3407,9 @@ public class NPCCommands {
                 degreesToPacket(entity.getYRot()), degreesToPacket(entity.getXRot()), entity.onGround());
         ClientboundRotateHeadPacket headPacket = new ClientboundRotateHeadPacket(entity,
                 degreesToPacket(entity.getYHeadRot()));
-        for (ServerPlayer viewer : EntityUtil.getNearbyVisiblePlayers(entity, 64)) {
-            viewer.connection.send(rot);
-            viewer.connection.send(headPacket);
+        for (ServerPlayer viewer : NPCVisibility.viewers(entity)) {
+            viewer.connection.send(RotationPackets.rewrite(entity, viewer, rot));
+            viewer.connection.send(RotationPackets.rewrite(entity, viewer, headPacket));
         }
         PlayerAnimation.ARM_SWING.play(player);
     }

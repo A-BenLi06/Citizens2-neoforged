@@ -2,6 +2,8 @@ package net.citizensnpcs.trait;
 
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.IdentityHashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
@@ -16,7 +18,6 @@ import net.citizensnpcs.api.persistence.Persistable;
 import net.citizensnpcs.api.trait.Trait;
 import net.citizensnpcs.api.trait.TraitName;
 import net.citizensnpcs.api.util.DataKey;
-import net.citizensnpcs.api.util.EntityUtil;
 import net.citizensnpcs.api.util.Location;
 import net.citizensnpcs.util.Util;
 import net.citizensnpcs.util.NPCVisibility;
@@ -35,34 +36,44 @@ import net.minecraft.world.entity.LivingEntity;
  * <li>The <b>physical</b> session moves the real entity, so every player sees the same rotation. This is what
  * {@link LookClose} and {@link Poses} drive.
  * <li>A <b>packet</b> session moves the NPC only for chosen viewers, by sending them rotation packets of their own.
- * Vanilla's public rotation packets are enough to send these, so no packet library is needed — but vanilla's <em>own</em>
- * rotation broadcasts are not suppressed, so a viewer under a packet session can see one frame of the real rotation when
- * the entity itself turns. Upstream avoids that by rewriting outgoing packets through packetevents;
- * {@link PacketRotationSession#onPacketOverwritten()} is the hook that will restore it when packet rewriting lands with
- * {@code PacketNPC}.
+ * Native pairing and broadcasts are projected onto the selected session for each admitted viewer.
  * </ul>
  */
 @TraitName("rotationtrait")
 public class RotationTrait extends Trait {
     private final RotationParams globalParameters = new RotationParams();
     private final RotationSession globalSession = new RotationSession(globalParameters);
-    private CopyOnWriteArrayList<PacketRotationSession> packetSessions = new CopyOnWriteArrayList<>();
+    private final CopyOnWriteArrayList<PacketRotationSession> packetSessions = new CopyOnWriteArrayList<>();
     private final Map<UUID, PacketRotationSession> packetSessionsByUUID = new ConcurrentHashMap<>();
+
+    private final Map<ServerPlayer, PacketRotation> delivered = new IdentityHashMap<>();
+    private final Set<ServerPlayer> resolving = java.util.Collections.newSetFromMap(new IdentityHashMap<>());
+    private long packetRevision;
 
     public RotationTrait() {
         super("rotationtrait");
     }
 
     public void clearPacketSessions() {
-        for (PacketRotationSession session : packetSessions) {
-            session.end();
-        }
-        for (PacketRotationSession session : packetSessionsByUUID.values()) {
-            session.end();
-        }
+        if (!hasPacketSessions() && delivered.isEmpty()) return;
+        Entity entity = npc != null && npc.isSpawned() ? npc.getEntity() : null;
+        List<ServerPlayer> viewers = entity == null ? List.of() : NPCVisibility.viewers(entity).stream()
+                .filter(viewer -> delivered.containsKey(viewer) || getPacketSession(viewer) != null).toList();
+        packetRevision++;
+        for (PacketRotationSession session : packetSessions) session.ended = true;
+        for (PacketRotationSession session : packetSessionsByUUID.values()) session.ended = true;
         packetSessions.clear();
         packetSessionsByUUID.clear();
+        delivered.clear();
+        for (ServerPlayer viewer : viewers) restore(entity, viewer);
     }
+
+    @Override public void onDespawn() {
+        clearPacketSessions();
+        globalSession.cancel(globalSession.revision());
+    }
+
+    @Override public void onRemove() { onDespawn(); }
 
     /**
      * Starts a rotation that only the viewers the parameters accept will see.
@@ -73,11 +84,12 @@ public class RotationTrait extends Trait {
     public PacketRotationSession createPacketSession(RotationParams params) {
         if (params.filter == null && params.uuidFilter == null)
             throw new IllegalArgumentException("a packet session needs a viewer filter, or it would affect nobody");
-        PacketRotationSession session = new PacketRotationSession(new RotationSession(params));
+        PacketRotationSession session = new PacketRotationSession(this, new RotationSession(params));
+        packetRevision++;
         if (params.uuidFilter != null) {
             for (UUID uuid : params.uuidFilter) {
                 PacketRotationSession previous = packetSessionsByUUID.put(uuid, session);
-                if (previous != null && previous != session) {
+                if (previous != null && previous != session && !packetSessionsByUUID.containsValue(previous)) {
                     previous.end();
                 }
             }
@@ -95,15 +107,42 @@ public class RotationTrait extends Trait {
      * @return the packet session covering this player, or null when it is seeing the real rotation
      */
     public PacketRotationSession getPacketSession(ServerPlayer player) {
-        PacketRotationSession byUUID = packetSessionsByUUID.get(player.getUUID());
-        if (byUUID != null && byUUID.isActive())
-            return byUUID;
-        for (PacketRotationSession session : packetSessions) {
-            if (session.isActive() && session.accepts(player))
-                return session;
-        }
-        return null;
+        // User predicates may change ownership or recurse. Never return a stale decision from such a callback.
+        if (!resolving.add(player)) return null;
+        long revision = packetRevision;
+        try {
+            PacketRotationSession byUUID = packetSessionsByUUID.get(player.getUUID());
+            if (byUUID != null && byUUID.isActive() && byUUID.accepts(player))
+                return revision == packetRevision && byUUID.isActive() ? byUUID : null;
+            for (PacketRotationSession session : packetSessions) {
+                if (session.isActive() && session.accepts(player))
+                    return revision == packetRevision && session.isActive() ? session : null;
+                if (revision != packetRevision) return null;
+            }
+            return null;
+        } finally { resolving.remove(player); }
     }
+
+    public boolean hasPacketSessions() { return !packetSessions.isEmpty() || !packetSessionsByUUID.isEmpty(); }
+
+    /** Quantised state shared by native packet projection and supplemental delivery. */
+    public record PacketRotation(PacketRotationSession owner, byte yaw, byte pitch, byte headYaw) { }
+
+    public PacketRotation getPacketRotation(ServerPlayer viewer) {
+        Entity entity = npc != null && npc.isSpawned() ? npc.getEntity() : null;
+        if (entity == null) return null;
+        PacketRotationSession session = getPacketSession(viewer);
+        if (session == null || npc.getEntity() != entity || entity.isRemoved()
+                || npc.getTraitNullable(RotationTrait.class) != this) return null;
+        session.initialize(entity);
+        return new PacketRotation(session, degreesToByte(session.getBodyYaw()), degreesToByte(session.getPitch()),
+                degreesToByte(session.getHeadYaw()));
+    }
+
+    /** Pairing contains all three angles; it is already the first delivery to this client entity. */
+    public void recordPairing(ServerPlayer viewer, PacketRotation rotation) { delivered.put(viewer, rotation); }
+
+    public void forgetViewer(ServerPlayer viewer) { delivered.remove(viewer); }
 
     /**
      * @return the session that moves the real entity
@@ -112,57 +151,80 @@ public class RotationTrait extends Trait {
         return globalSession;
     }
 
-    /** Drops any packet session for this player, so it goes back to seeing the real rotation. */
+    /** Remove only this UUID's override; other viewers of a shared session retain their ownership. */
     public void resetPlayerToPhysicalSession(UUID uuid) {
-        PacketRotationSession session = packetSessionsByUUID.remove(uuid);
-        if (session != null) {
-            session.end();
+        PacketRotationSession removed = packetSessionsByUUID.remove(uuid);
+        if (removed == null) return;
+        packetRevision++;
+        if (!packetSessionsByUUID.containsValue(removed)) removed.ended = true;
+        if (npc != null && npc.isSpawned()) {
+            for (ServerPlayer viewer : NPCVisibility.viewers(npc.getEntity())) {
+                if (viewer.getUUID().equals(uuid)) deliver(npc.getEntity(), viewer, true);
+            }
         }
     }
 
-    /** Release this exact owner's session and restore native angles for its current viewers. */
+    /** Release an exact owner, immediately showing the next session or the native entity angles. */
     public void releasePacketSession(PacketRotationSession session) {
-        Entity entity = npc.isSpawned() ? npc.getEntity() : null;
-        var viewers = entity == null ? java.util.List.<ServerPlayer>of() : NPCVisibility.viewers(entity).stream()
+        if (session == null || session.owner != this) return;
+        Entity entity = npc != null && npc.isSpawned() ? npc.getEntity() : null;
+        List<ServerPlayer> viewers = entity == null ? List.of() : NPCVisibility.viewers(entity).stream()
                 .filter(viewer -> getPacketSession(viewer) == session).toList();
-        session.end();
+        session.ended = true;
+        packetRevision++;
         packetSessions.remove(session);
         packetSessionsByUUID.values().removeIf(current -> current == session);
-        for (ServerPlayer viewer : viewers) {
-            // A later UUID or general session owns this view; do not reset it when an earlier owner exits.
-            if (getPacketSession(viewer) != null || !NPCVisibility.isTracked(entity, viewer)) continue;
-            viewer.connection.send(new ClientboundMoveEntityPacket.Rot(entity.getId(),
-                    PacketRotationTriple.degreesToByte(entity.getYRot()),
-                    PacketRotationTriple.degreesToByte(entity.getXRot()), entity.onGround()));
-            viewer.connection.send(new ClientboundRotateHeadPacket(entity,
-                    PacketRotationTriple.degreesToByte(entity.getYHeadRot())));
+        for (ServerPlayer viewer : viewers) deliver(entity, viewer, true);
+    }
+
+    private void restore(Entity entity, ServerPlayer viewer) {
+        if (!NPCVisibility.isTracked(entity, viewer)) return;
+        viewer.connection.send(new ClientboundMoveEntityPacket.Rot(entity.getId(), degreesToByte(entity.getYRot()),
+                degreesToByte(entity.getXRot()), entity.onGround()));
+        viewer.connection.send(new ClientboundRotateHeadPacket(entity, degreesToByte(entity.getYHeadRot())));
+    }
+
+    private void deliver(Entity entity, ServerPlayer viewer, boolean force) {
+        PacketRotation rotation = getPacketRotation(viewer);
+        if (npc.getEntity() != entity || !NPCVisibility.isTracked(entity, viewer)) {
+            delivered.remove(viewer);
+            return;
+        }
+        PacketRotation previous = delivered.get(viewer);
+        if (rotation == null) {
+            delivered.remove(viewer);
+            if (force || previous != null) restore(entity, viewer);
+        } else if (force || !rotation.equals(previous)) {
+            viewer.connection.send(new ClientboundMoveEntityPacket.Rot(entity.getId(), rotation.yaw(), rotation.pitch(),
+                    entity.onGround()));
+            viewer.connection.send(new ClientboundRotateHeadPacket(entity, rotation.headYaw()));
+            delivered.put(viewer, rotation);
         }
     }
 
     @Override
     public void run() {
-        if (!npc.isSpawned())
-            return;
-        if (npc.data().get(NPC.Metadata.RESET_PITCH_ON_TICK, false)) {
-            npc.getEntity().setXRot(0);
-        }
-        Set<PacketRotationSession> ran = new HashSet<>();
-        for (PacketRotationSession session : packetSessions) {
-            if (ran.add(session)) {
-                session.run(npc.getEntity());
-            }
-        }
-        for (PacketRotationSession session : packetSessionsByUUID.values()) {
-            if (ran.add(session)) {
-                session.run(npc.getEntity());
-            }
+        if (npc == null || !npc.isSpawned()) return;
+        Entity entity = npc.getEntity();
+        if (npc.data().get(NPC.Metadata.RESET_PITCH_ON_TICK, false)) entity.setXRot(0);
+        Set<PacketRotationSession> sessions = new HashSet<>(packetSessions);
+        sessions.addAll(packetSessionsByUUID.values());
+        for (PacketRotationSession session : sessions) {
+            session.run(entity);
+            if (npc.getEntity() != entity || entity.isRemoved()) return;
         }
         packetSessions.removeIf(s -> !s.isActive());
         packetSessionsByUUID.values().removeIf(s -> !s.isActive());
-        // while navigating, the navigator owns the rotation - fighting it would make the NPC walk sideways
-        if (npc.getNavigator().isNavigating())
-            return;
-        globalSession.run(new EntityRotation(npc.getEntity()));
+        // While navigating, the navigator owns the physical rotation.
+        if (!npc.getNavigator().isNavigating()) globalSession.run(new EntityRotation(entity));
+        if (!hasPacketSessions() && delivered.isEmpty()) return;
+        List<ServerPlayer> viewers = NPCVisibility.viewers(entity);
+        delivered.keySet().removeIf(viewer -> !viewers.contains(viewer));
+        for (ServerPlayer viewer : viewers) deliver(entity, viewer, false);
+    }
+
+    public static byte degreesToByte(float degrees) {
+        return (byte) net.minecraft.util.Mth.floor(degrees * 256.0F / 360.0F);
     }
 
     private Location getEyeLocation() {
@@ -205,10 +267,13 @@ public class RotationTrait extends Trait {
     /** A rotation shown to some viewers only, pushed to them as packets. */
     public static class PacketRotationSession {
         private volatile boolean ended;
+        private boolean finishing;
+        private final RotationTrait owner;
         private final RotationSession session;
         private volatile PacketRotationTriple triple;
 
-        PacketRotationSession(RotationSession session) {
+        PacketRotationSession(RotationTrait owner, RotationSession session) {
+            this.owner = owner;
             this.session = session;
         }
 
@@ -217,7 +282,7 @@ public class RotationTrait extends Trait {
         }
 
         public void end() {
-            ended = true;
+            owner.releasePacketSession(this);
         }
 
         public float getBodyYaw() {
@@ -237,73 +302,36 @@ public class RotationTrait extends Trait {
         }
 
         public boolean isActive() {
-            return !ended && session.isActive();
+            return !ended && (finishing || session.isActive());
         }
 
-        /**
-         * Tells the session that vanilla has just sent its own rotation to the viewers, so the next tick must resend even
-         * if the rotation has barely moved. Nothing calls this yet — outgoing packet rewriting arrives with
-         * {@code PacketNPC}.
-         */
-        public void onPacketOverwritten() {
-            if (triple != null) {
-                triple.record();
-            }
+        /** Compatibility notification; delivery is now tracked per viewer, not globally per session. */
+        public void onPacketOverwritten() { }
+
+        void initialize(Entity entity) {
+            if (triple == null) triple = new PacketRotationTriple(entity);
         }
 
         void run(Entity entity) {
-            if (triple == null) {
-                triple = new PacketRotationTriple(entity);
-            }
+            if (ended) return;
+            if (finishing && !session.isActive()) { ended = true; return; }
+            finishing = false;
+            if (!session.isActive()) return;
+            initialize(entity);
             session.run(triple);
-            if (!session.isActive()) {
-                triple = null;
-            }
+            // Keep the final frame through this tick's native broadcasts; fall back on the following tick.
+            finishing = !session.isActive();
         }
     }
 
-    /**
-     * A rotation that is sent rather than applied. Only resent once it has drifted by more than a degree in total, since
-     * the packets are byte-quantised anyway and a smaller change would not be visible.
-     */
+    /** Interpolation state only. The trait delivers the winning state once per viewer. */
     private static class PacketRotationTriple extends EntityRotation {
-        private volatile float lastBodyYaw;
-        private volatile float lastHeadYaw;
-        private volatile float lastPitch;
-
         PacketRotationTriple(Entity entity) {
             super(entity);
+            // The client starts from entity yaw; a living entity's body-animation yaw is a different native field.
+            bodyYaw = entity.getYRot();
         }
-
-        @Override
-        void apply(Function<ServerPlayer, Boolean> filter) {
-            if (Math.abs(lastBodyYaw - bodyYaw) + Math.abs(lastHeadYaw - headYaw) + Math.abs(pitch - lastPitch) <= 1)
-                return;
-            ClientboundMoveEntityPacket.Rot rot = new ClientboundMoveEntityPacket.Rot(entity.getId(),
-                    degreesToByte(bodyYaw), degreesToByte(pitch), entity.onGround());
-            ClientboundRotateHeadPacket head = new ClientboundRotateHeadPacket(entity, degreesToByte(headYaw));
-            for (ServerPlayer viewer : EntityUtil.getNearbyVisiblePlayers(entity, VIEW_RANGE)) {
-                if (filter != null && !Boolean.TRUE.equals(filter.apply(viewer))) {
-                    continue;
-                }
-                viewer.connection.send(rot);
-                viewer.connection.send(head);
-            }
-            record();
-        }
-
-        void record() {
-            lastBodyYaw = bodyYaw;
-            lastHeadYaw = headYaw;
-            lastPitch = pitch;
-        }
-
-        private static byte degreesToByte(float degrees) {
-            return (byte) net.minecraft.util.Mth.floor(degrees * 256.0F / 360.0F);
-        }
-
-        /** Far enough to cover any viewer that can see the entity at all; the tracking range is smaller than this. */
-        private static final double VIEW_RANGE = 128;
+        @Override void apply(Function<ServerPlayer, Boolean> filter) { }
     }
 
     /** How a session should turn: how fast, whether the body follows, and which viewers it applies to. */

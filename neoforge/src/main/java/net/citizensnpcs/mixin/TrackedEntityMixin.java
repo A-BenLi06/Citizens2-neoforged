@@ -14,6 +14,7 @@ import net.citizensnpcs.util.NPCVisibility;
 import net.citizensnpcs.util.HologramMetadata;
 import net.citizensnpcs.util.EquipmentPackets;
 import net.citizensnpcs.util.PacketMounts;
+import net.citizensnpcs.util.RotationPackets;
 import net.minecraft.network.protocol.Packet;
 import net.minecraft.server.network.ServerPlayerConnection;
 import net.minecraft.server.level.ServerPlayer;
@@ -55,7 +56,8 @@ public abstract class TrackedEntityMixin implements NPCVisibility.TrackedEntity 
             Operation<Void> original) {
         Packet<?> projected = PacketMounts.rewrite(entity, connection.getPlayer(), packet);
         if (projected != null) original.call(connection, EquipmentPackets.rewrite(entity, connection.getPlayer(),
-                HologramMetadata.rewrite(entity, connection.getPlayer(), projected)));
+                HologramMetadata.rewrite(entity, connection.getPlayer(),
+                        RotationPackets.rewrite(entity, connection.getPlayer(), projected))));
     }
 
     @WrapOperation(method = "broadcastAndSend", at = @At(value = "INVOKE",
@@ -64,7 +66,8 @@ public abstract class TrackedEntityMixin implements NPCVisibility.TrackedEntity 
             Packet<?> packet, Operation<Void> original) {
         Packet<?> projected = PacketMounts.rewrite(entity, connection.getPlayer(), packet);
         if (projected != null) original.call(connection, EquipmentPackets.rewrite(entity, connection.getPlayer(),
-                HologramMetadata.rewrite(entity, connection.getPlayer(), projected)));
+                HologramMetadata.rewrite(entity, connection.getPlayer(),
+                        RotationPackets.rewrite(entity, connection.getPlayer(), projected))));
     }
 
     @Override public void citizens$updateViewers(List<ServerPlayer> players) {

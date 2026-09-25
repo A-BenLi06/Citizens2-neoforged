@@ -20,6 +20,7 @@ import net.citizensnpcs.trait.ScoreboardTrait;
 import net.citizensnpcs.util.HologramMetadata;
 import net.citizensnpcs.util.EquipmentPackets;
 import net.citizensnpcs.util.PacketMounts;
+import net.citizensnpcs.util.RotationPackets;
 import net.minecraft.network.protocol.Packet;
 import net.minecraft.network.protocol.game.ClientGamePacketListener;
 import net.minecraft.server.level.ServerEntity;
@@ -41,13 +42,15 @@ public class ServerEntityMixin {
             Operation<Void> original) {
         Packet<?> projected = PacketMounts.pairing(entity, connection.getPlayer(), packet);
         if (projected != null) original.call(connection, EquipmentPackets.rewrite(entity, connection.getPlayer(),
-                HologramMetadata.rewrite(entity, connection.getPlayer(), projected)));
+                HologramMetadata.rewrite(entity, connection.getPlayer(),
+                        RotationPackets.rewrite(entity, connection.getPlayer(), projected))));
     }
 
     @Inject(method = "removePairing", at = @At(value = "INVOKE",
             target = "Lnet/neoforged/neoforge/event/EventHooks;onStopEntityTracking(Lnet/minecraft/world/entity/Entity;Lnet/minecraft/world/entity/player/Player;)V"))
     private void citizens$forgetViewerBeforeCallbacks(ServerPlayer viewer, CallbackInfo ci) {
         PacketMounts.forget(entity, viewer);
+        RotationPackets.forget(entity, viewer);
         HologramMetadata.forget(entity, viewer);
         if (entity instanceof EntityHumanNPC human) SkinPacketTracker.removeFrom(human, viewer);
     }
