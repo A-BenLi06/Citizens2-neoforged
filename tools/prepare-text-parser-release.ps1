@@ -44,7 +44,7 @@ $rewritten = foreach ($line in $lines) {
 Set-Content -LiteralPath (Join-Path $fixture 'launch-args.txt') -Encoding utf8NoBOM -Value $rewritten
 Set-Content -LiteralPath (Join-Path $fixture 'eula.txt') -Encoding ascii -Value 'eula=true'
 Set-Content -LiteralPath (Join-Path $fixture 'commands.txt') -Encoding utf8NoBOM -Value @(
-    'npc create <gradient:red:blue>PackageParser</gradient> --type COW --at 0,-60,0',
+    'npc create <gradient:red:blue>PackageParser</gradient> --type COW --at 0,-60,0,minecraft:overworld',
     'npc list',
     'stop'
 )

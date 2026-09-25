@@ -17,7 +17,6 @@ import org.joml.Vector3f;
 import com.google.common.base.CharMatcher;
 import com.google.common.base.Joiner;
 import com.google.common.base.Splitter;
-import com.google.common.collect.Iterables;
 
 import net.citizensnpcs.api.command.exception.CommandException;
 import net.citizensnpcs.api.persistence.LocationPersister;
@@ -44,8 +43,8 @@ import net.minecraft.world.phys.Vec3;
  * <ul>
  * <li>The sender is a {@link CommandSourceStack}, which already unifies player, command block and console — so upstream's
  * three-way branch on sender type collapses into asking the source for its position and level.
- * <li>A location's world part is a dimension id resolved through {@link LocationPersister#resolve}, which also accepts
- * the legacy world names an existing save may hold.
+ * <li>A location's world part is resolved through {@link LocationPersister#resolveStrict}, which also accepts
+ * known legacy world names without sending unknown command targets to the overworld.
  * <li>{@code parseEulerAngle} returns vanilla {@link Rotations} (degrees) rather than Bukkit's {@code EulerAngle}
  * (radians). The {@code d}/{@code r} suffixes still work, so the same input produces the same pose.
  * </ul>
@@ -353,6 +352,8 @@ public class CommandContext {
      * Resolves a {@code --at}-style location: coordinates, {@code me}/{@code here}, {@code facing}, or a player name.
      */
     public Location parseLocation(String flag) throws CommandException {
+        if (flag == null || flag.isBlank())
+            throw new CommandException(CommandMessages.INVALID_LOCATION);
         Location base = sourceLocation();
         if (LOCATION_PATTERN.asPredicate().test(flag))
             return parseLocation(base != null ? base.getWorld() : null, flag);
@@ -383,43 +384,16 @@ public class CommandContext {
      *            the dimension to use when the location does not name one
      */
     public static Location parseLocation(ServerLevel baseWorld, String flag) throws CommandException {
-        // Denizen's l@ prefix is kept: an existing saves.yml or script may still use it
-        boolean denizen = flag.startsWith("l@");
-        String[] parts = Iterables.toArray(LOCATION_SPLITTER.split(flag.replaceFirst("l@", "")), String.class);
-        String worldName = baseWorld != null ? baseWorld.dimension().location().toString() : "";
-        double x = 0, y = 0, z = 0;
-        float yaw = 0F, pitch = 0F;
-        switch (parts.length) {
-            case 6:
-                if (denizen) {
-                    worldName = parts[5].replaceFirst("w@", "");
-                } else {
-                    pitch = Float.parseFloat(parts[5]);
-                }
-            case 5:
-                if (denizen) {
-                    pitch = Float.parseFloat(parts[4]);
-                } else {
-                    yaw = Float.parseFloat(parts[4]);
-                }
-            case 4:
-                if (denizen && parts.length > 4) {
-                    yaw = Float.parseFloat(parts[3]);
-                } else {
-                    worldName = parts[3].replaceFirst("w@", "");
-                }
-            case 3:
-                x = Double.parseDouble(parts[0]);
-                y = Double.parseDouble(parts[1]);
-                z = Double.parseDouble(parts[2]);
-                break;
-            default:
-                throw new CommandException(CommandMessages.INVALID_LOCATION);
+        CommandLocation input;
+        try {
+            input = CommandLocation.parse(flag);
+        } catch (IllegalArgumentException invalid) {
+            throw new CommandException(CommandMessages.INVALID_LOCATION);
         }
-        ServerLevel world = LocationPersister.resolve(worldName);
+        ServerLevel world = input.world() == null ? baseWorld : LocationPersister.resolveStrict(input.world());
         if (world == null)
             throw new CommandException(CommandMessages.INVALID_LOCATION);
-        return new Location(world, x, y, z, yaw, pitch);
+        return new Location(world, input.x(), input.y(), input.z(), input.yaw(), input.pitch());
     }
 
     public static Quaternionf parseQuaternion(String string) {
@@ -469,6 +443,5 @@ public class CommandContext {
 
     private static final Pattern FLAG = Pattern.compile("^-[a-zA-Z]+$");
     private static final Pattern LOCATION_PATTERN = Pattern.compile("[,:]");
-    private static final Splitter LOCATION_SPLITTER = Splitter.on(Pattern.compile("[,:]")).omitEmptyStrings();
     private static final Pattern VALUE_FLAG = Pattern.compile("^--[a-zA-Z0-9-_]+$");
 }

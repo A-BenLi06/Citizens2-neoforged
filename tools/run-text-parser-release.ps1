@@ -33,7 +33,7 @@ try {
         Start-Sleep -Milliseconds 250
     }
     Write-Output "Release server ready (PID $($process.Id)); exercising the packaged parser"
-    $process.StandardInput.WriteLine('npc create <gradient:red:blue>PackageParser</gradient> --type COW --at 0,-60,0')
+    $process.StandardInput.WriteLine('npc create <gradient:red:blue>PackageParser</gradient> --type COW --at 0,-60,0,minecraft:overworld')
     $process.StandardInput.Flush()
     $deadline = [DateTime]::UtcNow.AddSeconds(30)
     while ((Get-Content -LiteralPath $log -Raw) -notmatch 'Created .*PackageParser') {
@@ -49,7 +49,8 @@ try {
     if ($raw -match 'NoClassDefFoundError|ClassNotFoundException|ModLoadingException|Exception executing command|Created .*<gradient') {
         throw 'Packaged parser smoke check failed; inspect the isolated log'
     }
-    if ($raw -notmatch '\d+ - PackageParser \(cow, spawned\)' -or !$raw.Contains('Citizens disabled.')) {
+    $created = [regex]::Match($raw, 'Created PackageParser \(ID (\d+)\)')
+    if (!$created.Success -or $raw -notmatch ('\]: ' + $created.Groups[1].Value + ' - PackageParser \(cow, spawned\)') -or !$raw.Contains('Citizens disabled.')) {
         throw 'Packaged NPC list or shutdown did not complete'
     }
     Write-Output 'PASS packaged Citizens and Interactions startup, gradient NPC creation, list and clean shutdown'

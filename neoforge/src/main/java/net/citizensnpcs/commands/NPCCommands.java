@@ -2063,6 +2063,8 @@ public class NPCCommands {
                 && !PermissionUtil.hasPermission(sender, "citizens.npc.admin"))
             throw new NoPermissionsException();
 
+        // Resolve all location inputs before creating a registry/NPC or applying traits and templates.
+        Location spawnAt = at != null ? args.parseLocation(at) : args.getSenderLocation();
         NPCRegistry registry = CitizensAPI.getNPCRegistry();
         if (registryName != null) {
             registry = CitizensAPI.getNamedNPCRegistry(registryName);
@@ -2133,7 +2135,6 @@ public class NPCCommands {
                 msg.append(" with templates ").append(Joiner.on(", ").join(applied));
             }
         }
-        Location spawnAt = at != null ? args.parseLocation(at) : args.getSenderLocation();
         if (spawnAt == null) {
             msg.append(" unspawned - run this in-world or pass --at to place it");
         } else {
