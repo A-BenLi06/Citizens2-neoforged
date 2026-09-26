@@ -8,20 +8,17 @@ import net.citizensnpcs.api.persistence.Persist;
 import net.citizensnpcs.api.trait.Trait;
 import net.citizensnpcs.api.trait.TraitName;
 import net.citizensnpcs.npc.NPCRegistries;
+import net.citizensnpcs.util.NPCMounts;
 import net.minecraft.world.entity.Entity;
 
-/**
- * Persists the NPC this one is riding, and remounts it whenever both are spawned.
- * <p>
- * Only another NPC can be the mount, since the target is looked up by NPC UUID — that is upstream's design too, and it
- * is what makes the mount survive a restart: a plain entity has no stable identity across a reload.
- * <p>
- * Upstream detects "am I riding an NPC" by testing the vehicle for {@code NPCHolder}. The port's entities are vanilla
- * instances with no such interface, so the vehicle is resolved through {@link NPCRegistries} instead.
- */
+/** Persists a requested NPC mount and retries when both entities can actually ride together. */
 @TraitName("mounttrait")
 public class MountTrait extends Trait {
-    private UUID currentMount;
+    private long checkingRevision = -1;
+    private Entity observedVehicle;
+    private boolean retired;
+    private long revision;
+    private boolean suspended;
     @Persist("mountedon")
     private UUID uuid;
 
@@ -30,48 +27,84 @@ public class MountTrait extends Trait {
     }
 
     public void checkMounted() {
-        if (uuid == null || uuid.equals(currentMount) || !npc.isSpawned())
+        if (!active() || uuid == null || checkingRevision == revision)
             return;
         NPC other = CitizensAPI.getNPCRegistry().getByUniqueIdGlobal(uuid);
-        if (other != null && other.isSpawned()) {
-            npc.getEntity().startRiding(other.getEntity(), true);
-            currentMount = uuid;
+        if (other == null || !other.isSpawned())
+            return;
+        Entity rider = npc.getEntity();
+        Entity previousVehicle = rider.getVehicle();
+        Entity target = other.getEntity();
+        long request = revision;
+        long previous = checkingRevision;
+        checkingRevision = request;
+        try {
+            NPCMounts.mount(rider, target, () -> request == revision && active() && npc.getEntity() == rider);
+        } finally {
+            checkingRevision = previous;
+            if (request == revision && active() && npc.getEntity() == rider) {
+                Entity actual = rider.getVehicle();
+                // A native listener can choose a different vehicle without calling this trait. Leave that
+                // change observable to run(), so it is adopted instead of overwritten on the next tick.
+                observedVehicle = actual == null || actual == target || actual == previousVehicle ? actual : previousVehicle;
+            }
         }
     }
 
+    /** Returns the actual NPC vehicle, never a pending or canceled mount request. */
     public UUID getMountedOn() {
-        return currentMount;
+        if (!active())
+            return null;
+        NPC mount = NPCRegistries.lookup(npc.getEntity().getVehicle());
+        return mount == null ? null : mount.getUniqueId();
+    }
+
+    private boolean active() {
+        return !retired && !suspended && npc != null && npc.isSpawned()
+                && npc.getTraitNullable(MountTrait.class) == this;
+    }
+
+    @Override
+    public void onAttach() {
+        retired = false;
+        suspended = false;
     }
 
     @Override
     public void onDespawn() {
-        if (currentMount == null)
-            return;
-        if (npc.isSpawned()) {
-            npc.getEntity().stopRiding();
-        }
-        currentMount = null;
+        suspended = true;
+        long request = ++revision;
+        Entity rider = npc.getEntity();
+        NPCMounts.dismount(rider, () -> revision == request && npc.getEntity() == rider);
+        observedVehicle = null;
     }
 
     @Override
     public void onRemove() {
+        retired = true;
         onDespawn();
     }
 
     @Override
+    public void onSpawn() {
+        suspended = false;
+        observedVehicle = null;
+        checkMounted();
+    }
+
+    @Override
     public void run() {
-        if (!npc.isSpawned())
+        if (!active())
             return;
         Entity vehicle = npc.getEntity().getVehicle();
-        if (vehicle == null) {
-            if (currentMount != null) {
-                currentMount = null;
-            }
-        } else {
+        if (vehicle != observedVehicle) {
+            observedVehicle = vehicle;
             NPC mount = NPCRegistries.lookup(vehicle);
             if (mount != null) {
-                // something else mounted us in the meantime; adopt it so the state persists
-                setMountedOn(mount.getUniqueId());
+                // Adopt an external change, but do not let an unchanged old vehicle overwrite a pending switch
+                // or restore a request explicitly cleared while a mod refused the dismount.
+                uuid = mount.getUniqueId();
+                revision++;
             }
         }
         checkMounted();
@@ -79,13 +112,22 @@ public class MountTrait extends Trait {
 
     public void setMountedOn(UUID uuid) {
         this.uuid = uuid;
+        revision++;
+        if (active()) observedVehicle = npc.getEntity().getVehicle();
         checkMounted();
     }
 
     public void unmount() {
-        if (currentMount == null)
-            return;
-        onDespawn();
         uuid = null;
+        long request = ++revision;
+        if (!active())
+            return;
+        Entity rider = npc.getEntity();
+        Entity previousVehicle = rider.getVehicle();
+        NPCMounts.dismount(rider, () -> request == revision && active() && npc.getEntity() == rider);
+        if (request == revision && active() && npc.getEntity() == rider) {
+            Entity actual = rider.getVehicle();
+            observedVehicle = actual == null || actual == previousVehicle ? actual : previousVehicle;
+        }
     }
 }

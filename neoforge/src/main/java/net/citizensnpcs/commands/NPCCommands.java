@@ -2559,17 +2559,32 @@ public class NPCCommands {
 
     @Command(
             aliases = { "npc" },
-            usage = "mount (--onnpc id)",
+            usage = "mount (--onnpc <npc id|uuid>) (-d(ismount)) (-c(ancel))",
             desc = "",
             modifiers = { "mount" },
+            flags = "cd",
+            strictArguments = true,
             min = 1,
             max = 1,
             permission = "citizens.npc.mount")
-    public void mount(CommandContext args, ServerPlayer player, NPC npc, @Flag("onnpc") Integer onNPC)
+    public void mount(CommandContext args, CommandSourceStack sender, NPC npc, @Flag("onnpc") String onNPC)
             throws CommandException {
-        CommandSourceStack sender = player.createCommandSourceStack();
+        if (args.hasFlag('d')) {
+            if (sender.getPlayer() != null)
+                net.citizensnpcs.util.NPCMounts.dismount(sender.getPlayer(), () -> true);
+            return;
+        }
         if (onNPC != null) {
-            NPC mount = CitizensAPI.getNPCRegistry().getById(onNPC);
+            NPC mount;
+            try {
+                mount = CitizensAPI.getNPCRegistry().getByUniqueId(UUID.fromString(onNPC));
+            } catch (IllegalArgumentException invalidUUID) {
+                try {
+                    mount = CitizensAPI.getNPCRegistry().getById(Integer.parseInt(onNPC));
+                } catch (NumberFormatException invalidID) {
+                    throw new CommandException(CommandMessages.INVALID_VALUE, "--onnpc", onNPC);
+                }
+            }
             if (mount == null || !mount.isSpawned())
                 throw new CommandException(Messages.MOUNT_NPC_MUST_BE_SPAWNED, onNPC);
             if (mount == npc)
@@ -2577,9 +2592,18 @@ public class NPCCommands {
             npc.getOrAddTrait(MountTrait.class).setMountedOn(mount.getUniqueId());
             return;
         }
-        if (!npc.isSpawned())
-            throw new CommandException(Messages.MOUNT_NPC_MUST_BE_SPAWNED, npc.getName());
-        if (!player.startRiding(npc.getEntity(), true)) {
+        if (args.hasFlag('c')) {
+            npc.getOrAddTrait(MountTrait.class).unmount();
+            return;
+        }
+        Controllable controllable = npc.getTraitNullable(Controllable.class);
+        if (controllable == null || !controllable.isEnabled()) {
+            Messaging.sendTr(sender, Messages.NPC_NOT_CONTROLLABLE, npc.getName());
+            return;
+        }
+        if (sender.getPlayer() == null)
+            throw new CommandException(CommandMessages.MUST_BE_INGAME);
+        if (!controllable.mount(sender.getPlayer())) {
             Messaging.sendTr(sender, Messages.FAILED_TO_MOUNT_NPC, npc.getName());
         }
     }

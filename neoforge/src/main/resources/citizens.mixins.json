@@ -6,6 +6,9 @@
   "mixins": [
     "BlockAttachedEntityMixin",
     "ChunkMapMixin",
+    "EntityMountMixin",
+    "LivingEntityMountMixin",
+    "ServerPlayerMountMixin",
     "LivingEntitySoundMixin",
     "MobSoundMixin",
     "ServerEntityMixin",

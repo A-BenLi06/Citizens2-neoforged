@@ -13,6 +13,7 @@ import net.citizensnpcs.api.trait.TraitName;
 import net.citizensnpcs.api.trait.trait.Owner;
 import net.citizensnpcs.api.util.PermissionUtil;
 import net.citizensnpcs.util.Util;
+import net.citizensnpcs.util.NPCMounts;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.Entity;
@@ -69,12 +70,15 @@ public class Controllable extends Trait {
     public boolean mount(ServerPlayer toMount) {
         if (!npc.isSpawned() || npc.getEntity().getPassengers().contains(toMount))
             return false;
-        return toMount.startRiding(npc.getEntity(), true);
+        Entity vehicle = npc.getEntity();
+        boolean wasEnabled = enabled;
+        return NPCMounts.mount(toMount, vehicle, () -> enabled == wasEnabled && npc.isSpawned()
+                && npc.getEntity() == vehicle && npc.getTraitNullable(Controllable.class) == this);
     }
 
     @TraitEventHandler
     public void onRightClick(NPCRightClickEvent event) {
-        if (!enabled || event.getNPC() != npc)
+        if (!enabled || event.getNPC() != npc || !npc.isSpawned() || controller == null)
             return;
         ServerPlayer clicker = event.getClicker();
         String typeName = BuiltInRegistries.ENTITY_TYPE.getKey(npc.getEntity().getType()).getPath()
@@ -83,8 +87,13 @@ public class Controllable extends Trait {
                 || !PermissionUtil.hasPermission(clicker, "citizens.npc.controllable." + typeName)
                 || ownerRequired && !npc.getOrAddTrait(Owner.class).isOwnedBy(clicker.createCommandSourceStack()))
             return;
+        Entity vehicle = npc.getEntity();
+        MovementController activeController = controller;
         mount(clicker);
-        controller.rightClickEntity(event);
+        if (!enabled || !npc.isSpawned() || npc.getEntity() != vehicle || controller != activeController
+                || npc.getTraitNullable(Controllable.class) != this)
+            return;
+        activeController.rightClickEntity(event);
         event.setDelayedCancellation(true);
     }
 
