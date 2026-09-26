@@ -25,6 +25,9 @@ public interface EntityController {
 
     Entity getEntity();
 
+    /** Adopts the native entity returned by a successful cross-dimension transfer. */
+    void replaceEntity(Entity entity);
+
     /**
      * Removes the entity from the level without a death animation.
      */

@@ -36,6 +36,14 @@ public abstract class AbstractEntityController implements EntityController {
     }
 
     @Override
+    public void replaceEntity(Entity replacement) {
+        if (entity == null || replacement == null || !entity.getUUID().equals(replacement.getUUID())
+                || entity.getType() != replacement.getType())
+            throw new IllegalArgumentException("Transferred entity must retain its type and UUID");
+        entity = replacement;
+    }
+
+    @Override
     public void remove() {
         if (entity == null)
             return;

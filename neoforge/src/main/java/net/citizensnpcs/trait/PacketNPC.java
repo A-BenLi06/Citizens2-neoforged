@@ -125,6 +125,11 @@ public class PacketNPC extends Trait {
         unlinkAll();
     }
 
+    /** Releases old-world viewers before the owning NPC transfers its native entity. */
+    public void prepareTeleport() {
+        unlinkAll(false);
+    }
+
     /** Trait replacement calls the no-argument hook; only the replacement may keep tracking the entity. */
     @Override
     public void onRemove() {
@@ -222,11 +227,13 @@ public class PacketNPC extends Trait {
             INTERACTION_TARGETS.remove(registeredEntityId.intValue(), this);
             registeredEntityId = null;
         }
-        if (spawned && packetTracker != null) {
-            if (discard) packetTracker.unlinkAll(null);
-            else packetTracker.unpairAll(null);
-        }
+        EntityPacketTracker previous = spawned ? packetTracker : null;
         spawned = false;
+        // Retire this tracker before callbacks can replace it or start another transfer.
+        if (previous != null) {
+            if (discard) previous.unlinkAll(null);
+            else previous.unpairAll(null);
+        }
     }
 
     private class PacketController implements EntityController {
@@ -250,6 +257,11 @@ public class PacketNPC extends Trait {
         @Override
         public Entity getEntity() {
             return base.getEntity();
+        }
+
+        @Override
+        public void replaceEntity(Entity entity) {
+            base.replaceEntity(entity);
         }
 
         @Override

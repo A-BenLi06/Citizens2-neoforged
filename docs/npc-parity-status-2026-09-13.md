@@ -4,7 +4,9 @@
 
 Initial audit timestamp: 2026-09-13 01:47:09 +08:00 (UTC+08:00).
 
-Current summary updated: 2026-09-25 20:36:52 +08:00 (UTC+08:00).
+Current summary updated: 2026-09-26 19:32:39 +08:00 (UTC+08:00).
+
+Latest Citizens follow-up: [follow commands, navigation ownership and native dimension transfer](follow-and-dimension-transfer-2026-09-26.md) restores explicit enable/disable, validates combined options and permissions before mutation, rejects stale pending target choices, resolves virtual player UUIDs, and preserves independent navigation. Native dimension transfers retain the current entity/controller relationship, bind ownership before world admission, keep virtual entities out of world/player indexes, and honor teleport cancellation and callback replacement. The dedicated fixture passes 129 checks, including native damage/protection, actual player sessions, four world/virtual entity/player transfer combinations and real tick movement. Physical-client, mounted cross-dimension hierarchy and combined modpack/proxy acceptance remain unverified. Evidence: `artifacts/follow-validation-summary.json`.
 
 Latest Citizens pose follow-up: [named directions and command parity](npc-poses-2026-09-25.md) restores NPC-based `--save`, source-based `--mirror`, yaw/pitch overrides, `-d`, trailing `-a` and stable pitch/yaw listing. Validation precedes mutations and unnecessary attachment. Pose names use a locale-independent key; malformed/nonfinite saved strings stay inactive and survive saves until explicitly repaired/removed. The dedicated fixture passes 70 checks, including actual command dispatch, legacy persistence, stored-position respawn, navigation and real ticks. Regressions pass 63 LookClose checks, 64 rotation checks, 107 NPC assertions, 223 general probes and 232 ordinary tests. Clean build and archive exclusions pass. Evidence: `artifacts/pose-validation-summary.json`. Physical-client and combined modpack/proxy acceptance remain unverified.
 
@@ -300,7 +302,7 @@ Six more missing pairs concern later-version capabilities: `chicken`, `cow`, `pi
 | `pose` | Superseded by [the native pose follow-up](npc-poses-2026-09-25.md): NPC-based save, source mirroring, yaw/pitch overrides, default/immediate flags, listing and safe legacy persistence are implemented. Physical-client presentation remains unverified. |
 | `anchor`, `chunkload`, `collidable` | Cursor-target anchor saving, temporary chunkload and fluid-push configuration flags are missing. Basic anchors, chunk tickets and collision controls exist. |
 | `spawn`, `tp`, `tphere` / `move` | Name/legacy option support and exact/front/cursor/centering semantics differ. The port's `tphere` declares `-c` but its body does not inspect it. Ordinary coordinate movement exists through `moveto`, which the initial scanner had omitted from both inventories. |
-| Remaining syntax differences | Explicit `follow --enable` and `powered --set` are absent while toggle/cancel operations exist. `name -h` has a positional hover alternative; `horse --colour` is an alias difference because `--color` works; `home` supports a current-location path but not every original flag/duration spelling. These should not be counted as missing whole behaviors. |
+| Remaining syntax differences | `follow --enable` is implemented in [the native follow-up](follow-and-dimension-transfer-2026-09-26.md), with exact route ownership and lifecycle coverage. `powered --set` remains absent while toggling exists. `name -h` has a positional hover alternative; `horse --colour` is an alias difference because `--color` works; `home` supports a current-location path but not every original flag/duration spelling. These should not be counted as missing whole behaviors. |
 
 The raw flag scan also reported `minecart --item`; inspection showed the upstream parameter is unused, so this is **not** counted as a missing implemented feature. Command/flag counts alone are insufficient to determine behavior.
 

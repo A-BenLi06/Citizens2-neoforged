@@ -107,6 +107,7 @@ public abstract class AbstractNPC implements NPC {
         Trait replaced = traits.get(trait.getTraitId());
         if (replaced != null) {
             Messaging.debug("NPC", this, "replacing trait", replaced, "with", trait);
+            EventBusUtil.unregister(replaced);
             replaced.onRemove();
             runnables.remove(replaced);
         }

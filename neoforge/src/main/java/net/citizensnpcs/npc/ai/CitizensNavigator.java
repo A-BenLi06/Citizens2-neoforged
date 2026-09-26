@@ -69,6 +69,9 @@ import net.neoforged.neoforge.common.world.chunk.TicketHelper;
  */
 public class CitizensNavigator implements Navigator, Runnable {
     private long pauseRevision;
+    private long navigationRevision;
+    private boolean despawning;
+    private PathStrategy ending;
     private ChunkCoord activeTicket;
     private final NavigatorParameters defaultParams = new NavigatorParameters().baseSpeed(UNINITIALISED_SPEED)
             .range(Setting.DEFAULT_PATHFINDING_RANGE.asFloat()).debug(Setting.DEBUG_PATHFINDING.asBoolean())
@@ -105,11 +108,13 @@ public class CitizensNavigator implements Navigator, Runnable {
 
     @Override
     public void cancelNavigation() {
+        navigationRevision++;
         stopNavigating(CancelReason.PLUGIN);
     }
 
     @Override
     public void cancelNavigation(CancelReason reason) {
+        navigationRevision++;
         stopNavigating(reason);
     }
 
@@ -241,10 +246,13 @@ public class CitizensNavigator implements Navigator, Runnable {
     }
 
     public void onDespawn() {
+        despawning = true;
+        navigationRevision++;
         stopNavigating(CancelReason.NPC_DESPAWNED);
     }
 
     public void onSpawn() {
+        despawning = false;
         if (npc.getEntity() instanceof LivingEntity living) {
             defaultParams.baseSpeed((float) living.getAttributeValue(Attributes.MOVEMENT_SPEED));
         }
@@ -254,8 +262,9 @@ public class CitizensNavigator implements Navigator, Runnable {
     /** Ticked once per NPC update from {@code CitizensNPC.update}. */
     @Override
     public void run() {
-        if (!isNavigating() || !npc.isSpawned() || isPaused())
+        if (!isNavigating() || !npc.isSpawned() || despawning || isPaused())
             return;
+        PathStrategy running = executing;
 
         Location npcLoc = npc.getStoredLocation();
         Location targetLoc = getTargetAsLocation();
@@ -281,15 +290,20 @@ public class CitizensNavigator implements Navigator, Runnable {
             npc.teleport(to, TeleportCause.PLUGIN);
         } else {
             boolean finished = executing.update();
+            if (executing != running) return;
             if (!finished) {
                 localParams.run();
+                if (executing != running) return;
             }
             if (localParams.lookAtFunction() != null) {
-                lookAt(localParams.lookAtFunction().apply(this));
+                Location at = localParams.lookAtFunction().apply(this);
+                if (executing != running) return;
+                lookAt(at);
             }
             if (!finished)
                 return;
         }
+        if (executing != running) return;
         if (executing.getCancelReason() != null) {
             stopNavigating(executing.getCancelReason());
             return;
@@ -353,9 +367,14 @@ public class CitizensNavigator implements Navigator, Runnable {
     public void setTarget(Function<NavigatorParameters, PathStrategy> strategy) {
         if (!npc.isSpawned())
             throw new IllegalStateException("npc is not spawned");
+        if (despawning) return;
+        long request = ++navigationRevision;
+        Entity handle = npc.getEntity();
         if (executing != null) {
             stopNavigating(CancelReason.REPLACE);
         }
+        // Cancellation callbacks may submit a newer request, cancel this one or despawn the NPC.
+        if (request != navigationRevision || despawning || !npc.isSpawned() || npc.getEntity() != handle) return;
         localParams = defaultParams.clone();
 
         if (localParams.pathfinderType().isCitizens()) {
@@ -370,7 +389,12 @@ public class CitizensNavigator implements Navigator, Runnable {
             }
         }
         updatePathfindingRange();
-        executing = strategy.apply(localParams);
+        PathStrategy prepared = strategy.apply(localParams);
+        if (request != navigationRevision || despawning || !npc.isSpawned() || npc.getEntity() != handle) {
+            if (prepared != null && prepared != executing) prepared.stop();
+            return;
+        }
+        executing = prepared;
         stationaryTicks = 0;
         // vanilla navigation keeps steering the mob from Mob.serverAiStep, so it has to be shut off before the Citizens
         // pathfinder starts driving the same move control
@@ -449,9 +473,7 @@ public class CitizensNavigator implements Navigator, Runnable {
     }
 
     private void stopNavigating() {
-        if (executing != null) {
-            executing.stop();
-        }
+        PathStrategy old = executing;
         executing = null;
         localParams = defaultParams;
         stationaryTicks = 0;
@@ -460,6 +482,9 @@ public class CitizensNavigator implements Navigator, Runnable {
             cancelMoveDestination();
         }
         updateTicket(null);
+        // A custom strategy may start another route from stop(). The old route must already be detached so that
+        // this callback neither recurses into itself nor has its replacement erased by the old cleanup.
+        if (old != null) old.stop();
     }
 
     /**
@@ -471,45 +496,60 @@ public class CitizensNavigator implements Navigator, Runnable {
     private void stopNavigating(CancelReason reason) {
         if (!isNavigating())
             return;
-        if (reason == CancelReason.STUCK && Messaging.isDebugging()) {
-            Messaging.debug(npc, "navigation ended, stuck", executing);
-        }
-        if (session != null) {
-            session.end();
-            session = null;
-        }
-        // callbacks are single-use, so they are drained before being run: a callback that starts a new navigation must
-        // not see itself again on the next one
-        List<NavigatorCallback> callbacks = new ArrayList<>();
-        Iterator<NavigatorCallback> itr = localParams.callbacks().iterator();
-        while (itr.hasNext()) {
-            callbacks.add(itr.next());
-            itr.remove();
-        }
-        for (NavigatorCallback callback : callbacks) {
-            callback.onCompletion(reason);
-        }
-        if (reason == null) {
+        PathStrategy old = executing;
+        // A callback can replace/cancel the route being ended. Release it once without dispatching its end again.
+        if (ending == old) {
             stopNavigating();
             return;
         }
-        if (reason == CancelReason.STUCK) {
-            NavigationStuckEvent event = new NavigationStuckEvent(this, localParams.stuckAction());
-            NeoForge.EVENT_BUS.post(event);
-            StuckAction action = event.getAction();
-            if (action != null && action.run(npc, this)) {
-                // the action fixed it up, so carry on with the same strategy
-                stationaryTicks = 0;
-                executing.clearCancelReason();
+        PathStrategy previousEnding = ending;
+        ending = old;
+        try {
+            if (reason == CancelReason.STUCK && Messaging.isDebugging()) {
+                Messaging.debug(npc, "navigation ended, stuck", executing);
+            }
+            if (session != null) {
+                session.end();
+                session = null;
+            }
+            // callbacks are single-use, so they are drained before being run: a callback that starts a new navigation must
+            // not see itself again on the next one
+            List<NavigatorCallback> callbacks = new ArrayList<>();
+            Iterator<NavigatorCallback> itr = localParams.callbacks().iterator();
+            while (itr.hasNext()) {
+                callbacks.add(itr.next());
+                itr.remove();
+            }
+            for (NavigatorCallback callback : callbacks) {
+                callback.onCompletion(reason);
+            }
+            if (old != executing) return;
+            if (reason == null) {
+                stopNavigating();
                 return;
             }
-        }
-        NavigationCancelEvent event = reason == CancelReason.REPLACE ? new NavigationReplaceEvent(this)
-                : new NavigationCancelEvent(this, reason);
-        PathStrategy old = executing;
-        NeoForge.EVENT_BUS.post(event);
-        if (old == executing) {
-            stopNavigating();
+            if (reason == CancelReason.STUCK) {
+                NavigationStuckEvent event = new NavigationStuckEvent(this, localParams.stuckAction());
+                NeoForge.EVENT_BUS.post(event);
+                if (old != executing) return;
+                StuckAction action = event.getAction();
+                boolean rescued = action != null && action.run(npc, this);
+                if (old != executing) return;
+                if (rescued) {
+                    // the action fixed it up, so carry on with the same strategy
+                    stationaryTicks = 0;
+                    executing.clearCancelReason();
+                    return;
+                }
+            }
+            NavigationCancelEvent event = reason == CancelReason.REPLACE ? new NavigationReplaceEvent(this)
+                    : new NavigationCancelEvent(this, reason);
+            NeoForge.EVENT_BUS.post(event);
+            if (old == executing) {
+                stopNavigating();
+            }
+        } finally {
+            ending = previousEnding;
         }
     }
 

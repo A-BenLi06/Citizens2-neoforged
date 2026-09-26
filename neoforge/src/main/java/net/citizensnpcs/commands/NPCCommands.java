@@ -198,6 +198,7 @@ import net.minecraft.world.item.DyeColor;
  */
 @Requirements(selected = true, ownership = true)
 public class NPCCommands {
+    private final java.util.Map<NPC, Long> followRequests = new java.util.WeakHashMap<>();
     /**
      * Undo history, shared by every command that creates or destroys an NPC. Built lazily for the same reason the
      * temporary registry is looked up late: the API implementation does not exist while commands are registered.
@@ -2192,54 +2193,91 @@ public class NPCCommands {
 
     @Command(
             aliases = { "npc" },
-            usage = "follow (player name) (-c(ancel) -p(rotect)) (--margin margin)",
+            usage = "follow (player name|NPC id) (-c -p) (--margin margin) (--enable true|false)",
             desc = "",
             flags = "cp",
+            valueFlags = { "range", "location", "entitylocation" },
+            strictArguments = true,
             modifiers = { "follow" },
             min = 1,
             max = 2,
             permission = "citizens.npc.follow")
-    public void follow(CommandContext args, CommandSourceStack sender, NPC npc, @Flag("margin") Double margin)
+    public void follow(CommandContext args, CommandSourceStack sender, NPC npc, @Flag("margin") Double margin,
+            @Flag("enable") Boolean explicit)
             throws CommandException {
-        FollowTrait trait = npc.getOrAddTrait(FollowTrait.class);
-        if (margin != null) {
-            trait.setFollowingMargin(margin);
-            Messaging.sendTr(sender, Messages.FOLLOW_MARGIN_SET, margin);
+        if (margin != null && (!Double.isFinite(margin) || margin < 0 && margin != -1))
+            throw new CommandException(CommandMessages.INVALID_VALUE, "--margin", margin);
+        if (args.hasFlag('c') && Boolean.TRUE.equals(explicit)) throw new CommandUsageException();
+        if (args.hasValueFlag("range")) {
+            try {
+                if (!Double.isFinite(args.getFlagDouble("range"))) throw new NumberFormatException();
+            } catch (NumberFormatException invalid) {
+                throw new CommandException(CommandMessages.INVALID_VALUE, "--range", args.getFlag("range"));
+            }
+        }
+        long request = followRequests.merge(npc, 1L, Long::sum);
+        FollowTrait trait = npc.getTraitNullable(FollowTrait.class);
+        if (margin != null && args.argsLength() == 1 && explicit == null && !args.hasFlag('c') && !args.hasFlag('p')) {
+            npc.getOrAddTrait(FollowTrait.class).setFollowingMargin(margin);
+            Messaging.sendTr(sender, Messages.FOLLOW_MARGIN_SET, npc.getName(), margin);
             return;
         }
-        if (args.hasFlag('c') || args.argsLength() == 1 && trait.isEnabled()) {
-            trait.follow(null);
+        boolean enabled = !args.hasFlag('c') && (explicit == null ? trait == null || !trait.isEnabled() : explicit);
+        if (!enabled) {
+            if (trait != null || margin != null || args.hasFlag('p')) {
+                trait = npc.getOrAddTrait(FollowTrait.class);
+                if (margin != null) trait.setFollowingMargin(margin);
+                trait.setProtecting(args.hasFlag('p'));
+                trait.follow(null);
+            }
             Messaging.sendTr(sender, Messages.FOLLOW_UNSET, npc.getName(), "");
             return;
         }
         ServerPlayer target = args.argsLength() > 1 ? playerByName(sender, args.getString(1)) : sender.getPlayer();
         if (target == null) {
-            // upstream falls back to following another NPC when the name is not a player's, which is how an NPC is made
-            // to follow an NPC at all. Only reachable with an explicit name, and gated the same way upstream gates it.
             if (args.argsLength() < 2)
                 throw new CommandException(CommandMessages.PLAYER_NOT_FOUND_FOR_SPAWN);
             if (!PermissionUtil.hasPermission(sender, "citizens.npc.follow.others"))
                 throw new CommandException(CommandMessages.NO_PERMISSION);
-
+            FollowTrait previous = trait;
+            long expected = trait == null ? 0 : trait.getRevision();
             NPCCommandSelector.Callback callback = following -> {
+                // A delayed name choice must not revive a removed NPC or overwrite a later follow configuration.
+                if (npc.getOwningRegistry() == null || npc.getOwningRegistry().getByUniqueId(npc.getUniqueId()) != npc
+                        || !Long.valueOf(request).equals(followRequests.get(npc))
+                        || npc.getTraitNullable(FollowTrait.class) != previous
+                        || previous != null && previous.getRevision() != expected) return;
                 if (following == null)
                     throw new CommandException(CommandMessages.PLAYER_NOT_FOUND_FOR_SPAWN);
+                if (!PermissionUtil.hasPermission(sender, "citizens.npc.follow.others"))
+                    throw new CommandException(CommandMessages.NO_PERMISSION);
+                if (!npc.getOrAddTrait(Owner.class).isOwnedBy(sender))
+                    throw new CommandException(CommandMessages.MUST_BE_OWNER);
                 if (sender.getPlayer() != null && !following.getOrAddTrait(Owner.class).isOwnedBy(sender))
                     throw new CommandException(CommandMessages.MUST_BE_OWNER);
                 if (!following.isSpawned())
                     throw new CommandException(Messages.MOUNT_NPC_MUST_BE_SPAWNED, following.getName());
-
-                trait.setProtecting(args.hasFlag('p'));
-                trait.follow(following.getEntity());
-                Messaging.sendTr(sender, Messages.FOLLOW_SET, npc.getName(), following.getName());
+                if (following == npc) throw new CommandException(CommandMessages.INVALID_VALUE, "follow", following.getName());
+                applyFollow(sender, npc, following.getEntity(), following.getName(), margin, args.hasFlag('p'));
             };
             NPCCommandSelector.startWithCallback(callback, CitizensAPI.getNPCRegistry(), sender, args,
                     args.getString(1));
             return;
         }
-        trait.setProtecting(args.hasFlag('p'));
+        if (target != sender.getPlayer() && !PermissionUtil.hasPermission(sender, "citizens.npc.follow.others"))
+            throw new CommandException(CommandMessages.NO_PERMISSION);
+        applyFollow(sender, npc, target, target.getGameProfile().getName(), margin, args.hasFlag('p'));
+    }
+
+    private static void applyFollow(CommandSourceStack sender, NPC npc, Entity target, String name, Double margin,
+            boolean protect) throws CommandException {
+        if (target == npc.getEntity() || !target.isAlive() || target.isRemoved())
+            throw new CommandException(CommandMessages.INVALID_VALUE, "follow", name);
+        FollowTrait trait = npc.getOrAddTrait(FollowTrait.class);
+        if (margin != null) trait.setFollowingMargin(margin);
+        trait.setProtecting(protect);
         trait.follow(target);
-        Messaging.sendTr(sender, Messages.FOLLOW_SET, npc.getName(), target.getGameProfile().getName());
+        Messaging.sendTr(sender, Messages.FOLLOW_SET, npc.getName(), name);
     }
 
     @Command(

@@ -454,16 +454,103 @@ public class CitizensNPC extends AbstractNPC {
 
     @Override
     public void teleport(Location location, net.citizensnpcs.api.util.TeleportCause cause) {
-        if (!isSpawned())
+        if (!isSpawned() || location.getWorld() == null)
             return;
+        long request = ++teleportRevision;
         Entity entity = getEntity();
-        Entity moved = EntityUtil.teleport(entity, location);
-        if (moved != null && moved != entity) {
-            // a cross-dimension teleport replaced the entity object; keep the NPC pointing at the survivor
-            NPCRegistries.unlink(entity);
-            NPCRegistries.link(moved, this);
+        EntityController controller = entityController;
+        location = location.clone();
+        var event = new net.citizensnpcs.api.event.NPCTeleportEvent(this, location);
+        NeoForge.EVENT_BUS.post(event);
+        if (event.isCanceled() || !ownsTransfer(request, controller, entity) || !isSpawned()
+                || location.getWorld() == null) return;
+        // The public NPC teleport contract loads its destination, including outside currently watched chunks.
+        location.getChunk();
+        if (!ownsTransfer(request, controller, entity) || !isSpawned()) return;
+        if (location.getWorld() == entity.level()) {
+            if (EntityUtil.teleport(entity, location) != null && ownsTransfer(request, controller, entity))
+                getOrAddTrait(CurrentLocation.class).setLocation(Location.of(entity));
+            return;
         }
-        getOrAddTrait(CurrentLocation.class).setLocation(location);
+        PacketNPC packet = getTraitNullable(PacketNPC.class);
+        try {
+            teleportAcrossWorlds(location, request, controller, entity, packet);
+        } finally {
+            // A cancellation callback can replace this transfer with an ordinary same-world move. Always release
+            // the temporary navigation suspension for the NPC that actually survives that callback.
+            if (isSpawned()) navigator.onSpawn();
+        }
+    }
+
+    private void teleportAcrossWorlds(Location location, long request, EntityController controller, Entity entity,
+            PacketNPC packet) {
+        navigator.onDespawn();
+        if (!ownsTransfer(request, controller, entity)) return;
+        if (packet != null) {
+            packet.prepareTeleport();
+            if (!ownsTransfer(request, controller, entity) || getTraitNullable(PacketNPC.class) != packet) return;
+        }
+
+        Entity moved;
+        if (entity instanceof ServerPlayer player) {
+            // Native players retain their object on dimension changes. Virtual players must also update their
+            // game-mode level, but must never enter the destination world's entity/player collections.
+            if (packet == null) {
+                moved = EntityUtil.teleport(entity, location);
+            } else {
+                player.unRide();
+                player.setServerLevel(location.getWorld());
+                player.moveTo(location.getX(), location.getY(), location.getZ(), location.getYaw(),
+                        net.minecraft.util.Mth.clamp(location.getPitch(), -90, 90));
+                player.setYHeadRot(location.getYaw());
+                moved = player;
+            }
+        } else {
+            // Follow Entity.teleportTo's native copy/remove/add sequence. Adopt and link the copy BEFORE native
+            // admission so join/tracking callbacks see its NPC ownership and visibility rules. Recreating the native
+            // entity also rebuilds world-bound components such as Mob's PathNavigation in the destination level.
+            moved = entity.getType().create(location.getWorld());
+            if (moved == null) {
+                if (packet != null) packet.onSpawn();
+                return;
+            }
+            moved.restoreFrom(entity);
+            moved.moveTo(location.getX(), location.getY(), location.getZ(), location.getYaw(),
+                    net.minecraft.util.Mth.clamp(location.getPitch(), -90, 90));
+            moved.setYHeadRot(location.getYaw());
+            if (!ownsTransfer(request, controller, entity)) {
+                moved.discard();
+                return;
+            }
+            entity.unRide();
+            entity.setRemoved(Entity.RemovalReason.CHANGED_DIMENSION);
+            if (!ownsTransfer(request, controller, entity)) {
+                moved.discard();
+                return;
+            }
+            NPCRegistries.unlink(entity);
+            controller.replaceEntity(moved);
+            NPCRegistries.link(moved, this);
+            if (moved instanceof Mob mob && !useMinecraftAI())
+                MobEntityController.clearGoals(mob);
+            getOrAddTrait(CurrentLocation.class).setLocation(Location.of(moved));
+            if (packet == null && !location.getWorld().addFreshEntity(moved)) {
+                moved.discard();
+                return;
+            }
+        }
+        if (moved == null || !ownsTransfer(request, controller, moved) || moved.isRemoved()) return;
+        if (packet == null && moved instanceof net.citizensnpcs.npc.entity.EntityHumanNPC human)
+            human.updatePlayerListMembership();
+        if (packet != null && getTraitNullable(PacketNPC.class) == packet) packet.onSpawn();
+        getOrAddTrait(CurrentLocation.class).setLocation(Location.of(moved));
+    }
+
+    private long teleportRevision;
+
+    private boolean ownsTransfer(long request, EntityController controller, Entity entity) {
+        return request == teleportRevision && entityController == controller && getEntity() == entity
+                && getOwningRegistry() != null && getOwningRegistry().getByUniqueId(getUniqueId()) == this;
     }
 
     @Override
