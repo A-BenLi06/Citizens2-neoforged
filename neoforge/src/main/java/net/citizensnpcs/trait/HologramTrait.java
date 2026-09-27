@@ -5,6 +5,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
+import java.util.function.BooleanSupplier;
 import java.util.stream.Collectors;
 
 import org.joml.Vector3d;
@@ -28,6 +29,9 @@ import net.citizensnpcs.api.util.Location;
 import net.citizensnpcs.api.util.MemoryDataKey;
 import net.citizensnpcs.api.util.Messaging;
 import net.citizensnpcs.api.util.Placeholders;
+import net.citizensnpcs.api.util.TeleportCause;
+import net.citizensnpcs.npc.NPCRegistries;
+import net.citizensnpcs.util.NPCMounts;
 import net.citizensnpcs.util.Util;
 import net.citizensnpcs.util.HologramMetadata;
 import net.minecraft.core.particles.BlockParticleOption;
@@ -75,6 +79,7 @@ public class HologramTrait extends Trait {
     private double lastEntityBbHeight = 0;
     private Location lastLoc;
     private boolean lastNameplateVisible;
+    private boolean suspended;
     @Persist
     private double lineHeight = -1;
     private final List<HologramLine> lines = new ArrayList<>();
@@ -125,10 +130,11 @@ public class HologramTrait extends Trait {
      * Clears all hologram lines
      */
     public void clear() {
-        for (HologramLine line : lines) {
+        List<HologramLine> previous = List.copyOf(lines);
+        lines.clear();
+        for (HologramLine line : previous) {
             line.removeNPC();
         }
-        lines.clear();
     }
 
     private HologramRenderer createHologramRenderer() {
@@ -263,26 +269,30 @@ public class HologramTrait extends Trait {
 
     @Override
     public void onDespawn() {
+        suspended = true;
         reset();
     }
 
     @Override
     public void onRemove() {
+        suspended = true;
         reset();
     }
+
+    @Override public void onAttach() { suspended = false; }
 
     /**
      * Tears down every hologram entity. They are rebuilt on the next tick, which is also how a changed line height or
      * margin takes effect.
      */
     private void reset() {
-        for (HologramLine line : lines) {
-            line.removeNPC();
-        }
+        List<HologramRenderer> previous = new ArrayList<>();
+        for (HologramLine line : lines) previous.add(line.renderer);
         if (nameLine != null) {
-            nameLine.removeNPC();
+            previous.add(nameLine.renderer);
             nameLine = null;
         }
+        previous.forEach(HologramRenderer::destroy);
     }
 
     public boolean onSeenByPlayer(ServerPlayer player) {
@@ -291,6 +301,7 @@ public class HologramTrait extends Trait {
 
     @Override
     public void onSpawn() {
+        suspended = false;
         if (!npc.isSpawned())
             return;
         lastNameplateVisible = Boolean
@@ -308,6 +319,7 @@ public class HologramTrait extends Trait {
 
     @Override
     public void run() {
+        if (suspended || npc.getTraitNullable(HologramTrait.class) != this) return;
         if (!npc.isSpawned() || !isVisible(npc.getEntity())) {
             reset();
             return;
@@ -342,31 +354,50 @@ public class HologramTrait extends Trait {
             lastEntityBbHeight = entity.getBbHeight();
         }
         if (nameLine != null) {
+            HologramLine currentName = nameLine;
             if (updateText) {
-                nameLine.setText(npc.getRawName());
+                currentName.setText(npc.getRawName());
             }
-            if (updatePosition || nameLine.renderer.getEntities().isEmpty()) {
-                nameLine.render(offset);
+            if (!ownsRender(entity, npcLoc)) return;
+            if (nameLine == currentName && (updatePosition || needsRender(currentName.renderer, entity))) {
+                currentName.render(offset);
             }
+            if (!ownsRender(entity, npcLoc)) return;
             // A flag-only change does not necessarily change the parent's position or dimensions.
             boolean sneaking = entity.isShiftKeyDown();
-            nameLine.renderer.getEntities().forEach(e -> e.setShiftKeyDown(sneaking));
+            if (nameLine == currentName) currentName.renderer.getEntities().forEach(e -> e.setShiftKeyDown(sneaking));
         }
-        for (int i = 0; i < lines.size(); i++) {
-            HologramLine line = lines.get(i);
+        for (HologramLine line : List.copyOf(lines)) {
+            int i = lines.indexOf(line);
+            if (i < 0) continue;
 
             if (line.ticks > 0 && --line.ticks == 0) {
-                lines.remove(i--).removeNPC();
+                lines.remove(line);
+                line.removeNPC();
+                if (!ownsRender(entity, npcLoc)) return;
                 continue;
             }
-            if (updatePosition || line.renderer.getEntities().isEmpty()) {
+            if (updatePosition || needsRender(line.renderer, entity)) {
                 offset.y = getHeight(i);
                 line.render(offset);
             }
-            if (updateText) {
+            if (!ownsRender(entity, npcLoc)) return;
+            if (updateText && lines.contains(line)) {
                 line.setText(line.text);
             }
+            if (!ownsRender(entity, npcLoc)) return;
         }
+    }
+
+    private boolean ownsRender(Entity entity, Location at) {
+        return !suspended && npc.isSpawned() && npc.getEntity() == entity && npc.getTraitNullable(HologramTrait.class) == this
+                && at.equals(Location.of(entity));
+    }
+
+    private static boolean needsRender(HologramRenderer renderer, Entity parent) {
+        Collection<Entity> entities = renderer.getEntities();
+        // Failed dimension transfers remain pending even when the parent is stationary.
+        return entities.isEmpty() || entities.stream().anyMatch(entity -> entity.level() != parent.level());
     }
 
     @Override
@@ -473,6 +504,12 @@ public class HologramTrait extends Trait {
             NPC npc = registry().createNPC(EntityType.AREA_EFFECT_CLOUD, name);
             configured = false;
             return npc;
+        }
+
+        @Override protected Location transferLocation(NPC parent, Vector3d offset) {
+            Location at = super.transferLocation(parent, offset);
+            at.setY(at.getY() - 0.5);
+            return at;
         }
 
         @Override
@@ -725,6 +762,9 @@ public class HologramTrait extends Trait {
      */
     public abstract static class SingleEntityHologramRenderer implements HologramRenderer {
         protected NPC hologram;
+        private long revision;
+        private boolean rendering;
+        private BooleanSupplier renderOwner;
         private NPCRegistry registry;
         private int spawnWaitTicks;
         protected String text;
@@ -734,10 +774,12 @@ public class HologramTrait extends Trait {
 
         @Override
         public void destroy() {
-            if (hologram != null) {
-                HologramMetadata.forget(hologram.getEntity());
-                hologram.destroy();
-                hologram = null;
+            revision++;
+            NPC previous = hologram;
+            hologram = null;
+            if (previous != null) {
+                HologramMetadata.forget(previous.getEntity());
+                previous.destroy();
             }
         }
 
@@ -769,6 +811,19 @@ public class HologramTrait extends Trait {
 
         @Override
         public void render(NPC npc, Vector3d offset) {
+            if (rendering || !npc.isSpawned()) return;
+            rendering = true;
+            try {
+                renderOwned(npc, offset);
+            } finally {
+                renderOwner = null;
+                rendering = false;
+            }
+        }
+
+        private void renderOwned(NPC npc, Vector3d offset) {
+            Entity parent = npc.getEntity();
+            Location parentLocation = Location.of(parent);
             if (getEntities().isEmpty() && spawnWaitTicks-- <= 0) {
                 destroy();
                 spawnHologram(npc, offset);
@@ -776,7 +831,42 @@ public class HologramTrait extends Trait {
             }
             if (hologram == null || !hologram.isSpawned())
                 return;
+            long request = revision;
+            NPC current = hologram;
+            renderOwner = () -> request == revision && hologram == current && current.isSpawned()
+                    && npc.isSpawned() && npc.getEntity() == parent && parentLocation.equals(Location.of(parent));
+            if (!isRenderingCurrent()) return;
+            // Retain every helper NPC and its settings. A native transfer may replace its entity, including the
+            // item passenger of an anchor, so capture owners and read their current entities after each callback.
+            List<Entity> entities = List.copyOf(getEntities());
+            List<NPC> helpers = entities.stream().map(NPCRegistries::lookup).toList();
+            for (int i = 0; i < helpers.size(); i++) {
+                NPC helper = helpers.get(i);
+                if (helper == null) {
+                    if (entities.get(i).level() != parent.level()) return;
+                    continue;
+                }
+                if (!helper.isSpawned()) return;
+                if (helper.getEntity().level() == parent.level()) continue;
+                Location target = transferLocation(npc, offset);
+                helper.teleport(target, TeleportCause.PLUGIN);
+                if (!isRenderingCurrent() || !helper.isSpawned() || helper.getEntity().level() != parent.level()) return;
+                // A newer helper teleport made by a listener must not be overwritten by this older render.
+                if (!helper.getEntity().isPassenger() && !target.equals(helper.getStoredLocation())) return;
+            }
+            if (!isRenderingCurrent() || getEntities().stream().anyMatch(entity -> entity.level() != parent.level())) return;
             render0(npc, offset);
+        }
+
+        protected boolean isRenderingCurrent() { return renderOwner == null || renderOwner.getAsBoolean(); }
+
+        protected Location transferLocation(NPC parent, Vector3d offset) {
+            Entity entity = parent.getEntity();
+            Location at = Location.of(entity);
+            at.setX(at.getX() + offset.x);
+            at.setY(at.getY() + entity.getBbHeight() + offset.y);
+            at.setZ(at.getZ() + offset.z);
+            return at;
         }
 
         protected abstract void render0(NPC npc, Vector3d offset);
@@ -792,7 +882,7 @@ public class HologramTrait extends Trait {
         protected void mountOnParent(NPC parent) {
             Entity hologramEntity = hologram.getEntity();
             if (hologramEntity != null && hologramEntity.getVehicle() == null && parent.isSpawned()) {
-                hologramEntity.startRiding(parent.getEntity(), true);
+                NPCMounts.mount(hologramEntity, parent.getEntity(), this::isRenderingCurrent);
             }
         }
 
@@ -923,6 +1013,12 @@ public class HologramTrait extends Trait {
             return (byte) (on ? flags | flag : flags & ~flag);
         }
 
+        @Override protected Location transferLocation(NPC parent, Vector3d offset) {
+            Location at = super.transferLocation(parent, offset);
+            at.setY(at.getY() + 0.2f);
+            return at;
+        }
+
         /**
          * Matches the hologram's scale to the NPC's, so a scaled-up NPC does not get a tiny nameplate.
          */
@@ -1051,7 +1147,8 @@ public class HologramTrait extends Trait {
             Entity anchor = hologram.getEntity();
             teleport(anchor, parent.getEntity(), offset.x, offset.y + parent.getEntity().getBbHeight(), offset.z);
             Entity item = itemNPC.getEntity();
-            if (item.getVehicle() != anchor) item.startRiding(anchor, true);
+            if (item.getVehicle() != anchor && !NPCMounts.mount(item, anchor, this::isRenderingCurrent)) return;
+            if (!isRenderingCurrent()) return;
             anchor.positionRider(item);
             if (item instanceof ItemEntity drop) {
                 drop.setNeverPickUp();
@@ -1060,9 +1157,11 @@ public class HologramTrait extends Trait {
         }
 
         @Override public void destroy() {
-            if (itemNPC != null && itemNPC != hologram) itemNPC.destroy();
+            NPC previous = itemNPC;
+            boolean separate = previous != null && previous != hologram;
             itemNPC = null;
             super.destroy();
+            if (separate) previous.destroy();
         }
     }
 

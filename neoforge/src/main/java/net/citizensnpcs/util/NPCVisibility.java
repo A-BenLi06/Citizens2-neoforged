@@ -71,6 +71,9 @@ public final class NPCVisibility {
         for (NPC current = npc; current != null;) {
             if (!visited.add(current) || current.isHiddenFrom(viewer) || !current.isSpawned()) return false;
             ClickRedirectTrait redirect = current.getTraitNullable(ClickRedirectTrait.class);
+            if (current.data().has(NPC.Metadata.HOLOGRAM_RENDERER) && redirect != null
+                    && redirect.getRedirectToNPC() != null && redirect.getRedirectToNPC().isSpawned()
+                    && current.getEntity().level() != redirect.getRedirectToNPC().getEntity().level()) return false;
             current = redirect == null ? null : redirect.getRedirectToNPC();
         }
         return true;
