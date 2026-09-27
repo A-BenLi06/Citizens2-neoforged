@@ -14,6 +14,7 @@ import com.google.common.base.Splitter;
 import net.citizensnpcs.api.command.exception.CommandException;
 import net.citizensnpcs.api.npc.NPC;
 import net.minecraft.commands.CommandSourceStack;
+import net.minecraft.core.Rotations;
 import net.minecraft.core.Registry;
 
 /**
@@ -90,6 +91,14 @@ public @interface Arg {
                     throws CommandException {
                 return input;
             }
+        }
+    }
+
+    /** Parses a three-axis pose, retaining the command context's original radians/degrees syntax. */
+    public static class EulerAngleFlagValidator implements FlagValidator<Rotations> {
+        @Override
+        public Rotations validate(CommandContext args, CommandSourceStack sender, NPC npc, String input) {
+            return args.parseEulerAngle(input);
         }
     }
 

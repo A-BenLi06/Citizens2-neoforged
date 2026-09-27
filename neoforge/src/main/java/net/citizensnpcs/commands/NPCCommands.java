@@ -80,6 +80,7 @@ import net.citizensnpcs.trait.RabbitType;
 import net.citizensnpcs.trait.WitherTrait;
 import net.citizensnpcs.trait.WolfModifiers;
 import net.minecraft.core.Holder;
+import net.minecraft.core.Rotations;
 import net.minecraft.world.entity.animal.Rabbit;
 import net.minecraft.world.entity.decoration.PaintingVariant;
 import net.citizensnpcs.trait.ArmorStandTrait;
@@ -1330,16 +1331,24 @@ public class NPCCommands {
 
     @Command(
             aliases = { "npc" },
-            usage = "armorstand --visible [visible] --small [small] --marker [marker] --gravity [gravity] --arms [arms] --baseplate [baseplate]",
+            usage = "armorstand --visible [visible] --small [small] --marker [marker] --gravity [gravity] --arms [arms] --baseplate [baseplate] --(head|body|leftarm|leftleg|rightarm|rightleg)pose [x,y,z]",
             desc = "",
             modifiers = { "armorstand" },
             min = 1,
             max = 1,
+            strictArguments = true,
             permission = "citizens.npc.armorstand")
     @Requirements(selected = true, ownership = true, types = { "minecraft:armor_stand" })
     public void armorstand(CommandContext args, CommandSourceStack sender, NPC npc, @Flag("visible") Boolean visible,
             @Flag("small") Boolean small, @Flag("gravity") Boolean gravity, @Flag("arms") Boolean arms,
-            @Flag("marker") Boolean marker, @Flag("baseplate") Boolean baseplate) {
+            @Flag("marker") Boolean marker, @Flag("baseplate") Boolean baseplate,
+            @Flag(value = "headpose", validator = Arg.EulerAngleFlagValidator.class) Rotations head,
+            @Flag(value = "bodypose", validator = Arg.EulerAngleFlagValidator.class) Rotations body,
+            @Flag(value = "leftarmpose", validator = Arg.EulerAngleFlagValidator.class) Rotations leftArm,
+            @Flag(value = "leftlegpose", validator = Arg.EulerAngleFlagValidator.class) Rotations leftLeg,
+            @Flag(value = "rightarmpose", validator = Arg.EulerAngleFlagValidator.class) Rotations rightArm,
+            @Flag(value = "rightlegpose", validator = Arg.EulerAngleFlagValidator.class) Rotations rightLeg) {
+        // The command framework validates every supplied flag before invoking this method.
         ArmorStandTrait trait = npc.getOrAddTrait(ArmorStandTrait.class);
         if (visible != null) {
             trait.setVisible(visible);
@@ -1359,6 +1368,25 @@ public class NPCCommands {
         if (baseplate != null) {
             trait.setHasBaseplate(baseplate);
         }
+        if (head != null) {
+            trait.setHeadPose(head);
+        }
+        if (body != null) {
+            trait.setBodyPose(body);
+        }
+        if (leftArm != null) {
+            trait.setLeftArmPose(leftArm);
+        }
+        if (leftLeg != null) {
+            trait.setLeftLegPose(leftLeg);
+        }
+        if (rightArm != null) {
+            trait.setRightArmPose(rightArm);
+        }
+        if (rightLeg != null) {
+            trait.setRightLegPose(rightLeg);
+        }
+        trait.run();
         Messaging.sendTr(sender, Messages.ARMORSTAND_UPDATED, npc.getName());
     }
 

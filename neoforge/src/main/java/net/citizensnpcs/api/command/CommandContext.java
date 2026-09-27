@@ -3,7 +3,6 @@ package net.citizensnpcs.api.command;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -16,7 +15,6 @@ import org.joml.Vector3f;
 
 import com.google.common.base.CharMatcher;
 import com.google.common.base.Joiner;
-import com.google.common.base.Splitter;
 
 import net.citizensnpcs.api.command.exception.CommandException;
 import net.citizensnpcs.api.persistence.LocationPersister;
@@ -334,18 +332,31 @@ public class CommandContext {
 
     /**
      * Three angles for an armour stand pose. A {@code d} suffix means degrees and {@code r} radians, as upstream; the
-     * result is in degrees because that is what vanilla {@link Rotations} holds.
+     * result is in degrees because that is what vanilla {@link Rotations} holds. Bare numbers are radians. Exactly
+     * three finite angles representable as native floats are required; invalid input throws {@link IllegalArgumentException}.
      */
     public Rotations parseEulerAngle(String input) {
-        Iterator<Double> itr = Splitter.on(',').splitToStream(input).map(s -> {
-            if (s.endsWith("d"))
-                return Double.parseDouble(s.substring(0, s.length() - 1));
-            if (s.endsWith("r"))
-                return Math.toDegrees(Double.parseDouble(s.substring(0, s.length() - 1)));
-            // upstream's bare number is radians, since that is what Bukkit's EulerAngle takes
-            return Math.toDegrees(Double.parseDouble(s));
-        }).iterator();
-        return new Rotations(itr.next().floatValue(), itr.next().floatValue(), itr.next().floatValue());
+        if (input == null)
+            throw new IllegalArgumentException("Expected three angles");
+        String[] components = input.split(",", -1);
+        if (components.length != 3)
+            throw new IllegalArgumentException("Expected three angles");
+        float[] angles = new float[3];
+        for (int i = 0; i < components.length; i++) {
+            String component = components[i].trim();
+            boolean degrees = component.endsWith("d");
+            if (degrees || component.endsWith("r")) {
+                component = component.substring(0, component.length() - 1);
+            }
+            double value = Double.parseDouble(component);
+            if (!degrees) {
+                value = Math.toDegrees(value);
+            }
+            angles[i] = (float) value;
+            if (!Double.isFinite(value) || !Float.isFinite(angles[i]))
+                throw new IllegalArgumentException("Angle must be finite and representable as a float");
+        }
+        return new Rotations(angles[0], angles[1], angles[2]);
     }
 
     /**

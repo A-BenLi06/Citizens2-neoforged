@@ -11,15 +11,14 @@ A read-only declaration scan of the checked-in `main` and `neoforge` source tree
 | Command | Remaining difference in the current implementation |
 |---|---|
 | `skin` | URL/file input, supplied texture/signature, export and skull branches. Bedrock-specific integration depends on an applicable native provider. Name lookup, clear/latest mode, refresh and mirrored appearance already exist. |
-| `armorstand` | Original body, head, left/right arm and leg pose parameters; ordinary switches already exist. |
 | `create` | Item-provider input, timed temporary duration and original unspawned/center/packet shortcuts. Native item/packet backends exist; strict destination parsing was already repaired. |
 | `list`, `select` | Registry/tag/expression filtering and original selection range/registry options. Basic list pagination, type/owner filters, ID/name and nearest selection exist. |
 | `anchor`, `chunkload`, `collidable` | Cursor-target anchor saving, temporary chunk loading and fluid-push options. Existing anchors, chunk tickets and collision switches remain implemented. |
 | `spawn`, `tp`, `tphere` / `move` | Original name/option support and exact/front/cursor/center behavior. The current `tphere` declares `-c` without inspecting it. Coordinate movement through `moveto` exists. |
-| `powered`, `name`, `home` | `powered --set`, `name -h`, and original home flag/duration spellings. Toggling, hover-name alternatives and home behavior already exist. |
+| `powered`, `name`, `home` | `powered --set`, `name -h`, and original home here/duration options and combined-option precedence. Toggling, hover-name alternatives and home behavior already exist. |
 | `waypoints hpa`, `wp hpa` | Original debugging aliases require a usefulness/native-backend decision; ordinary waypoint navigation exists. |
 
-Recent follow-ups cover `follow`, `mount`, `pose`, `lookclose` / `look`, native command locations, removal targeting, text editing, entity/display commands and particle options. Their unverified client/modpack scenarios remain acceptance work. They should not be listed again as wholly missing commands. `horse --color` and `--colour` both exist; upstream's unused `minecart --item` parameter is not a missing implemented behavior.
+Recent follow-ups cover [`armorstand` limb poses](armorstand-poses-2026-09-27.md), `follow`, `mount`, `pose`, `lookclose` / `look`, native command locations, removal targeting, text editing, entity/display commands and particle options. The armor-stand fixture passes 401 checks, including original units, atomic validation, immediate native poses, legacy persistence and ordinary/virtual NPCs. Six ordinary command groups remain above, plus the waypoint debugging aliases. Their unverified client/modpack scenarios remain acceptance work. They should not be listed again as wholly missing commands. `horse --color` and `--colour` both exist; upstream's unused `minecart --item` parameter is not a missing implemented behavior.
 
 ## Behavior, data and integration acceptance
 

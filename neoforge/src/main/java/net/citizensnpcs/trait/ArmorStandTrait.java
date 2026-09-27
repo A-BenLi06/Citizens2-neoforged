@@ -4,6 +4,7 @@ import net.citizensnpcs.api.npc.NPC;
 import net.citizensnpcs.api.persistence.Persist;
 import net.citizensnpcs.api.trait.Trait;
 import net.citizensnpcs.api.trait.TraitName;
+import net.citizensnpcs.api.util.DataKey;
 import net.minecraft.core.Rotations;
 import net.minecraft.world.entity.decoration.ArmorStand;
 
@@ -71,6 +72,19 @@ public class ArmorStandTrait extends Trait {
         return visible;
     }
 
+    private ArmorStand currentEntity() {
+        return npc != null && npc.getTraitNullable(ArmorStandTrait.class) == this
+                && npc.getEntity() instanceof ArmorStand entity ? entity : null;
+    }
+
+    @Override
+    public void onDespawn() {
+        ArmorStand entity = currentEntity();
+        if (entity != null) {
+            capturePoses(entity);
+        }
+    }
+
     @Override
     public void onPreSpawn() {
         onSpawn();
@@ -78,7 +92,8 @@ public class ArmorStandTrait extends Trait {
 
     @Override
     public void onSpawn() {
-        if (!(npc.getEntity() instanceof ArmorStand entity))
+        ArmorStand entity = currentEntity();
+        if (entity == null)
             return;
         if (leftArm != null) {
             entity.setLeftArmPose(leftArm);
@@ -103,16 +118,29 @@ public class ArmorStandTrait extends Trait {
 
     @Override
     public void run() {
-        if (!(npc.getEntity() instanceof ArmorStand entity))
+        ArmorStand entity = currentEntity();
+        if (entity == null)
             return;
         // read the poses back so a stand posed by other means is persisted, then re-assert our own flags
+        capturePoses(entity);
+        applyFlags(entity);
+    }
+
+    @Override
+    public void save(DataKey key) {
+        ArmorStand entity = currentEntity();
+        if (entity != null) {
+            capturePoses(entity);
+        }
+    }
+
+    private void capturePoses(ArmorStand entity) {
         body = entity.getBodyPose();
         leftArm = entity.getLeftArmPose();
         leftLeg = entity.getLeftLegPose();
         rightArm = entity.getRightArmPose();
         rightLeg = entity.getRightLegPose();
         head = entity.getHeadPose();
-        applyFlags(entity);
     }
 
     private void applyFlags(ArmorStand entity) {
@@ -203,25 +231,49 @@ public class ArmorStandTrait extends Trait {
 
     public void setBodyPose(Rotations pose) {
         body = pose;
+        ArmorStand entity = currentEntity();
+        if (entity != null && pose != null) {
+            entity.setBodyPose(pose);
+        }
     }
 
     public void setHeadPose(Rotations pose) {
         head = pose;
+        ArmorStand entity = currentEntity();
+        if (entity != null && pose != null) {
+            entity.setHeadPose(pose);
+        }
     }
 
     public void setLeftArmPose(Rotations pose) {
         leftArm = pose;
+        ArmorStand entity = currentEntity();
+        if (entity != null && pose != null) {
+            entity.setLeftArmPose(pose);
+        }
     }
 
     public void setLeftLegPose(Rotations pose) {
         leftLeg = pose;
+        ArmorStand entity = currentEntity();
+        if (entity != null && pose != null) {
+            entity.setLeftLegPose(pose);
+        }
     }
 
     public void setRightArmPose(Rotations pose) {
         rightArm = pose;
+        ArmorStand entity = currentEntity();
+        if (entity != null && pose != null) {
+            entity.setRightArmPose(pose);
+        }
     }
 
     public void setRightLegPose(Rotations pose) {
         rightLeg = pose;
+        ArmorStand entity = currentEntity();
+        if (entity != null && pose != null) {
+            entity.setRightLegPose(pose);
+        }
     }
 }
