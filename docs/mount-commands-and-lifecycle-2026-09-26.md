@@ -32,4 +32,6 @@ Release/source jars include the implementation and all three configured mixins, 
 
 ## Remaining work
 
+The subsequent [mounted passenger-tree transfer follow-up](mounted-tree-transfer-2026-09-27.md) addresses whole-tree movement, rollback and remount retries for built-in Citizens NPCs and ordinary entities. The paragraph below records the boundary of this earlier command/lifecycle batch.
+
 This batch does not implement AbstractNPC's whole mount-tree dimension-transfer/retry behavior. That remains distinct from retrying a saved mount after both entities become available in the same world. Physical-client seats/interpolation, arbitrary modded entity contracts, combined provider/modpack acceptance and actual proxy arrival remain unverified. Production installations and original saves were not modified.

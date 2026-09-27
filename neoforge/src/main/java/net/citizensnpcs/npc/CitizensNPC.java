@@ -467,28 +467,53 @@ public class CitizensNPC extends AbstractNPC {
         // The public NPC teleport contract loads its destination, including outside currently watched chunks.
         location.getChunk();
         if (!ownsTransfer(request, controller, entity) || !isSpawned()) return;
-        if (location.getWorld() == entity.level()) {
-            if (EntityUtil.teleport(entity, location) != null && ownsTransfer(request, controller, entity))
-                getOrAddTrait(CurrentLocation.class).setLocation(Location.of(entity));
+        // Join listeners see a candidate before the native level has admitted it. Finish that admission before
+        // executing a newer teleport, otherwise a return trip collides with the still-live source UUID.
+        if (admittingTeleport) {
+            deferredTeleport = new DeferredTeleport(request, location);
             return;
+        }
+        teleportAuthorized(location, request, controller, entity);
+    }
+
+    private void teleportAuthorized(Location location, long request, EntityController controller, Entity entity) {
+        if (entity.isPassenger() || entity.isVehicle()) {
+            MountedTeleport.start(this, location, request);
+            return;
+        }
+        teleportEntity(location, request, controller, entity);
+    }
+
+    private Entity teleportEntity(Location location, long request, EntityController controller, Entity entity) {
+        if (!ownsTransfer(request, controller, entity) || !isSpawned()) return null;
+        if (location.getWorld() == entity.level()) {
+            if (EntityUtil.teleport(entity, location) != null && ownsTransfer(request, controller, entity)) {
+                getOrAddTrait(CurrentLocation.class).setLocation(Location.of(entity));
+                return entity;
+            }
+            return null;
         }
         PacketNPC packet = getTraitNullable(PacketNPC.class);
         try {
-            teleportAcrossWorlds(location, request, controller, entity, packet);
+            return teleportAcrossWorlds(location, request, controller, entity, packet);
         } finally {
             // A cancellation callback can replace this transfer with an ordinary same-world move. Always release
             // the temporary navigation suspension for the NPC that actually survives that callback.
             if (isSpawned()) navigator.onSpawn();
+            DeferredTeleport deferred = deferredTeleport;
+            deferredTeleport = null;
+            if (deferred != null && deferred.request == teleportRevision && isSpawned())
+                teleportAuthorized(deferred.location, deferred.request, entityController, getEntity());
         }
     }
 
-    private void teleportAcrossWorlds(Location location, long request, EntityController controller, Entity entity,
+    private Entity teleportAcrossWorlds(Location location, long request, EntityController controller, Entity entity,
             PacketNPC packet) {
         navigator.onDespawn();
-        if (!ownsTransfer(request, controller, entity)) return;
+        if (!ownsTransfer(request, controller, entity)) return null;
         if (packet != null) {
             packet.prepareTeleport();
-            if (!ownsTransfer(request, controller, entity) || getTraitNullable(PacketNPC.class) != packet) return;
+            if (!ownsTransfer(request, controller, entity) || getTraitNullable(PacketNPC.class) != packet) return null;
         }
 
         Entity moved;
@@ -506,13 +531,13 @@ public class CitizensNPC extends AbstractNPC {
                 moved = player;
             }
         } else {
-            // Follow Entity.teleportTo's native copy/remove/add sequence. Adopt and link the copy BEFORE native
+            // Use a native entity copy and adopt/link it BEFORE native
             // admission so join/tracking callbacks see its NPC ownership and visibility rules. Recreating the native
             // entity also rebuilds world-bound components such as Mob's PathNavigation in the destination level.
             moved = entity.getType().create(location.getWorld());
             if (moved == null) {
                 if (packet != null) packet.onSpawn();
-                return;
+                return null;
             }
             moved.restoreFrom(entity);
             moved.moveTo(location.getX(), location.getY(), location.getZ(), location.getYaw(),
@@ -520,36 +545,100 @@ public class CitizensNPC extends AbstractNPC {
             moved.setYHeadRot(location.getYaw());
             if (!ownsTransfer(request, controller, entity)) {
                 moved.discard();
-                return;
+                return null;
             }
-            entity.unRide();
-            entity.setRemoved(Entity.RemovalReason.CHANGED_DIMENSION);
-            if (!ownsTransfer(request, controller, entity)) {
-                moved.discard();
-                return;
-            }
-            NPCRegistries.unlink(entity);
+            // Keep the original alive until native destination admission succeeds. Join callbacks must still
+            // see the candidate's real NPC owner, so temporarily adopt it before asking the level to admit it.
             controller.replaceEntity(moved);
             NPCRegistries.link(moved, this);
             if (moved instanceof Mob mob && !useMinecraftAI())
                 MobEntityController.clearGoals(mob);
-            getOrAddTrait(CurrentLocation.class).setLocation(Location.of(moved));
-            if (packet == null && !location.getWorld().addFreshEntity(moved)) {
-                moved.discard();
-                return;
+            boolean admitted;
+            admittingTeleport = true;
+            try {
+                admitted = packet != null || location.getWorld().addFreshEntity(moved);
+            } catch (Throwable failure) {
+                if (ownsEntity(controller, moved)) {
+                    controller.replaceEntity(entity);
+                    NPCRegistries.unlink(moved);
+                    moved.discard();
+                } else if (getEntity() != entity) {
+                    NPCRegistries.unlink(entity);
+                    entity.setRemoved(Entity.RemovalReason.CHANGED_DIMENSION);
+                }
+                throw failure;
+            } finally {
+                admittingTeleport = false;
             }
+            if (!ownsEntity(controller, moved)) {
+                // NeoForge's entity manager dispatches join after ServerLevel's removed check. A listener can
+                // destroy this candidate before the manager installs its level callback, then admission still
+                // indexes it. Remove the retired candidate again through that now-installed native callback.
+                if (getEntity() != moved) {
+                    NPCRegistries.unlink(moved);
+                    moved.discard();
+                }
+                // A join callback may have removed the NPC or started another transfer. Retire this operation's
+                // original entity, without changing the newer controller/entity relationship.
+                if (getEntity() != entity) {
+                    NPCRegistries.unlink(entity);
+                    entity.setRemoved(Entity.RemovalReason.CHANGED_DIMENSION);
+                }
+                return null;
+            }
+            if (!admitted || moved.isRemoved()) {
+                controller.replaceEntity(entity);
+                NPCRegistries.unlink(moved);
+                moved.discard();
+                return null;
+            }
+            NPCRegistries.unlink(entity);
+            entity.unRide();
+            entity.setRemoved(Entity.RemovalReason.CHANGED_DIMENSION);
         }
-        if (moved == null || !ownsTransfer(request, controller, moved) || moved.isRemoved()) return;
+        if (moved == null || !ownsEntity(controller, moved) || moved.isRemoved()
+                || moved.level() != location.getWorld()) return null;
         if (packet == null && moved instanceof net.citizensnpcs.npc.entity.EntityHumanNPC human)
             human.updatePlayerListMembership();
         if (packet != null && getTraitNullable(PacketNPC.class) == packet) packet.onSpawn();
         getOrAddTrait(CurrentLocation.class).setLocation(Location.of(moved));
+        return ownsTransfer(request, controller, moved) ? moved : null;
+    }
+
+    TeleportState claimTreeTeleport(long request) {
+        return new TeleportState(request < 0 ? ++teleportRevision : request);
+    }
+
+    final class TeleportState {
+        private final EntityController controller = entityController;
+        private Entity entity = getEntity();
+        private final long request;
+
+        private TeleportState(long request) { this.request = request; }
+
+        boolean isCurrent() { return ownsTransfer(request, controller, entity) && isSpawned() && !entity.isRemoved(); }
+
+        Entity move(Location location) {
+            if (!isCurrent()) return null;
+            location.getChunk();
+            Entity moved = teleportEntity(location, request, controller, entity);
+            if (moved != null) entity = moved;
+            return moved;
+        }
     }
 
     private long teleportRevision;
+    private boolean admittingTeleport;
+    private DeferredTeleport deferredTeleport;
+
+    private record DeferredTeleport(long request, Location location) { }
 
     private boolean ownsTransfer(long request, EntityController controller, Entity entity) {
-        return request == teleportRevision && entityController == controller && getEntity() == entity
+        return request == teleportRevision && ownsEntity(controller, entity);
+    }
+
+    private boolean ownsEntity(EntityController controller, Entity entity) {
+        return entityController == controller && getEntity() == entity
                 && getOwningRegistry() != null && getOwningRegistry().getByUniqueId(getUniqueId()) == this;
     }
 

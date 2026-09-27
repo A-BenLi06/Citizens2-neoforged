@@ -19,6 +19,7 @@ public class MountTrait extends Trait {
     private boolean retired;
     private long revision;
     private boolean suspended;
+    private TransferPause transferPause;
     @Persist("mountedon")
     private UUID uuid;
 
@@ -27,7 +28,7 @@ public class MountTrait extends Trait {
     }
 
     public void checkMounted() {
-        if (!active() || uuid == null || checkingRevision == revision)
+        if (!active() || uuid == null || checkingRevision == revision || isTransferPaused())
             return;
         NPC other = CitizensAPI.getNPCRegistry().getByUniqueIdGlobal(uuid);
         if (other == null || !other.isSpawned())
@@ -94,7 +95,7 @@ public class MountTrait extends Trait {
 
     @Override
     public void run() {
-        if (!active())
+        if (!active() || isTransferPaused())
             return;
         Entity vehicle = npc.getEntity().getVehicle();
         if (vehicle != observedVehicle) {
@@ -128,6 +129,41 @@ public class MountTrait extends Trait {
         if (request == revision && active() && npc.getEntity() == rider) {
             Entity actual = rider.getVehicle();
             observedVehicle = actual == null || actual == previousVehicle ? actual : previousVehicle;
+        }
+    }
+
+    /** Holds automatic remounting while a transfer owns the actual passenger tree. New user requests supersede it. */
+    public TransferPause pauseForTransfer() {
+        transferPause = new TransferPause(revision);
+        return transferPause;
+    }
+
+    private boolean isTransferPaused() {
+        return transferPause != null && transferPause.isCurrent();
+    }
+
+    public final class TransferPause implements AutoCloseable {
+        private final long request;
+        private final NPC previousMount = NPCRegistries.lookup(npc.getEntity().getVehicle());
+
+        private TransferPause(long request) { this.request = request; }
+
+        public boolean isCurrent() {
+            return transferPause == this && revision == request && active();
+        }
+
+        @Override
+        public void close() {
+            if (transferPause != this) return;
+            if (revision == request && active()) {
+                observedVehicle = npc.getEntity().getVehicle();
+                NPC actual = NPCRegistries.lookup(observedVehicle);
+                if (actual != null && actual != previousMount) {
+                    uuid = actual.getUniqueId();
+                    revision++;
+                }
+            }
+            transferPause = null;
         }
     }
 }
