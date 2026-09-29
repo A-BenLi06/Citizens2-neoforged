@@ -5,6 +5,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 import java.util.UUID;
+import java.util.function.Consumer;
 import java.util.function.Function;
 
 import net.citizensnpcs.Citizens;
@@ -152,7 +153,7 @@ public class CitizensNavigator implements Navigator, Runnable {
 
     @Override
     public NavigatorParameters getLocalParameters() {
-        return isNavigating() ? localParams : defaultParams;
+        return localParams;
     }
 
     @Override
@@ -365,6 +366,10 @@ public class CitizensNavigator implements Navigator, Runnable {
 
     @Override
     public void setTarget(Function<NavigatorParameters, PathStrategy> strategy) {
+        setTarget(strategy, params -> { });
+    }
+
+    private void setTarget(Function<NavigatorParameters, PathStrategy> strategy, Consumer<NavigatorParameters> configure) {
         if (!npc.isSpawned())
             throw new IllegalStateException("npc is not spawned");
         if (despawning) return;
@@ -375,35 +380,48 @@ public class CitizensNavigator implements Navigator, Runnable {
         }
         // Cancellation callbacks may submit a newer request, cancel this one or despawn the NPC.
         if (request != navigationRevision || despawning || !npc.isSpawned() || npc.getEntity() != handle) return;
-        localParams = defaultParams.clone();
-
-        if (localParams.pathfinderType().isCitizens()) {
-            if (localParams.fallDistance() != -1) {
-                localParams.examiner(new FallingExaminer(localParams.fallDistance()));
+        NavigatorParameters parameters = defaultParams.clone();
+        localParams = parameters;
+        try {
+            configure.accept(parameters);
+            if (request != navigationRevision || despawning || !npc.isSpawned() || npc.getEntity() != handle) return;
+            if (parameters.pathfinderType().isCitizens()) {
+                if (parameters.fallDistance() != -1) {
+                    parameters.examiner(new FallingExaminer(parameters.fallDistance()));
+                }
+                if (npc.data().get(NPC.Metadata.PATHFINDER_OPEN_DOORS, Setting.PATHFINDER_OPENS_DOORS.asBoolean())) {
+                    parameters.examiner(new DoorExaminer());
+                }
+                if (Setting.PATHFINDER_CHECK_BOUNDING_BOXES.asBoolean()) {
+                    parameters.examiner(new BoundingBoxExaminer(npc.getEntity()));
+                }
             }
-            if (npc.data().get(NPC.Metadata.PATHFINDER_OPEN_DOORS, Setting.PATHFINDER_OPENS_DOORS.asBoolean())) {
-                localParams.examiner(new DoorExaminer());
+            updatePathfindingRange();
+            PathStrategy prepared = strategy.apply(parameters);
+            if (request != navigationRevision || despawning || !npc.isSpawned() || npc.getEntity() != handle) {
+                if (prepared != null && prepared != executing) prepared.stop();
+                return;
             }
-            if (Setting.PATHFINDER_CHECK_BOUNDING_BOXES.asBoolean()) {
-                localParams.examiner(new BoundingBoxExaminer(npc.getEntity()));
+            executing = java.util.Objects.requireNonNull(prepared, "strategy");
+            stationaryTicks = 0;
+            // Vanilla navigation must stop steering before Citizens drives the same move control.
+            if (parameters.pathfinderType().isCitizens() && npc.getEntity() instanceof Mob mob) {
+                mob.getNavigation().stop();
             }
+            npc.getOrAddTrait(ChunkTicketTrait.class);
+            if (request != navigationRevision || executing != prepared || despawning
+                    || !npc.isSpawned() || npc.getEntity() != handle) return;
+            Location destination = prepared.getTargetAsLocation();
+            if (request != navigationRevision || executing != prepared || despawning
+                    || !npc.isSpawned() || npc.getEntity() != handle) return;
+            updateTicket(destination);
+            if (request != navigationRevision || executing != prepared || despawning
+                    || !npc.isSpawned() || npc.getEntity() != handle) return;
+            NeoForge.EVENT_BUS.post(new NavigationBeginEvent(this));
+        } finally {
+            // Failed preparation has no route, but a nested request owns its own parameters and must survive.
+            if (localParams == parameters && executing == null) localParams = defaultParams;
         }
-        updatePathfindingRange();
-        PathStrategy prepared = strategy.apply(localParams);
-        if (request != navigationRevision || despawning || !npc.isSpawned() || npc.getEntity() != handle) {
-            if (prepared != null && prepared != executing) prepared.stop();
-            return;
-        }
-        executing = prepared;
-        stationaryTicks = 0;
-        // vanilla navigation keeps steering the mob from Mob.serverAiStep, so it has to be shut off before the Citizens
-        // pathfinder starts driving the same move control
-        if (localParams.pathfinderType().isCitizens() && npc.getEntity() instanceof Mob mob) {
-            mob.getNavigation().stop();
-        }
-        npc.getOrAddTrait(ChunkTicketTrait.class);
-        updateTicket(executing.getTargetAsLocation());
-        NeoForge.EVENT_BUS.post(new NavigationBeginEvent(this));
     }
 
     @Override
@@ -425,6 +443,11 @@ public class CitizensNavigator implements Navigator, Runnable {
 
     @Override
     public void setTarget(Location targetIn) {
+        setTarget(targetIn, params -> { });
+    }
+
+    @Override
+    public void setTarget(Location targetIn, Consumer<NavigatorParameters> configure) {
         if (!npc.isSpawned())
             throw new IllegalStateException("npc is not spawned");
         if (targetIn == null) {
@@ -440,7 +463,7 @@ public class CitizensNavigator implements Navigator, Runnable {
             if (params.pathfinderType().isCitizens() || !(npc.getEntity() instanceof Mob))
                 return new AStarNavigationStrategy(npc, target, params);
             return new MCNavigationStrategy(npc, target, params);
-        });
+        }, configure);
     }
 
     /**
@@ -494,8 +517,10 @@ public class CitizensNavigator implements Navigator, Runnable {
      *            why it ended, or null when it completed normally
      */
     private void stopNavigating(CancelReason reason) {
-        if (!isNavigating())
+        if (executing == null) {
+            localParams = defaultParams;
             return;
+        }
         PathStrategy old = executing;
         // A callback can replace/cancel the route being ended. Release it once without dispatching its end again.
         if (ending == old) {

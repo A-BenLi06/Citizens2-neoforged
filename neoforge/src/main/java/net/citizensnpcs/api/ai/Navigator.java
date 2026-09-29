@@ -1,5 +1,6 @@
 package net.citizensnpcs.api.ai;
 
+import java.util.function.Consumer;
 import java.util.function.Function;
 
 import net.citizensnpcs.api.util.Location;
@@ -51,8 +52,8 @@ public interface Navigator {
     EntityTarget getEntityTarget();
 
     /**
-     * Returns the {@link NavigatorParameters} local to any current target execution. These are updated independently of
-     * the default parameters.
+     * Returns the {@link NavigatorParameters} for the current target, including strategy preparation and paused routes.
+     * These are updated independently of the default parameters. Returns the defaults when no request exists.
      *
      * @see #getDefaultParameters()
      * @return The local parameters
@@ -159,4 +160,10 @@ public interface Navigator {
      *            The destination
      */
     void setTarget(Location target);
+
+    /**
+     * Starts a location request with its own parameters configured before strategy creation and navigation callbacks.
+     * The consumer must only configure the supplied parameters; they belong to this request, never a later route.
+     */
+    void setTarget(Location target, Consumer<NavigatorParameters> configure);
 }

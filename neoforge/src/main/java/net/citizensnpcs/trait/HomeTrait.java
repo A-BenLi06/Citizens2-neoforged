@@ -1,5 +1,6 @@
 package net.citizensnpcs.trait;
 
+import net.citizensnpcs.api.ai.NavigatorParameters;
 import net.citizensnpcs.api.persistence.Persist;
 import net.citizensnpcs.api.trait.Trait;
 import net.citizensnpcs.api.trait.TraitName;
@@ -22,7 +23,10 @@ public class HomeTrait extends Trait {
     private Location location;
     @Persist
     private ReturnStrategy strategy = ReturnStrategy.TELEPORT;
-    private int t;
+    private long t;
+    private NavigatorParameters ownedParameters;
+    private boolean removed;
+    private boolean returning;
 
     public HomeTrait() {
         super("hometrait");
@@ -44,36 +48,77 @@ public class HomeTrait extends Trait {
         return strategy;
     }
 
+    private boolean isCurrent() {
+        return !removed && npc != null && npc.getTraitNullable(HomeTrait.class) == this;
+    }
+
+    @Override
+    public void onDespawn() {
+        t = 0;
+        releaseRoute();
+    }
+
+    @Override
+    public void onRemove() {
+        removed = true;
+        t = 0;
+        releaseRoute();
+    }
+
+    @Override
+    public void onSpawn() {
+        if (isCurrent()) t = 0;
+    }
+
+    private void releaseRoute() {
+        NavigatorParameters owned = ownedParameters;
+        ownedParameters = null;
+        if (npc != null && owned != null && npc.getNavigator().getLocalParameters() == owned) {
+            npc.getNavigator().cancelNavigation();
+        }
+    }
+
     @Override
     public void run() {
-        if (!npc.isSpawned() || location == null || location.getWorld() == null
-                || npc.getNavigator().isNavigating()) {
+        if (returning) return;
+        if (!isCurrent() || !npc.isSpawned() || location == null || location.getWorld() == null
+                || !finite(location) || !Double.isFinite(distance) || strategy == null
+                || npc.getNavigator().getPathStrategy() != null
+                || npc.getNavigator().getLocalParameters() != npc.getNavigator().getDefaultParameters()) {
             t = 0;
             return;
         }
+        ownedParameters = null;
         Location current = npc.getStoredLocation();
-        if (current == null || current.getWorld() != location.getWorld()) {
-            // a different dimension is always "away from home", and only a teleport can fix it
-            if (current != null && (delay == -1 || ++t > delay)) {
-                npc.teleport(location.clone(), TeleportCause.PLUGIN);
-            }
-            return;
-        }
-        if (current.distanceSquared(location) < 0.01) {
+        if (current == null) {
             t = 0;
             return;
         }
-        t++;
-        if (t <= delay && delay != -1)
+        boolean differentWorld = current.getWorld() != location.getWorld();
+        double separation = differentWorld ? Double.POSITIVE_INFINITY : current.distanceSquared(location);
+        if (separation < 0.01) {
+            t = 0;
             return;
-        if (distance != -1 && current.distanceSquared(location) < distance * distance)
+        }
+        // Stop counting once eligible so even the largest stored int delay cannot wrap around.
+        if (t <= delay) t++;
+        if (t <= delay)
             return;
-        if (strategy == ReturnStrategy.TELEPORT) {
-            npc.teleport(location.clone(), TeleportCause.PLUGIN);
-        } else {
-            npc.getNavigator().setTarget(location.clone());
-            npc.getNavigator().getLocalParameters().distanceMargin(0.9).pathDistanceMargin(0)
-                    .destinationTeleportMargin(1);
+        if (Math.sqrt(separation) < distance)
+            return;
+        Location destination = location.clone();
+        returning = true;
+        try {
+            if (strategy == ReturnStrategy.TELEPORT) {
+                npc.teleport(destination, TeleportCause.PLUGIN);
+            } else if (!differentWorld) {
+                npc.getNavigator().setTarget(destination, params -> {
+                    ownedParameters = params;
+                    params.distanceMargin(0.9).pathDistanceMargin(0).destinationTeleportMargin(1);
+                });
+            }
+        } finally {
+            returning = false;
         }
     }
 
@@ -82,15 +127,25 @@ public class HomeTrait extends Trait {
     }
 
     public void setDistanceBlocks(double distance) {
+        if (!Double.isFinite(distance)) throw new IllegalArgumentException("Distance must be finite");
         this.distance = distance;
     }
 
     public void setHomeLocation(Location location) {
+        if (location != null && !finite(location)) throw new IllegalArgumentException("Home location must be finite");
         this.location = location == null ? null : location.clone();
+        t = 0;
+        releaseRoute();
     }
 
     public void setReturnStrategy(ReturnStrategy strategy) {
-        this.strategy = strategy;
+        this.strategy = java.util.Objects.requireNonNull(strategy, "strategy");
+        releaseRoute();
+    }
+
+    private static boolean finite(Location location) {
+        return Double.isFinite(location.getX()) && Double.isFinite(location.getY()) && Double.isFinite(location.getZ())
+                && Float.isFinite(location.getYaw()) && Float.isFinite(location.getPitch());
     }
 
     public enum ReturnStrategy {

@@ -25,8 +25,13 @@ public class Powered extends Trait {
     }
 
     @Override
+    public void onPreSpawn() {
+        onSpawn();
+    }
+
+    @Override
     public void onSpawn() {
-        if (npc.getEntity() instanceof Creeper creeper) {
+        if (npc != null && npc.getTraitNullable(Powered.class) == this && npc.getEntity() instanceof Creeper creeper) {
             creeper.getEntityData().set(Creeper.DATA_IS_POWERED, powered);
         }
     }

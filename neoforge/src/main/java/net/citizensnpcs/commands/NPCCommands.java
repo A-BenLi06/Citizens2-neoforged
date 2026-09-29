@@ -2346,44 +2346,56 @@ public class NPCCommands {
 
     @Command(
             aliases = { "npc" },
-            usage = "home (--location x,y,z,world) (--distance blocks) (--delay ticks) (-p(athfind) -t(eleport) -c(lear))",
+            usage = "home (--location location) (--distance blocks) (--delay duration) (-h(ere) -p(athfind) -t(eleport) -c(lear))",
             desc = "",
-            flags = "ptc",
+            flags = "hptc",
             modifiers = { "home" },
             min = 1,
             max = 1,
+            strictArguments = true,
             permission = "citizens.npc.home")
-    public void home(CommandContext args, CommandSourceStack sender, NPC npc, @Flag("location") String location,
-            @Flag("distance") Double distance, @Flag("delay") Integer delay) throws CommandException {
+    public void home(CommandContext args, CommandSourceStack sender, NPC npc, @Flag("location") Location location,
+            @Flag("distance") Double distance, @Flag("delay") Duration delay) throws CommandException {
+        Location here = null;
+        if (args.hasFlag('h')) {
+            if (sender.getPlayer() == null)
+                throw new CommandException(CommandMessages.MUST_BE_INGAME);
+            here = Location.of(sender.getPlayer());
+        }
+        Integer ticks = null;
+        if (delay != null) {
+            try {
+                ticks = Math.toIntExact(delay.toMillis() / 50L);
+            } catch (ArithmeticException invalid) {
+                throw new CommandException(CommandMessages.INVALID_VALUE, "--delay", args.getFlag("delay"));
+            }
+        }
+        if (location == null && here == null && distance == null && ticks == null
+                && !args.hasFlag('p') && !args.hasFlag('t') && !args.hasFlag('c')) return;
         HomeTrait trait = npc.getOrAddTrait(HomeTrait.class);
         if (args.hasFlag('c')) {
             trait.setHomeLocation(null);
-            Messaging.send(sender, "Home location cleared.");
+            Messaging.sendTr(sender, Messages.HOME_TRAIT_CLEARED);
             return;
         }
-        boolean changed = false;
+        // Explicit location follows -h, and teleport follows pathfinding, as in the original command.
+        Location at = location != null ? location : here;
+        if (at != null) {
+            trait.setHomeLocation(at);
+            Messaging.sendTr(sender, Messages.HOME_TRAIT_LOCATION_SET, Util.prettyPrintLocation(at));
+        }
         if (args.hasFlag('p') || args.hasFlag('t')) {
-            trait.setReturnStrategy(args.hasFlag('p') ? ReturnStrategy.PATHFIND : ReturnStrategy.TELEPORT);
+            trait.setReturnStrategy(args.hasFlag('t') ? ReturnStrategy.TELEPORT : ReturnStrategy.PATHFIND);
             Messaging.sendTr(sender,
-                    args.hasFlag('p') ? Messages.HOME_TRAIT_PATHFIND_SET : Messages.HOME_TRAIT_TELEPORT_SET);
-            changed = true;
+                    args.hasFlag('t') ? Messages.HOME_TRAIT_TELEPORT_SET : Messages.HOME_TRAIT_PATHFIND_SET, npc.getName());
         }
         if (distance != null) {
             trait.setDistanceBlocks(distance);
             Messaging.sendTr(sender, Messages.HOME_TRAIT_DISTANCE_SET, distance);
-            changed = true;
         }
-        if (delay != null) {
-            trait.setDelayTicks(delay);
-            Messaging.sendTr(sender, Messages.HOME_TRAIT_DELAY_SET, delay);
-            changed = true;
-        }
-        if (location != null || !changed) {
-            Location at = location != null ? args.parseLocation(location) : args.getSenderLocation();
-            if (at == null)
-                throw new CommandException(CommandMessages.MUST_BE_INGAME);
-            trait.setHomeLocation(at);
-            Messaging.sendTr(sender, Messages.HOME_TRAIT_LOCATION_SET, at.getBlockX(), at.getBlockY(), at.getBlockZ());
+        if (ticks != null) {
+            trait.setDelayTicks(ticks);
+            Messaging.sendTr(sender, Messages.HOME_TRAIT_DELAY_SET, ticks);
         }
     }
 
@@ -2638,23 +2650,31 @@ public class NPCCommands {
 
     @Command(
             aliases = { "npc" },
-            usage = "name",
+            usage = "name (true|false|hover) (-h(over))",
             desc = "",
             modifiers = { "name", "hidename" },
             min = 1,
             max = 2,
+            flags = "h",
+            strictArguments = true,
             permission = "citizens.npc.name")
     public void name(CommandContext args, CommandSourceStack sender, NPC npc) throws CommandException {
         Object current = npc.data().get(NPC.Metadata.NAMEPLATE_VISIBLE, true);
         Object next;
         if (args.argsLength() > 1) {
             String raw = args.getString(1);
+            if (!raw.equalsIgnoreCase("hover") && !raw.equalsIgnoreCase("true") && !raw.equalsIgnoreCase("false"))
+                throw new CommandException(CommandMessages.INVALID_VALUE, "name", raw);
             next = raw.equalsIgnoreCase("hover") ? "hover" : Boolean.parseBoolean(raw);
         } else {
             next = !Boolean.parseBoolean(current.toString());
         }
+        if (args.hasFlag('h')) {
+            next = "hover";
+        }
         npc.data().setPersistent(NPC.Metadata.NAMEPLATE_VISIBLE, next);
         npc.getOrAddTrait(ScoreboardTrait.class);
+        npc.scheduleUpdate(NPC.NPCUpdate.PACKET);
         Messaging.sendTr(sender, Messages.NAMEPLATE_VISIBILITY_SET, next);
     }
 
@@ -2963,16 +2983,17 @@ public class NPCCommands {
 
     @Command(
             aliases = { "npc" },
-            usage = "powered",
+            usage = "powered (--set true|false)",
             desc = "",
             modifiers = { "powered" },
             min = 1,
             max = 1,
+            strictArguments = true,
             permission = "citizens.npc.powered")
     @Requirements(selected = true, ownership = true, types = { "creeper" })
-    public void powered(CommandContext args, CommandSourceStack sender, NPC npc) throws CommandException {
+    public void powered(CommandContext args, CommandSourceStack sender, NPC npc, @Flag("set") Boolean explicit) {
         Powered trait = npc.getOrAddTrait(Powered.class);
-        trait.setPowered(!trait.isPowered());
+        trait.setPowered(explicit != null ? explicit : !trait.isPowered());
         Messaging.sendTr(sender, trait.isPowered() ? Messages.POWERED_SET : Messages.POWERED_STOPPED, npc.getName());
     }
 

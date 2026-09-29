@@ -5,6 +5,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.lang.reflect.Parameter;
+import java.time.DateTimeException;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -198,7 +199,7 @@ public class CommandManager {
                         if (cmd.strictArguments() && (val == null || val instanceof Double number && !Double.isFinite(number)
                                 || val instanceof Float number && !Float.isFinite(number)))
                             throw new IllegalArgumentException("Invalid typed argument");
-                    } catch (IllegalArgumentException failure) {
+                    } catch (IllegalArgumentException | DateTimeException | ArithmeticException failure) {
                         if (!cmd.strictArguments()) throw failure;
                         String name = argument.names.length == 0 ? Integer.toString(argument.index) : "--" + argument.names[0];
                         throw new CommandException(CommandMessages.INVALID_VALUE, name, raw);
@@ -263,8 +264,10 @@ public class CommandManager {
             return context.parseLocation(raw);
         if (desiredType == UUID.class)
             return UUID.fromString(raw);
-        if (desiredType == Duration.class)
+        if (desiredType == Duration.class) {
+            if (raw.isBlank()) throw new IllegalArgumentException("Duration is required");
             return Durations.parse(raw, defaultDurationUnits);
+        }
         if (desiredType == Vec3.class)
             return CommandContext.parseVector(raw);
         if (Quaternionfc.class.isAssignableFrom(desiredType))
