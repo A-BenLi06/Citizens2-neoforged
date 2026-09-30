@@ -4,9 +4,11 @@
 
 Initial audit timestamp: 2026-09-13 01:47:09 +08:00 (UTC+08:00).
 
-Current summary updated: 2026-09-28 19:18:13 +08:00 (UTC+08:00).
+Current summary updated: 2026-09-30 11:08:24 +08:00 (UTC+08:00).
 
 The resumed goal explicitly continues comparison of remaining behavior in the retained Citizens, Interactions and Sentinel code. CmdCam owns camera playback and Yuuniverse Economy owns economic APIs; unrelated replacement suites and unverified client/modpack/proxy acceptance remain distinct.
+
+Latest retained Interactions follow-up: [swap-hand dialogue entry](swap-hand-dialogue-2026-09-30.md) restores `SWAP_HAND_CLICK` through native hand events and current player aim. Accepted starts preserve hands; refusal retains native swapping, and active sessions are not skipped. World/virtual visibility, occlusion, redirects, callbacks, reload and retired players pass 139 dedicated checks. Final regression passes 100 dialogue unit tests, 542 dialogue runtime checks, 78 packet-interaction checks, 107 NPC assertions, 223 general probes and 232 ordinary tests. Clean build and archive exclusions pass; Citizens archive entry contents remain unchanged. Evidence: `artifacts/swap-hand-validation-summary.json`. Death/respawn, five ordinary command groups and the other requirements in the [current checklist](remaining-citizens-work-2026-09-26.md) remain open.
 
 Latest Citizens command-options follow-up: [powered, name and home](command-options-home-2026-09-28.md) restores explicit powered state, hover-name shorthand, home here/duration options and original combined precedence. Validation precedes mutation, native powered data is ready before admission, and home routes own their parameters before strategy/callback execution. Paused/pending routes, clearing/removal, callback replacement and failed preparation preserve the correct owner. The recovered and fresh fixtures each pass 164 checks. Final regressions pass 129 follow, 81 movement/list, 401 armorstand and 49 location checks, plus 107 NPC assertions, 223 general probes and 232 ordinary tests. Clean build and archive checks pass; evidence is `artifacts/command-options-validation-summary.json`. Five ordinary command groups and the recorded native/addon/acceptance work remain. The earlier transfer batch is already committed as `8f6db5d` in current history; matching historical logs establish protocol checks, not actual proxy arrival.
 

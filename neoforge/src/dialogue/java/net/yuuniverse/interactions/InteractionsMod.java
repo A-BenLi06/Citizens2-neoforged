@@ -1,10 +1,14 @@
 package net.yuuniverse.interactions;
 
 import java.io.File;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.IdentityHashMap;
 import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.function.BooleanSupplier;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -21,12 +25,15 @@ import net.minecraft.commands.Commands;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.entity.Entity;
+import net.neoforged.bus.api.EventPriority;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.Mod;
 import net.neoforged.fml.loading.FMLPaths;
 import net.neoforged.neoforge.common.NeoForge;
 import net.neoforged.neoforge.event.RegisterCommandsEvent;
 import net.neoforged.neoforge.event.ServerChatEvent;
+import net.neoforged.neoforge.event.entity.living.LivingSwapItemsEvent;
 import net.neoforged.neoforge.event.entity.player.PlayerEvent;
 import net.neoforged.neoforge.event.server.ServerStartedEvent;
 import net.neoforged.neoforge.event.server.ServerStoppingEvent;
@@ -55,6 +62,7 @@ public class InteractionsMod implements Session.Engine {
     private final Influence influence = new Influence(progress, library);
     private final Map<UUID, Session> sessions = new ConcurrentHashMap<>();
     private final Map<UUID, String> proximityEntries = new HashMap<>();
+    private final Set<ServerPlayer> startingFromSwap = Collections.newSetFromMap(new IdentityHashMap<>());
     private Actions actions;
     private DialogueSettings settings = DialogueSettings.DEFAULT;
     private DialogueMessages messages = DialogueMessages.DEFAULT;
@@ -125,11 +133,7 @@ public class InteractionsMod implements Session.Engine {
         if (npc == null || player == null || actions == null)
             return;
         if (!settings.startClick().permits(player.isShiftKeyDown())) return;
-        Conversation conversation = library.forNpc(npc.getId());
-        if (conversation == null) {
-            // 15 of the migrated files trigger on the NPC's name rather than its id
-            conversation = library.forNpcName(npc.getName());
-        }
+        Conversation conversation = conversationFor(npc);
         if (conversation == null)
             return;
         Session active = sessions.get(player.getUUID());
@@ -140,32 +144,77 @@ public class InteractionsMod implements Session.Engine {
         startConversation(player, npc, conversation);
     }
 
-    private void startConversation(ServerPlayer player, NPC npc, Conversation conversation) {
+    /** Native hand swapping is consumed only by a newly accepted conversation, never by click-to-skip. */
+    @SubscribeEvent(priority = EventPriority.LOWEST)
+    public void onSwapHands(LivingSwapItemsEvent.Hands event) {
+        if (event.isCanceled() || !(event.getEntity() instanceof ServerPlayer player)
+                || actions == null || settings.startClick() != ConversationStartClick.SWAP_HAND_CLICK
+                || !DialogueTargeting.isCurrentPlayer(player) || sessions.containsKey(player.getUUID())
+                || !startingFromSwap.add(player)) return;
+        try {
+            DialogueSettings currentSettings = settings;
+            DialogueTargeting.Target target = DialogueTargeting.pick(player);
+            if (target == null) return;
+            Conversation conversation = conversationFor(target.npc());
+            if (conversation == null) return;
+            if (startConversation(player, target.npc(), conversation, () -> {
+                // Permission providers and visibility filters can reload, replace an NPC or reenter this event.
+                if (settings != currentSettings || !DialogueTargeting.isCurrentPlayer(player)) return false;
+                DialogueTargeting.Target current = DialogueTargeting.pick(player);
+                return target.matches(current) && settings == currentSettings
+                        && conversationFor(target.npc()) == conversation && DialogueTargeting.isCurrentPlayer(player);
+            })) event.setCanceled(true);
+        } finally {
+            startingFromSwap.remove(player);
+        }
+    }
+
+    private Conversation conversationFor(NPC npc) {
+        Conversation conversation = library.forNpc(npc.getId());
+        return conversation == null ? library.forNpcName(npc.getName()) : conversation;
+    }
+
+    private boolean startConversation(ServerPlayer player, NPC npc, Conversation conversation) {
+        return startConversation(player, npc, conversation, () -> true);
+    }
+
+    private boolean startConversation(ServerPlayer player, NPC npc, Conversation conversation, BooleanSupplier stillEligible) {
         if (sessions.containsKey(player.getUUID()))
-            return;
-        if (!npc.isSpawned() || npc.getEntity().level() != player.level()
-                || conversation.isOutsideEndRadius(npc.getEntity().distanceToSqr(player)))
-            return;
+            return false;
+        Entity entity = npc.getEntity();
+        if (!npc.isSpawned() || entity == null || entity.isRemoved() || entity.level() != player.level()
+                || conversation.isOutsideEndRadius(entity.distanceToSqr(player)))
+            return false;
         if (conversation.requiresPermission && !net.citizensnpcs.api.util.PermissionUtil.hasPermission(
                 player, "interactions.start." + conversation.id()))
-            return;
+            return false;
         if (!conversation.canBeStartedOnAir && !player.level().getBlockState(
                 net.minecraft.core.BlockPos.containing(player.getX(), player.getY() - 1, player.getZ())).isSolid())
-            return;
+            return false;
         if (!progress.isReadable(player.getUUID())
                 || progress.isCoolingDown(player.getUUID(), conversation.id(), conversation.cooldownSeconds,
                         System.currentTimeMillis())) {
-            return;
+            return false;
         }
         Conversation.Node first = conversation.first();
         if (first == null)
-            return;
+            return false;
+        if (!stillEligible.getAsBoolean() || sessions.containsKey(player.getUUID())
+                || !npc.isSpawned() || npc.getEntity() != entity || entity.isRemoved()
+                || entity.level() != player.level() || conversation.isOutsideEndRadius(entity.distanceToSqr(player))
+                || !conversation.canBeStartedOnAir && !player.level().getBlockState(
+                        net.minecraft.core.BlockPos.containing(player.getX(), player.getY() - 1, player.getZ())).isSolid()
+                || !progress.isReadable(player.getUUID())
+                || progress.isCoolingDown(player.getUUID(), conversation.id(), conversation.cooldownSeconds,
+                        System.currentTimeMillis()))
+            return false;
         if (conversation.cooldownSeconds > 0) {
             progress.setCooldown(player.getUUID(), player.getGameProfile().getName(), conversation.id(),
                     System.currentTimeMillis());
             progress.saveDirty();
         }
-        sessions.put(player.getUUID(), new Session(this, conversation, first, player, npc.getEntity()));
+        Session started = new Session(this, conversation, first, player, entity);
+        sessions.put(player.getUUID(), started);
         if (!settings.allowMobDamage()) {
             for (var mob : player.serverLevel().getEntitiesOfClass(net.minecraft.world.entity.Mob.class,
                     new net.minecraft.world.phys.AABB(player.position(), player.position()).inflate(30),
@@ -173,6 +222,7 @@ public class InteractionsMod implements Session.Engine {
                 mob.setTarget(null);
             }
         }
+        return sessions.get(player.getUUID()) == started && !started.isFinished();
     }
 
     @SubscribeEvent

@@ -57,6 +57,21 @@ public class LegacyParityAuditTest {
         assertTrue(ConversationStartClick.SHIFT_RIGHT_CLICK.permits(true));
         assertTrue(ConversationStartClick.ALL_RIGHT_CLICK.permits(false));
         assertTrue(ConversationStartClick.ALL_RIGHT_CLICK.permits(true));
+        assertFalse(ConversationStartClick.SWAP_HAND_CLICK.permits(false));
+        assertFalse(ConversationStartClick.SWAP_HAND_CLICK.permits(true));
+    }
+
+    @Test
+    void swapHandModeLoadsWithoutDiscardingOtherSettings() throws Exception {
+        Path file = directory.resolve("swap-hand.yml");
+        Files.writeString(file, "conversation_start_click_type: SWAP_HAND_CLICK\nallow_chat_while_in_conversation: true\n");
+        var settings = DialogueSettings.load(file.toFile(), DialogueSettings.DEFAULT);
+        assertEquals(ConversationStartClick.SWAP_HAND_CLICK, settings.startClick());
+        assertTrue(settings.allowChat());
+        assertFalse(settings.startClick().permits(false));
+        assertFalse(settings.startClick().permits(true));
+        Files.writeString(file, "conversation_start_click_type: invalid\n");
+        assertEquals(settings, DialogueSettings.load(file.toFile(), settings));
     }
 
     @Test
