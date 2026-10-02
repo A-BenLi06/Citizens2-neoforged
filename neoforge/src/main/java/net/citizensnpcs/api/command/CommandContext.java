@@ -51,6 +51,8 @@ public class CommandContext {
     protected String[] args;
     protected final Set<Character> flags = new HashSet<>();
     private Location location = null;
+    private Location targetLocation;
+    private boolean targetResolved;
     private final String[] rawArgs;
     private final CommandSourceStack sender;
     protected final Map<String, String> valueFlags = new HashMap<>();
@@ -292,12 +294,12 @@ public class CommandContext {
 
     /** The block the sender is looking at, or its own position when it cannot look anywhere. */
     public Location getSenderTargetBlockLocation() throws CommandException {
-        if (location != null)
-            return location;
-        if (hasValueFlag("location"))
-            return location = parseLocation(getFlag("location"));
-        Location targeted = targetBlockLocation();
-        return location = targeted != null ? targeted : sourceLocation();
+        if (!targetResolved) {
+            targetLocation = hasValueFlag("location") || hasValueFlag("entitylocation") ? getSenderLocation() : targetBlockLocation();
+            if (targetLocation == null) targetLocation = sourceLocation();
+            targetResolved = true;
+        }
+        return targetLocation;
     }
 
     public String[] getSlice(int index) {
@@ -471,12 +473,13 @@ public class CommandContext {
         if (sender == null || !(sender.getEntity() instanceof Entity entity))
             return null;
         Vec3 eye = entity.getEyePosition();
-        Vec3 end = eye.add(entity.getViewVector(1.0F).scale(64));
+        // LivingEntity's interpolated head yaw can lag behind the latest player look packet.
+        Vec3 end = eye.add(entity.calculateViewVector(entity.getXRot(), entity.getYRot()).scale(64));
         BlockHitResult hit = entity.level().clip(
                 new ClipContext(eye, end, ClipContext.Block.OUTLINE, ClipContext.Fluid.NONE, entity));
         if (hit.getType() != HitResult.Type.BLOCK)
             return null;
-        return Location.fromBlockPosCentred(sender.getLevel(), hit.getBlockPos());
+        return Location.fromBlockPosCentred((ServerLevel) entity.level(), hit.getBlockPos());
     }
 
     private static final Pattern FLAG = Pattern.compile("^-[a-zA-Z]+$");

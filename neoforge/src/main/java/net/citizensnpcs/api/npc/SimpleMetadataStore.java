@@ -72,8 +72,8 @@ public class SimpleMetadataStore implements MetadataStore {
 
     @Override
     public void loadFrom(DataKey key) {
-        metadata.entrySet().removeIf(e -> e.getValue().persistent);
-        npcMetadata.entrySet().removeIf(e -> e.getValue().persistent);
+        metadata.entrySet().removeIf(e -> e.getValue().persistent || e.getValue().temporary);
+        npcMetadata.entrySet().removeIf(e -> e.getValue().persistent || e.getValue().temporary);
         for (DataKey sub : key.getSubKeys()) {
             NPC.Metadata meta = Metadata.byKey(sub.name());
             if (meta != null) {
@@ -105,6 +105,8 @@ public class SimpleMetadataStore implements MetadataStore {
         for (Entry<NPC.Metadata, MetadataObject> entry : npcMetadata.entrySet()) {
             if (entry.getValue().persistent) {
                 key.setRaw(entry.getKey().getKey(), entry.getValue().value);
+            } else if (entry.getValue().temporary && entry.getValue().savedValue != null) {
+                key.setRaw(entry.getKey().getKey(), entry.getValue().savedValue);
             }
         }
     }
@@ -119,6 +121,16 @@ public class SimpleMetadataStore implements MetadataStore {
                 throw new IllegalArgumentException("data must be subtype of " + key.getType());
             this.npcMetadata.put(key, new MetadataObject(data, false));
         }
+    }
+
+    @Override
+    public void setTemporary(NPC.Metadata key, Object data) {
+        Objects.requireNonNull(key, "key cannot be null");
+        if (data == null) { remove(key); return; }
+        if (!key.accepts(data.getClass())) throw new IllegalArgumentException("data must be subtype of " + key.getType());
+        MetadataObject previous = npcMetadata.get(key);
+        Object saved = previous == null ? null : previous.persistent ? previous.value : previous.savedValue;
+        npcMetadata.put(key, new MetadataObject(data, false, true, saved));
     }
 
     @Override
@@ -165,10 +177,18 @@ public class SimpleMetadataStore implements MetadataStore {
     private static class MetadataObject {
         final boolean persistent;
         final Object value;
+        final boolean temporary;
+        final Object savedValue;
 
         public MetadataObject(Object raw, boolean persistent) {
+            this(raw, persistent, false, null);
+        }
+
+        private MetadataObject(Object raw, boolean persistent, boolean temporary, Object savedValue) {
             this.value = raw;
             this.persistent = persistent;
+            this.temporary = temporary;
+            this.savedValue = savedValue;
         }
     }
 }

@@ -16,6 +16,9 @@ public class Messages {
     public static final String ALREADY_IN_EDITOR = "citizens.editors.already-in-editor";
     public static final String ALREADY_OWNER = "citizens.commands.npc.owner.already-owner";
     public static final String ANCHOR_ADDED = "citizens.commands.npc.anchor.added";
+    public static final String ANCHOR_HEADER = "citizens.commands.npc.anchor.header";
+    public static final String ANCHOR_LEGEND = "citizens.commands.npc.anchor.legend";
+    public static final String ANCHOR_UNLOADED = "citizens.commands.npc.anchor.unloaded";
     public static final String ANCHOR_ALREADY_EXISTS = "citizens.commands.npc.anchor.already-exists";
     public static final String ANCHOR_MISSING = "citizens.commands.npc.anchor.missing";
     public static final String ANCHOR_REMOVED = "citizens.commands.npc.anchor.removed";

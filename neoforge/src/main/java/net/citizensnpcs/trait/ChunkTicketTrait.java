@@ -2,16 +2,25 @@ package net.citizensnpcs.trait;
 
 import java.util.ArrayList;
 import java.util.UUID;
+import java.util.Map;
+import java.util.HashMap;
+import java.util.Set;
+import java.util.Collections;
+import java.util.IdentityHashMap;
 
 import net.citizensnpcs.Citizens;
 import net.citizensnpcs.Settings.Setting;
 import net.citizensnpcs.api.npc.NPC;
 import net.citizensnpcs.api.trait.Trait;
 import net.citizensnpcs.api.trait.TraitName;
-import net.citizensnpcs.util.ChunkCoord;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.ChunkPos;
+import net.minecraft.world.entity.Entity;
+import net.neoforged.bus.api.SubscribeEvent;
+import net.neoforged.bus.api.EventPriority;
+import net.neoforged.fml.common.EventBusSubscriber;
+import net.neoforged.neoforge.event.server.ServerStoppingEvent;
 import net.neoforged.neoforge.common.world.chunk.TicketController;
 import net.neoforged.neoforge.common.world.chunk.TicketHelper;
 
@@ -28,7 +37,8 @@ import net.neoforged.neoforge.common.world.chunk.TicketHelper;
  */
 @TraitName("chunktickettrait")
 public class ChunkTicketTrait extends Trait {
-    private ChunkCoord active;
+    private static final Map<TicketKey, Set<ChunkTicketTrait>> owners = new HashMap<>();
+    private TicketKey active;
 
     public ChunkTicketTrait() {
         super("chunktickettrait");
@@ -46,9 +56,7 @@ public class ChunkTicketTrait extends Trait {
 
     @Override
     public void onSpawn() {
-        if (!npc.data().get(NPC.Metadata.KEEP_CHUNK_LOADED, Setting.KEEP_CHUNKS_LOADED.asBoolean()))
-            return;
-        acquire();
+        run();
     }
 
     /**
@@ -56,38 +64,62 @@ public class ChunkTicketTrait extends Trait {
      */
     @Override
     public void run() {
-        if (!npc.isSpawned())
-            return;
-        if (!npc.data().get(NPC.Metadata.KEEP_CHUNK_LOADED, Setting.KEEP_CHUNKS_LOADED.asBoolean())) {
+        Entity entity = npc.getEntity();
+        if (!owns(entity) || !npc.data().get(NPC.Metadata.KEEP_CHUNK_LOADED, Setting.KEEP_CHUNKS_LOADED.asBoolean())) {
             release();
             return;
         }
-        if (!(npc.getEntity().level() instanceof ServerLevel level))
-            return;
-        ChunkCoord at = new ChunkCoord(level, npc.getEntity().chunkPosition());
-        if (!at.equals(active)) {
-            release();
-            acquire();
-        }
-    }
-
-    private void acquire() {
-        if (!(npc.getEntity().level() instanceof ServerLevel level))
-            return;
-        ChunkPos pos = npc.getEntity().chunkPosition();
-        CONTROLLER.forceChunk(level, npc.getUniqueId(), pos.x, pos.z, true, true);
-        active = new ChunkCoord(level, pos);
+        if (!(entity.level() instanceof ServerLevel level)) return;
+        ChunkPos pos = entity.chunkPosition();
+        TicketKey next = new TicketKey(level, npc.getUniqueId(), pos.x, pos.z);
+        if (next.equals(active)) return;
+        release();
+        if (!owns(entity) || active != null || entity.level() != level || !entity.chunkPosition().equals(pos)) return;
+        active = next;
+        owners.computeIfAbsent(next, key -> Collections.newSetFromMap(new IdentityHashMap<>())).add(this);
+        reconcile(next);
+        if (!owns(entity) || !npc.data().get(NPC.Metadata.KEEP_CHUNK_LOADED, Setting.KEEP_CHUNKS_LOADED.asBoolean())) release();
     }
 
     private void release() {
         if (active == null)
             return;
-        ServerLevel level = active.getWorld();
-        if (level != null) {
-            CONTROLLER.forceChunk(level, npc.getUniqueId(), active.x, active.z, false, true);
-        }
+        TicketKey previous = active;
         active = null;
+        Set<ChunkTicketTrait> held = owners.get(previous);
+        if (held != null && held.remove(this)) {
+            if (held.isEmpty()) owners.remove(previous);
+            reconcile(previous);
+        }
     }
+
+    private boolean owns(Entity entity) {
+        return entity != null && !entity.isRemoved() && npc.isSpawned() && npc.getEntity() == entity
+                && npc.getTraitNullable(ChunkTicketTrait.class) == this
+                && npc.getOwningRegistry().getByUniqueId(npc.getUniqueId()) == npc
+                && npc.getOwningRegistry().getById(npc.getId()) == npc;
+    }
+
+    private static void reconcile(TicketKey key) {
+        boolean wanted;
+        do {
+            wanted = owners.containsKey(key);
+            CONTROLLER.forceChunk(key.level, key.owner, key.x, key.z, wanted, true);
+        } while (wanted != owners.containsKey(key));
+    }
+
+    // Traits are registered as event-bus instances; global handlers need their own class registration.
+    @EventBusSubscriber(modid = "citizens")
+    public static final class Lifecycle {
+        @SubscribeEvent(priority = EventPriority.LOWEST)
+        public static void stopping(ServerStoppingEvent event) {
+            var remaining = new ArrayList<>(owners.keySet());
+            owners.clear();
+            remaining.forEach(ChunkTicketTrait::reconcile);
+        }
+    }
+
+    private record TicketKey(ServerLevel level, UUID owner, int x, int z) { }
 
     /**
      * Drops every persisted ticket as a level loads, because {@link #onSpawn} re-acquires one for each NPC that should

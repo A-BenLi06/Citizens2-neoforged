@@ -1,4 +1,7 @@
 {
+  "citizens.commands.npc.anchor.header": "Anchors",
+  "citizens.commands.npc.anchor.legend": "ID  Name  World / location",
+  "citizens.commands.npc.anchor.unloaded": "(unloaded)",
   "citizens.commands.npc.list.header": "NPCs",
   "citizens.commands.npc.list.tp": "tp",
   "citizens.commands.npc.list.summon": "summon",

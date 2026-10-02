@@ -133,6 +133,11 @@ public interface MetadataStore {
      */
     void set(String key, Object data);
 
+    /** A session override. Native stores preserve the previous persistent value when saving. */
+    default void setTemporary(NPC.Metadata key, Object data) {
+        set(key, data);
+    }
+
     /**
      * Stores data at the given key. Data will persist and must be a primitive type or {@link String}.
      *

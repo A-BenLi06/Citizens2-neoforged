@@ -422,6 +422,9 @@ public class CitizensNPC extends AbstractNPC {
         CurrentLocation currentLocation = getOrAddTrait(CurrentLocation.class);
         if (!ownsEntity(previousController, null)) return true;
         if (getTraitNullable(CurrentLocation.class) == currentLocation) currentLocation.setLocation(location);
+        if (data().get(NPC.Metadata.KEEP_CHUNK_LOADED, Setting.KEEP_CHUNKS_LOADED.asBoolean()))
+            getOrAddTrait(net.citizensnpcs.trait.ChunkTicketTrait.class);
+        if (!ownsEntity(previousController, null)) return true;
         // Trait load/attachment order must not choose a different transport than the current trait set.
         entityController = PacketNPC.unwrap(entityController);
         PacketNPC packet = getTraitNullable(PacketNPC.class);

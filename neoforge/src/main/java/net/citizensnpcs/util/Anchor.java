@@ -13,7 +13,7 @@ import net.minecraft.server.level.ServerLevel;
  * Bukkit-provided library) give way to {@link Objects}. Equality is still by name alone, as upstream has it.
  * <p>
  * The stored string form is unchanged — {@code world;x;y;z} — and the world part is resolved through
- * {@link LocationPersister#resolve}, so anchors in an existing saves.yml keep working.
+ * {@link LocationPersister#resolveStrict}, so existing anchors keep working without redirecting unavailable worlds.
  */
 public class Anchor {
     private Location location;
@@ -23,7 +23,12 @@ public class Anchor {
     private final String unloaded_value;
 
     public Anchor(String name, Location location) {
-        this.location = location;
+        if (name == null || name.isBlank() || name.indexOf(';') >= 0) throw new IllegalArgumentException("Invalid anchor name");
+        Objects.requireNonNull(location, "location cannot be null");
+        if (location.getWorld() == null || !Double.isFinite(location.getX()) || !Double.isFinite(location.getY()) || !Double.isFinite(location.getZ())
+                || !Float.isFinite(location.getYaw()) || !Float.isFinite(location.getPitch()))
+            throw new IllegalArgumentException("Invalid anchor location");
+        this.location = location.clone();
         this.name = name;
         this.unloaded_value = worldIdOf(location) + ';' + location.getX() + ';' + location.getY() + ';'
                 + location.getZ();
@@ -49,7 +54,7 @@ public class Anchor {
     }
 
     public Location getLocation() {
-        return location;
+        return location == null ? null : location.clone();
     }
 
     public String getName() {
@@ -84,10 +89,10 @@ public class Anchor {
     public boolean load() {
         try {
             final String[] parts = getUnloadedValue();
-            ServerLevel level = LocationPersister.resolve(parts[0]);
+            ServerLevel level = LocationPersister.resolveStrict(parts[0]);
             if (level != null) {
-                this.location = new Location(level, Double.parseDouble(parts[1]), Double.parseDouble(parts[2]),
-                        Double.parseDouble(parts[3]));
+                double x = Double.parseDouble(parts[1]), y = Double.parseDouble(parts[2]), z = Double.parseDouble(parts[3]);
+                if (Double.isFinite(x) && Double.isFinite(y) && Double.isFinite(z)) this.location = new Location(level, x, y, z);
             }
         } catch (final Exception e) {
             // Still not able to be loaded

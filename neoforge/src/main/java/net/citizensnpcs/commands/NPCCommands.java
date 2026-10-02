@@ -270,75 +270,94 @@ public class NPCCommands {
 
     @Command(
             aliases = { "npc" },
-            usage = "anchor (--save [name]|--assume [name]|--remove [name]) (-a)",
+            usage = "anchor (page) (--save [name]|--assume [name]|--remove [name]) -a(ssume here) -c(ursor)",
             desc = "",
-            flags = "a",
+            flags = "ac",
             modifiers = { "anchor" },
+            strictArguments = true,
+            valueFlags = { "location", "entitylocation" },
             min = 1,
             max = 3,
             permission = "citizens.npc.anchor")
     public void anchor(CommandContext args, CommandSourceStack sender, NPC npc, @Flag("save") String save,
             @Flag("assume") String assume, @Flag("remove") String remove) throws CommandException {
-        net.citizensnpcs.trait.Anchors trait = npc.getOrAddTrait(net.citizensnpcs.trait.Anchors.class);
+        for (String name : new String[] { save, assume, remove })
+            if (name != null && (name.isBlank() || name.indexOf(';') >= 0)) throw new CommandException(Messages.INVALID_ANCHOR_NAME);
+        Location here = save != null || args.hasFlag('a') ? commandLocation(args.getSenderLocation()) : null;
+        Location savedLocation = save == null ? null : args.hasFlag('c') ? commandLocation(args.getSenderTargetBlockLocation()) : here;
+        net.citizensnpcs.trait.Anchors trait = npc.getTraitNullable(net.citizensnpcs.trait.Anchors.class);
         if (save != null) {
+            if (trait == null) trait = npc.getOrAddTrait(net.citizensnpcs.trait.Anchors.class);
+            if (!isCurrentTarget(npc) || npc.getTraitNullable(net.citizensnpcs.trait.Anchors.class) != trait) return;
             if (trait.getAnchor(save) != null)
                 throw new CommandException(Messages.ANCHOR_ALREADY_EXISTS, save);
-            Location at = args.getSenderLocation();
-            if (at == null)
-                throw new CommandException(CommandMessages.MUST_BE_INGAME);
-            trait.addAnchor(save, at);
+            trait.addAnchor(save, savedLocation);
             Messaging.sendTr(sender, Messages.ANCHOR_ADDED);
-            return;
-        }
-        if (remove != null) {
+        } else if (assume != null) {
+            Anchor anchor = trait == null ? null : trait.getAnchor(assume);
+            if (anchor == null || anchor.getLocation() == null) throw new CommandException(Messages.ANCHOR_MISSING, assume);
+            npc.teleport(commandLocation(anchor.getLocation()), TeleportCause.COMMAND);
+        } else if (remove != null) {
+            if (trait == null) throw new CommandException(Messages.ANCHOR_MISSING, remove);
             Anchor anchor = trait.getAnchor(remove);
             if (anchor == null)
                 throw new CommandException(Messages.ANCHOR_MISSING, remove);
             trait.removeAnchor(anchor);
             Messaging.sendTr(sender, Messages.ANCHOR_REMOVED);
-            return;
+        } else if (!args.hasFlag('a')) {
+            int page;
+            try { page = args.getInteger(1, 1); }
+            catch (NumberFormatException invalid) { throw new CommandException(CommandMessages.INVALID_VALUE, "page", args.getString(1)); }
+            Paginator paginator = new Paginator().header(Messaging.tr(Messages.ANCHOR_HEADER)).console(sender.getPlayer() == null);
+            paginator.addLine(net.minecraft.network.chat.Component.literal(Messaging.tr(Messages.ANCHOR_LEGEND)));
+            if (trait != null) {
+                int index = 0;
+                for (Anchor anchor : trait.getAnchors()) {
+                    String[] stored = anchor.getUnloadedValue();
+                    String location = anchor.isLoaded() ? Util.prettyPrintLocation(anchor.getLocation())
+                            : String.join(", ", stored) + " " + Messaging.tr(Messages.ANCHOR_UNLOADED);
+                    paginator.addLine(net.minecraft.network.chat.Component.literal(index++ + "  " + anchor.getName() + "  " + location));
+                }
+            }
+            if (!paginator.sendPage(sender, page)) throw new CommandException(CommandMessages.COMMAND_PAGE_MISSING, page);
         }
-        if (assume != null) {
-            Anchor anchor = trait.getAnchor(assume);
-            if (anchor == null || anchor.getLocation() == null)
-                throw new CommandException(Messages.ANCHOR_MISSING, assume);
-            npc.teleport(anchor.getLocation(), TeleportCause.COMMAND);
-            return;
-        }
-        Paginator paginator = new Paginator().header("Anchors").console(sender.getPlayer() == null);
-        for (Anchor anchor : trait.getAnchors()) {
-            paginator.addLine("<e>- " + anchor.getName());
-        }
-        if (!paginator.sendPage(sender, args.getInteger(1, 1)))
-            throw new CommandException(CommandMessages.COMMAND_PAGE_MISSING, args.getInteger(1, 1));
+        if (args.hasFlag('a') && isCurrentTarget(npc)) npc.teleport(here, TeleportCause.COMMAND);
     }
 
     @Command(
             aliases = { "npc" },
-            usage = "chunkload",
+            usage = "chunkload -t(emporary)",
             desc = "",
             modifiers = { "chunkload", "cload" },
+            flags = "t",
+            strictArguments = true,
             min = 1,
             max = 1,
             permission = "citizens.npc.chunkload")
     public void chunkload(CommandContext args, CommandSourceStack sender, NPC npc) throws CommandException {
         boolean keep = !npc.data().get(NPC.Metadata.KEEP_CHUNK_LOADED, Setting.KEEP_CHUNKS_LOADED.asBoolean());
-        npc.data().setPersistent(NPC.Metadata.KEEP_CHUNK_LOADED, keep);
-        if (keep) {
-            npc.getOrAddTrait(ChunkTicketTrait.class);
-        }
+        if (args.hasFlag('t')) npc.data().setTemporary(NPC.Metadata.KEEP_CHUNK_LOADED, keep);
+        else npc.data().setPersistent(NPC.Metadata.KEEP_CHUNK_LOADED, keep);
+        ChunkTicketTrait ticket = keep ? npc.getOrAddTrait(ChunkTicketTrait.class) : npc.getTraitNullable(ChunkTicketTrait.class);
+        if (ticket != null) ticket.run();
         Messaging.sendTr(sender, keep ? Messages.CHUNKLOAD_SET : Messages.CHUNKLOAD_UNSET, npc.getName());
     }
 
     @Command(
             aliases = { "npc" },
-            usage = "collidable",
+            usage = "collidable --fluids [true|false]",
             desc = "",
             modifiers = { "collidable", "pushable" },
+            strictArguments = true,
             min = 1,
             max = 1,
             permission = "citizens.npc.collidable")
-    public void collidable(CommandContext args, CommandSourceStack sender, NPC npc) throws CommandException {
+    public void collidable(CommandContext args, CommandSourceStack sender, NPC npc, @Flag("fluids") Boolean fluids) throws CommandException {
+        if (fluids != null) {
+            npc.data().setPersistent(NPC.Metadata.FLUID_PUSHABLE, fluids);
+            Messaging.sendTr(sender, fluids ? Messages.FLUID_PUSHABLE_SET : Messages.FLUID_PUSHABLE_UNSET, npc.getName());
+            return;
+        }
         boolean collidable = !npc.data().get(NPC.Metadata.COLLIDABLE, !npc.isProtected());
         npc.data().setPersistent(NPC.Metadata.COLLIDABLE, collidable);
         npc.getOrAddTrait(ScoreboardTrait.class);

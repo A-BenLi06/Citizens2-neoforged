@@ -30,6 +30,7 @@ public class Anchors extends Trait {
     }
 
     public boolean addAnchor(String name, Location location) {
+        if (getAnchor(name) != null) return false;
         Anchor newAnchor = new Anchor(name, location);
         if (anchors.contains(newAnchor))
             return false;
