@@ -43,14 +43,29 @@ public class MemoryDataKey extends DataKey {
     private Map<String, Object> deepCopyMap(Map<String, Object> source) {
         Map<String, Object> result = Maps.newHashMapWithExpectedSize(source.size());
         for (Map.Entry<String, Object> entry : source.entrySet()) {
-            Object value = entry.getValue();
-            if (value instanceof Map) {
-                result.put(entry.getKey(), deepCopyMap((Map<String, Object>) value));
-            } else {
-                result.put(entry.getKey(), value);
-            }
+            result.put(entry.getKey(), copyValue(entry.getValue()));
         }
         return result;
+    }
+
+    private Object copyValue(Object value) {
+        if (value instanceof Map<?, ?> map) {
+            Map<Object, Object> copy = new java.util.LinkedHashMap<>();
+            map.forEach((key, entry) -> copy.put(key, copyValue(entry)));
+            return copy;
+        }
+        if (value instanceof java.util.List<?> list) {
+            java.util.List<Object> copy = new java.util.ArrayList<>(list.size());
+            list.forEach(entry -> copy.add(copyValue(entry)));
+            return copy;
+        }
+        if (value != null && value.getClass().isArray()) {
+            int length = java.lang.reflect.Array.getLength(value);
+            Object copy = java.lang.reflect.Array.newInstance(value.getClass().getComponentType(), length);
+            for (int i = 0; i < length; i++) java.lang.reflect.Array.set(copy, i, copyValue(java.lang.reflect.Array.get(value, i)));
+            return copy;
+        }
+        return value;
     }
 
     @Override

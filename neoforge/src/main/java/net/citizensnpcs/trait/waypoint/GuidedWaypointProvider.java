@@ -51,6 +51,11 @@ public class GuidedWaypointProvider implements EnumerableWaypointProvider {
     private final List<Waypoint> guides = new ArrayList<>();
     private NPC npc;
     private boolean paused;
+    private long pauseRevision, routeRevision;
+
+    @Override public void onAttach(NPC npc) { this.npc = npc; }
+    @Override public long getPauseRevision() { return pauseRevision; }
+    @Override public long getRouteRevision() { return routeRevision; }
 
     public void addDestination(Waypoint waypoint) {
         destinations.add(waypoint);
@@ -79,6 +84,8 @@ public class GuidedWaypointProvider implements EnumerableWaypointProvider {
 
     @Override
     public void load(DataKey key) {
+        destinations.clear();
+        guides.clear();
         // the keys were renamed at some point; both spellings are still read so an old save keeps working
         DataKey destinationKey = key.keyExists("availablewaypoints") ? key.getRelative("availablewaypoints")
                 : key.getRelative("destinations");
@@ -106,9 +113,10 @@ public class GuidedWaypointProvider implements EnumerableWaypointProvider {
     public void onRemove() {
         if (currentGoal == null)
             return;
-        currentGoal.onProviderChanged();
-        npc.getDefaultBehaviorController().removeBehavior(currentGoal);
+        GuidedGoal previous = currentGoal;
         currentGoal = null;
+        try { previous.onProviderChanged(); }
+        finally { npc.getDefaultBehaviorController().removeBehavior(previous); }
     }
 
     @Override
@@ -123,22 +131,25 @@ public class GuidedWaypointProvider implements EnumerableWaypointProvider {
     @Override
     public void save(DataKey key) {
         key.removeKey("availablewaypoints");
+        key.removeKey("destinations");
         DataKey root = key.getRelative("destinations");
         for (int i = 0; i < destinations.size(); i++) {
             PersistenceLoader.save(destinations.get(i), root.getRelative(i));
         }
         key.removeKey("helperwaypoints");
+        key.removeKey("guides");
         root = key.getRelative("guides");
         for (int i = 0; i < guides.size(); i++) {
             PersistenceLoader.save(guides.get(i), root.getRelative(i));
         }
         if (distance != -1) {
             key.setDouble("distance", distance);
-        }
+        } else key.removeKey("distance");
     }
 
     @Override
     public void setPaused(boolean paused) {
+        pauseRevision++;
         this.paused = paused;
         if (currentGoal != null) {
             currentGoal.onProviderChanged();
@@ -155,6 +166,8 @@ public class GuidedWaypointProvider implements EnumerableWaypointProvider {
     }
 
     private void onWaypointsChanged() {
+        routeRevision++;
+        WaypointExecution.cancel(npc, this);
         if (currentGoal != null) {
             currentGoal.onProviderChanged();
         }
@@ -170,13 +183,13 @@ public class GuidedWaypointProvider implements EnumerableWaypointProvider {
         List<Waypoint> found = new ArrayList<>();
         double rangeSquared = range * range;
         for (Waypoint candidate : guides) {
-            if (candidate.getLocation().distanceSquared(of) <= rangeSquared) {
+            if (candidate.getLocation().getWorld() == of.getWorld() && candidate.getLocation().distanceSquared(of) <= rangeSquared) {
                 found.add(candidate);
             }
         }
         if (includeDestinations) {
             for (Waypoint candidate : destinations) {
-                if (candidate.getLocation().distanceSquared(of) <= rangeSquared) {
+                if (candidate.getLocation().getWorld() == of.getWorld() && candidate.getLocation().distanceSquared(of) <= rangeSquared) {
                     found.add(candidate);
                 }
             }
@@ -188,12 +201,12 @@ public class GuidedWaypointProvider implements EnumerableWaypointProvider {
     private class GuidedGoal implements Behavior {
         private GuidedPlan plan;
         private Waypoint target;
+        private net.citizensnpcs.api.ai.NavigatorParameters ownedParameters;
 
         public void onProviderChanged() {
-            if (plan == null)
-                return;
+            var previous = ownedParameters;
             reset();
-            if (npc.getNavigator().isNavigating()) {
+            if (previous != null && npc.getNavigator().isNavigating() && npc.getNavigator().getLocalParameters() == previous) {
                 npc.getNavigator().cancelNavigation();
             }
         }
@@ -202,13 +215,17 @@ public class GuidedWaypointProvider implements EnumerableWaypointProvider {
         public void reset() {
             plan = null;
             target = null;
+            ownedParameters = null;
         }
 
         @Override
         public BehaviorStatus run() {
+            if (currentGoal != this || paused || !Waypoints.owns(npc, GuidedWaypointProvider.this)) return BehaviorStatus.SUCCESS;
             if (plan != null && plan.isComplete()) {
-                target.onReach(npc);
+                Waypoint reached = target;
                 plan = null;
+                target = null;
+                reached.onReach(npc);
             }
             if (plan == null)
                 return BehaviorStatus.SUCCESS;
@@ -217,18 +234,23 @@ public class GuidedWaypointProvider implements EnumerableWaypointProvider {
 
             Waypoint current = plan.getCurrentWaypoint();
             Location at = current.getLocation();
-            npc.getNavigator().setTarget(Util.getCenterLocation(at.getWorld(), at.getBlockPos()));
-            npc.getNavigator().getLocalParameters().addSingleUseCallback(cancelReason -> {
-                if (plan != null) {
-                    plan.update(npc);
-                }
+            GuidedPlan issued = plan;
+            npc.getNavigator().setTarget(Util.getCenterLocation(at.getWorld(), at.getBlockPos()), parameters -> {
+                ownedParameters = parameters;
+                parameters.addSingleUseCallback(cancelReason -> {
+                    if (currentGoal != this || ownedParameters != parameters || plan != issued) return;
+                    ownedParameters = null;
+                    if (cancelReason == null && Waypoints.owns(npc, GuidedWaypointProvider.this)) issued.update(npc);
+                    else { plan = null; target = null; }
+                });
             });
             return BehaviorStatus.RUNNING;
         }
 
         @Override
         public boolean shouldExecute() {
-            if (paused || destinations.isEmpty() || !npc.isSpawned() || npc.getNavigator().isNavigating())
+            if (currentGoal != this || !Waypoints.owns(npc, GuidedWaypointProvider.this) || paused
+                    || destinations.isEmpty() || !npc.isSpawned() || npc.getNavigator().isNavigating())
                 return false;
             target = destinations.get(Util.getFastRandom().nextInt(destinations.size()));
             if (target.getLocation().getWorld() != npc.getStoredLocation().getWorld()) {

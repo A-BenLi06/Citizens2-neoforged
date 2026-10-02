@@ -126,6 +126,12 @@ public interface Navigator {
      */
     void setStraightLineTarget(Location target);
 
+    /** Configure this request before navigation callbacks. Legacy implementations configure after starting. */
+    default void setStraightLineTarget(Location target, Consumer<NavigatorParameters> configure) {
+        setStraightLineTarget(target);
+        configure.accept(getLocalParameters());
+    }
+
     /**
      * Sets the current navigation to an entity target.
      *
@@ -152,6 +158,12 @@ public interface Navigator {
      *            The path
      */
     void setTarget(Iterable<Vec3> path);
+
+    /** Configure this request before navigation callbacks. Legacy implementations configure after starting. */
+    default void setTarget(Iterable<Vec3> path, Consumer<NavigatorParameters> configure) {
+        setTarget(path);
+        configure.accept(getLocalParameters());
+    }
 
     /**
      * Sets the current navigation to a {@link Location} destination.

@@ -10,11 +10,13 @@ A read-only declaration scan of the checked-in `main` and `neoforge` source tree
 
 | Command | Remaining difference in the current implementation |
 |---|---|
-| `waypoints hpa`, `wp hpa` | Original debugging aliases require a usefulness/native-backend decision; ordinary waypoint navigation exists. |
+| `waypoints hpa`, `wp hpa` | Standalone HPA graph debugging remains unported. It is not a selectable NPC navigator; reproducing it requires a native hierarchical graph implementation, not an ordinary A* alias. See the [waypoint comparison](waypoint-lifecycle-2026-10-03.md). |
 
 Recent follow-ups cover [`powered`, `name` and `home` options](command-options-home-2026-09-28.md), [`armorstand` limb poses](armorstand-poses-2026-09-27.md), `follow`, `mount`, `pose`, `lookclose` / `look`, native command locations, removal targeting, text editing, entity/display commands and particle options. The command-options fixture passes 164 checks, including atomic validation, original duration/precedence, native powered admission and exact home navigation ownership. The known ordinary command groups on this checklist now have implementation follow-ups; the waypoint debugging aliases remain above. This does not prove every command/provider/client combination or the complete Citizens goal. `horse --color` and `--colour` both exist; upstream's unused `minecart --item` parameter is not a missing implemented behavior.
 
 ## Behavior, data and integration acceptance
+
+- [Waypoint lifecycle and delayed actions](waypoint-lifecycle-2026-10-03.md) repair unknown-provider route loss, old behavior cleanup, unavailable/disabled data retention, nested snapshot isolation, delayed-trigger and pause ownership, and request-specific navigation callbacks. Native provider/editor/custom-integration combinations still require appropriate acceptance; the standalone HPA experiment remains separate above.
 
 - [Skin commands and request ownership](skin-commands-2026-10-02.md) now cover URL/PNG imports, direct texture/signature input, complete PNG exports, native skull components, clear/latest/name semantics and explicit Geyser Bedrock lookups. Both NeoForge versions pass 127 dedicated checks, and the existing skin-refresh/mirroring fixture passes 367. Live MineSkin credentials/rate limits, Geyser availability, real signed-texture downloads and physical-client rendering remain unverified.
 

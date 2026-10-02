@@ -12,6 +12,7 @@ import net.citizensnpcs.Settings.Setting;
 import net.citizensnpcs.api.CitizensAPI;
 import net.citizensnpcs.api.util.ChatPrompts;
 import net.citizensnpcs.api.ai.Navigator;
+import net.citizensnpcs.api.ai.NavigatorParameters;
 import net.citizensnpcs.api.ai.PathStrategy;
 import net.citizensnpcs.api.ai.tree.Behavior;
 import net.citizensnpcs.api.ai.tree.BehaviorStatus;
@@ -51,6 +52,8 @@ public class LinearWaypointProvider implements EnumerableWaypointProvider {
     private boolean cycle;
     private LinearWaypointGoal currentGoal;
     private NPC npc;
+    private boolean paused;
+    private long pauseRevision, routeRevision;
     @Persist
     private boolean pathfind = true;
     @Persist(value = "points", reify = true, valueType = Waypoint.class)
@@ -61,6 +64,8 @@ public class LinearWaypointProvider implements EnumerableWaypointProvider {
 
     public void addWaypoint(Waypoint waypoint) {
         waypoints.add(waypoint);
+        routeRevision++;
+        WaypointExecution.cancel(npc, this);
         if (currentGoal != null) {
             currentGoal.onProviderChanged();
         }
@@ -80,8 +85,12 @@ public class LinearWaypointProvider implements EnumerableWaypointProvider {
 
     @Override
     public boolean isPaused() {
-        return currentGoal != null && currentGoal.isPaused();
+        return paused;
     }
+
+    @Override public void onAttach(NPC npc) { this.npc = npc; }
+    @Override public long getPauseRevision() { return pauseRevision; }
+    @Override public long getRouteRevision() { return routeRevision; }
 
     @Override
     public void load(DataKey key) {
@@ -91,9 +100,10 @@ public class LinearWaypointProvider implements EnumerableWaypointProvider {
     public void onRemove() {
         if (currentGoal == null)
             return;
-        currentGoal.onProviderChanged();
-        npc.getDefaultBehaviorController().removeBehavior(currentGoal);
+        LinearWaypointGoal previous = currentGoal;
         currentGoal = null;
+        try { previous.onProviderChanged(); }
+        finally { npc.getDefaultBehaviorController().removeBehavior(previous); }
     }
 
     @Override
@@ -114,6 +124,8 @@ public class LinearWaypointProvider implements EnumerableWaypointProvider {
     }
 
     public void setCachePaths(boolean cachePaths) {
+        routeRevision++;
+        WaypointExecution.cancel(npc, this);
         this.cachePaths = cachePaths;
         if (currentGoal != null) {
             currentGoal.onProviderChanged();
@@ -121,6 +133,8 @@ public class LinearWaypointProvider implements EnumerableWaypointProvider {
     }
 
     public void setCycle(boolean cycle) {
+        routeRevision++;
+        WaypointExecution.cancel(npc, this);
         this.cycle = cycle;
         if (currentGoal != null) {
             currentGoal.onProviderChanged();
@@ -128,11 +142,16 @@ public class LinearWaypointProvider implements EnumerableWaypointProvider {
     }
 
     public void setPathfind(boolean pathfind) {
+        routeRevision++;
+        WaypointExecution.cancel(npc, this);
         this.pathfind = pathfind;
+        if (currentGoal != null) currentGoal.onProviderChanged();
     }
 
     @Override
     public void setPaused(boolean paused) {
+        pauseRevision++;
+        this.paused = paused;
         if (currentGoal != null) {
             currentGoal.setPaused(paused);
         }
@@ -179,6 +198,8 @@ public class LinearWaypointProvider implements EnumerableWaypointProvider {
             }
 
             private void mod() {
+                routeRevision++;
+                WaypointExecution.cancel(npc, LinearWaypointProvider.this);
                 cachedPaths.clear();
                 if (currentGoal != null) {
                     currentGoal.onProviderChanged();
@@ -439,6 +460,8 @@ public class LinearWaypointProvider implements EnumerableWaypointProvider {
         }
 
         private void onWaypointsModified() {
+            routeRevision++;
+            WaypointExecution.cancel(npc, LinearWaypointProvider.this);
             cachedPaths.clear();
             if (currentGoal != null) {
                 currentGoal.onProviderChanged();
@@ -476,15 +499,19 @@ public class LinearWaypointProvider implements EnumerableWaypointProvider {
         private boolean ascending = true;
         private Waypoint currentDestination;
         private ListIterator<Waypoint> itr;
-        private boolean paused;
+        private NavigatorParameters ownedParameters;
 
         public boolean isPaused() {
             return paused;
         }
 
         public void onProviderChanged() {
+            NavigatorParameters previous = ownedParameters;
+            ownedParameters = null;
+            currentDestination = null;
             itr = getUnsafeIterator();
-            if (currentDestination != null && npc != null && npc.getNavigator().isNavigating()) {
+            if (previous != null && npc != null && npc.getNavigator().isNavigating()
+                    && npc.getNavigator().getLocalParameters() == previous) {
                 npc.getNavigator().cancelNavigation();
             }
         }
@@ -492,11 +519,12 @@ public class LinearWaypointProvider implements EnumerableWaypointProvider {
         @Override
         public void reset() {
             currentDestination = null;
+            ownedParameters = null;
         }
 
         @Override
         public BehaviorStatus run() {
-            if (paused || !getNavigator().isNavigating())
+            if (currentGoal != this || paused || !getNavigator().isNavigating())
                 return BehaviorStatus.SUCCESS;
             return BehaviorStatus.RUNNING;
         }
@@ -505,7 +533,7 @@ public class LinearWaypointProvider implements EnumerableWaypointProvider {
             paused = pause;
             if (!pause || currentDestination == null)
                 return;
-            if (npc != null && npc.getNavigator().isNavigating()) {
+            if (npc != null && npc.getNavigator().isNavigating() && npc.getNavigator().getLocalParameters() == ownedParameters) {
                 npc.getNavigator().cancelNavigation();
             }
             if (itr != null && itr.hasPrevious()) {
@@ -515,10 +543,11 @@ public class LinearWaypointProvider implements EnumerableWaypointProvider {
 
         @Override
         public boolean shouldExecute() {
-            if (paused || currentDestination != null || !npc.isSpawned() || getNavigator().isNavigating())
+            if (currentGoal != this || !Waypoints.owns(npc, LinearWaypointProvider.this) || paused
+                    || currentDestination != null || !npc.isSpawned() || getNavigator().isNavigating())
                 return false;
             ensureItr();
-            if (!itr.hasNext())
+            if (currentGoal != this || !Waypoints.owns(npc, LinearWaypointProvider.this) || itr == null || !itr.hasNext())
                 return false;
 
             Waypoint next = itr.next();
@@ -528,9 +557,19 @@ public class LinearWaypointProvider implements EnumerableWaypointProvider {
                 return false;
 
             currentDestination = next;
+            java.util.function.Consumer<NavigatorParameters> configure = parameters -> {
+                ownedParameters = parameters;
+                parameters.addSingleUseCallback(cancelReason -> {
+                    if (currentGoal != this || ownedParameters != parameters) return;
+                    ownedParameters = null;
+                    currentDestination = null;
+                    if (cancelReason == null && Waypoints.owns(npc, LinearWaypointProvider.this)) next.onReach(npc);
+                });
+            };
             if (cachePaths) {
-                replayCachedPath(npcLoc);
+                replayCachedPath(npcLoc, configure);
             }
+            if (currentGoal != this || currentDestination != next || !Waypoints.owns(npc, LinearWaypointProvider.this)) return false;
             if (!getNavigator().isNavigating()) {
                 Location target = currentDestination.getLocation();
                 Location centre = Util.getCenterLocation(target.getWorld(), target.getBlockPos());
@@ -538,23 +577,24 @@ public class LinearWaypointProvider implements EnumerableWaypointProvider {
                 // straight line and vice versa - its message and its behaviour contradict each other. Swapped here so
                 // that pathfind == true really pathfinds, which is also the documented default.
                 if (pathfind) {
-                    getNavigator().setTarget(centre);
+                    getNavigator().setTarget(centre, configure);
                 } else {
-                    getNavigator().setStraightLineTarget(centre);
+                    getNavigator().setStraightLineTarget(centre, configure);
                 }
             }
             PathStrategy strategy = getNavigator().getPathStrategy();
-            getNavigator().getLocalParameters().addSingleUseCallback(cancelReason -> {
-                Waypoint waypoint = currentDestination;
+            if (ownedParameters == null || getNavigator().getLocalParameters() != ownedParameters) {
                 currentDestination = null;
-                if (cancelReason != null || waypoint == null)
-                    return;
-                waypoint.onReach(npc);
-                if (cachePaths && strategy != null && strategy.getPath() != null) {
+                return false;
+            }
+            long version = routeRevision;
+            ownedParameters.addSingleUseCallback(cancelReason -> {
+                if (cancelReason == null && version == routeRevision && Waypoints.owns(npc, LinearWaypointProvider.this)
+                        && cachePaths && strategy != null && strategy.getPath() != null) {
                     List<Vec3> path = new ArrayList<>();
                     strategy.getPath().forEach(path::add);
                     if (!path.isEmpty()) {
-                        cachedPaths.put(new SourceDestinationPair(npcLoc, waypoint), path);
+                        cachedPaths.put(new SourceDestinationPair(npcLoc, next), path);
                     }
                 }
             });
@@ -638,7 +678,7 @@ public class LinearWaypointProvider implements EnumerableWaypointProvider {
         }
 
         /** Reuses a stored path, dropping it when the world no longer supports it. */
-        private void replayCachedPath(Location npcLoc) {
+        private void replayCachedPath(Location npcLoc, java.util.function.Consumer<NavigatorParameters> configure) {
             SourceDestinationPair key = new SourceDestinationPair(npcLoc, currentDestination);
             Iterable<Vec3> cached = cachedPaths.get(key);
             if (cached == null)
@@ -647,7 +687,7 @@ public class LinearWaypointProvider implements EnumerableWaypointProvider {
                 cachedPaths.remove(key);
                 return;
             }
-            getNavigator().setTarget(cached);
+            getNavigator().setTarget(cached, configure);
         }
     }
 

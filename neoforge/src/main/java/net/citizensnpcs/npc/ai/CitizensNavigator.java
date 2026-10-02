@@ -344,13 +344,18 @@ public class CitizensNavigator implements Navigator, Runnable {
 
     @Override
     public void setStraightLineTarget(Location target) {
+        setStraightLineTarget(target, params -> { });
+    }
+
+    @Override
+    public void setStraightLineTarget(Location target, Consumer<NavigatorParameters> configure) {
         if (!npc.isSpawned())
             throw new IllegalStateException("npc is not spawned");
         if (target == null) {
             cancelNavigation();
             return;
         }
-        setTarget(params -> new StraightLineNavigationStrategy(npc, target.clone(), params));
+        setTarget(params -> new StraightLineNavigationStrategy(npc, target.clone(), params), configure);
     }
 
     @Override
@@ -426,6 +431,11 @@ public class CitizensNavigator implements Navigator, Runnable {
 
     @Override
     public void setTarget(Iterable<Vec3> path) {
+        setTarget(path, params -> { });
+    }
+
+    @Override
+    public void setTarget(Iterable<Vec3> path, Consumer<NavigatorParameters> configure) {
         if (!npc.isSpawned())
             throw new IllegalStateException("npc is not spawned");
         if (path == null || !path.iterator().hasNext()) {
@@ -438,7 +448,7 @@ public class CitizensNavigator implements Navigator, Runnable {
             if (params.pathfinderType().isCitizens() || !(npc.getEntity() instanceof Mob))
                 return new AStarNavigationStrategy(npc, path, params);
             return new MCNavigationStrategy(npc, path, params);
-        });
+        }, configure);
     }
 
     @Override

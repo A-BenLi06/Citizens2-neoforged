@@ -5,6 +5,7 @@ import java.util.List;
 
 import net.citizensnpcs.api.command.Command;
 import net.citizensnpcs.api.command.CommandContext;
+import net.citizensnpcs.api.command.CommandMessages;
 import net.citizensnpcs.api.command.Flag;
 import net.citizensnpcs.api.command.Requirements;
 import net.citizensnpcs.api.command.exception.CommandException;
@@ -37,20 +38,22 @@ public class WaypointCommands {
             usage = "add [x] [y] [z] (world) (--index idx)",
             desc = "",
             modifiers = { "add" },
+            strictArguments = true,
             min = 4,
             max = 5,
             permission = "citizens.waypoints.add")
     public void add(CommandContext args, CommandSourceStack sender, NPC npc, @Flag("index") Integer index)
             throws CommandException {
-        List<Waypoint> waypoints = linearWaypoints(npc);
-        ServerLevel level = args.argsLength() > 4 ? Util.getLevel(sender.getServer(), args.getString(4))
-                : npc.getStoredLocation().getWorld();
-        if (level == null)
-            throw new CommandException(Messages.WORLD_NOT_FOUND);
-        Location at = new Location(level, args.getInteger(1), args.getInteger(2), args.getInteger(3));
+        Location at = commandLocation(args, sender, npc);
+        Waypoints trait = npc.getTraitNullable(Waypoints.class);
+        List<Waypoint> waypoints = trait == null ? java.util.Collections.emptyList() : linearWaypoints(trait);
         int insertAt = index == null ? waypoints.size() : index;
         if (insertAt > waypoints.size() || insertAt < 0)
             throw new CommandException(Messages.WAYPOINT_INDEX_OUT_OF_RANGE, waypoints.size());
+        if (trait == null) trait = npc.getOrAddTrait(Waypoints.class);
+        if (!trait.isCurrent()) return;
+        waypoints = linearWaypoints(trait);
+        if (insertAt > waypoints.size()) throw new CommandException(Messages.WAYPOINT_INDEX_OUT_OF_RANGE, waypoints.size());
         waypoints.add(insertAt, new Waypoint(at));
         Messaging.sendTr(sender, Messages.WAYPOINT_ADDED, Util.prettyPrintLocation(at), insertAt);
     }
@@ -60,6 +63,7 @@ public class WaypointCommands {
             usage = "provider [provider name]",
             desc = "",
             modifiers = { "provider" },
+            strictArguments = true,
             min = 1,
             max = 2,
             permission = "citizens.waypoints.provider")
@@ -70,12 +74,11 @@ public class WaypointCommands {
             waypoints.describeProviders(sender);
             return;
         }
-        ServerPlayer player = sender.getPlayer();
-        if (player != null && Editor.hasEditor(player)) {
-            Editor.leave(player);
-        }
         if (!waypoints.setWaypointProvider(args.getString(1)))
             throw new CommandException(Messages.WAYPOINT_PROVIDER_NOT_FOUND, args.getString(1));
+        ServerPlayer player = sender.getPlayer();
+        if (player != null && Editor.hasEditor(player)) Editor.leave(player);
+        if (!waypoints.isCurrent()) return;
         Messaging.sendTr(sender, Messages.WAYPOINT_PROVIDER_SET, args.getString(1));
     }
 
@@ -84,26 +87,28 @@ public class WaypointCommands {
             usage = "remove (x y z world) (--index idx)",
             desc = "",
             modifiers = { "remove" },
+            strictArguments = true,
             min = 1,
             max = 5,
             permission = "citizens.waypoints.remove")
     public void remove(CommandContext args, CommandSourceStack sender, NPC npc, @Flag("index") Integer index)
             throws CommandException {
-        List<Waypoint> waypoints = linearWaypoints(npc);
-        if (index != null && index >= 0 && index < waypoints.size()) {
+        Waypoints trait = npc.getTraitNullable(Waypoints.class);
+        if (trait == null) throw new CommandException(Messages.WAYPOINT_PROVIDER_NOT_LINEAR);
+        List<Waypoint> waypoints = linearWaypoints(trait);
+        if (index != null) {
+            if (index < 0 || index >= waypoints.size()) throw new CommandException(Messages.WAYPOINT_INDEX_OUT_OF_RANGE, waypoints.size());
             waypoints.remove(index.intValue());
             Messaging.sendTr(sender, Messages.WAYPOINT_REMOVED, index);
             return;
         }
         if (args.argsLength() < 4)
             throw new CommandUsageException();
-        ServerLevel level = args.argsLength() > 4 ? Util.getLevel(sender.getServer(), args.getString(4))
-                : npc.getStoredLocation().getWorld();
-        if (level == null)
-            throw new CommandException(Messages.WORLD_NOT_FOUND);
-        Location at = new Location(level, args.getInteger(1), args.getInteger(2), args.getInteger(3));
+        Location at = commandLocation(args, sender, npc);
         for (Iterator<Waypoint> itr = waypoints.iterator(); itr.hasNext();) {
-            if (itr.next().getLocation().equals(at)) {
+            Location candidate = itr.next().getLocation();
+            if (candidate.getWorld() == at.getWorld() && candidate.getX() == at.getX()
+                    && candidate.getY() == at.getY() && candidate.getZ() == at.getZ()) {
                 itr.remove();
             }
         }
@@ -115,10 +120,19 @@ public class WaypointCommands {
      * ordered route to index into.
      */
     @SuppressWarnings("unchecked")
-    private static List<Waypoint> linearWaypoints(NPC npc) throws CommandException {
-        WaypointProvider provider = npc.getOrAddTrait(Waypoints.class).getCurrentProvider();
+    private static List<Waypoint> linearWaypoints(Waypoints trait) throws CommandException {
+        WaypointProvider provider = trait.getCurrentProvider();
         if (!(provider instanceof LinearWaypointProvider linear))
             throw new CommandException(Messages.WAYPOINT_PROVIDER_NOT_LINEAR);
         return (List<Waypoint>) linear.waypoints();
+    }
+
+    private static Location commandLocation(CommandContext args, CommandSourceStack sender, NPC npc) throws CommandException {
+        Location stored = npc.getStoredLocation();
+        ServerLevel level = args.argsLength() > 4 ? net.citizensnpcs.api.persistence.LocationPersister.resolveStrict(args.getString(4))
+                : stored != null && stored.getWorld() != null ? stored.getWorld() : sender.getLevel();
+        if (level == null) throw new CommandException(Messages.WORLD_NOT_FOUND);
+        try { return new Location(level, args.getInteger(1), args.getInteger(2), args.getInteger(3)); }
+        catch (NumberFormatException invalid) { throw new CommandException(CommandMessages.INVALID_NUMBER); }
     }
 }

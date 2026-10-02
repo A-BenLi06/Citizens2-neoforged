@@ -34,6 +34,11 @@ import net.minecraft.world.phys.AABB;
 public class WanderWaypointProvider implements WaypointProvider {
     private List<AABB> boxes = new ArrayList<>();
     private WanderGoal currentGoal;
+    private long pauseRevision, routeRevision;
+
+    @Override public void onAttach(NPC npc) { this.npc = npc; }
+    @Override public long getPauseRevision() { return pauseRevision; }
+    @Override public long getRouteRevision() { return routeRevision; }
     @Persist
     private int delay = -1;
     private NPC npc;
@@ -92,9 +97,10 @@ public class WanderWaypointProvider implements WaypointProvider {
     public void onRemove() {
         if (currentGoal == null)
             return;
-        currentGoal.pause();
-        npc.getDefaultBehaviorController().removeBehavior(currentGoal);
+        WanderGoal previous = currentGoal;
         currentGoal = null;
+        try { previous.pause(); }
+        finally { npc.getDefaultBehaviorController().removeBehavior(previous); }
     }
 
     @Override
@@ -142,6 +148,7 @@ public class WanderWaypointProvider implements WaypointProvider {
 
     @Override
     public void setPaused(boolean paused) {
+        pauseRevision++;
         this.paused = paused;
         if (currentGoal == null)
             return;
@@ -162,6 +169,8 @@ public class WanderWaypointProvider implements WaypointProvider {
     }
 
     private void recalculateBoxes() {
+        routeRevision++;
+        WaypointExecution.cancel(npc, this);
         List<AABB> rebuilt = new ArrayList<>(regionCentres.size());
         for (Location centre : regionCentres) {
             rebuilt.add(new AABB(centre.getBlockX() - xrange, centre.getBlockY() - yrange, centre.getBlockZ() - xrange,

@@ -83,33 +83,9 @@ public class Waypoint {
     public void onReach(NPC npc) {
         if (triggers == null)
             return;
-        runTriggers(npc, 0);
+        WaypointExecution.begin(npc, this);
     }
 
-    /**
-     * Runs the triggers in order, stopping at a {@link DelayTrigger} to pause the route and pick up where it left off
-     * once the delay is up.
-     */
-    private void runTriggers(NPC npc, int start) {
-        WaypointTrigger[] snapshot = triggers.toArray(new WaypointTrigger[0]);
-        for (int i = start; i < snapshot.length; i++) {
-            WaypointTrigger trigger = snapshot[i];
-            trigger.onWaypointReached(npc, location.clone());
-            if (!(trigger instanceof DelayTrigger delayTrigger))
-                continue;
-            int delay = delayTrigger.getDelay();
-            if (delay <= 0)
-                continue;
-            WaypointProvider provider = npc.getOrAddTrait(Waypoints.class).getCurrentProvider();
-            provider.setPaused(true);
-            int resumeAt = i + 1;
-            CitizensAPI.getScheduler().runTaskLater(() -> {
-                provider.setPaused(false);
-                runTriggers(npc, resumeAt);
-            }, delay);
-            break;
-        }
-    }
 
     @Override
     public String toString() {

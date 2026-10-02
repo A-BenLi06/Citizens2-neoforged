@@ -28,6 +28,11 @@ import net.minecraft.commands.CommandSourceStack;
 public class Waypoints extends Trait {
     private WaypointProvider provider = new LinearWaypointProvider();
     private String providerName = "linear";
+    private DataKey unavailable;
+    private long revision;
+    private boolean removed, despawning;
+    private boolean providerStopped;
+    private net.minecraft.world.entity.Entity runningEntity;
 
     public Waypoints() {
         super("waypoints");
@@ -53,30 +58,73 @@ public class Waypoints extends Trait {
         return provider == null ? null : provider.createEditor(sender, args);
     }
 
+    @Override public void onAttach() { if (provider != null) provider.onAttach(npc); }
+
+    public long getRevision() { return revision; }
+
+    static boolean owns(net.citizensnpcs.api.npc.NPC npc, WaypointProvider provider) {
+        if (npc == null) return false;
+        Waypoints trait = npc.getTraitNullable(Waypoints.class);
+        return trait != null && trait.isCurrent() && trait.provider == provider;
+    }
+
+    public boolean isCurrent() {
+        return !removed && (npc == null || npc.getTraitNullable(Waypoints.class) == this
+                && npc.getOwningRegistry().getByUniqueId(npc.getUniqueId()) == npc
+                && npc.getOwningRegistry().getById(npc.getId()) == npc);
+    }
+
     @Override
     public void load(DataKey key) throws NPCLoadException {
-        providerName = key.getString("provider", "linear");
-        provider = create(providerName);
-        if (provider == null)
-            return;
-        PersistenceLoader.load(provider, key.getRelative(providerName));
-        if (npc != null) {
-            provider.onSpawn(npc);
-        }
+        long before = revision;
+        String name = key.getString("provider", "linear");
+        WaypointProvider candidate = create(name);
+        if (candidate != null && PersistenceLoader.load(candidate, key.getRelative(name)) == null) candidate = null;
+        install(candidate, name, candidate == null && !name.isEmpty() ? key.copy() : null, before);
     }
 
     @Override
     public void onSpawn() {
-        if (provider != null) {
+        if (isCurrent() && !despawning && provider != null && npc != null && npc.isSpawned()
+                && (providerStopped || runningEntity != npc.getEntity())) {
+            providerStopped = false;
+            runningEntity = npc.getEntity();
             provider.onSpawn(npc);
         }
     }
 
+    @Override public void onDespawn() {
+        despawning = true;
+        WaypointProvider previous = provider;
+        boolean release = !providerStopped;
+        providerStopped = true;
+        runningEntity = null;
+        try {
+            WaypointExecution.cancelWaiting(npc, previous);
+            if (release && previous != null) previous.onRemove();
+        } finally { despawning = false; }
+    }
+
+    @Override public void onRemove() {
+        if (removed) return;
+        removed = true;
+        revision++;
+        WaypointProvider previous = provider;
+        boolean release = !providerStopped;
+        providerStopped = true;
+        runningEntity = null;
+        provider = null;
+        WaypointExecution.cancel(npc, previous);
+        if (release && previous != null) previous.onRemove();
+    }
+
     @Override
     public void save(DataKey key) {
-        if (provider == null)
+        if (unavailable != null) {
+            key.setRaw("", unavailable.copy().getRaw(""));
             return;
-        PersistenceLoader.save(provider, key.getRelative(providerName));
+        }
+        if (provider != null) PersistenceLoader.save(provider, key.getRelative(providerName));
         key.setString("provider", providerName);
     }
 
@@ -86,22 +134,34 @@ public class Waypoints extends Trait {
      * @return whether the name was known
      */
     public boolean setWaypointProvider(String name) {
-        if (provider != null) {
-            provider.onRemove();
+        if (!isCurrent()) return false;
+        long before = revision;
+        String key = name == null ? "" : name.toLowerCase(Locale.ROOT);
+        WaypointProvider candidate = key.isEmpty() ? null : create(key);
+        if (!key.isEmpty() && candidate == null) return false;
+        return install(candidate, key, null, before);
+    }
+
+    private boolean install(WaypointProvider candidate, String name, DataKey saved, long expected) {
+        if (revision != expected || !isCurrent()) return false;
+        WaypointProvider previous = provider;
+        boolean release = !providerStopped;
+        provider = candidate;
+        providerStopped = false;
+        runningEntity = null;
+        providerName = name;
+        unavailable = saved;
+        long installed = ++revision;
+        try {
+            WaypointExecution.cancel(npc, previous);
+            if (release && previous != null && previous != candidate) previous.onRemove();
+        } finally {
+            if (isCurrent() && revision == installed && candidate != null && npc != null) {
+                candidate.onAttach(npc);
+                if (isCurrent() && revision == installed) onSpawn();
+            }
         }
-        provider = null;
-        providerName = null;
-        if (name == null || name.isEmpty())
-            return true;
-        String key = name.toLowerCase(Locale.ROOT);
-        provider = create(key);
-        if (provider == null)
-            return false;
-        providerName = key;
-        if (npc != null && npc.isSpawned()) {
-            provider.onSpawn(npc);
-        }
-        return true;
+        return isCurrent() && revision == installed && provider == candidate;
     }
 
     private static WaypointProvider create(String name) {

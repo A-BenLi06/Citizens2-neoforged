@@ -4,9 +4,11 @@
 
 Initial audit timestamp: 2026-09-13 01:47:09 +08:00 (UTC+08:00).
 
-Current summary updated: 2026-10-02 23:21:49 +08:00 (UTC+08:00).
+Current summary updated: 2026-10-03 00:44:48 +08:00 (UTC+08:00).
 
 The resumed goal explicitly continues comparison of remaining behavior in the retained Citizens, Interactions and Sentinel code. CmdCam owns camera playback and Yuuniverse Economy owns economic APIs; unrelated replacement suites and unverified client/modpack/proxy acceptance remain distinct.
+
+Latest waypoint follow-up: [provider lifecycle and delayed actions](waypoint-lifecycle-2026-10-03.md) repairs unknown-provider route loss, old behavior cleanup, unavailable/disabled saves, nested data snapshots, delayed-trigger/pause ownership and navigation callback attribution. The dedicated native fixture includes successful arrival/cache replay and callback replacement. HPA debugging remains unported rather than being aliased to another algorithm. Evidence: `artifacts/waypoint-lifecycle-validation-summary.json`. The broader provider/data/client/modpack/proxy requirements remain open.
 
 Latest skin follow-up: [native skin commands and asynchronous ownership](skin-commands-2026-10-02.md) restores URL/file generation, direct textures, exports, skulls, latest/name semantics and explicit Bedrock lookups. Revision and identity checks keep delayed work from replacing newer state; native caches and persisted textures retain their distinct roles. Both NeoForge versions pass 127 dedicated checks, and skin-refresh/mirroring regression passes 367. Interactions remains separate. Evidence: `artifacts/skin-command-validation-summary.json`. Known ordinary command groups now have implementation follow-ups; debugging aliases, live service/provider/data work and physical-client/modpack/proxy acceptance remain open.
 

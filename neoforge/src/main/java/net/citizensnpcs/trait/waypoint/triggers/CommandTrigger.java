@@ -29,6 +29,8 @@ public class CommandTrigger implements WaypointTrigger {
     @Override
     public void onWaypointReached(NPC npc, Location waypoint) {
         for (String command : commands) {
+            if (!npc.isSpawned() || npc.getOwningRegistry().getByUniqueId(npc.getUniqueId()) != npc
+                    || npc.getOwningRegistry().getById(npc.getId()) != npc) return;
             Util.runCommand(npc, null, command, false, false);
         }
     }

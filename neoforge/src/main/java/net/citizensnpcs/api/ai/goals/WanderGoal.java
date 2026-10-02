@@ -41,6 +41,7 @@ public class WanderGoal implements Behavior {
     private boolean paused;
     private final Function<NPC, Location> picker;
     private Location target;
+    private net.citizensnpcs.api.ai.NavigatorParameters ownedParameters;
     private int xrange;
     private int yrange;
 
@@ -80,7 +81,8 @@ public class WanderGoal implements Behavior {
         if (target == null)
             return;
         if (pathfind) {
-            npc.getNavigator().cancelNavigation();
+            if (ownedParameters != null && npc.getNavigator().getLocalParameters() == ownedParameters)
+                npc.getNavigator().cancelNavigation();
         } else {
             npc.setMoveDestination(null);
         }
@@ -89,6 +91,7 @@ public class WanderGoal implements Behavior {
     @Override
     public void reset() {
         target = null;
+        ownedParameters = null;
         movingTicks = 0;
         delayedTicks = delay;
         forceFinish = false;
@@ -137,10 +140,14 @@ public class WanderGoal implements Behavior {
         if (dest == null)
             return false;
         if (pathfind) {
-            npc.getNavigator().setTarget(dest);
-            // an NPC that cannot reach where it picked should pick again, not be teleported there
-            npc.getNavigator().getLocalParameters().stuckAction(null);
-            npc.getNavigator().getLocalParameters().addSingleUseCallback(reason -> forceFinish = true);
+            npc.getNavigator().setTarget(dest, parameters -> {
+                ownedParameters = parameters;
+                parameters.stuckAction(null);
+                parameters.addSingleUseCallback(reason -> {
+                    if (ownedParameters == parameters) { ownedParameters = null; forceFinish = true; }
+                });
+            });
+            if (ownedParameters == null || npc.getNavigator().getLocalParameters() != ownedParameters) return false;
         } else {
             Random random = new Random();
             dest = dest.clone();

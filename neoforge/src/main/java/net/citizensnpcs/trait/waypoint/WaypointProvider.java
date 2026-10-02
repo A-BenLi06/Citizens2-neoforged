@@ -18,6 +18,15 @@ public interface WaypointProvider extends Persistable {
 
     boolean isPaused();
 
+    /** Bind context without starting movement; also used while editing an unspawned NPC. */
+    default void onAttach(NPC npc) { }
+
+    /** Explicit pause requests, including requests that repeat the current value. */
+    default long getPauseRevision() { return -1; }
+
+    /** Changes that invalidate an in-flight waypoint sequence. */
+    default long getRouteRevision() { return 0; }
+
     /** Called when the provider is removed from the NPC. */
     void onRemove();
 
