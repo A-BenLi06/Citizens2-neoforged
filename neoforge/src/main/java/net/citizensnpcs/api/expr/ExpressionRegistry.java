@@ -54,6 +54,8 @@ public class ExpressionRegistry {
         String expression = matcher.group(2);
         String language = defaultEngineName;
 
+        if (!prefix.isEmpty() && !engines.containsKey(prefix))
+            throw new ExpressionCompileException("Unknown expression engine: " + prefix);
         if (engines.containsKey(prefix)) {
             language = prefix;
         }
@@ -103,7 +105,7 @@ public class ExpressionRegistry {
                 return new ExpressionValue(compile(expr));
             } catch (ExpressionCompileException e) {
                 e.printStackTrace();
-                return new ExpressionValue(expr);
+                return new ExpressionValue(expr, true);
             }
         }
         return new ExpressionValue(expr);
@@ -132,15 +134,22 @@ public class ExpressionRegistry {
     public static class ExpressionValue {
         private final CompiledExpression expression;
         private final Object literal;
+        private final boolean invalidExpression;
 
         ExpressionValue(CompiledExpression expression) {
             this.expression = expression;
             this.literal = null;
+            this.invalidExpression = false;
         }
 
         ExpressionValue(Object literal) {
+            this(literal, false);
+        }
+
+        ExpressionValue(Object literal, boolean invalidExpression) {
             this.expression = null;
             this.literal = literal;
+            this.invalidExpression = invalidExpression;
         }
 
         public Object evaluate(ExpressionScope scope) {
@@ -151,6 +160,7 @@ public class ExpressionRegistry {
         }
 
         public boolean evaluateAsBoolean(ExpressionScope scope) {
+            if (invalidExpression) return false;
             if (expression != null)
                 return expression.evaluateAsBoolean(scope);
 

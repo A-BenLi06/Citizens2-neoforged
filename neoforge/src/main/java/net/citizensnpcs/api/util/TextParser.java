@@ -20,6 +20,14 @@ public class TextParser {
     private TextParser() {
     }
 
+    public static String escapeTags(String text) {
+        return MINIMESSAGE.escapeTags(text);
+    }
+
+    public static String quoteTagArgument(String value) {
+        return "\"" + value.replace("\\", "\\\\").replace("\"", "\\\"") + "\"";
+    }
+
     /** Parses text without resolving selectors, scores or NBT against a command source. */
     public static MutableComponent parse(String raw) {
         if (raw == null || raw.isEmpty())

@@ -38,6 +38,7 @@ import net.minecraft.network.protocol.game.ClientboundMoveEntityPacket;
 import net.minecraft.network.protocol.game.ClientboundRotateHeadPacket;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Locale;
 
 import com.google.common.base.Joiner;
@@ -2469,31 +2470,93 @@ public class NPCCommands {
 
     @Command(
             aliases = { "npc" },
-            usage = "list (page) (--type type) (--owner owner)",
+            usage = "list (page) -a(ll) --owner [owner] --type [type] --registry [name] --tag [tag] --filter [expression] --page [page]",
             desc = "",
             modifiers = { "list" },
+            flags = "a",
+            strictArguments = true,
             min = 1,
             max = 2,
             permission = "citizens.npc.list")
     @Requirements
     public void list(CommandContext args, CommandSourceStack sender, NPC npc, @Flag("type") String rawType,
-            @Flag("owner") String owner) throws CommandException {
+            @Flag("owner") String owner, @Flag("registry") String registryName, @Flag("tag") String tag,
+            @Flag("filter") String filter, @Flag("page") Integer pageFlag) throws CommandException {
+        NPCRegistry registry = commandRegistry(registryName);
         EntityType<?> filterType = rawType == null ? null : MobType.match(rawType);
-        Paginator paginator = new Paginator().header("NPCs").console(sender.getPlayer() == null);
-        for (NPC each : CitizensAPI.getNPCRegistry().sorted()) {
-            EntityType<?> type = each.getOrAddTrait(MobType.class).getType();
-            if (filterType != null && type != filterType) {
-                continue;
+        if (rawType != null && filterType == null) throw new CommandException(Messages.COMMAND_INVALID_MOBTYPE, rawType);
+        int page;
+        try { page = pageFlag == null ? args.getInteger(1, 1) : pageFlag; }
+        catch (NumberFormatException invalid) { throw new CommandException(CommandMessages.INVALID_VALUE, "page", args.getString(1, "")); }
+        if (page < 1) throw new CommandException(CommandMessages.COMMAND_PAGE_MISSING, page);
+        net.citizensnpcs.api.expr.CompiledExpression expression = null;
+        if (filter != null) {
+            if (!PermissionUtil.hasPermission(sender, "citizens.admin")) throw new NoPermissionsException();
+            try {
+                expression = CitizensAPI.getExpressionRegistry().compile(
+                        CitizensAPI.getExpressionRegistry().applyDefaultExpressionMarkup(filter));
+            } catch (net.citizensnpcs.api.expr.ExpressionEngine.ExpressionCompileException invalid) {
+                throw new CommandException(CommandMessages.INVALID_VALUE, "--filter", filter);
             }
-            if (owner != null && !each.getOrAddTrait(Owner.class).isOwnedBy(owner)) {
-                continue;
-            }
-            paginator.addLine("<e>" + each.getId() + "<gray> - " + each.getName() + " <gray>("
-                    + EntityType.getKey(type).getPath() + ", " + (each.isSpawned() ? "spawned" : "despawned") + ")");
         }
-        int page = args.getInteger(1, 1);
+        UUID ownerId = owner == null || owner.equalsIgnoreCase("SERVER") ? null : matchPlayerUUID(sender, owner);
+        if (owner != null && !owner.equalsIgnoreCase("SERVER") && ownerId == null)
+            throw new CommandException(CommandMessages.INVALID_VALUE, "--owner", owner);
+        StringBuilder query = new StringBuilder("/").append(args.getCommand()).append(" list");
+        args.getFlags().stream().sorted().forEach(flag -> query.append(" -").append(flag));
+        args.getValueFlags().entrySet().stream().filter(e -> !e.getKey().equals("page")).sorted(Map.Entry.comparingByKey())
+                .forEach(e -> query.append(" --").append(e.getKey()).append(' ').append(CommandContext.quoteArgument(e.getValue())));
+        Paginator paginator = new Paginator().header(Messaging.tr(Messages.NPC_LIST_HEADER)).console(sender.getPlayer() == null)
+                .enablePageSwitcher(number -> query + " --page " + number);
+        List<NPC> candidates = new ArrayList<>();
+        registry.sorted().forEach(candidates::add);
+        for (NPC each : candidates) {
+            if (!isCurrentTarget(each) || each.getOwningRegistry() != registry || registry.getById(each.getId()) != each) continue;
+            MobType type = each.getTraitNullable(MobType.class);
+            if (filterType != null && (type == null || type.getType() != filterType)) continue;
+            boolean include;
+            if (args.hasFlag('a')) include = true;
+            else if (expression != null) {
+                var scope = net.citizensnpcs.npc.ai.tree.NPCExpressionScope.createFor(each);
+                scope.setNPC(each); scope.setPlayer(sender.getPlayer());
+                try { include = expression.evaluateAsBoolean(scope); }
+                catch (RuntimeException invalid) { throw new CommandException(CommandMessages.INVALID_VALUE, "--filter", filter); }
+            } else if (tag != null) {
+                ScoreboardTrait scoreboard = each.getTraitNullable(ScoreboardTrait.class);
+                include = scoreboard != null && scoreboard.getTags().contains(tag);
+            } else if (owner != null) {
+                Owner ownership = each.getTraitNullable(Owner.class);
+                include = ownership == null ? ownerId == null : ownership.isOwnedBy(ownerId);
+            } else {
+                Owner ownership = each.getTraitNullable(Owner.class);
+                include = sender.getPlayer() == null || ownership != null && ownership.isOwnedBy(sender)
+                        || PermissionUtil.hasPermission(sender, "citizens.admin") || PermissionUtil.hasPermission(sender, "citizens.ignore-owner");
+            }
+            if (!include || !isCurrentTarget(each) || registry.getById(each.getId()) != each) continue;
+            String id = each.getUniqueId().toString();
+            String scope = registryName == null ? "" : " --registry " + CommandContext.quoteArgument(registryName);
+            var line = net.minecraft.network.chat.Component.literal(Integer.toString(each.getId())).withStyle(net.minecraft.ChatFormatting.YELLOW)
+                    .append(net.minecraft.network.chat.Component.literal(" " + each.getName() + " (").withStyle(net.minecraft.ChatFormatting.WHITE))
+                    .append(listAction("/npc tp --uuid " + id + scope, Messages.NPC_LIST_TP, Messages.NPC_LIST_TP_HINT))
+                    .append(") (").append(listAction("/npc tph --uuid " + id + scope, Messages.NPC_LIST_SUMMON, Messages.NPC_LIST_SUMMON_HINT))
+                    .append(") (").append(listAction("/npc remove " + id + scope, Messages.NPC_LIST_REMOVE, Messages.NPC_LIST_REMOVE_HINT)).append(")");
+            if (isCurrentTarget(each) && registry.getById(each.getId()) == each) paginator.addLine(line);
+        }
         if (!paginator.sendPage(sender, page))
             throw new CommandException(CommandMessages.COMMAND_PAGE_MISSING, page);
+    }
+
+    private static net.minecraft.network.chat.Component listAction(String command, String label, String hint) {
+        return net.minecraft.network.chat.Component.literal(Messaging.tr(label)).withStyle(style -> style
+                .withClickEvent(new net.minecraft.network.chat.ClickEvent(net.minecraft.network.chat.ClickEvent.Action.RUN_COMMAND, command))
+                .withHoverEvent(new net.minecraft.network.chat.HoverEvent(net.minecraft.network.chat.HoverEvent.Action.SHOW_TEXT,
+                        net.minecraft.network.chat.Component.literal(Messaging.tr(hint)))));
+    }
+
+    private static NPCRegistry commandRegistry(String name) throws CommandException {
+        NPCRegistry registry = name == null ? CitizensAPI.getNPCRegistry() : CitizensAPI.getNamedNPCRegistry(name);
+        if (registry == null) throw new CommandException(Messages.UNKNOWN_NPC_REGISTRY, name);
+        return registry;
     }
 
     @Command(
@@ -3128,16 +3191,16 @@ public class NPCCommands {
 
     @Command(
             aliases = { "npc" },
-            usage = "remove (all|id|uuid|name|--owner owner|--eid entity-uuid|--world world)",
+            usage = "remove (all|id|uuid|name|--owner owner|--eid entity-uuid|--world world) --registry [name]",
             desc = "",
             modifiers = { "remove", "rem" },
             min = 1,
             max = 2)
     @Requirements
     public void remove(CommandContext args, CommandSourceStack sender, NPC npc, @Flag("owner") String owner,
-            @Flag("eid") UUID eid, @Flag("world") String world,
+            @Flag("eid") UUID eid, @Flag("world") String world, @Flag("registry") String registryName,
             @Arg(value = 1, completions = "all") String action) throws CommandException {
-        NPCRegistry registry = CitizensAPI.getNPCRegistry();
+        NPCRegistry registry = commandRegistry(registryName);
         if (owner != null) {
             boolean serverOwned = owner.equalsIgnoreCase("server");
             UUID ownerId = null;
@@ -3180,7 +3243,8 @@ public class NPCCommands {
                 Entity entity = level.getEntity(eid);
                 if (entity != null) { found = registry.getNPC(entity); break; }
             }
-            if (found == null || !found.getOrAddTrait(Owner.class).isOwnedBy(sender))
+            if (found == null || registryName != null && found.getOwningRegistry() != registry
+                    || !found.getOrAddTrait(Owner.class).isOwnedBy(sender))
                 throw new CommandException(Messages.NPC_NOT_FOUND);
             String name = found.getName();
             int id = found.getId();
@@ -3250,34 +3314,38 @@ public class NPCCommands {
 
     @Command(
             aliases = { "npc" },
-            usage = "select (id|--name name)",
+            usage = "select (id|uuid|name) --name [name] --range [range] --registry [name]",
             desc = "",
             modifiers = { "select", "sel" },
+            strictArguments = true,
+            valueFlags = { "location", "entitylocation" },
             min = 1,
             max = 2,
             permission = "citizens.npc.select")
     @Requirements
-    public void select(CommandContext args, CommandSourceStack sender, NPC npc, @Flag("name") String name)
+    public void select(CommandContext args, CommandSourceStack sender, NPC npc, @Flag("name") String name,
+            @Flag(value = "range", defValue = "15") Double range, @Flag("registry") String registryName)
             throws CommandException {
-        NPC target = null;
-        if (name != null) {
-            for (NPC each : CitizensAPI.getNPCRegistry()) {
-                if (each.getName().equalsIgnoreCase(name)) {
-                    target = each;
-                    break;
-                }
-            }
-        } else if (args.argsLength() > 1) {
-            target = CitizensAPI.getNPCRegistry().getById(args.getInteger(1));
-        } else {
-            target = nearestNPC(sender);
-        }
-        if (target == null)
-            throw new CommandException(Messages.NPC_NOT_FOUND);
-        if (target.equals(npc))
-            throw new CommandException(Messages.NPC_ALREADY_SELECTED);
-        CitizensAPI.getDefaultNPCSelector().select(sender, target);
-        Messaging.send(sender, "Selected [[" + target.getName() + "]] (ID [[" + target.getId() + "]]).");
+        if (range == null || !Double.isFinite(range) || range < 0) throw new CommandException(CommandMessages.INVALID_VALUE, "--range", range);
+        NPCRegistry registry = commandRegistry(registryName);
+        int selectors = (name == null ? 0 : 1) + (args.argsLength() > 1 ? 1 : 0)
+                + (args.hasValueFlag("id") ? 1 : 0) + (args.hasValueFlag("uuid") ? 1 : 0);
+        if (selectors > 1) throw new CommandException(CommandMessages.INVALID_VALUE, "target", args.getRawCommand());
+        NPCCommandSelector.Callback callback = target -> {
+            if (!currentCommandSource(sender) || !PermissionUtil.hasPermission(sender, "citizens.npc.select")
+                    && !PermissionUtil.hasPermission(sender, "citizens.admin")) throw new NoPermissionsException();
+            if (commandRegistry(registryName) != registry || !isCurrentTarget(target)
+                    || registryName != null && target.getOwningRegistry() != registry)
+                throw new CommandException(Messages.NPC_NOT_FOUND);
+            if (CitizensAPI.getDefaultNPCSelector().getSelected(sender) == target) throw new CommandException(Messages.NPC_ALREADY_SELECTED);
+            CitizensAPI.getDefaultNPCSelector().select(sender, target);
+            String message = Setting.SELECTION_MESSAGE.asString();
+            if (!message.isEmpty()) Messaging.send(sender, Placeholders.replace(message, sender, target));
+        };
+        if (name != null || args.argsLength() > 1) {
+            NPCCommandSelector.startWithCallback(callback, registry, sender, args, name == null ? args.getString(1) : name, name != null);
+        } else if (selectors > 0) callback.run(npc);
+        else callback.run(NPCSelectionQuery.nearby(sender, commandLocation(args.getSenderLocation()), registry, range));
     }
 
     @Command(
@@ -4470,27 +4538,4 @@ public class NPCCommands {
         return sender.getServer() == null ? null : sender.getServer().getPlayerList().getPlayerByName(name);
     }
 
-    /**
-     * @return the NPC nearest the sender within a short radius, so {@code /npc select} works by walking up to one
-     */
-    private static NPC nearestNPC(CommandSourceStack sender) {
-        Entity from = sender.getEntity();
-        if (from == null)
-            return null;
-        NPC closest = null;
-        double closestDistance = Double.MAX_VALUE;
-        for (NPC each : CitizensAPI.getNPCRegistry()) {
-            if (!each.isSpawned() || each.getEntity().level() != from.level()) {
-                continue;
-            }
-            double distance = each.getEntity().distanceToSqr(from);
-            if (distance < closestDistance && distance <= SELECT_RADIUS * SELECT_RADIUS) {
-                closest = each;
-                closestDistance = distance;
-            }
-        }
-        return closest;
-    }
-
-    private static final double SELECT_RADIUS = 10;
 }

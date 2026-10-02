@@ -3,6 +3,13 @@ package net.citizensnpcs.api.util;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.function.IntFunction;
+import java.util.HashMap;
+import java.util.Map;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.ClickEvent;
+import net.minecraft.network.chat.HoverEvent;
+import net.minecraft.ChatFormatting;
 
 import net.minecraft.commands.CommandSourceStack;
 
@@ -16,7 +23,8 @@ public class Paginator {
     private boolean console;
     private String header;
     private final List<String> lines = new ArrayList<>();
-    private String pageCommand;
+    private final Map<Integer, Component> componentLines = new HashMap<>();
+    private IntFunction<String> pageCommand;
     private boolean pageSwitcher;
 
     public Paginator() {
@@ -36,6 +44,12 @@ public class Paginator {
         lines.add(line);
     }
 
+    /** Native rows keep interactive command data separate from display markup. */
+    public void addLine(Component line) {
+        componentLines.put(lines.size(), line.copy());
+        lines.add(line.getString());
+    }
+
     public Paginator console(boolean console) {
         this.console = console;
         return this;
@@ -46,6 +60,10 @@ public class Paginator {
     }
 
     public Paginator enablePageSwitcher(String command) {
+        return enablePageSwitcher(page -> command.replace("$page", Integer.toString(page)));
+    }
+
+    public Paginator enablePageSwitcher(IntFunction<String> command) {
         pageSwitcher = true;
         pageCommand = command;
         return this;
@@ -69,12 +87,14 @@ public class Paginator {
         String pageDisplay = page + "/" + pages;
         if (pageSwitcher) {
             if (page > 1) {
-                pageDisplay = "<click:run_command:" + pageCommand.replace("$page", "" + (page - 1))
-                        + "><hover:show_text:Previous page><</hover></click> <white>" + pageDisplay;
+                pageDisplay = "<click:run_command:" + TextParser.quoteTagArgument(pageCommand.apply(page - 1))
+                        + "><hover:show_text:" + TextParser.quoteTagArgument(Messaging.tr("citizens.commands.page.previous"))
+                        + "><</hover></click> <white>" + pageDisplay;
             }
             if (pages > 1 && page != pages) {
-                pageDisplay += " <click:run_command:" + pageCommand.replace("$page", "" + (page + 1))
-                        + "><hover:show_text:Next page>></hover></click><white>";
+                pageDisplay += " <click:run_command:" + TextParser.quoteTagArgument(pageCommand.apply(page + 1))
+                        + "><hover:show_text:" + TextParser.quoteTagArgument(Messaging.tr("citizens.commands.page.next"))
+                        + ">></hover></click><white>";
             }
         }
         StringBuilder text = new StringBuilder(
@@ -98,8 +118,32 @@ public class Paginator {
         String text = getPageText(page);
         if (text == null)
             return false;
+        if (!componentLines.isEmpty()) {
+            var title = Component.empty();
+            if (header != null) title.append(Messaging.minecraftComponentFromRawMessage(
+                    wrapHeader("[[" + header + " <white>" + page + "/" + pageCount())));
+            if (pageSwitcher) {
+                if (page > 1) title.append(pageButton(page - 1, "<", "citizens.commands.page.previous"));
+                if (page < pageCount()) title.append(pageButton(page + 1, ">", "citizens.commands.page.next"));
+            }
+            sender.sendSystemMessage(title);
+            int count = console ? CONSOLE_LINES_PER_PAGE : LINES_PER_PAGE;
+            int start = (page - 1) * count;
+            for (int i = start; i < Math.min(start + count, lines.size()); i++) {
+                Component line = componentLines.get(i);
+                if (line == null) Messaging.send(sender, lines.get(i));
+                else sender.sendSystemMessage(line.copy());
+            }
+            return true;
+        }
         Messaging.send(sender, text);
         return true;
+    }
+
+    private Component pageButton(int page, String label, String hint) {
+        return Component.literal(" " + label).withStyle(style -> style.withColor(ChatFormatting.YELLOW)
+                .withClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, pageCommand.apply(page)))
+                .withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, Component.literal(Messaging.tr(hint)))));
     }
 
     public static String wrapHeader(Object string) {

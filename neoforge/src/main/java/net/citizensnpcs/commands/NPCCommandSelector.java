@@ -99,14 +99,19 @@ public class NPCCommandSelector implements ChatPrompt {
      */
     public static void startWithCallback(Callback callback, NPCRegistry registry, CommandSourceStack sender,
             CommandContext args, String raw) throws CommandException {
+        startWithCallback(callback, registry, sender, args, raw, false);
+    }
+
+    public static void startWithCallback(Callback callback, NPCRegistry registry, CommandSourceStack sender,
+            CommandContext args, String raw, boolean nameOnly) throws CommandException {
         UUID uuid;
-        try { uuid = UUID.fromString(raw); }
+        try { uuid = nameOnly ? null : UUID.fromString(raw); }
         catch (IllegalArgumentException notUuid) { uuid = null; }
         if (uuid != null) {
-            callback.run(registry.getByUniqueIdGlobal(uuid));
+            callback.run(args.hasValueFlag("registry") ? registry.getByUniqueId(uuid) : registry.getByUniqueIdGlobal(uuid));
             return;
         }
-        Integer id = Ints.tryParse(raw);
+        Integer id = nameOnly ? null : Ints.tryParse(raw);
         if (id != null) {
             callback.run(id < 0 ? null : registry.getById(id));
             return;

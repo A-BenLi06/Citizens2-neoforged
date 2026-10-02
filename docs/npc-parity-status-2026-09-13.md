@@ -4,9 +4,11 @@
 
 Initial audit timestamp: 2026-09-13 01:47:09 +08:00 (UTC+08:00).
 
-Current summary updated: 2026-10-02 18:43:32 +08:00 (UTC+08:00).
+Current summary updated: 2026-10-02 21:07:52 +08:00 (UTC+08:00).
 
 The resumed goal explicitly continues comparison of remaining behavior in the retained Citizens, Interactions and Sentinel code. CmdCam owns camera playback and Yuuniverse Economy owns economic APIs; unrelated replacement suites and unverified client/modpack/proxy acceptance remain distinct.
+
+Latest query follow-up: [listing and scoped selection](list-selection-2026-10-02.md) restores registry/tag/owner/expression modes, quoted interactive pagination/actions, name/UUID targeting, range and ray/nearest selection, virtual visibility and redirects. Each expression binds its candidate; strict parsing reports malformed input, and invalid expression values remain false in conditions. Selections and target overrides preserve registry identity. The fixture passes 126 checks on both NeoForge versions; creation, relocation, removal, location, text-editor and general regressions pass, as do 100 Interactions tests, 232 ordinary tests and clean build. Evidence: `artifacts/selection-validation-summary.json`. Two ordinary command groups plus debugging aliases, data/integration and client acceptance remain open.
 
 Latest creation follow-up: [native options and lifecycle](npc-creation-2026-10-02.md) restores unspawned/packet/center shortcuts, timed temporary NPCs, item-provider input, creator cancellation and undo. Creation validation precedes allocation, templates cannot transiently spawn a prepared candidate, and cleanup preserves callback replacements. Name-dependent work occurs after construction/registration. Native item carriers apply default/provided items and block-state components; falling blocks and ominous spawners keep NPC behavior. Final fixtures pass 305 checks on both NeoForge versions, 100 Interactions tests, the related native suites, 232 ordinary tests and clean build. Interactions remains separate and unchanged. Evidence: `artifacts/creation-validation-summary.json`. Three ordinary command groups plus data/integration and physical-client acceptance remain open.
 

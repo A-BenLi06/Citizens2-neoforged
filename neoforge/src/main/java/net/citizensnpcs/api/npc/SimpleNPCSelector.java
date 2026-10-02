@@ -11,11 +11,11 @@ import net.minecraft.commands.CommandSourceStack;
  * The default selector: one selection per sender, keyed by the sender entity, with the console and command blocks sharing
  * a single slot.
  * <p>
- * Selections are held by NPC UUID rather than by reference, so a selection survives the NPC despawning and respawning and
- * never keeps a removed NPC alive.
+ * Selections retain an NPC UUID and logical registry identity, so ordinary reloads remain usable without selecting
+ * another registry's NPC with the same UUID.
  */
 public class SimpleNPCSelector implements NPCSelector {
-    private final Map<UUID, UUID> selected = new ConcurrentHashMap<>();
+    private final Map<UUID, Selection> selected = new ConcurrentHashMap<>();
 
     @Override
     public void deselect(CommandSourceStack sender) {
@@ -26,8 +26,12 @@ public class SimpleNPCSelector implements NPCSelector {
     public NPC getSelected(CommandSourceStack sender) {
         if (sender == null)
             return null;
-        UUID id = selected.get(keyOf(sender));
-        return id == null ? null : CitizensAPI.getNPCRegistry().getByUniqueIdGlobal(id);
+        Selection choice = selected.get(keyOf(sender));
+        if (choice == null) return null;
+        NPCRegistry registry = choice.registry();
+        if (registry == null) return null;
+        NPC npc = registry.getByUniqueId(choice.id);
+        return npc != null && npc.getOwningRegistry() == registry && registry.getById(npc.getId()) == npc ? npc : null;
     }
 
     @Override
@@ -36,8 +40,36 @@ public class SimpleNPCSelector implements NPCSelector {
             deselect(sender);
             return;
         }
-        selected.put(keyOf(sender), npc.getUniqueId());
+        NPCRegistry registry = npc.getOwningRegistry();
+        if (registry == null || registry.getByUniqueId(npc.getUniqueId()) != npc || registry.getById(npc.getId()) != npc) return;
+        selected.put(keyOf(sender), new Selection(npc));
     }
+
+    /** Keep logical registry identity across reload without resolving into an unrelated registry. */
+    private static final class Selection {
+        final UUID id;
+        final String name;
+        final RegistryKind kind;
+        final NPCRegistry anonymous;
+        Selection(NPC npc) {
+            id = npc.getUniqueId();
+            NPCRegistry registry = npc.getOwningRegistry();
+            name = registry.getName();
+            kind = registry == CitizensAPI.getNPCRegistry() ? RegistryKind.DEFAULT
+                    : registry == CitizensAPI.getTemporaryNPCRegistry() ? RegistryKind.TEMPORARY
+                    : CitizensAPI.getNamedNPCRegistry(name) == registry ? RegistryKind.NAMED : RegistryKind.ANONYMOUS;
+            anonymous = kind == RegistryKind.ANONYMOUS ? registry : null;
+        }
+        NPCRegistry registry() {
+            if (kind == RegistryKind.DEFAULT) return CitizensAPI.getNPCRegistry();
+            if (kind == RegistryKind.TEMPORARY) return CitizensAPI.getTemporaryNPCRegistry();
+            if (kind == RegistryKind.NAMED) return CitizensAPI.getNamedNPCRegistry(name);
+            for (NPCRegistry registry : CitizensAPI.getNPCRegistries()) if (registry == anonymous) return registry;
+            return null;
+        }
+    }
+
+    private enum RegistryKind { DEFAULT, TEMPORARY, NAMED, ANONYMOUS }
 
     /** Anything without an entity - the console, a command block, a function - shares one selection. */
     private static UUID keyOf(CommandSourceStack sender) {

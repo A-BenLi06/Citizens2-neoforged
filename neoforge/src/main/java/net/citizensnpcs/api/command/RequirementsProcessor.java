@@ -39,10 +39,13 @@ public class RequirementsProcessor implements CommandAnnotationProcessor {
             throw new RequirementMissingException(Messaging.tr(CommandMessages.NO_PERMISSION));
         String error = Messaging.tr(CommandMessages.MUST_HAVE_SELECTED);
         if (canRedefineSelected) {
+            var registry = context.hasValueFlag("registry") ? CitizensAPI.getNamedNPCRegistry(context.getFlag("registry"))
+                    : CitizensAPI.getNPCRegistry();
+            if (registry == null) throw new CommandException(net.citizensnpcs.util.Messages.UNKNOWN_NPC_REGISTRY, context.getFlag("registry"));
             String flag = context.hasValueFlag("uuid") ? "uuid" : "id";
             try {
-                npc = flag.equals("uuid") ? CitizensAPI.getNPCRegistry().getByUniqueIdGlobal(UUID.fromString(context.getFlag(flag)))
-                        : CitizensAPI.getNPCRegistry().getById(context.getFlagInteger(flag));
+                npc = flag.equals("uuid") ? context.hasValueFlag("registry") ? registry.getByUniqueId(UUID.fromString(context.getFlag(flag)))
+                        : registry.getByUniqueIdGlobal(UUID.fromString(context.getFlag(flag))) : registry.getById(context.getFlagInteger(flag));
             } catch (IllegalArgumentException invalid) {
                 throw new CommandException(CommandMessages.INVALID_VALUE, "--" + flag, context.getFlag(flag));
             }

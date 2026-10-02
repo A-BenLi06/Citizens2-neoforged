@@ -39,6 +39,7 @@ public class MolangEngine implements ExpressionEngine {
 
     public MolangEngine() {
         this.engine = MochaEngine.createStandard();
+        this.engine.handleParseExceptions(failure -> { throw new IllegalArgumentException(failure); });
     }
 
     @Override

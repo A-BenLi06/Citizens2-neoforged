@@ -181,6 +181,7 @@ public class Settings {
         REMOVE_PLAYERS_FROM_PLAYER_LIST("npc.player.remove-from-list", true),
         RESET_FORMATTING_ON_COLOR_CHANGE("general.reset-formatting-on-color-change", false),
         SERVER_OWNS_NPCS("npc.server-ownership", false),
+        SELECTION_MESSAGE("npc.selection.message", "Selected [[<npc>]] (ID [[<id>]])."),
         SHOP_DEFAULT_ITEM_SETTINGS("npc.shops.default-item", defaultShopItemSettings()),
         SHOP_GLOBAL_VIEW_PERMISSION("npc.defaults.shops.global-view-permission", "npc.shops.global-view-permission", ""),
         SHOP_USE_DEFAULT_DESCRIPTION("npc.shops.add-default-item-description", false),

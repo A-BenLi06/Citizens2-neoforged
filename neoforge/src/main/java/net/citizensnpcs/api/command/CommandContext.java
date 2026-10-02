@@ -81,8 +81,8 @@ public class CommandContext {
             } else if (args[i].charAt(0) == '\'' || args[i].charAt(0) == '"' || args[i].charAt(0) == '`') {
                 char quote = args[i].charAt(0);
                 String quoted = args[i].substring(1);
-                if (quoted.length() > 0 && quoted.charAt(quoted.length() - 1) == quote) {
-                    args[i] = quoted.substring(0, quoted.length() - 1);
+                if (closesQuote(quoted, quote)) {
+                    args[i] = unescapeQuoted(quoted.substring(0, quoted.length() - 1), quote);
                     isquoted[i] = true;
                     continue;
                 }
@@ -92,8 +92,8 @@ public class CommandContext {
 
                     String test = args[inner].trim();
                     quoted += " " + test;
-                    if (test.charAt(test.length() - 1) == quote) {
-                        args[i] = quoted.substring(0, quoted.length() - 1);
+                    if (closesQuote(test, quote)) {
+                        args[i] = unescapeQuoted(quoted.substring(0, quoted.length() - 1), quote);
                         isquoted[i] = true;
                         // remove ending quote
                         for (int j = i + 1; j <= inner; ++j) {
@@ -244,6 +244,30 @@ public class CommandContext {
 
     public String getRawCommand() {
         return Joiner.on(' ').join(rawArgs);
+    }
+
+    /** Round-trip one value through the command parser, including whitespace, quotes and backslashes. */
+    public static String quoteArgument(String value) {
+        return "\"" + value.replace("\\", "\\\\").replace("\"", "\\\"") + "\"";
+    }
+
+    private static boolean closesQuote(String value, char quote) {
+        int last = value.length() - 1;
+        if (last < 0 || value.charAt(last) != quote) return false;
+        int slashes = 0;
+        while (--last >= 0 && value.charAt(last) == '\\') slashes++;
+        return slashes % 2 == 0;
+    }
+
+    private static String unescapeQuoted(String value, char quote) {
+        StringBuilder result = new StringBuilder();
+        for (int i = 0; i < value.length(); i++) {
+            char current = value.charAt(i);
+            if (current == '\\' && i + 1 < value.length()
+                    && (value.charAt(i + 1) == quote || value.charAt(i + 1) == '\\')) current = value.charAt(++i);
+            result.append(current);
+        }
+        return result.toString();
     }
 
     /**

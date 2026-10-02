@@ -167,7 +167,8 @@ public class CommandManager {
 
         if (cmd.strictArguments()) {
             for (String flag : context.getValueFlags().keySet()) {
-                if (!info.valueFlags().contains(flag) && !flag.equals("id") && !flag.equals("uuid"))
+                if (!info.valueFlags().contains(flag) && !flag.equals("id") && !flag.equals("uuid")
+                        && !(flag.equals("registry") && (context.hasValueFlag("id") || context.hasValueFlag("uuid"))))
                     throw new CommandException(CommandMessages.UNKNOWN_FLAG, "--" + flag);
             }
         }

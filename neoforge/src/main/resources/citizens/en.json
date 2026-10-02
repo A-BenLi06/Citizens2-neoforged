@@ -1,4 +1,13 @@
 {
+  "citizens.commands.npc.list.header": "NPCs",
+  "citizens.commands.npc.list.tp": "tp",
+  "citizens.commands.npc.list.summon": "summon",
+  "citizens.commands.npc.list.remove": "-",
+  "citizens.commands.npc.list.tp-hint": "Teleport to this NPC",
+  "citizens.commands.npc.list.summon-hint": "Teleport NPC to me",
+  "citizens.commands.npc.list.remove-hint": "Remove this NPC",
+  "citizens.commands.page.previous": "Previous page",
+  "citizens.commands.page.next": "Next page",
   "citizens.commands.npc.create.created": "Created [[{0}]] (ID [[{1}]]){2}{3}{4}.",
   "citizens.commands.npc.create.baby": " as a baby",
   "citizens.commands.npc.create.traits": " with traits {0}",
