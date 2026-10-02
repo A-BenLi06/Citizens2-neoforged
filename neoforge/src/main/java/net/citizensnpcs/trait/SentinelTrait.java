@@ -10,7 +10,6 @@ import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 
 import net.citizensnpcs.api.CitizensAPI;
-import net.citizensnpcs.api.event.SpawnReason;
 import net.citizensnpcs.api.npc.NPC;
 import net.citizensnpcs.api.persistence.Persist;
 import net.citizensnpcs.api.trait.Trait;
@@ -83,7 +82,7 @@ public class SentinelTrait extends Trait {
     private int targetTicks;
     private int greetCooldown;
     private final Map<java.util.UUID, Integer> greeted = new HashMap<>();
-    private int respawnCountdown = -1;
+    private Location chaseOrigin;
     private long timeSinceHeal;
     /** Compiled once per distinct pattern rather than per player per tick. */
     private final List<Pattern> heldItemPatterns = new ArrayList<>();
@@ -127,9 +126,6 @@ public class SentinelTrait extends Trait {
                 passthrough.put(sub.name(), sub.getRaw(""));
             }
         }
-        if (spawnPoint == null && npc != null) {
-            spawnPoint = npc.getStoredLocation();
-        }
     }
 
     @Override
@@ -165,10 +161,7 @@ public class SentinelTrait extends Trait {
     @Override
     public void onSpawn() {
         applyCombatShape();
-        if (spawnPoint == null) {
-            spawnPoint = npc.getStoredLocation();
-        }
-        respawnCountdown = -1;
+        chaseOrigin = npc.getStoredLocation();
     }
 
     /** Pushes Sentinel's numbers onto the things that already implement them. */
@@ -204,7 +197,6 @@ public class SentinelTrait extends Trait {
     @Override
     public void run() {
         if (!npc.isSpawned()) {
-            tickRespawn();
             return;
         }
         tickHealing();
@@ -236,19 +228,6 @@ public class SentinelTrait extends Trait {
         timeSinceHeal = 0;
     }
 
-    private void tickRespawn() {
-        if (respawnTime < 0 || spawnPoint == null)
-            return;
-        if (respawnCountdown < 0) {
-            respawnCountdown = respawnTime;
-            return;
-        }
-        if (--respawnCountdown <= 0) {
-            respawnCountdown = -1;
-            npc.spawn(spawnPoint, SpawnReason.RESPAWN);
-        }
-    }
-
     private boolean isStillValid(Entity candidate) {
         if (candidate.isRemoved())
             return false;
@@ -261,7 +240,8 @@ public class SentinelTrait extends Trait {
             return true;
         if (target.level() != self.level())
             return true;
-        Location from = spawnPoint != null && !closeChase ? spawnPoint : Location.of(self);
+        Location from = !closeChase ? (spawnPoint != null ? spawnPoint : chaseOrigin) : Location.of(self);
+        if (from == null) from = Location.of(self);
         double limit = chaseRange <= 0 ? range : chaseRange;
         return from.getWorld() != null && target.position().distanceToSqr(from.getX(), from.getY(), from.getZ()) > limit
                 * limit;
@@ -340,8 +320,9 @@ public class SentinelTrait extends Trait {
             npc.getNavigator().cancelNavigation();
         }
         // walk home rather than standing wherever the fight ended
-        if (spawnPoint != null && spawnPoint.getWorld() != null) {
-            npc.getNavigator().setTarget(spawnPoint);
+        Location home = spawnPoint != null ? spawnPoint : chaseOrigin;
+        if (home != null && home.getWorld() != null) {
+            npc.getNavigator().setTarget(home);
         }
     }
 
@@ -414,4 +395,6 @@ public class SentinelTrait extends Trait {
     public Location getSpawnPoint() {
         return spawnPoint;
     }
+
+    public int getRespawnTime() { return respawnTime; }
 }

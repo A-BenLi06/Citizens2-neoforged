@@ -73,9 +73,10 @@ public class EntityHumanNPC extends ServerPlayer {
         if (dead)
             return;
         super.die(cause);
-        // a dead ServerPlayer would normally await a respawn packet that will never arrive, so drop the entity
-        setRemoved(RemovalReason.KILLED);
     }
+
+    /** ServerPlayer does not set LivingEntity.dead; only the accepted native hook may mark it. */
+    public void markDeathAccepted() { dead = true; }
 
     public NPC getNPC() {
         return npc;
@@ -116,6 +117,7 @@ public class EntityHumanNPC extends ServerPlayer {
         // Real players receive their base/physics tick through the network listener. An NPC has no ticking client
         // connection, so run that part here. Default NPCs must not inherit Player.tick's automatic pickup/hunger/healing.
         super.baseTick();
+        if (dead) return;
         if (!isPassenger() && (npc.getNavigator().isNavigating() || !isNoGravity() && !npc.isFlyable())) {
             if (npc.isFlyable()) move(MoverType.SELF, getDeltaMovement());
             else travel(Vec3.ZERO);

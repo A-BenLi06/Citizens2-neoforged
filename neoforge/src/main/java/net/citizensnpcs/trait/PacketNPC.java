@@ -125,6 +125,24 @@ public class PacketNPC extends Trait {
         unlinkAll();
     }
 
+    @Override
+    public void onDespawn(DespawnReason reason) {
+        Entity entity = npc.getEntity();
+        if (reason != DespawnReason.DEATH || !net.citizensnpcs.npc.NPCDeaths.isAccepted(entity) || !spawned) {
+            onDespawn();
+            return;
+        }
+        EntityPacketTracker previous = packetTracker;
+        if (registeredEntityId != null) INTERACTION_TARGETS.remove(registeredEntityId.intValue(), this);
+        registeredEntityId = null;
+        spawned = false;
+        previous.broadcastDeath();
+        net.citizensnpcs.npc.NPCDeaths.retainVisual(entity, () -> {
+            previous.unpairAll(null);
+            entity.remove(Entity.RemovalReason.KILLED);
+        });
+    }
+
     /** Releases old-world viewers before the owning NPC transfers its native entity. */
     public void prepareTeleport() {
         unlinkAll(false);

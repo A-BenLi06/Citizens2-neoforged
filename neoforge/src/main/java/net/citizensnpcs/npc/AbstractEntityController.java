@@ -26,8 +26,9 @@ public abstract class AbstractEntityController implements EntityController {
     public void die() {
         if (entity == null)
             return;
-        entity.remove(Entity.RemovalReason.KILLED);
+        Entity dying = entity;
         entity = null;
+        if (!NPCDeaths.isAccepted(dying)) dying.remove(Entity.RemovalReason.KILLED);
     }
 
     @Override
@@ -47,8 +48,9 @@ public abstract class AbstractEntityController implements EntityController {
     public void remove() {
         if (entity == null)
             return;
-        entity.remove(Entity.RemovalReason.DISCARDED);
+        Entity removed = entity;
         entity = null;
+        removed.remove(Entity.RemovalReason.DISCARDED);
     }
 
     @Override

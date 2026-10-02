@@ -4,9 +4,11 @@
 
 Initial audit timestamp: 2026-09-13 01:47:09 +08:00 (UTC+08:00).
 
-Current summary updated: 2026-09-30 11:08:24 +08:00 (UTC+08:00).
+Current summary updated: 2026-10-02 13:08:08 +08:00 (UTC+08:00).
 
 The resumed goal explicitly continues comparison of remaining behavior in the retained Citizens, Interactions and Sentinel code. CmdCam owns camera playback and Yuuniverse Economy owns economic APIs; unrelated replacement suites and unverified client/modpack/proxy acceptance remain distinct.
+
+Latest Citizens lifecycle follow-up: [native death and respawn](npc-death-respawn-2026-10-02.md) repairs ordinary mob/player death cancellation, mutable drops, controller retirement, virtual death visuals, Citizens/Sentinel timers and callback ownership during spawn/despawn. Final dedicated runs each pass 839 checks on NeoForge 21.1.233 and 21.1.248. Eight related suites pass 1,688 checks; after the special-drop notification follow-up, the dedicated suites and general runtime suite pass again. Armor-stand native drops retain their existing NPC event and cancellation behavior. Special armor-stand/dragon destruction still needs lifecycle implementation/comparison; five command groups, applicable data/services and client/modpack/proxy acceptance remain open. Interactions remains an unchanged, separate mod/JAR. Consolidated build/archive evidence is in `artifacts/death-validation-summary.json` and the root walkthrough.
 
 Latest retained Interactions follow-up: [swap-hand dialogue entry](swap-hand-dialogue-2026-09-30.md) restores `SWAP_HAND_CLICK` through native hand events and current player aim. Accepted starts preserve hands; refusal retains native swapping, and active sessions are not skipped. World/virtual visibility, occlusion, redirects, callbacks, reload and retired players pass 139 dedicated checks. Final regression passes 100 dialogue unit tests, 542 dialogue runtime checks, 78 packet-interaction checks, 107 NPC assertions, 223 general probes and 232 ordinary tests. Clean build and archive exclusions pass; Citizens archive entry contents remain unchanged. Evidence: `artifacts/swap-hand-validation-summary.json`. Death/respawn, five ordinary command groups and the other requirements in the [current checklist](remaining-citizens-work-2026-09-26.md) remain open.
 

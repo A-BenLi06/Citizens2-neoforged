@@ -47,8 +47,6 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.animal.SnowGolem;
 import net.minecraft.world.entity.boss.enderdragon.EnderDragon;
-import net.minecraft.world.entity.item.ItemEntity;
-import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.ChunkPos;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.neoforge.common.NeoForge;
@@ -109,6 +107,7 @@ public class EventListen {
     /** A deleted NPC must not be resurrected by a later chunk load. */
     @SubscribeEvent
     public void onNPCRemove(NPCRemoveEvent event) {
+        net.citizensnpcs.npc.NPCDeaths.invalidate(event.getNPC());
         for (ChunkCoord coord : new ArrayList<>(toRespawn.keySet())) {
             toRespawn.remove(coord, event.getNPC());
         }
@@ -116,6 +115,7 @@ public class EventListen {
 
     /** Drops the whole queue, for {@code /citizens reload}, which reloads every NPC from disk anyway. */
     public void clearRespawnQueue() {
+        net.citizensnpcs.npc.NPCDeaths.clear();
         toRespawn.clear();
     }
 
@@ -348,27 +348,9 @@ public class EventListen {
      * written against. The entities are therefore unwrapped into a stack list, offered to listeners, and rebuilt — which
      * keeps removals and edits working, not just additions.
      */
-    @SubscribeEvent
+    @SubscribeEvent(priority = net.neoforged.bus.api.EventPriority.HIGHEST, receiveCanceled = true)
     public void onLivingDrops(LivingDropsEvent event) {
-        NPC npc = CitizensAPI.getNPCRegistry().getNPC(event.getEntity());
-        if (npc == null)
-            return;
-        List<ItemStack> stacks = new ArrayList<>();
-        for (ItemEntity item : event.getDrops()) {
-            stacks.add(item.getItem());
-        }
-        List<ItemStack> before = new ArrayList<>(stacks);
-        NeoForge.EVENT_BUS.post(new NPCDeathEvent(npc, event.getSource(), stacks));
-        if (stacks.equals(before))
-            return;
-        LivingEntity dying = event.getEntity();
-        event.getDrops().clear();
-        for (ItemStack stack : stacks) {
-            if (stack != null && !stack.isEmpty()) {
-                event.getDrops()
-                        .add(new ItemEntity(dying.level(), dying.getX(), dying.getY(), dying.getZ(), stack));
-            }
-        }
+        net.citizensnpcs.npc.NPCDeaths.drops(event);
     }
 
     /**

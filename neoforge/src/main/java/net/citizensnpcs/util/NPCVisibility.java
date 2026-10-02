@@ -11,6 +11,7 @@ import net.citizensnpcs.api.event.NPCSeenByPlayerEvent;
 import net.citizensnpcs.api.npc.NPC;
 import net.citizensnpcs.api.trait.TraitEventHandler;
 import net.citizensnpcs.npc.NPCRegistries;
+import net.citizensnpcs.npc.NPCDeaths;
 import net.citizensnpcs.trait.ClickRedirectTrait;
 import net.citizensnpcs.trait.PacketNPC;
 import net.minecraft.server.level.ServerLevel;
@@ -29,7 +30,7 @@ public final class NPCVisibility {
 
     /** Cancellable admission before either tracker records a new viewer or sends pairing data. */
     public static boolean allowPairing(Entity entity, ServerPlayer viewer) {
-        if (entity.isRemoved()) return false;
+        if (entity.isRemoved() || NPCDeaths.isVisual(entity)) return false;
         NPC npc = NPCRegistries.lookup(entity);
         if (npc == null) return true;
         if (!isVisible(npc, viewer)) return false;
@@ -62,6 +63,7 @@ public final class NPCVisibility {
     }
 
     public static boolean isVisible(Entity entity, ServerPlayer viewer) {
+        if (NPCDeaths.isVisual(entity)) return !entity.isRemoved() && NPCDeaths.isVisualVisibleTo(entity, viewer);
         NPC npc = NPCRegistries.lookup(entity);
         return !entity.isRemoved() && (npc == null || isVisible(npc, viewer));
     }
@@ -81,7 +83,7 @@ public final class NPCVisibility {
 
     /** Called in the world tracking loop, including for stationary NPCs outside simulation distance. */
     public static void refresh(Entity entity) {
-        if (NPCRegistries.lookup(entity) != null && entity.level() instanceof ServerLevel level)
+        if ((NPCRegistries.lookup(entity) != null || NPCDeaths.isVisual(entity)) && entity.level() instanceof ServerLevel level)
             ((WorldTrackers) level.getChunkSource().chunkMap).citizens$refreshVisibility(entity);
     }
 

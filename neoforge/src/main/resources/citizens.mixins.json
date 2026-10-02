@@ -8,6 +8,8 @@
     "ChunkMapMixin",
     "EntityMountMixin",
     "LivingEntityMountMixin",
+    "LivingEntityDeathMixin",
+    "ServerPlayerDeathMixin",
     "ServerPlayerMountMixin",
     "LivingEntitySoundMixin",
     "MobSoundMixin",

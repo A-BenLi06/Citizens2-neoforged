@@ -73,6 +73,7 @@ public class CitizensNPC extends AbstractNPC {
     private boolean isUpdating;
     private final CitizensNavigator navigator = new CitizensNavigator(this);
     private int updateCounter;
+    private DespawnOperation despawning;
 
     public CitizensNPC(UUID uuid, int id, String name, EntityController entityController, NPCRegistry registry,
             CitizensPlugin plugin) {
@@ -83,45 +84,80 @@ public class CitizensNPC extends AbstractNPC {
 
     @Override
     public boolean despawn(DespawnReason reason) {
-        if (!isSpawned() && reason != DespawnReason.DEATH) {
+        if (reason != DespawnReason.DEATH) NPCDeaths.invalidate(this);
+        if (getEntity() == null) {
             Messaging.debug("Tried to despawn", this, "while already despawned, DespawnReason." + reason);
             return false;
         }
+        if (despawning != null && despawning.ownsEntity()) {
+            if (reason != DespawnReason.DEATH) despawning.reason = reason;
+            return despawning.complete();
+        }
+        DespawnOperation previous = despawning;
+        DespawnOperation operation = new DespawnOperation(reason);
+        despawning = operation;
+        try {
         NPCDespawnEvent event = new NPCDespawnEvent(this, reason);
         if (reason == DespawnReason.CHUNK_UNLOAD) {
             // the only reason Citizens itself pre-cancels: keeping the NPC alive forces its chunk to stay loaded
             event.setCanceled(data().get(NPC.Metadata.KEEP_CHUNK_LOADED, Setting.KEEP_CHUNKS_LOADED.asBoolean()));
         }
         NeoForge.EVENT_BUS.post(event);
+        if (operation.finished) return true;
+        if (!operation.ownsEntity()) return false;
         if (event.isCanceled() && reason != DespawnReason.DEATH && reason != DespawnReason.REMOVAL) {
             Messaging.debug("Couldn't despawn", this, "due to event cancellation, DespawnReason." + reason);
             return false;
         }
-        // an NPC that is not coming back on the next start should not stay selected either
-        boolean keepSelected = hasTrait(Spawned.class) && getTraitNullable(Spawned.class).shouldSpawn();
-        if (!keepSelected) {
-            data().remove(SELECTORS_METADATA);
+        return operation.complete();
+        } finally {
+            if (despawning == operation) despawning = previous;
         }
-        getOrAddTrait(CurrentLocation.class).setLocation(getStoredLocation());
-        navigator.onDespawn();
-        traits.forEach(trait -> {
-            try {
-                trait.onDespawn(reason);
-            } catch (Throwable ex) {
-                Messaging.severe("Trait", trait.getName(), "onDespawn failed for NPC", getId());
-                ex.printStackTrace();
+    }
+
+    /** Recursive callbacks can finish the old operation before creating a replacement. */
+    private final class DespawnOperation {
+        final EntityController controller = entityController;
+        final Entity entity = getEntity();
+        final Location location = Location.of(entity);
+        final List<Trait> snapshot = new ArrayList<>();
+        DespawnReason reason;
+        boolean started, finished;
+        int nextTrait;
+
+        DespawnOperation(DespawnReason reason) {
+            this.reason = reason;
+            traits.forEach(snapshot::add);
+        }
+        boolean ownsEntity() { return entityController == controller && getEntity() == entity; }
+
+        boolean complete() {
+            if (finished) return true;
+            if (!ownsEntity()) return false;
+            if (!started) {
+                started = true;
+                if (!hasTrait(Spawned.class) || !getTraitNullable(Spawned.class).shouldSpawn()) data().remove(SELECTORS_METADATA);
+                getOrAddTrait(CurrentLocation.class).setLocation(location);
+                navigator.onDespawn();
             }
-        });
-        Entity entity = getEntity();
-        if (entity != null) {
+            while (!finished && ownsEntity() && nextTrait < snapshot.size()) {
+                Trait trait = snapshot.get(nextTrait++);
+                if (getTraitNullable(trait.getClass()) != trait) continue;
+                try {
+                    trait.onDespawn(reason);
+                } catch (Throwable ex) {
+                    Messaging.severe("Trait", trait.getName(), "onDespawn failed for NPC", getId());
+                    ex.printStackTrace();
+                }
+            }
+            if (finished) return true;
+            if (!ownsEntity()) return false;
+            finished = true;
             NPCRegistries.unlink(entity);
+            if (reason == DespawnReason.DEATH) controller.die();
+            else controller.remove();
+            return true;
         }
-        if (reason == DespawnReason.DEATH) {
-            entityController.die();
-        } else {
-            entityController.remove();
-        }
-        return true;
     }
 
     @Override
@@ -253,11 +289,13 @@ public class CitizensNPC extends AbstractNPC {
             newController = packet.wrap(newController);
         }
         boolean wasSpawned = isSpawned();
+        EntityController previous = entityController;
         Location prev = null;
         if (wasSpawned) {
             prev = getStoredLocation();
-            despawn(DespawnReason.PENDING_RESPAWN);
+            if (!despawn(DespawnReason.PENDING_RESPAWN) || entityController != previous) return;
         }
+        NPCDeaths.invalidate(this);
         entityController = newController;
         if (wasSpawned) {
             spawn(prev, SpawnReason.RESPAWN);
@@ -341,6 +379,9 @@ public class CitizensNPC extends AbstractNPC {
             Messaging.debug("Tried to spawn", this, "while already spawned. SpawnReason." + reason);
             return false;
         }
+        EntityController previousController = entityController;
+        NPCDeaths.beforeSpawn(this);
+        if (!ownsEntity(previousController, null)) return true;
         ServerLevel level = at.getWorld();
         if (level == null) {
             Messaging.debug("Tried to spawn", this, "but the level was null. SpawnReason." + reason);
@@ -366,66 +407,84 @@ public class CitizensNPC extends AbstractNPC {
                     "- respawning at the surface", surface.getY(), "instead");
             location.setY(surface.getY());
         }
-        getOrAddTrait(CurrentLocation.class).setLocation(location);
+        CurrentLocation currentLocation = getOrAddTrait(CurrentLocation.class);
+        if (!ownsEntity(previousController, null)) return true;
+        if (getTraitNullable(CurrentLocation.class) == currentLocation) currentLocation.setLocation(location);
         // Trait load/attachment order must not choose a different transport than the current trait set.
         entityController = PacketNPC.unwrap(entityController);
         PacketNPC packet = getTraitNullable(PacketNPC.class);
         if (packet != null) entityController = packet.wrap(entityController);
-        entityController.create(location, this);
+        EntityController controller = entityController;
+        controller.create(location, this);
+        Entity entity = controller.getEntity();
+        SpawnOperation operation = new SpawnOperation(controller, entity);
+        spawning = operation;
+        if (!operation.proceed()) return true;
         // Player controllers initialize all skin layers; SkinLayers applies explicit overrides during trait spawning.
 
-        traits.forEach(trait -> {
+        for (Trait trait : operation.snapshot) {
+            if (getTraitNullable(trait.getClass()) != trait) continue;
             try {
                 trait.onPreSpawn();
             } catch (Throwable ex) {
                 Messaging.severe("Trait", trait.getName(), "onPreSpawn failed for NPC", getId());
                 ex.printStackTrace();
             }
-        });
+            if (!operation.proceed()) return true;
+        }
         if (data().get(NPC.Metadata.HOLOGRAM_RENDERER) instanceof HologramTrait.HologramRenderer renderer) {
             try {
                 renderer.onPreSpawn(this);
             } catch (RuntimeException | Error failure) {
-                discardFailedSpawn();
+                discardFailedSpawn(operation);
                 throw failure;
             }
+            if (!operation.proceed()) return true;
         }
         data().set(NPC.Metadata.NPC_SPAWNING_IN_PROGRESS, true);
 
-        entityController.spawn(location, couldSpawn -> {
+        controller.spawn(location, couldSpawn -> {
+            if (!operation.proceed()) return;
             if (!couldSpawn) {
                 Messaging.debug("Retrying spawn of", this, "later, SpawnReason." + reason);
-                discardFailedSpawn();
-                NeoForge.EVENT_BUS.post(new NPCNeedsRespawnEvent(this, location));
-                data().remove(NPC.Metadata.NPC_SPAWNING_IN_PROGRESS);
+                discardFailedSpawn(operation);
+                if (ownsEntity(controller, null)) NeoForge.EVENT_BUS.post(new NPCNeedsRespawnEvent(this, location));
                 return;
             }
-            Entity entity = getEntity();
             NPCSpawnEvent spawnEvent = new NPCSpawnEvent(this, location, reason);
             NeoForge.EVENT_BUS.post(spawnEvent);
+            if (!operation.proceed()) return;
             if (spawnEvent.isCanceled()) {
                 Messaging.debug("Couldn't spawn", this, "SpawnReason." + reason, "due to event cancellation.");
-                discardFailedSpawn();
-                data().remove(NPC.Metadata.NPC_SPAWNING_IN_PROGRESS);
+                discardFailedSpawn(operation);
                 return;
             }
+            NPCDeaths.invalidate(this);
+            if (!operation.proceed()) return;
             // upstream waits several ticks here for Paper to finish adding the entity to its chunk; vanilla
             // addFreshEntity is synchronous and has already reported success, so the entity is live now
             entity.moveTo(location.getX(), location.getY(), location.getZ(), location.getYaw(), location.getPitch());
             entity.setYHeadRot(location.getYaw());
-            data().remove(NPC.Metadata.NPC_SPAWNING_IN_PROGRESS);
+            operation.clearMetadata();
 
-            getOrAddTrait(CurrentLocation.class).setLocation(location);
-            getOrAddTrait(Spawned.class).setSpawned(true);
+            CurrentLocation spawnedLocation = getOrAddTrait(CurrentLocation.class);
+            if (!operation.proceed()) return;
+            if (getTraitNullable(CurrentLocation.class) == spawnedLocation) spawnedLocation.setLocation(location);
+            Spawned spawnedTrait = getOrAddTrait(Spawned.class);
+            if (!operation.proceed()) return;
+            if (getTraitNullable(Spawned.class) == spawnedTrait) spawnedTrait.setSpawned(true);
             navigator.onSpawn();
-            traits.forEach(trait -> {
+            if (!operation.proceed()) return;
+            for (Trait trait : operation.snapshot) {
+                if (getTraitNullable(trait.getClass()) != trait) continue;
                 try {
                     trait.onSpawn();
                 } catch (Throwable ex) {
                     Messaging.severe("Trait", trait.getName(), "onSpawn failed for NPC", getId());
                     ex.printStackTrace();
                 }
-            });
+                if (!operation.proceed()) return;
+            }
             if (entity instanceof Mob) {
                 ((Mob) entity).setPersistenceRequired();
             }
@@ -433,9 +492,11 @@ public class CitizensNPC extends AbstractNPC {
                 ((LivingEntity) entity).setInvulnerable(isProtected());
             }
             updateCustomName();
+            if (!operation.proceed()) return;
             if (requiresNameHologram() && !hasTrait(HologramTrait.class)) {
                 // a name too long or too colourful for a vanilla nameplate is drawn as a hologram instead
                 addTrait(HologramTrait.class);
+                if (!operation.proceed()) return;
             }
             if (entity instanceof ServerPlayer || entity instanceof AbstractHorse) {
                 AttributeTrait attributes = getTraitNullable(AttributeTrait.class);
@@ -445,8 +506,16 @@ public class CitizensNPC extends AbstractNPC {
             }
 
             Messaging.debug("Spawned", this, "SpawnReason." + reason);
-            if (callback != null) {
-                callback.accept(entity);
+            DeferredTeleport deferred = operation.pendingTeleport;
+            long completedRequest = teleportRevision;
+            operation.finish();
+            if (deferred != null && ownsTransfer(deferred.request, controller, entity)) {
+                teleportAuthorized(deferred.location, deferred.request, controller, entity);
+            }
+            Entity spawned = getEntity();
+            if (callback != null && operation.revision == spawnRevision && spawned != null && !spawned.isRemoved()
+                    && ownsTransfer(completedRequest, controller, spawned)) {
+                callback.accept(spawned);
             }
         });
         return true;
@@ -467,6 +536,12 @@ public class CitizensNPC extends AbstractNPC {
         // The public NPC teleport contract loads its destination, including outside currently watched chunks.
         location.getChunk();
         if (!ownsTransfer(request, controller, entity) || !isSpawned()) return;
+        // Trait and native admission callbacks can request a move before this entity is fully initialized.
+        // Retain the approved destination until spawn completion so its remaining steps cannot overwrite it.
+        if (spawning != null && spawning.ownsCandidate()) {
+            spawning.pendingTeleport = new DeferredTeleport(request, location);
+            return;
+        }
         // Join listeners see a candidate before the native level has admitted it. Finish that admission before
         // executing a newer teleport, otherwise a return trip collides with the still-live source UUID.
         if (admittingTeleport) {
@@ -637,7 +712,9 @@ public class CitizensNPC extends AbstractNPC {
         return request == teleportRevision && ownsEntity(controller, entity);
     }
 
-    private boolean ownsEntity(EntityController controller, Entity entity) {
+    EntityController controller() { return entityController; }
+
+    boolean ownsEntity(EntityController controller, Entity entity) {
         return entityController == controller && getEntity() == entity
                 && getOwningRegistry() != null && getOwningRegistry().getByUniqueId(getUniqueId()) == this;
     }
@@ -709,13 +786,69 @@ public class CitizensNPC extends AbstractNPC {
                 : trait.getDisguiseType();
     }
 
-    private void discardFailedSpawn() {
-        // Native insertion may already have paired viewers before the spawn event rejects the NPC.
-        ScoreboardTrait scoreboard = getTraitNullable(ScoreboardTrait.class);
-        if (scoreboard != null) {
-            scoreboard.onDespawn(DespawnReason.PENDING_RESPAWN);
+    private SpawnOperation spawning;
+    private long spawnRevision;
+
+    /** A spawn callback may outlive its candidate, including through a synchronous nested spawn. */
+    private final class SpawnOperation {
+        final EntityController controller;
+        final Entity entity;
+        final long revision = ++spawnRevision;
+        final List<Trait> snapshot = new ArrayList<>();
+        final ScoreboardTrait scoreboard = getTraitNullable(ScoreboardTrait.class);
+        DeferredTeleport pendingTeleport;
+
+        SpawnOperation(EntityController controller, Entity entity) {
+            this.controller = controller;
+            this.entity = entity;
+            traits.forEach(snapshot::add);
         }
-        entityController.remove();
+
+        boolean ownsCandidate() {
+            return spawning == this && entityController == controller && getEntity() == entity;
+        }
+
+        boolean proceed() {
+            if (ownsCandidate() && entity != null && !entity.isRemoved()
+                    && ownsEntity(controller, entity)) return true;
+            discardFailedSpawn(this);
+            return false;
+        }
+
+        void clearMetadata() {
+            if (spawning == this) data().remove(NPC.Metadata.NPC_SPAWNING_IN_PROGRESS);
+        }
+
+        void finish() {
+            clearMetadata();
+            pendingTeleport = null;
+            if (spawning == this) spawning = null;
+        }
+    }
+
+    private void discardFailedSpawn(SpawnOperation operation) {
+        try {
+            // Native insertion may already have paired viewers before the spawn event rejects the NPC.
+            if (operation.ownsCandidate() && operation.scoreboard != null
+                    && getTraitNullable(ScoreboardTrait.class) == operation.scoreboard) {
+                operation.scoreboard.onDespawn(DespawnReason.PENDING_RESPAWN);
+            }
+        } finally {
+            try {
+                if (operation.ownsCandidate()) {
+                    NPCRegistries.unlink(operation.entity);
+                    operation.controller.remove();
+                } else if (operation.entity != null && getEntity() != operation.entity) {
+                    // A join listener can discard the candidate before native admission installs its level
+                    // callback. Discard it again afterwards to remove that stale native registration, while
+                    // leaving a replacement controller/entity and same-object teleports intact.
+                    NPCRegistries.unlink(operation.entity);
+                    operation.entity.discard();
+                }
+            } finally {
+                operation.finish();
+            }
+        }
     }
 
     /** Refreshes attached scoreboard traits, including teams not created during pairing. */

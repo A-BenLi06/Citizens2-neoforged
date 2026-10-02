@@ -52,6 +52,16 @@ public class EntityPacketTracker {
         return List.copyOf(linked);
     }
 
+    /** A detached virtual corpse retains its existing viewers only, until native death animation ends. */
+    public void broadcastDeath() {
+        var packet = new net.minecraft.network.protocol.game.ClientboundEntityEventPacket(entity, (byte) 3);
+        for (ServerPlayer player : List.copyOf(linked)) {
+            if (!player.hasDisconnected() && player.level() == entity.level()
+                    && player.getServer().getPlayerList().getPlayer(player.getUUID()) == player)
+                player.connection.send(packet);
+        }
+    }
+
     public boolean isLinked(ServerPlayer player) {
         return linked.stream().anyMatch(viewer -> viewer == player);
     }
