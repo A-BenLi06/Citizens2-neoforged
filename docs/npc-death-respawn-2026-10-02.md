@@ -2,7 +2,7 @@
 
 Accepted native death previously left the controller holding a dead entity. A later spawn therefore refused to create a replacement. Citizens' `RESPAWN_DELAY` had no reader, and Sentinel's respawn counter was in a trait branch that normal NPC ticks never reached.
 
-Follow-up: [armor-stand destruction](armorstand-death-2026-10-02.md) now addresses the armor-stand lifecycle limitation recorded below, including complete native drops. The dragon's distinct sequence remains open.
+Follow-ups: [armor-stand destruction](armorstand-death-2026-10-02.md) addresses complete native breaking/drops, and [dragon death phases](dragon-death-2026-10-02.md) handles the native flight and longer death sequence. These supersede the implementation limitations recorded below; client/modpack acceptance remains open.
 
 ## Lifecycle and drops
 

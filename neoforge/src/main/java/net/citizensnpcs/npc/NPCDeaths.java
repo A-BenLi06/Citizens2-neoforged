@@ -19,12 +19,14 @@ import net.citizensnpcs.api.util.schedulers.SchedulerTask;
 import net.citizensnpcs.npc.entity.EntityHumanNPC;
 import net.citizensnpcs.mixin.BlockDropCaptureAccessor;
 import net.citizensnpcs.trait.HomeTrait;
+import net.citizensnpcs.trait.PacketNPC;
 import net.citizensnpcs.trait.SentinelTrait;
 import net.citizensnpcs.util.NPCVisibility;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.boss.enderdragon.EnderDragon;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.item.ItemStack;
 import net.neoforged.neoforge.common.NeoForge;
@@ -36,8 +38,84 @@ public final class NPCDeaths {
     private static final Map<LivingEntity, Death> active = new IdentityHashMap<>();
     private static final Map<CitizensNPC, Death> pending = new IdentityHashMap<>();
     private static final Map<Entity, Death> visuals = new IdentityHashMap<>();
+    private static final Map<EnderDragon, DragonDamage> dragonDamage = new IdentityHashMap<>();
 
     private NPCDeaths() { }
+
+    /** Lethal dragon damage finishes its native phase/health transition after LivingEntity.die returns. */
+    public static boolean duringDragonDamage(EnderDragon entity, BooleanSupplier nativeDamage) {
+        NPC owner = NPCRegistries.lookup(entity);
+        if (!(owner instanceof CitizensNPC npc) || !npc.ownsEntity(npc.controller(), entity)) return nativeDamage.getAsBoolean();
+        if (dragonDamage.containsKey(entity) || active.containsKey(entity)) return false;
+        DragonDamage operation = new DragonDamage();
+        dragonDamage.put(entity, operation);
+        try {
+            return nativeDamage.getAsBoolean();
+        } finally {
+            try {
+                if (operation.death != null) finish(operation.death);
+            } finally {
+                if (operation.death != null) active.remove(entity, operation.death);
+                dragonDamage.remove(entity, operation);
+            }
+        }
+    }
+
+    /** Native phase changes/setHealth can enter tickDeath without invoking die. */
+    public static void duringDragonDeathTick(EnderDragon entity, Runnable nativeTick) {
+        if (isVisual(entity) || active.containsKey(entity)) {
+            nativeTick.run();
+            return;
+        }
+        DamageSource source = entity.getLastDamageSource();
+        duringDeath(entity, source == null ? entity.damageSources().generic() : source, () -> {
+            accepted(entity);
+            nativeTick.run();
+        });
+    }
+
+    /** Called after the server scheduler advances, so newly scheduled delays start at this server tick. */
+    public static void tickNativeVisuals() {
+        for (Death death : List.copyOf(pending.values())) {
+            if (!death.waitingForNativeVisual || !death.isPending()) continue;
+            int tick = death.entity.getServer().getTickCount();
+            if (death.lastVisualTick == tick) continue;
+            death.lastVisualTick = tick;
+            try {
+                if (death.virtual && !death.entity.isRemoved()) death.entity.tick();
+                if (!death.isPending()) continue;
+                if (death.entity.isRemoved()) {
+                    death.waitingForNativeVisual = false;
+                    death.finishVisual();
+                    if (death.isPending()) scheduleRespawns(death, 0);
+                } else if (death.visualUpdate != null) death.visualUpdate.run();
+            } catch (RuntimeException | Error failure) {
+                invalidate(death.npc);
+                net.citizensnpcs.Citizens.LOGGER.error("Failed to advance NPC death visual {}", death.npc.getId(), failure);
+            }
+        }
+    }
+
+    public static NPC visualOwner(Entity entity) {
+        Death death = visuals.get(entity);
+        return death == null ? null : death.npc;
+    }
+
+    /** A virtual dragon's native death sound belongs to its current viewers, not the whole server. */
+    public static boolean sendVirtualLevelEvent(Entity entity, int eventId, net.minecraft.core.BlockPos pos, int data) {
+        Death death = visuals.get(entity);
+        boolean retained = death != null;
+        if (death == null) death = active.get(entity);
+        if (death == null || !death.virtual) return false;
+        boolean global = entity.level().getGameRules().getBoolean(net.minecraft.world.level.GameRules.RULE_GLOBAL_SOUND_EVENTS);
+        List<ServerPlayer> viewers = retained ? death.viewers : NPCVisibility.viewers(entity);
+        for (ServerPlayer viewer : viewers) {
+            boolean visible = retained ? isVisualVisibleTo(entity, viewer) : NPCVisibility.isTracked(entity, viewer);
+            if (visible && (global || viewer.distanceToSqr(pos.getX(), pos.getY(), pos.getZ()) < 64 * 64))
+                viewer.connection.send(new net.minecraft.network.protocol.game.ClientboundLevelEventPacket(eventId, pos, data, global));
+        }
+        return true;
+    }
 
     /** A native break may be nonlethal; only its actual break/kill boundary accepts death. */
     public static boolean duringInstantDeath(LivingEntity entity, DamageSource source, BooleanSupplier nativeDamage) {
@@ -132,10 +210,15 @@ public final class NPCDeaths {
         try {
             nativeDeath.run();
         } finally {
-            try {
-                if (death.accepted) finish(death);
-            } finally {
-                active.remove(entity, death);
+            DragonDamage outer = dragonDamage.get(entity);
+            if (death.accepted && outer != null) {
+                outer.death = death;
+            } else {
+                try {
+                    if (death.accepted) finish(death);
+                } finally {
+                    active.remove(entity, death);
+                }
             }
         }
     }
@@ -231,8 +314,18 @@ public final class NPCDeaths {
         }
         npc.despawn(DespawnReason.DEATH);
         if (!death.isPending()) return;
+        if (death.entity instanceof EnderDragon && !death.instant && !death.entity.isRemoved()) {
+            death.waitingForNativeVisual = true;
+            death.lastVisualTick = death.entity.getServer().getTickCount();
+            return;
+        }
         if (death.instant) death.finishVisual();
         else schedule(death, 20, death::finishVisual);
+        scheduleRespawns(death, 20);
+    }
+
+    private static void scheduleRespawns(Death death, int animationDelay) {
+        CitizensNPC npc = death.npc;
         SentinelTrait sentinel = death.sentinel;
         if (sentinel != null && npc.getTraitNullable(SentinelTrait.class) == sentinel) {
             int delay = sentinel.getRespawnTime();
@@ -252,7 +345,7 @@ public final class NPCDeaths {
             }
         }
         int delay = npc.data().get(NPC.Metadata.RESPAWN_DELAY, -1);
-        if (delay >= 0) schedule(death, (long) delay + 20, () -> {
+        if (delay >= 0) schedule(death, (long) delay + animationDelay, () -> {
             if (!death.canRespawn()) return;
             HomeTrait home = npc.getTraitNullable(HomeTrait.class);
             Location at = home == null ? null : home.getHomeLocation();
@@ -262,8 +355,15 @@ public final class NPCDeaths {
     }
 
     public static void retainVisual(Entity entity, Runnable cleanup) {
+        retainVisual(entity, cleanup, null);
+    }
+
+    public static void retainVisual(Entity entity, Runnable cleanup, Runnable update) {
         Death death = active.get(entity);
-        if (death != null && pending.get(death.npc) == death) death.visual = cleanup;
+        if (death != null && pending.get(death.npc) == death) {
+            death.visual = cleanup;
+            death.visualUpdate = update;
+        }
         else cleanup.run();
     }
 
@@ -296,6 +396,10 @@ public final class NPCDeaths {
     }
 
     private static void schedule(Death death, long delay, Runnable action) {
+        if (delay == 0) {
+            if (death.isPending()) action.run();
+            return;
+        }
         death.remaining++;
         death.tasks.add(CitizensAPI.getScheduler().runTaskLater(() -> {
             try {
@@ -311,19 +415,24 @@ public final class NPCDeaths {
         final LivingEntity entity;
         final EntityController controller;
         final DamageSource source;
+        final boolean virtual;
         final List<SchedulerTask> tasks = new ArrayList<>();
         final List<ItemEntity> nativeDrops = new ArrayList<>();
         final Map<ItemEntity, List<ItemEntity>> blockDestinations = new IdentityHashMap<>();
         boolean accepted, notified;
         boolean instant, collectedDrops, flushedDrops, recentlyHit;
+        boolean waitingForNativeVisual;
+        int lastVisualTick;
         Location location;
         SentinelTrait sentinel;
         List<ServerPlayer> viewers = List.of();
         Runnable visual;
+        Runnable visualUpdate;
         int remaining;
 
         Death(CitizensNPC npc, LivingEntity entity, DamageSource source) {
             this.npc = npc; this.entity = entity; this.source = source; controller = npc.controller();
+            virtual = PacketNPC.isPacketEntity(entity);
         }
 
         boolean ownsEntity() { return npc.ownsEntity(controller, entity); }
@@ -337,8 +446,11 @@ public final class NPCDeaths {
         void finishVisual() {
             Runnable cleanup = visual;
             visual = null;
+            visualUpdate = null;
             visuals.remove(entity, this);
             if (cleanup != null) cleanup.run();
         }
     }
+
+    private static final class DragonDamage { Death death; }
 }

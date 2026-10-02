@@ -66,6 +66,14 @@ public class EntityPacketTracker {
         return linked.stream().anyMatch(viewer -> viewer == player);
     }
 
+    /** Continue native metadata/movement for a detached corpse without admitting any new viewers. */
+    public void runDeathVisual() {
+        for (ServerPlayer player : List.copyOf(linked)) {
+            if (!net.citizensnpcs.npc.NPCDeaths.isVisualVisibleTo(entity, player)) unlink(player);
+        }
+        run();
+    }
+
     /**
      * Starts showing a live entity to an admitted player, sending the native spawn bundle immediately.
      * A rejected attempt retains no viewer membership. Discarded entities cannot be revived by a pending link.

@@ -1,5 +1,7 @@
 # Armor-stand destruction and complete native drops
 
+Follow-up: [dragon death phases](dragon-death-2026-10-02.md) now implements the dragon lifecycle work recorded as open below. Client/modpack acceptance and the other checklist requirements remain open.
+
 Armor stands break through their own `hurt` and `kill` methods. They do not normally call `LivingEntity.die`. The previous change preserved their NPC drop notification, but breaking still left the controller holding a removed entity. Equipment and the stand item also bypassed the mutable death-drop list because vanilla emits them with `Block.popResource` after/beside `dropAllDeathLoot`.
 
 ## Native lifecycle

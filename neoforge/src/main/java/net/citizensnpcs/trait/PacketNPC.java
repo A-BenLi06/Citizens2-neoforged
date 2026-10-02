@@ -47,6 +47,7 @@ public class PacketNPC extends Trait {
     private EntityPacketTracker packetTracker;
     private Integer registeredEntityId;
     private boolean spawned;
+    private int lastDragonDeathTick = Integer.MIN_VALUE;
 
     public PacketNPC() {
         super("packet");
@@ -140,7 +141,7 @@ public class PacketNPC extends Trait {
         net.citizensnpcs.npc.NPCDeaths.retainVisual(entity, () -> {
             previous.unpairAll(null);
             entity.remove(Entity.RemovalReason.KILLED);
-        });
+        }, previous::runDeathVisual);
     }
 
     /** Releases old-world viewers before the owning NPC transfers its native entity. */
@@ -204,6 +205,14 @@ public class PacketNPC extends Trait {
         if (!spawned || packetTracker == null || npc.getEntity() == null)
             return;
         Entity entity = npc.getEntity();
+        if (entity instanceof net.minecraft.world.entity.boss.enderdragon.EnderDragon dragon
+                && (dragon.isDeadOrDying() || dragon.getPhaseManager().getCurrentPhase().getPhase()
+                        == net.minecraft.world.entity.boss.enderdragon.phases.EnderDragonPhase.DYING)
+                && lastDragonDeathTick != entity.getServer().getTickCount()) {
+            lastDragonDeathTick = entity.getServer().getTickCount();
+            dragon.tick();
+            if (!spawned || npc.getEntity() != entity || npc.getTraitNullable(PacketNPC.class) != this) return;
+        }
         PacketMounts.position(entity);
         var box = trackingBox(entity);
         // Spectators and invisible players can see entities. This is viewer eligibility, not NPC target selection.

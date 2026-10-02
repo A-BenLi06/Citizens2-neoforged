@@ -300,6 +300,7 @@ public class EventListen {
         if (!golem && !(event.getEntity() instanceof EnderDragon))
             return;
         NPC npc = CitizensAPI.getNPCRegistry().getNPC(event.getEntity());
+        if (npc == null) npc = net.citizensnpcs.npc.NPCDeaths.visualOwner(event.getEntity());
         if (npc == null)
             return;
         if (golem) {

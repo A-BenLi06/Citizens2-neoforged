@@ -431,6 +431,7 @@ public class Citizens implements CitizensPlugin {
         }
         if (!enabled)
             return;
+        net.citizensnpcs.npc.NPCDeaths.tickNativeVisuals();
         for (NPCRegistry registry : getNPCRegistries()) {
             if (registry == null) {
                 continue;
