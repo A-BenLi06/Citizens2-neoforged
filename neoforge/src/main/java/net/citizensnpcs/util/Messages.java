@@ -450,6 +450,10 @@ public class Messages {
     public static final String SIZE_DESCRIPTION = "citizens.commands.npc.size.describe";
     public static final String SIZE_SET = "citizens.commands.npc.size.set";
     public static final String SKIN_CLEARED = "citizens.commands.npc.skin.cleared";
+    public static final String SKIN_INVALID_TEXTURE = "citizens.commands.npc.skin.invalid-texture";
+    public static final String SKIN_CURRENT = "citizens.commands.npc.skin.current";
+    public static final String SKIN_LATEST_UNSET = "citizens.commands.npc.skin.latest-unset";
+    public static final String SKIN_BEDROCK_PREFIX_REQUIRED = "citizens.commands.npc.skin.bedrock-prefix-required";
     public static final String SKIN_EXPORTED = "citizens.commands.npc.skin.exported";
     public static final String SKIN_LATEST_SET = "citizens.commands.npc.skin.latest-set";
     public static final String SKIN_LAYERS_SET = "citizens.commands.npc.skin.layers-set";

@@ -1,12 +1,12 @@
 package net.citizensnpcs.npc.skin;
 
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
-import java.util.Set;
 import java.util.UUID;
 import java.util.WeakHashMap;
+import java.util.Optional;
+import java.util.concurrent.CompletableFuture;
 
 import com.mojang.authlib.GameProfile;
 
@@ -15,23 +15,26 @@ import net.citizensnpcs.api.npc.NPC;
 import net.citizensnpcs.api.util.Messaging;
 import net.citizensnpcs.npc.entity.EntityHumanNPC;
 import net.citizensnpcs.util.SkinProperty;
+import net.citizensnpcs.util.MojangSkinGenerator;
+import net.citizensnpcs.trait.SkinTrait;
+import net.citizensnpcs.Settings.Setting;
 import net.minecraft.world.level.block.entity.SkullBlockEntity;
 
 /**
  * A player skin, fetched by name and cached.
  * <p>
- * The whole fetch pipeline is vanilla's. Upstream ships {@code ProfileFetcher}, {@code ProfileRequest} and a retry
- * queue — several hundred lines — because Bukkit gives it no async profile lookup. Minecraft already has one:
- * {@link SkullBlockEntity#fetchGameProfile(String)} returns a cached {@code CompletableFuture} and handles the HTTP
- * call, the session service and rate limiting. So this class is only the NPC-facing part: cache by name, remember which
- * entities are waiting, and apply the texture when the profile lands.
+ * Java profiles use {@link SkullBlockEntity#fetchGameProfile(String)} and its native cache/session service.
+ * Explicit Bedrock-prefixed names use the configured Geyser skin API. Pending recipients retain their trait revision
+ * so a delayed result cannot replace a newer choice or a replacement NPC.
  * <p>
  * The completion runs on the HTTP thread, so the apply step is bounced back onto the main thread — touching entity state
  * off-thread is exactly the kind of bug that shows up later as a random CME.
  */
 public class Skin {
     private volatile boolean isValid = true;
-    private final Set<EntityHumanNPC> pending = Collections.newSetFromMap(new WeakHashMap<>());
+    private final Map<EntityHumanNPC, Pending> pending = new WeakHashMap<>();
+    private boolean retired;
+    private final long cacheGeneration = generation;
     private volatile SkinProperty skinData;
     private volatile UUID skinId;
     private final String skinName;
@@ -47,11 +50,12 @@ public class Skin {
      * @return true if the texture was applied now
      */
     public boolean apply(EntityHumanNPC entity) {
-        if (!isValid)
+        if (!isValid || retired || cacheGeneration != generation)
             return false;
         if (skinData == null) {
             synchronized (pending) {
-                pending.add(entity);
+                SkinTrait trait = entity.getNPC().getTraitNullable(SkinTrait.class);
+                if (trait != null) pending.put(entity, new Pending(trait, trait.getSkinRevision()));
             }
             return false;
         }
@@ -69,21 +73,42 @@ public class Skin {
 
         NPC npc = entity.getNPC();
         if (npc != null && skinId != null) {
+            SkinTrait trait = npc.getTraitNullable(SkinTrait.class);
+            if (trait != null) trait.applyTextureInternal(property.signature, property.value);
             npc.data().setPersistent(CACHED_SKIN_UUID_NAME_METADATA, skinName);
             npc.data().setPersistent(CACHED_SKIN_UUID_METADATA, skinId.toString());
         }
     }
 
     private void fetch() {
-        if (skinName.length() < 3 || skinName.length() > 16 || skinName.startsWith("cit-")) {
+        String prefix = Setting.BEDROCK_SKIN_PREFIX.asString().toLowerCase(Locale.ROOT);
+        boolean bedrock = !prefix.isEmpty() && skinName.startsWith(prefix);
+        if (!bedrock && (skinName.length() < 3 || skinName.length() > 16 || skinName.startsWith("cit-"))) {
             isValid = false;
             return;
         }
-        SkullBlockEntity.fetchGameProfile(skinName).thenAccept(result -> {
+        CompletableFuture<Optional<GameProfile>> lookup;
+        if (bedrock) {
+            lookup = new CompletableFuture<>();
+            CitizensAPI.getScheduler().runTaskAsynchronously(() -> {
+                try {
+                    String name = skinName.substring(prefix.length());
+                    Long xuid = MojangSkinGenerator.getXUIDFromName(name);
+                    lookup.complete(xuid == null ? Optional.empty() : Optional.ofNullable(MojangSkinGenerator.getFilledGameProfileByXUID(name, xuid)));
+                } catch (Exception failure) {
+                    if (failure instanceof InterruptedException) Thread.currentThread().interrupt();
+                    lookup.completeExceptionally(failure);
+                }
+            });
+        } else lookup = SkullBlockEntity.fetchGameProfile(skinName);
+        var scheduler = CitizensAPI.getScheduler();
+        lookup.whenComplete((result, failure) -> {
             // completes on the profile-lookup thread; entity state must only be touched on the main thread
-            CitizensAPI.getScheduler().runTask(() -> {
-                if (result.isEmpty()) {
+            scheduler.runTask(() -> {
+                if (retired || cacheGeneration != generation) return;
+                if (failure != null || result == null || result.isEmpty()) {
                     isValid = false;
+                    synchronized (pending) { pending.clear(); }
                     Messaging.idebug(() -> "Could not find skin for '" + skinName + "'");
                     return;
                 }
@@ -113,27 +138,41 @@ public class Skin {
 
     private void setData(GameProfile profile) {
         SkinProperty property = SkinProperty.fromMojangProfile(profile);
-        if (property == null) {
+        try {
+            if (property == null) throw new IllegalArgumentException();
+            net.citizensnpcs.util.SkinData.textures(property.value);
+        } catch (IllegalArgumentException invalid) {
             isValid = false;
+            synchronized (pending) { pending.clear(); }
             return;
         }
         skinId = profile.getId();
         skinData = property;
 
         synchronized (pending) {
-            for (EntityHumanNPC entity : pending) {
-                if (entity != null && !entity.isRemoved()) {
+            var waiting = new HashMap<>(pending);
+            pending.clear();
+            for (var entry : waiting.entrySet()) {
+                EntityHumanNPC entity = entry.getKey();
+                Pending request = entry.getValue();
+                NPC npc = entity.getNPC();
+                if (!retired && cacheGeneration == generation && !entity.isRemoved() && npc != null && npc.getCosmeticEntity() == entity
+                        && npc.getOwningRegistry().getByUniqueId(npc.getUniqueId()) == npc
+                        && npc.getOwningRegistry().getById(npc.getId()) == npc
+                        && npc.getTraitNullable(SkinTrait.class) == request.trait
+                        && request.trait.getSkinRevision() == request.revision) {
                     applyTo(entity);
                     // the client only re-reads the profile on respawn, so the entity is re-sent
                     SkinPacketTracker.respawn(entity);
                 }
             }
-            pending.clear();
         }
     }
 
     public static void clearCache() {
         synchronized (CACHE) {
+            generation++;
+            CACHE.values().forEach(skin -> { skin.retired = true; synchronized (skin.pending) { skin.pending.clear(); } });
             CACHE.clear();
         }
     }
@@ -142,8 +181,12 @@ public class Skin {
      * @return the cached skin for the name, fetching it if this is the first request
      */
     public static Skin get(NPC npc, String skinName) {
-        String cached = npc.data().get(CACHED_SKIN_UUID_NAME_METADATA, skinName);
-        return get(cached);
+        return get(skinName);
+    }
+
+    /** Refresh this name while leaving other NPCs' already pending lookups valid. */
+    public static void invalidate(String name) {
+        synchronized (CACHE) { CACHE.remove(name.toLowerCase(Locale.ROOT)); }
     }
 
     public static Skin get(String skinName) {
@@ -160,6 +203,8 @@ public class Skin {
     }
 
     private static final Map<String, Skin> CACHE = new HashMap<>(20);
+    private static long generation;
+    private record Pending(SkinTrait trait, long revision) { }
     public static final String CACHED_SKIN_UUID_METADATA = "cached-skin-uuid";
     public static final String CACHED_SKIN_UUID_NAME_METADATA = "cached-skin-uuid-name";
 }

@@ -4,9 +4,11 @@
 
 Initial audit timestamp: 2026-09-13 01:47:09 +08:00 (UTC+08:00).
 
-Current summary updated: 2026-10-02 22:43:55 +08:00 (UTC+08:00).
+Current summary updated: 2026-10-02 23:21:49 +08:00 (UTC+08:00).
 
 The resumed goal explicitly continues comparison of remaining behavior in the retained Citizens, Interactions and Sentinel code. CmdCam owns camera playback and Yuuniverse Economy owns economic APIs; unrelated replacement suites and unverified client/modpack/proxy acceptance remain distinct.
+
+Latest skin follow-up: [native skin commands and asynchronous ownership](skin-commands-2026-10-02.md) restores URL/file generation, direct textures, exports, skulls, latest/name semantics and explicit Bedrock lookups. Revision and identity checks keep delayed work from replacing newer state; native caches and persisted textures retain their distinct roles. Both NeoForge versions pass 127 dedicated checks, and skin-refresh/mirroring regression passes 367. Interactions remains separate. Evidence: `artifacts/skin-command-validation-summary.json`. Known ordinary command groups now have implementation follow-ups; debugging aliases, live service/provider/data work and physical-client/modpack/proxy acceptance remain open.
 
 Latest world-options follow-up: [anchors, chunk loading and fluid pushing](npc-world-options-2026-10-02.md) restores cursor/explicit anchor saving, temporary metadata backing and native fluid policy. Current-rotation targeting, exact trait/entity/registry ticket ownership, shared UUID holders and retained death visuals pass 213 checks on both NeoForge 21.1.233 and 21.1.248. Interactions remains an independent mod/JAR and its implementation is unchanged. Evidence: `artifacts/world-options-validation-summary.json`. One ordinary command group (`skin`), debugging aliases, applicable data/integration and physical-client acceptance remain open.
 
@@ -321,7 +323,7 @@ Six more missing pairs concern later-version capabilities: `chicken`, `cow`, `pi
 | Command/group | Confirmed difference, beyond declaration presence |
 |---|---|
 | `remove` / `rem` | The port only distinguishes `all` from “remove selected”. Original ID/name, owner, world and entity-UUID targeting is missing. **With NPC A selected, `npc remove B` follows the current source path to destroy A, not resolve B.** This is a concrete data-loss risk from legacy syntax, not merely a missing help entry. It was identified by source inspection; no production delete was executed. |
-| `skin` | Name lookup, clear and latest-update mode exist. Original URL/file import, texture/signature input, export, skull and Bedrock-related command branches are absent. Existing skin display should not be described as missing. |
+| `skin` | Superseded by [the skin-command follow-up](skin-commands-2026-10-02.md): URL/file imports, supplied textures, exports, skulls, clear/latest/name semantics and explicit Bedrock lookups are implemented. Live service/account and physical-client/modpack acceptance remains open. |
 | `armorstand` | Basic switches exist; body/head/left-right arm and leg pose flags are absent. |
 | `create` | Item-provider input, timed temporary duration, unspawned/center/packet shortcuts are missing. The packet trait/backend exists and is already tested separately. |
 | `list`, `select` | Registry/tag/expression filters and original selection-range/registry options are incomplete. Page, owner/type or name operations have some alternate syntax. |

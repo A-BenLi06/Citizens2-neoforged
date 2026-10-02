@@ -10,12 +10,13 @@ A read-only declaration scan of the checked-in `main` and `neoforge` source tree
 
 | Command | Remaining difference in the current implementation |
 |---|---|
-| `skin` | URL/file input, supplied texture/signature, export and skull branches. Bedrock-specific integration depends on an applicable native provider. Name lookup, clear/latest mode, refresh and mirrored appearance already exist. |
 | `waypoints hpa`, `wp hpa` | Original debugging aliases require a usefulness/native-backend decision; ordinary waypoint navigation exists. |
 
-Recent follow-ups cover [`powered`, `name` and `home` options](command-options-home-2026-09-28.md), [`armorstand` limb poses](armorstand-poses-2026-09-27.md), `follow`, `mount`, `pose`, `lookclose` / `look`, native command locations, removal targeting, text editing, entity/display commands and particle options. The command-options fixture passes 164 checks, including atomic validation, original duration/precedence, native powered admission and exact home navigation ownership. One ordinary command group remains above, plus the waypoint debugging aliases. Their unverified client/modpack scenarios remain acceptance work. They should not be listed again as wholly missing commands. `horse --color` and `--colour` both exist; upstream's unused `minecart --item` parameter is not a missing implemented behavior.
+Recent follow-ups cover [`powered`, `name` and `home` options](command-options-home-2026-09-28.md), [`armorstand` limb poses](armorstand-poses-2026-09-27.md), `follow`, `mount`, `pose`, `lookclose` / `look`, native command locations, removal targeting, text editing, entity/display commands and particle options. The command-options fixture passes 164 checks, including atomic validation, original duration/precedence, native powered admission and exact home navigation ownership. The known ordinary command groups on this checklist now have implementation follow-ups; the waypoint debugging aliases remain above. This does not prove every command/provider/client combination or the complete Citizens goal. `horse --color` and `--colour` both exist; upstream's unused `minecart --item` parameter is not a missing implemented behavior.
 
 ## Behavior, data and integration acceptance
+
+- [Skin commands and request ownership](skin-commands-2026-10-02.md) now cover URL/PNG imports, direct texture/signature input, complete PNG exports, native skull components, clear/latest/name semantics and explicit Geyser Bedrock lookups. Both NeoForge versions pass 127 dedicated checks, and the existing skin-refresh/mirroring fixture passes 367. Live MineSkin credentials/rate limits, Geyser availability, real signed-texture downloads and physical-client rendering remain unverified.
 
 - [Anchors, chunk loading and fluid pushing](npc-world-options-2026-10-02.md) now cover cursor/explicit saving, temporary metadata backing, immediate tickets with exact ownership and shared UUIDs, native fluid gates and retained death visuals. Both NeoForge versions pass 213 dedicated checks. Interactions remains a separate mod/JAR with one-way dependence on Citizens.
 

@@ -165,6 +165,10 @@ public class Settings {
         NPC_SKIN_FETCH_DEFAULT("npc.skins.try-fetch-default-skin", true),
         NPC_SKIN_USE_LATEST("npc.skins.use-latest-by-default", false),
         NPC_SKIN_VIEW_DISTANCE("npc.skins.view-distance", 100),
+        SKIN_GENERATION_ENDPOINT("npc.skins.generation-endpoint", "https://api.mineskin.org/v2/generate"),
+        SKIN_GENERATION_API_KEY("npc.skins.generation-api-key", ""),
+        BEDROCK_SKIN_ENDPOINT("npc.skins.bedrock-api", "https://api.geysermc.org/v2/"),
+        BEDROCK_SKIN_PREFIX("npc.skins.bedrock-name-prefix", "."),
         NPC_WATER_SPEED_MODIFIER("npc.movement.water-speed-modifier", 1.15F),
         PACKET_HOLOGRAMS("npc.use-packet-holograms", false),
         // Upstream prefixes these CITIZENS_PATHFINDER_* to tell its own pathfinder apart from Minecraft's, which has no

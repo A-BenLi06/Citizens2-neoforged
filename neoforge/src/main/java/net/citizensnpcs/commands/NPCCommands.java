@@ -3388,30 +3388,20 @@ public class NPCCommands {
 
     @Command(
             aliases = { "npc" },
-            usage = "skin (name) (-c(lear) -l(atest))",
+            usage = "skin (name) -c(lear) -l(atest) -s(kull) -b(edrock) -u(rl) -e(xport) --url [url] --file [file.png] -t [name] [data] [signature]",
             desc = "",
-            flags = "cl",
+            flags = "clusbet",
             modifiers = { "skin" },
+            strictArguments = true,
             min = 1,
-            max = 2,
+            max = 4,
             permission = "citizens.npc.skin")
-    public void skin(CommandContext args, CommandSourceStack sender, NPC npc) throws CommandException {
-        SkinTrait trait = npc.getOrAddTrait(SkinTrait.class);
-        if (args.hasFlag('c')) {
-            trait.clearTexture();
-            Messaging.sendTr(sender, Messages.SKIN_CLEARED);
-            return;
-        }
-        if (args.hasFlag('l')) {
-            trait.setShouldUpdateSkins(true);
-            Messaging.sendTr(sender, Messages.SKIN_LATEST_SET, npc.getName());
-            return;
-        }
-        if (args.argsLength() < 2)
-            throw new CommandUsageException();
-        String skinName = args.getString(1);
-        trait.setSkinName(skinName);
-        Messaging.sendTr(sender, Messages.SKIN_SET, npc.getName(), skinName);
+    public void skin(CommandContext args, CommandSourceStack sender, NPC npc, @Flag("url") String url,
+            @Flag("file") String file) throws CommandException {
+        NPCSkinCommands.execute(args, sender, npc, url, file, () -> {
+            try { requireOwnedTarget(sender, npc, "citizens.npc.skin"); return true; }
+            catch (CommandException denied) { return false; }
+        });
     }
 
     @Command(

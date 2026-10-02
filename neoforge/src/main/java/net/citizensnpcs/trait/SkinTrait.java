@@ -1,9 +1,8 @@
 package net.citizensnpcs.trait;
 
-import java.nio.charset.StandardCharsets;
+import java.util.Locale;
 import java.util.Objects;
 
-import com.google.common.io.BaseEncoding;
 import com.mojang.authlib.GameProfile;
 
 import net.citizensnpcs.Settings.Setting;
@@ -17,6 +16,7 @@ import net.citizensnpcs.npc.entity.EntityHumanNPC;
 import net.citizensnpcs.npc.skin.Skin;
 import net.citizensnpcs.npc.skin.SkinPacketTracker;
 import net.citizensnpcs.util.SkinProperty;
+import net.citizensnpcs.util.SkinData;
 import net.minecraft.server.level.ServerPlayer;
 
 /**
@@ -45,6 +45,7 @@ public class SkinTrait extends Trait {
     @Persist
     private String textureRaw;
     private int timer;
+    private long revision;
     @Persist
     private boolean updateSkins = Setting.NPC_SKIN_USE_LATEST.asBoolean();
 
@@ -57,6 +58,7 @@ public class SkinTrait extends Trait {
      * Mojang answers.
      */
     public void applyTextureInternal(String signature, String value) {
+        SkinData.textures(value);
         textureRaw = value;
         this.signature = signature;
     }
@@ -69,7 +71,7 @@ public class SkinTrait extends Trait {
     public boolean applyTo(EntityHumanNPC entity) {
         if (entity == null)
             return false;
-        if (textureRaw != null && signature != null) {
+        if (textureRaw != null) {
             // an explicit texture needs no lookup, so it is never subject to Mojang rate limiting
             // the first argument is the GameProfile property name and has to be "textures" - passing the skin's own
             // name here put the texture under a key the client never reads, so every NPC drew the default skin
@@ -77,7 +79,7 @@ public class SkinTrait extends Trait {
             GameProfile profile = entity.getGameProfile();
             profile.getProperties().removeAll(SkinProperty.TEXTURES_KEY);
             profile.getProperties().put(SkinProperty.TEXTURES_KEY, property.toMojang());
-            return true;
+            if (!updateSkins) return true;
         }
         String source = getSkinName();
         if (source == null) {
@@ -87,7 +89,7 @@ public class SkinTrait extends Trait {
         }
         if (source == null || source.isEmpty())
             return false;
-        return Skin.get(npc, TextParser.strip(source)).apply(entity);
+        return Skin.get(npc, TextParser.strip(source)).apply(entity) || textureRaw != null;
     }
 
     /**
@@ -97,9 +99,12 @@ public class SkinTrait extends Trait {
     private boolean checkPlaceholder() {
         if (skinName == null)
             return false;
-        String filled = TextParser.strip(Placeholders.replace(skinName, null, npc)).toLowerCase();
+        String filled = TextParser.strip(Placeholders.replace(skinName, null, npc)).toLowerCase(Locale.ROOT);
         if (!filled.equalsIgnoreCase(skinName) && !filled.equalsIgnoreCase(filledPlaceholder)) {
             filledPlaceholder = filled;
+            revision++;
+            textureRaw = null;
+            signature = null;
             Messaging.debug("Filled skin placeholder", filled, "from", skinName);
             return true;
         }
@@ -110,10 +115,13 @@ public class SkinTrait extends Trait {
      * Clears skin texture and name.
      */
     public void clearTexture() {
+        revision++;
         textureRaw = null;
         signature = null;
         skinName = null;
         filledPlaceholder = null;
+        clearCachedIdentity();
+        onSkinChange(false);
     }
 
     /**
@@ -135,7 +143,7 @@ public class SkinTrait extends Trait {
      */
     public String getSkinName() {
         return filledPlaceholder != null && skinName != null ? filledPlaceholder
-                : skinName == null ? null : skinName.toLowerCase();
+                : skinName == null ? null : skinName.toLowerCase(Locale.ROOT);
     }
 
     /**
@@ -146,14 +154,24 @@ public class SkinTrait extends Trait {
     }
 
     private void onSkinChange(boolean forceUpdate) {
+        if (npc == null) return;
+        String source = getSkinName();
+        if (source == null && fetchDefaultSkin) source = npc.getName();
+        if (forceUpdate && source != null) Skin.invalidate(source);
         if (!(npc.getCosmeticEntity() instanceof EntityHumanNPC human))
             return;
+        human.getGameProfile().getProperties().removeAll(SkinProperty.TEXTURES_KEY);
         applyTo(human);
         SkinPacketTracker.respawn(human);
     }
 
     @Override
     public void onSpawn() {
+        if (updateSkins) {
+            String source = getSkinName();
+            if (source == null && fetchDefaultSkin) source = npc.getName();
+            if (source != null) Skin.invalidate(source);
+        }
         if (npc.getCosmeticEntity() instanceof EntityHumanNPC human) {
             applyTo(human);
         }
@@ -173,6 +191,7 @@ public class SkinTrait extends Trait {
      * @see #fetchDefaultSkin
      */
     public void setFetchDefaultSkin(boolean fetch) {
+        revision++;
         fetchDefaultSkin = fetch;
     }
 
@@ -180,7 +199,9 @@ public class SkinTrait extends Trait {
      * @see #shouldUpdateSkins()
      */
     public void setShouldUpdateSkins(boolean update) {
+        revision++;
         updateSkins = update;
+        onSkinChange(update);
     }
 
     /**
@@ -198,7 +219,10 @@ public class SkinTrait extends Trait {
      */
     public void setSkinName(String name, boolean forceUpdate) {
         Objects.requireNonNull(name);
+        if (TextParser.strip(name).isBlank()) throw new IllegalArgumentException("Invalid skin name");
+        revision++;
         setSkinNameInternal(name);
+        clearCachedIdentity();
         // a named skin supersedes any pasted texture, otherwise the old texture would keep winning in applyTo
         textureRaw = null;
         signature = null;
@@ -237,15 +261,16 @@ public class SkinTrait extends Trait {
         Objects.requireNonNull(signature);
         Objects.requireNonNull(data);
 
+        if (TextParser.strip(skinName).isBlank()) throw new IllegalArgumentException("Invalid skin name");
+        SkinData.textures(data);
+        revision++;
         setSkinNameInternal(skinName);
-        String json = new String(BaseEncoding.base64().decode(data), StandardCharsets.UTF_8);
-        if (!json.contains("textures"))
-            throw new IllegalArgumentException("Invalid texture data");
+        clearCachedIdentity();
 
         this.signature = signature;
         textureRaw = data;
         updateSkins = false;
-        npc.data().setPersistent(Skin.CACHED_SKIN_UUID_NAME_METADATA, skinName.toLowerCase());
+        npc.data().setPersistent(Skin.CACHED_SKIN_UUID_NAME_METADATA, skinName.toLowerCase(Locale.ROOT));
         onSkinChange(false);
     }
 
@@ -254,5 +279,18 @@ public class SkinTrait extends Trait {
      */
     public boolean shouldUpdateSkins() {
         return updateSkins;
+    }
+
+    /** Identifies a pending import or lookup without persisting transient request state. */
+    public long beginSkinRequest() { return ++revision; }
+    public long getSkinRevision() { return revision; }
+
+    @Override public void onRemove() { revision++; }
+    @Override public void load(net.citizensnpcs.api.util.DataKey key) { revision++; filledPlaceholder = null; }
+
+    private void clearCachedIdentity() {
+        if (npc == null) return;
+        npc.data().remove(Skin.CACHED_SKIN_UUID_METADATA);
+        npc.data().remove(Skin.CACHED_SKIN_UUID_NAME_METADATA);
     }
 }
