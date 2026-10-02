@@ -1,4 +1,12 @@
 {
+  "citizens.commands.npc.create.created": "Created [[{0}]] (ID [[{1}]]){2}{3}{4}.",
+  "citizens.commands.npc.create.baby": " as a baby",
+  "citizens.commands.npc.create.traits": " with traits {0}",
+  "citizens.commands.npc.create.templates": " with templates {0}",
+  "citizens.commands.npc.create.canceled": "NPC creation was canceled. {0}",
+  "citizens.commands.npc.create.failed": "NPC creation failed.",
+  "citizens.commands.npc.create.item-unsupported": "Entity type {0} does not render an item.",
+  "citizens.commands.npc.create.registry": "An in-memory registry has been created named [[{0}]].",
   "citizens.items.unavailable": "One or more saved items are unavailable.",
   "citizens.items.unavailable-edit": "Restore the required item provider or repair the saved item definitions before editing this list.",
   "citizens.commands.npc.potioneffects.list-unavailable": "[[{0}]]: unavailable effect type [[{1}]] (saved definition retained)",

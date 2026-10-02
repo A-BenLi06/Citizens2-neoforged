@@ -93,8 +93,11 @@ public class MobEntityController extends AbstractEntityController {
      * turned into air.
      */
     public static void applyItem(Entity entity, NPC npc) {
-        if (!npc.data().has(NPC.Metadata.ITEM_ID))
-            return;
+        boolean minecartType = entity instanceof net.minecraft.world.entity.vehicle.AbstractMinecart;
+        if (!(entity instanceof Display.ItemDisplay || entity instanceof Display.BlockDisplay
+                || entity instanceof ItemEntity || entity instanceof ItemFrame || entity instanceof OminousItemSpawner
+                || entity instanceof FallingBlockEntity || minecartType)) return;
+        if (minecartType && !npc.data().has(NPC.Metadata.ITEM_ID)) return;
         ItemStack stack = npc.getItemProvider().get();
         if (stack == null || stack.isEmpty())
             return;
@@ -117,6 +120,12 @@ public class MobEntityController extends AbstractEntityController {
             if (state != null) {
                 falling.blockState = state;
             }
+        } else if (entity instanceof net.minecraft.world.entity.vehicle.AbstractMinecart cart) {
+            BlockState state = blockStateOf(stack);
+            if (state != null) {
+                cart.setDisplayBlockState(state);
+                cart.setCustomDisplay(true);
+            }
         }
     }
 
@@ -124,7 +133,10 @@ public class MobEntityController extends AbstractEntityController {
      * @return the default state of the block this item places, or null when the item is not a block
      */
     private static BlockState blockStateOf(ItemStack stack) {
-        return stack.getItem() instanceof BlockItem block ? block.getBlock().defaultBlockState() : null;
+        return stack.getItem() instanceof BlockItem block
+                ? stack.getOrDefault(net.minecraft.core.component.DataComponents.BLOCK_STATE,
+                        net.minecraft.world.item.component.BlockItemStateProperties.EMPTY).apply(block.getBlock().defaultBlockState())
+                : null;
     }
 
     /**

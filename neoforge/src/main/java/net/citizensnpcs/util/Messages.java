@@ -324,6 +324,14 @@ public class Messages {
     public static final String NPC_COMMAND_PLAYER_NOT_VALID = "citizens.commands.npc.command.invalid-player";
     public static final String NPC_COPIED = "citizens.commands.npc.copy.copied";
     public static final String NPC_CREATE_INVALID_MOBTYPE = "citizens.commands.npc.create.invalid-mobtype";
+    public static final String NPC_CREATED = "citizens.commands.npc.create.created";
+    public static final String NPC_CREATE_BABY = "citizens.commands.npc.create.baby";
+    public static final String NPC_CREATE_TRAITS = "citizens.commands.npc.create.traits";
+    public static final String NPC_CREATE_TEMPLATES = "citizens.commands.npc.create.templates";
+    public static final String NPC_CREATE_CANCELED = "citizens.commands.npc.create.canceled";
+    public static final String NPC_CREATE_FAILED = "citizens.commands.npc.create.failed";
+    public static final String NPC_CREATE_ITEM_UNSUPPORTED = "citizens.commands.npc.create.item-unsupported";
+    public static final String NPC_CREATE_REGISTRY = "citizens.commands.npc.create.registry";
     public static final String NPC_CREATE_MISSING_MOBTYPE = "citizens.commands.npc.create.mobtype-missing";
     public static final String NPC_DESPAWNED = "citizens.commands.npc.despawn.despawned";
     public static final String NPC_NAME_TOO_LONG = "citizens.commands.npc.create.npc-name-too-long";

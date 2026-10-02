@@ -144,6 +144,7 @@ import net.citizensnpcs.api.npc.NPCRegistry;
 import net.citizensnpcs.api.trait.Trait;
 import net.citizensnpcs.api.trait.trait.MobType;
 import net.citizensnpcs.api.trait.trait.Owner;
+import net.citizensnpcs.api.trait.trait.CurrentLocation;
 import net.citizensnpcs.api.trait.trait.Spawned;
 import net.citizensnpcs.api.util.EntityUtil;
 import net.citizensnpcs.api.util.Location;
@@ -2058,123 +2059,176 @@ public class NPCCommands {
 
     @Command(
             aliases = { "npc" },
-            usage = "create [name] (--type type) (--at x,y,z,world) (--trait trait1,trait2) (--registry name) (-t(emporary) -b(aby) -s(ilent))",
+            usage = "create [name] (-b(aby) -u(nspawned) -s(ilent) -t(emporary) -c(enter) -p(acket)) --at [location] --type [type] --item [item] --trait [traits] --template [templates] --nameplate [true|false|hover] --temporaryduration [duration] --registry [name]",
             desc = "",
-            flags = "tbs",
+            flags = "bustcp",
             modifiers = { "create" },
             min = 2,
+            valueFlags = { "location", "entitylocation" },
+            strictArguments = true,
             permission = "citizens.npc.create")
     @Requirements
     public void create(CommandContext args, CommandSourceStack sender, NPC npc, @Flag("at") String at,
             @Flag(value = "type", defValue = "player") String rawType, @Flag("trait") String traits,
             @Flag(value = "nameplate", completions = { "true", "false", "hover" }) String nameplate,
             @Flag(value = "template", completionsProvider = TemplateCommands.TemplateCompletions.class) String templateName,
-            @Flag("registry") String registryName) throws CommandException {
+            @Flag("registry") String registryName, @Flag("temporaryduration") Duration temporaryDuration,
+            @Flag("item") String item) throws CommandException {
+        if (!currentCommandSource(sender)) throw new NoPermissionsException();
         EntityType<?> type = MobType.match(rawType);
-        if (type == null)
-            throw new CommandException(Messages.NPC_CREATE_INVALID_MOBTYPE, rawType);
-        if (!EntityControllers.controllerExistsForType(type))
-            throw new CommandException(Messages.NPC_CREATE_MISSING_MOBTYPE, rawType);
+        if (type == null) throw new CommandException(Messages.NPC_CREATE_INVALID_MOBTYPE, rawType);
+        if (!EntityControllers.controllerExistsForType(type)) throw new CommandException(Messages.NPC_CREATE_MISSING_MOBTYPE, rawType);
         checkCreationLimit(sender);
-
         String name = args.getJoinedStrings(1).trim();
         int nameLength = EntityUtil.getMaxNameLength(type);
         if (Placeholders.replace(Messaging.stripColor(name), sender, npc).length() > nameLength) {
             Messaging.sendErrorTr(sender, Messages.NPC_NAME_TOO_LONG, nameLength);
-            name = name.substring(0, nameLength);
+            name = name.substring(0, Math.min(name.length(), nameLength));
         }
-        if (name.isEmpty())
-            throw new CommandException();
-
+        if (name.isEmpty()) throw new CommandException(CommandMessages.INVALID_VALUE, "name", name);
         String typePath = EntityType.getKey(type).getPath();
         if (!PermissionUtil.hasPermission(sender, "citizens.npc.create.*")
                 && !PermissionUtil.hasPermission(sender, "citizens.npc.createall")
-                && !PermissionUtil.hasPermission(sender, "citizens.npc.create." + typePath))
-            throw new NoPermissionsException();
-        if ((at != null || registryName != null || traits != null)
-                && !PermissionUtil.hasPermission(sender, "citizens.npc.admin"))
-            throw new NoPermissionsException();
-
-        // Resolve all location inputs before creating a registry/NPC or applying traits and templates.
-        Location spawnAt = at != null ? args.parseLocation(at) : args.getSenderLocation();
-        NPCRegistry registry = CitizensAPI.getNPCRegistry();
-        if (registryName != null) {
+                && !PermissionUtil.hasPermission(sender, "citizens.npc.create." + typePath)) throw new NoPermissionsException();
+        if ((at != null || registryName != null || traits != null || templateName != null
+                || args.hasValueFlag("location") || args.hasValueFlag("entitylocation"))
+                && !PermissionUtil.hasPermission(sender, "citizens.npc.admin")) throw new NoPermissionsException();
+        if (nameplate != null && !List.of("true", "false", "hover").contains(nameplate.toLowerCase(Locale.ROOT)))
+            throw new CommandException(CommandMessages.INVALID_VALUE, "--nameplate", nameplate);
+        if (registryName != null && registryName.isBlank())
+            throw new CommandException(CommandMessages.INVALID_VALUE, "--registry", registryName);
+        long lifetime = -1;
+        if (temporaryDuration != null) {
+            try {
+                if (temporaryDuration.isNegative()) throw new ArithmeticException();
+                lifetime = temporaryDuration.toMillis() / 50;
+            } catch (ArithmeticException invalid) {
+                throw new CommandException(CommandMessages.INVALID_VALUE, "--temporaryduration", args.getFlag("temporaryduration"));
+            }
+        }
+        Location spawnAt = commandLocation(at != null ? args.parseLocation(at) : args.getSenderLocation());
+        if (args.hasFlag('c')) {
+            var pos = spawnAt.getBlockPos();
+            var shape = spawnAt.getWorld().getBlockState(pos).getCollisionShape(spawnAt.getWorld(), pos);
+            spawnAt = Location.fromBlockPos(spawnAt.getWorld(), pos).add(0.5, 0, 0.5);
+            if (!shape.isEmpty()) {
+                double height = shape.bounds().getYsize();
+                if (height < 0.6) spawnAt.add(0, height, 0);
+            }
+        }
+        ItemStack provided = null;
+        if (item != null) {
+            if (!net.citizensnpcs.npc.CitizensNPCRegistry.isItemCarrier(type))
+                throw new CommandException(Messages.NPC_CREATE_ITEM_UNSUPPORTED, EntityType.getKey(type));
+            provided = ItemStorage.parseItemStack(item, 1);
+            if (provided.isEmpty()) throw new CommandException(Messages.UNKNOWN_MATERIAL);
+            if (net.citizensnpcs.npc.CitizensNPCRegistry.isBlockItemCarrier(type)
+                    && !(provided.getItem() instanceof net.minecraft.world.item.BlockItem))
+                throw new CommandException(CommandMessages.INVALID_VALUE, "--item", item);
+        }
+        List<Trait> additions = new ArrayList<>();
+        if (traits != null) for (String requested : Splitter.on(',').trimResults().omitEmptyStrings().split(traits)) {
+            Trait addition = CitizensAPI.getTraitFactory().getTrait(requested);
+            if (addition != null) additions.add(addition);
+        }
+        List<Template> templates = new ArrayList<>();
+        if (templateName != null) for (String requested : Splitter.on(',').trimResults().omitEmptyStrings().split(templateName)) {
+            Template template = null;
+            if (requested.contains(":")) {
+                ResourceLocation key = ResourceLocation.tryParse(requested.toLowerCase(Locale.ROOT));
+                if (key != null) template = CitizensAPI.getTemplateRegistry().getTemplateByKey(key);
+            } else {
+                Collection<Template> matches = CitizensAPI.getTemplateRegistry().getTemplates(requested);
+                if (matches.size() == 1) template = matches.iterator().next();
+            }
+            if (template == null) Messaging.sendErrorTr(sender, Messages.TEMPLATE_MISSING);
+            else templates.add(template);
+        }
+        NPCRegistry registry = args.hasFlag('t') || lifetime >= 0 ? temporaryRegistry() : CitizensAPI.getNPCRegistry();
+        boolean newRegistry = false;
+        if (registry != temporaryRegistry() && registryName != null) {
             registry = CitizensAPI.getNamedNPCRegistry(registryName);
             if (registry == null) {
                 registry = CitizensAPI.createNamedNPCRegistry(registryName, new MemoryNPCDataStore());
-                Messaging.send(sender, "An in-memory registry has been created named [[" + registryName + "]].");
+                newRegistry = true;
             }
         }
-        if (args.hasFlag('t')) {
-            registry = temporaryRegistry();
-        }
-        NPC created = registry.createNPC(type, name);
-        created.getOrAddTrait(MobType.class).setType(type);
-        StringBuilder msg = new StringBuilder("Created [[" + created.getName() + "]] (ID [[" + created.getId() + "]])");
-
-        if (args.hasFlag('b')) {
-            msg.append(" as a baby");
-            created.getOrAddTrait(Age.class).setAge(-24000);
-        }
-        if (args.hasFlag('s')) {
-            created.data().setPersistent(NPC.Metadata.SILENT, true);
-        }
-        if (nameplate != null) {
-            created.data().setPersistent(NPC.Metadata.NAMEPLATE_VISIBLE,
-                    nameplate.equalsIgnoreCase("hover") ? "hover" : Boolean.parseBoolean(nameplate));
-        }
-        if (!Setting.SERVER_OWNS_NPCS.asBoolean()) {
-            created.getOrAddTrait(Owner.class).setOwner(sender);
-        }
-        if (traits != null) {
-            List<String> added = new ArrayList<>();
-            for (String traitName : Splitter.on(',').trimResults().split(traits)) {
-                Trait trait = CitizensAPI.getTraitFactory().getTrait(traitName);
-                if (trait == null) {
-                    continue;
+        NPC created = null;
+        CreateNPCHistoryItem historyItem = null;
+        String[] cancelReason = { "" };
+        try {
+            created = provided == null ? registry.createNPC(type, name) : registry.createNPCUsingItem(type, name, provided);
+            NPC candidate = created;
+            Location requestedLocation = spawnAt;
+            Runnable configure = () -> {
+                requireCreationCandidate(candidate);
+                candidate.getOrAddTrait(CurrentLocation.class).setLocation(requestedLocation);
+                requireCreationCandidate(candidate);
+                candidate.getOrAddTrait(Spawned.class).setSpawned(false);
+                requireCreationCandidate(candidate);
+                if (args.hasFlag('b')) candidate.getOrAddTrait(Age.class).setAge(-24000);
+                requireCreationCandidate(candidate);
+                if (args.hasFlag('s')) candidate.data().setPersistent(NPC.Metadata.SILENT, true);
+                if (nameplate != null) candidate.data().setPersistent(NPC.Metadata.NAMEPLATE_VISIBLE,
+                        nameplate.equalsIgnoreCase("hover") ? "hover" : Boolean.parseBoolean(nameplate));
+                if (!Setting.SERVER_OWNS_NPCS.asBoolean()) candidate.getOrAddTrait(Owner.class).setOwner(sender);
+                requireCreationCandidate(candidate);
+                if (args.hasFlag('p')) candidate.getOrAddTrait(PacketNPC.class);
+                requireCreationCandidate(candidate);
+                net.citizensnpcs.api.event.CommandSenderCreateNPCEvent event = sender.getPlayer() == null
+                        ? new net.citizensnpcs.api.event.CommandSenderCreateNPCEvent(sender, candidate)
+                        : new net.citizensnpcs.api.event.PlayerCreateNPCEvent(sender, candidate);
+                NeoForge.EVENT_BUS.post(event);
+                if (event.isCanceled()) {
+                    cancelReason[0] = event.getCancelReason();
+                    throw new net.citizensnpcs.api.exception.NPCCreationException("Command creation was canceled");
                 }
-                created.addTrait(trait);
-                added.add(StringHelper.wrap(traitName));
-            }
-            if (!added.isEmpty()) {
-                msg.append(" with traits ").append(Joiner.on(", ").join(added));
-            }
-        }
-        if (templateName != null) {
-            // comma-separated, and each entry is either namespace:name or a bare name that must be unambiguous. A name
-            // that resolves to nothing is skipped rather than failing the create, as upstream does - the NPC is already
-            // made by this point, so aborting would leave it half-configured.
-            List<String> applied = new ArrayList<>();
-            for (String part : Splitter.on(',').trimResults().omitEmptyStrings().split(templateName)) {
-                Template template = null;
-                if (part.contains(":")) {
-                    ResourceLocation key = ResourceLocation.tryParse(part.toLowerCase(Locale.ROOT));
-                    template = key == null ? null : CitizensAPI.getTemplateRegistry().getTemplateByKey(key);
-                } else {
-                    Collection<Template> matches = CitizensAPI.getTemplateRegistry().getTemplates(part);
-                    if (matches.size() == 1) {
-                        template = matches.iterator().next();
-                    }
+                requireCreationCandidate(candidate);
+                for (Trait addition : additions) { candidate.addTrait(addition); requireCreationCandidate(candidate); }
+                for (Template template : templates) { template.apply(candidate); requireCreationCandidate(candidate); }
+                candidate.getOrAddTrait(CurrentLocation.class).setLocation(requestedLocation);
+                candidate.getOrAddTrait(Spawned.class).setSpawned(false);
+            };
+            if (candidate instanceof net.citizensnpcs.npc.CitizensNPC nativeNpc) nativeNpc.prepareCreation(configure);
+            else configure.run();
+            requireCreationCandidate(candidate);
+            if (lifetime >= 0) net.citizensnpcs.npc.NPCLifetimes.expireAfter(candidate, lifetime);
+            NPC previousSelection = CitizensAPI.getDefaultNPCSelector().getSelected(sender);
+            historyItem = new CreateNPCHistoryItem(candidate);
+            history().add(sender, historyItem);
+            if (!args.hasFlag('u')) candidate.spawn(spawnAt, SpawnReason.CREATE);
+            requireCreationCandidate(candidate);
+            if (CitizensAPI.getDefaultNPCSelector().getSelected(sender) == previousSelection)
+                CitizensAPI.getDefaultNPCSelector().select(sender, candidate);
+            if (newRegistry) Messaging.sendTr(sender, Messages.NPC_CREATE_REGISTRY, registryName);
+            Messaging.sendTr(sender, Messages.NPC_CREATED, candidate.getName(), candidate.getId(),
+                    args.hasFlag('b') ? Messaging.tr(Messages.NPC_CREATE_BABY) : "",
+                    additions.isEmpty() ? "" : Messaging.tr(Messages.NPC_CREATE_TRAITS,
+                            additions.stream().map(Trait::getName).map(StringHelper::wrap).collect(java.util.stream.Collectors.joining(", "))),
+                    templates.isEmpty() ? "" : Messaging.tr(Messages.NPC_CREATE_TEMPLATES,
+                            templates.stream().map(t -> StringHelper.wrap(t.getKey().toString())).collect(java.util.stream.Collectors.joining(", "))));
+        } catch (RuntimeException | Error failure) {
+            if (historyItem != null) history().discard(sender, historyItem);
+            if (created != null) {
+                try { created.destroy(); } catch (RuntimeException | Error cleanup) {
+                    if (cleanup != failure) failure.addSuppressed(cleanup);
                 }
-                if (template == null) {
-                    Messaging.sendErrorTr(sender, Messages.TEMPLATE_MISSING);
-                    continue;
-                }
-                template.apply(created);
-                applied.add(StringHelper.wrap(part));
             }
-            if (!applied.isEmpty()) {
-                msg.append(" with templates ").append(Joiner.on(", ").join(applied));
-            }
+            if (newRegistry && !registry.iterator().hasNext() && CitizensAPI.getNamedNPCRegistry(registryName) == registry)
+                CitizensAPI.removeNamedNPCRegistry(registryName);
+            if (failure instanceof net.citizensnpcs.api.exception.NPCCreationException)
+                throw new CommandException(Messages.NPC_CREATE_CANCELED, cancelReason[0]);
+            if (failure instanceof Error error) throw error;
+            Citizens.LOGGER.error("NPC creation failed", failure);
+            throw new CommandException(Messages.NPC_CREATE_FAILED);
         }
-        if (spawnAt == null) {
-            msg.append(" unspawned - run this in-world or pass --at to place it");
-        } else {
-            created.spawn(spawnAt, SpawnReason.COMMAND);
-        }
-        CitizensAPI.getDefaultNPCSelector().select(sender, created);
-        Messaging.send(sender, msg.append('.').toString());
     }
+
+    private static void requireCreationCandidate(NPC npc) {
+        if (!isCurrentTarget(npc) || npc.getOwningRegistry().getById(npc.getId()) != npc)
+            throw new net.citizensnpcs.api.exception.NPCCreationException("Creation candidate was removed or replaced");
+    }
+
 
     @Command(
             aliases = { "npc" },

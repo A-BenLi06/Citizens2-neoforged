@@ -1,5 +1,7 @@
 package net.citizensnpcs.npc;
 
+import net.citizensnpcs.api.npc.NPC;
+
 import net.citizensnpcs.trait.SentinelTrait;
 import net.citizensnpcs.trait.PacketNPC;
 import java.util.ArrayList;
@@ -281,6 +283,9 @@ public class CitizensTraitFactory implements TraitFactory {
     @SubscribeEvent
     public void onNPCCreate(NPCCreateEvent event) {
         for (TraitInfo info : defaultTraits) {
+            NPC candidate = event.getNPC();
+            if (candidate.getOwningRegistry().getById(candidate.getId()) != candidate
+                    || candidate.getOwningRegistry().getByUniqueId(candidate.getUniqueId()) != candidate) return;
             // The registry has already initialized required traits (notably the requested entity type). Defaults
             // fill missing traits; replacing an initialized MobType here would turn unspawned NPCs into players.
             if (!event.getNPC().hasTrait(info.getTraitClass())) event.getNPC().addTrait(info.tryCreateInstance());

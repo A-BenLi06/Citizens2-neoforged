@@ -267,7 +267,9 @@ public class ItemStorage {
         MinecraftServer server = ServerLifecycleHooks.getCurrentServer();
         HolderLookup.Provider registries = server == null ? RegistryAccess.EMPTY : server.registryAccess();
         try {
-            ItemParser.ItemResult result = new ItemParser(registries).parse(new StringReader(raw.trim()));
+            StringReader input = new StringReader(raw.trim());
+            ItemParser.ItemResult result = new ItemParser(registries).parse(input);
+            if (input.canRead()) return ItemStack.EMPTY;
             ItemStack stack = new ItemStack(result.item(), Math.max(1, count));
             stack.applyComponents(result.components());
             return stack;

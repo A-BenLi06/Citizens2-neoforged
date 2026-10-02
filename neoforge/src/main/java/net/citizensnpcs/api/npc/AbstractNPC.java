@@ -63,7 +63,7 @@ public abstract class AbstractNPC implements NPC {
     private Supplier<ItemStack> itemProvider = () -> {
         Item id = data().has(NPC.Metadata.ITEM_ID)
                 ? (Item) RegistryUtil.get(Item.class, data().<String> get(NPC.Metadata.ITEM_ID))
-                : null;
+                : Items.STONE;
         if (id == null || id == Items.AIR) {
             id = Items.STONE;
             Messaging.severe(getId(), "invalid item: converted to stone");
@@ -84,7 +84,7 @@ public abstract class AbstractNPC implements NPC {
         this.registry = registry;
         this.plugin = plugin;
         this.traits = new ArrayTraitLookup(plugin.getTraitFactory().getRegisteredTraits().size() + 32);
-        setNameInternal(name);
+        initializeName(name);
     }
 
     @Override
@@ -149,16 +149,35 @@ public abstract class AbstractNPC implements NPC {
 
     @Override
     public void destroy() {
-        NeoForge.EVENT_BUS.post(new NPCRemoveEvent(this));
+        if (destroyed) return;
+        destroyed = true;
+        Throwable[] failure = { null };
+        finishCleanup(() -> NeoForge.EVENT_BUS.post(new NPCRemoveEvent(this)), failure);
         runnables.clear();
-        traits.forEach(trait -> {
-            EventBusUtil.unregister(trait);
-            trait.onRemove(RemoveReason.DESTROYED);
+        List<Trait> cleanupTraits = new ArrayList<>();
+        traits.forEach(cleanupTraits::add);
+        cleanupTraits.forEach(trait -> {
+            finishCleanup(() -> EventBusUtil.unregister(trait), failure);
+            if (getTraitNullable(trait.getClass()) == trait)
+                finishCleanup(() -> trait.onRemove(RemoveReason.DESTROYED), failure);
         });
         traits.clear();
-        goalController.clear();
-        registry.deregister(this);
+        finishCleanup(goalController::clear, failure);
+        finishCleanup(() -> registry.deregister(this), failure);
+        if (failure[0] instanceof RuntimeException exception) throw exception;
+        if (failure[0] instanceof Error error) throw error;
     }
+
+    private static void finishCleanup(Runnable action, Throwable[] failure) {
+        try { action.run(); }
+        catch (RuntimeException | Error error) {
+            if (failure[0] == null) failure[0] = error;
+            else if (failure[0] != error) failure[0].addSuppressed(error);
+        }
+    }
+
+    private boolean destroyed;
+    protected final boolean isDestroyed() { return destroyed; }
 
     @Override
     public boolean equals(Object obj) {
@@ -474,6 +493,10 @@ public abstract class AbstractNPC implements NPC {
     }
 
     protected void setNameInternal(String name) {
+        initializeName(name);
+    }
+
+    private void initializeName(String name) {
         this.name = name;
         coloredNameComponentCache = Messaging.minecraftComponentFromRawMessage(this.name);
         coloredNameStringCache = Messaging.parseComponents(this.name);

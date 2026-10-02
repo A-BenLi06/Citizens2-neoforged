@@ -28,6 +28,11 @@ public class CommandHistory {
         history.put(keyOf(sender), item);
     }
 
+    /** Discard only the operation that failed, preserving history added by callbacks. */
+    public void discard(CommandSourceStack sender, CommandHistoryItem item) {
+        history.remove(keyOf(sender), item);
+    }
+
     private static UUID keyOf(CommandSourceStack sender) {
         Entity entity = sender == null ? null : sender.getEntity();
         return entity == null ? null : entity.getUUID();
@@ -37,8 +42,9 @@ public class CommandHistory {
         List<CommandHistoryItem> hist = history.get(keyOf(sender));
         if (hist.isEmpty())
             return false;
-        hist.get(hist.size() - 1).undo(sender, selector);
-        hist.remove(hist.size() - 1);
+        CommandHistoryItem item = hist.get(hist.size() - 1);
+        item.undo(sender, selector);
+        hist.remove(item);
         return true;
     }
 }

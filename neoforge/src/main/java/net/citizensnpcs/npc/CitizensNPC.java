@@ -74,6 +74,17 @@ public class CitizensNPC extends AbstractNPC {
     private final CitizensNavigator navigator = new CitizensNavigator(this);
     private int updateCounter;
     private DespawnOperation despawning;
+    private int creationPreparation;
+
+    /** Keep a newly created candidate out of the world until its configuration has been accepted. */
+    public void prepareCreation(Runnable action) {
+        if (isDestroyed()) throw new net.citizensnpcs.api.exception.NPCCreationException("Creation candidate is already destroyed");
+        creationPreparation++;
+        try { action.run(); } finally { creationPreparation--; }
+    }
+
+    /** Name-dependent traits are initialized only after construction and registry/type assignment. */
+    void initializeCreationName() { setNameInternal(getRawName()); }
 
     public CitizensNPC(UUID uuid, int id, String name, EntityController entityController, NPCRegistry registry,
             CitizensPlugin plugin) {
@@ -375,6 +386,7 @@ public class CitizensNPC extends AbstractNPC {
     public boolean spawn(Location at, SpawnReason reason, Consumer<Entity> callback) {
         Objects.requireNonNull(at, "location cannot be null");
         Objects.requireNonNull(reason, "reason cannot be null");
+        if (creationPreparation > 0 || isDestroyed()) return false;
         if (getEntity() != null) {
             Messaging.debug("Tried to spawn", this, "while already spawned. SpawnReason." + reason);
             return false;

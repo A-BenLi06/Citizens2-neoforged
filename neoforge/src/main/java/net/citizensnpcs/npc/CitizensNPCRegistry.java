@@ -67,45 +67,72 @@ public class CitizensNPCRegistry implements NPCRegistry {
         Objects.requireNonNull(name, "name cannot be null");
         Objects.requireNonNull(type, "type cannot be null");
         CitizensNPC npc = new CitizensNPC(uuid, id, name, EntityControllers.createForType(type), this, plugin);
-        npc.getOrAddTrait(MobType.class).setType(type);
-        npcs.put(id, npc);
-        uniqueNPCs.put(npc.getUniqueId(), npc);
-        NeoForge.EVENT_BUS.post(new NPCCreateEvent(npc));
-        if (type == EntityType.ARMOR_STAND)
-            npc.getOrAddTrait(ArmorStandTrait.class);
-        if (Setting.DEFAULT_LOOK_CLOSE.asBoolean())
-            npc.getOrAddTrait(LookClose.class);
-        return npc;
+        try {
+            npc.prepareCreation(() -> {
+                npcs.put(id, npc);
+                uniqueNPCs.put(npc.getUniqueId(), npc);
+                npc.getOrAddTrait(MobType.class).setType(type);
+                if (npcs.get(id) != npc || uniqueNPCs.get(uuid) != npc)
+                    throw new net.citizensnpcs.api.exception.NPCCreationException("NPC initialization was superseded");
+                npc.initializeCreationName();
+                if (npcs.get(id) != npc || uniqueNPCs.get(uuid) != npc)
+                    throw new net.citizensnpcs.api.exception.NPCCreationException("NPC name initialization was superseded");
+                NPCCreateEvent event = new NPCCreateEvent(npc);
+                NeoForge.EVENT_BUS.post(event);
+                if (event.isCanceled() || npcs.get(id) != npc || uniqueNPCs.get(uuid) != npc)
+                    throw new net.citizensnpcs.api.exception.NPCCreationException("NPC creation was canceled or superseded");
+                if (type == EntityType.ARMOR_STAND) npc.getOrAddTrait(ArmorStandTrait.class);
+                if (Setting.DEFAULT_LOOK_CLOSE.asBoolean()) npc.getOrAddTrait(LookClose.class);
+                if (npcs.get(id) != npc || uniqueNPCs.get(uuid) != npc)
+                    throw new net.citizensnpcs.api.exception.NPCCreationException("NPC initialization was superseded");
+            });
+            return npc;
+        } catch (RuntimeException | Error failure) {
+            try { npc.destroy(); } catch (RuntimeException | Error cleanup) {
+                if (cleanup != failure) failure.addSuppressed(cleanup);
+            }
+            throw failure;
+        }
     }
 
     @Override
     public NPC createNPCUsingItem(EntityType<?> type, String name, ItemStack item) {
-        NPC npc = createNPC(type, name);
         if (!isItemCarrier(type))
             throw new UnsupportedOperationException("Not an item entity type");
-        npc.data().set(NPC.Metadata.ITEM_AMOUNT, item.getCount());
+        Objects.requireNonNull(item, "item cannot be null");
+        if (item.isEmpty()) throw new IllegalArgumentException("Item cannot be empty");
+        if (isBlockItemCarrier(type) && !(item.getItem() instanceof net.minecraft.world.item.BlockItem))
+            throw new IllegalArgumentException("This entity requires a block item");
+        ItemStack provided = item.copy();
+        NPC npc = createNPC(type, name);
+        npc.data().set(NPC.Metadata.ITEM_AMOUNT, provided.getCount());
         npc.data().set(NPC.Metadata.ITEM_ID,
-                net.citizensnpcs.api.util.RegistryUtil.keyOf(item.getItem()));
-        npc.setItemProvider(() -> item.copy());
+                net.citizensnpcs.api.util.RegistryUtil.keyOf(provided.getItem()));
+        npc.setItemProvider(() -> provided.copy());
         return npc;
     }
 
     /**
      * @return whether the type renders a held ItemStack, so {@code createNPCUsingItem} makes sense for it
      */
-    private static boolean isItemCarrier(EntityType<?> type) {
+    public static boolean isItemCarrier(EntityType<?> type) {
         return type == EntityType.ITEM || type == EntityType.ITEM_FRAME || type == EntityType.GLOW_ITEM_FRAME
-                || type == EntityType.ITEM_DISPLAY || type == EntityType.BLOCK_DISPLAY
-                || type == EntityType.FALLING_BLOCK || type == EntityType.OMINOUS_ITEM_SPAWNER
+                || type == EntityType.ITEM_DISPLAY || type == EntityType.OMINOUS_ITEM_SPAWNER || isBlockItemCarrier(type);
+    }
+
+    public static boolean isBlockItemCarrier(EntityType<?> type) {
+        return type == EntityType.BLOCK_DISPLAY || type == EntityType.FALLING_BLOCK
                 || EntityType.getKey(type).getPath().contains("minecart");
     }
 
     @Override
     public void deregister(NPC npc) {
+        NPCLifetimes.cancel(npc);
         npc.despawn(DespawnReason.REMOVAL);
-        npcs.remove(npc.getId());
-        uniqueNPCs.remove(npc.getUniqueId());
-        if (saves != null) {
+        boolean ownsId = npcs.get(npc.getId()) == npc;
+        if (ownsId) npcs.remove(npc.getId());
+        if (uniqueNPCs.get(npc.getUniqueId()) == npc) uniqueNPCs.remove(npc.getUniqueId());
+        if (saves != null && ownsId) {
             saves.clearData(npc);
         }
     }
@@ -193,6 +220,7 @@ public class CitizensNPCRegistry implements NPCRegistry {
         return new Iterator<NPC>() {
             Iterator<NPC> itr = npcs.values().iterator();
             UUID lastUUID;
+            NPC lastNPC;
 
             @Override
             public boolean hasNext() {
@@ -202,6 +230,7 @@ public class CitizensNPCRegistry implements NPCRegistry {
             @Override
             public NPC next() {
                 NPC npc = itr.next();
+                lastNPC = npc;
                 if (npc != null && npc.getUniqueId() != null) {
                     lastUUID = npc.getUniqueId();
                 }
@@ -210,11 +239,13 @@ public class CitizensNPCRegistry implements NPCRegistry {
 
             @Override
             public void remove() {
+                if (lastNPC != null) NPCLifetimes.cancel(lastNPC);
                 itr.remove();
                 if (lastUUID != null) {
-                    uniqueNPCs.remove(lastUUID);
+                    if (uniqueNPCs.get(lastUUID) == lastNPC) uniqueNPCs.remove(lastUUID);
                     lastUUID = null;
                 }
+                lastNPC = null;
             }
         };
     }
