@@ -4,9 +4,11 @@
 
 Initial audit timestamp: 2026-09-13 01:47:09 +08:00 (UTC+08:00).
 
-Current summary updated: 2026-10-02 13:08:08 +08:00 (UTC+08:00).
+Current summary updated: 2026-10-02 13:34:27 +08:00 (UTC+08:00).
 
 The resumed goal explicitly continues comparison of remaining behavior in the retained Citizens, Interactions and Sentinel code. CmdCam owns camera playback and Yuuniverse Economy owns economic APIs; unrelated replacement suites and unverified client/modpack/proxy acceptance remain distinct.
+
+Latest armor-stand lifecycle follow-up: [native destruction and complete drops](armorstand-death-2026-10-02.md) releases the dead controller, preserves survival/creative/fire/explosion/direct-kill distinctions, combines native equipment and stand items into one mutable drop event, respects native block capture/gamerules, and removes virtual stands immediately. Callback replacements and respawn timers retain their owner. The final death suite passes 1,639 checks on both NeoForge 21.1.233 and 21.1.248; related pose/interaction/viewer/removal suites pass 584 checks. This supersedes the armor-stand lifecycle limitation below. Dragon death, five command groups, applicable data/integration work and client/modpack/proxy acceptance remain open. Evidence: `artifacts/armorstand-death-validation-summary.json`.
 
 Latest Citizens lifecycle follow-up: [native death and respawn](npc-death-respawn-2026-10-02.md) repairs ordinary mob/player death cancellation, mutable drops, controller retirement, virtual death visuals, Citizens/Sentinel timers and callback ownership during spawn/despawn. Final dedicated runs each pass 839 checks on NeoForge 21.1.233 and 21.1.248. Eight related suites pass 1,688 checks; after the special-drop notification follow-up, the dedicated suites and general runtime suite pass again. Armor-stand native drops retain their existing NPC event and cancellation behavior. Special armor-stand/dragon destruction still needs lifecycle implementation/comparison; five command groups, applicable data/services and client/modpack/proxy acceptance remain open. Interactions remains an unchanged, separate mod/JAR. Consolidated build/archive evidence is in `artifacts/death-validation-summary.json` and the root walkthrough.
 

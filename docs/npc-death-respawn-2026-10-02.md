@@ -2,6 +2,8 @@
 
 Accepted native death previously left the controller holding a dead entity. A later spawn therefore refused to create a replacement. Citizens' `RESPAWN_DELAY` had no reader, and Sentinel's respawn counter was in a trait branch that normal NPC ticks never reached.
 
+Follow-up: [armor-stand destruction](armorstand-death-2026-10-02.md) now addresses the armor-stand lifecycle limitation recorded below, including complete native drops. The dragon's distinct sequence remains open.
+
 ## Lifecycle and drops
 
 The native `LivingEntity.die` and `ServerPlayer.die` boundaries now distinguish accepted death from NeoForge cancellation. The entity remains under native death processing while Citizens offers the mutable `NPCDeathEvent` drop list once. `DROPS_ITEMS` defaults to suppressing native drops; trait and listener additions remain available, and native drop cancellation still decides whether items enter the level. Deaths that skip loot still notify the lifecycle without creating loot.

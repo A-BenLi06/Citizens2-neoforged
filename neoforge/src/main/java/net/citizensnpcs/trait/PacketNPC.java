@@ -128,7 +128,7 @@ public class PacketNPC extends Trait {
     @Override
     public void onDespawn(DespawnReason reason) {
         Entity entity = npc.getEntity();
-        if (reason != DespawnReason.DEATH || !net.citizensnpcs.npc.NPCDeaths.isAccepted(entity) || !spawned) {
+        if (reason != DespawnReason.DEATH || !net.citizensnpcs.npc.NPCDeaths.hasDeathAnimation(entity) || !spawned) {
             onDespawn();
             return;
         }

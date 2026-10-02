@@ -1,9 +1,11 @@
 package net.citizensnpcs.npc;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.IdentityHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.function.BooleanSupplier;
 
 import net.citizensnpcs.api.CitizensAPI;
 import net.citizensnpcs.api.event.DespawnReason;
@@ -15,6 +17,7 @@ import net.citizensnpcs.api.trait.trait.Spawned;
 import net.citizensnpcs.api.util.Location;
 import net.citizensnpcs.api.util.schedulers.SchedulerTask;
 import net.citizensnpcs.npc.entity.EntityHumanNPC;
+import net.citizensnpcs.mixin.BlockDropCaptureAccessor;
 import net.citizensnpcs.trait.HomeTrait;
 import net.citizensnpcs.trait.SentinelTrait;
 import net.citizensnpcs.util.NPCVisibility;
@@ -25,6 +28,7 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.item.ItemStack;
 import net.neoforged.neoforge.common.NeoForge;
+import net.neoforged.neoforge.common.CommonHooks;
 import net.neoforged.neoforge.event.entity.living.LivingDropsEvent;
 
 /** Accepted native deaths own their drops, detached visuals and pending respawns. */
@@ -34,6 +38,87 @@ public final class NPCDeaths {
     private static final Map<Entity, Death> visuals = new IdentityHashMap<>();
 
     private NPCDeaths() { }
+
+    /** A native break may be nonlethal; only its actual break/kill boundary accepts death. */
+    public static boolean duringInstantDeath(LivingEntity entity, DamageSource source, BooleanSupplier nativeDamage) {
+        NPC owner = NPCRegistries.lookup(entity);
+        if (!(owner instanceof CitizensNPC npc) || !npc.ownsEntity(npc.controller(), entity)) return nativeDamage.getAsBoolean();
+        if (active.containsKey(entity)) return false;
+        Death death = new Death(npc, entity, source);
+        death.instant = true;
+        active.put(entity, death);
+        try {
+            return nativeDamage.getAsBoolean();
+        } finally {
+            try {
+                if (death.accepted) {
+                    try {
+                        flushInstantDrops(death);
+                    } finally {
+                        finish(death);
+                    }
+                }
+            } finally {
+                active.remove(entity, death);
+            }
+        }
+    }
+
+    /** Nested native kill calls complete the current break; direct calls open their own lifecycle. */
+    public static void instantKill(LivingEntity entity, Runnable nativeKill) {
+        Death death = active.get(entity);
+        if (death == null) {
+            duringInstantDeath(entity, entity.damageSources().genericKill(), () -> {
+                accepted(entity);
+                nativeKill.run();
+                return true;
+            });
+        } else {
+            accepted(entity);
+            flushInstantDrops(death);
+            nativeKill.run();
+        }
+    }
+
+    public static boolean collectInstantDrops(LivingEntity entity, Collection<ItemEntity> drops, boolean recentlyHit) {
+        Death death = active.get(entity);
+        if (death == null || !death.instant || !death.accepted || !death.ownsEntity()) return false;
+        death.collectedDrops = true;
+        death.recentlyHit = recentlyHit;
+        death.nativeDrops.addAll(drops);
+        return true;
+    }
+
+    /** Preserve native item construction, gamerules, pickup delay, and any surrounding block-drop capture. */
+    public static void captureBlockDrop(LivingEntity entity, Runnable nativeDrop) {
+        Death death = active.get(entity);
+        if (death == null || !death.instant || !death.accepted || !death.ownsEntity()) {
+            nativeDrop.run();
+            return;
+        }
+        List<ItemEntity> previous = BlockDropCaptureAccessor.citizens$getCapturedDrops();
+        List<ItemEntity> captured = new ArrayList<>();
+        BlockDropCaptureAccessor.citizens$setCapturedDrops(captured);
+        try {
+            nativeDrop.run();
+        } finally {
+            if (BlockDropCaptureAccessor.citizens$getCapturedDrops() == captured)
+                BlockDropCaptureAccessor.citizens$setCapturedDrops(previous);
+            death.nativeDrops.addAll(captured);
+            for (ItemEntity item : captured) death.blockDestinations.put(item, previous);
+        }
+    }
+
+    private static void flushInstantDrops(Death death) {
+        if (!death.collectedDrops || death.flushedDrops || !death.ownsEntity()) return;
+        death.flushedDrops = true;
+        if (CommonHooks.onLivingDrops(death.entity, death.source, death.nativeDrops, death.recentlyHit)) return;
+        for (ItemEntity item : death.nativeDrops) {
+            List<ItemEntity> destination = death.blockDestinations.get(item);
+            if (destination != null) destination.add(item);
+            else death.entity.level().addFreshEntity(item);
+        }
+    }
 
     public static void duringDeath(LivingEntity entity, DamageSource source, Runnable nativeDeath) {
         NPC owner = NPCRegistries.lookup(entity);
@@ -68,6 +153,11 @@ public final class NPCDeaths {
     public static boolean isAccepted(Entity entity) {
         Death death = active.get(entity);
         return death != null && death.accepted;
+    }
+
+    public static boolean hasDeathAnimation(Entity entity) {
+        Death death = active.get(entity);
+        return death != null && death.accepted && !death.instant;
     }
 
     public static void drops(LivingDropsEvent event) {
@@ -141,7 +231,8 @@ public final class NPCDeaths {
         }
         npc.despawn(DespawnReason.DEATH);
         if (!death.isPending()) return;
-        schedule(death, 20, death::finishVisual);
+        if (death.instant) death.finishVisual();
+        else schedule(death, 20, death::finishVisual);
         SentinelTrait sentinel = death.sentinel;
         if (sentinel != null && npc.getTraitNullable(SentinelTrait.class) == sentinel) {
             int delay = sentinel.getRespawnTime();
@@ -167,6 +258,7 @@ public final class NPCDeaths {
             Location at = home == null ? null : home.getHomeLocation();
             npc.spawn(at == null ? death.location.clone() : at.clone(), SpawnReason.TIMED_RESPAWN);
         });
+        if (death.remaining == 0) pending.remove(npc, death);
     }
 
     public static void retainVisual(Entity entity, Runnable cleanup) {
@@ -220,7 +312,10 @@ public final class NPCDeaths {
         final EntityController controller;
         final DamageSource source;
         final List<SchedulerTask> tasks = new ArrayList<>();
+        final List<ItemEntity> nativeDrops = new ArrayList<>();
+        final Map<ItemEntity, List<ItemEntity>> blockDestinations = new IdentityHashMap<>();
         boolean accepted, notified;
+        boolean instant, collectedDrops, flushedDrops, recentlyHit;
         Location location;
         SentinelTrait sentinel;
         List<ServerPlayer> viewers = List.of();

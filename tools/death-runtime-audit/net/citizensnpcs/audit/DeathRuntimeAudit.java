@@ -34,6 +34,7 @@ import net.citizensnpcs.api.util.Location;
 import net.citizensnpcs.api.util.MemoryDataKey;
 import net.citizensnpcs.api.util.TeleportCause;
 import net.citizensnpcs.npc.NPCRegistries;
+import net.citizensnpcs.mixin.BlockDropCaptureAccessor;
 import net.citizensnpcs.trait.DropsTrait;
 import net.citizensnpcs.trait.HomeTrait;
 import net.citizensnpcs.trait.LookClose;
@@ -90,6 +91,7 @@ public final class DeathRuntimeAudit {
     private static final Map<NPC, List<SpawnReason>> spawns = new IdentityHashMap<>();
     private static final Map<NPC, List<ItemStack>> npcDrops = new IdentityHashMap<>();
     private static final Map<Entity, List<ItemEntity>> nativeDrops = new IdentityHashMap<>();
+    private static final Map<Entity, Integer> nativeDropEvents = new IdentityHashMap<>();
     private static final Map<Integer, List<Runnable>> checks = new HashMap<>();
     private static Consumer<LivingDeathEvent> livingDeath;
     private static Consumer<LivingDropsEvent> livingDrops;
@@ -111,6 +113,7 @@ public final class DeathRuntimeAudit {
     @SubscribeEvent(priority = EventPriority.LOWEST, receiveCanceled = true)
     public static void livingDrops(LivingDropsEvent event) {
         if (livingDrops != null) livingDrops.accept(event);
+        nativeDropEvents.merge(event.getEntity(), 1, Integer::sum);
         nativeDrops.put(event.getEntity(), List.copyOf(event.getDrops()));
         nativeEntities.addAll(event.getDrops());
     }
@@ -161,6 +164,7 @@ public final class DeathRuntimeAudit {
                 acceptedAndCanceled();
                 drops();
                 specialDrops();
+                armorStandLifecycle();
                 spawnCallbacks();
                 timers();
                 callbacks();
@@ -286,6 +290,7 @@ public final class DeathRuntimeAudit {
                 entity.hurt(entity.damageSources().explosion(null, null), 100);
                 livingDrops = null;
                 check(entity.isRemoved(), "native_armor_stand_break_" + label);
+                released(npc, entity, "armor_stand_break_" + label);
                 check(deaths.getOrDefault(npc, 0) != 0 && npcDrops.containsKey(npc), "special_native_drops_notify_npc_" + label);
                 check(deaths.get(npc) == 1 && count(nativeDrops.get(entity), Items.EMERALD) == 2,
                         "special_native_drops_preserve_trait_additions_" + label);
@@ -293,6 +298,155 @@ public final class DeathRuntimeAudit {
                     check((level.getEntity(item.getUUID()) == item) == !cancelDrops,
                             "special_native_drops_respect_cancellation_" + label);
                     item.discard();
+                }
+            }
+        }
+    }
+
+    private static void armorStandLifecycle() {
+        for (boolean packet : new boolean[] { false, true }) {
+            for (String route : List.of("explosion", "survival", "fire")) {
+                for (boolean enabled : new boolean[] { false, true }) {
+                    for (int mode = 0; mode < 4; mode++) {
+                        boolean canceled = mode == 1, replaced = mode == 2, capturing = mode == 3;
+                        String label = packet + "_" + route + "_" + enabled + "_" + mode;
+                        NPC npc = npc(named, "StandLifecycle" + sequence, EntityType.ARMOR_STAND, packet);
+                        npc.data().set(NPC.Metadata.RESPAWN_DELAY, 5);
+                        npc.data().set(NPC.Metadata.DROPS_ITEMS, enabled);
+                        npc.getOrAddTrait(DropsTrait.class).addDrop(new ItemStack(Items.EMERALD, 2), 1);
+                        LivingEntity stand = (LivingEntity) npc.getEntity();
+                        stand.setItemSlot(EquipmentSlot.MAINHAND, new ItemStack(Items.DIAMOND, 3));
+                        stand.setItemSlot(EquipmentSlot.CHEST, new ItemStack(Items.IRON_CHESTPLATE));
+                        EntityPacketTracker tracker = packet ? npc.getTraitNullable(PacketNPC.class).getPacketTracker() : null;
+                        if (packet) {
+                            npc.getTraitNullable(PacketNPC.class).run();
+                            check(tracker.isLinked(viewer.player), "stand_viewer_paired_" + label);
+                        }
+                        DamageSource damage = switch (route) {
+                            case "survival" -> stand.damageSources().playerAttack(viewer.player);
+                            case "fire" -> stand.damageSources().onFire();
+                            default -> stand.damageSources().explosion(null, null);
+                        };
+                        List<ItemEntity> admitted = new ArrayList<>();
+                        join = e -> { if (e.getEntity() instanceof ItemEntity item) admitted.add(item); };
+                        livingDrops = e -> { if (e.getEntity() == stand && canceled) e.setCanceled(true); };
+                        death = e -> {
+                            if (e.getNPC() != npc) return;
+                            check(e.getSource() == damage, "stand_original_damage_source_" + label);
+                            check(!stand.hurt(damage, 100), "stand_recursive_hurt_is_ignored_" + label);
+                            if (replaced) { e.getDrops().clear(); e.getDrops().add(new ItemStack(Items.GOLD_INGOT, 5)); }
+                        };
+                        List<ItemEntity> parent = capturing ? new ArrayList<>() : null;
+                        check(BlockDropCaptureAccessor.citizens$getCapturedDrops() == null, "stand_initial_capture_clear_" + label);
+                        BlockDropCaptureAccessor.citizens$setCapturedDrops(parent);
+                        try {
+                            if (route.equals("survival")) {
+                                check(stand.hurt(damage, 100), "stand_first_hit_native_result_" + label);
+                                check(npc.getEntity() == stand && stand.isAlive() && deaths.getOrDefault(npc, 0) == 0
+                                        && admitted.isEmpty(), "stand_first_survival_hit_is_nonlethal_" + label);
+                            }
+                            if (route.equals("fire")) stand.setHealth(1);
+                            boolean result = stand.hurt(damage, 100);
+                            check(result == route.equals("survival"), "stand_native_break_return_value_" + label);
+                            check(BlockDropCaptureAccessor.citizens$getCapturedDrops() == parent, "stand_restores_parent_capture_" + label);
+                        } finally {
+                            BlockDropCaptureAccessor.citizens$setCapturedDrops(null);
+                            join = null; livingDrops = null; death = null;
+                        }
+                        released(npc, stand, "full_stand_" + label);
+                        check(stand.isRemoved() && deaths.getOrDefault(npc, 0) == 1 && nativeDropEvents.getOrDefault(stand, 0) == 1,
+                                "stand_one_death_and_complete_native_drop_event_" + label);
+                        List<ItemEntity> drops = nativeDrops.get(stand);
+                        check(count(drops, Items.DIAMOND) == (enabled && !replaced ? 3 : 0)
+                                        && count(drops, Items.IRON_CHESTPLATE) == (enabled && !replaced ? 1 : 0)
+                                        && count(drops, Items.ARMOR_STAND) == (enabled && !replaced && route.equals("survival") ? 1 : 0)
+                                        && count(drops, Items.EMERALD) == (replaced ? 0 : 2)
+                                        && count(drops, Items.GOLD_INGOT) == (replaced ? 5 : 0),
+                                "stand_complete_mutable_loot_" + label);
+                        check(admitted.size() + (parent == null ? 0 : parent.size()) == (canceled ? 0 : drops.size()),
+                                "stand_no_bypass_or_duplicate_item_admission_" + label);
+                        if (capturing) check(count(parent, Items.DIAMOND) == (enabled ? 3 : 0)
+                                        && count(parent, Items.IRON_CHESTPLATE) == (enabled ? 1 : 0)
+                                        && count(parent, Items.EMERALD) == 0,
+                                "stand_native_block_items_keep_parent_destination_" + label);
+                        if (packet) check(tracker.getLinked().isEmpty() && viewer.removals(stand) == 1 && viewer.deaths(stand) == 0,
+                                "stand_virtual_break_removes_without_mob_death_animation_" + label);
+                        for (ItemEntity item : drops) item.discard();
+                        expectRespawn(npc, 25, SpawnReason.TIMED_RESPAWN, "stand_timer_" + label);
+                    }
+                }
+            }
+            for (String route : List.of("creative", "bypass", "kill")) {
+                String label = packet + "_" + route;
+                NPC npc = npc(named, "StandNoLoot" + sequence, EntityType.ARMOR_STAND, packet);
+                npc.data().set(NPC.Metadata.RESPAWN_DELAY, 0);
+                npc.data().set(NPC.Metadata.DROPS_ITEMS, true);
+                npc.getOrAddTrait(DropsTrait.class).addDrop(new ItemStack(Items.EMERALD, 2), 1);
+                LivingEntity stand = (LivingEntity) npc.getEntity();
+                stand.setItemSlot(EquipmentSlot.CHEST, new ItemStack(Items.IRON_CHESTPLATE));
+                List<ItemEntity> admitted = new ArrayList<>();
+                join = e -> { if (e.getEntity() instanceof ItemEntity item) admitted.add(item); };
+                try {
+                    if (route.equals("creative")) {
+                        viewer.player.getAbilities().instabuild = true;
+                        check(stand.hurt(stand.damageSources().playerAttack(viewer.player), 100), "stand_creative_native_result_" + label);
+                    } else if (route.equals("bypass")) {
+                        check(!stand.hurt(stand.damageSources().genericKill(), 100), "stand_bypass_native_result_" + label);
+                    } else stand.kill();
+                } finally { viewer.player.getAbilities().instabuild = false; join = null; }
+                released(npc, stand, "stand_no_loot_" + label);
+                check(stand.isRemoved() && admitted.isEmpty() && !nativeDrops.containsKey(stand)
+                                && deaths.getOrDefault(npc, 0) == 1, "stand_native_no_loot_semantics_" + label);
+                stand.kill();
+                check(deaths.get(npc) == 1, "stand_duplicate_kill_does_not_notify_again_" + label);
+                expectRespawn(npc, 20, SpawnReason.TIMED_RESPAWN, "stand_no_loot_timer_" + label);
+            }
+        }
+        net.minecraft.world.entity.decoration.ArmorStand vanilla = EntityType.ARMOR_STAND.create(level);
+        vanilla.setPos(5, -60, 5); nativeEntities.add(vanilla); check(level.addFreshEntity(vanilla), "stand_vanilla_control_admitted");
+        vanilla.setItemSlot(EquipmentSlot.MAINHAND, new ItemStack(Items.DIAMOND, 3));
+        List<ItemEntity> parent = new ArrayList<>();
+        BlockDropCaptureAccessor.citizens$setCapturedDrops(parent);
+        try { vanilla.hurt(vanilla.damageSources().explosion(null, null), 100); }
+        finally { BlockDropCaptureAccessor.citizens$setCapturedDrops(null); }
+        nativeEntities.addAll(parent);
+        check(vanilla.isRemoved() && count(parent, Items.DIAMOND) == 3 && nativeDropEvents.getOrDefault(vanilla, 0) == 1,
+                "stand_vanilla_control_preserves_native_capture_and_removal");
+        for (boolean packet : new boolean[] { false, true }) {
+            NPC noBlockDrops = npc(named, "StandBlockRule" + packet, EntityType.ARMOR_STAND, packet);
+            noBlockDrops.data().set(NPC.Metadata.DROPS_ITEMS, true);
+            noBlockDrops.getOrAddTrait(DropsTrait.class).addDrop(new ItemStack(Items.EMERALD, 2), 1);
+            LivingEntity stand = (LivingEntity) noBlockDrops.getEntity();
+            stand.setItemSlot(EquipmentSlot.MAINHAND, new ItemStack(Items.DIAMOND, 3));
+            level.getGameRules().getRule(GameRules.RULE_DOBLOCKDROPS).set(false, level.getServer());
+            try { stand.hurt(stand.damageSources().explosion(null, null), 100); }
+            finally { level.getGameRules().getRule(GameRules.RULE_DOBLOCKDROPS).set(true, level.getServer()); }
+            check(count(nativeDrops.get(stand), Items.DIAMOND) == 0 && count(nativeDrops.get(stand), Items.EMERALD) == 2,
+                    "stand_block_drop_gamerule_keeps_native_meaning_" + packet);
+            for (ItemEntity item : nativeDrops.get(stand)) item.discard();
+            for (boolean duringDespawn : new boolean[] { false, true }) {
+                for (boolean destroy : new boolean[] { false, true }) {
+                    String label = packet + "_" + duringDespawn + "_" + destroy;
+                    NPC npc = npc(named, "StandCallback" + label, EntityType.ARMOR_STAND, packet);
+                    npc.data().set(NPC.Metadata.RESPAWN_DELAY, 0);
+                    LivingEntity old = (LivingEntity) npc.getEntity();
+                    Runnable change = () -> {
+                        death = null; despawn = null;
+                        if (destroy) npc.destroy();
+                        else {
+                            npc.despawn(DespawnReason.PLUGIN);
+                            npc.spawn(new Location(level, 13, -60, 13));
+                        }
+                    };
+                    if (duringDespawn) despawn = e -> { if (e.getNPC() == npc) change.run(); };
+                    else death = e -> { if (e.getNPC() == npc) change.run(); };
+                    old.hurt(old.damageSources().explosion(null, null), 100);
+                    death = null; despawn = null;
+                    Entity result = npc.getEntity();
+                    check(old.isRemoved() && (destroy ? !exists(npc) && result == null : npc.isSpawned() && result != old),
+                            "stand_callback_result_survives_native_kill_" + label);
+                    at(80, () -> check(npc.getEntity() == result && (destroy || npc.isSpawned()),
+                            "stand_callback_cannot_be_replaced_by_old_timer_" + label));
                 }
             }
         }
