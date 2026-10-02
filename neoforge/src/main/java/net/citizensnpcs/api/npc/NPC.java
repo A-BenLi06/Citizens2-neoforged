@@ -499,6 +499,15 @@ public interface NPC extends Agent, Cloneable {
     public void teleport(Location location, TeleportCause cause);
 
     /**
+     * Teleports with an optional notification of confirmed completion, including passenger remounting.
+     * Canceled, failed or superseded requests do not notify. Legacy implementations retain their existing
+     * teleport behavior and can override this overload when they can report completion.
+     */
+    default void teleport(Location location, TeleportCause cause, Consumer<Entity> callback) {
+        teleport(location, cause);
+    }
+
+    /**
      * Whether the NPC is currently set to use Minecraft AI. Defaults to false.
      */
     default boolean useMinecraftAI() {

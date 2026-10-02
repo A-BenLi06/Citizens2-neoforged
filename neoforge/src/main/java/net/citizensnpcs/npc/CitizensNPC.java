@@ -510,7 +510,7 @@ public class CitizensNPC extends AbstractNPC {
             long completedRequest = teleportRevision;
             operation.finish();
             if (deferred != null && ownsTransfer(deferred.request, controller, entity)) {
-                teleportAuthorized(deferred.location, deferred.request, controller, entity);
+                teleportAuthorized(deferred.location, deferred.request, controller, entity, deferred.callback);
             }
             Entity spawned = getEntity();
             if (callback != null && operation.revision == spawnRevision && spawned != null && !spawned.isRemoved()
@@ -523,6 +523,11 @@ public class CitizensNPC extends AbstractNPC {
 
     @Override
     public void teleport(Location location, net.citizensnpcs.api.util.TeleportCause cause) {
+        teleport(location, cause, null);
+    }
+
+    @Override
+    public void teleport(Location location, net.citizensnpcs.api.util.TeleportCause cause, Consumer<Entity> callback) {
         if (!isSpawned() || location.getWorld() == null)
             return;
         long request = ++teleportRevision;
@@ -539,24 +544,28 @@ public class CitizensNPC extends AbstractNPC {
         // Trait and native admission callbacks can request a move before this entity is fully initialized.
         // Retain the approved destination until spawn completion so its remaining steps cannot overwrite it.
         if (spawning != null && spawning.ownsCandidate()) {
-            spawning.pendingTeleport = new DeferredTeleport(request, location);
+            spawning.pendingTeleport = new DeferredTeleport(request, location, callback);
             return;
         }
         // Join listeners see a candidate before the native level has admitted it. Finish that admission before
         // executing a newer teleport, otherwise a return trip collides with the still-live source UUID.
         if (admittingTeleport) {
-            deferredTeleport = new DeferredTeleport(request, location);
+            deferredTeleport = new DeferredTeleport(request, location, callback);
             return;
         }
-        teleportAuthorized(location, request, controller, entity);
+        teleportAuthorized(location, request, controller, entity, callback);
     }
 
-    private void teleportAuthorized(Location location, long request, EntityController controller, Entity entity) {
+    private void teleportAuthorized(Location location, long request, EntityController controller, Entity entity, Consumer<Entity> callback) {
+        Consumer<Entity> completed = moved -> {
+            if (callback != null && moved != null && !moved.isRemoved() && ownsTransfer(request, controller, moved))
+                callback.accept(moved);
+        };
         if (entity.isPassenger() || entity.isVehicle()) {
-            MountedTeleport.start(this, location, request);
+            MountedTeleport.start(this, location, request, completed);
             return;
         }
-        teleportEntity(location, request, controller, entity);
+        completed.accept(teleportEntity(location, request, controller, entity));
     }
 
     private Entity teleportEntity(Location location, long request, EntityController controller, Entity entity) {
@@ -578,7 +587,7 @@ public class CitizensNPC extends AbstractNPC {
             DeferredTeleport deferred = deferredTeleport;
             deferredTeleport = null;
             if (deferred != null && deferred.request == teleportRevision && isSpawned())
-                teleportAuthorized(deferred.location, deferred.request, entityController, getEntity());
+                teleportAuthorized(deferred.location, deferred.request, entityController, getEntity(), deferred.callback);
         }
     }
 
@@ -706,7 +715,7 @@ public class CitizensNPC extends AbstractNPC {
     private boolean admittingTeleport;
     private DeferredTeleport deferredTeleport;
 
-    private record DeferredTeleport(long request, Location location) { }
+    private record DeferredTeleport(long request, Location location, Consumer<Entity> callback) { }
 
     private boolean ownsTransfer(long request, EntityController controller, Entity entity) {
         return request == teleportRevision && ownsEntity(controller, entity);

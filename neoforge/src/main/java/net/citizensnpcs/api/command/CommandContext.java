@@ -253,7 +253,10 @@ public class CommandContext {
         if (location != null)
             return location;
         if (hasValueFlag("entitylocation")) {
-            Entity entity = EntityUtil.getEntity(UUID.fromString(getFlag("entitylocation")));
+            UUID id;
+            try { id = UUID.fromString(getFlag("entitylocation")); }
+            catch (IllegalArgumentException invalid) { throw new CommandException(CommandMessages.INVALID_LOCATION); }
+            Entity entity = EntityUtil.getEntity(id);
             if (entity == null)
                 throw new CommandException(CommandMessages.INVALID_LOCATION);
             return location = Location.of(entity);

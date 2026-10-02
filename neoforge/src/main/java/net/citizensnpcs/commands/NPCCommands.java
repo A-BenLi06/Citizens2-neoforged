@@ -129,6 +129,7 @@ import net.citizensnpcs.api.command.Requirements;
 import net.citizensnpcs.api.command.exception.CommandException;
 import net.citizensnpcs.api.command.exception.CommandUsageException;
 import net.citizensnpcs.api.command.exception.NoPermissionsException;
+import net.neoforged.neoforge.common.NeoForge;
 import net.citizensnpcs.api.event.DespawnReason;
 import java.time.Duration;
 
@@ -2202,6 +2203,7 @@ public class NPCCommands {
         NPCCommandSelector.Callback callback = target -> {
             if (target == null)
                 throw new CommandException(Messages.NO_NPC_WITH_ID_FOUND, args.getString(1));
+            requireOwnedTarget(sender, target, "citizens.npc.despawn");
             // cleared first, so the NPC stays away across a restart rather than coming back
             target.getOrAddTrait(Spawned.class).setSpawned(false);
             target.despawn(DespawnReason.PLUGIN);
@@ -3288,25 +3290,47 @@ public class NPCCommands {
 
     @Command(
             aliases = { "npc" },
-            usage = "spawn (id)",
+            usage = "spawn (id|uuid|name) -l(oad chunks)",
             desc = "",
             modifiers = { "spawn" },
             min = 1,
             max = 2,
+            flags = "l",
+            valueFlags = { "location", "entitylocation", "range" },
+            strictArguments = true,
             permission = "citizens.npc.spawn")
     @Requirements
     public void spawn(CommandContext args, CommandSourceStack sender, NPC npc) throws CommandException {
-        NPC target = args.argsLength() > 1 ? CitizensAPI.getNPCRegistry().getById(args.getInteger(1)) : npc;
-        if (target == null)
-            throw new CommandException(CommandMessages.MUST_HAVE_SELECTED);
-        if (target.isSpawned())
-            throw new CommandException(Messages.NPC_ALREADY_SPAWNED, target.getName());
-        Location at = target.getStoredLocation() != null ? target.getStoredLocation() : args.getSenderLocation();
-        if (at == null)
-            throw new CommandException(CommandMessages.MUST_BE_INGAME);
-        target.getOrAddTrait(Spawned.class).setSpawned(true);
-        target.spawn(at, SpawnReason.COMMAND);
-        Messaging.sendTr(sender, Messages.NPC_SPAWNED, target.getName());
+        Location source = commandLocation(args.getSenderLocation());
+        if (args.hasValueFlag("range")) {
+            try {
+                if (!Double.isFinite(args.getFlagDouble("range"))) throw new NumberFormatException();
+            } catch (NumberFormatException invalid) {
+                throw new CommandException(CommandMessages.INVALID_VALUE, "--range", args.getFlag("range"));
+            }
+        }
+        NPCCommandSelector.Callback spawn = target -> {
+            if (target == null) throw new CommandException(args.argsLength() > 1 ? Messages.NO_NPC_WITH_ID_FOUND
+                    : CommandMessages.MUST_HAVE_SELECTED, args.getString(1, ""));
+            requireOwnedTarget(sender, target, "citizens.npc.spawn");
+            if (target.isSpawned() || target.getEntity() != null)
+                throw new CommandException(Messages.NPC_ALREADY_SPAWNED, target.getName());
+            Location stored = target.getStoredLocation();
+            Location at = commandLocation(stored == null || args.hasValueFlag("location") || args.hasValueFlag("entitylocation")
+                    ? source : stored);
+            if (args.hasFlag('l')) at.getChunk();
+            NPC previousSelection = CitizensAPI.getDefaultNPCSelector().getSelected(sender);
+            target.spawn(at, SpawnReason.COMMAND, entity -> {
+                if (!isCurrentTarget(target) || !currentCommandSource(sender)) return;
+                if (CitizensAPI.getDefaultNPCSelector().getSelected(sender) == previousSelection
+                        && target.getOrAddTrait(Owner.class).isOwnedBy(sender))
+                    CitizensAPI.getDefaultNPCSelector().select(sender, target);
+                Messaging.sendTr(sender, Messages.NPC_SPAWNED, target.getName());
+            });
+        };
+        if (args.argsLength() > 1)
+            NPCCommandSelector.startWithCallback(spawn, CitizensAPI.getNPCRegistry(), sender, args, args.getString(1));
+        else spawn.run(npc);
     }
 
     @Command(
@@ -3394,40 +3418,117 @@ public class NPCCommands {
 
     @Command(
             aliases = { "npc" },
-            usage = "tp",
+            usage = "tp -e(xact)",
             desc = "",
             modifiers = { "tp", "teleport" },
             min = 1,
             max = 1,
+            flags = "e",
+            strictArguments = true,
             permission = "citizens.npc.tp")
     public void tp(CommandContext args, ServerPlayer player, NPC npc) throws CommandException {
         CommandSourceStack sender = player.createCommandSourceStack();
+        if (!currentCommandSource(sender)) throw new NoPermissionsException();
         Location at = npc.getStoredLocation();
         if (at == null || at.getWorld() == null)
-            throw new CommandException(Messages.NPC_NOT_FOUND);
-        EntityUtil.teleport(player, at);
-        Messaging.sendTr(sender, Messages.NPC_TELEPORTED, npc.getName());
+            throw new CommandException(Messages.TELEPORT_NPC_LOCATION_NOT_FOUND);
+        at = commandLocation(at);
+        if (!args.hasFlag('e')) at = inFrontOf(at);
+        NPC executor = net.citizensnpcs.npc.NPCRegistries.lookup(player);
+        if (executor != null)
+            executor.teleport(at, TeleportCause.COMMAND, entity -> Messaging.sendTr(sender, Messages.TELEPORTED_TO_NPC, npc.getName()));
+        else if (EntityUtil.teleport(player, at) != null)
+            Messaging.sendTr(sender, Messages.TELEPORTED_TO_NPC, npc.getName());
     }
 
     @Command(
             aliases = { "npc" },
-            usage = "tphere (-c(urrent location))",
+            usage = "tphere (cursor) -c(enter) -f(ront)",
             desc = "",
-            flags = "c",
+            flags = "cf",
             modifiers = { "tphere", "tph", "move" },
             min = 1,
-            max = 1,
+            max = 2,
+            valueFlags = { "location", "entitylocation" },
+            strictArguments = true,
             permission = "citizens.npc.tphere")
     public void tphere(CommandContext args, CommandSourceStack sender, NPC npc) throws CommandException {
-        Location at = args.getSenderLocation();
-        if (at == null)
-            throw new CommandException(CommandMessages.MUST_BE_INGAME);
-        if (!npc.isSpawned()) {
-            npc.spawn(at, SpawnReason.COMMAND);
-        } else {
-            npc.teleport(at, TeleportCause.COMMAND);
+        requireOwnedTarget(sender, npc, "citizens.npc.tphere");
+        Location at = commandLocation(args.getSenderLocation());
+        if (args.argsLength() > 1) {
+            if (!args.getString(1).equalsIgnoreCase("cursor"))
+                throw new CommandException(CommandMessages.INVALID_VALUE, "target", args.getString(1));
+            ServerPlayer player = sender.getPlayer();
+            if (player == null) throw new CommandException(CommandMessages.MUST_BE_INGAME);
+            Vec3 eye = player.getEyePosition();
+            var hit = player.level().clip(new net.minecraft.world.level.ClipContext(eye,
+                    eye.add(player.getViewVector(1).scale(64)), net.minecraft.world.level.ClipContext.Block.OUTLINE,
+                    net.minecraft.world.level.ClipContext.Fluid.ANY, player));
+            if (hit.getType() != net.minecraft.world.phys.HitResult.Type.BLOCK)
+                throw new CommandException(Messages.MISSING_TP_CURSOR_BLOCK);
+            at = Location.fromBlockPos(player.serverLevel(), hit.getBlockPos().above());
         }
-        Messaging.sendTr(sender, Messages.NPC_TELEPORTED, npc.getName());
+        requireMoveWorld(sender, npc, at);
+        if (args.hasFlag('c')) at = Location.fromBlockPos(at.getWorld(), at.getBlockPos()).add(0.5, 0, 0.5);
+        if (args.hasFlag('f')) at = inFrontOf(at);
+        java.util.function.Consumer<Entity> completed = entity -> {
+            if (isCurrentTarget(npc) && currentCommandSource(sender))
+                Messaging.sendTr(sender, Messages.NPC_TELEPORTED, npc.getName(), Util.prettyPrintLocation(Location.of(entity)));
+        };
+        if (!npc.isSpawned()) {
+            if (npc.getEntity() != null) return;
+            var event = new net.citizensnpcs.api.event.NPCTeleportEvent(npc, at);
+            NeoForge.EVENT_BUS.post(event);
+            if (event.isCanceled() || !isCurrentTarget(npc) || npc.getEntity() != null) return;
+            requireOwnedTarget(sender, npc, "citizens.npc.tphere");
+            at = commandLocation(event.getTo());
+            requireMoveWorld(sender, npc, at);
+            npc.spawn(at, SpawnReason.COMMAND, completed);
+        } else {
+            npc.teleport(at, TeleportCause.COMMAND, completed);
+        }
+    }
+
+    private static boolean isCurrentTarget(NPC npc) {
+        return npc != null && npc.getOwningRegistry() != null && npc.getOwningRegistry().getByUniqueId(npc.getUniqueId()) == npc;
+    }
+
+    private static boolean currentCommandSource(CommandSourceStack sender) {
+        Entity entity = sender.getEntity();
+        if (entity != null && entity.isRemoved()) return false;
+        NPC executor = net.citizensnpcs.npc.NPCRegistries.lookup(entity);
+        if (executor != null) return isCurrentTarget(executor) && executor.getEntity() == entity && executor.isSpawned();
+        ServerPlayer player = sender.getPlayer();
+        if (player instanceof net.neoforged.neoforge.common.util.FakePlayer) return player.getServer() == sender.getServer();
+        return player == null || !player.hasDisconnected() && sender.getServer().getPlayerList().getPlayer(player.getUUID()) == player;
+    }
+
+    private static void requireOwnedTarget(CommandSourceStack sender, NPC npc, String permission) throws CommandException {
+        if (!isCurrentTarget(npc)) throw new CommandException(Messages.NPC_NOT_FOUND);
+        if (!currentCommandSource(sender) || !PermissionUtil.hasPermission(sender, permission)
+                && !PermissionUtil.hasPermission(sender, "citizens.admin")) throw new NoPermissionsException();
+        if (!npc.getOrAddTrait(Owner.class).isOwnedBy(sender)) throw new CommandException(CommandMessages.MUST_BE_OWNER);
+    }
+
+    private static void requireMoveWorld(CommandSourceStack sender, NPC npc, Location destination) throws CommandException {
+        Location current = npc.getStoredLocation();
+        if (current != null && current.getWorld() != null && current.getWorld() != destination.getWorld()
+                && !PermissionUtil.hasPermission(sender, "citizens.npc.tphere.multiworld"))
+            throw new CommandException(Messages.CANNOT_TELEPORT_ACROSS_WORLDS);
+    }
+
+    private static Location commandLocation(Location location) throws CommandException {
+        if (location == null || location.getWorld() == null || !Double.isFinite(location.getX()) || !Double.isFinite(location.getY())
+                || !Double.isFinite(location.getZ()) || !Float.isFinite(location.getYaw()) || !Float.isFinite(location.getPitch()))
+            throw new CommandException(CommandMessages.INVALID_LOCATION);
+        return location.clone();
+    }
+
+    private static Location inFrontOf(Location location) {
+        Vec3 direction = location.getDirection();
+        Location target = location.clone().add(direction.x, 0, direction.z).setDirection(direction.scale(-1));
+        target.setPitch(0);
+        return target;
     }
 
     @Command(

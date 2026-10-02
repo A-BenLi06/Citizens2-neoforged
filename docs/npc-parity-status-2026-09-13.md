@@ -4,9 +4,11 @@
 
 Initial audit timestamp: 2026-09-13 01:47:09 +08:00 (UTC+08:00).
 
-Current summary updated: 2026-10-02 14:30:59 +08:00 (UTC+08:00).
+Current summary updated: 2026-10-02 15:56:17 +08:00 (UTC+08:00).
 
 The resumed goal explicitly continues comparison of remaining behavior in the retained Citizens, Interactions and Sentinel code. CmdCam owns camera playback and Yuuniverse Economy owns economic APIs; unrelated replacement suites and unverified client/modpack/proxy acceptance remain distinct.
+
+Latest command follow-up: [spawn and native relocation](spawn-relocation-2026-10-02.md) restores name/UUID/ID selection, original exact/front/cursor/center options, cross-world permission checks and unspawned teleport cancellation. Resolved-target ownership and global ID overrides are enforced before mutation; prompt replies reject replaced identities. Confirmed completion callbacks survive deferred transfers and wait for passenger remounts without reporting rollback/cancellation as success. Native NPC/fake-player command sources retain authority, and player-NPC teleport preserves transport. Final native fixtures pass 302 checks on both NeoForge versions, followed by general regression, 232 ordinary tests and clean build. Interactions remains separate and unchanged. Evidence: `artifacts/relocation-validation-summary.json`. Four ordinary command groups and the remaining data/integration/client acceptance requirements stay open.
 
 Latest dragon lifecycle follow-up: [native phases and completion](dragon-death-2026-10-02.md) preserves the dying flight and full 200-tick sequence, covers direct/phase-driven entry and cancellation, advances dying virtual dragons without ticking ordinary live virtual NPCs, and starts Citizens/Sentinel delays after native completion. Virtual health/movement/sound remain tied to existing viewers. Manual operations and callbacks retire obsolete visual work. The fixture passes 10,068 checks on both NeoForge 21.1.233 and 21.1.248, including native experience events and a vanilla control. Regression passes the ordinary/armor-stand death suite, viewers, tracking admission, interactions and general probes; 232 ordinary tests and clean build pass. Evidence: `artifacts/dragon-death-validation-summary.json`. This supersedes the dragon implementation gaps below. Five command groups, applicable data/integration work and physical-client/modpack/proxy acceptance remain open.
 

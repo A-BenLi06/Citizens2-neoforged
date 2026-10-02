@@ -5,6 +5,7 @@ import java.util.Collections;
 import java.util.IdentityHashMap;
 import java.util.List;
 import java.util.Set;
+import java.util.function.Consumer;
 
 import net.citizensnpcs.api.CitizensAPI;
 import net.citizensnpcs.api.npc.NPC;
@@ -21,11 +22,15 @@ final class MountedTeleport {
     private final Location destination;
     private boolean done;
     private boolean rollback;
+    private final CitizensNPC selected;
+    private final Consumer<Entity> callback;
 
-    private MountedTeleport(Location destination) { this.destination = destination.clone(); }
+    private MountedTeleport(Location destination, CitizensNPC selected, Consumer<Entity> callback) {
+        this.destination = destination.clone(); this.selected = selected; this.callback = callback;
+    }
 
-    static void start(CitizensNPC selected, Location destination, long request) {
-        MountedTeleport transfer = new MountedTeleport(destination);
+    static void start(CitizensNPC selected, Location destination, long request, Consumer<Entity> callback) {
+        MountedTeleport transfer = new MountedTeleport(destination, selected, callback);
         Entity root = selected.getEntity();
         Set<Entity> visited = Collections.newSetFromMap(new IdentityHashMap<>());
         while (root.getVehicle() != null) {
@@ -120,7 +125,7 @@ final class MountedTeleport {
                 }
             }
             if (pending) CitizensAPI.getScheduler().runTaskLater(this::advance, 1);
-            else finish();
+            else finish(!rollback);
         } catch (Throwable failure) {
             if (!rollback) {
                 rollback = true;
@@ -131,9 +136,16 @@ final class MountedTeleport {
     }
 
     private void finish() {
+        finish(false);
+    }
+
+    private void finish(boolean success) {
         if (done) return;
+        boolean notify = success && isCurrent() && topologyMatches();
         done = true;
         restoreOwnedEdges();
+        if (notify && callback != null && topologyMatches() && nodes.stream().allMatch(Node::ownsEntity))
+            callback.accept(selected.getEntity());
     }
 
     private void restoreOwnedEdges() {
@@ -175,9 +187,12 @@ final class MountedTeleport {
         }
 
         boolean isCurrent() {
+            return ownsEntity() && (pause == null || pause.isCurrent());
+        }
+
+        boolean ownsEntity() {
             return !entity.isRemoved() && (state == null ? NPCRegistries.lookup(entity) == null : state.isCurrent())
-                    && (npc == null || npc.getTraitNullable(MountTrait.class) == mount)
-                    && (pause == null || pause.isCurrent());
+                    && (npc == null || npc.getTraitNullable(MountTrait.class) == mount);
         }
 
         boolean arrivedAt(Location target) {

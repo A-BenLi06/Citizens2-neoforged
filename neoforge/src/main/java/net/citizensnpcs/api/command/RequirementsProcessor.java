@@ -33,14 +33,18 @@ public class RequirementsProcessor implements CommandAnnotationProcessor {
         NPC npc = methodArgs.length >= 3 && methodArgs[2] instanceof NPC ? (NPC) methodArgs[2] : null;
 
         // --id and --uuid let a command act on an NPC other than the selected one, for anybody allowed to select
-        boolean canRedefineSelected = (context.hasValueFlag("uuid") || context.hasValueFlag("id"))
-                && PermissionUtil.hasPermission(sender, "citizens.npc.select");
+        boolean canRedefineSelected = context.hasValueFlag("uuid") || context.hasValueFlag("id");
+        if (canRedefineSelected && !PermissionUtil.hasPermission(sender, "citizens.npc.select")
+                && !PermissionUtil.hasPermission(sender, "citizens.admin"))
+            throw new RequirementMissingException(Messaging.tr(CommandMessages.NO_PERMISSION));
         String error = Messaging.tr(CommandMessages.MUST_HAVE_SELECTED);
         if (canRedefineSelected) {
-            if (context.hasValueFlag("uuid")) {
-                npc = CitizensAPI.getNPCRegistry().getByUniqueIdGlobal(UUID.fromString(context.getFlag("uuid")));
-            } else {
-                npc = CitizensAPI.getNPCRegistry().getById(context.getFlagInteger("id"));
+            String flag = context.hasValueFlag("uuid") ? "uuid" : "id";
+            try {
+                npc = flag.equals("uuid") ? CitizensAPI.getNPCRegistry().getByUniqueIdGlobal(UUID.fromString(context.getFlag(flag)))
+                        : CitizensAPI.getNPCRegistry().getById(context.getFlagInteger(flag));
+            } catch (IllegalArgumentException invalid) {
+                throw new CommandException(CommandMessages.INVALID_VALUE, "--" + flag, context.getFlag(flag));
             }
             if (methodArgs.length >= 3) {
                 methodArgs[2] = npc;

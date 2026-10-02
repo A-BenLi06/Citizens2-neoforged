@@ -60,7 +60,7 @@ public class NPCCommandSelector implements ChatPrompt {
             return this;
         }
         NPC target = choice.getOwningRegistry().getByUniqueId(choice.getUniqueId());
-        if (target == null || target.getId() != choice.getId()) {
+        if (target != choice || target.getId() != choice.getId()) {
             Messaging.sendErrorTr(sender, Messages.NPC_NOT_FOUND);
             return this;
         }
