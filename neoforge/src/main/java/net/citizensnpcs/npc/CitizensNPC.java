@@ -93,6 +93,25 @@ public class CitizensNPC extends AbstractNPC {
         this.entityController = entityController;
     }
 
+    /** Registry replacement is final even when a listener vetoes despawning or throws during cleanup. */
+    void retire() {
+        retire(() -> {
+            Throwable[] failure = { null };
+            finishCleanup(() -> despawn(DespawnReason.RELOAD), failure);
+            if (getEntity() != null) {
+                EntityController controller = entityController;
+                Entity entity = getEntity();
+                finishCleanup(() -> new DespawnOperation(DespawnReason.RELOAD).complete(), failure);
+                if (entityController == controller && getEntity() == entity) {
+                    finishCleanup(() -> NPCRegistries.unlink(entity), failure);
+                    finishCleanup(controller::remove, failure);
+                }
+            }
+            if (failure[0] instanceof RuntimeException exception) throw exception;
+            if (failure[0] instanceof Error error) throw error;
+        });
+    }
+
     @Override
     public boolean despawn(DespawnReason reason) {
         if (reason != DespawnReason.DEATH) NPCDeaths.invalidate(this);

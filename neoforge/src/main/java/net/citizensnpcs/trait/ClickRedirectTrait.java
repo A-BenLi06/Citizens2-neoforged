@@ -2,7 +2,6 @@ package net.citizensnpcs.trait;
 
 import java.util.UUID;
 
-import net.citizensnpcs.api.CitizensAPI;
 import net.citizensnpcs.api.event.NPCAddTraitEvent;
 import net.citizensnpcs.api.npc.NPC;
 import net.citizensnpcs.api.trait.Trait;
@@ -24,6 +23,7 @@ import net.citizensnpcs.api.util.DataKey;
 @TraitName("clickredirecttrait")
 public class ClickRedirectTrait extends Trait {
     private NPC redirectTo;
+    private UUID savedRedirect;
 
     public ClickRedirectTrait() {
         super("clickredirecttrait");
@@ -35,6 +35,11 @@ public class ClickRedirectTrait extends Trait {
     }
 
     public NPC getRedirectToNPC() {
+        // A loaded reference can precede its target or belong to a provisional registry. Resolve against its owner
+        // when used, so it cannot retain the old default registry's NPC after replacement.
+        if (savedRedirect != null && npc != null && npc.getOwningRegistry() != null) {
+            replaceRedirect(npc.getOwningRegistry().getByUniqueIdGlobal(savedRedirect));
+        }
         return redirectTo;
     }
 
@@ -49,13 +54,27 @@ public class ClickRedirectTrait extends Trait {
     @Override
     public void load(DataKey key) {
         String uuid = key.getString("uuid", "");
-        redirectTo = uuid.isEmpty() ? null : CitizensAPI.getNPCRegistry().getByUniqueIdGlobal(UUID.fromString(uuid));
+        UUID loaded = uuid.isEmpty() ? null : UUID.fromString(uuid);
+        replaceRedirect(null);
+        savedRedirect = loaded;
     }
 
     @Override
     public void onRemove() {
-        if (redirectTo != null && redirectTo.hasTrait(PlayerFilter.class))
-            redirectTo.getTrait(PlayerFilter.class).removeChildNPC(npc);
+        replaceRedirect(null);
+        savedRedirect = null;
+    }
+
+    @Override public void onSpawn() { getRedirectToNPC(); }
+    @Override public void run() { if (savedRedirect != null) getRedirectToNPC(); }
+
+    private void replaceRedirect(NPC target) {
+        if (redirectTo == target) return;
+        if (npc != null && redirectTo != null && redirectTo.hasTrait(PlayerFilter.class))
+            redirectTo.getTraitNullable(PlayerFilter.class).removeChildNPC(npc);
+        redirectTo = target;
+        if (npc != null && redirectTo != null && redirectTo.hasTrait(PlayerFilter.class))
+            redirectTo.getTraitNullable(PlayerFilter.class).addChildNPC(npc);
     }
 
     /** The parent may gain a {@link PlayerFilter} after this trait was attached; pick it up when it does. */
@@ -69,8 +88,7 @@ public class ClickRedirectTrait extends Trait {
     @Override
     public void save(DataKey key) {
         key.removeKey("uuid");
-        if (redirectTo == null)
-            return;
-        key.setString("uuid", redirectTo.getUniqueId().toString());
+        UUID target = savedRedirect != null ? savedRedirect : redirectTo == null ? null : redirectTo.getUniqueId();
+        if (target != null) key.setString("uuid", target.toString());
     }
 }

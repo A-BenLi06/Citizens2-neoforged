@@ -98,25 +98,33 @@ public class EventListen {
     /** Remembers an NPC that could not spawn because its chunk is not loaded. */
     @SubscribeEvent
     public void onNPCNeedsRespawn(NPCNeedsRespawnEvent event) {
-        ChunkCoord coord = event.getChunkCoord();
-        if (coord == null || toRespawn.containsEntry(coord, event.getNPC()))
-            return;
-        toRespawn.put(coord, event.getNPC());
+        queueRespawn(event.getChunkCoord(), event.getNPC());
+    }
+
+    private void queueRespawn(ChunkCoord coord, NPC npc) {
+        if (coord == null || npc.getOwningRegistry() == null
+                || npc.getOwningRegistry().getByUniqueId(npc.getUniqueId()) != npc) return;
+        // NPC.equals compares UUIDs, which may be shared by a provisional or unrelated registry.
+        for (NPC pending : toRespawn.get(coord)) if (pending == npc) return;
+        toRespawn.put(coord, npc);
     }
 
     /** A deleted NPC must not be resurrected by a later chunk load. */
     @SubscribeEvent
     public void onNPCRemove(NPCRemoveEvent event) {
         net.citizensnpcs.npc.NPCDeaths.invalidate(event.getNPC());
-        for (ChunkCoord coord : new ArrayList<>(toRespawn.keySet())) {
-            toRespawn.remove(coord, event.getNPC());
-        }
+        toRespawn.entries().removeIf(entry -> entry.getValue() == event.getNPC());
     }
 
     /** Drops the whole queue, for {@code /citizens reload}, which reloads every NPC from disk anyway. */
     public void clearRespawnQueue() {
         net.citizensnpcs.npc.NPCDeaths.clear();
         toRespawn.clear();
+    }
+
+    /** A default-store switch must leave pending spawns owned by other registries alone. */
+    public void clearRespawnQueue(net.citizensnpcs.api.npc.NPCRegistry registry) {
+        toRespawn.entries().removeIf(entry -> entry.getValue().getOwningRegistry() == registry);
     }
 
     /**
@@ -138,7 +146,7 @@ public class EventListen {
 
     private void respawnAllAt(ChunkCoord coord) {
         for (NPC npc : new ArrayList<>(toRespawn.get(coord))) {
-            toRespawn.remove(coord, npc);
+            toRespawn.get(coord).removeIf(pending -> pending == npc);
             if (npc.getOwningRegistry() == null || npc.getOwningRegistry().getByUniqueId(npc.getUniqueId()) != npc
                     || npc.isSpawned()) {
                 continue;
@@ -149,7 +157,7 @@ public class EventListen {
             }
             if (!npc.spawn(at, SpawnReason.CHUNK_LOAD)) {
                 // queue it again rather than losing it - a spawn can fail for reasons that will not last
-                toRespawn.put(coord, npc);
+                queueRespawn(coord, npc);
             }
         }
     }
@@ -187,9 +195,7 @@ public class EventListen {
         for (NPC npc : leaving) {
             // despawn() pre-cancels itself when the NPC is meant to keep its chunk loaded, and returns false when
             // anything else vetoes it; in both cases the NPC stays up and must not be queued for a respawn
-            if (npc.despawn(DespawnReason.CHUNK_UNLOAD) && !toRespawn.containsEntry(coord, npc)) {
-                toRespawn.put(coord, npc);
-            }
+            if (npc.despawn(DespawnReason.CHUNK_UNLOAD)) queueRespawn(coord, npc);
         }
     }
 

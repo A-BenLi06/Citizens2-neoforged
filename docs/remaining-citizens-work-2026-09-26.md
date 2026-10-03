@@ -14,7 +14,9 @@ Recent follow-ups cover [`powered`, `name` and `home` options](command-options-h
 
 ## Behavior, data and integration acceptance
 
-- [NPC identity allocation and failed reloads](npc-data-restoration-2026-10-03.md) reserve IDs for unloaded definitions, isolate rejected records and preserve live NPCs when the source cannot be read. Native provider absence/presence/absence cycles pass on both NeoForge versions. Default-store replacement still leaves the registry attached to its previous store and requires a separate repair; custom store, configuration/shop reload and registry lifecycle contracts retain targeted acceptance work.
+- [Default-store replacement](npc-store-replacement-2026-10-03.md) now binds loading, allocation, deletion and saving to the replacement, honors startup overrides and retires old runtime ownership. Both NeoForge versions pass runtime/early/late phases, 480 checks total. Reported load/save failures preserve the previous binding; synchronous YAML write errors propagate, and saved redirects retain/recover their targets. Strict trait serialization, atomic writes, configuration/shop reload and ordinary/named-registry reload/shutdown lifecycles retain targeted work.
+
+- [NPC identity allocation and failed reloads](npc-data-restoration-2026-10-03.md) reserve IDs for unloaded definitions, isolate rejected records and preserve live NPCs when the source cannot be read. Native provider absence/presence/absence cycles pass on both NeoForge versions. Custom provider/trait and external backend contracts still need appropriate acceptance.
 
 - [Native HPA debugging](hpa-debugging-2026-10-03.md) passes 109 command/snapshot checks on each NeoForge version and 16 algorithm tests. Height bounds, hierarchical refinement, blocked corners, repeated queries, dirty rebuilds, request ownership and cancellation are covered. The diagnostic remains bounded to its captured regions and the original land-walking model; it does not add a selectable NPC navigator. Interactions remains an independent mod/JAR with unchanged entry contents.
 

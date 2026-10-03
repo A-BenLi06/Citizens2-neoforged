@@ -4,9 +4,11 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.io.File;
+import java.io.UncheckedIOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
@@ -52,6 +54,18 @@ public class YamlStorageRoundTripTest {
     public enum Mode {
         FIRST,
         SECOND
+    }
+
+    @Test
+    public void synchronousNpcStoreWriteReportsFilesystemFailure(@TempDir Path dir) throws Exception {
+        Path blocked = Files.createDirectory(dir.resolve("blocked.yml"));
+        YamlStorage storage = new YamlStorage(blocked.toFile());
+        storage.getKey("").setString("retained", "in-memory snapshot");
+        var before = storage.getKey("").getValuesDeep();
+        var store = new net.citizensnpcs.api.npc.SimpleNPCDataStore(storage);
+        assertThrows(UncheckedIOException.class, store::saveToDiskImmediate);
+        assertEquals(before, storage.getKey("").getValuesDeep());
+        assertTrue(Files.isDirectory(blocked), "a failed write must not replace the obstructing path");
     }
 
     @Test

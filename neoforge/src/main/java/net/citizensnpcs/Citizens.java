@@ -11,9 +11,7 @@ import net.citizensnpcs.npc.skin.Skin;
 import java.io.File;
 import java.nio.file.Path;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -102,6 +100,9 @@ public class Citizens implements CitizensPlugin {
     private CitizensNPCRegistry npcRegistry;
     private boolean saveOnDisable = true;
     private NPCDataStore saves;
+    private NPCDataStore configuredNPCDataStore;
+    private boolean npcDataOperation;
+    private boolean serverStarted;
     private NeoForgeScheduler scheduler;
     private MinecraftServer server;
     private final net.citizensnpcs.api.npc.NPCSelector selector = new net.citizensnpcs.api.npc.SimpleNPCSelector();
@@ -186,10 +187,12 @@ public class Citizens implements CitizensPlugin {
 
     @Override
     public Iterable<NPCRegistry> getNPCRegistries() {
-        return () -> Iterables
-                .concat(Arrays.asList(npcRegistry), storedRegistries.values(), anonymousRegistries,
-                        Arrays.asList(temporaryRegistry))
-                .iterator();
+        List<NPCRegistry> registries = new ArrayList<>();
+        if (npcRegistry != null) registries.add(npcRegistry);
+        registries.addAll(storedRegistries.values());
+        registries.addAll(anonymousRegistries);
+        if (temporaryRegistry != null) registries.add(temporaryRegistry);
+        return registries;
     }
 
     @Override
@@ -207,7 +210,7 @@ public class Citizens implements CitizensPlugin {
         return getClass().getClassLoader();
     }
 
-    /** @return the store the default registry saves to, or null before the server starts */
+    /** @return the default store, including an explicit startup override, or null before one is configured */
     public NPCDataStore getDefaultNPCDataStore() {
         return saves;
     }
@@ -287,8 +290,10 @@ public class Citizens implements CitizensPlugin {
         net.citizensnpcs.util.YuuniverseEconomy.install();
         if (saves == null)
             return;
+        serverStarted = true;
+        beginNPCDataOperation();
         try {
-            saves.loadInto(npcRegistry);
+            npcRegistry.loadFromStore();
             if (shops != null) {
                 // after the NPCs, because a per-NPC shop is keyed by its NPC's UUID
                 shops.load();
@@ -297,12 +302,15 @@ public class Citizens implements CitizensPlugin {
         } catch (Throwable t) {
             Messaging.severe("Failed to load NPCs:", t.getMessage());
             t.printStackTrace();
+        } finally {
+            npcDataOperation = false;
         }
     }
 
     @SubscribeEvent
     public void onServerStarting(ServerStartingEvent event) {
         server = event.getServer();
+        serverStarted = false;
         scheduler = new NeoForgeScheduler(server);
         Schedulers.set(scheduler);
 
@@ -335,7 +343,7 @@ public class Citizens implements CitizensPlugin {
         Editor.registerListeners();
         ChatPrompts.registerListeners();
 
-        saves = createStorage(dataFolder);
+        saves = configuredNPCDataStore != null ? configuredNPCDataStore : createStorage(dataFolder);
         if (saves == null) {
             Messaging.severe("Could not load saves.yml, disabling");
             return;
@@ -361,6 +369,7 @@ public class Citizens implements CitizensPlugin {
     @SubscribeEvent
     public void onServerStopped(ServerStoppedEvent event) {
         server = null;
+        serverStarted = false;
     }
 
     @SubscribeEvent
@@ -397,7 +406,7 @@ public class Citizens implements CitizensPlugin {
         ChatPrompts.abandonAll();
         if (npcRegistry != null) {
             if (saveOnDisable) {
-                storeNPCs();
+                storeNPCsInternal();
             }
             npcRegistry.despawnNPCs(DespawnReason.RELOAD);
         }
@@ -436,9 +445,11 @@ public class Citizens implements CitizensPlugin {
             if (registry == null) {
                 continue;
             }
-            for (Iterator<NPC> itr = registry.iterator(); itr.hasNext();) {
-                NPC npc = itr.next();
-                if (!(npc instanceof CitizensNPC) || !npc.isSpawned()) {
+            List<NPC> snapshot = new ArrayList<>();
+            registry.forEach(snapshot::add);
+            for (NPC npc : snapshot) {
+                if (!(npc instanceof CitizensNPC) || !npc.isSpawned()
+                        || registry.getById(npc.getId()) != npc || registry.getByUniqueId(npc.getUniqueId()) != npc) {
                     continue;
                 }
                 try {
@@ -460,7 +471,49 @@ public class Citizens implements CitizensPlugin {
 
     @Override
     public void setDefaultNPCDataStore(NPCDataStore store) {
-        saves = store;
+        if (store == null) throw new IllegalArgumentException("NPC data store must be non-null");
+        beginNPCDataOperation();
+        CitizensNPCRegistry candidate = null;
+        try {
+            if (saves == store) return;
+            if (server == null || npcRegistry == null) {
+                configuredNPCDataStore = saves = store;
+                return;
+            }
+            candidate = new CitizensNPCRegistry(store, this, "citizens-global-" + UUID.randomUUID());
+            // Providers populate the supplied registry. Until that succeeds, global lookups still see the old NPCs.
+            if (serverStarted) candidate.loadFromStore();
+            if (serverStarted || npcRegistry.iterator().hasNext()) {
+                Editor.leaveAll();
+                ChatPrompts.abandonAll();
+                storeNPCsInternal();
+            }
+            CitizensNPCRegistry previous = npcRegistry;
+            configuredNPCDataStore = saves = store;
+            npcRegistry = candidate;
+            if (eventListen != null) eventListen.clearRespawnQueue(previous);
+            previous.retire();
+        } catch (RuntimeException | Error failure) {
+            if (candidate != null && npcRegistry != candidate) {
+                try {
+                    if (eventListen != null) eventListen.clearRespawnQueue(candidate);
+                    candidate.retire();
+                } catch (RuntimeException | Error cleanup) {
+                    if (cleanup != failure) failure.addSuppressed(cleanup);
+                }
+            }
+            throw failure;
+        } finally { npcDataOperation = false; }
+    }
+
+    private void beginNPCDataOperation() {
+        if (server != null && !server.isSameThread())
+            throw new IllegalStateException("NPC data-store operations must run on the server thread");
+        if (serverStarted && !enabled)
+            throw new IllegalStateException("NPC data-store operations are unavailable during shutdown");
+        if (npcDataOperation || npcRegistry != null && npcRegistry.isDataStoreBusy())
+            throw new IllegalStateException("NPC data-store operation is already in progress");
+        npcDataOperation = true;
     }
 
     /** @return the mod version, for {@code /citizens} */
@@ -477,6 +530,13 @@ public class Citizens implements CitizensPlugin {
      * to be replaced by a freshly loaded one.
      */
     public void reload() throws NPCLoadException {
+        beginNPCDataOperation();
+        try {
+            reloadInternal();
+        } finally { npcDataOperation = false; }
+    }
+
+    private void reloadInternal() throws NPCLoadException {
         // A failed source read must leave current entities, editors and pending respawns in place.
         if (saves != null) {
             try { saves.reloadFromSource(); }
@@ -495,7 +555,7 @@ public class Citizens implements CitizensPlugin {
         Skin.clearCache();
         if (saves != null) {
             if (npcRegistry != null) {
-                try { saves.loadInto(npcRegistry); }
+                try { npcRegistry.loadFromStore(); }
                 catch (RuntimeException failure) { throw new NPCLoadException("Could not restore NPCs", failure); }
             }
         }
@@ -508,14 +568,19 @@ public class Citizens implements CitizensPlugin {
     }
 
     public void storeNPCs() {
+        beginNPCDataOperation();
+        try { storeNPCsInternal(); }
+        finally { npcDataOperation = false; }
+    }
+
+    private void storeNPCsInternal() {
         if (saves == null || npcRegistry == null)
             return;
-        saves.storeAll(npcRegistry);
+        npcRegistry.saveToStore();
         if (shops != null) {
             shops.storeShops();
             shops.saveToDiskImmediate();
         }
-        saves.saveToDiskImmediate();
     }
 
     /**

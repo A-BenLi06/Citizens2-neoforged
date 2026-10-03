@@ -95,7 +95,13 @@ public interface CitizensPlugin {
     public void removeNamedNPCRegistry(String name);
 
     /**
-     * Sets the default NPC data store. Should be set during startup.
+     * Sets the default NPC data store. Should be set during startup, on the server thread once it exists.
+     * A startup override loads once levels are ready. A later switch loads a provisional registry, saves the old
+     * registry, then publishes the replacement and retires the old runtime NPCs without deleting their records.
+     * Loading or saving failure leaves the previous binding active. Cleanup failures after publication propagate with
+     * the replacement active. Store callbacks must use their supplied registry and must not reenter save/reload/switch.
+     * Passing the current store is a no-op; null is not supported. Named, anonymous and temporary registries retain
+     * their own stores and lifetimes.
      *
      * @param store
      *            The new default store

@@ -149,10 +149,19 @@ public abstract class AbstractNPC implements NPC {
 
     @Override
     public void destroy() {
+        dispose(() -> NeoForge.EVENT_BUS.post(new NPCRemoveEvent(this)), () -> registry.deregister(this));
+    }
+
+    /** Releases a replaced registry's runtime instance without announcing deletion or clearing its stored record. */
+    protected final void retire(Runnable releaseEntity) {
+        dispose(releaseEntity, null);
+    }
+
+    private void dispose(Runnable beforeTraits, Runnable afterTraits) {
         if (destroyed) return;
         destroyed = true;
         Throwable[] failure = { null };
-        finishCleanup(() -> NeoForge.EVENT_BUS.post(new NPCRemoveEvent(this)), failure);
+        finishCleanup(beforeTraits, failure);
         runnables.clear();
         List<Trait> cleanupTraits = new ArrayList<>();
         traits.forEach(cleanupTraits::add);
@@ -163,12 +172,12 @@ public abstract class AbstractNPC implements NPC {
         });
         traits.clear();
         finishCleanup(goalController::clear, failure);
-        finishCleanup(() -> registry.deregister(this), failure);
+        if (afterTraits != null) finishCleanup(afterTraits, failure);
         if (failure[0] instanceof RuntimeException exception) throw exception;
         if (failure[0] instanceof Error error) throw error;
     }
 
-    private static void finishCleanup(Runnable action, Throwable[] failure) {
+    protected static void finishCleanup(Runnable action, Throwable[] failure) {
         try { action.run(); }
         catch (RuntimeException | Error error) {
             if (failure[0] == null) failure[0] = error;

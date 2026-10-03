@@ -23,6 +23,10 @@ public interface NPCDataStore {
 
     /**
      * Loads NPCs from disk into the given {@link NPCRegistry}. The registry should be cleared before this is called.
+     * During default-store replacement this registry is provisional: global lookups still refer to the previous
+     * registry. Populate the supplied registry synchronously; throw on an unrecoverable load failure. Native NPC
+     * loading schedules respawns for a later tick, after successful publication. Callers may retire all candidates
+     * after a failure without clearing their source records. External callback/backend side effects are not rolled back.
      *
      * @param registry
      *            The NPCRegistry to load NPCs into
@@ -42,6 +46,8 @@ public interface NPCDataStore {
 
     /**
      * Notifies the data store to save all stored data to disk <em>immediately</em>. Must not be asynchronous.
+     * Implementations must throw when persistence fails so a caller can reject a store replacement before retiring
+     * the current NPCs. Backend writes already performed before failure cannot be rolled back by the caller.
      */
     void saveToDiskImmediate();
 

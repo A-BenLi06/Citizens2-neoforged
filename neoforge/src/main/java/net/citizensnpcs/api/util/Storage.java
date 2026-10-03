@@ -19,6 +19,7 @@ public interface Storage {
 
     /**
      * Saves the in-memory aspects of the storage to disk.
+     * A synchronous persistence failure must be reported through a runtime exception.
      */
     public void save();
 

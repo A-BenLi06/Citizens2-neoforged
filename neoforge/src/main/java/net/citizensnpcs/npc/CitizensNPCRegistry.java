@@ -39,6 +39,10 @@ public class CitizensNPCRegistry implements NPCRegistry {
     private final CitizensPlugin plugin;
     private final NPCDataStore saves;
     private final Map<UUID, NPC> uniqueNPCs = Maps.newConcurrentMap();
+    private DataOperation dataOperation;
+    private boolean retired;
+
+    private enum DataOperation { LOAD, SAVE }
 
     public CitizensNPCRegistry(NPCDataStore store, CitizensPlugin plugin) {
         this(store, plugin, "");
@@ -64,6 +68,7 @@ public class CitizensNPCRegistry implements NPCRegistry {
 
     @Override
     public NPC createNPC(EntityType<?> type, UUID uuid, int id, String name) {
+        requireOpen();
         Objects.requireNonNull(name, "name cannot be null");
         Objects.requireNonNull(type, "type cannot be null");
         CitizensNPC npc = new CitizensNPC(uuid, id, name, EntityControllers.createForType(type), this, plugin);
@@ -132,7 +137,7 @@ public class CitizensNPCRegistry implements NPCRegistry {
         boolean ownsId = npcs.get(npc.getId()) == npc;
         if (ownsId) npcs.remove(npc.getId());
         if (uniqueNPCs.get(npc.getUniqueId()) == npc) uniqueNPCs.remove(npc.getUniqueId());
-        if (saves != null && ownsId) {
+        if (saves != null && ownsId && dataOperation != DataOperation.LOAD) {
             saves.clearData(npc);
         }
     }
@@ -148,7 +153,7 @@ public class CitizensNPCRegistry implements NPCRegistry {
                 t.onRemove(RemoveReason.REMOVAL);
             }
             itr.remove();
-            if (saves != null) {
+            if (saves != null && dataOperation != DataOperation.LOAD) {
                 saves.clearData(npc);
             }
         }
@@ -169,7 +174,54 @@ public class CitizensNPCRegistry implements NPCRegistry {
     }
 
     private int generateIntegerId() {
+        requireOpen();
         return saves.createUniqueNPCId(this);
+    }
+
+    /** Whether a store callback is currently loading or saving this registry. */
+    public boolean isDataStoreBusy() { return dataOperation != null; }
+
+    /** Load-time cancellation retires a runtime candidate; it must not erase the store's recovery record. */
+    public void loadFromStore() {
+        beginDataOperation(DataOperation.LOAD);
+        try { saves.loadInto(this); }
+        finally { dataOperation = null; }
+    }
+
+    /**
+     * Permanently releases a registry replaced by another default store. Clear both indexes before callbacks so stale
+     * tasks cannot recover ownership, and preserve data even if a callback explicitly destroys another old NPC.
+     */
+    public void retire() {
+        if (retired) return;
+        if (isDataStoreBusy()) throw new IllegalStateException("Cannot retire a registry during a data-store operation");
+        retired = true;
+        var retiring = java.util.Collections.newSetFromMap(new java.util.IdentityHashMap<NPC, Boolean>());
+        retiring.addAll(npcs.values());
+        retiring.addAll(uniqueNPCs.values());
+        npcs.clear();
+        uniqueNPCs.clear();
+        Throwable failure = null;
+        for (NPC npc : retiring) {
+            NPCLifetimes.cancel(npc);
+            try { ((CitizensNPC) npc).retire(); }
+            catch (RuntimeException | Error cleanup) {
+                if (failure == null) failure = cleanup;
+                else if (failure != cleanup) failure.addSuppressed(cleanup);
+            }
+        }
+        if (failure instanceof RuntimeException exception) throw exception;
+        if (failure instanceof Error error) throw error;
+    }
+
+    private void requireOpen() {
+        if (retired) throw new IllegalStateException("NPC registry has been retired");
+    }
+
+    private void beginDataOperation(DataOperation operation) {
+        requireOpen();
+        if (isDataStoreBusy()) throw new IllegalStateException("NPC data-store operation is already in progress");
+        dataOperation = operation;
     }
 
     @Override
@@ -265,8 +317,11 @@ public class CitizensNPCRegistry implements NPCRegistry {
 
     @Override
     public void saveToStore() {
-        saves.storeAll(this);
-        saves.saveToDiskImmediate();
+        beginDataOperation(DataOperation.SAVE);
+        try {
+            saves.storeAll(this);
+            saves.saveToDiskImmediate();
+        } finally { dataOperation = null; }
     }
 
     @Override
