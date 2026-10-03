@@ -4,9 +4,11 @@
 
 Initial audit timestamp: 2026-09-13 01:47:09 +08:00 (UTC+08:00).
 
-Current summary updated: 2026-10-03 12:29:37 +08:00 (UTC+08:00).
+Current summary updated: 2026-10-03 13:11:33 +08:00 (UTC+08:00).
 
 The resumed goal explicitly continues comparison of remaining behavior in the retained Citizens, Interactions and Sentinel code. CmdCam owns camera playback and Yuuniverse Economy owns economic APIs; unrelated replacement suites and unverified client/modpack/proxy acceptance remain distinct.
+
+Latest persistence follow-up: [NPC identity allocation and failed reloads](npc-data-restoration-2026-10-03.md) protects unloaded definitions against ID reuse, isolates rejected records and keeps current NPCs alive after an unreadable source. Both NeoForge versions pass the provider absence/presence/absence sequence, with 387 native checks in total. Creation/removal and general regressions, 261 ordinary tests, 100 Interactions tests, clean build and archive checks also pass. Interactions remains separate with unchanged entry contents. Default-store replacement and other data/provider/client acceptance items remain on the current checklist. Evidence: `artifacts/datastore-validation-summary.json`.
 
 Latest HPA follow-up: [native hierarchical graph debugging](hpa-debugging-2026-10-03.md) restores `waypoints hpa` / `wp hpa` with dimension-aware clusters, safe recursive refinement and loaded-chunk snapshots. Queued work validates exact request/NPC/registry/player ownership and handles cancellation and failing providers. Both NeoForge versions pass 109 dedicated checks; 16 algorithm tests, all 249 ordinary tests and 100 Interactions tests pass. Related and general regressions, clean build, source checkpoints and separate-JAR ownership also pass. Evidence: `artifacts/hpa-validation-summary.json`. Known command groups on the current checklist now have implementation follow-ups; applicable provider/data/service and physical-client/modpack/proxy acceptance remain open.
 

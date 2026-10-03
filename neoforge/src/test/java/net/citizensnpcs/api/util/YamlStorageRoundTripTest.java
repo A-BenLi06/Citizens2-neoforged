@@ -55,6 +55,34 @@ public class YamlStorageRoundTripTest {
     }
 
     @Test
+    public void rejectedYamlPreservesTheExistingSnapshot(@TempDir Path dir) throws Exception {
+        Path file = dir.resolve("reload.yml");
+        YamlStorage storage = new YamlStorage(file.toFile());
+        storage.getKey("").setMap("npc", Map.of("0", Map.of("name", "retained")));
+        var before = storage.getKey("").getValuesDeep();
+        for (String invalid : List.of("[broken", "scalar root", "- list root\n", "npc: one\nnpc: two\n",
+                "npc:\n  1: one\n  '1': two\n", "npc: &cycle\n  self: *cycle\n")) {
+            Files.writeString(file, invalid);
+            assertFalse(storage.load(), invalid);
+            assertEquals(before, storage.getKey("").getValuesDeep(), invalid);
+            assertEquals(invalid, Files.readString(file), "a rejected read must not rewrite the file");
+        }
+    }
+
+    @Test
+    public void sharedAliasesAndAnExplicitEmptyDocumentRemainValid(@TempDir Path dir) throws Exception {
+        Path file = dir.resolve("aliases.yml");
+        Files.writeString(file, "first: &shared\n  value: kept\nsecond: *shared\n");
+        YamlStorage storage = new YamlStorage(file.toFile());
+        assertTrue(storage.load());
+        storage.getKey("first").setString("value", "changed");
+        assertEquals("kept", storage.getKey("second").getString("value"));
+        Files.writeString(file, "# intentionally empty\n");
+        assertTrue(storage.load());
+        assertTrue(storage.getKey("").getValuesDeep().isEmpty());
+    }
+
+    @Test
     public void deepKeysAndRemoval(@TempDir Path dir) {
         YamlStorage storage = new YamlStorage(new File(dir.toFile(), "nested.yml"));
         DataKey root = storage.getKey("");

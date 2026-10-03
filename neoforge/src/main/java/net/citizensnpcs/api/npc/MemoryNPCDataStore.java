@@ -1,7 +1,7 @@
 package net.citizensnpcs.api.npc;
 
 public class MemoryNPCDataStore implements NPCDataStore {
-    private int lastID;
+    private int lastID = -1;
 
     @Override
     public void clearData(NPC npc) {
@@ -13,7 +13,7 @@ public class MemoryNPCDataStore implements NPCDataStore {
 
     @Override
     public int createUniqueNPCId(NPCRegistry registry) {
-        return lastID++;
+        return lastID = NPCIdAllocator.next(registry, lastID, java.util.Set.of());
     }
 
     @Override

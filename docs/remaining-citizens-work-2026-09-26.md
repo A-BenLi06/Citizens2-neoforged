@@ -14,6 +14,8 @@ Recent follow-ups cover [`powered`, `name` and `home` options](command-options-h
 
 ## Behavior, data and integration acceptance
 
+- [NPC identity allocation and failed reloads](npc-data-restoration-2026-10-03.md) reserve IDs for unloaded definitions, isolate rejected records and preserve live NPCs when the source cannot be read. Native provider absence/presence/absence cycles pass on both NeoForge versions. Default-store replacement still leaves the registry attached to its previous store and requires a separate repair; custom store, configuration/shop reload and registry lifecycle contracts retain targeted acceptance work.
+
 - [Native HPA debugging](hpa-debugging-2026-10-03.md) passes 109 command/snapshot checks on each NeoForge version and 16 algorithm tests. Height bounds, hierarchical refinement, blocked corners, repeated queries, dirty rebuilds, request ownership and cancellation are covered. The diagnostic remains bounded to its captured regions and the original land-walking model; it does not add a selectable NPC navigator. Interactions remains an independent mod/JAR with unchanged entry contents.
 
 - [Waypoint lifecycle and delayed actions](waypoint-lifecycle-2026-10-03.md) repair unknown-provider route loss, old behavior cleanup, unavailable/disabled data retention, nested snapshot isolation, delayed-trigger and pause ownership, and request-specific navigation callbacks. Native provider/editor/custom-integration combinations still require appropriate acceptance.

@@ -8,5 +8,9 @@ public class NPCLoadException extends Exception {
         super(msg);
     }
 
+    public NPCLoadException(String msg, Throwable cause) {
+        super(msg, cause);
+    }
+
     private static final long serialVersionUID = -4604062224372942561L;
 }

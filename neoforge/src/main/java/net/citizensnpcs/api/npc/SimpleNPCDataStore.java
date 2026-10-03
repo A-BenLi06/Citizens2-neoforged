@@ -1,7 +1,12 @@
 package net.citizensnpcs.api.npc;
 
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.Set;
+import java.util.TreeMap;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -16,6 +21,8 @@ import net.minecraft.world.entity.EntityType;
 
 public class SimpleNPCDataStore implements NPCDataStore {
     private final Storage root;
+    private final Set<Integer> restoringIds = new HashSet<>();
+    private boolean restoring;
 
     public SimpleNPCDataStore(Storage saves) {
         root = saves;
@@ -23,7 +30,9 @@ public class SimpleNPCDataStore implements NPCDataStore {
 
     @Override
     public void clearData(NPC npc) {
-        root.getKey("npc").removeKey(Integer.toString(npc.getId()));
+        // Failed creation/load cleanup must retire the runtime object without deleting its recovery source.
+        if (restoringIds.contains(npc.getId())) return;
+        for (DataKey key : records().getOrDefault(npc.getId(), List.of())) key.removeKey("");
     }
 
     @Override
@@ -44,46 +53,76 @@ public class SimpleNPCDataStore implements NPCDataStore {
     @Override
     public int createUniqueNPCId(NPCRegistry registry) {
         DataKey key = root.getKey("");
-        int newId = key.getInt("last-created-npc-id", -1);
-        if (newId == -1 || registry.getById(newId + 1) != null) {
-            int maxId = Integer.MIN_VALUE;
-            for (NPC npc : registry) {
-                if (npc.getId() > maxId) {
-                    maxId = npc.getId();
-                }
-            }
-            newId = maxId == Integer.MIN_VALUE ? 0 : maxId + 1;
-        } else {
-            newId++;
-        }
+        Integer previous = NPCIdAllocator.parse(key.getRaw("last-created-npc-id"));
+        int newId = NPCIdAllocator.next(registry, previous == null ? -1 : previous, records().keySet());
         key.setInt("last-created-npc-id", newId);
         return newId;
     }
 
     @Override
     public void loadInto(NPCRegistry registry) {
-        for (DataKey key : root.getKey("npc").getIntegerSubKeys()) {
-            int id = Integer.parseInt(key.name());
-            if (!key.keyExists("name")) {
-                Messaging.logTr(LOAD_NAME_NOT_FOUND, id);
-                continue;
+        if (restoring) throw new IllegalStateException("NPC restoration is already in progress");
+        restoring = true;
+        try {
+            for (var entry : records().entrySet()) {
+                int id = entry.getKey();
+                if (entry.getValue().size() != 1) {
+                    Messaging.severeTr(LOAD_FAILED, id, "Multiple stored keys identify this NPC ID");
+                    continue;
+                }
+                // Loaders may set defaults or normalize values. Publish only through a later explicit save.
+                DataKey key = entry.getValue().getFirst().copy();
+                NPC npc = null;
+                restoringIds.add(id);
+                try {
+                    if (!key.keyExists("name")) {
+                        Messaging.logTr(LOAD_NAME_NOT_FOUND, id);
+                        continue;
+                    }
+                    if (key.getString("traitnames").isBlank()) throw new IllegalArgumentException("Missing trait names");
+                    String unparsedEntityType = key.getRelative("traits").getString("type", "PLAYER");
+                    EntityType<?> type = MobType.match(unparsedEntityType);
+                    if (type == null) {
+                        Messaging.logTr(LOAD_UNKNOWN_NPC_TYPE, unparsedEntityType);
+                        continue;
+                    }
+                    UUID uuid = !key.getString("uuid").isEmpty() ? UUID.fromString(key.getString("uuid")) : UUID.randomUUID();
+                    if (registry.getById(id) != null || registry.getByUniqueId(uuid) != null)
+                        throw new IllegalArgumentException("NPC ID or UUID is already registered");
+                    key.getRelative("traits").setString("type", EntityType.getKey(type).toString());
+                    npc = registry.createNPC(type, uuid, id, key.getString("name"));
+                    npc.load(key);
+                    if (registry.getById(id) != npc || registry.getByUniqueId(uuid) != npc)
+                        throw new IllegalStateException("NPC restoration was superseded");
+                } catch (RuntimeException failure) {
+                    if (npc != null) {
+                        try { npc.destroy(); }
+                        catch (RuntimeException cleanup) {
+                            if (cleanup != failure) failure.addSuppressed(cleanup);
+                            Messaging.severe("Could not clean up failed NPC restoration", id, cleanup.getMessage());
+                        }
+                    }
+                    Messaging.severeTr(LOAD_FAILED, id, failure.getMessage());
+                } finally {
+                    restoringIds.remove(id);
+                }
             }
-            String unparsedEntityType = key.getRelative("traits").getString("type", "PLAYER");
-            EntityType<?> type = MobType.match(unparsedEntityType);
-            if (type == null) {
-                Messaging.logTr(LOAD_UNKNOWN_NPC_TYPE, unparsedEntityType);
-                continue;
-            }
-            NPC npc = registry.createNPC(type,
-                    !key.getString("uuid").isEmpty() ? UUID.fromString(key.getString("uuid")) : UUID.randomUUID(), id,
-                    key.getString("name"));
-            npc.load(key);
+        } finally {
+            restoring = false;
         }
     }
 
     @Override
     public void reloadFromSource() {
-        root.load();
+        if (restoring) throw new IllegalStateException("Cannot reload NPC storage during restoration");
+        DataKey previous = root.getKey("").copy();
+        try {
+            if (!root.load()) throw new IllegalStateException("Could not reload NPC storage: " + root);
+            records();
+        } catch (RuntimeException failure) {
+            root.getKey("").setRaw("", previous.getValuesDeep());
+            throw failure;
+        }
     }
 
     @Override
@@ -98,7 +137,10 @@ public class SimpleNPCDataStore implements NPCDataStore {
 
     @Override
     public void store(NPC npc) {
-        npc.save(root.getKey("npc." + npc.getId()));
+        if (restoringIds.contains(npc.getId())) throw new IllegalStateException("Cannot save an NPC during restoration");
+        List<DataKey> keys = records().getOrDefault(npc.getId(), List.of());
+        if (keys.size() > 1) throw new IllegalStateException("Ambiguous stored NPC ID: " + npc.getId());
+        npc.save(keys.isEmpty() ? root.getKey("npc." + npc.getId()) : keys.getFirst());
     }
 
     @Override
@@ -111,6 +153,20 @@ public class SimpleNPCDataStore implements NPCDataStore {
     public static NPCDataStore create(Storage storage) {
         return new SimpleNPCDataStore(storage);
     }
+
+    private Map<Integer, List<DataKey>> records() {
+        DataKey section = root.getKey("npc");
+        if (section.getRaw("") != null && !(section.getRaw("") instanceof Map<?, ?>))
+            throw new IllegalStateException("NPC storage must contain a mapping of IDs to definitions");
+        Map<Integer, List<DataKey>> records = new TreeMap<>();
+        for (DataKey key : section.getSubKeys()) {
+            Integer id = NPCIdAllocator.parse(key.name());
+            if (id != null) records.computeIfAbsent(id, unused -> new ArrayList<>()).add(key);
+        }
+        return records;
+    }
+
+    private static final String LOAD_FAILED = "citizens.notifications.npc-load-failed";
 
     private static final String LOAD_NAME_NOT_FOUND = "citizens.notifications.npc-name-not-found";
 

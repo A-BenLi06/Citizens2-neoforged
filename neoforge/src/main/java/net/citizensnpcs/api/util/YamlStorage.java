@@ -6,10 +6,13 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.IdentityHashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
 import java.util.concurrent.ForkJoinPool;
 
 import org.yaml.snakeyaml.DumperOptions;
@@ -52,21 +55,33 @@ public class YamlStorage implements Storage {
      * keys to strings for the same reason.
      */
     private Object deepCopy(Object source) {
-        if (source instanceof Map) {
-            Map<String, Object> result = new LinkedHashMap<>();
-            for (Map.Entry<?, ?> e : ((Map<?, ?>) source).entrySet()) {
-                result.put(String.valueOf(e.getKey()), deepCopy(e.getValue()));
+        return deepCopy(source, Collections.newSetFromMap(new IdentityHashMap<>()));
+    }
+
+    private Object deepCopy(Object source, Set<Object> ancestors) {
+        if (!(source instanceof Map<?, ?>) && !(source instanceof List<?>)) return source;
+        if (!ancestors.add(source)) throw new IllegalArgumentException("Recursive YAML collections are not supported");
+        try {
+            if (source instanceof Map) {
+                Map<String, Object> result = new LinkedHashMap<>();
+                for (Map.Entry<?, ?> e : ((Map<?, ?>) source).entrySet()) {
+                    String key = String.valueOf(e.getKey());
+                    if (result.containsKey(key)) throw new IllegalArgumentException("Conflicting YAML keys: " + key);
+                    result.put(key, deepCopy(e.getValue(), ancestors));
+                }
+                return result;
             }
-            return result;
-        }
-        if (source instanceof List) {
-            List<Object> result = new ArrayList<>();
-            for (Object item : (List<?>) source) {
-                result.add(deepCopy(item));
+            if (source instanceof List) {
+                List<Object> result = new ArrayList<>();
+                for (Object item : (List<?>) source) {
+                    result.add(deepCopy(item, ancestors));
+                }
+                return result;
             }
-            return result;
+            return source;
+        } finally {
+            ancestors.remove(source);
         }
-        return source;
     }
 
     @SuppressWarnings("unchecked")
@@ -132,14 +147,15 @@ public class YamlStorage implements Storage {
         try (FileReader reader = new FileReader(file)) {
             LoaderOptions options = new LoaderOptions();
             options.setCodePointLimit(64 * 1024 * 1024);
+            options.setAllowDuplicateKeys(false);
             Object loaded = new Yaml(options).load(reader);
-            data.clear();
-            if (loaded instanceof Map) {
-                data.putAll((Map<String, Object>) deepCopy(loaded));
-            }
+            if (loaded != null && !(loaded instanceof Map<?, ?>)) throw new IllegalArgumentException("Expected a YAML mapping");
+            Map<String, Object> replacement = loaded == null ? new LinkedHashMap<>() : (Map<String, Object>) deepCopy(loaded);
             if (transformLists) {
-                transformListsToMaps(data);
+                transformListsToMaps(replacement);
             }
+            data.clear();
+            data.putAll(replacement);
             return true;
         } catch (Exception e) {
             e.printStackTrace();

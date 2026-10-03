@@ -477,6 +477,11 @@ public class Citizens implements CitizensPlugin {
      * to be replaced by a freshly loaded one.
      */
     public void reload() throws NPCLoadException {
+        // A failed source read must leave current entities, editors and pending respawns in place.
+        if (saves != null) {
+            try { saves.reloadFromSource(); }
+            catch (RuntimeException failure) { throw new NPCLoadException("Could not reload NPC storage", failure); }
+        }
         Editor.leaveAll();
         ChatPrompts.abandonAll();
         config.reload();
@@ -489,9 +494,9 @@ public class Citizens implements CitizensPlugin {
         }
         Skin.clearCache();
         if (saves != null) {
-            saves.reloadFromSource();
             if (npcRegistry != null) {
-                saves.loadInto(npcRegistry);
+                try { saves.loadInto(npcRegistry); }
+                catch (RuntimeException failure) { throw new NPCLoadException("Could not restore NPCs", failure); }
             }
         }
         if (shops != null) {

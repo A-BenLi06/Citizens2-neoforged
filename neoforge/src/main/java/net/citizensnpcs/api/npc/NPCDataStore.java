@@ -30,7 +30,8 @@ public interface NPCDataStore {
     void loadInto(NPCRegistry registry);
 
     /**
-     * Reloads the data store from source (such as a file on disk).
+     * Reloads the data store from source (such as a file on disk). A failed read must preserve the previous snapshot
+     * and throw a runtime exception so the caller can keep its current NPCs alive.
      */
     void reloadFromSource();
 
