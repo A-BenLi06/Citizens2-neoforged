@@ -24,13 +24,7 @@ import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 
-/**
- * {@code /waypoints}, for editing a route without the in-world editor.
- * <p>
- * Upstream also has an op-only {@code waypoints hpa} that prints a hierarchical-pathfinding graph to stdout. It depends on
- * {@code api/hpastar}, which nothing else uses and which is not ported; the command is a debugging aid rather than a
- * feature, so it is absent rather than stubbed.
- */
+/** Waypoint editing and the independent hierarchical pathfinding diagnostic. */
 @Requirements(ownership = true, selected = true)
 public class WaypointCommands {
     @Command(
@@ -56,6 +50,19 @@ public class WaypointCommands {
         if (insertAt > waypoints.size()) throw new CommandException(Messages.WAYPOINT_INDEX_OUT_OF_RANGE, waypoints.size());
         waypoints.add(insertAt, new Waypoint(at));
         Messaging.sendTr(sender, Messages.WAYPOINT_ADDED, Util.prettyPrintLocation(at), insertAt);
+    }
+
+    @Command(
+            aliases = { "waypoints", "wp" },
+            usage = "hpa",
+            desc = "",
+            modifiers = { "hpa" },
+            strictArguments = true,
+            min = 1,
+            max = 1,
+            permission = "citizens.admin")
+    public void hpa(CommandContext args, ServerPlayer sender, NPC npc) throws CommandException {
+        HPADebugService.start(sender, npc);
     }
 
     @Command(

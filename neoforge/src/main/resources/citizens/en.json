@@ -924,5 +924,18 @@
   "citizens.traits.age-description": "{0}''s age is [[{1}]]. Locked is [[{2}]].",
   "citizens.waypoints.available-providers-header": "List of available providers",
   "citizens.commands.waypoints.current-provider": "The current waypoint provider is [[{0}]].",
-  "citizens.commands.waypoints.set-provider": "Set the waypoint provider to [[{0}]]."
+  "citizens.commands.waypoints.set-provider": "Set the waypoint provider to [[{0}]].",
+  "citizens.commands.waypoints.hpa.requires-op": "HPA diagnostics require a server operator.",
+  "citizens.commands.waypoints.hpa.different-world": "The NPC and player must be in the same world for HPA diagnostics.",
+  "citizens.commands.waypoints.hpa.disabled": "HPA diagnostics are disabled by the configured limits.",
+  "citizens.commands.waypoints.hpa.invalid-settings": "Invalid HPA limits or timeout. Check npc.pathfinding.hpa-debug in config.yml.",
+  "citizens.commands.waypoints.hpa.region-limit": "This HPA search needs {0} regions; the configured limit is {1}.",
+  "citizens.commands.waypoints.hpa.busy": "All {0} HPA request slots are in use. Try again after a search finishes.",
+  "citizens.commands.waypoints.hpa.unloaded": "Both HPA endpoints must be in loaded chunks.",
+  "citizens.commands.waypoints.hpa.started": "Searching HPA from [[{0}]] to [[{1}]] in {2} loaded chunks ({3} regions).",
+  "citizens.commands.waypoints.hpa.failed": "HPA calculation failed. See the server log for details.",
+  "citizens.commands.waypoints.hpa.no-path": "No HPA path from [[{0}]] to [[{1}]] within the snapshot of {2} loaded chunks ({3} regions).",
+  "citizens.commands.waypoints.hpa.path": "HPA path from {0} to {1}: {2}",
+  "citizens.commands.waypoints.hpa.complete": "HPA found a path of {0} blocks using {1} clusters and {2} abstraction levels in {3} ms. The complete path is in the server log.",
+  "citizens.commands.waypoints.hpa.timeout": "HPA search exceeded the configured time limit and was cancelled."
 }

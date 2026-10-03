@@ -47,6 +47,11 @@ public abstract class BlockSource {
 
     public abstract boolean isYWithinBounds(int y);
 
+    /** Distinguishes known air from missing snapshot/unloaded data. Fully populated sources need no override. */
+    public boolean isBlockAvailable(int x, int y, int z) {
+        return isYWithinBounds(y);
+    }
+
     private static int floor(double value) {
         int i = (int) value;
         return value < i ? i - 1 : i;

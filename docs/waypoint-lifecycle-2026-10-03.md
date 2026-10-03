@@ -26,7 +26,7 @@ Waypoint add/remove commands validate coordinates, world and index before alloca
 
 The original `waypoints hpa` / `wp hpa` command constructs an `HPAGraph`, adds clusters, computes a path to the player and prints it to stdout. It does not select an NPC navigator or modify a waypoint provider. The inspected NeoForge navigator supports its existing Citizens/Minecraft/plugin strategies; none uses the HPA graph. The [upstream graph source](https://github.com/CitizensDev/CitizensAPI/blob/master/src/main/java/net/citizensnpcs/api/hpastar/HPAGraph.java) is retained as a hashed comparison artifact alongside the checked-in command source.
 
-Those debugging aliases remain unported. Substituting ordinary A* behind their names would not reproduce the original operation. A native HPA graph port remains separate work if that experiment is retained; this follow-up does not claim it is implemented or use command-name counts as completion evidence.
+The later [native HPA follow-up](hpa-debugging-2026-10-03.md) implements both debugging aliases with an actual multi-level graph and loaded-chunk snapshots. It repairs height, boundary, refinement and cancellation behavior while preserving ordinary waypoint/navigation state. Both NeoForge versions pass 109 dedicated command/snapshot checks, and 16 algorithm tests cover the hierarchy itself. This supersedes the HPA implementation gap recorded when the waypoint-lifecycle batch was completed.
 
 ## Validation
 

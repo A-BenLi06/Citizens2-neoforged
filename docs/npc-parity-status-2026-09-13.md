@@ -4,11 +4,15 @@
 
 Initial audit timestamp: 2026-09-13 01:47:09 +08:00 (UTC+08:00).
 
-Current summary updated: 2026-10-03 00:44:48 +08:00 (UTC+08:00).
+Current summary updated: 2026-10-03 12:29:37 +08:00 (UTC+08:00).
 
 The resumed goal explicitly continues comparison of remaining behavior in the retained Citizens, Interactions and Sentinel code. CmdCam owns camera playback and Yuuniverse Economy owns economic APIs; unrelated replacement suites and unverified client/modpack/proxy acceptance remain distinct.
 
-Latest waypoint follow-up: [provider lifecycle and delayed actions](waypoint-lifecycle-2026-10-03.md) repairs unknown-provider route loss, old behavior cleanup, unavailable/disabled saves, nested data snapshots, delayed-trigger/pause ownership and navigation callback attribution. The dedicated native fixture includes successful arrival/cache replay and callback replacement. HPA debugging remains unported rather than being aliased to another algorithm. Evidence: `artifacts/waypoint-lifecycle-validation-summary.json`. The broader provider/data/client/modpack/proxy requirements remain open.
+Latest HPA follow-up: [native hierarchical graph debugging](hpa-debugging-2026-10-03.md) restores `waypoints hpa` / `wp hpa` with dimension-aware clusters, safe recursive refinement and loaded-chunk snapshots. Queued work validates exact request/NPC/registry/player ownership and handles cancellation and failing providers. Both NeoForge versions pass 109 dedicated checks; 16 algorithm tests, all 249 ordinary tests and 100 Interactions tests pass. Related and general regressions, clean build, source checkpoints and separate-JAR ownership also pass. Evidence: `artifacts/hpa-validation-summary.json`. Known command groups on the current checklist now have implementation follow-ups; applicable provider/data/service and physical-client/modpack/proxy acceptance remain open.
+
+Earlier follow-ups below record acceptance and remaining work at their respective timestamps. The [current checklist](remaining-citizens-work-2026-09-26.md) is authoritative for the remaining scope.
+
+Latest waypoint follow-up: [provider lifecycle and delayed actions](waypoint-lifecycle-2026-10-03.md) repairs unknown-provider route loss, old behavior cleanup, unavailable/disabled saves, nested data snapshots, delayed-trigger/pause ownership and navigation callback attribution. The dedicated native fixture includes successful arrival/cache replay and callback replacement. The later HPA follow-up above covers the standalone debugging aliases. Evidence: `artifacts/waypoint-lifecycle-validation-summary.json`. The broader provider/data/client/modpack/proxy requirements remain open.
 
 Latest skin follow-up: [native skin commands and asynchronous ownership](skin-commands-2026-10-02.md) restores URL/file generation, direct textures, exports, skulls, latest/name semantics and explicit Bedrock lookups. Revision and identity checks keep delayed work from replacing newer state; native caches and persisted textures retain their distinct roles. Both NeoForge versions pass 127 dedicated checks, and skin-refresh/mirroring regression passes 367. Interactions remains separate. Evidence: `artifacts/skin-command-validation-summary.json`. Known ordinary command groups now have implementation follow-ups; debugging aliases, live service/provider/data work and physical-client/modpack/proxy acceptance remain open.
 
