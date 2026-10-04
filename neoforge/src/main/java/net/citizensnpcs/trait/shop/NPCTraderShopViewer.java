@@ -39,7 +39,7 @@ public class NPCTraderShopViewer {
     }
 
     public static void open(NPCShop shop, NPCShopStorage storage, ServerPlayer player) {
-        if (!shop.isActive()) return;
+        if (!shop.isActive() || !storage.isActive()) return;
         Map<Integer, NPCShopItem> trades = new HashMap<>();
         MerchantOffers offers = new MerchantOffers();
         for (NPCShopPage page : shop.getPages()) {
@@ -169,6 +169,7 @@ public class NPCTraderShopViewer {
         private final Map<Integer, NPCShopItem> trades;
         private final Player owner;
         private final Runnable detach;
+        private final Runnable detachStock;
         private boolean invalidated;
 
         ShopMerchantMenu(int id, Inventory inventory, Merchant merchant, NPCShop shop, NPCShopStorage storage,
@@ -180,27 +181,29 @@ public class NPCTraderShopViewer {
             owner = inventory.player;
             merchant.setTradingPlayer(owner);
             detach = shop.trackSession(this, ShopMerchantMenu::dispose);
+            try { detachStock = storage.trackSession(this, ShopMerchantMenu::dispose); }
+            catch (RuntimeException | Error failure) { detach.run(); throw failure; }
         }
 
         private void dispose() {
             invalidated = true;
             try { if (owner.containerMenu == this) owner.closeContainer(); }
-            finally { detach.run(); }
+            finally { detach.run(); detachStock.run(); }
         }
 
         @Override public void removed(Player player) {
             invalidated = true;
             try { super.removed(player); }
-            finally { detach.run(); }
+            finally { detach.run(); detachStock.run(); }
         }
 
         @Override public boolean stillValid(Player player) {
-            return !invalidated && shop.isActive() && super.stillValid(player);
+            return !invalidated && shop.isActive() && storage.isActive() && super.stillValid(player);
         }
 
         @Override
         public void clicked(int slotId, int button, ClickType clickType, Player player) {
-            if (invalidated || !shop.isActive() || player != owner || player.containerMenu != this) return;
+            if (invalidated || !shop.isActive() || !storage.isActive() || player != owner || player.containerMenu != this) return;
             if (slotId != RESULT_SLOT || !(player instanceof ServerPlayer buyer)) {
                 super.clicked(slotId, button, clickType, player);
                 return;

@@ -55,12 +55,20 @@ public class ShopTrait extends Trait {
 
     @Override
     public void onRemove() {
-        shops.deleteShop(getDefaultShop());
+        Throwable failure = null;
+        try { storage.retire(); } catch (RuntimeException | Error ex) { failure = ex; }
+        try { shops.deleteShop(getDefaultShop()); } catch (RuntimeException | Error ex) {
+            if (failure == null) failure = ex;
+            else if (failure != ex) failure.addSuppressed(ex);
+        }
+        if (failure instanceof RuntimeException ex) throw ex;
+        if (failure instanceof Error ex) throw ex;
     }
 
     @Override
     public void onRetire() {
         // The shop belongs to the saved NPC identity, not this runtime trait instance.
+        storage.retire();
     }
 
     @TraitEventHandler

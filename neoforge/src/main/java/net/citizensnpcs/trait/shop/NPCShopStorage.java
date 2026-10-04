@@ -22,6 +22,15 @@ import net.minecraft.world.item.ItemStack;
  * {@link NPCShopAction}: every action needs the storage type, and the trait needs every action.
  */
 public class NPCShopStorage {
+    private final ShopSessionOwner sessions = new ShopSessionOwner();
+
+    public boolean isActive() { return sessions.isActive(); }
+    public void requireIdle() { sessions.requireIdle(); }
+    public Runnable suspendSessions() { return sessions.suspend(); }
+    public void retire() { sessions.retire(); }
+    <T> Runnable trackSession(T target, Consumer<T> close) { return sessions.track(target, close); }
+    boolean beginTrade() { return sessions.beginTrade(); }
+    void endTrade() { sessions.endTrade(); }
     @Persist
     private double balance;
     @Persist
@@ -33,6 +42,7 @@ public class NPCShopStorage {
 
     /** The page that shows and edits this stock. */
     public InventoryMenuPage createInventoryViewer(ServerPlayer whoClicked) {
+        if (!isActive()) throw new IllegalStateException("Shop stock is unavailable");
         return new InventoryViewer(this);
     }
 
@@ -87,6 +97,7 @@ public class NPCShopStorage {
      *            the goods. The empty slots are really provided here.
      */
     public void transact(Consumer<ItemStack[]> action, int additional) {
+        if (!isActive()) throw new IllegalStateException("Shop stock is unavailable");
         if (unlimited)
             return;
         if (hasUnavailableItems()) throw new IllegalStateException("Shop stock contains unavailable item definitions");

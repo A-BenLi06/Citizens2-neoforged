@@ -242,6 +242,7 @@ public class NPCShopItem implements Cloneable, Persistable {
     void onClick(NPCShop shop, NPCShopStorage storage, ServerPlayer player, InventoryMultiplexer inventory,
             boolean shiftClick, boolean secondClick) {
         if (!shop.beginTrade()) return;
+        if (!storage.beginTrade()) { shop.endTrade(); return; }
         try {
         if (isClickableExpression != null && !evaluate(isClickableExpression, player))
             return;
@@ -291,7 +292,7 @@ public class NPCShopItem implements Cloneable, Persistable {
             npurchases++;
         }
         new NPCShopPurchaseEvent(player, shop, this).callEvent();
-        } finally { shop.endTrade(); }
+        } finally { storage.endTrade(); shop.endTrade(); }
     }
 
     /** Fills in {@code <cost>}, {@code <result>} and {@code <times_purchasable>} as well as the usual placeholders. */

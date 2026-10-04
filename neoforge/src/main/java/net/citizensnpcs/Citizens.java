@@ -500,18 +500,26 @@ public class Citizens implements CitizensPlugin {
         if (store == null) throw new IllegalArgumentException("NPC data store must be non-null");
         beginNPCDataOperation();
         CitizensNPCRegistry candidate = null;
+        List<Runnable> resumeShopSessions = new ArrayList<>();
         try {
             if (saves == store) return;
             if (server == null || npcRegistry == null) {
                 configuredNPCDataStore = saves = store;
                 return;
             }
+            List<net.citizensnpcs.trait.shop.NPCShopStorage> privateStocks = new ArrayList<>();
+            for (NPC npc : npcRegistry) {
+                var trait = npc.getTraitNullable(net.citizensnpcs.trait.ShopTrait.class);
+                if (trait != null) privateStocks.add(trait.getStorage());
+            }
+            privateStocks.forEach(net.citizensnpcs.trait.shop.NPCShopStorage::requireIdle);
             candidate = new CitizensNPCRegistry(store, this, "citizens-global-" + UUID.randomUUID());
             // Providers populate the supplied registry. Until that succeeds, global lookups still see the old NPCs.
             if (serverStarted) candidate.loadFromStore();
             if (serverStarted || npcRegistry.iterator().hasNext()) {
                 Editor.leaveAll();
                 ChatPrompts.abandonAll();
+                for (var stock : privateStocks) resumeShopSessions.add(stock.suspendSessions());
                 storeNPCsInternal();
             }
             CitizensNPCRegistry previous = npcRegistry;
@@ -529,7 +537,10 @@ public class Citizens implements CitizensPlugin {
                 }
             }
             throw failure;
-        } finally { npcDataOperation = false; }
+        } finally {
+            resumeShopSessions.forEach(Runnable::run);
+            npcDataOperation = false;
+        }
     }
 
     private void beginNPCDataOperation() {

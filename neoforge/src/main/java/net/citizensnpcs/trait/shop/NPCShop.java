@@ -36,49 +36,32 @@ public class NPCShop {
     private ShopType type = ShopType.DEFAULT;
     @Persist
     private String viewPermission;
-    private boolean retired;
-    private int activeTrades;
-    private final java.util.Set<Session<?>> sessions = new java.util.HashSet<>();
-
-    private record Session<T>(java.lang.ref.WeakReference<T> target, java.util.function.Consumer<T> close) {
-        void end() { T value = target.get(); if (value != null) close.accept(value); }
-    }
+    private final ShopSessionOwner sessions = new ShopSessionOwner();
 
     <T> Runnable trackSession(T target, java.util.function.Consumer<T> close) {
-        if (retired) throw new IllegalStateException("Shop has been retired");
-        sessions.removeIf(session -> session.target().get() == null);
-        Session<T> session = new Session<>(new java.lang.ref.WeakReference<>(target), close);
-        sessions.add(session);
-        return () -> sessions.remove(session);
+        return sessions.track(target, close);
     }
 
-    public boolean isActive() { return !retired; }
-    boolean beginTrade() { if (retired) return false; activeTrades++; return true; }
-    void endTrade() { activeTrades--; }
-    void requireIdle() {
-        if (activeTrades != 0) throw new IllegalStateException("Cannot replace a shop during a transaction");
-    }
-
+    public boolean isActive() { return sessions.isActive(); }
+    boolean beginTrade() { return sessions.beginTrade(); }
+    void endTrade() { sessions.endTrade(); }
+    void requireIdle() { sessions.requireIdle(); storage.requireIdle(); }
     void retire() {
         requireIdle();
-        if (retired) return;
-        retired = true;
-        var pending = new ArrayList<>(sessions);
-        sessions.clear();
         Throwable failure = null;
-        for (Session<?> session : pending) {
-            try { session.end(); }
-            catch (RuntimeException | Error ex) {
-                if (failure == null) failure = ex;
-                else if (failure != ex) failure.addSuppressed(ex);
-            }
+        try { sessions.retire(); } catch (RuntimeException | Error ex) { failure = ex; }
+        try { storage.retire(); } catch (RuntimeException | Error ex) {
+            if (failure == null) failure = ex;
+            else if (failure != ex) failure.addSuppressed(ex);
         }
         if (failure instanceof RuntimeException ex) throw ex;
         if (failure instanceof Error ex) throw ex;
     }
 
-    private void present(InventoryMenu menu, ServerPlayer player) {
+    private void present(InventoryMenu menu, NPCShopStorage stock, ServerPlayer player) {
         menu.addCloseCallback(trackSession(menu, InventoryMenu::dispose));
+        try { menu.addCloseCallback(stock.trackSession(menu, InventoryMenu::dispose)); }
+        catch (RuntimeException | Error failure) { menu.dispose(); throw failure; }
         menu.present(player);
     }
 
@@ -105,7 +88,7 @@ public class NPCShop {
     }
 
     public void display(NPCShopStorage storage, ServerPlayer sender) {
-        if (retired) return;
+        if (!isActive() || !storage.isActive()) return;
         if (!canView(sender))
             return;
         if (pages.isEmpty()) {
@@ -115,7 +98,7 @@ public class NPCShop {
         if (getShopType() == ShopType.TRADER) {
             NPCTraderShopViewer.open(this, storage, sender);
         } else {
-            present(InventoryMenu.createSelfRegistered(new NPCShopViewer(this, storage, sender)), sender);
+            present(InventoryMenu.createSelfRegistered(new NPCShopViewer(this, storage, sender)), storage, sender);
         }
     }
 
@@ -124,8 +107,10 @@ public class NPCShop {
     }
 
     public void displayEditor(ShopTrait trait, ServerPlayer sender) {
-        if (retired) return;
-        present(InventoryMenu.createSelfRegistered(new NPCShopSettings(trait, this)), sender);
+        if (!isActive()) return;
+        NPCShopStorage stock = trait == null ? storage : trait.getStorage();
+        if (!stock.isActive()) return;
+        present(InventoryMenu.createSelfRegistered(new NPCShopSettings(trait, this)), stock, sender);
     }
 
     public String getName() {
