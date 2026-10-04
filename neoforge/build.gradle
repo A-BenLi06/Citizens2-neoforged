@@ -31,6 +31,9 @@ tasks.register('dialogueJar', Jar) {
     from sourceSets.dialogue.output
     archiveBaseName = 'yuuniverse-interactions'
     archiveVersion = project.version
+    manifest {
+        attributes 'Implementation-Version': project.version
+    }
 }
 
 tasks.named('build') { dependsOn 'dialogueJar' }

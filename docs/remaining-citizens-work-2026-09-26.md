@@ -2,6 +2,8 @@
 
 This is the current command and acceptance checklist for Minecraft 1.21.1. The September 13 audit contains historical gaps; later follow-ups supersede those rows. See the [ecosystem scope](neoforge-ecosystem-replacements-2026-09-22.md) for provider ownership.
 
+[Interactions remains an independent NeoForge mod/JAR](independent-interactions-jar-2026-10-04.md), with dependency Interactions → Citizens. Its dedicated artifact now includes the release version in its own manifest. This packaging follow-up changes no gameplay classes/resources and leaves both Citizens artifacts byte-identical to the preceding validated build.
+
 All 37 historically missing 1.21.1 `/npc` command names have entry points. Entry-point coverage is not behavior parity, and the historical missing-command count must not be used as today's backlog or a completion percentage.
 
 A read-only declaration scan of the checked-in `main` and `neoforge` source trees on 2026-09-27 10:55:42 +08:00 (UTC+08:00) found eight unmatched pairs: `npc chicken`, `npc cow`, `npc pig`, `npc coppergolem`, `npc mannequin`, `npc sulfurcube`, `waypoints hpa` and `wp hpa`. The first six concern newer-version entity capabilities. The two HPA debugging aliases are now implemented and validated in the [native HPA follow-up](hpa-debugging-2026-10-03.md). Historical inventory evidence: `artifacts/command-inventory-2026-09-27.json`. The declaration scan does not validate parameter handling or runtime behavior.
