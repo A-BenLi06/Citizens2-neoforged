@@ -526,8 +526,9 @@ public class Citizens implements CitizensPlugin {
      * <p>
      * Upstream additionally restarts its {@code PlayerUpdateTask} and resets {@code ProfileFetcher}; this port has
      * neither (skins are fetched through {@code MojangSkinGenerator} and cached in {@link Skin}, whose cache is cleared
-     * here instead). Editors and chat prompts are abandoned first because both hold a reference to an NPC that is about
-     * to be replaced by a freshly loaded one.
+     * here instead). The default registry is replaced only after its provider finishes loading. Editors and chat prompts
+     * are then abandoned because both hold references to NPCs from the retiring registry. Integrations must reacquire
+     * the default registry after a successful reload, as they do after a default-store replacement.
      */
     public void reload() throws NPCLoadException {
         beginNPCDataOperation();
@@ -542,22 +543,35 @@ public class Citizens implements CitizensPlugin {
             try { saves.reloadFromSource(); }
             catch (RuntimeException failure) { throw new NPCLoadException("Could not reload NPC storage", failure); }
         }
-        Editor.leaveAll();
-        ChatPrompts.abandonAll();
-        config.reload();
-        if (eventListen != null) {
-            // the queued NPCs are about to be replaced by freshly loaded objects; a stale entry would respawn a copy
-            eventListen.clearRespawnQueue();
-        }
-        if (npcRegistry != null) {
-            npcRegistry.despawnNPCs(DespawnReason.RELOAD);
-        }
-        Skin.clearCache();
-        if (saves != null) {
-            if (npcRegistry != null) {
-                try { npcRegistry.loadFromStore(); }
-                catch (RuntimeException failure) { throw new NPCLoadException("Could not restore NPCs", failure); }
+        CitizensNPCRegistry candidate = null;
+        try {
+            config.reload();
+            Skin.clearCache();
+            if (saves != null && npcRegistry != null) {
+                candidate = new CitizensNPCRegistry(saves, this, "citizens-global-" + UUID.randomUUID());
+                // A provider may fail after constructing some NPCs. Keep those objects isolated until loading succeeds.
+                candidate.loadFromStore();
             }
+            Editor.leaveAll();
+            ChatPrompts.abandonAll();
+            if (candidate != null) {
+                CitizensNPCRegistry previous = npcRegistry;
+                npcRegistry = candidate;
+                if (eventListen != null) eventListen.clearRespawnQueue(previous);
+                previous.retire();
+            }
+        } catch (RuntimeException | Error failure) {
+            if (candidate != null && npcRegistry != candidate) {
+                try {
+                    if (eventListen != null) eventListen.clearRespawnQueue(candidate);
+                    candidate.retire();
+                } catch (RuntimeException | Error cleanup) {
+                    if (cleanup != failure) failure.addSuppressed(cleanup);
+                }
+            }
+            if (failure instanceof Error error) throw error;
+            throw new NPCLoadException(candidate != null && npcRegistry == candidate
+                    ? "NPCs restored, but old NPC cleanup failed" : "Could not restore NPCs", failure);
         }
         if (shops != null) {
             shops.loadFromDisk();

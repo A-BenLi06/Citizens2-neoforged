@@ -116,13 +116,13 @@ public class EventListen {
         toRespawn.entries().removeIf(entry -> entry.getValue() == event.getNPC());
     }
 
-    /** Drops the whole queue, for {@code /citizens reload}, which reloads every NPC from disk anyway. */
+    /** Drops all registries' pending respawns and death visuals. */
     public void clearRespawnQueue() {
         net.citizensnpcs.npc.NPCDeaths.clear();
         toRespawn.clear();
     }
 
-    /** A default-store switch must leave pending spawns owned by other registries alone. */
+    /** Default-registry replacement or reload leaves other registries' pending spawns alone. */
     public void clearRespawnQueue(net.citizensnpcs.api.npc.NPCRegistry registry) {
         toRespawn.entries().removeIf(entry -> entry.getValue().getOwningRegistry() == registry);
     }
