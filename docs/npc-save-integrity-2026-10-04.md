@@ -32,4 +32,4 @@ All nine modified production/test/fixture checkpoints match the tested files. Re
 
 This is Citizens persistence work. Interactions conversations, choices, conditions, actions, cutscenes and player progress remain in the independent Interactions source set and NeoForge JAR. Dependency remains Interactions → Citizens.
 
-Atomic/ordered YAML writes, persistence delegate initialization failures, large-store snapshot costs, configuration/shop reload and broader registry/provider/client acceptance remain on [the current checklist](remaining-citizens-work-2026-09-26.md). No production deployment or physical-client acceptance is implied.
+The [delegate-initialization follow-up](persistence-delegate-failures-2026-10-04.md) now propagates constructor failures, preserves existing registration and permits retry without caching an omitted field. Its fixture extends these original 98 checks to 104 per version. Atomic/ordered YAML writes, large-store snapshot costs, configuration/shop reload and broader registry/provider/client acceptance remain on [the current checklist](remaining-citizens-work-2026-09-26.md). No production deployment or physical-client acceptance is implied.

@@ -94,8 +94,7 @@ public class PersistenceLoader {
             try {
                 return (T) field.get(instance);
             } catch (Exception e) {
-                e.printStackTrace();
-                return (T) NULL;
+                throw new IllegalStateException("Could not read persisted field " + field, e);
             }
         }
 
@@ -149,7 +148,6 @@ public class PersistenceLoader {
             }
         }
 
-        private static final Object NULL = new Object();
     }
 
     public static <T> PersisterRegistry<T> createRegistry(Class<?> base) {
@@ -451,8 +449,8 @@ public class PersistenceLoader {
             constructor.setAccessible(true);
             loadedDelegates.put(delegateClass, constructor.newInstance());
         } catch (Exception e) {
-            e.printStackTrace();
-            loadedDelegates.put(delegateClass, null);
+            // A failed constructor must neither erase a field nor poison later retries with a cached null.
+            throw new IllegalStateException("Could not construct persistence delegate " + delegateClass.getName(), e);
         }
     }
 
@@ -469,8 +467,8 @@ public class PersistenceLoader {
         if (delegate == null)
             return getDelegate(fieldType);
 
-        Persister<?> persister = loadedDelegates.get(delegate.value());
-        return persister == null ? loadedDelegates.get(persistRedirects.get(fieldType)) : persister;
+        ensureDelegateLoaded(delegate.value());
+        return loadedDelegates.get(delegate.value());
     }
 
     private static PersistField[] getFields(Class<?> clazz) {
@@ -494,18 +492,6 @@ public class PersistenceLoader {
             field.setAccessible(true);
             Persist persistAnnotation = field.getAnnotation(Persist.class);
             if (persistAnnotation == null) {
-                itr.remove();
-                continue;
-            }
-            DelegatePersistence delegate = field.getAnnotation(DelegatePersistence.class);
-            if (delegate == null) {
-                continue;
-            }
-            Class<? extends Persister<?>> delegateClass = delegate.value();
-            ensureDelegateLoaded(delegateClass);
-            Persister<?> in = loadedDelegates.get(delegateClass);
-            if (in == null) {
-                // class couldn't be loaded earlier, we can't deserialise.
                 itr.remove();
                 continue;
             }
@@ -607,8 +593,8 @@ public class PersistenceLoader {
      *            The Persister class to use when loading and saving
      */
     public static void registerPersistDelegate(Class<?> clazz, Class<? extends Persister<?>> delegateClass) {
-        persistRedirects.put(clazz, delegateClass);
         ensureDelegateLoaded(delegateClass);
+        persistRedirects.put(clazz, delegateClass);
     }
 
     /**

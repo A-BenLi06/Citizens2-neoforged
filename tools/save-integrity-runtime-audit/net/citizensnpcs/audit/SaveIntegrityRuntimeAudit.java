@@ -57,12 +57,13 @@ public final class SaveIntegrityRuntimeAudit {
                 original = plugin.getDefaultNPCDataStore();
                 CitizensAPI.getTraitFactory().registerTrait(TraitInfo.create(Probe.class).withName("saveintegrityprobe"));
                 CitizensAPI.getTraitFactory().registerTrait(TraitInfo.create(RemovedProbe.class).withName("saveintegrityremoved"));
+                CitizensAPI.getTraitFactory().registerTrait(TraitInfo.create(InitializationProbe.class).withName("saveintegrityinitialization"));
                 level.setChunkForced(0, 0, true); forced = true; started = server.getTickCount();
             }
             if (server.getTickCount() - started > 400) throw new AssertionError("fixture_timeout");
             if (!level.isPositionEntityTicking(new BlockPos(4, -58, 4))) return;
             standalone(false); standalone(true);
-            batch(); replacementDuringSave(); commandAndReplacement();
+            batch(); replacementDuringSave(); initializationFailure(); commandAndReplacement();
             close();
             LoggerFactory.getLogger("citizens").info("[SAVEINTEGRITYAUDIT] COMPLETE {} checks", passed);
         } catch (Throwable failure) {
@@ -272,6 +273,27 @@ public final class SaveIntegrityRuntimeAudit {
         check(storage.key.keyExists("npc." + ordinary.getId()) && storage.key.keyExists("npc." + virtual.getId()), "retirement_keeps_persisted_definitions");
     }
 
+    private static void initializationFailure() {
+        MemoryStorage storage = new MemoryStorage();
+        InspectingStore store = new InspectingStore(storage);
+        NPCRegistry registry = registry(store);
+        NPC npc = registry.createNPC(EntityType.PIG, "Before initialization failure");
+        registry.saveToStore();
+        Map<String, Object> before = storage.key.getValuesDeep();
+        npc.setName("After initialization retry"); npc.getOrAddTrait(InitializationProbe.class);
+        MemoryDataKey destination = new MemoryDataKey(); destination.setString("untouched", "original");
+        Map<String, Object> beforeSnapshot = destination.getValuesDeep();
+        reject(() -> npc.saveSnapshot(destination), "delegate_initialization_snapshot_failure_propagates");
+        check(beforeSnapshot.equals(destination.getValuesDeep()), "delegate_initialization_keeps_snapshot");
+        reject(registry::saveToStore, "delegate_initialization_store_failure_propagates");
+        check(before.equals(storage.key.getValuesDeep()) && storage.flushes == 1, "delegate_initialization_keeps_store_and_flush_count");
+        InitializingPersister.fail = false; registry.saveToStore();
+        check(record(storage, npc).getString("name").equals("After initialization retry")
+                && record(storage, npc).getString("traits.saveintegrityinitialization.value").equals("persisted value")
+                && storage.flushes == 2, "delegate_initialization_retry_publishes_all_fields");
+        check(InitializingPersister.attempts == 3, "failed_delegate_initialization_does_not_poison_cache");
+    }
+
     private static NPCRegistry registry(NPCDataStore store) {
         NPCRegistry result = CitizensAPI.createNamedNPCRegistry("save-integrity-" + named.size(), store);
         named.add(result); return result;
@@ -342,6 +364,21 @@ public final class SaveIntegrityRuntimeAudit {
     public static final class RemovedProbe extends Trait {
         @Persist String value = "";
         public RemovedProbe() { super("saveintegrityremoved"); }
+    }
+    public static final class InitializationProbe extends Trait {
+        @Persist @DelegatePersistence(InitializingPersister.class) String value = "persisted value";
+        public InitializationProbe() { super("saveintegrityinitialization"); }
+        @Override public void save(DataKey key) { key.setString("manual", "written before initializing delegate"); }
+    }
+    public static final class InitializingPersister implements Persister<String> {
+        static boolean fail = true;
+        static int attempts;
+        public InitializingPersister() {
+            attempts++;
+            if (fail) throw new IllegalStateException("synthetic delegate constructor failure");
+        }
+        @Override public String create(DataKey key) { return key.getString(""); }
+        @Override public void save(String value, DataKey key) { key.setString("", value); }
     }
     public static final class Payload { String value = "original"; boolean fail; }
     public static final class ProbePersister implements Persister<Payload> {
