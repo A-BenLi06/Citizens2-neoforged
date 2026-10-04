@@ -152,7 +152,21 @@ public abstract class AbstractNPC implements NPC {
 
     @Override
     public void destroy() {
+        validateRemoval();
         dispose(() -> NeoForge.EVENT_BUS.post(new NPCRemoveEvent(this)), () -> registry.deregister(this), false);
+    }
+
+    /** Creation rollback is mandatory cleanup, not a new user request to remove an established NPC. */
+    protected final void disposeFailedCreation() {
+        dispose(() -> NeoForge.EVENT_BUS.post(new NPCRemoveEvent(this)), () -> registry.deregister(this), false);
+    }
+
+    @Override
+    public final void validateRemoval() {
+        if (destroyed) return;
+        List<Trait> snapshot = new ArrayList<>();
+        traits.forEach(snapshot::add);
+        snapshot.forEach(Trait::validateRemoval);
     }
 
     /** Releases a replaced registry's runtime instance without announcing deletion or clearing its stored record. */
@@ -367,8 +381,12 @@ public abstract class AbstractNPC implements NPC {
 
     @Override
     public void removeTrait(Class<? extends Trait> clazz) {
-        Trait trait = traits.remove(plugin.getTraitFactory().getId(clazz));
+        int id = plugin.getTraitFactory().getId(clazz);
+        Trait trait = traits.get(id);
         if (trait != null) {
+            trait.validateRemoval();
+            if (traits.get(id) != trait) return;
+            traits.remove(id);
             NeoForge.EVENT_BUS.post(new NPCRemoveTraitEvent(this, trait));
             clearSaveData.add("traits." + trait.getName());
             runnables.remove(trait);

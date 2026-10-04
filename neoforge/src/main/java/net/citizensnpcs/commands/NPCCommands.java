@@ -3234,12 +3234,15 @@ public class NPCCommands {
             }
             var candidates = new ArrayList<NPC>();
             registry.forEach(candidates::add);
+            var targets = new ArrayList<NPC>();
             for (NPC candidate : candidates) {
                 Owner ownership = candidate.getOrAddTrait(Owner.class);
                 boolean matches = serverOwned ? ownership.getOwnerId() == null
                         : ownerId != null && ownership.isOwnedBy(ownerId);
-                if (matches && ownership.isOwnedBy(sender)) removeWithHistory(sender, candidate);
+                if (matches && ownership.isOwnedBy(sender)) targets.add(candidate);
             }
+            targets.forEach(NPC::validateRemoval);
+            targets.forEach(target -> removeWithHistory(sender, target));
             Messaging.sendTr(sender, Messages.NPCS_REMOVED);
             return;
         }
@@ -3248,11 +3251,14 @@ public class NPCCommands {
             if (level == null) throw new CommandException(Messages.WORLD_NOT_FOUND, world);
             var candidates = new ArrayList<NPC>();
             registry.forEach(candidates::add);
+            var targets = new ArrayList<NPC>();
             for (NPC candidate : candidates) {
                 Location location = candidate.getStoredLocation();
                 if (location != null && location.getWorld() == level
-                        && candidate.getOrAddTrait(Owner.class).isOwnedBy(sender)) removeWithHistory(sender, candidate);
+                        && candidate.getOrAddTrait(Owner.class).isOwnedBy(sender)) targets.add(candidate);
             }
+            targets.forEach(NPC::validateRemoval);
+            targets.forEach(target -> removeWithHistory(sender, target));
             Messaging.sendTr(sender, Messages.NPCS_REMOVED);
             return;
         }
@@ -3276,6 +3282,7 @@ public class NPCCommands {
                     && !PermissionUtil.hasPermission(sender, "citizens.admin")
                     && !PermissionUtil.hasPermission(sender, "citizens.npc.remove.all"))
                 throw new NoPermissionsException();
+            registry.forEach(NPC::validateRemoval);
             var snapshots = new ArrayList<RemoveNPCHistoryItem>();
             registry.forEach(candidate -> snapshots.add(new RemoveNPCHistoryItem(candidate)));
             snapshots.forEach(snapshot -> history().add(sender, snapshot));
@@ -3305,6 +3312,7 @@ public class NPCCommands {
     }
 
     private void removeWithHistory(CommandSourceStack sender, NPC npc) {
+        npc.validateRemoval();
         var snapshot = new RemoveNPCHistoryItem(npc);
         history().add(sender, snapshot);
         if (CitizensAPI.getDefaultNPCSelector().getSelected(sender) == npc)

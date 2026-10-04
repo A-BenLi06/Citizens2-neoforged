@@ -110,6 +110,10 @@ public abstract class Trait implements Runnable {
     public void onRemove() {
     }
 
+    /** Read-only, repeatable preflight. Throw to reject removal before NPC or trait ownership changes. */
+    public void validateRemoval() {
+    }
+
     /**
      * Called when a trait is removed from the attached {@link NPC}.
      */

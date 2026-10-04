@@ -54,6 +54,13 @@ public class ShopTrait extends Trait {
     }
 
     @Override
+    public void validateRemoval() {
+        storage.requireIdle();
+        NPCShop definition = shops.npcShops.get(npc.getUniqueId().toString());
+        if (definition != null) definition.requireIdle();
+    }
+
+    @Override
     public void onRemove() {
         Throwable failure = null;
         try { storage.retire(); } catch (RuntimeException | Error ex) { failure = ex; }

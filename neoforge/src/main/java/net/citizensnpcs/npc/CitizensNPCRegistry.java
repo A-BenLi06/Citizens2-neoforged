@@ -93,7 +93,7 @@ public class CitizensNPCRegistry implements NPCRegistry {
             });
             return npc;
         } catch (RuntimeException | Error failure) {
-            try { npc.destroy(); } catch (RuntimeException | Error cleanup) {
+            try { npc.rollbackCreation(); } catch (RuntimeException | Error cleanup) {
                 if (cleanup != failure) failure.addSuppressed(cleanup);
             }
             throw failure;
@@ -132,6 +132,7 @@ public class CitizensNPCRegistry implements NPCRegistry {
 
     @Override
     public void deregister(NPC npc) {
+        npc.validateRemoval();
         NPCLifetimes.cancel(npc);
         npc.despawn(DespawnReason.REMOVAL);
         boolean ownsId = npcs.get(npc.getId()) == npc;
@@ -144,6 +145,7 @@ public class CitizensNPCRegistry implements NPCRegistry {
 
     @Override
     public void deregisterAll() {
+        for (NPC npc : this) npc.validateRemoval();
         Iterator<NPC> itr = iterator();
         while (itr.hasNext()) {
             NPC npc = itr.next();

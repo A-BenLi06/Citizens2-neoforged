@@ -103,6 +103,11 @@ public interface NPC extends Agent, Cloneable {
      */
     public void destroy();
 
+    /** Validate permanent removal without changing ownership or emitting removal events. */
+    default void validateRemoval() {
+        for (Trait trait : getTraits()) trait.validateRemoval();
+    }
+
     /**
      * Permanently removes this NPC and all data about it from the registry it's attached to.
      *
@@ -110,6 +115,7 @@ public interface NPC extends Agent, Cloneable {
      *            The source of the removal
      */
     default void destroy(CommandSourceStack source) {
+        validateRemoval();
         NeoForge.EVENT_BUS.post(new NPCRemoveByCommandSenderEvent(this, source));
         destroy();
     }

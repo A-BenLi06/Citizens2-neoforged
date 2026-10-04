@@ -16,6 +16,8 @@ Recent follow-ups cover [`powered`, `name` and `home` options](command-options-h
 
 ## Behavior, data and integration acceptance
 
+- [Shop removal preflight](shop-removal-preflight-2026-10-05.md) now rejects destructive NPC/trait/registry requests before mutation when their stock or per-NPC shop is being traded. Commands preserve undo history and selection on rejection, while failed creation still performs mandatory rollback. Both NeoForge versions pass 55 native checks and a negative control reproduces the old partial removal. Automatic post-purchase destructive commands, post-admission callback failure semantics, custom implementations and full reload transactionality remain separate work.
+
 - [Private shop storage ownership](private-shop-storage-2026-10-05.md) now scopes views to their concrete stock as well as their shared shop definition. Default-store replacement preserves old views on load failure, commits editor changes before saving the old provider, resumes stock admission on save failure and closes only retired private views on success. Both NeoForge versions pass 28 native checks. Physical-client/provider acceptance, destructive command reentry and full reload transactionality remain separate work.
 
 - [Shop session ownership](shop-session-lifecycle-2026-10-05.md) now closes and invalidates old chest/editor/trader sessions after successful publication, cancels chat/deferred returns, returns merchant payments once, preserves screens on failed loading and rejects replacement during a trade. Both NeoForge versions pass 33 native checks. Built-in action registration no longer depends on creating a ShopTrait. Physical-client/provider acceptance and transactionality across reload participants remain separate work.

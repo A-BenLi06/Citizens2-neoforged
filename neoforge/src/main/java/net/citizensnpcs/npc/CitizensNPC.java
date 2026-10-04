@@ -86,6 +86,8 @@ public class CitizensNPC extends AbstractNPC {
     /** Name-dependent traits are initialized only after construction and registry/type assignment. */
     void initializeCreationName() { setNameInternal(getRawName()); }
 
+    void rollbackCreation() { disposeFailedCreation(); }
+
     public CitizensNPC(UUID uuid, int id, String name, EntityController entityController, NPCRegistry registry,
             CitizensPlugin plugin) {
         super(uuid, id, name, registry, plugin);

@@ -45,7 +45,7 @@ public class NPCShop {
     public boolean isActive() { return sessions.isActive(); }
     boolean beginTrade() { return sessions.beginTrade(); }
     void endTrade() { sessions.endTrade(); }
-    void requireIdle() { sessions.requireIdle(); storage.requireIdle(); }
+    public void requireIdle() { sessions.requireIdle(); storage.requireIdle(); }
     void retire() {
         requireIdle();
         Throwable failure = null;
