@@ -4,6 +4,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
+import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 import com.google.common.base.Splitter;
@@ -45,8 +46,24 @@ public class MemoryDataKey extends DataKey {
         return new MemoryDataKey(deepCopyMap(root), path, name);
     }
 
+    @Override
+    public void writeAtomically(Consumer<DataKey> writer) {
+        // The outer transaction takes the full snapshot once. Nested writers fork only accessed branches and commit
+        // detached changes into that unpublished document; a failed inner writer leaves its parent unchanged.
+        StagedMap<String> staged = new StagedMap<>(root instanceof StagedMap<?> ? root : deepCopyMap(root));
+        writer.accept(new MemoryDataKey(staged, path, name));
+        if (root instanceof StagedMap<?>) {
+            staged.prepare().run();
+        } else {
+            Map<String, Object> published = deepCopyMap(staged);
+            root.clear();
+            root.putAll(published);
+        }
+    }
+
     @SuppressWarnings("unchecked")
-    private Map<String, Object> deepCopyMap(Map<String, Object> source) {
+    private static Map<String, Object> deepCopyMap(Map<String, Object> source) {
+        if (source instanceof StagedMap<?> staged) return (Map<String, Object>) staged.detached();
         Map<String, Object> result = Maps.newHashMapWithExpectedSize(source.size());
         for (Map.Entry<String, Object> entry : source.entrySet()) {
             result.put(entry.getKey(), copyValue(entry.getValue()));
@@ -54,7 +71,8 @@ public class MemoryDataKey extends DataKey {
         return result;
     }
 
-    private Object copyValue(Object value) {
+    private static Object copyValue(Object value) {
+        if (value instanceof StagedMap<?> staged) return staged.detached();
         if (value instanceof Map<?, ?> map) {
             Map<Object, Object> copy = new java.util.LinkedHashMap<>();
             map.forEach((key, entry) -> copy.put(key, copyValue(entry)));
@@ -380,6 +398,169 @@ public class MemoryDataKey extends DataKey {
     @Override
     public String toString() {
         return "MemoryDataKey[" + getDisplayPath() + "]";
+    }
+
+    /** A private working map. Reading a mutable value owns a copy before handing it to a writer. */
+    private static final class StagedMap<K> extends java.util.AbstractMap<K, Object> {
+        private final Map<K, Object> source;
+        private final Map<K, Object> values = new java.util.LinkedHashMap<>();
+        private final java.util.Set<K> replaced = new java.util.HashSet<>();
+        private final java.util.Set<Object> removed = new java.util.HashSet<>();
+        private boolean cleared;
+
+        @SuppressWarnings("unchecked")
+        StagedMap(Map<?, ?> source) { this.source = (Map<K, Object>) source; }
+
+        @Override
+        public boolean containsKey(Object key) {
+            return values.containsKey(key) || (!cleared && !removed.contains(key) && source.containsKey(key));
+        }
+
+        @Override
+        @SuppressWarnings("unchecked")
+        public Object get(Object key) {
+            if (values.containsKey(key)) return values.get(key);
+            if (!containsKey(key)) return null;
+            Object original = source.get(key);
+            Object value = original instanceof Map<?, ?> map ? new StagedMap<>(map) : copyValue(original);
+            values.put((K) key, value);
+            // Raw lists and arrays may be mutated without another Map call, so their exposed copies are changes.
+            if (value != original && !(value instanceof StagedMap<?>)) replaced.add((K) key);
+            return value;
+        }
+
+        @Override
+        public Object put(K key, Object value) {
+            Object previous = get(key);
+            assign(key, value);
+            return previous;
+        }
+
+        private void assign(K key, Object value) {
+            values.put(key, value); replaced.add(key); removed.remove(key);
+        }
+
+        @Override
+        public Object remove(Object key) {
+            Object previous = get(key);
+            discard(key);
+            return previous;
+        }
+
+        private void discard(Object key) {
+            values.remove(key); replaced.remove(key); removed.add(key);
+        }
+
+        @Override
+        public void clear() {
+            values.clear(); replaced.clear(); removed.clear(); cleared = true;
+        }
+
+        private java.util.Set<K> keys() {
+            java.util.Set<K> keys = cleared ? new java.util.LinkedHashSet<>() : new java.util.LinkedHashSet<>(source.keySet());
+            keys.removeAll(removed); keys.addAll(values.keySet());
+            return keys;
+        }
+
+        @Override
+        public int size() { return keys().size(); }
+
+        @Override
+        public java.util.Set<K> keySet() {
+            return new java.util.AbstractSet<>() {
+                @Override public int size() { return StagedMap.this.size(); }
+                @Override public boolean contains(Object key) { return containsKey(key); }
+                @Override public void clear() { StagedMap.this.clear(); }
+                @Override public boolean remove(Object key) {
+                    if (!containsKey(key)) return false;
+                    discard(key); return true;
+                }
+                @Override public java.util.Iterator<K> iterator() {
+                    java.util.Iterator<K> keys = StagedMap.this.keys().iterator();
+                    return new java.util.Iterator<>() {
+                        private K current;
+                        private boolean removable;
+                        @Override public boolean hasNext() { return keys.hasNext(); }
+                        @Override public K next() { current = keys.next(); removable = true; return current; }
+                        @Override public void remove() {
+                            if (!removable) throw new IllegalStateException();
+                            discard(current); removable = false;
+                        }
+                    };
+                }
+            };
+        }
+
+        private Object peek(Object key) {
+            if (values.containsKey(key)) return values.get(key);
+            if (cleared || removed.contains(key)) return null;
+            return source instanceof StagedMap<?> parent ? parent.peek(key) : source.get(key);
+        }
+
+        private Map<K, Object> detached() {
+            Map<K, Object> result = new java.util.LinkedHashMap<>();
+            for (K key : keys()) result.put(key, copyValue(peek(key)));
+            return result;
+        }
+
+        @Override
+        public java.util.Set<Entry<K, Object>> entrySet() {
+            return new java.util.AbstractSet<>() {
+                @Override public int size() { return StagedMap.this.size(); }
+                @Override public void clear() { StagedMap.this.clear(); }
+                @Override public java.util.Iterator<Entry<K, Object>> iterator() {
+                    java.util.Iterator<K> keys = StagedMap.this.keys().iterator();
+                    return new java.util.Iterator<>() {
+                        private Object current;
+                        private boolean removable;
+                        @Override public boolean hasNext() { return keys.hasNext(); }
+                        @Override public Entry<K, Object> next() {
+                            K key = keys.next(); current = key; removable = true;
+                            return new SimpleEntry<>(key, get(key)) {
+                                @Override public Object setValue(Object value) {
+                                    Object previous = put(key, value); super.setValue(value); return previous;
+                                }
+                            };
+                        }
+                        @Override public void remove() {
+                            if (!removable) throw new IllegalStateException();
+                            StagedMap.this.remove(current); removable = false;
+                        }
+                    };
+                }
+            };
+        }
+
+        private boolean changed() {
+            return cleared || !replaced.isEmpty() || !removed.isEmpty()
+                    || values.values().stream().anyMatch(value -> value instanceof StagedMap<?> map && map.changed());
+        }
+
+        /** Prepare every detached value before applying any change to the parent transaction. */
+        @SuppressWarnings("unchecked")
+        private Runnable prepare() {
+            if (!(source instanceof StagedMap<?>)) throw new IllegalStateException("No parent transaction");
+            StagedMap<K> parent = (StagedMap<K>) source;
+            Map<K, Object> writes = new java.util.LinkedHashMap<>();
+            java.util.List<Runnable> children = new java.util.ArrayList<>();
+            for (Map.Entry<K, Object> entry : values.entrySet()) {
+                Object value = entry.getValue();
+                if (replaced.contains(entry.getKey())) {
+                    writes.put(entry.getKey(), copyValue(value));
+                } else if (value instanceof StagedMap<?> child && child.changed()) {
+                    if (child.source instanceof StagedMap<?>) children.add(child.prepare());
+                    else writes.put(entry.getKey(), copyValue(child));
+                }
+            }
+            java.util.Set<Object> deletes = new java.util.HashSet<>(removed);
+            boolean clear = cleared;
+            return () -> {
+                if (clear) parent.clear();
+                for (Object key : deletes) parent.discard(key);
+                writes.forEach(parent::assign);
+                children.forEach(Runnable::run);
+            };
+        }
     }
 
     private static final char INTERNAL_SEPARATOR = '\0';

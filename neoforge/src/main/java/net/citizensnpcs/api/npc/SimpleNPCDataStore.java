@@ -150,10 +150,10 @@ public class SimpleNPCDataStore implements NPCDataStore {
         try {
             NPCRegistry registry = npc.getOwningRegistry();
             requireRegistered(npc, registry);
-            DataKey staged = root.getKey("").copy();
-            store(npc, staged);
-            requireRegistered(npc, registry);
-            root.getKey("").setRaw("", staged.getValuesDeep());
+            root.getKey("").writeAtomically(staged -> {
+                store(npc, staged);
+                requireRegistered(npc, registry);
+            });
         } finally {
             saving = false;
         }
@@ -165,22 +165,23 @@ public class SimpleNPCDataStore implements NPCDataStore {
         try {
             List<NPC> snapshot = new ArrayList<>();
             registry.forEach(npc -> { requireRegistered(npc, registry); snapshot.add(npc); });
-            DataKey staged = root.getKey("").copy();
-            for (NPC npc : snapshot) {
-                requireRegistered(npc, registry);
-                store(npc, staged);
-            }
+            root.getKey("").writeAtomically(staged -> {
+                RecordIndex records = new RecordIndex(staged.getRelative("npc"));
+                for (NPC npc : snapshot) {
+                    requireRegistered(npc, registry);
+                    store(npc, staged, records.current());
+                }
 
-            // Callbacks can replace an NPC with the same ID or UUID, or mutate the registry directly. Never publish
-            // an obsolete snapshot; those external live mutations themselves are outside this store's transaction.
-            Set<NPC> remaining = java.util.Collections.newSetFromMap(new IdentityHashMap<>());
-            remaining.addAll(snapshot);
-            for (NPC npc : registry) {
-                requireRegistered(npc, registry);
-                if (!remaining.remove(npc)) throw new IllegalStateException("NPC registry changed during serialization");
-            }
-            if (!remaining.isEmpty()) throw new IllegalStateException("NPC registry changed during serialization");
-            root.getKey("").setRaw("", staged.getValuesDeep());
+                // Callbacks can replace an NPC with the same ID or UUID, or mutate the registry directly. Never publish
+                // an obsolete snapshot; those external live mutations themselves are outside this store's transaction.
+                Set<NPC> remaining = java.util.Collections.newSetFromMap(new IdentityHashMap<>());
+                remaining.addAll(snapshot);
+                for (NPC npc : registry) {
+                    requireRegistered(npc, registry);
+                    if (!remaining.remove(npc)) throw new IllegalStateException("NPC registry changed during serialization");
+                }
+                if (!remaining.isEmpty()) throw new IllegalStateException("NPC registry changed during serialization");
+            });
         } finally {
             saving = false;
         }
@@ -202,9 +203,34 @@ public class SimpleNPCDataStore implements NPCDataStore {
     }
 
     private static void store(NPC npc, DataKey staged) {
-        List<DataKey> keys = records(staged.getRelative("npc")).getOrDefault(npc.getId(), List.of());
+        store(npc, staged, records(staged.getRelative("npc")));
+    }
+
+    private static void store(NPC npc, DataKey staged, Map<Integer, List<DataKey>> records) {
+        List<DataKey> keys = records.getOrDefault(npc.getId(), List.of());
         if (keys.size() > 1) throw new IllegalStateException("Ambiguous stored NPC ID: " + npc.getId());
         npc.save(keys.isEmpty() ? staged.getRelative("npc." + npc.getId()) : keys.getFirst());
+    }
+
+    private static final class RecordIndex {
+        private final DataKey section;
+        private Set<?> names;
+        private Map<Integer, List<DataKey>> indexed;
+
+        RecordIndex(DataKey section) { this.section = section; }
+
+        Map<Integer, List<DataKey>> current() {
+            Object raw = section.getRaw("");
+            if (raw != null && !(raw instanceof Map<?, ?>)) throw new IllegalStateException("NPC storage must contain a mapping of IDs to definitions");
+            Set<?> current = raw instanceof Map<?, ?> map ? map.keySet() : Set.of();
+            // Callbacks can add, delete or rename record keys, even without changing their count. Reuse parsed IDs
+            // only while the complete key set matches; retained DataKeys resolve against the current staged root.
+            if (names == null || !names.equals(current)) {
+                indexed = records(section);
+                names = new HashSet<>(current);
+            }
+            return indexed;
+        }
     }
 
     public static NPCDataStore create(Storage storage) {

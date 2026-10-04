@@ -32,4 +32,4 @@ Release/source archives contain the built implementation and exclude audit class
 
 This is Citizens storage work. Conversations, choices, conditions, dialogue actions, cutscenes and player progress remain in the independent Interactions source set and NeoForge JAR. Dependency remains Interactions → Citizens.
 
-Large-store snapshot costs, configuration/shop reload, ordinary/named-registry reload/shutdown and broader provider/client/modpack/proxy acceptance remain on [the current checklist](remaining-citizens-work-2026-09-26.md). No production deployment or physical-client acceptance is implied.
+The [batch-cost follow-up](npc-snapshot-costs-2026-10-04.md) now avoids repeated full-document copies inside a batch while preserving nested rollback and final snapshot isolation. Standalone save/reload costs, configuration/shop reload, ordinary/named-registry reload/shutdown and broader provider/client/modpack/proxy acceptance remain on [the current checklist](remaining-citizens-work-2026-09-26.md). No production deployment or physical-client acceptance is implied.

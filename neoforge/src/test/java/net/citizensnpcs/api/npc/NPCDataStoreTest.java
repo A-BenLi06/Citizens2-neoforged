@@ -135,6 +135,43 @@ class NPCDataStoreTest {
         assertFalse(storage.key.keyExists("npc.007"));
     }
 
+    @Test @SuppressWarnings("unchecked")
+    void aBatchResolvesRecordKeysRenamedByAnEarlierWriter() {
+        MemoryStorage storage = new MemoryStorage();
+        record(storage, "0", UUID.randomUUID());
+        record(storage, "007", UUID.randomUUID()).setString("unknown", "retained");
+        Registry registry = new Registry(new SimpleNPCDataStore(storage));
+        registry.store.loadInto(registry.api);
+        registry.writer = (npc, key) -> {
+            if (npc.getId() == 0) {
+                Map<String, Object> records = (Map<String, Object>) key.getFromRoot("npc").getRaw("");
+                records.put("0007", records.remove("007"));
+            } else {
+                assertEquals("0007", key.name());
+            }
+            key.setString("name", "updated");
+        };
+        registry.store.storeAll(registry.api);
+        assertEquals("updated", storage.key.getString("npc.0007.name"));
+        assertEquals("retained", storage.key.getString("npc.0007.unknown"));
+        assertFalse(storage.key.keyExists("npc.007")); assertFalse(storage.key.keyExists("npc.7"));
+    }
+
+    @Test void anEarlierWriterCannotIntroduceAmbiguousKeysForTheNextNpc() {
+        MemoryStorage storage = new MemoryStorage();
+        record(storage, "0", UUID.randomUUID()); record(storage, "7", UUID.randomUUID());
+        Registry registry = new Registry(new SimpleNPCDataStore(storage));
+        registry.store.loadInto(registry.api);
+        Map<String, Object> before = storage.key.getValuesDeep();
+        registry.writer = (npc, key) -> {
+            key.setString("name", "unpublished");
+            if (npc.getId() == 0) key.getFromRoot("npc.007").setString("name", "ambiguous");
+            else fail("the newly ambiguous record must be rejected before its writer runs");
+        };
+        assertThrows(IllegalStateException.class, () -> registry.store.storeAll(registry.api));
+        assertEquals(before, storage.key.getValuesDeep());
+    }
+
     @Test void aRestoreCannotPublishItsPartialRecord() {
         MemoryStorage storage = new MemoryStorage();
         record(storage, "0", UUID.randomUUID());

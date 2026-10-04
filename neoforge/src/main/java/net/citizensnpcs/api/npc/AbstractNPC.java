@@ -423,10 +423,7 @@ public abstract class AbstractNPC implements NPC {
         if (saving) throw new IllegalStateException("NPC serialization is already in progress: " + id);
         saving = true;
         try {
-            DataKey staged = root.copyWithRoot();
-            saveState(staged, true);
-            // Do not expose a writer's retained keys or mutable collections as the published snapshot.
-            root.getFromRoot("").setRaw("", staged.getFromRoot("").getValuesDeep());
+            root.writeAtomically(staged -> saveState(staged, true));
         } finally {
             saving = false;
         }

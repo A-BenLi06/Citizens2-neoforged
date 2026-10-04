@@ -4,6 +4,7 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.function.Consumer;
 
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
@@ -27,6 +28,18 @@ public abstract class DataKey {
      */
     public DataKey copyWithRoot() {
         return getFromRoot("").copy().getRelative(getPath());
+    }
+
+    /**
+     * Runs a writer against detached data at this path and publishes the enclosing document only after it succeeds.
+     * Retained writer keys and supported mutable values cannot alter the published document. Nested writes may use
+     * an implementation-specific transaction, while {@link #copyWithRoot()} always returns a full detached copy.
+     * Callers must serialize access to the document; changes made outside the supplied key are not rolled back.
+     */
+    public void writeAtomically(Consumer<DataKey> writer) {
+        DataKey staged = copyWithRoot();
+        writer.accept(staged);
+        getFromRoot("").setRaw("", staged.getFromRoot("").getValuesDeep());
     }
 
     protected String createRelativeKey(String from) {
