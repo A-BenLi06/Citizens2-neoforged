@@ -575,8 +575,10 @@ public class Citizens implements CitizensPlugin {
             catch (RuntimeException failure) { throw new NPCLoadException("Could not reload NPC storage", failure); }
         }
         CitizensNPCRegistry candidate = null;
+        StoredShops.PreparedLoad preparedShops = null;
         try {
             config.reload();
+            if (shops != null) preparedShops = shops.prepareLoad();
             Skin.clearCache();
             if (saves != null && npcRegistry != null) {
                 candidate = new CitizensNPCRegistry(saves, this, "citizens-global-" + UUID.randomUUID());
@@ -591,6 +593,7 @@ public class Citizens implements CitizensPlugin {
                 if (eventListen != null) eventListen.clearRespawnQueue(previous);
                 previous.retire();
             }
+            if (preparedShops != null) preparedShops.publish();
         } catch (RuntimeException | Error failure) {
             if (candidate != null && npcRegistry != candidate) {
                 try {
@@ -603,9 +606,6 @@ public class Citizens implements CitizensPlugin {
             if (failure instanceof Error error) throw error;
             throw new NPCLoadException(candidate != null && npcRegistry == candidate
                     ? "NPCs restored, but old NPC cleanup failed" : "Could not restore NPCs", failure);
-        }
-        if (shops != null) {
-            shops.load();
         }
         templateRegistry = new TemplateRegistry(new File(dataFolder, "templates").toPath());
         LOGGER.info("Citizens reloaded.");

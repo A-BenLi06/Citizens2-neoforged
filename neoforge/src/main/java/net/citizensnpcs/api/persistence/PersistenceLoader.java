@@ -47,6 +47,24 @@ import net.minecraft.world.phys.Vec3;
  * @see Persist
  */
 public class PersistenceLoader {
+    private static final ThreadLocal<Boolean> strictLoad = ThreadLocal.withInitial(() -> false);
+
+    /**
+     * Loads a detached candidate, propagating nested failures instead of silently omitting failed children.
+     * The caller owns publication/rollback; this method may partially populate the supplied candidate on failure.
+     */
+    public static <T> T loadStrict(T candidate, DataKey root) {
+        boolean previous = strictLoad.get();
+        strictLoad.set(true);
+        try {
+            T loaded = load(candidate, root);
+            if (loaded == null) throw new IllegalStateException("Could not load persisted object at " + root);
+            return loaded;
+        } finally {
+            if (previous) strictLoad.set(true);
+            else strictLoad.remove();
+        }
+    }
     private static class PersistenceLoaderPersister implements Persister<Object> {
         private final Class<?> clazz;
 
@@ -72,6 +90,7 @@ public class PersistenceLoader {
         private final Field field;
         private final String key;
         private final Persist persistAnnotation;
+        private final Class<?> valueType;
 
         private PersistField(Field field) {
             this.field = field;
@@ -85,6 +104,7 @@ public class PersistenceLoader {
             if (persistAnnotation.valueType() != Object.class) {
                 fieldType = persistAnnotation.valueType();
             }
+            this.valueType = fieldType;
             this.delegate = persistAnnotation.reify() ? new PersistenceLoaderPersister(fieldType)
                     : getDelegate(field, fieldType);
         }
@@ -144,6 +164,7 @@ public class PersistenceLoader {
             try {
                 field.set(instance, value);
             } catch (Exception e) {
+                if (strictLoad.get()) throw new IllegalStateException("Could not assign persisted field " + field, e);
                 e.printStackTrace();
             }
         }
@@ -174,6 +195,12 @@ public class PersistenceLoader {
         Object value;
         Class<?> type = field.getType();
         Class<?> collectionType = field.getCollectionType();
+
+        if (strictLoad.get() && (Map.class.isAssignableFrom(type) || Collection.class.isAssignableFrom(type))) {
+            Object raw = root.getRaw(field.key);
+            if (raw != null && !(raw instanceof Map) && !(raw instanceof Collection))
+                throw new IllegalStateException("Expected collection at " + root.getRelative(field.key));
+        }
 
         if (!Collection.class.isAssignableFrom(collectionType) && !Map.class.isAssignableFrom(collectionType))
             throw loadException;
@@ -266,6 +293,14 @@ public class PersistenceLoader {
                 type = Primitives.wrap(type);
             }
             Class<?> clazz = value.getClass();
+            if (strictLoad.get() && (
+                    clazz == Integer.class && type != Integer.class && type != Double.class && type != Long.class && type != Float.class
+                    || clazz == Float.class && type != Float.class && type != Double.class
+                    || clazz == Double.class && type != Double.class && type != Float.class
+                    || clazz == Byte.class && !List.of(Byte.class, Short.class, Integer.class, Long.class, Float.class, Double.class).contains(type)
+                    || clazz == Short.class && !List.of(Short.class, Integer.class, Long.class, Float.class, Double.class).contains(type)
+                    || clazz == Character.class && !List.of(Character.class, Short.class, Integer.class, Long.class, Float.class, Double.class).contains(type)))
+                throw new IllegalStateException("Invalid primitive value for " + field.field + " at " + root);
             if (clazz == Integer.class && type != Integer.class && type != Double.class && type != Long.class
                     && type != Float.class)
                 return;
@@ -290,6 +325,8 @@ public class PersistenceLoader {
             if (root.getRelative(field.key).hasSubKeys() && field.field.getType() == String.class
                     && field.delegate == null) {
                 field.set(instance, root.getRelative(field.key).name());
+            } else if (strictLoad.get()) {
+                throw new IllegalStateException("Invalid value type for " + field.field + " at " + root);
             }
             return;
         }
@@ -303,14 +340,19 @@ public class PersistenceLoader {
     private static void deserialiseCollection(Collection<Object> collection, DataKey root, PersistField field) {
         for (DataKey subKey : root.getRelative(field.key).getSubKeys()) {
             Object loaded = deserialiseCollectionValue(field, subKey, field.getValueType());
-            if (loaded == null)
+            if (loaded == null) {
+                if (strictLoad.get()) throw new IllegalStateException("Could not load collection entry at " + subKey);
                 continue;
+            }
 
             collection.add(loaded);
         }
     }
 
     private static Object deserialiseCollectionValue(PersistField field, DataKey subKey, Class<?> type) {
+        if (strictLoad.get()) {
+            type = field.valueType;
+        }
         Object deserialised = deserialiseValue(field, subKey);
         if (deserialised == null || type == Object.class)
             return deserialised;
@@ -334,6 +376,8 @@ public class PersistenceLoader {
                     return ((Number) deserialised).intValue();
             }
         }
+        if (strictLoad.get() && !Primitives.wrap(type).isInstance(deserialised))
+            throw new IllegalStateException("Invalid collection entry type at " + subKey);
         return deserialised;
     }
 
@@ -341,8 +385,10 @@ public class PersistenceLoader {
     private static void deserialiseMap(Map<Object, Object> map, DataKey root, PersistField field) {
         for (DataKey subKey : root.getRelative(field.key).getSubKeys()) {
             Object loaded = deserialiseCollectionValue(field, subKey, field.getValueType());
-            if (loaded == null)
+            if (loaded == null) {
+                if (strictLoad.get()) throw new IllegalStateException("Could not load map entry at " + subKey);
                 continue;
+            }
 
             Object key = subKey.name();
             Class<?> type = field.persistAnnotation.keyType();
@@ -381,7 +427,8 @@ public class PersistenceLoader {
 
     @SuppressWarnings({ "unchecked", "rawtypes" })
     private static Object deserialiseValue(PersistField field, DataKey root) {
-        Class<?> type = field.field.getType().isEnum() ? field.field.getType() : getGenericType(field.field);
+        Class<?> type = strictLoad.get() ? field.valueType
+                : field.field.getType().isEnum() ? field.field.getType() : getGenericType(field.field);
         if (field.delegate == null) {
             if (RegistryUtil.isRegistryKeyed(type)) {
                 Object obj = root.getRaw("");
@@ -394,6 +441,7 @@ public class PersistenceLoader {
                     try {
                         return Enum.valueOf(clazz, obj.toString());
                     } catch (IllegalArgumentException e) {
+                        if (strictLoad.get()) throw new IllegalStateException("Unknown enum value at " + root, e);
                         // fallback to default
                     }
                 }
@@ -540,8 +588,14 @@ public class PersistenceLoader {
                     }
                 }
             }
+            Object raw = root.getRaw("");
+            if (strictLoad.get() && raw != null && !(raw instanceof Map)
+                    && Arrays.stream(getFields(clazz)).noneMatch(field -> field.key.isEmpty() && field.delegate == null
+                            && Primitives.wrap(field.getType()).isInstance(coerce(raw, field.getType()))))
+                throw new IllegalStateException("Expected object at " + root);
             instance = (T) constructor.newInstance();
         } catch (Exception e) {
+            if (strictLoad.get()) throw new IllegalStateException("Could not create " + clazz + " at " + root, e);
             Messaging.severe("Error creating instance for " + clazz + " using " + root);
             e.printStackTrace();
         }
@@ -570,6 +624,7 @@ public class PersistenceLoader {
                 field.populateDefault(instance);
                 deserialise(field, instance, field.get(instance), field.getDataKey(root));
             } catch (Exception e) {
+                if (strictLoad.get()) throw new IllegalStateException("Could not load " + field.field + " at " + root, e);
                 if (e != loadException) {
                     e.printStackTrace();
                 }

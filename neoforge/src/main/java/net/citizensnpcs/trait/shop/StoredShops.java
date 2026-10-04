@@ -23,8 +23,13 @@ public class StoredShops {
     public Map<String, NPCShop> npcShops = new HashMap<>();
     private final Storage storage;
     private boolean sourceAvailable;
+    private long sourceGeneration;
 
     public StoredShops(YamlStorage storage) {
+        this((Storage) storage);
+    }
+
+    private StoredShops(Storage storage) {
         this.storage = storage;
     }
 
@@ -59,11 +64,42 @@ public class StoredShops {
     }
 
     public void load() {
+        prepareLoad().publish();
+    }
+
+    /** Decode into fresh maps so a failed child never mutates current shops or drops a stored trade. */
+    public PreparedLoad prepareLoad() {
         requireSource();
-        PersistenceLoader.load(this, storage.getKey(""));
+        try {
+            StoredShops candidate = new StoredShops(storage);
+            PersistenceLoader.loadStrict(candidate, storage.getKey("").copyWithRoot());
+            return new PreparedLoad(candidate, sourceGeneration);
+        } catch (RuntimeException | Error failure) {
+            sourceAvailable = false;
+            throw failure;
+        }
+    }
+
+    public final class PreparedLoad {
+        private final StoredShops candidate;
+        private final long generation;
+
+        private PreparedLoad(StoredShops candidate, long generation) {
+            this.candidate = candidate;
+            this.generation = generation;
+        }
+
+        public void publish() {
+            requireSource();
+            if (generation != sourceGeneration) throw new IllegalStateException("Shop source changed after preparation");
+            globalShops = candidate.globalShops;
+            npcShops = candidate.npcShops;
+            sourceGeneration++;
+        }
     }
 
     public boolean loadFromDisk() {
+        sourceGeneration++;
         sourceAvailable = false;
         sourceAvailable = storage.load();
         return sourceAvailable;
@@ -82,6 +118,7 @@ public class StoredShops {
     public void storeShops() {
         requireSource();
         storage.getKey("").writeAtomically(key -> PersistenceLoader.save(this, key));
+        sourceGeneration++;
     }
 
     private void requireSource() {

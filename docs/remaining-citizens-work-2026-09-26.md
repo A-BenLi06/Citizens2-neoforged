@@ -16,7 +16,9 @@ Recent follow-ups cover [`powered`, `name` and `home` options](command-options-h
 
 ## Behavior, data and integration acceptance
 
-- [Configuration reads and shop preservation](config-shop-preservation-2026-10-05.md) now preserve live settings on read/default-write failure, reject overwrite after failed source reads, serialize shops atomically and retain shop records during runtime NPC retirement. Both NeoForge versions pass 44 native checks. Strict nested shop decoding, removal of source-deleted entries, invalidation of old shop menus and a transaction across reload participants remain concrete work.
+- [Strict shop loading](strict-shop-loading-2026-10-05.md) now decodes into fresh maps before publication, propagates nested failures, retains live shops on rejection, removes source-deleted shops and rejects stale prepared loads. Both NeoForge versions pass 48 native checks. Legacy empty-shop scalars and quoted purchase counts remain supported. Old shop menu invalidation and transactionality across reload participants remain unfinished.
+
+- [Configuration reads and shop preservation](config-shop-preservation-2026-10-05.md) now preserve live settings on read/default-write failure, reject overwrite after failed source reads, serialize shops atomically and retain shop records during runtime NPC retirement. Both NeoForge versions pass 44 native checks. Strict nested decoding and source-deleted entries are addressed by the follow-up above; old shop menu invalidation and a transaction across reload participants remain concrete work.
 
 - [Server shutdown](npc-shutdown-2026-10-05.md) now isolates save/callback failures, retires all registered NPC registries, releases selections/listeners/queues/tasks and provider references, and rejects shutdown reentry. Both NeoForge versions pass 59 native checks. Configuration/shop reload transactionality and full integrated-server/provider restart acceptance remain targeted work.
 
