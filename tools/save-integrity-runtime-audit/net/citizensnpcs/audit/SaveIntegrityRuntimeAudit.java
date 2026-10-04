@@ -63,7 +63,7 @@ public final class SaveIntegrityRuntimeAudit {
             if (server.getTickCount() - started > 400) throw new AssertionError("fixture_timeout");
             if (!level.isPositionEntityTicking(new BlockPos(4, -58, 4))) return;
             standalone(false); standalone(true);
-            batch(); replacementDuringSave(); initializationFailure(); commandAndReplacement();
+            batch(); replacementDuringSave(); initializationFailure(); yamlFiles(); commandAndReplacement();
             close();
             LoggerFactory.getLogger("citizens").info("[SAVEINTEGRITYAUDIT] COMPLETE {} checks", passed);
         } catch (Throwable failure) {
@@ -294,6 +294,40 @@ public final class SaveIntegrityRuntimeAudit {
         check(InitializingPersister.attempts == 3, "failed_delegate_initialization_does_not_poison_cache");
     }
 
+    private static void yamlFiles() throws Exception {
+        Path file = Path.of("save-integrity-yaml.yml");
+        Files.writeString(file, "retained: fixture\n");
+        YamlStorage storage = new YamlStorage(file.toFile(), "Save-integrity fixture\nNative NPCs");
+        check(storage.load(), "yaml_fixture_loads");
+        NPCRegistry registry = registry(new SimpleNPCDataStore(storage));
+        NPC normal = registry.createNPC(EntityType.PIG, "YamlNormal"); probe(normal);
+        NPC packet = registry.createNPC(EntityType.PIG, "YamlPacket"); packet.getOrAddTrait(PacketNPC.class); probe(packet);
+        normal.getOrAddTrait(net.citizensnpcs.api.trait.trait.Spawned.class).setSpawned(false);
+        packet.getOrAddTrait(net.citizensnpcs.api.trait.trait.Spawned.class).setSpawned(false);
+        registry.saveToStore();
+        YamlStorage reader = new YamlStorage(file.toFile());
+        check(reader.load() && reader.getKey("npc." + normal.getId()).getString("name").equals("YamlNormal")
+                && reader.getKey("npc." + packet.getId()).getString("traitnames").contains("packet"), "yaml_native_records_written");
+        byte[] before = Files.readAllBytes(file);
+        normal.setName("YamlRetry"); storage.getKey("").setRaw("broken-yaml", new YamlFailureBean());
+        reject(registry::saveToStore, RuntimeException.class, "yaml_native_serialization_failure_propagates");
+        check(java.util.Arrays.equals(before, Files.readAllBytes(file)), "yaml_failure_preserves_previous_file");
+        check(storage.getKey("npc." + normal.getId()).getString("name").equals("YamlRetry"), "yaml_failure_keeps_complete_memory_for_retry");
+        try (var children = Files.list(Path.of("."))) {
+            check(children.noneMatch(path -> path.getFileName().toString().startsWith("save-integrity-yaml.yml.tmp-")), "yaml_failure_cleans_temporary_files");
+        }
+        storage.getKey("").removeKey("broken-yaml"); registry.saveToStore();
+        check(reader.load(), "yaml_retry_reloads");
+        check(reader.getKey("npc." + normal.getId()).getString("name").equals("YamlRetry")
+                && reader.getKey("").getString("retained").equals("fixture") && Files.readString(file).contains("# Native NPCs"),
+                "yaml_retry_preserves_records_unknown_data_and_header");
+        NPCRegistry restored = registry(new MemoryNPCDataStore()); new SimpleNPCDataStore(reader).loadInto(restored);
+        check(restored.getById(normal.getId()).getUniqueId().equals(normal.getUniqueId())
+                && restored.getById(normal.getId()).getRawName().equals("YamlRetry"), "yaml_restores_normal_npc");
+        check(restored.getById(packet.getId()).getUniqueId().equals(packet.getUniqueId())
+                && restored.getById(packet.getId()).hasTrait(PacketNPC.class), "yaml_restores_packet_npc");
+    }
+
     private static NPCRegistry registry(NPCDataStore store) {
         NPCRegistry result = CitizensAPI.createNamedNPCRegistry("save-integrity-" + named.size(), store);
         named.add(result); return result;
@@ -369,6 +403,10 @@ public final class SaveIntegrityRuntimeAudit {
         @Persist @DelegatePersistence(InitializingPersister.class) String value = "persisted value";
         public InitializationProbe() { super("saveintegrityinitialization"); }
         @Override public void save(DataKey key) { key.setString("manual", "written before initializing delegate"); }
+    }
+    public static final class YamlFailureBean {
+        public String getValue() { throw new IllegalStateException("synthetic native YAML serialization failure"); }
+        public void setValue(String unused) { }
     }
     public static final class InitializingPersister implements Persister<String> {
         static boolean fail = true;
