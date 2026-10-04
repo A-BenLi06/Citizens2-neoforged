@@ -39,6 +39,12 @@ public class MemoryDataKey extends DataKey {
         return new MemoryDataKey(deepCopyMap(getCurrentSection()), "", "");
     }
 
+    @Override
+    public MemoryDataKey copyWithRoot() {
+        // Preserve literal key segments; the display path cannot distinguish dots inside a key from separators.
+        return new MemoryDataKey(deepCopyMap(root), path, name);
+    }
+
     @SuppressWarnings("unchecked")
     private Map<String, Object> deepCopyMap(Map<String, Object> source) {
         Map<String, Object> result = Maps.newHashMapWithExpectedSize(source.size());

@@ -1,6 +1,7 @@
 package net.citizensnpcs.api.npc;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
@@ -48,7 +49,9 @@ import net.citizensnpcs.api.util.EntityUtil;
 import net.citizensnpcs.api.util.EventBusUtil;
 
 public abstract class AbstractNPC implements NPC {
-    private final List<String> clearSaveData = new ArrayList<>();
+    // A removal must apply to every destination and to retries after a later NPC aborts a batch.
+    private final Set<String> clearSaveData = new HashSet<>();
+    private boolean saving;
     protected Object coloredNameComponentCache;
     protected String coloredNameStringCache;
     /** Name the cached {@link #nameIsRewrittenByPlaceholders()} answer was computed for. */
@@ -408,13 +411,25 @@ public abstract class AbstractNPC implements NPC {
     public void save(DataKey root) {
         if (!metadata.get(NPC.Metadata.SHOULD_SAVE, true))
             return;
-        saveState(root, false);
-        clearSaveData.clear();
+        saveAtomically(root);
     }
 
     @Override
     public void saveSnapshot(DataKey root) {
-        saveState(root, true);
+        saveAtomically(root);
+    }
+
+    private void saveAtomically(DataKey root) {
+        if (saving) throw new IllegalStateException("NPC serialization is already in progress: " + id);
+        saving = true;
+        try {
+            DataKey staged = root.copyWithRoot();
+            saveState(staged, true);
+            // Do not expose a writer's retained keys or mutable collections as the published snapshot.
+            root.getFromRoot("").setRaw("", staged.getFromRoot("").getValuesDeep());
+        } finally {
+            saving = false;
+        }
     }
 
     /** A strict snapshot must succeed before a destructive operation can rely on it. */

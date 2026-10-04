@@ -2,6 +2,7 @@ package net.citizensnpcs.api.npc;
 
 import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.IdentityHashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -23,6 +24,7 @@ public class SimpleNPCDataStore implements NPCDataStore {
     private final Storage root;
     private final Set<Integer> restoringIds = new HashSet<>();
     private boolean restoring;
+    private boolean saving;
 
     public SimpleNPCDataStore(Storage saves) {
         root = saves;
@@ -30,6 +32,7 @@ public class SimpleNPCDataStore implements NPCDataStore {
 
     @Override
     public void clearData(NPC npc) {
+        requireNotSaving();
         // Failed creation/load cleanup must retire the runtime object without deleting its recovery source.
         if (restoringIds.contains(npc.getId())) return;
         for (DataKey key : records().getOrDefault(npc.getId(), List.of())) key.removeKey("");
@@ -37,6 +40,7 @@ public class SimpleNPCDataStore implements NPCDataStore {
 
     @Override
     public void clearTraitData(Iterable<String> traitNames) {
+        requireNotSaving();
         for (DataKey key : root.getKey("npc").getSubKeys()) {
             Set<String> storedNames = Splitter.on(',').splitToStream(key.getString("traitnames"))
                     .collect(Collectors.toSet());
@@ -52,6 +56,7 @@ public class SimpleNPCDataStore implements NPCDataStore {
 
     @Override
     public int createUniqueNPCId(NPCRegistry registry) {
+        requireNotSaving();
         DataKey key = root.getKey("");
         Integer previous = NPCIdAllocator.parse(key.getRaw("last-created-npc-id"));
         int newId = NPCIdAllocator.next(registry, previous == null ? -1 : previous, records().keySet());
@@ -61,6 +66,7 @@ public class SimpleNPCDataStore implements NPCDataStore {
 
     @Override
     public void loadInto(NPCRegistry registry) {
+        requireNotSaving();
         if (restoring) throw new IllegalStateException("NPC restoration is already in progress");
         restoring = true;
         try {
@@ -71,7 +77,7 @@ public class SimpleNPCDataStore implements NPCDataStore {
                     continue;
                 }
                 // Loaders may set defaults or normalize values. Publish only through a later explicit save.
-                DataKey key = entry.getValue().getFirst().copy();
+                DataKey key = entry.getValue().getFirst().copyWithRoot();
                 NPC npc = null;
                 restoringIds.add(id);
                 try {
@@ -114,6 +120,7 @@ public class SimpleNPCDataStore implements NPCDataStore {
 
     @Override
     public void reloadFromSource() {
+        requireNotSaving();
         if (restoring) throw new IllegalStateException("Cannot reload NPC storage during restoration");
         DataKey previous = root.getKey("").copy();
         try {
@@ -127,27 +134,77 @@ public class SimpleNPCDataStore implements NPCDataStore {
 
     @Override
     public void saveToDisk() {
+        requireNotSaving();
         root.saveAsync();
     }
 
     @Override
     public void saveToDiskImmediate() {
+        requireNotSaving();
         root.save();
     }
 
     @Override
     public void store(NPC npc) {
-        if (restoringIds.contains(npc.getId())) throw new IllegalStateException("Cannot save an NPC during restoration");
-        List<DataKey> keys = records().getOrDefault(npc.getId(), List.of());
-        if (keys.size() > 1) throw new IllegalStateException("Ambiguous stored NPC ID: " + npc.getId());
-        npc.save(keys.isEmpty() ? root.getKey("npc." + npc.getId()) : keys.getFirst());
+        beginSave();
+        try {
+            NPCRegistry registry = npc.getOwningRegistry();
+            requireRegistered(npc, registry);
+            DataKey staged = root.getKey("").copy();
+            store(npc, staged);
+            requireRegistered(npc, registry);
+            root.getKey("").setRaw("", staged.getValuesDeep());
+        } finally {
+            saving = false;
+        }
     }
 
     @Override
     public void storeAll(NPCRegistry registry) {
-        for (NPC npc : registry) {
-            store(npc);
+        beginSave();
+        try {
+            List<NPC> snapshot = new ArrayList<>();
+            registry.forEach(npc -> { requireRegistered(npc, registry); snapshot.add(npc); });
+            DataKey staged = root.getKey("").copy();
+            for (NPC npc : snapshot) {
+                requireRegistered(npc, registry);
+                store(npc, staged);
+            }
+
+            // Callbacks can replace an NPC with the same ID or UUID, or mutate the registry directly. Never publish
+            // an obsolete snapshot; those external live mutations themselves are outside this store's transaction.
+            Set<NPC> remaining = java.util.Collections.newSetFromMap(new IdentityHashMap<>());
+            remaining.addAll(snapshot);
+            for (NPC npc : registry) {
+                requireRegistered(npc, registry);
+                if (!remaining.remove(npc)) throw new IllegalStateException("NPC registry changed during serialization");
+            }
+            if (!remaining.isEmpty()) throw new IllegalStateException("NPC registry changed during serialization");
+            root.getKey("").setRaw("", staged.getValuesDeep());
+        } finally {
+            saving = false;
         }
+    }
+
+    private void beginSave() {
+        requireNotSaving();
+        if (restoring) throw new IllegalStateException("Cannot save NPC storage during restoration");
+        saving = true;
+    }
+
+    private void requireNotSaving() {
+        if (saving) throw new IllegalStateException("NPC storage serialization is already in progress");
+    }
+
+    private static void requireRegistered(NPC npc, NPCRegistry registry) {
+        if (registry.getById(npc.getId()) != npc || registry.getByUniqueId(npc.getUniqueId()) != npc)
+            throw new IllegalStateException("NPC registration changed during serialization: " + npc.getId());
+    }
+
+    private static void store(NPC npc, DataKey staged) {
+        List<DataKey> keys = records(staged.getRelative("npc")).getOrDefault(npc.getId(), List.of());
+        if (keys.size() > 1) throw new IllegalStateException("Ambiguous stored NPC ID: " + npc.getId());
+        npc.save(keys.isEmpty() ? staged.getRelative("npc." + npc.getId()) : keys.getFirst());
     }
 
     public static NPCDataStore create(Storage storage) {
@@ -155,7 +212,10 @@ public class SimpleNPCDataStore implements NPCDataStore {
     }
 
     private Map<Integer, List<DataKey>> records() {
-        DataKey section = root.getKey("npc");
+        return records(root.getKey("npc"));
+    }
+
+    private static Map<Integer, List<DataKey>> records(DataKey section) {
         if (section.getRaw("") != null && !(section.getRaw("") instanceof Map<?, ?>))
             throw new IllegalStateException("NPC storage must contain a mapping of IDs to definitions");
         Map<Integer, List<DataKey>> records = new TreeMap<>();

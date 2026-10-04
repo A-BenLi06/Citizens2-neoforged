@@ -21,6 +21,14 @@ public abstract class DataKey {
 
     public abstract DataKey copy();
 
+    /**
+     * Returns a detached copy at the same path, including the enclosing document. Unlike {@link #copy()}, absolute
+     * references such as namespaced persistence fields still resolve against the original document root.
+     */
+    public DataKey copyWithRoot() {
+        return getFromRoot("").copy().getRelative(getPath());
+    }
+
     protected String createRelativeKey(String from) {
         if (from.isEmpty())
             return path;
