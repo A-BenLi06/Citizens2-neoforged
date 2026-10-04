@@ -54,9 +54,19 @@ public class ChatPrompts {
     }
 
     public static void abandonAll() {
-        for (ChatPromptSession session : new java.util.ArrayList<>(SESSIONS.values())) {
-            abandon(session);
+        Throwable failure = null;
+        for (Map.Entry<UUID, ChatPromptSession> entry : new java.util.ArrayList<>(SESSIONS.entrySet())) {
+            if (!SESSIONS.remove(entry.getKey(), entry.getValue())) continue;
+            try {
+                entry.getValue().end();
+                entry.getValue().runAbandonCallback();
+            } catch (RuntimeException | Error ex) {
+                if (failure == null) failure = ex;
+                else if (failure != ex) failure.addSuppressed(ex);
+            }
         }
+        if (failure instanceof RuntimeException ex) throw ex;
+        if (failure instanceof Error ex) throw ex;
     }
 
     public static ChatPromptSession begin(ServerPlayer player, ChatPrompt first) {
@@ -68,12 +78,14 @@ public class ChatPrompts {
     }
 
     /** Configures ownership/abandonment handlers before publishing the session or rendering its first prompt. */
-    public static ChatPromptSession begin(ServerPlayer player, ChatPrompt first, Map<String, Object> initial,
+    public static synchronized ChatPromptSession begin(ServerPlayer player, ChatPrompt first, Map<String, Object> initial,
             Consumer<ChatPromptSession> configure) {
         if (first == null)
             return null;
+        if (!acceptingSessions) throw new IllegalStateException("Chat prompts are shut down");
         ChatPromptSession session = new ChatPromptSession(player, first, initial);
         if (configure != null) configure.accept(session);
+        if (!acceptingSessions) throw new IllegalStateException("Chat prompts are shut down");
         ChatPromptSession previous = SESSIONS.put(player.getUUID(), session);
         if (previous != null) {
             previous.end();
@@ -105,9 +117,42 @@ public class ChatPrompts {
         if (session.isEnded()) abandon(session);
     }
 
-    /** Registered once at startup; there is nothing per-conversation to register or leak. */
-    public static void registerListeners() {
-        NeoForge.EVENT_BUS.register(new Dispatcher());
+    /** Register once per server lifetime, reopening prompts after a completed shutdown. */
+    public static synchronized void registerListeners() {
+        if (shuttingDown || net.citizensnpcs.Citizens.getInstance() != null
+                && net.citizensnpcs.Citizens.getInstance().isStopping())
+            throw new IllegalStateException("Chat prompts are shutting down");
+        if (dispatcher == null) {
+            Dispatcher candidate = new Dispatcher();
+            NeoForge.EVENT_BUS.register(candidate);
+            dispatcher = candidate;
+        }
+        acceptingSessions = true;
+    }
+
+    /** Reject new conversations before invoking callbacks and always release the server's listener. */
+    public static synchronized void shutdown() {
+        if (shuttingDown) return;
+        acceptingSessions = false;
+        shuttingDown = true;
+        Throwable failure = null;
+        try {
+            try { abandonAll(); }
+            catch (RuntimeException | Error ex) { failure = ex; }
+            if (dispatcher != null) {
+                try {
+                    NeoForge.EVENT_BUS.unregister(dispatcher);
+                    dispatcher = null;
+                } catch (RuntimeException | Error ex) {
+                    if (failure == null) failure = ex;
+                    else if (failure != ex) failure.addSuppressed(ex);
+                }
+            }
+        } finally {
+            shuttingDown = false;
+        }
+        if (failure instanceof RuntimeException ex) throw ex;
+        if (failure instanceof Error ex) throw ex;
     }
 
     private static void ask(ChatPromptSession session, ChatPrompt prompt) {
@@ -168,4 +213,7 @@ public class ChatPrompts {
     }
 
     private static final Map<UUID, ChatPromptSession> SESSIONS = new ConcurrentHashMap<>();
+    private static boolean acceptingSessions = true;
+    private static boolean shuttingDown;
+    private static Dispatcher dispatcher;
 }

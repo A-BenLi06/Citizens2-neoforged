@@ -31,6 +31,7 @@ import net.neoforged.fml.ModList;
 public final class LuckPermsGroups {
     private static final String MOD_ID = "luckperms";
     private static Object api;
+    private static GroupResolver installed;
     private static Method getUserManager;
     private static Method getUser;
     private static Method getContextManager;
@@ -50,6 +51,7 @@ public final class LuckPermsGroups {
      * @return true when group queries will now resolve
      */
     public static boolean install() {
+        uninstall();
         if (!ModList.get().isLoaded(MOD_ID)) {
             // Deliberately does not tell the reader to install LuckPerms: on 1.21.1 its only builds are from August
             // 2024 and the newer one kicks every player at login (its issues #4106 and #4235). Naming no mod is more
@@ -93,18 +95,34 @@ public final class LuckPermsGroups {
         } catch (Throwable ex) {
             Messaging.severe("LuckPerms is installed but its API could not be reached, so NPC group checks stay"
                     + " unresolved:", ex);
-            api = null;
+            uninstall();
             return false;
         }
-        PermissionUtil.setGroupResolver(new Resolver());
+        installed = new Resolver();
+        PermissionUtil.setGroupResolver(installed);
         Messaging.log("Group checks are resolving through LuckPerms.");
         return true;
+    }
+
+    /** Releases this bridge's server references without removing another provider's resolver. */
+    public static void uninstall() {
+        if (installed != null && PermissionUtil.getGroupResolver() == installed) PermissionUtil.setGroupResolver(null);
+        installed = null;
+        api = null;
+        getUserManager = null;
+        getUser = null;
+        getContextManager = null;
+        getQueryOptions = null;
+        nonContextual = null;
+        getInheritedGroups = null;
+        getGroupName = null;
+        WARNED.clear();
     }
 
     private static class Resolver implements GroupResolver {
         @Override
         public Boolean inGroup(ServerPlayer player, String group) {
-            if (api == null || player == null || group == null || group.isEmpty())
+            if (installed != this || api == null || player == null || group == null || group.isEmpty())
                 return null;
             try {
                 Object user = getUser.invoke(getUserManager.invoke(api), player.getUUID());

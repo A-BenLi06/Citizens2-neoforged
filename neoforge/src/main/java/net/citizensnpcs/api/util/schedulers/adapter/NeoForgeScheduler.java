@@ -1,12 +1,14 @@
 package net.citizensnpcs.api.util.schedulers.adapter;
 
 import java.util.ArrayList;
-import java.util.Iterator;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Queue;
+import java.util.Set;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
+import java.util.concurrent.RejectedExecutionException;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
@@ -32,6 +34,9 @@ import net.minecraft.world.entity.Entity;
 public class NeoForgeScheduler implements SchedulerAdapter {
     private final List<NeoForgeSchedulerTask> active = new ArrayList<>();
     private final ScheduledExecutorService async;
+    private final Set<NeoForgeSchedulerTask> asyncTasks = new HashSet<>();
+    private final Object lifecycle = new Object();
+    private boolean stopped;
     private long currentTick;
     private final Queue<NeoForgeSchedulerTask> incoming = new ConcurrentLinkedQueue<>();
     private final MinecraftServer server;
@@ -48,9 +53,17 @@ public class NeoForgeScheduler implements SchedulerAdapter {
 
     /** Cancels all pending tasks and shuts the async pool down. Call on server stop. */
     public void shutdown() {
-        active.clear();
-        incoming.clear();
-        async.shutdownNow();
+        synchronized (lifecycle) {
+            if (stopped) return;
+            stopped = true;
+            active.forEach(NeoForgeSchedulerTask::cancel);
+            incoming.forEach(NeoForgeSchedulerTask::cancel);
+            asyncTasks.forEach(NeoForgeSchedulerTask::cancel);
+            active.clear();
+            incoming.clear();
+            asyncTasks.clear();
+            async.shutdownNow();
+        }
     }
 
     @Override
@@ -59,24 +72,36 @@ public class NeoForgeScheduler implements SchedulerAdapter {
     }
 
     private SchedulerTask schedule(Runnable runnable, long delayTicks, long periodTicks) {
-        NeoForgeSchedulerTask task = new NeoForgeSchedulerTask(runnable, currentTick + Math.max(0, delayTicks),
-                periodTicks);
-        incoming.add(task);
-        return task;
+        synchronized (lifecycle) {
+            requireRunning();
+            NeoForgeSchedulerTask task = new NeoForgeSchedulerTask(runnable, currentTick + Math.max(0, delayTicks),
+                    periodTicks);
+            incoming.add(task);
+            return task;
+        }
+    }
+
+    private void requireRunning() {
+        if (stopped) throw new RejectedExecutionException("Citizens scheduler has stopped");
     }
 
     private SchedulerTask scheduleAsync(Runnable runnable, long delayTicks, long periodTicks) {
-        NeoForgeSchedulerTask task = new NeoForgeSchedulerTask(runnable, 0, periodTicks);
-        long delayMs = Math.max(0, delayTicks) * 50L;
-        Future<?> future;
-        if (periodTicks > 0) {
-            future = async.scheduleAtFixedRate(() -> runGuarded(task), delayMs, periodTicks * 50L,
-                    TimeUnit.MILLISECONDS);
-        } else {
-            future = async.schedule(() -> runGuarded(task), delayMs, TimeUnit.MILLISECONDS);
+        synchronized (lifecycle) {
+            requireRunning();
+            NeoForgeSchedulerTask task = new NeoForgeSchedulerTask(runnable, 0, periodTicks);
+            asyncTasks.removeIf(NeoForgeSchedulerTask::isCancelled);
+            asyncTasks.add(task);
+            long delayMs = Math.max(0, delayTicks) * 50L;
+            Future<?> future;
+            if (periodTicks > 0) {
+                future = async.scheduleAtFixedRate(() -> runGuarded(task), delayMs, periodTicks * 50L,
+                        TimeUnit.MILLISECONDS);
+            } else {
+                future = async.schedule(() -> runGuarded(task), delayMs, TimeUnit.MILLISECONDS);
+            }
+            task.setFuture(future);
+            return task;
         }
-        task.setFuture(future);
-        return task;
     }
 
     private void runGuarded(NeoForgeSchedulerTask task) {
@@ -86,23 +111,28 @@ public class NeoForgeScheduler implements SchedulerAdapter {
             task.getRunnable().run();
         } catch (Throwable t) {
             net.citizensnpcs.Citizens.LOGGER.error("Error in Citizens async task", t);
+        } finally {
+            if (!task.isRepeating()) {
+                synchronized (lifecycle) { asyncTasks.remove(task); }
+            }
         }
     }
 
     /** Drains due tasks. Must be called once per server tick from the main thread. */
     public void tick() {
-        currentTick++;
-        NeoForgeSchedulerTask staged;
-        while ((staged = incoming.poll()) != null) {
-            active.add(staged);
+        List<NeoForgeSchedulerTask> due;
+        synchronized (lifecycle) {
+            if (stopped) return;
+            currentTick++;
+            NeoForgeSchedulerTask staged;
+            while ((staged = incoming.poll()) != null) {
+                active.add(staged);
+            }
+            due = new ArrayList<>(active);
         }
-        if (active.isEmpty())
-            return;
 
-        for (Iterator<NeoForgeSchedulerTask> itr = active.iterator(); itr.hasNext();) {
-            NeoForgeSchedulerTask task = itr.next();
+        for (NeoForgeSchedulerTask task : due) {
             if (task.isCancelled()) {
-                itr.remove();
                 continue;
             }
             if (task.getNextRunTick() > currentTick) {
@@ -117,9 +147,9 @@ public class NeoForgeScheduler implements SchedulerAdapter {
                 task.setNextRunTick(currentTick + task.getPeriodTicks());
             } else {
                 task.cancel();
-                itr.remove();
             }
         }
+        synchronized (lifecycle) { active.removeIf(NeoForgeSchedulerTask::isCancelled); }
     }
 
     @Override

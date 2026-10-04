@@ -17,6 +17,11 @@ import net.minecraft.commands.CommandSourceStack;
 public class SimpleNPCSelector implements NPCSelector {
     private final Map<UUID, Selection> selected = new ConcurrentHashMap<>();
 
+    /** Release sender selections and anonymous-registry references when the server stops. */
+    public void clear() {
+        selected.clear();
+    }
+
     @Override
     public void deselect(CommandSourceStack sender) {
         selected.remove(keyOf(sender));

@@ -87,9 +87,11 @@ public abstract class Editor {
         return EDITING.get(player.getUUID());
     }
 
-    public static void enterOrLeave(ServerPlayer player, Editor editor) {
+    public static synchronized void enterOrLeave(ServerPlayer player, Editor editor) {
         if (editor == null)
             return;
+        if (!acceptingSessions)
+            throw new IllegalStateException("Editors are shut down");
         Editor existing = EDITING.get(player.getUUID());
         if (existing == null) {
             EDITING.put(player.getUUID(), editor);
@@ -118,14 +120,55 @@ public abstract class Editor {
     }
 
     public static void leaveAll() {
+        Throwable failure = null;
         for (Map.Entry<UUID, Editor> entry : new java.util.ArrayList<>(EDITING.entrySet())) {
-            if (EDITING.remove(entry.getKey(), entry.getValue())) entry.getValue().end();
+            if (!EDITING.remove(entry.getKey(), entry.getValue())) continue;
+            try { entry.getValue().end(); }
+            catch (RuntimeException | Error ex) {
+                if (failure == null) failure = ex;
+                else if (failure != ex) failure.addSuppressed(ex);
+            }
         }
+        if (failure instanceof RuntimeException ex) throw ex;
+        if (failure instanceof Error ex) throw ex;
     }
 
-    /** Registered once at startup; there is no per-editor registration to leak. */
-    public static void registerListeners() {
-        NeoForge.EVENT_BUS.register(new Dispatcher());
+    /** Register once per server lifetime, reopening editors after a completed shutdown. */
+    public static synchronized void registerListeners() {
+        if (shuttingDown || net.citizensnpcs.Citizens.getInstance() != null
+                && net.citizensnpcs.Citizens.getInstance().isStopping())
+            throw new IllegalStateException("Editors are shutting down");
+        if (dispatcher == null) {
+            Dispatcher candidate = new Dispatcher();
+            NeoForge.EVENT_BUS.register(candidate);
+            dispatcher = candidate;
+        }
+        acceptingSessions = true;
+    }
+
+    /** Reject new editors before invoking callbacks and always release the server's listener. */
+    public static synchronized void shutdown() {
+        if (shuttingDown) return;
+        acceptingSessions = false;
+        shuttingDown = true;
+        Throwable failure = null;
+        try {
+            try { leaveAll(); }
+            catch (RuntimeException | Error ex) { failure = ex; }
+            if (dispatcher != null) {
+                try {
+                    NeoForge.EVENT_BUS.unregister(dispatcher);
+                    dispatcher = null;
+                } catch (RuntimeException | Error ex) {
+                    if (failure == null) failure = ex;
+                    else if (failure != ex) failure.addSuppressed(ex);
+                }
+            }
+        } finally {
+            shuttingDown = false;
+        }
+        if (failure instanceof RuntimeException ex) throw ex;
+        if (failure instanceof Error ex) throw ex;
     }
 
     private static class Dispatcher {
@@ -197,4 +240,7 @@ public abstract class Editor {
     }
 
     private static final Map<UUID, Editor> EDITING = new ConcurrentHashMap<>();
+    private static boolean acceptingSessions = true;
+    private static boolean shuttingDown;
+    private static Dispatcher dispatcher;
 }

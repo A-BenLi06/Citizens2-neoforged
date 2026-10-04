@@ -24,7 +24,6 @@ import com.google.common.collect.Iterables;
 
 import net.citizensnpcs.api.CitizensAPI;
 import net.citizensnpcs.api.CitizensPlugin;
-import net.citizensnpcs.api.event.DespawnReason;
 import net.citizensnpcs.api.ai.tree.BehaviorRegistry;
 import net.citizensnpcs.npc.ai.tree.CitizensBehaviorRegistry;
 import net.citizensnpcs.api.expr.ExpressionRegistry;
@@ -103,9 +102,10 @@ public class Citizens implements CitizensPlugin {
     private NPCDataStore configuredNPCDataStore;
     private boolean npcDataOperation;
     private boolean serverStarted;
+    private boolean stopping;
     private NeoForgeScheduler scheduler;
     private MinecraftServer server;
-    private final net.citizensnpcs.api.npc.NPCSelector selector = new net.citizensnpcs.api.npc.SimpleNPCSelector();
+    private final net.citizensnpcs.api.npc.SimpleNPCSelector selector = new net.citizensnpcs.api.npc.SimpleNPCSelector();
     private final Map<String, NPCRegistry> storedRegistries = new HashMap<>();
     private NPCRegistry temporaryRegistry;
     private CitizensTraitFactory traitFactory;
@@ -147,6 +147,7 @@ public class Citizens implements CitizensPlugin {
 
     @Override
     public NPCRegistry createAnonymousNPCRegistry(NPCDataStore store) {
+        if (stopping) throw new IllegalStateException("NPC registries are unavailable during shutdown");
         CitizensNPCRegistry anon = new CitizensNPCRegistry(store, this, "anonymous-" + UUID.randomUUID());
         anonymousRegistries.add(anon);
         return anon;
@@ -154,6 +155,7 @@ public class Citizens implements CitizensPlugin {
 
     @Override
     public NPCRegistry createNamedNPCRegistry(String name, NPCDataStore store) {
+        if (stopping) throw new IllegalStateException("NPC registries are unavailable during shutdown");
         NPCRegistry created = new CitizensNPCRegistry(store, this, name);
         storedRegistries.put(name, created);
         return created;
@@ -275,6 +277,11 @@ public class Citizens implements CitizensPlugin {
         return enabled;
     }
 
+    /** Remains true after shutdown until the next server starts. */
+    public boolean isStopping() {
+        return stopping;
+    }
+
     @Override
     public void onImplementationChanged() {
         Messaging.severe("Citizens implementation changed, disabling");
@@ -311,6 +318,8 @@ public class Citizens implements CitizensPlugin {
     public void onServerStarting(ServerStartingEvent event) {
         server = event.getServer();
         serverStarted = false;
+        stopping = false;
+        saveOnDisable = true;
         scheduler = new NeoForgeScheduler(server);
         Schedulers.set(scheduler);
 
@@ -396,34 +405,49 @@ public class Citizens implements CitizensPlugin {
 
     @SubscribeEvent
     public void onServerStopping(ServerStoppingEvent event) {
+        if (stopping) return;
+        stopping = true;
         enabled = false;
-        net.citizensnpcs.util.ParadigmPlaceholders.uninstall();
-        ParadigmPermissions.uninstall();
-        ParadigmGroups.uninstall();
-        PermissionUtil.clearTemporary();
-        net.citizensnpcs.util.YuuniverseEconomy.uninstall();
-        Editor.leaveAll();
-        ChatPrompts.abandonAll();
-        if (npcRegistry != null) {
-            if (saveOnDisable) {
-                storeNPCsInternal();
-            }
-            npcRegistry.despawnNPCs(DespawnReason.RELOAD);
+        // Cleanup/provider callbacks may remove registry names; ownership at shutdown entry still must be retired.
+        Iterable<NPCRegistry> retiring = getNPCRegistries();
+        shutdownStep("editors", Editor::shutdown);
+        shutdownStep("chat prompts", ChatPrompts::shutdown);
+        // Saving must not prevent disposal. Keep providers/API available until traits have finished cleanup.
+        if (npcRegistry != null && saveOnDisable) shutdownStep("NPC and shop save", this::storeNPCsInternal);
+        for (NPCRegistry registry : retiring) {
+            shutdownStep("registry " + registry.getName(), () -> ((CitizensNPCRegistry) registry).retire());
         }
-        if (temporaryRegistry != null) {
-            temporaryRegistry.despawnNPCs(DespawnReason.RELOAD);
-        }
-        CitizensAPI.setImplementation(null);
-        Schedulers.unset();
+        npcRegistry = null;
+        temporaryRegistry = null;
+        storedRegistries.clear();
+        anonymousRegistries.clear();
+        shutdownStep("NPC selections", selector::clear);
         if (eventListen != null) {
-            NeoForge.EVENT_BUS.unregister(eventListen);
+            shutdownStep("pending respawns", eventListen::clearRespawnQueue);
+            shutdownStep("NPC listeners", () -> NeoForge.EVENT_BUS.unregister(eventListen));
             eventListen = null;
         }
         if (scheduler != null) {
-            scheduler.shutdown();
+            shutdownStep("scheduler", scheduler::shutdown);
             scheduler = null;
         }
+        shutdownStep("scheduler API", Schedulers::unset);
+        shutdownStep("Citizens API", () -> CitizensAPI.setImplementation(null));
+        shutdownStep("placeholders", net.citizensnpcs.util.ParadigmPlaceholders::uninstall);
+        shutdownStep("permissions", ParadigmPermissions::uninstall);
+        shutdownStep("groups", ParadigmGroups::uninstall);
+        shutdownStep("LuckPerms groups", LuckPermsGroups::uninstall);
+        shutdownStep("temporary permissions", PermissionUtil::clearTemporary);
+        shutdownStep("economy", net.citizensnpcs.util.YuuniverseEconomy::uninstall);
         LOGGER.info("Citizens disabled.");
+    }
+
+    private static void shutdownStep(String operation, Runnable action) {
+        try { action.run(); }
+        catch (RuntimeException | Error failure) {
+            // Throwing from the lifecycle event would also prevent later listeners/mods from stopping.
+            LOGGER.error("Error while stopping Citizens ({})", operation, failure);
+        }
     }
 
     /**
@@ -509,7 +533,7 @@ public class Citizens implements CitizensPlugin {
     private void beginNPCDataOperation() {
         if (server != null && !server.isSameThread())
             throw new IllegalStateException("NPC data-store operations must run on the server thread");
-        if (serverStarted && !enabled)
+        if (stopping || serverStarted && !enabled)
             throw new IllegalStateException("NPC data-store operations are unavailable during shutdown");
         if (npcDataOperation || npcRegistry != null && npcRegistry.isDataStoreBusy())
             throw new IllegalStateException("NPC data-store operation is already in progress");
