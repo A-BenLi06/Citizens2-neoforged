@@ -54,6 +54,8 @@ import net.minecraft.world.item.ItemStack;
 public class InventoryMenu implements Runnable {
     private final List<Runnable> closeCallbacks = new ArrayList<>();
     private boolean closing;
+    private boolean disposed;
+    private boolean firingCloseCallbacks;
     private PageContext page;
     private final Deque<PageContext> stack = new ArrayDeque<>();
     private boolean transitioning;
@@ -71,6 +73,7 @@ public class InventoryMenu implements Runnable {
 
     /** Closes the menu for every viewer. */
     public void close() {
+        if (disposed) return;
         pendingReturns.clear();
         cancelChatPrompts();
         closing = true;
@@ -84,13 +87,56 @@ public class InventoryMenu implements Runnable {
         }
         viewers.clear();
         closing = false;
-        for (Runnable callback : closeCallbacks) {
-            callback.run();
+        runCloseCallbacks();
+    }
+
+    /** Permanently ends this menu, including deferred returns and chat input, even if a close callback fails. */
+    public void dispose() {
+        if (disposed) return;
+        disposed = true;
+        pendingReturns.clear();
+        Map<ServerPlayer, AbstractContainerMenu> active = new LinkedHashMap<>(viewers);
+        viewers.clear();
+        Throwable[] failure = { null };
+        finishDisposal(this::cancelChatPrompts, failure);
+        closing = true;
+        for (var entry : active.entrySet()) {
+            if (page != null) finishDisposal(() -> page.page.onClose(entry.getKey()), failure);
+            finishDisposal(() -> {
+                if (entry.getKey().containerMenu == entry.getValue()) entry.getKey().closeContainer();
+            }, failure);
         }
+        page = null;
+        stack.clear();
+        closing = false;
+        finishDisposal(this::runCloseCallbacks, failure);
+        closeCallbacks.clear();
+        if (failure[0] instanceof RuntimeException ex) throw ex;
+        if (failure[0] instanceof Error ex) throw ex;
+    }
+
+    private static void finishDisposal(Runnable action, Throwable[] failure) {
+        try { action.run(); }
+        catch (RuntimeException | Error ex) {
+            if (failure[0] == null) failure[0] = ex;
+            else if (failure[0] != ex) failure[0].addSuppressed(ex);
+        }
+    }
+
+    private void runCloseCallbacks() {
+        if (firingCloseCallbacks) return;
+        firingCloseCallbacks = true;
+        Throwable[] failure = { null };
+        try {
+            for (Runnable callback : new ArrayList<>(closeCallbacks)) finishDisposal(callback, failure);
+        } finally { firingCloseCallbacks = false; }
+        if (failure[0] instanceof RuntimeException ex) throw ex;
+        if (failure[0] instanceof Error ex) throw ex;
     }
 
     /** Closes the menu for one viewer, leaving it open for any others. */
     public void close(ServerPlayer player) {
+        if (disposed) return;
         pendingReturns.remove(player);
         cancelChatPrompt(player);
         if (!viewers.containsKey(player))
@@ -109,14 +155,14 @@ public class InventoryMenu implements Runnable {
 
     /** The current page and player session still own this exact container. */
     boolean isCurrent(AbstractContainerMenu container, Player player) {
-        return page != null && !closing && !transitioning && player instanceof ServerPlayer viewer
+        return !disposed && page != null && !closing && !transitioning && player instanceof ServerPlayer viewer
                 && !viewer.hasDisconnected() && viewer.containerMenu == container && viewers.get(viewer) == container
                 && viewer.getServer().getPlayerList().getPlayer(viewer.getUUID()) == viewer;
     }
 
     /** Shows the menu to a player. Several players may share one menu; transitions affect all of them. */
     public void present(ServerPlayer player) {
-        if (page == null)
+        if (disposed || page == null)
             return;
         openFor(player);
         pendingReturns.remove(player);
@@ -124,7 +170,7 @@ public class InventoryMenu implements Runnable {
 
     @Override
     public void run() {
-        if (page == null || transitioning)
+        if (disposed || page == null || transitioning)
             return;
         page.page.run();
     }
@@ -138,7 +184,7 @@ public class InventoryMenu implements Runnable {
      * that slot.
      */
     void handleClick(CitizensInventoryClickEvent event) {
-        if (page == null || transitioning || closing) {
+        if (disposed || page == null || transitioning || closing) {
             event.setCancelled(true);
             return;
         }
@@ -174,7 +220,7 @@ public class InventoryMenu implements Runnable {
 
     /** Called by {@link CitizensMenuContainer} when a viewer's screen closes. */
     void onContainerClosed(AbstractContainerMenu container, Player player) {
-        if (closing || transitioning || page == null)
+        if (disposed || closing || transitioning || page == null)
             return;
         if (!(player instanceof ServerPlayer serverPlayer) || viewers.get(serverPlayer) != container)
             return;
@@ -234,7 +280,7 @@ public class InventoryMenu implements Runnable {
     }
 
     private void transitionBack(ServerPlayer closedBy) {
-        if (page == null)
+        if (disposed || page == null)
             return;
         pendingReturns.clear();
         cancelChatPrompts();
@@ -257,15 +303,14 @@ public class InventoryMenu implements Runnable {
             }
             viewers.clear();
             closing = false;
-            for (Runnable callback : closeCallbacks) {
-                callback.run();
-            }
+            runCloseCallbacks();
             return;
         }
         reopenAll();
     }
 
     private void transition(InventoryMenuInfo info, InventoryMenuPage instance, Map<String, Object> context) {
+        if (disposed) return;
         pendingReturns.clear();
         cancelChatPrompts();
         if (page != null) {
@@ -371,6 +416,7 @@ public class InventoryMenu implements Runnable {
     }
 
     private void openFor(ServerPlayer player) {
+        if (disposed || page == null) return;
         PageContext current = page;
         String initial = current.page instanceof InputMenus.ChatStringInputPage input ? input.initialValue() : null;
         if (current.page instanceof InputMenus.ChatStringInputPage input) {
@@ -385,6 +431,7 @@ public class InventoryMenu implements Runnable {
         MenuProvider provider = new MenuProvider() {
             @Override
             public AbstractContainerMenu createMenu(int containerId, Inventory inventory, Player who) {
+                if (disposed || page != current) return null;
                 AbstractContainerMenu container = current.page instanceof InputMenus.StringInputPage input
                         ? new CitizensAnvilMenu(containerId, inventory, InventoryMenu.this, input, initial)
                         : new CitizensMenuContainer(type, containerId, inventory,
@@ -435,10 +482,12 @@ public class InventoryMenu implements Runnable {
     }
 
     private void cancelChatPrompts() {
-        for (Runnable cancel : chatPrompts.values()) {
-            cancel.run();
-        }
+        List<Runnable> pending = new ArrayList<>(chatPrompts.values());
         chatPrompts.clear();
+        Throwable[] failure = { null };
+        for (Runnable cancel : pending) finishDisposal(cancel, failure);
+        if (failure[0] instanceof RuntimeException ex) throw ex;
+        if (failure[0] instanceof Error ex) throw ex;
     }
 
     /**

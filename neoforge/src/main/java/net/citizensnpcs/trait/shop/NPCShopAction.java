@@ -165,4 +165,18 @@ public abstract class NPCShopAction implements Cloneable {
     private static final List<GUI> GUIS = new ArrayList<>();
     private static final PersisterRegistry<NPCShopAction> REGISTRY = PersistenceLoader
             .createRegistry(NPCShopAction.class);
+    private static boolean bootstrapped;
+    /** Makes built-in actions available without requiring an NPC ShopTrait instance. */
+    public static void bootstrap() {
+        if (bootstrapped) return;
+        bootstrapped = true;
+        register(ItemAction.class, "items", new ItemAction.ItemActionGUI());
+        register(PermissionAction.class, "permissions", new PermissionAction.PermissionActionGUI());
+        register(MoneyAction.class, "money", new MoneyAction.MoneyActionGUI());
+        register(CommandAction.class, "command", new CommandAction.CommandActionGUI());
+        register(ExperienceAction.class, "experience", new ExperienceAction.ExperienceActionGUI());
+        register(OpenShopAction.class, "open_shop", new OpenShopAction.OpenShopActionGUI());
+        register(ConditionAction.class, "condition", new ConditionAction.ConditionActionGUI());
+    }
+    static { bootstrap(); }
 }

@@ -13,6 +13,44 @@ import net.citizensnpcs.api.util.YamlStorage;
 
 class StoredShopsTest {
     @Test
+    void publicationRetiresEverySessionEvenWhenOneCloseThrows(@TempDir Path directory) {
+        YamlStorage storage = new YamlStorage(directory.resolve("shops.yml").toFile());
+        StoredShops shops = new StoredShops(storage);
+        assertTrue(shops.loadFromDisk());
+        NPCShop old = shops.addNamedShop("old");
+        java.util.concurrent.atomic.AtomicInteger closed = new java.util.concurrent.atomic.AtomicInteger();
+        old.trackSession(closed, count -> { count.incrementAndGet(); throw new IllegalStateException("expected close failure"); });
+        old.trackSession(closed, java.util.concurrent.atomic.AtomicInteger::incrementAndGet);
+        storage.getKey("").setRaw("global", Map.of("new", "new"));
+        var ready = shops.prepareLoad();
+        assertTrue(old.isActive());
+        assertEquals(0, closed.get());
+        assertThrows(IllegalStateException.class, ready::publish);
+        assertFalse(old.isActive());
+        assertEquals(2, closed.get());
+        assertNotNull(shops.getGlobalShop("new"));
+        assertNull(shops.getGlobalShop("old"));
+        assertThrows(IllegalStateException.class, () -> old.trackSession(closed, count -> {}));
+    }
+
+    @Test
+    void tradingShopCannotBePreparedOrPublishedAway(@TempDir Path directory) {
+        YamlStorage storage = new YamlStorage(directory.resolve("shops.yml").toFile());
+        StoredShops shops = new StoredShops(storage);
+        assertTrue(shops.loadFromDisk());
+        NPCShop old = shops.addNamedShop("old");
+        var ready = shops.prepareLoad();
+        assertTrue(old.beginTrade());
+        assertThrows(IllegalStateException.class, shops::prepareLoad);
+        assertThrows(IllegalStateException.class, ready::publish);
+        assertThrows(IllegalStateException.class, shops::closeSessions);
+        assertTrue(old.isActive());
+        old.endTrade();
+        ready.publish();
+        assertFalse(old.isActive());
+        assertFalse(old.beginTrade());
+    }
+    @Test
     void quotedPurchaseCountsUseMapValueTypeRatherThanUuidKeyType(@TempDir Path directory) {
         YamlStorage storage = new YamlStorage(directory.resolve("shops.yml").toFile());
         StoredShops shops = new StoredShops(storage);

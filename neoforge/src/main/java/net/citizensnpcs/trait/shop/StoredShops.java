@@ -24,6 +24,15 @@ public class StoredShops {
     private final Storage storage;
     private boolean sourceAvailable;
     private long sourceGeneration;
+    private boolean publishing;
+    private boolean closed;
+
+    private java.util.Set<NPCShop> currentShops() {
+        var result = java.util.Collections.newSetFromMap(new java.util.IdentityHashMap<NPCShop, Boolean>());
+        result.addAll(globalShops.values());
+        result.addAll(npcShops.values());
+        return result;
+    }
 
     public StoredShops(YamlStorage storage) {
         this((Storage) storage);
@@ -34,16 +43,41 @@ public class StoredShops {
     }
 
     public NPCShop addNamedShop(String name) {
+        requireOpen();
         return globalShops.computeIfAbsent(name, NPCShop::new);
+    }
+
+    public NPCShop addNPCShop(String name) {
+        requireOpen();
+        return npcShops.computeIfAbsent(name, NPCShop::new);
+    }
+
+    private void requireOpen() {
+        if (closed || publishing) throw new IllegalStateException("Shop sessions are unavailable");
     }
 
     public void deleteShop(NPCShop shop) {
         Messaging.idebug(() -> "Deleting shop " + shop.getName());
-        if (npcShops.containsKey(shop.getName())) {
-            npcShops.remove(shop.getName());
-        } else {
-            globalShops.remove(shop.getName());
+        shop.requireIdle();
+        if (npcShops.remove(shop.getName(), shop) || globalShops.remove(shop.getName(), shop)) shop.retire();
+    }
+
+    /** Release views and editors before shutdown saving so their final edits are included. */
+    public void closeSessions() {
+        if (closed) return;
+        var current = currentShops();
+        current.forEach(NPCShop::requireIdle);
+        closed = true;
+        Throwable failure = null;
+        for (NPCShop shop : current) {
+            try { shop.retire(); }
+            catch (RuntimeException | Error ex) {
+                if (failure == null) failure = ex;
+                else if (failure != ex) failure.addSuppressed(ex);
+            }
         }
+        if (failure instanceof RuntimeException ex) throw ex;
+        if (failure instanceof Error ex) throw ex;
     }
 
     public NPCShop getGlobalShop(String name) {
@@ -69,7 +103,10 @@ public class StoredShops {
 
     /** Decode into fresh maps so a failed child never mutates current shops or drops a stored trade. */
     public PreparedLoad prepareLoad() {
+        requireOpen();
         requireSource();
+        NPCShopAction.bootstrap();
+        currentShops().forEach(NPCShop::requireIdle);
         try {
             StoredShops candidate = new StoredShops(storage);
             PersistenceLoader.loadStrict(candidate, storage.getKey("").copyWithRoot());
@@ -90,15 +127,31 @@ public class StoredShops {
         }
 
         public void publish() {
+            requireOpen();
             requireSource();
             if (generation != sourceGeneration) throw new IllegalStateException("Shop source changed after preparation");
-            globalShops = candidate.globalShops;
-            npcShops = candidate.npcShops;
-            sourceGeneration++;
+            var previous = currentShops();
+            previous.forEach(NPCShop::requireIdle);
+            publishing = true;
+            Throwable failure = null;
+            try {
+                for (NPCShop shop : previous) {
+                    try { shop.retire(); }
+                    catch (RuntimeException | Error ex) {
+                        if (failure == null) failure = ex;
+                        else if (failure != ex) failure.addSuppressed(ex);
+                    }
+                }
+                globalShops = candidate.globalShops;
+                npcShops = candidate.npcShops;
+                sourceGeneration++;
+            } finally { publishing = false; }
+            if (failure != null) throw new IllegalStateException("Shops restored, but previous sessions could not all close", failure);
         }
     }
 
     public boolean loadFromDisk() {
+        requireOpen();
         sourceGeneration++;
         sourceAvailable = false;
         sourceAvailable = storage.load();
@@ -122,6 +175,7 @@ public class StoredShops {
     }
 
     private void requireSource() {
+        if (publishing) throw new IllegalStateException("Shop publication is already in progress");
         if (!sourceAvailable) throw new IllegalStateException("Shop storage has not been loaded successfully");
     }
 }

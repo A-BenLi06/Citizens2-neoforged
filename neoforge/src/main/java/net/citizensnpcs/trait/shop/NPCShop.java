@@ -36,6 +36,51 @@ public class NPCShop {
     private ShopType type = ShopType.DEFAULT;
     @Persist
     private String viewPermission;
+    private boolean retired;
+    private int activeTrades;
+    private final java.util.Set<Session<?>> sessions = new java.util.HashSet<>();
+
+    private record Session<T>(java.lang.ref.WeakReference<T> target, java.util.function.Consumer<T> close) {
+        void end() { T value = target.get(); if (value != null) close.accept(value); }
+    }
+
+    <T> Runnable trackSession(T target, java.util.function.Consumer<T> close) {
+        if (retired) throw new IllegalStateException("Shop has been retired");
+        sessions.removeIf(session -> session.target().get() == null);
+        Session<T> session = new Session<>(new java.lang.ref.WeakReference<>(target), close);
+        sessions.add(session);
+        return () -> sessions.remove(session);
+    }
+
+    public boolean isActive() { return !retired; }
+    boolean beginTrade() { if (retired) return false; activeTrades++; return true; }
+    void endTrade() { activeTrades--; }
+    void requireIdle() {
+        if (activeTrades != 0) throw new IllegalStateException("Cannot replace a shop during a transaction");
+    }
+
+    void retire() {
+        requireIdle();
+        if (retired) return;
+        retired = true;
+        var pending = new ArrayList<>(sessions);
+        sessions.clear();
+        Throwable failure = null;
+        for (Session<?> session : pending) {
+            try { session.end(); }
+            catch (RuntimeException | Error ex) {
+                if (failure == null) failure = ex;
+                else if (failure != ex) failure.addSuppressed(ex);
+            }
+        }
+        if (failure instanceof RuntimeException ex) throw ex;
+        if (failure instanceof Error ex) throw ex;
+    }
+
+    private void present(InventoryMenu menu, ServerPlayer player) {
+        menu.addCloseCallback(trackSession(menu, InventoryMenu::dispose));
+        menu.present(player);
+    }
 
     private NPCShop() {
     }
@@ -60,6 +105,7 @@ public class NPCShop {
     }
 
     public void display(NPCShopStorage storage, ServerPlayer sender) {
+        if (retired) return;
         if (!canView(sender))
             return;
         if (pages.isEmpty()) {
@@ -69,7 +115,7 @@ public class NPCShop {
         if (getShopType() == ShopType.TRADER) {
             NPCTraderShopViewer.open(this, storage, sender);
         } else {
-            InventoryMenu.createSelfRegistered(new NPCShopViewer(this, storage, sender)).present(sender);
+            present(InventoryMenu.createSelfRegistered(new NPCShopViewer(this, storage, sender)), sender);
         }
     }
 
@@ -78,7 +124,8 @@ public class NPCShop {
     }
 
     public void displayEditor(ShopTrait trait, ServerPlayer sender) {
-        InventoryMenu.createSelfRegistered(new NPCShopSettings(trait, this)).present(sender);
+        if (retired) return;
+        present(InventoryMenu.createSelfRegistered(new NPCShopSettings(trait, this)), sender);
     }
 
     public String getName() {

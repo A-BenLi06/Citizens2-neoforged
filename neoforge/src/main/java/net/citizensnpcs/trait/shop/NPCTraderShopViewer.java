@@ -39,6 +39,7 @@ public class NPCTraderShopViewer {
     }
 
     public static void open(NPCShop shop, NPCShopStorage storage, ServerPlayer player) {
+        if (!shop.isActive()) return;
         Map<Integer, NPCShopItem> trades = new HashMap<>();
         MerchantOffers offers = new MerchantOffers();
         for (NPCShopPage page : shop.getPages()) {
@@ -166,6 +167,9 @@ public class NPCTraderShopViewer {
         private final NPCShop shop;
         private final NPCShopStorage storage;
         private final Map<Integer, NPCShopItem> trades;
+        private final Player owner;
+        private final Runnable detach;
+        private boolean invalidated;
 
         ShopMerchantMenu(int id, Inventory inventory, Merchant merchant, NPCShop shop, NPCShopStorage storage,
                 Map<Integer, NPCShopItem> trades) {
@@ -173,10 +177,30 @@ public class NPCTraderShopViewer {
             this.shop = shop;
             this.storage = storage;
             this.trades = trades;
+            owner = inventory.player;
+            merchant.setTradingPlayer(owner);
+            detach = shop.trackSession(this, ShopMerchantMenu::dispose);
+        }
+
+        private void dispose() {
+            invalidated = true;
+            try { if (owner.containerMenu == this) owner.closeContainer(); }
+            finally { detach.run(); }
+        }
+
+        @Override public void removed(Player player) {
+            invalidated = true;
+            try { super.removed(player); }
+            finally { detach.run(); }
+        }
+
+        @Override public boolean stillValid(Player player) {
+            return !invalidated && shop.isActive() && super.stillValid(player);
         }
 
         @Override
         public void clicked(int slotId, int button, ClickType clickType, Player player) {
+            if (invalidated || !shop.isActive() || player != owner || player.containerMenu != this) return;
             if (slotId != RESULT_SLOT || !(player instanceof ServerPlayer buyer)) {
                 super.clicked(slotId, button, clickType, player);
                 return;

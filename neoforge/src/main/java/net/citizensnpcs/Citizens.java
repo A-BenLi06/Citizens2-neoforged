@@ -328,6 +328,7 @@ public class Citizens implements CitizensPlugin {
         Translator.setInstance(dataFolder, Locale.getDefault());
 
         traitFactory = new CitizensTraitFactory();
+        net.citizensnpcs.trait.shop.NPCShopAction.bootstrap();
         expressionRegistry = new ExpressionRegistry();
         expressionRegistry.registerEngine(new MolangEngine());
         behaviorRegistry = new CitizensBehaviorRegistry(expressionRegistry);
@@ -412,6 +413,7 @@ public class Citizens implements CitizensPlugin {
         Iterable<NPCRegistry> retiring = getNPCRegistries();
         shutdownStep("editors", Editor::shutdown);
         shutdownStep("chat prompts", ChatPrompts::shutdown);
+        if (shops != null) shutdownStep("shop sessions", shops::closeSessions);
         // Saving must not prevent disposal. Keep providers/API available until traits have finished cleanup.
         if (npcRegistry != null && saveOnDisable) shutdownStep("NPC and shop save", this::storeNPCsInternal);
         for (NPCRegistry registry : retiring) {
@@ -587,13 +589,23 @@ public class Citizens implements CitizensPlugin {
             }
             Editor.leaveAll();
             ChatPrompts.abandonAll();
+            Throwable cleanupFailure = null;
             if (candidate != null) {
                 CitizensNPCRegistry previous = npcRegistry;
                 npcRegistry = candidate;
                 if (eventListen != null) eventListen.clearRespawnQueue(previous);
-                previous.retire();
+                try { previous.retire(); }
+                catch (RuntimeException | Error failure) { cleanupFailure = failure; }
             }
-            if (preparedShops != null) preparedShops.publish();
+            if (preparedShops != null) {
+                try { preparedShops.publish(); }
+                catch (RuntimeException | Error failure) {
+                    if (cleanupFailure == null) cleanupFailure = failure;
+                    else if (cleanupFailure != failure) cleanupFailure.addSuppressed(failure);
+                }
+            }
+            if (cleanupFailure instanceof RuntimeException failure) throw failure;
+            if (cleanupFailure instanceof Error failure) throw failure;
         } catch (RuntimeException | Error failure) {
             if (candidate != null && npcRegistry != candidate) {
                 try {
