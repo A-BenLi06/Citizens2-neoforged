@@ -22,6 +22,7 @@ public class StoredShops {
     @Persist(value = "npc", reify = true)
     public Map<String, NPCShop> npcShops = new HashMap<>();
     private final Storage storage;
+    private boolean sourceAvailable;
 
     public StoredShops(YamlStorage storage) {
         this.storage = storage;
@@ -58,22 +59,32 @@ public class StoredShops {
     }
 
     public void load() {
+        requireSource();
         PersistenceLoader.load(this, storage.getKey(""));
     }
 
     public boolean loadFromDisk() {
-        return storage.load();
+        sourceAvailable = false;
+        sourceAvailable = storage.load();
+        return sourceAvailable;
     }
 
     public void saveToDisk() {
+        requireSource();
         storage.saveAsync();
     }
 
     public void saveToDiskImmediate() {
+        requireSource();
         storage.save();
     }
 
     public void storeShops() {
-        PersistenceLoader.save(this, storage.getKey(""));
+        requireSource();
+        storage.getKey("").writeAtomically(key -> PersistenceLoader.save(this, key));
+    }
+
+    private void requireSource() {
+        if (!sourceAvailable) throw new IllegalStateException("Shop storage has not been loaded successfully");
     }
 }

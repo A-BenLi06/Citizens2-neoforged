@@ -36,26 +36,41 @@ import net.citizensnpcs.api.util.YamlStorage;
 public class Settings {
     private final File file;
     private final Storage storage;
+    private boolean sourceAvailable;
 
     public Settings(File folder) {
-        file = new File(folder, "config.yml");
-        storage = new YamlStorage(file, "Citizens Configuration");
+        this(new File(folder, "config.yml"), new YamlStorage(new File(folder, "config.yml"), "Citizens Configuration"));
+    }
+
+    Settings(File file, Storage storage) {
+        this.file = file;
+        this.storage = storage;
         load();
     }
 
     private void load() {
-        storage.load();
+        sourceAvailable = false;
+        if (!storage.load()) {
+            throw new IllegalStateException("Unable to load Citizens configuration: " + file);
+        }
         DataKey root = storage.getKey("");
+        Map<Setting, LoadedSetting> loaded = new LinkedHashMap<>();
         boolean dirty = false;
         for (Setting setting : Setting.values()) {
-            if (setting.loadFrom(root)) {
-                dirty = true;
-            }
+            LoadedSetting candidate = setting.readFrom(root);
+            loaded.put(setting, candidate);
+            dirty |= candidate.dirty();
         }
-        updateMessagingSettings();
         if (dirty) {
             storage.save();
         }
+        // Keep every live value and parsed-duration cache intact until defaults and migrations are durable.
+        loaded.forEach((setting, candidate) -> setting.set(candidate.value()));
+        updateMessagingSettings();
+        sourceAvailable = true;
+    }
+
+    private record LoadedSetting(Object value, boolean dirty) {
     }
 
     public void reload() {
@@ -63,6 +78,7 @@ public class Settings {
     }
 
     public void save() {
+        if (!sourceAvailable) throw new IllegalStateException("Citizens configuration has not been loaded successfully");
         DataKey root = storage.getKey("");
         for (Setting setting : Setting.values()) {
             setting.writeTo(root);
@@ -218,24 +234,21 @@ public class Settings {
         /**
          * Reads this setting out of the config, migrating from the old path when present.
          *
-         * @return true when the config was missing the key and the default was written back
+         * Stages the value without changing the live setting or its parsed duration.
          */
-        boolean loadFrom(DataKey root) {
-            duration = null;
+        private LoadedSetting readFrom(DataKey root) {
             if (migrateFrom != null && root.keyExists(migrateFrom) && !root.keyExists(path)) {
-                value = root.getRaw(migrateFrom);
+                Object migrated = root.getRaw(migrateFrom);
                 root.removeKey(migrateFrom);
-                writeTo(root);
-                return true;
+                root.setRaw(path, migrated);
+                return new LoadedSetting(migrated, true);
             }
             if (!root.keyExists(path)) {
-                value = def;
-                writeTo(root);
-                return true;
+                root.setRaw(path, def);
+                return new LoadedSetting(def, true);
             }
             Object raw = root.getRaw(path);
-            value = raw == null ? def : raw;
-            return false;
+            return new LoadedSetting(raw == null ? def : raw, false);
         }
 
         void writeTo(DataKey root) {

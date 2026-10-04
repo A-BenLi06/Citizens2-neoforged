@@ -73,6 +73,11 @@ public class ShopTrait extends Trait {
         shops.deleteShop(getDefaultShop());
     }
 
+    @Override
+    public void onRetire() {
+        // The shop belongs to the saved NPC identity, not this runtime trait instance.
+    }
+
     @TraitEventHandler
     public void onRightClick(NPCRightClickEvent event) {
         if (rightClickShop == null || rightClickShop.isEmpty())

@@ -562,6 +562,13 @@ public class Citizens implements CitizensPlugin {
     }
 
     private void reloadInternal() throws NPCLoadException {
+        if (shops != null) {
+            try {
+                if (!shops.loadFromDisk()) throw new IllegalStateException("Could not read shop storage");
+            } catch (RuntimeException failure) {
+                throw new NPCLoadException("Could not reload shop storage", failure);
+            }
+        }
         // A failed source read must leave current entities, editors and pending respawns in place.
         if (saves != null) {
             try { saves.reloadFromSource(); }
@@ -598,7 +605,6 @@ public class Citizens implements CitizensPlugin {
                     ? "NPCs restored, but old NPC cleanup failed" : "Could not restore NPCs", failure);
         }
         if (shops != null) {
-            shops.loadFromDisk();
             shops.load();
         }
         templateRegistry = new TemplateRegistry(new File(dataFolder, "templates").toPath());

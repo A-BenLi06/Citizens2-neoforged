@@ -152,15 +152,15 @@ public abstract class AbstractNPC implements NPC {
 
     @Override
     public void destroy() {
-        dispose(() -> NeoForge.EVENT_BUS.post(new NPCRemoveEvent(this)), () -> registry.deregister(this));
+        dispose(() -> NeoForge.EVENT_BUS.post(new NPCRemoveEvent(this)), () -> registry.deregister(this), false);
     }
 
     /** Releases a replaced registry's runtime instance without announcing deletion or clearing its stored record. */
     protected final void retire(Runnable releaseEntity) {
-        dispose(releaseEntity, null);
+        dispose(releaseEntity, null, true);
     }
 
-    private void dispose(Runnable beforeTraits, Runnable afterTraits) {
+    private void dispose(Runnable beforeTraits, Runnable afterTraits, boolean retiring) {
         if (destroyed) return;
         destroyed = true;
         Throwable[] failure = { null };
@@ -171,7 +171,10 @@ public abstract class AbstractNPC implements NPC {
         cleanupTraits.forEach(trait -> {
             finishCleanup(() -> EventBusUtil.unregister(trait), failure);
             if (getTraitNullable(trait.getClass()) == trait)
-                finishCleanup(() -> trait.onRemove(RemoveReason.DESTROYED), failure);
+                finishCleanup(() -> {
+                    if (retiring) trait.onRetire();
+                    else trait.onRemove(RemoveReason.DESTROYED);
+                }, failure);
         });
         traits.clear();
         finishCleanup(goalController::clear, failure);

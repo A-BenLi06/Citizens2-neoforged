@@ -2,18 +2,27 @@ package net.citizensnpcs;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertSame;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.time.Duration;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 
 import net.citizensnpcs.Settings.Setting;
+import net.citizensnpcs.api.util.DataKey;
+import net.citizensnpcs.api.util.Messaging;
+import net.citizensnpcs.api.util.Storage;
+import net.citizensnpcs.api.util.YamlStorage;
 
 /**
  * Covers the parts of {@link Settings} the port had to rewrite: reading through {@code YamlStorage} instead of Bukkit's
@@ -98,6 +107,79 @@ public class SettingsTest {
         write(dir, "npc:\n  limits:\n    default-limit: 7\n");
         settings.reload();
         assertEquals(7, Setting.DEFAULT_NPC_LIMIT.asInt());
+    }
+
+    @Test
+    public void malformedReloadPreservesLiveSettingsAndFile(@TempDir Path dir) throws IOException {
+        Settings settings = new Settings(dir.toFile());
+        Setting.DEFAULT_NPC_LIMIT.set(37);
+        Duration duration = Setting.DEFAULT_RANDOM_LOOK_DELAY.asDuration();
+        Map<Setting, String> live = snapshot();
+        String malformed = "npc: [unterminated\n";
+        write(dir, malformed);
+
+        assertThrows(IllegalStateException.class, settings::reload);
+
+        assertEquals(live, snapshot());
+        assertSame(duration, Setting.DEFAULT_RANDOM_LOOK_DELAY.asDuration());
+        assertEquals(malformed, read(dir));
+        assertThrows(IllegalStateException.class, settings::save);
+        assertEquals(malformed, read(dir));
+        assertThrows(IllegalStateException.class, () -> new Settings(dir.toFile()));
+        assertEquals(live, snapshot());
+        assertEquals(malformed, read(dir));
+    }
+
+    @Test
+    public void failedMigrationSaveDoesNotPublishAnySettings(@TempDir Path dir) throws IOException {
+        YamlStorage backing = new YamlStorage(dir.resolve("config.yml").toFile());
+        class FailingStorage implements Storage {
+            boolean failSave;
+            Runnable beforeSave = () -> { };
+
+            @Override public DataKey getKey(String root) { return backing.getKey(root); }
+            @Override public boolean load() { return backing.load(); }
+            @Override public void saveAsync() { save(); }
+            @Override public void save() {
+                beforeSave.run();
+                if (failSave) throw new IllegalStateException("Expected settings write failure");
+                backing.save();
+            }
+        }
+        FailingStorage storage = new FailingStorage();
+        Settings settings = new Settings(dir.resolve("config.yml").toFile(), storage);
+        Duration duration = Setting.DEFAULT_RANDOM_LOOK_DELAY.asDuration();
+        Map<Setting, String> live = snapshot();
+        boolean debugging = Messaging.isDebugging();
+        String replacement = "general:\n  debug-mode: true\nnpc:\n  limits:\n    default-limit: 72\n"
+                + "  default:\n    look-close:\n      random-look-delay: 9s\n      realistic-looking: true\n";
+        write(dir, replacement);
+        storage.beforeSave = () -> {
+            assertEquals(live, snapshot(), "Values must remain unpublished during persistence");
+            assertSame(duration, Setting.DEFAULT_RANDOM_LOOK_DELAY.asDuration());
+            assertEquals(debugging, Messaging.isDebugging());
+        };
+        storage.failSave = true;
+
+        assertThrows(IllegalStateException.class, settings::reload);
+
+        assertEquals(live, snapshot());
+        assertSame(duration, Setting.DEFAULT_RANDOM_LOOK_DELAY.asDuration());
+        assertEquals(debugging, Messaging.isDebugging());
+        assertEquals(replacement, read(dir));
+        storage.failSave = false;
+        settings.reload();
+        assertEquals(72, Setting.DEFAULT_NPC_LIMIT.asInt());
+        assertEquals(180, Setting.DEFAULT_RANDOM_LOOK_DELAY.asTicks());
+        assertTrue(Setting.DEFAULT_REALISTIC_LOOKING.asBoolean());
+        assertTrue(Messaging.isDebugging());
+        assertTrue(read(dir).contains("realistic-looking: true"));
+    }
+
+    private static Map<Setting, String> snapshot() {
+        Map<Setting, String> values = new LinkedHashMap<>();
+        for (Setting setting : Setting.values()) values.put(setting, setting.asString());
+        return values;
     }
 
     @Test

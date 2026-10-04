@@ -118,6 +118,15 @@ public abstract class Trait implements Runnable {
     }
 
     /**
+     * Releases a runtime instance during registry replacement or server shutdown, without deleting its saved data.
+     * The default preserves legacy cleanup callbacks; traits owning independent persistent records should override
+     * this hook to release runtime resources while retaining those records.
+     */
+    public void onRetire() {
+        onRemove(RemoveReason.DESTROYED);
+    }
+
+    /**
      * Called when an {@link NPC} is spawned. {@link NPC#getEntity()} will return null until this is called. This is
      * also called onAttach when the NPC is already spawned.
      */
