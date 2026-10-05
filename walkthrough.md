@@ -1621,3 +1621,9 @@ All 438 ordinary tests and the normal build pass without failures/errors/skips; 
 ExpressionValue.evaluateAsNumber now checks failed string parsing before unboxing and throws an IllegalArgumentException containing the offending value. Valid literal and compiled-expression behavior remains unchanged.
 
 Two tests cover malformed/empty literals with useful diagnostics and decimal/scientific/compiled conversions. All 440 ordinary tests and the normal build pass without failures/errors/skips; git diff --check passes. No fresh native/client run is claimed. Production Interactions sources and packaging are unchanged; no unrelated server or original data was changed. Updated docs/behavior-replacement-2026-10-05.md. The full Citizens goal remains active.
+
+## 2026-10-06 04:47:53 +08:00 — Align expression scope caching and inherited binding lookup
+
+Rebinding lazy variables now clears the old cached result, null lazy results are cached, and explicit eager nulls shadow parent values. Parent names are included in variable enumeration; isConstant/getSupplier follow the same local-override rules as get, allowing Molang to access inherited lazy variables correctly.
+
+Four tests cover rebinding, null caching/shadowing, inherited names/kinds and actual Molang evaluation with a local override. All 444 ordinary tests and the normal build pass without failures/errors/skips; git diff --check passes. No fresh native/client run is claimed. Production Interactions sources and packaging are unchanged; no unrelated server or original data was changed. Details: docs/expression-scope-bindings-2026-10-06.md. The full Citizens goal remains active.

@@ -37,6 +37,7 @@ public class ExpressionScope {
      */
     public void bind(String name, Supplier<?> supplier) {
         lazyBindings.put(name, supplier);
+        cachedValues.remove(name);
     }
 
     /**
@@ -55,17 +56,12 @@ public class ExpressionScope {
      * @return the value, or null if not found
      */
     public Object get(String name) {
-        Object value = eagerValues.get(name);
-        if (value != null)
-            return value;
-
-        value = cachedValues.get(name);
-        if (value != null)
-            return value;
+        if (eagerValues.containsKey(name)) return eagerValues.get(name);
+        if (cachedValues.containsKey(name)) return cachedValues.get(name);
 
         Supplier<?> supplier = lazyBindings.get(name);
         if (supplier != null) {
-            value = supplier.get();
+            Object value = supplier.get();
             cachedValues.put(name, value);
             return value;
         }
@@ -122,6 +118,7 @@ public class ExpressionScope {
      * @return the supplier, or null if the variable is not a lazy binding
      */
     public Supplier<?> getSupplier(String name) {
+        if (eagerValues.containsKey(name)) return null;
         Supplier<?> supplier = lazyBindings.get(name);
         if (supplier != null)
             return supplier;
@@ -138,6 +135,7 @@ public class ExpressionScope {
     public Iterable<String> getVariableNames() {
         Set<String> keys = Sets.newHashSet(eagerValues.keySet());
         keys.addAll(lazyBindings.keySet());
+        if (parent != null) parent.getVariableNames().forEach(keys::add);
         return keys;
     }
 
@@ -155,17 +153,16 @@ public class ExpressionScope {
     }
 
     /**
-     * Checks if a variable is a lazy binding (not eagerly evaluated).
+     * Checks if the visible binding is eager rather than lazy, respecting local shadowing.
      *
      * @param name
      *            the variable name
-     * @return true if the variable is a lazy binding
+     * @return true if no visible lazy binding supplies this variable
      */
     public boolean isConstant(String name) {
-        if (!lazyBindings.containsKey(name))
-            return true;
-
-        return parent != null && parent.isConstant(name);
+        if (eagerValues.containsKey(name)) return true;
+        if (lazyBindings.containsKey(name)) return false;
+        return parent == null || parent.isConstant(name);
     }
 
     /**
