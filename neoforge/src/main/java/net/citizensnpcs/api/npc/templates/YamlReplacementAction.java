@@ -40,7 +40,11 @@ public class YamlReplacementAction implements Consumer<NPC> {
             Node node = queue.get(i);
             for (Entry<String, Object> entry : node.map.entrySet()) {
                 String fullKey = node.headKey.isEmpty() ? entry.getKey() : node.headKey + '.' + entry.getKey();
-                if (entry.getValue() instanceof Map<?, ?>) {
+                if (!override && hasScalarAncestor(memoryKey, fullKey)) continue;
+                if (entry.getValue() instanceof Map<?, ?> map && !map.isEmpty()) {
+                    // Defaults must not replace an existing scalar/list just to reach a nested field.
+                    if (!override && memoryKey.keyExists(fullKey) && !(memoryKey.getRaw(fullKey) instanceof Map))
+                        continue;
                     @SuppressWarnings("unchecked")
                     Map<String, Object> child = (Map<String, Object>) entry.getValue();
                     queue.add(new Node(fullKey, child));
@@ -53,6 +57,14 @@ public class YamlReplacementAction implements Consumer<NPC> {
             }
         }
         npc.load(memoryKey);
+    }
+
+    private static boolean hasScalarAncestor(DataKey root, String path) {
+        for (int dot = path.indexOf('.'); dot >= 0; dot = path.indexOf('.', dot + 1)) {
+            String parent = path.substring(0, dot);
+            if (root.keyExists(parent) && !(root.getRaw(parent) instanceof Map)) return true;
+        }
+        return false;
     }
 
     private static class Node {

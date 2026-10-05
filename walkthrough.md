@@ -1445,3 +1445,9 @@ YamlReplacementAction now captures the target with saveSnapshot so partial templ
 Expanded native creation coverage to generate a sibling template, overwrite the original with a new age, verify bare-name/full-key index agreement, and apply the updated template via the real creation command. Both NeoForge 21.1.233 and 21.1.248 pass 306 creation checks. Clean ordinary test/build passes with 376 tests; Interactions audit tests pass with 100; no failures/errors/skips. Release archives remain independent and exclude creation/reload/removal probes. All invoked handles completed; no unrelated server or original data was changed.
 
 Updated docs/template-generation-2026-10-05.md and the current backlog. Arbitrary provider/client combinations and template action rollback remain separate concerns. The full Citizens goal remains active.
+
+## 2026-10-05 22:22:50 +08:00 — Preserve empty template maps and default-only ancestors
+
+YamlReplacementAction now handles empty maps as explicit values rather than skipping them during traversal. Override-enabled templates can clear map contents, and missing empty structures are retained. Default-only nested maps and dotted paths check existing ancestors before descending, so they cannot silently replace scalar/list parents. The established dotted-path contract is unchanged.
+
+Three added tests cover empty maps, default-only ancestor preservation and explicit scalar-to-map override. All 379 ordinary tests and the normal build pass with no failures/errors/skips; git diff --check passes. These are replacement-action snapshot tests, not a fresh native/client run. Production Interactions sources and packaging are unchanged. No unrelated server or original data was changed. Details: docs/template-map-merge-2026-10-05.md. The full Citizens goal remains active.
