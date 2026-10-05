@@ -1457,3 +1457,11 @@ Three added tests cover empty maps, default-only ancestor preservation and expli
 TemplateWorkspace now normalizes relative names and resolves them against the real namespace directory, returning only regular direct-child files. Valid ./-prefixed names work; directories, missing/invalid names and out-of-scope references return null. The existing BehaviorTrait fallback is unchanged.
 
 Three filesystem tests cover normalized file lookup, invalid/directory/missing entries and parent/nested/absolute path rejection. All 382 ordinary tests and the normal build pass with no failures/errors/skips; git diff --check passes. No new native/client or link-specific acceptance is claimed. Production Interactions sources and packaging are unchanged; no unrelated server or original data was changed. Details: docs/template-workspace-2026-10-05.md. The full Citizens goal remains active.
+
+## 2026-10-05 22:58:43 +08:00 — Correct behavior short-template arguments and reject failed file input
+
+BehaviorTrait's short template parser now uses CommandContext's actual argument convention: require one filename argument and join from index zero. Previously a one-token filename was ignored and multiword names lost their first token. Missing arguments/files and unreadable YAML now throw, and file contents are loaded before attaching or changing the target trait. Namespace lookup and existing behaviors-folder fallback remain available.
+
+The first native input test exposed the argument-offset error; it was corrected and a valid multiword filename test added. All 310 creation checks pass on NeoForge 21.1.233 and 21.1.248, including three rejected-input cases preserving the target and successful behavior initialization. Clean ordinary test/build passes with 382 tests; Interactions audit tests pass with 100; no failures/errors/skips. Release archives remain independent and exclude probes. All invoked handles completed; no unrelated server or original data was changed.
+
+Details: docs/behavior-template-input-2026-10-05.md. Semantic behavior-tree replacement and arbitrary provider side effects remain separate work. The full Citizens goal remains active.

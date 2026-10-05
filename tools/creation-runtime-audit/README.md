@@ -1,7 +1,9 @@
 # Native NPC creation runtime audit
 
-The fixture currently has 306 checks. Template coverage includes sibling definitions,
+The fixture currently has 310 checks. Template coverage includes sibling definitions,
 overwrite index consistency, and applying the updated trait value through creation.
+Behavior short-form coverage includes missing arguments/files, malformed YAML and a
+valid filename containing spaces, with target preservation on file-input failures.
 
 Run from the repository root with PowerShell 7 and JDK 21:
 

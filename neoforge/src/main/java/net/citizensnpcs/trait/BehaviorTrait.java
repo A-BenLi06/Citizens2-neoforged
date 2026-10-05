@@ -161,10 +161,10 @@ public class BehaviorTrait extends Trait {
             @Override
             public ShortTemplateParser getShortTemplateParser() {
                 return (ctx, cmdCtx) -> {
-                    if (cmdCtx.argsLength() < 2)
-                        return null;
+                    if (cmdCtx.argsLength() < 1)
+                        throw new IllegalArgumentException("Behavior template requires a file name");
 
-                    String fileName = cmdCtx.getJoinedStrings(1);
+                    String fileName = cmdCtx.getJoinedStrings(0);
                     return loadFromFile(ctx.npc, ctx.workspace, fileName);
                 };
             }
@@ -183,14 +183,11 @@ public class BehaviorTrait extends Trait {
                 if (file == null) {
                     file = new File(CitizensAPI.getDataFolder(), "behaviors/" + fileName);
                 }
-                if (!file.exists()) {
-                    Messaging.severe("Behavior file not found", fileName);
-                    return null;
-                }
+                if (!file.isFile()) throw new IllegalArgumentException("Behavior file not found: " + fileName);
+                YamlStorage storage = new YamlStorage(file);
+                if (!storage.load()) throw new IllegalStateException("Unable to read behavior template: " + fileName);
                 BehaviorTrait trait = npc.getOrAddTrait(BehaviorTrait.class);
-                if (!trait.applyBehaviorsFromFile(file)) {
-                    Messaging.severe("Failed to load behavior tree from", fileName);
-                }
+                trait.applyBehaviorsFromKey(storage.getKey(""));
                 return null;
             }
         };

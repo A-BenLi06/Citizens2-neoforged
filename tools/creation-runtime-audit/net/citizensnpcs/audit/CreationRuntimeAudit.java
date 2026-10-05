@@ -342,6 +342,32 @@ public final class CreationRuntimeAudit {
                 "unspawned_template_never_transiently_spawns");
         at(copied.getStoredLocation(), 6, -58, 6, 0, 0, "command_destination_wins_over_template_location");
         check(copied.getTraitNullable(Age.class).getAge() == -6000, "template_traits_still_apply");
+        NPC behaviorTarget = registry.createNPC(EntityType.COW, "BehaviorTemplateFailure");
+        Path workspace = Files.createDirectories(CitizensAPI.getDataFolder().toPath().resolve("behavior-template-audit"));
+        String missing = "missing-" + UUID.randomUUID() + ".yml";
+        Path malformed = workspace.resolve("malformed-" + UUID.randomUUID() + ".yml");
+        Path validBehavior = workspace.resolve("valid tree-" + UUID.randomUUID() + ".yml");
+        Files.writeString(malformed, "tree: [unfinished\n");
+        Files.writeString(validBehavior, "sequence: []\n");
+        var parser = BehaviorTrait.createTemplateParser().getShortTemplateParser();
+        var context = new net.citizensnpcs.api.trait.TraitTemplateParser.TraitParserContext(behaviorTarget,
+                new net.citizensnpcs.api.npc.templates.TemplateWorkspace(workspace.toFile()));
+        String[][] inputs = { {"behavior"}, {"behavior", missing}, {"behavior", malformed.getFileName().toString()} };
+        String[] messages = { "requires a file name", "Behavior file not found", "Unable to read behavior template" };
+        try {
+            for (int i = 0; i < inputs.length; i++) {
+                RuntimeException failure = null;
+                try { parser.apply(context, new net.citizensnpcs.api.command.CommandContext(inputs[i])); }
+                catch (RuntimeException expected) { failure = expected; }
+                check(failure != null && failure.getMessage().contains(messages[i])
+                        && !behaviorTarget.hasTrait(BehaviorTrait.class) && exists(behaviorTarget),
+                        "behavior_template_input_failure_preserves_npc_" + i);
+            }
+            parser.apply(context, new net.citizensnpcs.api.command.CommandContext(
+                    ("behavior " + validBehavior.getFileName()).split(" ")));
+            check(behaviorTarget.hasTrait(BehaviorTrait.class) && behaviorTarget.getTraitNullable(BehaviorTrait.class).getMemory() != null,
+                    "behavior_template_short_form_loads_filename_with_spaces");
+        } finally { Files.deleteIfExists(malformed); Files.deleteIfExists(validBehavior); behaviorTarget.destroy(); }
     }
 
     private static NPC create(String options) throws Exception { run("create C" + serial++ + " " + options); NPC npc = selected(); check(npc != null && exists(npc), "created_and_selected"); return npc; }
