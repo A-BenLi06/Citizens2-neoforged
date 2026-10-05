@@ -7,6 +7,25 @@ import net.citizensnpcs.api.expr.ExpressionScope;
 import net.citizensnpcs.api.expr.Memory;
 
 class MolangMemoryBindingTest {
+    @Test void invalidNumericIndicesCannotReadOrRemoveTheFirstSlot() throws Exception {
+        for (double index : new double[] {-1, -0.5, 0.5, 2147483648D}) {
+            Memory memory = new Memory();
+            memory.set("items", List.of(7D, 9D));
+            memory.set("index", index);
+            assertEquals(0D, evaluate(memory, "list.get('items', mem.get('index'))"));
+            assertEquals(0D, evaluate(memory, "list.remove_at('items', mem.get('index'))"));
+            assertEquals(List.of(7D, 9D), memory.getList("items"));
+        }
+    }
+
+    @Test void indexBindingsRequireNumbersAndPreserveValidIntegerBehavior() throws Exception {
+        Memory memory = new Memory(); memory.set("items", List.of(7D, 9D));
+        assertEquals(0D, evaluate(memory, "list.remove_at('items', 'not-an-index')"));
+        assertEquals(9D, evaluate(memory, "list.get('items', 1)"));
+        assertEquals(1D, evaluate(memory, "list.remove_at('items', 1)"));
+        assertEquals(List.of(7D), memory.getList("items"));
+    }
+
     private static double evaluate(Memory memory, String expression) throws Exception {
         var scope = new ExpressionScope(); scope.setMemory(memory);
         return new MolangEngine().compile(expression).evaluateAsNumber(scope);

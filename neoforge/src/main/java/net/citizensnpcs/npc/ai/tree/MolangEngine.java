@@ -479,7 +479,7 @@ public class MolangEngine implements ExpressionEngine {
             if (memory == null || args.length() < 2)
                 return NumberValue.zero();
             String key = args.next().eval().getAsString();
-            int index = (int) args.next().eval().getAsNumber();
+            int index = listIndex(args.next().eval());
             if (index < 0 || index >= memory.listSize(key)) return NumberValue.zero();
             memory.listRemoveAt(key, index);
             return NumberValue.of(1);
@@ -504,7 +504,7 @@ public class MolangEngine implements ExpressionEngine {
         binding.set("get", (Function<?>) (context, args) -> {
             if (memory == null || args.length() < 2)
                 return NumberValue.zero();
-            Object value = memory.listGet(args.next().eval().getAsString(), (int) args.next().eval().getAsNumber());
+            Object value = memory.listGet(args.next().eval().getAsString(), listIndex(args.next().eval()));
             return toMochaValue(value);
         });
 
@@ -576,6 +576,13 @@ public class MolangEngine implements ExpressionEngine {
         if (value instanceof StringValue) return value.getAsString();
         if (value instanceof NumberValue) return value.getAsNumber();
         throw new IllegalArgumentException("Blackboard expressions require a string or number value");
+    }
+
+    private static int listIndex(Value value) {
+        if (!(value instanceof NumberValue)) return -1;
+        double index = value.getAsNumber();
+        if (!Double.isFinite(index) || index < 0 || index > Integer.MAX_VALUE || index != Math.rint(index)) return -1;
+        return (int) index;
     }
 
     /** Converts a Java object to a Mocha value. */
