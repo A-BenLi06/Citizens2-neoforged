@@ -18,3 +18,9 @@ unknown expression language and a valid empty container.
 This protects against parsing failure; arbitrary custom factory side effects and
 controller reset exceptions are not rolled back. A replacement currently uses the
 existing blackboard, so this is not a transaction over arbitrary provider mutations.
+
+Strict timeout parsing validates a finite, non-negative integer tick count before
+narrowing it to int, and wraps invalid numeric conversion with timeout context.
+Tests cover invalid literals and valid zero/integer budgets. Ordinary compatibility
+parsing retains its previous conversion policy. Values already normalized by the
+expression engine cannot be distinguished from their normalized result here.

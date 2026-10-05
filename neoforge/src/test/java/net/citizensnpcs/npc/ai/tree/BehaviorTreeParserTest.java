@@ -23,6 +23,32 @@ import net.citizensnpcs.api.util.MemoryDataKey;
  */
 public class BehaviorTreeParserTest {
     @Test
+    public void strictTimeoutsRejectInvalidLiteralTickCounts() {
+        var parser = new BehaviorTreeParser(new CitizensBehaviorRegistry(new ExpressionRegistry()));
+        for (String value : java.util.List.of("-1", "0.5", "2147483648", "NaN", "Infinity", "not-a-number")) {
+            DataKey root = new MemoryDataKey();
+            String name = "timeout " + value;
+            root.setRaw("", map(name, map("0", "succeed")));
+            DataKey timeout = root.getSubKeys().iterator().next();
+            var failure = org.junit.jupiter.api.Assertions.assertThrows(IllegalArgumentException.class,
+                    () -> parser.parseStrict(timeout, null, new ExpressionScope(), new Memory()));
+            assertTrue(failure.getMessage().toLowerCase().contains("timeout"));
+        }
+    }
+
+    @Test
+    public void strictTimeoutsAllowZeroAndOrdinaryIntegerBudgets() {
+        var parser = new BehaviorTreeParser(new CitizensBehaviorRegistry(new ExpressionRegistry()));
+        DataKey root = new MemoryDataKey();
+        root.setRaw("timeout 0", map("0", "succeed"));
+        assertEquals(BehaviorStatus.FAILURE,
+                parser.parseStrict(root.getRelative("timeout 0"), null, new ExpressionScope(), new Memory()).run());
+        root.setRaw("timeout 2", map("0", "succeed"));
+        assertEquals(BehaviorStatus.SUCCESS,
+                parser.parseStrict(root.getRelative("timeout 2"), null, new ExpressionScope(), new Memory()).run());
+    }
+
+    @Test
     public void parsedParallelContainerExecutesItsChildren() {
         Memory memory = new Memory();
         Behavior tree = parse(map("parallel", map("0", "set first `1`", "1", "set second `2`")), memory);

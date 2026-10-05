@@ -169,7 +169,16 @@ public class BehaviorTreeParser {
             String timeoutStr = name.substring(8).trim();
             ExpressionRegistry exprRegistry = registry.getExpressionRegistry();
             ExpressionValue timeoutHolder = exprRegistry.parseValue(timeoutStr);
-            int ticks = (int) timeoutHolder.evaluateAsNumber(context.getScope());
+            double evaluated;
+            try { evaluated = timeoutHolder.evaluateAsNumber(context.getScope()); }
+            catch (RuntimeException failure) {
+                if (strict) throw new IllegalArgumentException("Invalid behavior timeout: " + timeoutStr, failure);
+                throw failure;
+            }
+            if (strict && (!Double.isFinite(evaluated) || evaluated < 0 || evaluated > Integer.MAX_VALUE
+                    || evaluated != Math.rint(evaluated)))
+                throw new IllegalArgumentException("Behavior timeout must be a non-negative integer tick count: " + timeoutStr);
+            int ticks = (int) evaluated;
 
             List<Behavior> children = parseContainerChildren(key, context);
             Behavior body = children.size() == 1 ? children.get(0)
