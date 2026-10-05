@@ -8,6 +8,35 @@ import org.junit.jupiter.api.Test;
 import net.citizensnpcs.api.util.MemoryDataKey;
 
 class MemoryListPersistenceTest {
+    @Test void reloadingReplacesOldListsAndScalarsInsteadOfRetainingTransientEntries() {
+        Memory memory = new Memory();
+        memory.set("oldScalar", 1);
+        memory.listAdd("oldList", "remove");
+        memory.listAdd("changed", "old");
+        var incoming = new MemoryDataKey();
+        incoming.setString("changed", "new scalar");
+        incoming.setRaw("newList", List.of(2));
+        memory.loadFrom(incoming);
+        assertFalse(memory.has("oldScalar"));
+        assertFalse(memory.has("oldList"));
+        assertEquals("new scalar", memory.getString("changed"));
+        assertEquals(List.of(2), memory.getList("newList"));
+        memory.loadFrom(new MemoryDataKey());
+        assertEquals(0, memory.size());
+    }
+
+    @Test void failedLoadPreparationKeepsPreviousMemory() {
+        Memory memory = new Memory();
+        memory.set("scalar", 1);
+        memory.listAdd("list", "keep");
+        var unreadable = new MemoryDataKey() {
+            @Override public MemoryDataKey copyWithRoot() { throw new IllegalStateException("snapshot failure"); }
+        };
+        assertThrows(IllegalStateException.class, () -> memory.loadFrom(unreadable));
+        assertEquals(1D, memory.getNumber("scalar"));
+        assertEquals(List.of("keep"), memory.getList("list"));
+    }
+
     @Test void listOperationsAndEmptyListsSurviveSaveAndLoad(@org.junit.jupiter.api.io.TempDir java.nio.file.Path directory) {
         Memory memory = new Memory();
         memory.set("values", Arrays.asList("first", 2, true, null));

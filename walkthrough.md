@@ -1497,3 +1497,9 @@ Native metadata loading now has an explicit string-key mode used by Memory, incl
 Three tests cover real YAML round trips with native-name collisions and dotted keys, injected stores and ordinary typed-key compatibility. Both NeoForge 21.1.233 and 21.1.248 pass 312 creation checks. Clean ordinary test/build passes with 395 tests; Interactions audit tests pass with 100; no failures/errors/skips. Release archives remain separate and exclude probes. All invoked handles completed; no unrelated server or original data was changed. An initial test compile typo used a wrapper method on a primitive double and was corrected before validation.
 
 Details: docs/behavior-memory-key-identity-2026-10-06.md. Ambiguous legacy nested data is not automatically flattened; custom providers retain their own contracts. The full Citizens goal remains active.
+
+## 2026-10-06 00:28:57 +08:00 — Replace native blackboard contents on reload
+
+Memory now uses a separate native metadata replacement operation, so transient-backed lists absent from the incoming snapshot cannot survive reload. The native operation reads into a candidate before replacing live entries; Memory still detaches/decodes its input first. Ordinary NPC metadata load semantics and custom-provider load contracts remain unchanged.
+
+Two tests cover old scalar/list removal, list-to-scalar replacement, empty loads, and preparation failure preserving previous values. All 397 ordinary tests and the normal build pass without failures/errors/skips; git diff --check passes. No fresh native/client run is claimed. Production Interactions sources and packaging are unchanged; no unrelated server or original data was changed. Details: docs/behavior-memory-reload-2026-10-06.md. The full Citizens goal remains active.

@@ -102,6 +102,16 @@ public class SimpleMetadataStore implements MetadataStore {
         }
     }
 
+    /** Replace all entries only after the incoming data has been read successfully. */
+    public void replaceFrom(DataKey key, boolean resolveNPCKeys) {
+        SimpleMetadataStore candidate = new SimpleMetadataStore();
+        candidate.loadFrom(key, resolveNPCKeys);
+        metadata.clear();
+        metadata.putAll(candidate.metadata);
+        npcMetadata.clear();
+        npcMetadata.putAll(candidate.npcMetadata);
+    }
+
     @Override
     public void remove(NPC.Metadata key) {
         npcMetadata.remove(key);

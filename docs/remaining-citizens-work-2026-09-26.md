@@ -16,6 +16,8 @@ Recent follow-ups cover [`powered`, `name` and `home` options](command-options-h
 
 ## Behavior, data and integration acceptance
 
+- [Blackboard reload replacement](behavior-memory-reload-2026-10-06.md) now removes stale native scalar/list entries absent from the incoming snapshot, with preparation failure preserving old contents. Ordinary NPC metadata transient policy is unchanged; custom-store loading remains provider-defined.
+
 - [Blackboard key identity](behavior-memory-key-identity-2026-10-06.md) keeps built-in-name collisions in the string key space and preserves dotted names during metadata saving. Tests cover native and injected storage plus ordinary typed-key compatibility. Custom-store contracts and ambiguous legacy nested data remain separate scope.
 
 - [Persistent blackboard lists](behavior-memory-lists-2026-10-05.md) now survive YAML save/load, including empty lists and null elements. Owned mutable copies isolate caller and snapshot state, and invalid list mutations cannot replace a previous save. Typed/string metadata-name interactions and custom-store acceptance remain open.
