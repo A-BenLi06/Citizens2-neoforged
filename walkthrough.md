@@ -1579,3 +1579,9 @@ Three direct tests cover completion timing, reset/removal and empty composites; 
 IfElse now clears its active branch reference before invoking reset, so a throwing callback cannot retain stale cleanup ownership. A focused test verifies reset is not repeated and a different branch can execute afterward. Added a parallel-composite callback-clear test verifying old siblings stop and a new child starts only in the next cycle.
 
 All 427 ordinary tests and the normal build pass without failures/errors/skips; git diff --check passes. No fresh native/client run is claimed. Production Interactions sources and packaging are unchanged; no unrelated server or original data was changed. Updated docs/behavior-clear-recovery-2026-10-06.md. The full Citizens goal remains active.
+
+## 2026-10-06 03:10:20 +08:00 — Validate recent behavior changes in the native NPC lifecycle
+
+Extended the native creation fixture with a parsed parallel tree on an actual NPC. It verifies effects from two scalar children, a Molang string-list write, and recovery of that list through a BehaviorTrait memory snapshot. The original counting behavior is reinstalled before the existing trait-removal check so that check retains its meaning.
+
+Both NeoForge 21.1.233 and 21.1.248 pass all 320 creation checks. Clean ordinary test/build passes with 427 tests; Interactions audit tests pass with 100; no failures/errors/skips. Release archives contain separate Citizens/Interactions classes and no creation/reload/removal probes. All invoked handles completed; no unrelated server or original data was changed. Updated the fixture README and parallel-composite documentation. This adds native integration evidence for recent changes, not physical-client acceptance or complete Citizens parity. The full goal remains active.

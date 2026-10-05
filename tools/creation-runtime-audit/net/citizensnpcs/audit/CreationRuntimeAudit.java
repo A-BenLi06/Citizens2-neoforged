@@ -404,6 +404,20 @@ public final class CreationRuntimeAudit {
             int beforeRun = runs.get();
             behaviorTarget.getDefaultBehaviorController().run();
             check(runs.get() == beforeRun + 1, "behavior_execution_resumes_after_respawn");
+            DataKey parallelTree = new MemoryDataKey();
+            parallelTree.setRaw("parallel", Map.of("0", "set native_parallel_first `1`",
+                    "1", "set native_parallel_second `2`", "2", "`list.add('native_list', 'kept')`"));
+            behavior.applyBehaviorsFromKey(parallelTree);
+            behaviorTarget.getDefaultBehaviorController().run();
+            check(behavior.getMemory().getNumber("native_parallel_first") == 1D
+                    && behavior.getMemory().getNumber("native_parallel_second") == 2D,
+                    "native_parallel_tree_executes_all_children");
+            DataKey memorySnapshot = new MemoryDataKey(); behavior.save(memorySnapshot);
+            var recoveredMemory = new net.citizensnpcs.api.expr.Memory();
+            recoveredMemory.loadFrom(memorySnapshot.getRelative("memory"));
+            check(recoveredMemory.getList("native_list").equals(List.of("kept")),
+                    "native_behavior_string_list_survives_snapshot");
+            behavior.applyBehaviorsFromKey(goodTree);
             behaviorTarget.removeTrait(BehaviorTrait.class);
             int afterRemoval = runs.get();
             behaviorTarget.getDefaultBehaviorController().run();

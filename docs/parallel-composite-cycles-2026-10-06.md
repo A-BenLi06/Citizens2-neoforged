@@ -14,3 +14,7 @@ tickParallel mode.
 Three direct tests cover mixed completion timing, reset/removal and empty composites.
 A parser test verifies a YAML parallel container actually executes both expression
 children. No fresh native/client run is claimed for these core behavior tests.
+
+A subsequent native creation-fixture check executes a parsed parallel tree on a real
+NPC, verifies both scalar children and restores a string list from a trait snapshot.
+This adds server integration coverage without asserting physical-client behavior.
