@@ -18,3 +18,10 @@ Molang also exposes mem.size() and mem.clear(). Size counts blackboard entries;
 clear removes scalar and list entries and returns 1 when a blackboard is available
 (or 0 without one). A compiled-expression test verifies counting, clearing and saving
 after clearing without reviving prior data.
+
+Molang list membership/removal compare numeric values across Java number wrappers,
+so YAML Integer/Long entries match expression Double values. Decimal comparison avoids
+rounding large integers into a different requested value; strings remain distinct
+from numbers. Tests cover a YAML round trip, numeric/string separation, signed zero
+and values beyond exact double integer precision. Direct Memory list equality keeps
+its existing Java-object contract; this adaptation belongs to the expression binding.

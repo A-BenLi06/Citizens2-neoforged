@@ -7,6 +7,28 @@ import net.citizensnpcs.api.expr.ExpressionScope;
 import net.citizensnpcs.api.expr.Memory;
 
 class MolangMemoryBindingTest {
+    @Test void yamlIntegersMatchNumericExpressionsWithoutMatchingStrings(@org.junit.jupiter.api.io.TempDir java.nio.file.Path directory) throws Exception {
+        var storage = new net.citizensnpcs.api.util.YamlStorage(directory.resolve("memory.yml").toFile());
+        assertTrue(storage.load());
+        Memory original = new Memory(); original.set("items", List.of(2, "2", 3L));
+        original.saveTo(storage.getKey("")); storage.save(); assertTrue(storage.load());
+        Memory memory = new Memory(); memory.loadFrom(storage.getKey(""));
+        assertEquals(1D, evaluate(memory, "list.contains('items', 2)"));
+        assertEquals(1D, evaluate(memory, "list.remove('items', 2)"));
+        assertEquals(0D, evaluate(memory, "list.contains('items', 2)"));
+        assertEquals(1D, evaluate(memory, "list.contains('items', '2')"));
+        assertEquals(1D, evaluate(memory, "list.remove('items', 3)"));
+        assertEquals(List.of("2"), memory.getList("items"));
+    }
+
+    @Test void numericMatchingDoesNotRoundLargeIntegersIntoADifferentValue() throws Exception {
+        Memory memory = new Memory(); memory.set("items", List.of(9007199254740993L, -0.0D));
+        assertEquals(0D, evaluate(memory, "list.contains('items', 9007199254740992)"));
+        assertEquals(0D, evaluate(memory, "list.remove('items', 9007199254740992)"));
+        assertEquals(1D, evaluate(memory, "list.remove('items', 0)"));
+        assertEquals(List.of(9007199254740993L), memory.getList("items"));
+    }
+
     @Test void expressionsCanCountAndClearScalarAndListMemory() throws Exception {
         Memory memory = new Memory();
         evaluate(memory, "mem.set('name', 'value')");

@@ -491,9 +491,11 @@ public class MolangEngine implements ExpressionEngine {
         binding.set("remove", (Function<?>) (context, args) -> {
             if (memory == null || args.length() < 2)
                 return NumberValue.zero();
-            return memory.listRemove(args.next().eval().getAsString(), memoryValue(args.next().eval()))
-                    ? NumberValue.of(1)
-                    : NumberValue.zero();
+            String key = args.next().eval().getAsString();
+            int index = memoryListIndex(memory, key, memoryValue(args.next().eval()));
+            if (index < 0) return NumberValue.zero();
+            memory.listRemoveAt(key, index);
+            return NumberValue.of(1);
         });
 
         // list.remove_at(key, index)
@@ -534,7 +536,7 @@ public class MolangEngine implements ExpressionEngine {
         binding.set("contains", (Function<?>) (context, args) -> {
             if (memory == null || args.length() < 2)
                 return NumberValue.zero();
-            return memory.listContains(args.next().eval().getAsString(), memoryValue(args.next().eval()))
+            return memoryListIndex(memory, args.next().eval().getAsString(), memoryValue(args.next().eval())) >= 0
                     ? NumberValue.of(1)
                     : NumberValue.zero();
         });
@@ -606,6 +608,21 @@ public class MolangEngine implements ExpressionEngine {
         if (value instanceof StringValue) return value.getAsString();
         if (value instanceof NumberValue) return value.getAsNumber();
         throw new IllegalArgumentException("Blackboard expressions require a string or number value");
+    }
+
+    private static int memoryListIndex(Memory memory, String key, Object expected) {
+        for (int i = 0, size = memory.listSize(key); i < size; i++) {
+            Object value = memory.listGet(key, i);
+            if (value instanceof Number left && expected instanceof Number right) {
+                try {
+                    if (new java.math.BigDecimal(left.toString()).compareTo(new java.math.BigDecimal(right.toString())) == 0)
+                        return i;
+                } catch (NumberFormatException invalidDecimal) {
+                    if (left.doubleValue() == right.doubleValue()) return i;
+                }
+            } else if (java.util.Objects.equals(value, expected)) return i;
+        }
+        return -1;
     }
 
     private static int listIndex(Value value) {

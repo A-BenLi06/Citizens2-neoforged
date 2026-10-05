@@ -1657,3 +1657,9 @@ Four compiled-expression tests cover removed/omitted variables, temporary standa
 Added compiled-expression tests for binding setup failure after temporary variables are installed, handled evaluation exceptions and uncaught Errors. Each verifies that a later empty scope cannot observe the failed call's bindings. Existing production restoration already passes all cases, so no production change was needed.
 
 All 460 ordinary tests and the normal build pass without failures/errors/skips; git diff --check passes. No fresh native/client run is claimed. Production Interactions sources and packaging are unchanged; no unrelated server or original data was changed. Updated docs/molang-scope-isolation-2026-10-06.md. The full Citizens goal remains active.
+
+## 2026-10-06 05:48:47 +08:00 — Match persisted list numbers by value in Molang bindings
+
+Molang list.contains/remove now locate numerically equal Number values across wrapper types rather than relying on Integer/Long/Double object equality. Strings are not coerced into numeric matches. Decimal comparison preserves large integer distinctions and treats signed zero as equal; direct Memory APIs retain their existing object-equality behavior.
+
+Two tests cover YAML-loaded integer lists queried/removed by compiled expressions, string separation, signed zero and avoiding a large-integer rounding match. All 462 ordinary tests and the normal build pass without failures/errors/skips; git diff --check passes. No fresh native/client run is claimed. Production Interactions sources and packaging are unchanged; no unrelated server or original data was changed. Updated docs/molang-memory-types-2026-10-06.md. The full Citizens goal remains active.
