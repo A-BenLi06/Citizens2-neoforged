@@ -5,6 +5,39 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 
 class SkinCacheReloadTest {
+    private static java.util.Optional<com.mojang.authlib.GameProfile> result() {
+        var profile = new com.mojang.authlib.GameProfile(java.util.UUID.randomUUID(), "CachedProfile");
+        String json = "{\"textures\":{\"SKIN\":{\"url\":\"https://textures.minecraft.net/texture/" + "a".repeat(64) + "\"}}}";
+        String texture = java.util.Base64.getEncoder().encodeToString(json.getBytes(java.nio.charset.StandardCharsets.UTF_8));
+        profile.getProperties().put("textures", new com.mojang.authlib.properties.Property("textures", texture));
+        return java.util.Optional.of(profile);
+    }
+
+    @Test void oldLookupResultCanCompleteAfterRollback() {
+        Skin previous = Skin.get("");
+        var profile = result();
+        try (var reload = Skin.beginReload()) { Skin.get(""); }
+        previous.acceptLookupResult(profile, null);
+        assertTrue(previous.hasSkinData());
+        assertEquals(profile.orElseThrow().getId(), previous.getSkinId());
+    }
+
+    @Test void discardedLookupResultCannotPopulateCacheDuringLaterAttempt() {
+        Skin discarded;
+        try (var reload = Skin.beginReload()) {
+            discarded = Skin.get("");
+            Skin.invalidate("");
+        }
+        try (var later = Skin.beginReload()) {
+            Skin current = Skin.get("");
+            discarded.acceptLookupResult(result(), null);
+            assertFalse(discarded.hasSkinData());
+            assertFalse(current.hasSkinData());
+            current.acceptLookupResult(result(), null);
+            assertTrue(current.hasSkinData());
+        }
+    }
+
     @AfterEach void cleanup() { Skin.clearCache(); }
 
     @Test void rollbackRestoresPreviousCacheIdentity() {

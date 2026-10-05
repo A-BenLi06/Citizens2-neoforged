@@ -1415,3 +1415,9 @@ NPC reload now opens a scoped candidate skin cache instead of clearing the old c
 Four cache tests cover identity rollback, commit/late-close isolation, nested resets and stale generations including entries already removed by name invalidation. Both NeoForge 21.1.233 and 21.1.248 pass 45 reload checks, verifying fresh candidate cache, provider/shop failure rollback and success commit. Tests deliberately use invalid-name cache entries without network lookups. Clean ordinary test/build passes with 366 tests; Interactions audit tests pass with 100; no failures/errors/skips. Release archives remain separate and exclude all audit probes. All invoked handles completed; no unrelated server or original data was changed.
 
 Details: docs/reload-skin-cache-2026-10-05.md. Live HTTP completion and physical-client rendering are not claimed verified by these cache-ownership tests. The full Citizens goal remains active.
+
+## 2026-10-05 21:17:15 +08:00 — Verify completed skin results across cache rollback
+
+Reviewed lookup scheduling: the asynchronous fetch already queues entity/result handling onto the server scheduler. Extracted that existing handler into a package-private result method without changing the thread boundary. Two additional tests feed valid synthetic texture profiles through the same handler, verifying completion of an old request after rollback and rejection of an invalidated candidate request during a subsequent attempt.
+
+All 368 ordinary tests and the normal build pass with no failures/errors/skips; git diff --check passes. These tests validate actual result acceptance/data population rather than only cache identity. They do not perform live HTTP or physical-client rendering. No server was deployed or stopped, and Interactions production sources/packaging are unchanged. Updated docs/reload-skin-cache-2026-10-05.md. The full Citizens goal remains active.

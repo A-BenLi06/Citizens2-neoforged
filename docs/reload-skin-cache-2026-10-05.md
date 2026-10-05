@@ -12,9 +12,13 @@ becoming current when a later reload begins. Fetch completion and skin applicati
 share the same ownership check. Nested full resets/reloads are rejected while the
 cache scope is active; per-name invalidation retains its existing behavior.
 
-Four cache tests cover rollback identity, commit and late-close isolation, nested
-reset rejection, and obsolete lookup generations across repeated attempts. They use
-an invalid name to avoid network dependence. Native reload checks use the same
+Six cache tests cover rollback identity, commit and late-close isolation, nested
+reset rejection, obsolete lookup generations across repeated attempts, and acceptance
+or rejection of completed texture results. The real scheduled completion handler is
+factored into a server-thread result method; tests feed valid synthetic profile data
+to verify old results after rollback and rejected candidate results during a later
+attempt. They use an invalid name to construct entries without network dependence.
+Native reload checks use the same
 no-network cache entry to verify candidate visibility, provider/shop failure rollback
 and successful commit. Live HTTP completion and physical-client skin rendering are
 not asserted by these checks.

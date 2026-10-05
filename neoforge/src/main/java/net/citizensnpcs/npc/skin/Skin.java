@@ -104,17 +104,20 @@ public class Skin {
         var scheduler = CitizensAPI.getScheduler();
         lookup.whenComplete((result, failure) -> {
             // completes on the profile-lookup thread; entity state must only be touched on the main thread
-            scheduler.runTask(() -> {
-                if (!isCurrent()) return;
-                if (failure != null || result == null || result.isEmpty()) {
-                    isValid = false;
-                    synchronized (pending) { pending.clear(); }
-                    Messaging.idebug(() -> "Could not find skin for '" + skinName + "'");
-                    return;
-                }
-                setData(result.get());
-            });
+            scheduler.runTask(() -> acceptLookupResult(result, failure));
         });
+    }
+
+    /** Called on the server thread after a lookup completes. */
+    void acceptLookupResult(Optional<GameProfile> result, Throwable failure) {
+        if (!isCurrent()) return;
+        if (failure != null || result == null || result.isEmpty()) {
+            isValid = false;
+            synchronized (pending) { pending.clear(); }
+            Messaging.idebug(() -> "Could not find skin for '" + skinName + "'");
+            return;
+        }
+        setData(result.get());
     }
 
     /**
