@@ -518,6 +518,7 @@ public class Messages {
     public static final String TROPICALFISH_PATTERN_COLOR_SET = "citizens.commands.npc.tropicalfish.pattern-color-set";
     public static final String TROPICALFISH_PATTERN_SET = "citizens.commands.npc.tropicalfish.pattern-set";
     public static final String UNDO_ID_CONFLICT = "citizens.commands.npc.undo.id-conflict";
+    public static final String UNDO_IN_PROGRESS = "citizens.commands.npc.undo.in-progress";
     public static final String UNDO_SHOP_CONFLICT = "citizens.commands.npc.undo.shop-conflict";
     public static final String UNDO_SUCCESSFUL = "citizens.commands.npc.undo.successful";
     public static final String UNDO_UNSUCCESSFUL = "citizens.commands.npc.undo.unsuccessful";

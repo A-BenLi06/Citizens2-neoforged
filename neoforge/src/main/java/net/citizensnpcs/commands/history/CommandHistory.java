@@ -2,12 +2,15 @@ package net.citizensnpcs.commands.history;
 
 import java.util.List;
 import java.util.UUID;
+import java.util.HashSet;
+import java.util.Set;
 
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.ListMultimap;
 
 import net.citizensnpcs.api.npc.NPCSelector;
 import net.citizensnpcs.api.command.exception.CommandException;
+import net.citizensnpcs.util.Messages;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.world.entity.Entity;
 
@@ -19,6 +22,7 @@ import net.minecraft.world.entity.Entity;
 public class CommandHistory {
     private final ListMultimap<UUID, CommandHistoryItem> history = ArrayListMultimap.create();
     private final NPCSelector selector;
+    private final Set<UUID> undoing = new HashSet<>();
 
     public CommandHistory(NPCSelector selector) {
         this.selector = selector;
@@ -39,12 +43,15 @@ public class CommandHistory {
     }
 
     public boolean undo(CommandSourceStack sender) throws CommandException {
-        List<CommandHistoryItem> hist = history.get(keyOf(sender));
-        if (hist.isEmpty())
-            return false;
-        CommandHistoryItem item = hist.get(hist.size() - 1);
-        item.undo(sender, selector);
-        hist.remove(item);
-        return true;
+        UUID key = keyOf(sender);
+        if (!undoing.add(key)) throw new CommandException(Messages.UNDO_IN_PROGRESS);
+        try {
+            List<CommandHistoryItem> hist = history.get(key);
+            if (hist.isEmpty()) return false;
+            CommandHistoryItem item = hist.get(hist.size() - 1);
+            item.undo(sender, selector);
+            hist.remove(item);
+            return true;
+        } finally { undoing.remove(key); }
     }
 }
