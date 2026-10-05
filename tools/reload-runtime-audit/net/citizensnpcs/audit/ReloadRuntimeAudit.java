@@ -102,6 +102,15 @@ public final class ReloadRuntimeAudit {
     }
 
     private static void failedReload() throws Exception {
+        var editorPlayer = new net.minecraft.server.level.ServerPlayer(server, level,
+                new com.mojang.authlib.GameProfile(UUID.randomUUID(), "ReloadEditor"),
+                net.minecraft.server.level.ClientInformation.createDefault());
+        var editor = new ProbeEditor(false);
+        net.citizensnpcs.editor.Editor.enterOrLeave(editorPlayer, editor);
+        var prompt = ChatPrompts.begin(editorPlayer, new ChatPrompt() {
+            public String getPromptText(ChatPromptSession session) { return ""; }
+            public ChatPrompt acceptInput(ChatPromptSession session, String input) { return this; }
+        });
         Setting.DEFAULT_NPC_LIMIT.set(37);
         var previousDuration = Setting.DEFAULT_RANDOM_LOOK_DELAY.asDuration();
         writeLimit(71);
@@ -133,6 +142,8 @@ public final class ReloadRuntimeAudit {
         check(plugin.getNPCRegistry() == old && world.getEntity() == entity && !entity.isRemoved()
                 && Setting.DEFAULT_NPC_LIMIT.asInt() == 37,
                 "shop_publication_preflight_failure_preserves_registry_and_settings");
+        check(net.citizensnpcs.editor.Editor.getEditor(editorPlayer) == editor && editor.ends == 0
+                && ChatPrompts.isActive(prompt), "failed_shop_preflight_preserves_editor_and_prompt");
         store.afterLoad = null;
     }
 
@@ -151,6 +162,19 @@ public final class ReloadRuntimeAudit {
         NPCRegistry before = plugin.getNPCRegistry();
         NPC npc = before.getById(world.getId()); Entity previousEntity = npc.getEntity();
         Probe failing = new Probe(true); npc.addTrait(failing);
+        var editorPlayer = new net.minecraft.server.level.ServerPlayer(server, level,
+                new com.mojang.authlib.GameProfile(UUID.randomUUID(), "ThrowingEditor"),
+                net.minecraft.server.level.ClientInformation.createDefault());
+        var editor = new ProbeEditor(true);
+        net.citizensnpcs.editor.Editor.enterOrLeave(editorPlayer, editor);
+        var promptEnds = new java.util.concurrent.atomic.AtomicInteger();
+        var prompt = ChatPrompts.begin(editorPlayer, new ChatPrompt() {
+            public String getPromptText(ChatPromptSession session) { return ""; }
+            public ChatPrompt acceptInput(ChatPromptSession session, String input) { return this; }
+        }, null, session -> session.onAbandon(() -> {
+            promptEnds.incrementAndGet();
+            throw new IllegalStateException("expected prompt cleanup failure");
+        }));
         var oldShop = plugin.getShops().addNamedShop("reload-cleanup-shop");
         var shopCloseCalls = net.citizensnpcs.trait.shop.ReloadShopProbe.failOnClose(oldShop);
         plugin.getShops().storeShops();
@@ -162,9 +186,15 @@ public final class ReloadRuntimeAudit {
                 && plugin.getShops().getGlobalShop("reload-cleanup-shop") != oldShop
                 && plugin.getShops().getGlobalShop("reload-cleanup-shop") != null,
                 "shop_cleanup_failure_keeps_new_shop_publication");
-        check(failure.getCause().getSuppressed().length == 1,
-                "shop_and_npc_cleanup_errors_are_both_retained");
-        check(failure.getMessage().contains("old NPC cleanup failed"), "published_cleanup_failure_distinguished");
+        check(failure.getCause().getSuppressed().length == 3,
+                "shop_editor_prompt_and_npc_cleanup_errors_retained");
+        check(promptEnds.get() == 1 && !ChatPrompts.isActive(prompt),
+                "throwing_prompt_cleanup_does_not_abort_registry_publication");
+        check(editor.ends == 1 && editor.observedRegistry != before
+                && editor.observedRegistry == plugin.getNPCRegistry()
+                && !net.citizensnpcs.editor.Editor.hasEditor(editorPlayer),
+                "throwing_editor_cleanup_does_not_abort_registry_publication");
+        check(failure.getMessage().contains("previous runtime cleanup failed"), "published_cleanup_failure_distinguished");
         check(plugin.getNPCRegistry() != before && plugin.getNPCRegistry().getById(world.getId()) != null,
                 "cleanup_failure_keeps_successful_publication");
         check(npc.getEntity() == null && previousEntity.isRemoved() && failing.removals == 1,
@@ -181,6 +211,18 @@ public final class ReloadRuntimeAudit {
         if (!config.load()) throw new AssertionError("Could not read fixture configuration");
         config.getKey("").setInt("npc.limits.default-limit", limit);
         config.save();
+    }
+    private static final class ProbeEditor extends net.citizensnpcs.editor.Editor {
+        private final boolean fail;
+        int ends;
+        NPCRegistry observedRegistry;
+        ProbeEditor(boolean fail) { this.fail = fail; }
+        @Override public void begin() { }
+        @Override public void end() {
+            ends++;
+            observedRegistry = plugin.getNPCRegistry();
+            if (fail) throw new IllegalStateException("expected editor cleanup failure");
+        }
     }
     private static Location at(int x) { return new Location(level, x, -58, 4); }
     private static void check(boolean value, String label) {

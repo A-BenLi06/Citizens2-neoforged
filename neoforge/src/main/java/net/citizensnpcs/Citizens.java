@@ -600,8 +600,6 @@ public class Citizens implements CitizensPlugin {
                 // A provider may fail after constructing some NPCs. Keep those objects isolated until loading succeeds.
                 candidate.loadFromStore();
             }
-            Editor.leaveAll();
-            ChatPrompts.abandonAll();
             Throwable cleanupFailure = null;
             if (preparedShops != null) {
                 try { preparedShops.publish(); }
@@ -611,10 +609,19 @@ public class Citizens implements CitizensPlugin {
                 }
             }
             publicationStarted = true;
+            CitizensNPCRegistry previous = candidate == null ? null : npcRegistry;
             if (candidate != null) {
-                CitizensNPCRegistry previous = npcRegistry;
                 npcRegistry = candidate;
                 if (eventListen != null) eventListen.clearRespawnQueue(previous);
+            }
+            for (Runnable cleanup : java.util.List.<Runnable>of(Editor::leaveAll, ChatPrompts::abandonAll)) {
+                try { cleanup.run(); }
+                catch (RuntimeException | Error failure) {
+                    if (cleanupFailure == null) cleanupFailure = failure;
+                    else if (cleanupFailure != failure) cleanupFailure.addSuppressed(failure);
+                }
+            }
+            if (previous != null) {
                 try { previous.retire(); }
                 catch (RuntimeException | Error failure) {
                     if (cleanupFailure == null) cleanupFailure = failure;
@@ -640,7 +647,7 @@ public class Citizens implements CitizensPlugin {
             }
             if (failure instanceof Error error) throw error;
             throw new NPCLoadException(candidate != null && npcRegistry == candidate
-                    ? "NPCs restored, but old NPC cleanup failed" : "Could not restore NPCs", failure);
+                    ? "NPCs restored, but previous runtime cleanup failed" : "Could not restore NPCs", failure);
         }
         templateRegistry = new TemplateRegistry(new File(dataFolder, "templates").toPath());
         LOGGER.info("Citizens reloaded.");

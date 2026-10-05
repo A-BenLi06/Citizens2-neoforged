@@ -16,6 +16,8 @@ Recent follow-ups cover [`powered`, `name` and `home` options](command-options-h
 
 ## Behavior, data and integration acceptance
 
+- [Reload session cleanup](reload-session-cleanup-2026-10-05.md) retains world editors and chat prompts through rejected shop preparation and closes them after new shop/NPC publication. Combined cleanup errors are retained without interrupting later cleanup categories; editor callbacks see the new registry. Physical-client interaction, skin-cache invalidation and arbitrary callback effects remain separate concerns.
+
 - [Reload shop publication](reload-shop-publication-2026-10-05.md) checks and publishes shop maps before replacing the NPC registry. Stale preparation preserves old NPCs/settings; old-session cleanup errors still allow consistent new shop/NPC publication with aggregated errors. Editor closure, skin-cache invalidation and arbitrary provider effects remain separate concerns.
 
 - [Reload settings recovery](reload-settings-2026-10-05.md) restores runtime values, duration caches and messaging configuration when candidate NPC preparation fails. Candidate loading sees new values; published registries keep them after cleanup errors. Both NeoForge versions pass 34 reload checks. Disk edits, arbitrary provider effects and complete shop publication transactionality remain separate concerns.

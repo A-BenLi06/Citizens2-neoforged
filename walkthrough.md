@@ -1399,3 +1399,11 @@ Native coverage invalidates shop preparation from an NPC load callback and verif
 Both NeoForge 21.1.233 and 21.1.248 pass 38 reload checks. Clean ordinary test/build passes with 362 tests; Interactions audit tests pass with 100; no failures/errors/skips. Release archives preserve independent mod classes and exclude reload/removal/shop probes. All invoked handles completed; no unrelated server or production data was changed.
 
 Details: docs/reload-shop-publication-2026-10-05.md. Editor/prompt closure, skin-cache invalidation and arbitrary provider side effects are not claimed fully transactional. The full Citizens goal remains active.
+
+## 2026-10-05 20:57:00 +08:00 — Preserve sessions until reload publication and complete all cleanup categories
+
+Moved world-editor and chat-prompt closure after shop and NPC registry publication. A stale-shop preflight rejection leaves the old editor/prompt sessions active. Once publishing, closure callbacks observe the new registry and shops together; failures from editor and prompt closure are accumulated alongside shop and old-NPC cleanup without preventing later cleanup. The final diagnostic now describes previous runtime cleanup rather than only old NPC cleanup.
+
+Native tests use a synthetic player with real session registries to verify preflight retention, throwing editor and prompt abandonment, exactly-once closure, new-registry visibility and retention of all four cleanup failures. Both NeoForge 21.1.233 and 21.1.248 pass 41 reload checks. Clean ordinary test/build passes with 362 tests; Interactions audit tests pass with 100; no failures/errors/skips. Release archives remain separate and exclude all reload/removal probes. All invoked handles completed; no unrelated server or production data was changed.
+
+Details: docs/reload-session-cleanup-2026-10-05.md. Physical-client interaction, arbitrary callback side effects and skin-cache invalidation remain separate work. The full Citizens goal remains active.
