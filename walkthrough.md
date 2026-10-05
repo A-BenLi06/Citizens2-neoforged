@@ -1627,3 +1627,9 @@ Two tests cover malformed/empty literals with useful diagnostics and decimal/sci
 Rebinding lazy variables now clears the old cached result, null lazy results are cached, and explicit eager nulls shadow parent values. Parent names are included in variable enumeration; isConstant/getSupplier follow the same local-override rules as get, allowing Molang to access inherited lazy variables correctly.
 
 Four tests cover rebinding, null caching/shadowing, inherited names/kinds and actual Molang evaluation with a local override. All 444 ordinary tests and the normal build pass without failures/errors/skips; git diff --check passes. No fresh native/client run is claimed. Production Interactions sources and packaging are unchanged; no unrelated server or original data was changed. Details: docs/expression-scope-bindings-2026-10-06.md. The full Citizens goal remains active.
+
+## 2026-10-06 04:57:54 +08:00 — Guard lazy expression cache writes against callback mutation
+
+ExpressionScope now associates lazy bindings with distinct identities and cache cycles with versions. Results computed across self-rebinding, removal or cache reset are returned to the initiating caller but cannot refill the replacement binding/cycle's cache. Identical supplier objects rebound during evaluation are distinguished correctly.
+
+Three tests cover new-supplier and same-supplier rebinding, removal exposing an inherited value, and reset during evaluation. All 447 ordinary tests and the normal build pass without failures/errors/skips; git diff --check passes. No fresh native/client run is claimed. Production Interactions sources and packaging are unchanged; no unrelated server or original data was changed. Updated docs/expression-scope-bindings-2026-10-06.md. The full Citizens goal remains active.

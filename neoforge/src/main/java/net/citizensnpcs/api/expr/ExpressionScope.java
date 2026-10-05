@@ -18,6 +18,8 @@ public class ExpressionScope {
     private final Map<String, Object> cachedValues = new HashMap<>();
     private final Map<String, Object> eagerValues = new HashMap<>();
     private final Map<String, Supplier<?>> lazyBindings = new HashMap<>();
+    private final Map<String, Object> bindingVersions = new HashMap<>();
+    private long cacheVersion;
     private Memory memory;
     private NPC npc;
     private final ExpressionScope parent;
@@ -37,6 +39,7 @@ public class ExpressionScope {
      */
     public void bind(String name, Supplier<?> supplier) {
         lazyBindings.put(name, supplier);
+        bindingVersions.put(name, new Object());
         cachedValues.remove(name);
     }
 
@@ -61,8 +64,11 @@ public class ExpressionScope {
 
         Supplier<?> supplier = lazyBindings.get(name);
         if (supplier != null) {
+            Object bindingVersion = bindingVersions.get(name);
+            long version = cacheVersion;
             Object value = supplier.get();
-            cachedValues.put(name, value);
+            if (version == cacheVersion && bindingVersions.get(name) == bindingVersion
+                    && !eagerValues.containsKey(name)) cachedValues.put(name, value);
             return value;
         }
         if (parent != null)
@@ -171,6 +177,7 @@ public class ExpressionScope {
     public void remove(String name) {
         eagerValues.remove(name);
         lazyBindings.remove(name);
+        bindingVersions.remove(name);
         cachedValues.remove(name);
     }
 
@@ -179,6 +186,7 @@ public class ExpressionScope {
      * data.
      */
     public void resetCache() {
+        cacheVersion++;
         cachedValues.clear();
     }
 
