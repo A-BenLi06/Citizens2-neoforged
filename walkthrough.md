@@ -1651,3 +1651,9 @@ Three actual-expression tests verify repeated lazy reads share a cached result, 
 Each compiled evaluation now snapshots overridden engine bindings and restores them in finally. Nested scopes hide omitted outer variable roots and restore the outer frame afterward. Standard bindings are preserved, and NPC-free scopes explicitly disable inventory closures rather than retaining a previous/outer NPC.
 
 Four compiled-expression tests cover removed/omitted variables, temporary standard-binding overrides, nested variable isolation and nested/later NPC-free inventory access via an interface probe. All 457 ordinary tests and the normal build pass without failures/errors/skips; git diff --check passes. No fresh native/client or concurrent-evaluation guarantee is claimed. Production Interactions sources and packaging are unchanged; no unrelated server or original data was changed. Details: docs/molang-scope-isolation-2026-10-06.md. The previously listed scope-reuse audit now has implementation/test evidence; the full Citizens goal remains active.
+
+## 2026-10-06 05:38:59 +08:00 — Verify Molang scope restoration on all evaluation failure paths
+
+Added compiled-expression tests for binding setup failure after temporary variables are installed, handled evaluation exceptions and uncaught Errors. Each verifies that a later empty scope cannot observe the failed call's bindings. Existing production restoration already passes all cases, so no production change was needed.
+
+All 460 ordinary tests and the normal build pass without failures/errors/skips; git diff --check passes. No fresh native/client run is claimed. Production Interactions sources and packaging are unchanged; no unrelated server or original data was changed. Updated docs/molang-scope-isolation-2026-10-06.md. The full Citizens goal remains active.

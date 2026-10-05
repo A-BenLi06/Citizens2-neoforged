@@ -10,7 +10,12 @@ explicitly supplies them, then restore the outer bindings on return. NPC-free sc
 explicitly disable inv instead of inheriting an outer or previous NPC's closures.
 Memory, list, item and placeholder bindings are restored with the same frame.
 
-Four compiled-expression tests cover sequential variable removal, standard-binding
+Seven compiled-expression tests cover sequential variable removal, standard-binding
 restoration, nested variable isolation, and nested/later NPC-free inventory binding
 access using an NPC interface probe. These are expression tests, not physical-client
 or concurrent-evaluation guarantees.
+
+Failure-path checks cover binding setup exceptions after variable installation,
+handled evaluation exceptions and uncaught Errors. In each case a later empty scope
+sees no residual temporary value, while existing exception propagation/fallback
+behavior is preserved.

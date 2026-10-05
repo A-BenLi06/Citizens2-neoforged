@@ -7,6 +7,34 @@ import net.citizensnpcs.api.expr.ExpressionScope;
 import net.citizensnpcs.api.npc.NPC;
 
 class MolangScopeIsolationTest {
+    @Test void bindingSetupFailureRestoresAlreadyInstalledVariables() throws Exception {
+        var expression = new MolangEngine().compile("temporary");
+        var failing = new ExpressionScope() {
+            @Override public net.citizensnpcs.api.expr.Memory getMemory() {
+                throw new IllegalStateException("binding failure");
+            }
+        };
+        failing.set("temporary", 9D);
+        assertThrows(IllegalStateException.class, () -> expression.evaluate(failing));
+        assertEquals(0D, expression.evaluateAsNumber(new ExpressionScope()));
+    }
+
+    @Test void handledEvaluationFailureCannotLeakOtherBindings() throws Exception {
+        var expression = new MolangEngine().compile("hook() + temporary");
+        var failing = new ExpressionScope(); failing.set("temporary", 9D);
+        failing.bind("hook", () -> { throw new IllegalStateException("evaluation failure"); });
+        assertEquals(0D, expression.evaluateAsNumber(failing));
+        assertEquals(0D, expression.evaluateAsNumber(new ExpressionScope()));
+    }
+
+    @Test void uncaughtErrorStillRestoresTemporaryBindings() throws Exception {
+        var expression = new MolangEngine().compile("hook() + temporary");
+        var failing = new ExpressionScope(); failing.set("temporary", 9D);
+        failing.bind("hook", () -> { throw new AssertionError("evaluation error"); });
+        assertThrows(AssertionError.class, () -> expression.evaluate(failing));
+        assertEquals(0D, expression.evaluateAsNumber(new ExpressionScope()));
+    }
+
     @Test void nestedEvaluationCannotSeeOuterVariablesAndRestoresThemAfterward() throws Exception {
         var expression = new MolangEngine().compile("hook() + query.value");
         var outer = new ExpressionScope(); outer.set("query.value", 4D);
