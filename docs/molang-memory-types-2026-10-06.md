@@ -13,3 +13,8 @@ Two tests compile and execute actual Molang expressions to exercise string memor
 list add/get/contains/remove, string defaults, null-slot removal and non-mutating
 queries. The full ordinary suite also covers existing numeric behavior expressions.
 No new physical-client or native server run is claimed by this expression-level test.
+
+Molang also exposes mem.size() and mem.clear(). Size counts blackboard entries;
+clear removes scalar and list entries and returns 1 when a blackboard is available
+(or 0 without one). A compiled-expression test verifies counting, clearing and saving
+after clearing without reviving prior data.

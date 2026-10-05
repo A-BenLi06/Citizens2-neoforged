@@ -7,6 +7,21 @@ import net.citizensnpcs.api.expr.ExpressionScope;
 import net.citizensnpcs.api.expr.Memory;
 
 class MolangMemoryBindingTest {
+    @Test void expressionsCanCountAndClearScalarAndListMemory() throws Exception {
+        Memory memory = new Memory();
+        evaluate(memory, "mem.set('name', 'value')");
+        evaluate(memory, "list.add('items', 7)");
+        assertEquals(2D, evaluate(memory, "mem.size()"));
+        assertEquals(1D, evaluate(memory, "mem.clear()"));
+        assertEquals(0D, evaluate(memory, "mem.size()"));
+        assertFalse(memory.has("name"));
+        assertFalse(memory.has("items"));
+        var saved = new net.citizensnpcs.api.util.MemoryDataKey();
+        saved.setString("old", "removed");
+        memory.saveTo(saved);
+        assertFalse(saved.hasSubKeys());
+    }
+
     @Test void invalidNumericIndicesCannotReadOrRemoveTheFirstSlot() throws Exception {
         for (double index : new double[] {-1, -0.5, 0.5, 2147483648D}) {
             Memory memory = new Memory();

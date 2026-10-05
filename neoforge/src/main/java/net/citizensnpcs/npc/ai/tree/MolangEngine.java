@@ -523,6 +523,14 @@ public class MolangEngine implements ExpressionEngine {
     private static ObjectValue createMemBinding(Memory memory) {
         MutableObjectBinding binding = new MutableObjectBinding();
 
+        binding.set("size", (Function<?>) (context, args) ->
+                memory == null ? NumberValue.zero() : NumberValue.of(memory.size()));
+        binding.set("clear", (Function<?>) (context, args) -> {
+            if (memory == null) return NumberValue.zero();
+            memory.clear();
+            return NumberValue.of(1);
+        });
+
         // mem.set(key, value)
         binding.set("set", (Function<?>) (context, args) -> {
             if (memory == null || args.length() < 2)

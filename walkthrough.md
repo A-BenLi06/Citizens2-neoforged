@@ -1527,3 +1527,9 @@ Two compiled-expression tests exercise actual Mocha/Molang bindings for string r
 list.get and list.remove_at now reject identifiable fractional, negative, non-number and out-of-int-range indices instead of truncating them to another slot. Valid integer access/removal is unchanged. Two compiled-expression tests cover list preservation for rejected indices and valid operations.
 
 An initial non-finite assertion failed because Mocha normalizes NaN/infinity to zero inside NumberValue construction. Dependency bytecode confirmed that contract; tests and documentation now distinguish engine normalization from binding validation rather than claiming the original non-finite value can be recovered. All 406 ordinary tests and the normal build pass without failures/errors/skips; git diff --check passes. No fresh native/client run is claimed. Production Interactions sources and packaging are unchanged; no unrelated server or original data was changed. Details: docs/molang-list-indices-2026-10-06.md. The full Citizens goal remains active.
+
+## 2026-10-06 01:23:50 +08:00 — Expose blackboard count and clear to Molang
+
+Added mem.size() and mem.clear() bindings so behavior expressions can use the existing blackboard count/clear implementation. Clear handles both scalar and list entries and reports whether a memory instance is available.
+
+A compiled-expression test creates scalar/list entries, counts and clears them, then saves over old data to verify no keys revive. All 407 ordinary tests and the normal build pass without failures/errors/skips; git diff --check passes. No fresh native/client run is claimed. Production Interactions sources and packaging are unchanged; no unrelated server or original data was changed. Updated docs/molang-memory-types-2026-10-06.md. The full Citizens goal remains active.
