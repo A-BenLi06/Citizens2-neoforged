@@ -11,7 +11,7 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundEvents;
-import net.minecraft.world.SimpleContainer;
+import net.minecraft.world.Container;
 import net.minecraft.world.SimpleMenuProvider;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
@@ -215,18 +215,16 @@ public class NPCTraderShopViewer {
             if (selectedTrade == -1 || !trades.containsKey(selectedTrade))
                 return;
 
-            // the two payment slots stand in for an inventory the cost can be taken from, exactly as a chest shop would
-            // use the player's own, and are written back once the transaction has run
-            SimpleContainer payment = new SimpleContainer(2);
-            payment.setItem(0, getSlot(PAYMENT1_SLOT).getItem());
-            payment.setItem(1, getSlot(PAYMENT2_SLOT).getItem());
+            // Costs update the real payment slots before action/notification callbacks can close this menu. The
+            // preview result slot is excluded: it is not another item owned by the player.
+            PaymentView payment = new PaymentView(this, getSlot(PAYMENT1_SLOT).container, PAYMENT1_SLOT, PAYMENT2_SLOT);
             InventoryMultiplexer multiplexer = new InventoryMultiplexer(buyer.getInventory(), payment);
-            trades.get(selectedTrade).onClick(shop, storage, buyer, multiplexer, shiftClick,
-                    lastClickedTrade == selectedTrade);
-            getSlot(PAYMENT1_SLOT).set(payment.getItem(0));
-            getSlot(PAYMENT2_SLOT).set(payment.getItem(1));
+            try {
+                trades.get(selectedTrade).onClick(shop, storage, buyer, multiplexer, shiftClick,
+                        lastClickedTrade == selectedTrade, payment::finish);
+            } finally { payment.finish(); }
             lastClickedTrade = selectedTrade;
-            broadcastFullState();
+            if (!invalidated && buyer.containerMenu == this) broadcastFullState();
         }
 
         @Override
@@ -237,6 +235,64 @@ public class NPCTraderShopViewer {
                 lastClickedTrade = -1;
             }
             selectedTrade = index;
+        }
+    }
+
+    private static final class PaymentView implements Container {
+        private final ShopMerchantMenu menu;
+        private final Container source;
+        private final int first, size;
+        private final ItemStack[] escrow;
+        PaymentView(ShopMerchantMenu menu, Container source, int first, int last) {
+            this.menu = menu;
+            this.source = source;
+            this.first = first;
+            size = last - first + 1;
+            escrow = new ItemStack[size];
+            java.util.Arrays.fill(escrow, ItemStack.EMPTY);
+        }
+        private boolean closed() { return menu.invalidated || menu.owner.containerMenu != menu; }
+        void finish() {
+            // Closing has already returned native inputs. Only new items staged after that closure remain here.
+            for (int i = 0; i < escrow.length; i++) {
+                ItemStack stack = escrow[i];
+                escrow[i] = ItemStack.EMPTY;
+                if (!stack.isEmpty()) menu.owner.getInventory().placeItemBackInInventory(stack);
+            }
+        }
+        private int index(int slot) {
+            if (slot < 0 || slot >= getContainerSize()) throw new IndexOutOfBoundsException(slot);
+            return first + slot;
+        }
+        @Override public int getContainerSize() { return size; }
+        @Override public boolean isEmpty() {
+            for (int i = 0; i < getContainerSize(); i++) if (!getItem(i).isEmpty()) return false;
+            return true;
+        }
+        @Override public ItemStack getItem(int slot) { int mapped = index(slot); return closed() ? escrow[slot] : source.getItem(mapped); }
+        @Override public ItemStack removeItem(int slot, int count) {
+            int mapped = index(slot);
+            if (!closed()) return source.removeItem(mapped, count);
+            ItemStack result = escrow[slot].split(count);
+            if (escrow[slot].isEmpty()) escrow[slot] = ItemStack.EMPTY;
+            return result;
+        }
+        @Override public ItemStack removeItemNoUpdate(int slot) {
+            int mapped = index(slot);
+            if (!closed()) return source.removeItemNoUpdate(mapped);
+            ItemStack result = escrow[slot]; escrow[slot] = ItemStack.EMPTY; return result;
+        }
+        @Override public void setItem(int slot, ItemStack stack) {
+            int mapped = index(slot);
+            if (closed()) escrow[slot] = stack;
+            else source.setItem(mapped, stack);
+        }
+        @Override public int getMaxStackSize() { return source.getMaxStackSize(); }
+        @Override public void setChanged() { if (!closed()) source.setChanged(); }
+        @Override public boolean stillValid(Player player) { return menu.stillValid(player); }
+        @Override public boolean canPlaceItem(int slot, ItemStack stack) { return source.canPlaceItem(index(slot), stack); }
+        @Override public void clearContent() {
+            for (int i = 0; i < getContainerSize(); i++) setItem(i, ItemStack.EMPTY);
         }
     }
 }

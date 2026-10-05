@@ -16,6 +16,7 @@ import net.minecraft.world.item.ItemStack;
 
 /**
  * Opens another shop, so one shop can act as a menu leading to others.
+ * Rollback cancels pending openings; it does not recreate an origin screen that has already closed.
  */
 public class OpenShopAction extends NPCShopAction {
     @Persist
@@ -53,13 +54,18 @@ public class OpenShopAction extends NPCShopAction {
         // every click instead of simply refusing
         if (shop == null)
             return Transaction.fail();
-        return Transaction.create(() -> shop.canView(player), () -> {
+        java.util.List<net.citizensnpcs.api.util.schedulers.SchedulerTask> pending = new java.util.ArrayList<>();
+        return Transaction.create(() -> shop.isActive() && shop.canView(player), () -> {
             player.closeContainer();
+            // Merchant closure returns remaining input items to the player; subsequent actions/refunds must see them.
+            inventory.refresh();
             // a tick or two later: the client is still closing the old screen, and opening one inside the close would be
             // lost
-            CitizensAPI.getScheduler().runEntityTaskLater(player, () -> shop.display(player), 2);
-        }, () -> {
-        });
+            pending.add(CitizensAPI.getScheduler().runEntityTaskLater(player, () -> {
+                if (!player.hasDisconnected() && player.getServer().getPlayerList().getPlayer(player.getUUID()) == player)
+                    shop.display(player);
+            }, 2));
+        }, () -> pending.forEach(net.citizensnpcs.api.util.schedulers.SchedulerTask::cancel));
     }
 
     private static StoredShops shops() {

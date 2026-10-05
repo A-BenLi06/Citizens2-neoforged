@@ -5,6 +5,8 @@ import net.minecraft.server.level.ServerPlayer;
 
 /**
  * Fired after a shop item has been paid for and handed over.
+ * Purchase limits and native inventory settlement are complete, and transaction ownership is released before dispatch.
+ * Listener failures are reported without reversing the committed purchase.
  */
 public class NPCShopPurchaseEvent extends CitizensEvent {
     private final NPCShopItem item;

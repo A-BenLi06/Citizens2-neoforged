@@ -241,6 +241,11 @@ public class NPCShopItem implements Cloneable, Persistable {
 
     void onClick(NPCShop shop, NPCShopStorage storage, ServerPlayer player, InventoryMultiplexer inventory,
             boolean shiftClick, boolean secondClick) {
+        onClick(shop, storage, player, inventory, shiftClick, secondClick, () -> {});
+    }
+
+    void onClick(NPCShop shop, NPCShopStorage storage, ServerPlayer player, InventoryMultiplexer inventory,
+            boolean shiftClick, boolean secondClick, Runnable settleInventory) {
         if (!shop.beginTrade()) return;
         if (!storage.beginTrade()) { shop.endTrade(); return; }
         try {
@@ -282,17 +287,27 @@ public class NPCShopItem implements Cloneable, Persistable {
             rollback(take);
             return;
         }
-        if (resultMessage != null) {
-            Messaging.sendColorless(player.createCommandSourceStack(), placeholders(resultMessage, player));
-        }
         if (timesPurchasable > 0) {
             purchases.put(player.getUUID(), purchases.getOrDefault(player.getUUID(), 0) + 1);
         }
         if (globalTimesPurchasable > 0) {
             npurchases++;
         }
-        new NPCShopPurchaseEvent(player, shop, this).callEvent();
         } finally { storage.endTrade(); shop.endTrade(); }
+        settleInventory.run();
+        // Goods are already transferred. Notification failure must not erase the committed purchase or escape into
+        // the merchant's inventory handling after payment has been taken.
+        if (resultMessage != null) {
+            notifyPurchase("message", () -> Messaging.sendColorless(player.createCommandSourceStack(), placeholders(resultMessage, player)));
+        }
+        notifyPurchase("event", () -> new NPCShopPurchaseEvent(player, shop, this).callEvent());
+    }
+
+    private static void notifyPurchase(String kind, Runnable notification) {
+        try { notification.run(); }
+        catch (RuntimeException | Error failure) {
+            org.slf4j.LoggerFactory.getLogger(NPCShopItem.class).error("Shop purchase {} notification failed", kind, failure);
+        }
     }
 
     /** Fills in {@code <cost>}, {@code <result>} and {@code <times_purchasable>} as well as the usual placeholders. */
