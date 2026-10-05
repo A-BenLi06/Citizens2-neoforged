@@ -1315,3 +1315,11 @@ ShopTrait now reads an existing default shop without creating an empty definitio
 Validation: StoredShopsTest passes, including four new cases covering different binding/name keys, shared aliases, replacement ownership and active-trade rejection. Gradle completed successfully; git diff --check passed. No server was deployed or stopped. Interactions source and packaging are unchanged and retain their independent JAR.
 
 The separate, in-progress RemoveNPCHistoryItem/CitizensNPCRegistry restoration edits are not included in this commit. Full shop undo is not yet verified: creation rollback can still invoke deletion callbacks against a replacement definition, and conflict localization and native recovery coverage remain outstanding. The full Citizens completion goal remains active.
+
+## 2026-10-05 18:48:56 +08:00 — Restore independent shops through NPC removal history
+
+Removal history captures the independent default shop after closing stock sessions. Undo rejects shop UUID conflicts, decodes a fresh definition, and uses native runtime retirement on failed creation/restoration so callbacks cannot cause cleanup to delete a replacement definition. Orphaned provisional definitions retire without removing unrelated bindings. Conflict text uses the translation catalog. Creation callback cancellation and retry are exercised through native commands.
+
+The expanded runtime probe exposed lost empty pages in reified-object persistence. Encoding a present empty object as an empty map preserves its collection position; a disk round-trip test verifies pages and empty items. This fixes actual serialization rather than compensating inside undo.
+
+Validation: 71 native removal checks pass on NeoForge 21.1.248; clean test/build passes with 354 ordinary tests; the Interactions audit test invocation succeeds. Release archives were inspected for Citizens/Interactions separation and absence of the removal probe. No original server was deployed or stopped. Details and remaining validation limits are recorded in docs/shop-undo-2026-10-05.md. Editor-buffer capture and broader callback/load failure coverage, custom registry behavior and 21.1.233 native verification remain follow-up work. The full Citizens goal remains active.

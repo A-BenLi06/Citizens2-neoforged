@@ -68,6 +68,15 @@ public class CitizensNPCRegistry implements NPCRegistry {
 
     @Override
     public NPC createNPC(EntityType<?> type, UUID uuid, int id, String name) {
+        return createNPC(type, uuid, id, name, false);
+    }
+
+    /** Restore a saved identity; failed initialization must not delete independent saved definitions. */
+    public NPC createNPCForRestore(EntityType<?> type, UUID uuid, int id, String name) {
+        return createNPC(type, uuid, id, name, true);
+    }
+
+    private NPC createNPC(EntityType<?> type, UUID uuid, int id, String name, boolean restoring) {
         requireOpen();
         Objects.requireNonNull(name, "name cannot be null");
         Objects.requireNonNull(type, "type cannot be null");
@@ -93,7 +102,10 @@ public class CitizensNPCRegistry implements NPCRegistry {
             });
             return npc;
         } catch (RuntimeException | Error failure) {
-            try { npc.rollbackCreation(); } catch (RuntimeException | Error cleanup) {
+            try {
+                if (restoring) discardRuntimeNPC(npc);
+                else npc.rollbackCreation();
+            } catch (RuntimeException | Error cleanup) {
                 if (cleanup != failure) failure.addSuppressed(cleanup);
             }
             throw failure;
@@ -214,6 +226,15 @@ public class CitizensNPCRegistry implements NPCRegistry {
         }
         if (failure instanceof RuntimeException exception) throw exception;
         if (failure instanceof Error error) throw error;
+    }
+
+    /** Discard one failed runtime restoration without deleting its persisted definitions or other identities. */
+    public void discardRuntimeNPC(NPC npc) {
+        if (npc.getOwningRegistry() != this) throw new IllegalArgumentException("NPC belongs to another registry");
+        NPCLifetimes.cancel(npc);
+        if (npcs.get(npc.getId()) == npc) npcs.remove(npc.getId());
+        uniqueNPCs.remove(npc.getUniqueId(), npc);
+        ((CitizensNPC) npc).retire();
     }
 
     private void requireOpen() {

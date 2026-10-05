@@ -13,6 +13,24 @@ import net.citizensnpcs.api.util.YamlStorage;
 
 class StoredShopsTest {
     @Test
+    void emptyPagesAndItemsRetainTheirPositionsAcrossSave(@TempDir Path directory) {
+        StoredShops shops = new StoredShops(new YamlStorage(directory.resolve("shops.yml").toFile()));
+        assertTrue(shops.loadFromDisk());
+        NPCShop shop = shops.addNamedShop("pages");
+        shop.getOrCreatePage(1).setItem(4, new NPCShopItem());
+        shops.storeShops();
+        shops.saveToDiskImmediate();
+        assertTrue(shops.loadFromDisk());
+        shops.load();
+        NPCShop restored = shops.getGlobalShop("pages");
+        assertEquals(2, restored.getPages().size());
+        assertEquals(0, restored.getPages().get(0).getIndex());
+        assertTrue(restored.getPages().get(0).getItems().isEmpty());
+        assertEquals(1, restored.getPages().get(1).getIndex());
+        assertNotNull(restored.getPages().get(1).getItem(4));
+    }
+
+    @Test
     void npcRemovalUsesBindingKeyInsteadOfDefinitionName(@TempDir Path directory) {
         StoredShops shops = new StoredShops(new YamlStorage(directory.resolve("shops.yml").toFile()));
         NPCShop definition = new NPCShop("different-name");
@@ -45,6 +63,7 @@ class StoredShopsTest {
         shops.removeNPCShop("npc-id", previous);
         assertSame(replacement, shops.npcShops.get("npc-id"));
         assertTrue(replacement.isActive());
+        assertFalse(previous.isActive());
     }
 
     @Test

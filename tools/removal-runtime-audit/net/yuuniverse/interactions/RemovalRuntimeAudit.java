@@ -234,13 +234,50 @@ public final class RemovalRuntimeAudit {
         void basicCommands() throws Exception {
             NPC control = npc(registry, alice.getUUID(), "Control", null);
             NPC target = npc(registry, alice.getUUID(), "Target", null);
+            var originalShop = target.getOrAddTrait(net.citizensnpcs.trait.ShopTrait.class).getDefaultShop();
+            originalShop.setTitle("Saved shop title");
+            originalShop.getStorage().setUnlimited(false);
+            originalShop.getStorage().setBalance(123);
+            originalShop.getStorage().setInventory(new ArrayList<>(List.of(new ItemStack(Items.DIAMOND, 7))));
+            originalShop.setShopType(net.citizensnpcs.trait.shop.ShopType.TRADER);
+            originalShop.setPermission("audit.shop.view");
+            originalShop.getOrCreatePage(1).setItem(4, new net.citizensnpcs.trait.shop.NPCShopItem());
+            target.getOrAddTrait(net.citizensnpcs.trait.ShopTrait.class).getStorage().setUnlimited(false);
+            target.getOrAddTrait(net.citizensnpcs.trait.ShopTrait.class).getStorage().setBalance(45);
             UUID targetUuid = target.getUniqueId(); int targetId = target.getId();
             CitizensAPI.getDefaultNPCSelector().select(a, control);
             ok(a, "npc remove " + targetId);
             check(exists(control) && !exists(target) && CitizensAPI.getDefaultNPCSelector().getSelected(a) == control,
                     "id_argument_does_not_delete_selected_npc");
             check(recorder.lastNpc == target && recorder.lastSource.getEntity() == alice, "removal_event_carries_command_sender");
+            originalShop.setTitle("Changed after deletion");
+            var shops = net.citizensnpcs.Citizens.getInstance().getShops();
+            check(!shops.npcShops.containsKey(targetUuid.toString()), "removal_deletes_private_shop_binding");
+            var conflict = shops.addNPCShop(targetUuid.toString());
+            reject(a, "npc undo");
+            check(shops.npcShops.get(targetUuid.toString()) == conflict && registry.getById(targetId) == null,
+                    "shop_conflict_preserves_definition_and_registry");
+            shops.removeNPCShop(targetUuid.toString(), conflict);
+            recorder.cancelRestore = targetUuid;
+            try { reject(a, "npc undo"); }
+            finally { recorder.cancelRestore = null; }
+            check(registry.getById(targetId) == null && registry.getByUniqueId(targetUuid) == null
+                    && shops.npcShops.get(targetUuid.toString()) == recorder.replacement
+                    && recorder.replacement.isActive(), "canceled_restore_preserves_callback_shop_and_cleans_registry");
+            shops.removeNPCShop(targetUuid.toString(), recorder.replacement);
             ok(a, "npc undo"); target = registry.getById(targetId);
+            var restoredShop = target.getOrAddTrait(net.citizensnpcs.trait.ShopTrait.class).getDefaultShop();
+            check(restoredShop != originalShop && restoredShop.getTitle().equals("Saved shop title")
+                    && restoredShop.getStorage().getBalance() == 123,
+                    "undo_restores_detached_shop_definition_and_stock");
+            check(target.getOrAddTrait(net.citizensnpcs.trait.ShopTrait.class).getStorage().getBalance() == 45,
+                    "undo_restores_private_shop_stock");
+            check(restoredShop.getShopType() == net.citizensnpcs.trait.shop.ShopType.TRADER, "undo_restores_shop_type");
+            check("audit.shop.view".equals(restoredShop.getRequiredPermission()), "undo_restores_shop_permission");
+            check(restoredShop.getPages().size() == 2 && restoredShop.getPages().get(1).getItem(4) != null,
+                    "undo_restores_shop_pages");
+            check(ItemStack.matches(restoredShop.getStorage().getContents()[0], new ItemStack(Items.DIAMOND, 7)),
+                    "undo_restores_shop_items");
             check(target != null && target.getUniqueId().equals(targetUuid) && target.getName().equals("Target")
                     && target.getOrAddTrait(Owner.class).isOwnedBy(alice.getUUID()), "undo_restores_identity_name_and_owner");
             CitizensAPI.getDefaultNPCSelector().select(a, control);
@@ -551,6 +588,15 @@ public final class RemovalRuntimeAudit {
         @Override public void save(DataKey key) { throw new IllegalStateException("Injected snapshot failure"); }
     }
     public static class RemovalRecorder {
+        UUID cancelRestore;
+        net.citizensnpcs.trait.shop.NPCShop replacement;
+        @SubscribeEvent public void created(net.citizensnpcs.api.event.NPCCreateEvent event) {
+            if (!event.getNPC().getUniqueId().equals(cancelRestore)) return;
+            event.getNPC().getOrAddTrait(net.citizensnpcs.trait.ShopTrait.class);
+            replacement = new net.citizensnpcs.trait.shop.NPCShop(cancelRestore.toString());
+            net.citizensnpcs.Citizens.getInstance().getShops().npcShops.put(cancelRestore.toString(), replacement);
+            event.setCanceled(true);
+        }
         NPC lastNpc; CommandSourceStack lastSource;
         @SubscribeEvent public void removed(NPCRemoveByCommandSenderEvent event) { lastNpc = event.getNPC(); lastSource = event.getSource(); }
     }

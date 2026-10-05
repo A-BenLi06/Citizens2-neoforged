@@ -80,6 +80,8 @@ public class PersistenceLoader {
         @Override
         public void save(Object instance, DataKey root) {
             PersistenceLoader.save(instance, root);
+            // A present object with only default/key fields still occupies a collection or map entry.
+            if (instance != null && root.getRaw("") == null) root.setRaw("", new LinkedHashMap<>());
         }
     }
 

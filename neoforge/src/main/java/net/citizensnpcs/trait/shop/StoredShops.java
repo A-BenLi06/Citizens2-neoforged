@@ -65,8 +65,8 @@ public class StoredShops {
     /** Remove only the expected per-NPC binding; another binding may still own the same definition. */
     public void removeNPCShop(String id, NPCShop expected) {
         expected.requireIdle();
-        if (npcShops.remove(id, expected)
-                && npcShops.values().stream().noneMatch(shop -> shop == expected)
+        npcShops.remove(id, expected);
+        if (npcShops.values().stream().noneMatch(shop -> shop == expected)
                 && globalShops.values().stream().noneMatch(shop -> shop == expected)) expected.retire();
     }
 

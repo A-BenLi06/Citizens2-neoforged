@@ -27,7 +27,10 @@ The dispatcher checks verify that expected Citizens failures become Brigadier
 failures and stop later dialogue actions. The public `executeSafe` handled-result
 contract is separate from this dispatcher outcome.
 
-The fixture has 62 checks. Seven item-persistence checks exercise native enchantment
+The fixture has 71 checks. Nine shop-undo checks cover independent definition and
+stock restoration, conflicting definitions, canceled creation callbacks that replace
+the shop, retry, detached snapshots, empty pages, type, permission and stored items.
+Seven item-persistence checks exercise native enchantment
 components with live registries, failed inventory encoding without deleting the old
 slot, snapshot failure blocking removal and copying, retry after fixing the item,
 exact item restoration through undo, and explicit clearing of an inventory slot.
