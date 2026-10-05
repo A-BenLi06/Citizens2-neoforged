@@ -1633,3 +1633,9 @@ Four tests cover rebinding, null caching/shadowing, inherited names/kinds and ac
 ExpressionScope now associates lazy bindings with distinct identities and cache cycles with versions. Results computed across self-rebinding, removal or cache reset are returned to the initiating caller but cannot refill the replacement binding/cycle's cache. Identical supplier objects rebound during evaluation are distinguished correctly.
 
 Three tests cover new-supplier and same-supplier rebinding, removal exposing an inherited value, and reset during evaluation. All 447 ordinary tests and the normal build pass without failures/errors/skips; git diff --check passes. No fresh native/client run is claimed. Production Interactions sources and packaging are unchanged; no unrelated server or original data was changed. Updated docs/expression-scope-bindings-2026-10-06.md. The full Citizens goal remains active.
+
+## 2026-10-06 05:06:41 +08:00 — Detect cyclic lazy expression bindings without poisoning retry
+
+ExpressionScope tracks active binding versions during supplier calls and rejects recursive lookup of the same version with a named error. Guards are released in finally. A genuinely new binding may still be evaluated inside the previous supplier's call.
+
+Three tests cover direct cycles, parent/child cycles with successful repair, and replacement-binding evaluation/caching. All 450 ordinary tests and the normal build pass without failures/errors/skips; git diff --check passes. No fresh native/client run is claimed. Production Interactions sources and packaging are unchanged; no unrelated server or original data was changed. Updated docs/expression-scope-bindings-2026-10-06.md. The full Citizens goal remains active.

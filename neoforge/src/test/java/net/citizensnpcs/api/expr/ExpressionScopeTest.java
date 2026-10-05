@@ -8,6 +8,34 @@ import org.junit.jupiter.api.Test;
 import net.citizensnpcs.npc.ai.tree.MolangEngine;
 
 class ExpressionScopeTest {
+    @Test void directCycleReportsItsBindingAndCanBeRepaired() {
+        var scope = new ExpressionScope(); scope.bind("cycle", () -> scope.get("cycle"));
+        var failure = assertThrows(IllegalStateException.class, () -> scope.get("cycle"));
+        assertTrue(failure.getMessage().contains("cycle"));
+        scope.bind("cycle", () -> 7);
+        assertEquals(7, scope.get("cycle"));
+    }
+
+    @Test void cycleAcrossParentAndChildScopesReleasesAllEvaluationGuards() {
+        var parent = new ExpressionScope(); var child = parent.createChild();
+        parent.bind("first", () -> child.get("second"));
+        child.bind("second", () -> parent.get("first"));
+        assertThrows(IllegalStateException.class, () -> parent.get("first"));
+        child.set("second", 5);
+        assertEquals(5, parent.get("first"));
+    }
+
+    @Test void aNewBindingMayBeEvaluatedInsideThePreviousSuppliersCall() {
+        var scope = new ExpressionScope(); var calls = new AtomicInteger();
+        scope.bind("value", () -> {
+            scope.bind("value", () -> { calls.incrementAndGet(); return 9; });
+            return scope.get("value");
+        });
+        assertEquals(9, scope.get("value"));
+        assertEquals(9, scope.get("value"));
+        assertEquals(1, calls.get());
+    }
+
     @Test void supplierRebindingItselfCannotCacheItsOldResult() {
         var scope = new ExpressionScope();
         scope.bind("value", () -> { scope.bind("value", () -> 2); return 1; });

@@ -18,3 +18,9 @@ A supplier may rebind/remove itself or reset the cache while computing; its curr
 call returns its result, but that result is not cached for the replacement binding
 or cycle. Rebinding the same supplier object still creates a distinct binding.
 Three tests cover these callback mutation paths.
+
+Scope lookup detects recursive evaluation of the same lazy binding version and
+reports the binding name instead of recursing to stack exhaustion. Evaluation guards
+are released on failure. Rebinding to a new version during a supplier call remains
+valid and may be evaluated immediately. Tests cover direct and parent/child cycles,
+repair after failure, and legitimate nested evaluation of a replacement binding.

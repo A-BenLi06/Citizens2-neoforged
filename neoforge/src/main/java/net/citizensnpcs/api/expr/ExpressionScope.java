@@ -19,6 +19,7 @@ public class ExpressionScope {
     private final Map<String, Object> eagerValues = new HashMap<>();
     private final Map<String, Supplier<?>> lazyBindings = new HashMap<>();
     private final Map<String, Object> bindingVersions = new HashMap<>();
+    private final Set<Object> evaluatingBindings = new java.util.HashSet<>();
     private long cacheVersion;
     private Memory memory;
     private NPC npc;
@@ -66,10 +67,14 @@ public class ExpressionScope {
         if (supplier != null) {
             Object bindingVersion = bindingVersions.get(name);
             long version = cacheVersion;
-            Object value = supplier.get();
-            if (version == cacheVersion && bindingVersions.get(name) == bindingVersion
-                    && !eagerValues.containsKey(name)) cachedValues.put(name, value);
-            return value;
+            if (!evaluatingBindings.add(bindingVersion))
+                throw new IllegalStateException("Cyclic lazy expression binding: " + name);
+            try {
+                Object value = supplier.get();
+                if (version == cacheVersion && bindingVersions.get(name) == bindingVersion
+                        && !eagerValues.containsKey(name)) cachedValues.put(name, value);
+                return value;
+            } finally { evaluatingBindings.remove(bindingVersion); }
         }
         if (parent != null)
             return parent.get(name);
