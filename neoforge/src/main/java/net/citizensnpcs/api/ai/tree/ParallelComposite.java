@@ -7,16 +7,23 @@ import java.util.Collection;
  * status doesn't affect the composite's return value.
  */
 public class ParallelComposite extends Composite {
+    private boolean started;
     public ParallelComposite(Collection<Behavior> behaviors) {
         super(behaviors);
     }
 
     @Override
     public BehaviorStatus run() {
-        if (parallelExecuting.isEmpty())
-            return BehaviorStatus.SUCCESS;
-        tickParallel();
-        return BehaviorStatus.RUNNING;
+        boolean admit = !started;
+        started = true;
+        tickParallel(admit);
+        return parallelExecuting.isEmpty() ? BehaviorStatus.SUCCESS : BehaviorStatus.RUNNING;
+    }
+
+    @Override
+    public void reset() {
+        started = false;
+        super.reset();
     }
 
     @Override

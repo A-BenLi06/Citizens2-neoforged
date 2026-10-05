@@ -80,9 +80,11 @@ public abstract class Composite implements Behavior {
     }
 
     protected void tickParallel() {
-        for (Behavior b : List.copyOf(parallel)) {
-            tryAddParallel(b);
-        }
+        tickParallel(true);
+    }
+
+    protected void tickParallel(boolean admitChildren) {
+        if (admitChildren) for (Behavior b : List.copyOf(parallel)) tryAddParallel(b);
         for (Behavior behavior : List.copyOf(parallelExecuting)) {
             if (!parallelExecuting.contains(behavior)) continue;
             BehaviorStatus status = behavior.run();

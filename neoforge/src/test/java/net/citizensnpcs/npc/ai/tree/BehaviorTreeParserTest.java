@@ -23,6 +23,16 @@ import net.citizensnpcs.api.util.MemoryDataKey;
  */
 public class BehaviorTreeParserTest {
     @Test
+    public void parsedParallelContainerExecutesItsChildren() {
+        Memory memory = new Memory();
+        Behavior tree = parse(map("parallel", map("0", "set first `1`", "1", "set second `2`")), memory);
+        assertTrue(tree.shouldExecute());
+        assertEquals(BehaviorStatus.SUCCESS, tree.run());
+        assertEquals(1D, memory.getNumber("first"));
+        assertEquals(2D, memory.getNumber("second"));
+    }
+
+    @Test
     public void strictParsingAcceptsExplicitEmptyContainers() {
         var parser = new BehaviorTreeParser(new CitizensBehaviorRegistry(new ExpressionRegistry()));
         DataKey root = new MemoryDataKey();

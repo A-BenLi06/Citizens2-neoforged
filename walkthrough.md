@@ -1567,3 +1567,9 @@ Four new controller tests cover dynamic parallel-only execution/clear, terminal 
 Sequence removal now adjusts the active index when earlier/current nodes leave the list and clears the execution reference before cleanup. RESET_AND_REMOVE resets its removed node through this path before advancing. Admission/run callback ownership checks avoid using removed children. Reset detaches active state first and aggregates parallel/current cleanup errors.
 
 Four new sequence tests cover terminal removal, removal of earlier/current children without skipping successors, self-removal during admission and throwing reset during clear. All 421 ordinary tests and the normal build pass without failures/errors/skips; git diff --check passes. No fresh native/client run is claimed. Production Interactions sources and packaging are unchanged; no unrelated server or original data was changed. Details: docs/sequence-removal-2026-10-06.md. The full Citizens goal remains active.
+
+## 2026-10-06 02:44:48 +08:00 — Start and complete parallel composite cycles correctly
+
+ParallelComposite now admits children before its first completion check and admits them only once per cycle. It waits for active siblings without restarting completed children, resets for another cycle, and honors permanent RESET_AND_REMOVE. Other composites retain recurring parallel admission through the default tick mode.
+
+Three direct tests cover completion timing, reset/removal and empty composites; a parser test verifies both expressions inside a YAML parallel container actually execute. All 425 ordinary tests and the normal build pass without failures/errors/skips; git diff --check passes. No fresh native/client run is claimed. Production Interactions sources and packaging are unchanged; no unrelated server or original data was changed. Details: docs/parallel-composite-cycles-2026-10-06.md. The full Citizens goal remains active.
