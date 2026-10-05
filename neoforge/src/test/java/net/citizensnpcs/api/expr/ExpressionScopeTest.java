@@ -8,6 +8,33 @@ import org.junit.jupiter.api.Test;
 import net.citizensnpcs.npc.ai.tree.MolangEngine;
 
 class ExpressionScopeTest {
+    @Test void molangNestedReadsShareTheScopesEvaluationCache() throws Exception {
+        var scope = new ExpressionScope(); var calls = new AtomicInteger();
+        scope.bind("query.counter", () -> calls.incrementAndGet());
+        var expression = new MolangEngine().compile("query.counter + query.counter");
+        assertEquals(2D, expression.evaluateAsNumber(scope));
+        assertEquals(1, calls.get());
+        scope.resetCache();
+        assertEquals(4D, expression.evaluateAsNumber(scope));
+        assertEquals(2, calls.get());
+    }
+
+    @Test void molangTopLevelLazyCallsAlsoShareTheScopeCache() throws Exception {
+        var scope = new ExpressionScope(); var calls = new AtomicInteger();
+        scope.bind("counter", () -> calls.incrementAndGet());
+        var expression = new MolangEngine().compile("counter() + counter()");
+        assertEquals(2D, expression.evaluateAsNumber(scope));
+        assertEquals(1, calls.get());
+    }
+
+    @Test void eagerNullReplacesThePreviousMolangValue() throws Exception {
+        var scope = new ExpressionScope(); scope.set("value", 7D);
+        var expression = new MolangEngine().compile("value");
+        assertEquals(7D, expression.evaluateAsNumber(scope));
+        scope.set("value", null);
+        assertEquals(0D, expression.evaluateAsNumber(scope));
+    }
+
     @Test void directCycleReportsItsBindingAndCanBeRepaired() {
         var scope = new ExpressionScope(); scope.bind("cycle", () -> scope.get("cycle"));
         var failure = assertThrows(IllegalStateException.class, () -> scope.get("cycle"));

@@ -1639,3 +1639,9 @@ Three tests cover new-supplier and same-supplier rebinding, removal exposing an 
 ExpressionScope tracks active binding versions during supplier calls and rejects recursive lookup of the same version with a named error. Guards are released in finally. A genuinely new binding may still be evaluated inside the previous supplier's call.
 
 Three tests cover direct cycles, parent/child cycles with successful repair, and replacement-binding evaluation/caching. All 450 ordinary tests and the normal build pass without failures/errors/skips; git diff --check passes. No fresh native/client run is claimed. Production Interactions sources and packaging are unchanged; no unrelated server or original data was changed. Updated docs/expression-scope-bindings-2026-10-06.md. The full Citizens goal remains active.
+
+## 2026-10-06 05:16:03 +08:00 — Route Molang lazy values through scope cache ownership
+
+Nested and top-level Molang lazy bindings now call ExpressionScope.get instead of bypassing its cache and evaluation guards via raw suppliers. Explicit eager nulls are installed into the engine instead of leaving a previous value behind.
+
+Three actual-expression tests verify repeated lazy reads share a cached result, resetCache permits fresh computation, and eager null overwrites an earlier value. All 453 ordinary tests and the normal build pass without failures/errors/skips; git diff --check passes. No fresh native/client run is claimed. Production Interactions sources and packaging are unchanged; no unrelated server or original data was changed. Added a concrete follow-up audit for compiled-engine reuse after variable removal or NPC-context loss. The full Citizens goal remains active.

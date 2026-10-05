@@ -129,3 +129,7 @@ Recent follow-ups cover [`powered`, `name` and `home` options](command-options-h
 - Resolve the required legacy group definitions, shop destinations and account identities through Paradigm and Yuuniverse Economy. Keep Yuuniverse Interactions and CMDCam as their respective owners. FTB Quests and RSItemEditor adapters/data migration are conditional on selecting those providers.
 
 Full Quests, GroupManager, EssentialsX, PlaceholderAPI or Sentinel replication is not an implicit Citizens completion requirement. Future-version entity variants are outside ordinary Minecraft 1.21.1 parity. No production deployment or physical-client acceptance is implied by this checklist.
+
+Open expression isolation audit: compiled Molang expressions retain an engine scope;
+check reuse after variable removal and after switching from an NPC scope to a scope
+without an NPC, so old variable or inventory bindings cannot leak into later calls.

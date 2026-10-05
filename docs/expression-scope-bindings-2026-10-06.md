@@ -24,3 +24,8 @@ reports the binding name instead of recursing to stack exhaustion. Evaluation gu
 are released on failure. Rebinding to a new version during a supplier call remains
 valid and may be evaluated immediately. Tests cover direct and parent/child cycles,
 repair after failure, and legitimate nested evaluation of a replacement binding.
+
+Molang lazy bindings now resolve through ExpressionScope.get rather than calling raw
+suppliers, sharing the scope's cached result and ownership/cycle checks. Compiled
+expression tests verify repeated nested and top-level lazy reads plus recomputation
+after resetCache. Explicit eager nulls now overwrite the previous engine value.

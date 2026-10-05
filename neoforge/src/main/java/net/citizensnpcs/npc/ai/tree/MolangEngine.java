@@ -146,13 +146,11 @@ public class MolangEngine implements ExpressionEngine {
                 if (parts.length == 1) {
                     if (scope.isConstant(name)) {
                         Object value = scope.get(name);
-                        if (value != null) {
-                            evalEngine.scope().set(name, toMochaValue(value));
-                        }
+                        evalEngine.scope().set(name, toMochaValue(value));
                     } else {
                         Supplier<?> supplier = scope.getSupplier(name);
                         if (supplier != null) {
-                            evalEngine.scope().set(name, (Function<?>) (ctx, args) -> toMochaValue(supplier.get()));
+                            evalEngine.scope().set(name, (Function<?>) (ctx, args) -> toMochaValue(scope.get(name)));
                         }
                     }
                     continue;
@@ -217,7 +215,7 @@ public class MolangEngine implements ExpressionEngine {
                 } else {
                     Supplier<?> supplier = scope.getSupplier(fullName);
                     if (supplier != null) {
-                        parent.setLazy(currentPart, supplier);
+                        parent.setLazy(currentPart, () -> scope.get(fullName));
                     }
                 }
                 return;
