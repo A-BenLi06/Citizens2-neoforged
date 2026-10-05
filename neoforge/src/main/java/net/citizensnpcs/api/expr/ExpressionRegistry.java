@@ -46,7 +46,7 @@ public class ExpressionRegistry {
         if (defaultEngineName == null)
             throw new ExpressionCompileException("No expression engines registered");
 
-        Matcher matcher = EXPRESSION_PATTERN.matcher(expr);
+        Matcher matcher = EXPRESSION_PATTERN.matcher(expr.strip());
         if (!matcher.matches())
             throw new ExpressionCompileException("Invalid expression syntax: " + expr);
 
@@ -88,7 +88,7 @@ public class ExpressionRegistry {
      * Checks if a string is possibly a valid expression.
      */
     public boolean isPossiblyExpression(String value) {
-        return value != null && EXPRESSION_PATTERN.matcher(value).matches();
+        return value != null && EXPRESSION_PATTERN.matcher(value.strip()).matches();
     }
 
     /**
@@ -204,5 +204,5 @@ public class ExpressionRegistry {
         }
     }
 
-    private static final Pattern EXPRESSION_PATTERN = Pattern.compile("^([a-zA-Z_]*)\\`(.+)\\`$");
+    private static final Pattern EXPRESSION_PATTERN = Pattern.compile("^([a-zA-Z_]*)\\`(.+)\\`$", Pattern.DOTALL);
 }

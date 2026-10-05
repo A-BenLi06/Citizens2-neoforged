@@ -17,6 +17,28 @@ import net.citizensnpcs.npc.ai.tree.MolangEngine;
  */
 public class ExpressionRegistryTest {
     @Test
+    public void multilineExpressionsRemainExpressionsInsteadOfTruthyLiterals() throws ExpressionCompileException {
+        String source = " \n`1 +\n2`\n";
+        assertTrue(registry.isPossiblyExpression(source));
+        assertEquals(source, registry.applyDefaultExpressionMarkup(source));
+        assertEquals(3D, registry.compile(source).evaluateAsNumber(new ExpressionScope()));
+        assertFalse(registry.parseValue("`1 >\n2`").evaluateAsBoolean(new ExpressionScope()));
+    }
+
+    @Test
+    public void multilineUnknownEngineCannotBecomeATruthyLiteral() {
+        assertFalse(registry.parseValue("unavailable`1 +\n2`").evaluateAsBoolean(new ExpressionScope()));
+    }
+
+    @Test
+    public void engineSelectionIsCaseIndependentForDefaultAndExplicitNames() throws ExpressionCompileException {
+        registry.setDefaultEngine("MoLaNg");
+        assertEquals("molang", registry.getDefaultEngineName());
+        assertEquals(registry.getEngine("molang"), registry.getEngine("MOLANG"));
+        assertEquals(3D, registry.compile("MoLaNg`1 +\n2`").evaluateAsNumber(new ExpressionScope()));
+    }
+
+    @Test
     public void invalidNumericLiteralsReportTheirValueRatherThanNullUnboxing() {
         for (String literal : java.util.List.of("not-a-number", "12ticks", "")) {
             var failure = assertThrows(IllegalArgumentException.class,
