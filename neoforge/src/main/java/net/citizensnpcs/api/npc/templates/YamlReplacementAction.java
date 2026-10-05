@@ -32,7 +32,7 @@ public class YamlReplacementAction implements Consumer<NPC> {
     @Override
     public void accept(NPC npc) {
         MemoryDataKey memoryKey = new MemoryDataKey();
-        npc.save(memoryKey);
+        npc.saveSnapshot(memoryKey);
         // breadth-first over the replacement tree, so a nested map becomes dotted keys the data key understands
         List<Node> queue = new ArrayList<>();
         queue.add(new Node("", replacements));

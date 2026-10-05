@@ -1,5 +1,8 @@
 # Native NPC creation runtime audit
 
+The fixture currently has 306 checks. Template coverage includes sibling definitions,
+overwrite index consistency, and applying the updated trait value through creation.
+
 Run from the repository root with PowerShell 7 and JDK 21:
 
 ~~~powershell

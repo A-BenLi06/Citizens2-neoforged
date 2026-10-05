@@ -1437,3 +1437,11 @@ Details: docs/reload-templates-2026-10-05.md. Legacy migration disk effects and 
 Template generation now validates one detached NPC snapshot before saving and updates its full-key and bare-name indexes only after the write succeeds. It no longer reloads sibling entries as duplicates or leaves stale name-index objects. Existing definitions retain their source file and literal YAML key (case/dots included); new definitions use the namespace templates file. Replacement snapshots clear stale fields and omit UUID.
 
 Three file-based tests cover repeat overwrite with siblings, both indexes, literal key/source preservation, stale field removal and snapshot failure preserving disk/index state. All 375 ordinary tests and the normal build pass with no failures/errors/skips; git diff --check passes. NPC snapshot calls use an interface test double; no fresh native/client run is claimed for this batch. Production Interactions sources and packaging are unchanged. No unrelated server or original data was changed. Details: docs/template-generation-2026-10-05.md. The full Citizens goal remains active.
+
+## 2026-10-05 22:09:36 +08:00 — Preserve temporary target state while applying templates
+
+YamlReplacementAction now captures the target with saveSnapshot so partial templates preserve existing fields of NPCs excluded from ordinary persistence. A focused interface-double test verifies name/owner/save policy retention while applying a replacement trait value.
+
+Expanded native creation coverage to generate a sibling template, overwrite the original with a new age, verify bare-name/full-key index agreement, and apply the updated template via the real creation command. Both NeoForge 21.1.233 and 21.1.248 pass 306 creation checks. Clean ordinary test/build passes with 376 tests; Interactions audit tests pass with 100; no failures/errors/skips. Release archives remain independent and exclude creation/reload/removal probes. All invoked handles completed; no unrelated server or original data was changed.
+
+Updated docs/template-generation-2026-10-05.md and the current backlog. Arbitrary provider/client combinations and template action rollback remain separate concerns. The full Citizens goal remains active.

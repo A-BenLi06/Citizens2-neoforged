@@ -322,7 +322,15 @@ public final class CreationRuntimeAudit {
         template.getOrAddTrait(Age.class).setAge(-12000);
         template.spawn(new Location(level, 10, -58, 10));
         ResourceLocation key = ResourceLocation.fromNamespaceAndPath("creation_audit", "stored_spawn");
-        CitizensAPI.getTemplateRegistry().generateTemplateFromNPC(key, template); template.destroy();
+        CitizensAPI.getTemplateRegistry().generateTemplateFromNPC(key, template);
+        CitizensAPI.getTemplateRegistry().generateTemplateFromNPC(
+                ResourceLocation.fromNamespaceAndPath("creation_audit", "sibling"), template);
+        template.getOrAddTrait(Age.class).setAge(-6000);
+        CitizensAPI.getTemplateRegistry().generateTemplateFromNPC(key, template);
+        check(CitizensAPI.getTemplateRegistry().getTemplates(key.getPath()).size() == 1
+                && CitizensAPI.getTemplateRegistry().getTemplates(key.getPath()).iterator().next()
+                        == CitizensAPI.getTemplateRegistry().getTemplateByKey(key), "overwritten_template_indexes_agree");
+        template.destroy();
         int before = count(registry); NPC previous = selected();
         admin.remove();
         reject("create Unauthorized --type cow --template " + key);
@@ -333,7 +341,7 @@ public final class CreationRuntimeAudit {
         check(!copied.isSpawned() && spawns.getOrDefault(copied, 0) == 0 && !copied.getOrAddTrait(Spawned.class).shouldSpawn(),
                 "unspawned_template_never_transiently_spawns");
         at(copied.getStoredLocation(), 6, -58, 6, 0, 0, "command_destination_wins_over_template_location");
-        check(copied.getTraitNullable(Age.class).getAge() == -12000, "template_traits_still_apply");
+        check(copied.getTraitNullable(Age.class).getAge() == -6000, "template_traits_still_apply");
     }
 
     private static NPC create(String options) throws Exception { run("create C" + serial++ + " " + options); NPC npc = selected(); check(npc != null && exists(npc), "created_and_selected"); return npc; }
