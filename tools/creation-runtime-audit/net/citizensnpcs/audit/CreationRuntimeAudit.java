@@ -367,6 +367,26 @@ public final class CreationRuntimeAudit {
                     ("behavior " + validBehavior.getFileName()).split(" ")));
             check(behaviorTarget.hasTrait(BehaviorTrait.class) && behaviorTarget.getTraitNullable(BehaviorTrait.class).getMemory() != null,
                     "behavior_template_short_form_loads_filename_with_spaces");
+            var runs = new java.util.concurrent.atomic.AtomicInteger();
+            CitizensAPI.getBehaviorRegistry().registerBehavior("template_preserve_probe", (params, ctx) ->
+                    (net.citizensnpcs.api.ai.tree.InstantBehavior) () -> {
+                        runs.incrementAndGet(); return net.citizensnpcs.api.ai.tree.BehaviorStatus.SUCCESS;
+                    });
+            var behavior = behaviorTarget.getTraitNullable(BehaviorTrait.class);
+            DataKey goodTree = new MemoryDataKey(); goodTree.setString("root", "template_preserve_probe");
+            behavior.applyBehaviorsFromKey(goodTree);
+            behaviorTarget.getDefaultBehaviorController().run();
+            var oldMemory = behavior.getMemory();
+            DataKey invalidTree = new MemoryDataKey(); invalidTree.setString("root", "missing_behavior_" + UUID.randomUUID());
+            boolean rejected = false;
+            try { behavior.applyBehaviorsFromKey(invalidTree); }
+            catch (IllegalArgumentException expected) { rejected = expected.getMessage().contains("Unknown behavior"); }
+            behaviorTarget.getDefaultBehaviorController().run();
+            check(rejected && runs.get() == 2 && behavior.getMemory() == oldMemory,
+                    "invalid_behavior_replacement_preserves_running_tree");
+            DataKey savedBehavior = new MemoryDataKey(); behavior.save(savedBehavior);
+            check("template_preserve_probe".equals(savedBehavior.getString("tree.root")),
+                    "invalid_behavior_replacement_preserves_saved_tree");
         } finally { Files.deleteIfExists(malformed); Files.deleteIfExists(validBehavior); behaviorTarget.destroy(); }
     }
 

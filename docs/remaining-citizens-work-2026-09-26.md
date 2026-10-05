@@ -16,6 +16,10 @@ Recent follow-ups cover [`powered`, `name` and `home` options](command-options-h
 
 ## Behavior, data and integration acceptance
 
+- Open implementation gap: behavior blackboard `Memory.getKeys()` currently returns an empty list, so `Memory.clear()` does not remove stored keys. Implement real enumeration and verify clear/persistence behavior before treating blackboard support as complete.
+
+- [Behavior replacement preparation](behavior-replacement-2026-10-05.md) parses candidates strictly before removing a running tree. Unknown nodes and expression failures reject explicit replacement; empty containers remain valid. Native tests preserve old execution, blackboard identity and saved data after rejection. Custom factory side effects/controller reset failure remain separate concerns.
+
 - [Behavior template input](behavior-template-input-2026-10-05.md) fixes short-form argument offsets and reports missing/unreadable files before attaching or modifying BehaviorTrait. Native parser coverage includes valid multiword filenames and rejected input preserving the target. Semantic tree replacement and provider side effects remain separate work.
 
 - [Template workspace files](template-workspace-2026-10-05.md) normalize relative names and require regular direct-child files. Filesystem tests cover directories, missing/invalid entries and path scope; behavior fallback/provider execution remains separate coverage.

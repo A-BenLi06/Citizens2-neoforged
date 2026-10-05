@@ -45,6 +45,7 @@ import net.citizensnpcs.util.Util;
  */
 public class BehaviorTreeParser {
     private final BehaviorRegistry registry;
+    private boolean strict;
 
     public BehaviorTreeParser(BehaviorRegistry registry) {
         this.registry = registry;
@@ -125,6 +126,13 @@ public class BehaviorTreeParser {
         return parseNode(root, context);
     }
 
+    public Behavior parseStrict(DataKey root, NPC npc, ExpressionScope scope, Memory blackboard) {
+        boolean previous = strict;
+        strict = true;
+        try { return parse(root, npc, scope, blackboard); }
+        finally { strict = previous; }
+    }
+
     private Supplier<Boolean> parseCondition(String conditionStr, BehaviorRegistry.BehaviorContext context) {
         ExpressionRegistry exprRegistry = registry.getExpressionRegistry();
 
@@ -133,6 +141,7 @@ public class BehaviorTreeParser {
                 CompiledExpression expr = exprRegistry.compile(conditionStr);
                 return () -> expr.evaluateAsBoolean(context.getScope());
             } catch (ExpressionCompileException e) {
+                if (strict) throw new IllegalArgumentException("Invalid behavior condition: " + conditionStr, e);
                 e.printStackTrace();
                 return () -> false;
             }
@@ -264,6 +273,7 @@ public class BehaviorTreeParser {
         ExpressionEngine engine = exprRegistry.getEngine(engineName);
         if (engine == null) {
             Messaging.severe("Unknown expression language", engineName);
+            if (strict) throw new IllegalArgumentException("Unknown expression language: " + engineName);
             return EMPTY;
         }
         for (DataKey sub : key.getIntegerSubKeys()) {
@@ -272,6 +282,7 @@ public class BehaviorTreeParser {
                 try {
                     expressions.add(engine.compile(expr));
                 } catch (ExpressionCompileException e) {
+                    if (strict) throw new IllegalArgumentException("Invalid behavior expression: " + expr, e);
                     e.printStackTrace();
                 }
             }
@@ -410,6 +421,7 @@ public class BehaviorTreeParser {
         }
         Behavior behavior = registry.createBehavior(behaviorName, params, context);
         if (behavior == null) {
+            if (strict) throw new IllegalArgumentException("Unknown behavior: " + behaviorName);
             Messaging.severe("Unknown behavior", behaviorName);
             return EMPTY;
         }
@@ -417,7 +429,8 @@ public class BehaviorTreeParser {
     }
 
     private Behavior parseNode(DataKey key, BehaviorRegistry.BehaviorContext context) {
-        if (key.hasSubKeys()) {
+        if (key.hasSubKeys() || key.getRaw("") instanceof java.util.Map
+                || key.getRaw("") instanceof java.util.Collection) {
             DataKey ifKey = null;
             DataKey elseKey = null;
             for (DataKey sub : key.getSubKeys()) {

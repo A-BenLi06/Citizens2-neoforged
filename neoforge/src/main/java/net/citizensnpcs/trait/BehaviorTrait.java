@@ -14,7 +14,6 @@ import net.citizensnpcs.api.trait.Trait;
 import net.citizensnpcs.api.trait.TraitName;
 import net.citizensnpcs.api.trait.TraitTemplateParser;
 import net.citizensnpcs.api.util.DataKey;
-import net.citizensnpcs.api.util.MemoryDataKey;
 import net.citizensnpcs.api.util.Messaging;
 import net.citizensnpcs.api.util.YamlStorage;
 import net.citizensnpcs.npc.ai.tree.BehaviorTreeParser;
@@ -43,15 +42,21 @@ public class BehaviorTrait extends Trait {
     }
 
     public void applyBehaviorsFromKey(DataKey key) {
+        DataKey candidate = key.copyWithRoot();
+        if (!candidate.hasSubKeys()) throw new IllegalArgumentException("Behavior tree is empty");
+        Memory candidateMemory = memory == null ? new Memory() : memory;
+        ExpressionScope scope = NPCExpressionScope.createFor(npc);
+        Behavior parsed = new BehaviorTreeParser(CitizensAPI.getBehaviorRegistry()).parseStrict(
+                candidate.getSubKeys().iterator().next(), npc, scope, candidateMemory);
+        if (parsed == null) throw new IllegalArgumentException("Behavior tree could not be parsed");
+        RootBehavior replacement = new RootBehavior(parsed, scope);
         if (root != null) {
             npc.getDefaultBehaviorController().removeBehavior(root);
-            root = null;
         }
-        DataKey load = new MemoryDataKey();
-        Map<String, Object> values = key.getValuesDeep();
-        load.setMap("tree", values);
-        yamlCache = values;
-        load(load);
+        npc.getDefaultBehaviorController().addBehavior(replacement);
+        root = replacement;
+        memory = candidateMemory;
+        yamlCache = candidate.getValuesDeep();
     }
 
     /**

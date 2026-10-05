@@ -22,6 +22,34 @@ import net.citizensnpcs.api.util.MemoryDataKey;
  * parser, the registry and the Molang expressions in between actually drive a tree, rather than only compiling.
  */
 public class BehaviorTreeParserTest {
+    @Test
+    public void strictParsingAcceptsExplicitEmptyContainers() {
+        var parser = new BehaviorTreeParser(new CitizensBehaviorRegistry(new ExpressionRegistry()));
+        DataKey root = new MemoryDataKey();
+        root.setRaw("sequence", java.util.List.of());
+        assertNotNull(parser.parseStrict(root.getRelative("sequence"), null, new ExpressionScope(), new Memory()));
+    }
+
+    @Test
+    public void strictParsingRejectsUnknownChildrenWithoutChangingCompatibilityMode() {
+        ExpressionRegistry expressions = new ExpressionRegistry();
+        var parser = new BehaviorTreeParser(new CitizensBehaviorRegistry(expressions));
+        DataKey root = new MemoryDataKey();
+        root.setRaw("sequence", map("0", "succeed", "1", "missing_behavior_for_test"));
+        org.junit.jupiter.api.Assertions.assertThrows(IllegalArgumentException.class,
+                () -> parser.parseStrict(root.getRelative("sequence"), null, new ExpressionScope(), new Memory()));
+        assertNotNull(parser.parse(root.getRelative("sequence"), null, new ExpressionScope(), new Memory()));
+    }
+
+    @Test
+    public void strictParsingRejectsUnavailableExpressionLanguages() {
+        var parser = new BehaviorTreeParser(new CitizensBehaviorRegistry(new ExpressionRegistry()));
+        DataKey root = new MemoryDataKey();
+        root.setRaw("eval missing_language", map("0", "1"));
+        org.junit.jupiter.api.Assertions.assertThrows(IllegalArgumentException.class,
+                () -> parser.parseStrict(root.getRelative("eval missing_language"), null, new ExpressionScope(), new Memory()));
+    }
+
     private static Behavior parse(Map<String, Object> tree, Memory memory) {
         ExpressionRegistry expressions = new ExpressionRegistry();
         expressions.registerEngine(new MolangEngine());
