@@ -16,6 +16,24 @@ import net.citizensnpcs.npc.ai.tree.MolangEngine;
  * binding code, so "it compiles" says very little about whether an expression written in a shop condition works.
  */
 public class ExpressionRegistryTest {
+    @Test
+    public void invalidNumericLiteralsReportTheirValueRatherThanNullUnboxing() {
+        for (String literal : java.util.List.of("not-a-number", "12ticks", "")) {
+            var failure = assertThrows(IllegalArgumentException.class,
+                    () -> registry.parseValue(literal).evaluateAsNumber(new ExpressionScope()));
+            assertTrue(failure.getMessage().contains("numeric expression value"));
+            assertTrue(failure.getMessage().contains(literal));
+        }
+    }
+
+    @Test
+    public void numericLiteralAndCompiledConversionsRemainSupported() {
+        var scope = new ExpressionScope();
+        assertEquals(-2.5D, registry.parseValue("-2.5").evaluateAsNumber(scope));
+        assertEquals(100D, registry.parseValue("1e2").evaluateAsNumber(scope));
+        assertEquals(7D, registry.parseValue("`3 + 4`").evaluateAsNumber(scope));
+    }
+
     private ExpressionRegistry registry;
 
     @BeforeEach

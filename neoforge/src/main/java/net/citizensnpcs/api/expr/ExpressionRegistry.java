@@ -183,8 +183,11 @@ public class ExpressionRegistry {
             if (literal instanceof Number)
                 return ((Number) literal).doubleValue();
 
-            if (literal instanceof String)
-                return Doubles.tryParse(literal.toString());
+            if (literal instanceof String) {
+                Double parsed = Doubles.tryParse(literal.toString());
+                if (parsed == null) throw new IllegalArgumentException("Not a numeric expression value: " + literal);
+                return parsed;
+            }
 
             return 0;
         }

@@ -24,3 +24,7 @@ narrowing it to int, and wraps invalid numeric conversion with timeout context.
 Tests cover invalid literals and valid zero/integer budgets. Ordinary compatibility
 parsing retains its previous conversion policy. Values already normalized by the
 expression engine cannot be distinguished from their normalized result here.
+
+ExpressionRegistry numeric-literal conversion now explicitly rejects a failed parse
+with the offending value, instead of unboxing null into a NullPointerException.
+Tests preserve decimal/scientific notation and compiled-expression conversion.

@@ -1615,3 +1615,9 @@ Two tests cover SUCCESS, FAILURE and RESET_AND_REMOVE callbacks plus rejected ad
 Strict behavior parsing rejects negative, fractional, non-finite and out-of-int-range timeout values before casting, and reports invalid conversion with timeout context. Ordinary parsing remains compatible. Two tests cover rejected literal categories plus valid zero/integer budgets; the test's timeout names use literal YAML keys so fractional dots are not misinterpreted as DataKey paths.
 
 All 438 ordinary tests and the normal build pass without failures/errors/skips; git diff --check passes. No fresh native/client run is claimed. Expression-engine normalization still applies before these checks when an expression is used. Production Interactions sources and packaging are unchanged; no unrelated server or original data was changed. Updated docs/behavior-replacement-2026-10-05.md. The full Citizens goal remains active.
+
+## 2026-10-06 04:38:58 +08:00 — Report invalid numeric expression literals explicitly
+
+ExpressionValue.evaluateAsNumber now checks failed string parsing before unboxing and throws an IllegalArgumentException containing the offending value. Valid literal and compiled-expression behavior remains unchanged.
+
+Two tests cover malformed/empty literals with useful diagnostics and decimal/scientific/compiled conversions. All 440 ordinary tests and the normal build pass without failures/errors/skips; git diff --check passes. No fresh native/client run is claimed. Production Interactions sources and packaging are unchanged; no unrelated server or original data was changed. Updated docs/behavior-replacement-2026-10-05.md. The full Citizens goal remains active.
