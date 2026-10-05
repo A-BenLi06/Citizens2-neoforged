@@ -30,6 +30,7 @@ import net.minecraft.world.item.ItemStack;
  * A cost or reward paid in items.
  */
 public class ItemAction extends NPCShopAction {
+    private boolean exactComponents;
     @Persist
     public List<ItemStack> items = new ArrayList<>();
     @Persist
@@ -161,36 +162,97 @@ public class ItemAction extends NPCShopAction {
     private void removeItems(ItemStack[] inventory, int repeats) {
         if (!takeItems(inventory, repeats, true)) throw new IllegalStateException("Insufficient items for transfer");
     }
+    private record Receipt(ItemAction exact, int repeats) { }
+    private record Removal(ItemStack[] remaining, Receipt receipt) { }
+
+    private static ItemAction exactItems(List<ItemStack> values) {
+        ItemAction result = new ItemAction(values);
+        result.exactComponents = true;
+        result.requireUndamaged = false;
+        return result;
+    }
+
+    private Removal removal(ItemStack[] source, int repeats) {
+        ItemStack[] remaining = copy(source);
+        List<ItemStack> removed = new ArrayList<>();
+        if (!takeItems(remaining, repeats, true, removed)) return null;
+        return new Removal(remaining, new Receipt(exactItems(removed), 1));
+    }
+
+    private Receipt reward(NPCShopStorage storage, int repeats) {
+        if (storage.isUnlimited()) return new Receipt(exactItems(Arrays.asList(copy(items.toArray(ItemStack[]::new)))), repeats);
+        Removal removal = removal(storage.getContents(), repeats);
+        return removal == null ? null : removal.receipt();
+    }
+
+    private static void replace(ItemStack[] destination, ItemStack[] snapshot) {
+        if (destination.length != snapshot.length) throw new IllegalStateException("Inventory layout changed during item transfer");
+        System.arraycopy(snapshot, 0, destination, 0, snapshot.length);
+    }
+
     @Override
     public Transaction grant(NPCShopStorage storage, Entity entity, InventoryMultiplexer im, int repeats) {
         if (repeats < 0 || hasUnavailableItems() || storage.hasUnavailableItems()) return Transaction.fail();
         if (repeats == 0) return Transaction.success();
-        return Transaction.create(() -> storage.isActive() && (storage.isUnlimited() || takeItems(storage.getContents(), repeats, false))
-                && canAccept(im, repeats), () -> transfer(storage, () -> {
-                    if (!canAccept(im, repeats)) throw new IllegalStateException("Insufficient inventory capacity for reward");
-                    storage.transact(inventory -> removeItems(inventory, repeats));
-                    im.transact(inventory -> giveItems(inventory, repeats, im::getSlotLimit));
-                }), () -> transfer(storage, () -> {
-                    deposit(storage, repeats);
-                    im.transact(inventory -> removeItems(inventory, repeats));
-                }));
+        java.util.Deque<Receipt> completed = new java.util.ArrayDeque<>();
+        return Transaction.create(() -> {
+            if (!storage.isActive()) return false;
+            Receipt receipt = reward(storage, repeats);
+            return receipt != null && receipt.exact().canAccept(im, receipt.repeats());
+        }, () -> {
+            boolean unlimited = storage.isUnlimited();
+            Removal removed = unlimited ? null : removal(storage.getContents(), repeats);
+            Receipt receipt = unlimited ? reward(storage, repeats) : removed == null ? null : removed.receipt();
+            if (receipt == null || !receipt.exact().canAccept(im, receipt.repeats()))
+                throw new IllegalStateException("Insufficient stock or inventory capacity for reward");
+            if (storage.isUnlimited() != unlimited) throw new IllegalStateException("Shop stock mode changed during reward preparation");
+            transfer(storage, () -> {
+                storage.transact(stacks -> {
+                    if (removed == null) throw new IllegalStateException("Shop stock mode changed during reward preparation");
+                    replace(stacks, removed.remaining());
+                });
+                im.transact(stacks -> receipt.exact().giveItems(stacks, receipt.repeats(), im::getSlotLimit));
+            });
+            completed.push(receipt);
+        }, () -> {
+            if (completed.isEmpty()) return;
+            Receipt receipt = completed.peek();
+            transfer(storage, () -> {
+                receipt.exact().deposit(storage, receipt.repeats());
+                im.transact(stacks -> receipt.exact().removeItems(stacks, receipt.repeats()));
+            });
+            completed.pop();
+        });
     }
 
     @Override
     public Transaction take(NPCShopStorage storage, Entity entity, InventoryMultiplexer im, int repeats) {
         if (repeats < 0 || hasUnavailableItems() || storage.hasUnavailableItems()) return Transaction.fail();
         if (repeats == 0) return Transaction.success();
-        return Transaction.create(() -> storage.isActive() && takeItems(im.getInventory(), repeats, false)
-                && stockAdditional(storage, repeats) >= 0, () -> transfer(storage, () -> {
-                    if (!takeItems(im.getInventory(), repeats, false)) throw new IllegalStateException("Insufficient items for payment");
-                    deposit(storage, repeats);
-                    im.transact(inventory -> removeItems(inventory, repeats));
-                }), () -> transfer(storage, () -> {
-                    storage.transact(inventory -> removeItems(inventory, repeats));
-                    im.transact(inventory -> giveItems(inventory, repeats, im::getSlotLimit));
-                }));
+        java.util.Deque<Receipt> completed = new java.util.ArrayDeque<>();
+        return Transaction.create(() -> {
+            if (!storage.isActive()) return false;
+            Removal removed = removal(im.getInventory(), repeats);
+            return removed != null && removed.receipt().exact().stockAdditional(storage, 1) >= 0;
+        }, () -> {
+            Removal removed = removal(im.getInventory(), repeats);
+            if (removed == null) throw new IllegalStateException("Insufficient items for payment");
+            Receipt receipt = removed.receipt();
+            transfer(storage, () -> {
+                receipt.exact().deposit(storage, 1);
+                im.transact(stacks -> replace(stacks, removed.remaining()));
+            });
+            completed.push(receipt);
+        }, () -> {
+            if (completed.isEmpty()) return;
+            Receipt receipt = completed.peek();
+            transfer(storage, () -> {
+                storage.transact(stacks -> receipt.exact().removeItems(stacks, 1));
+                im.transact(stacks -> receipt.exact().giveItems(stacks, 1, im::getSlotLimit));
+            });
+            completed.pop();
+        });
     }
-
     private static void transfer(NPCShopStorage storage, Runnable operation) {
         // Stock transactions publish a new detached list. Keep the exact previous list, including its persistence
         // metadata, until the player-side write succeeds. The same rule applies when refunding a completed action.
@@ -225,6 +287,7 @@ public class ItemAction extends NPCShopAction {
      * player would not expect an otherwise identical tool to stop being accepted.
      */
     private boolean matches(ItemStack a, ItemStack toMatch) {
+        if (exactComponents) return ItemStack.isSameItemSameComponents(a, toMatch);
         if (Messaging.isDebugging()) {
             Messaging.debug("Shop filter: comparing", a, "to", toMatch, "(" + metaFilter + ")",
                     ItemStack.isSameItemSameComponents(a, toMatch));
@@ -297,6 +360,10 @@ public class ItemAction extends NPCShopAction {
 
     /** Allocate requirements cumulatively, using wide counts so multiplication and summation cannot wrap. */
     private boolean takeItems(ItemStack[] contents, int repeats, boolean modify) {
+        return takeItems(contents, repeats, modify, null);
+    }
+
+    private boolean takeItems(ItemStack[] contents, int repeats, boolean modify, List<ItemStack> removed) {
         if (repeats < 0) return false;
         long[] required = items.stream().mapToLong(item -> (long) item.getCount() * repeats).toArray();
         for (int slot = 0; slot < contents.length; slot++) {
@@ -308,6 +375,7 @@ public class ItemAction extends NPCShopAction {
                 int taken = (int) Math.min(remaining, required[item]);
                 remaining -= taken; required[item] -= taken;
             }
+            if (removed != null && remaining != stack.getCount()) removed.add(stack.copyWithCount(stack.getCount() - remaining));
             if (modify && remaining != stack.getCount())
                 contents[slot] = remaining == 0 ? ItemStack.EMPTY : stack.copyWithCount(remaining);
         }

@@ -16,6 +16,8 @@ Recent follow-ups cover [`powered`, `name` and `home` options](command-options-h
 
 ## Behavior, data and integration acceptance
 
+- [Exact item receipts](exact-item-receipts-2026-10-05.md) now preserve actual component variants across filtered payments, finite-stock rewards and refunds. Capacity uses actual variants, refunds cannot consume a different loosely matching item, and per-execution receipts prevent repeated refunds. Six unit tests and 11 native checks on each NeoForge version cover this. External item changes, physical-client/provider acceptance and full reload transactionality remain separate work.
+
 - [Experience transactions](experience-transactions-2026-10-05.md) now reject negative/overflowing level amounts and recheck execution/refund bounds before vanilla level changes. Three arithmetic tests and 49 native checks on each NeoForge version cover late affordability, preserved XP fields, shift purchases and rollback. External changes that prevent refunds, physical-client/provider acceptance and full reload transactionality remain separate work.
 
 - [Shop item quantities](shop-item-quantities-2026-10-05.md) now share exact allocation logic for duplicate costs, merge capacity, batch grants, legal stack splitting and limited-stock capacity. Wide arithmetic prevents overflow/free transfers. Eight unit tests and 16 native checks on each NeoForge version cover the change. Physical-client/custom-provider acceptance and full reload transactionality remain separate work.
