@@ -9,8 +9,8 @@ explicitly instead of returning a misleading empty result.
 
 Memory.saveTo now atomically replaces its own data section, preventing removed or
 cleared persistent keys from surviving in a reused save tree. Sibling sections are
-preserved. Existing list values remain session-only; this change does not expand
-their persistence policy or resolve all typed/string metadata-name interactions.
+preserved. [List persistence is covered by a later follow-up](behavior-memory-lists-2026-10-05.md).
+Typed/string metadata-name interactions still require separate work.
 
 Four focused tests cover stable key snapshots, loaded/session/directly written data,
 typed temporary overrides, clear/save/reload, and deleting one key without affecting

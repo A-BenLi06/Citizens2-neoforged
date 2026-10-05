@@ -356,7 +356,22 @@ public class Memory {
      *            the key to load from
      */
     public void loadFrom(DataKey key) {
-        store.loadFrom(key);
+        DataKey candidate = key.copyWithRoot();
+        var values = new java.util.LinkedHashMap<>(candidate.getValuesDeep());
+        values.replaceAll((name, value) -> decodeList(value));
+        candidate.setRaw("", values);
+        store.loadFrom(candidate);
+    }
+
+    private static Object decodeList(Object value) {
+        if (!(value instanceof java.util.Map<?, ?> map)) return value;
+        List<Object> list = new ArrayList<>(map.size());
+        for (int i = 0; i < map.size(); i++) {
+            String index = Integer.toString(i);
+            if (!map.containsKey(index)) return value;
+            list.add(map.get(index));
+        }
+        return list;
     }
 
     /**
@@ -379,6 +394,16 @@ public class Memory {
         key.writeAtomically(candidate -> {
             candidate.removeKey("");
             store.saveTo(candidate);
+            // MetadataStore's persistent-value contract excludes lists; the blackboard owns their encoding.
+            var entries = new java.util.LinkedHashMap<>(candidate.getValuesDeep());
+            for (String name : store.getKeys()) {
+                Object value = store.get(name);
+                if (value instanceof List<?> list) {
+                    if (!isValidType(list)) throw new IllegalArgumentException("Memory list contains a non-primitive value: " + name);
+                    entries.put(name, new ArrayList<>(list));
+                }
+            }
+            candidate.setRaw("", entries);
         });
     }
 
@@ -402,9 +427,9 @@ public class Memory {
             throw new IllegalArgumentException("Memory can only store primitive types and Lists of primitives. Got: "
                     + value.getClass().getName());
         }
-        // Use setPersistent for primitives, set for lists (lists can't be persisted directly)
+        // Lists are encoded by saveTo; keep an owned mutable copy for subsequent list operations.
         if (value instanceof List) {
-            store.set(key, value);
+            store.set(key, new ArrayList<>((List<?>) value));
         } else {
             store.setPersistent(key, value);
         }

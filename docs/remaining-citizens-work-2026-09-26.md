@@ -16,6 +16,8 @@ Recent follow-ups cover [`powered`, `name` and `home` options](command-options-h
 
 ## Behavior, data and integration acceptance
 
+- [Persistent blackboard lists](behavior-memory-lists-2026-10-05.md) now survive YAML save/load, including empty lists and null elements. Owned mutable copies isolate caller and snapshot state, and invalid list mutations cannot replace a previous save. Typed/string metadata-name interactions and custom-store acceptance remain open.
+
 - [Behavior blackboard enumeration](behavior-memory-keys-2026-10-05.md) now exposes real key snapshots and clears native storage, including typed/session entries. Saving removes deleted keys from the owned data section. List persistence and typed/string metadata-name interactions still need their own acceptance before claiming complete blackboard support.
 
 - [Behavior replacement preparation](behavior-replacement-2026-10-05.md) parses candidates strictly before removing a running tree. Unknown nodes and expression failures reject explicit replacement; empty containers remain valid. Native tests preserve old execution, blackboard identity and saved data after rejection. Custom factory side effects/controller reset failure remain separate concerns.

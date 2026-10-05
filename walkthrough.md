@@ -1481,3 +1481,11 @@ Added MetadataStore key-snapshot/clear contracts and native implementations cove
 Memory.saveTo now atomically replaces its own section, so deleted/cleared values cannot survive a save and return on reload. Four tests cover stable snapshots, direct backing-store mutations, loaded/session/typed data, clear/save/reload and sibling preservation. All 389 ordinary tests and the normal build pass without failures/errors/skips; git diff --check passes. No new native/client acceptance is claimed. Production Interactions sources and packaging are unchanged; no unrelated server or original data was changed.
 
 Details: docs/behavior-memory-keys-2026-10-05.md. The former enumeration placeholder is removed from the backlog. Existing session-only list persistence and typed/string metadata-name interactions remain separate scope. The full Citizens goal remains active.
+
+## 2026-10-05 23:54:02 +08:00 — Persist behavior blackboard lists and isolate their snapshots
+
+Memory now encodes list entries during its own atomic save without widening MetadataStore's scalar persistence contract. Incoming lists become owned mutable copies and loaded data is detached from source snapshots. Mutable list contents are validated before save publication. Load recognizes the storage layer's contiguous numeric-map representation of lists, including empty lists, while preserving non-list maps.
+
+Three tests cover actual YAML round trips with empty/null-containing lists and appended values, mutable/immutable caller input and saved-snapshot isolation, and invalid mutation preserving the prior save. The first memory-only tests passed; upgrading to disk round-trip testing exposed numeric-map normalization, now handled explicitly. All 392 ordinary tests and the normal build pass with no failures/errors/skips; git diff --check passes. No fresh native/client acceptance is claimed. Production Interactions sources and packaging are unchanged; no unrelated server or original data was changed.
+
+Details: docs/behavior-memory-lists-2026-10-05.md. Typed/string metadata-name interactions and custom-store acceptance remain separate work. The full Citizens goal remains active.
