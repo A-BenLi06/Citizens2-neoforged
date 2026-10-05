@@ -16,6 +16,8 @@ Recent follow-ups cover [`powered`, `name` and `home` options](command-options-h
 
 ## Behavior, data and integration acceptance
 
+- [Inventory publication recovery](inventory-publication-recovery-2026-10-05.md) now restores attempted slot writes, verifies restoration, preserves errors and blocks blind retries after incomplete recovery. Item actions also compensate their stock step when player-side writing fails, including during refunds. Seven focused tests and negative controls cover these cases; both NeoForge versions pass 31 native settlement checks. Arbitrary provider side effects, reconciliation after failed restoration and full reload transactionality remain separate work.
+
 - [Inventory callback isolation](inventory-callback-isolation-2026-10-05.md) now prevents failed callbacks and retained ItemStack aliases from mutating real inventories or private stock. Nested writes are rejected and container clamping is reflected in the cached snapshot. Five focused tests cover the boundary; the original code fails four. Both NeoForge versions pass 31 native settlement checks. Arbitrary external container publication failures and full reload transactionality remain separate work.
 
 - [Purchase completion and notification](purchase-completion-2026-10-05.md) now commits limits and native merchant payments before notifications, isolates receipt/event failures, permits post-commit owner removal and cancels rolled-back shop openings. Transaction-local escrow preserves refunds/rewards after a merchant closes, including full inventories. Both NeoForge versions pass 31 native checks with negative controls. Origin-screen restoration, arbitrary callback/provider side effects, durable settlement and full reload transactionality remain separate work.

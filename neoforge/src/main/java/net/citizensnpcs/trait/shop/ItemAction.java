@@ -140,26 +140,42 @@ public class ItemAction extends NPCShopAction {
     public Transaction grant(NPCShopStorage storage, Entity entity, InventoryMultiplexer im, int repeats) {
         if (hasUnavailableItems() || storage.hasUnavailableItems()) return Transaction.fail();
         return Transaction.create(() -> (storage.isUnlimited() || takeItems(storage.getContents(), repeats, false))
-                && canAccept(im, repeats), () -> {
+                && canAccept(im, repeats), () -> transfer(storage, () -> {
                     storage.transact(inventory -> takeItems(inventory, repeats, true));
                     im.transact(inventory -> giveItems(inventory, repeats));
-                }, () -> {
+                }), () -> transfer(storage, () -> {
                     storage.transact(inventory -> giveItems(inventory, repeats), items.size() * repeats);
                     im.transact(inventory -> takeItems(inventory, repeats, true));
-                });
+                }));
     }
 
     @Override
     public Transaction take(NPCShopStorage storage, Entity entity, InventoryMultiplexer im, int repeats) {
         if (hasUnavailableItems() || storage.hasUnavailableItems()) return Transaction.fail();
         return Transaction.create(() -> (storage.isUnlimited() || storage.canAdd(items.size() * repeats))
-                && takeItems(im.getInventory(), repeats, false), () -> {
+                && takeItems(im.getInventory(), repeats, false), () -> transfer(storage, () -> {
                     storage.transact(inventory -> giveItems(inventory, repeats), items.size() * repeats);
                     im.transact(inventory -> takeItems(inventory, repeats, true));
-                }, () -> {
+                }), () -> transfer(storage, () -> {
                     storage.transact(inventory -> takeItems(inventory, repeats, true));
                     im.transact(inventory -> giveItems(inventory, repeats));
-                });
+                }));
+    }
+
+    private static void transfer(NPCShopStorage storage, Runnable operation) {
+        // Stock transactions publish a new detached list. Keep the exact previous list, including its persistence
+        // metadata, until the player-side write succeeds. The same rule applies when refunding a completed action.
+        List<ItemStack> before = storage.isUnlimited() ? null : storage.getInventory();
+        try { operation.run(); }
+        catch (RuntimeException | Error failure) {
+            if (before != null) {
+                try { storage.setInventory(before); }
+                catch (RuntimeException | Error restore) {
+                    if (restore != failure) failure.addSuppressed(restore);
+                }
+            }
+            throw failure;
+        }
     }
 
     private static boolean isEmpty(ItemStack stack) {
