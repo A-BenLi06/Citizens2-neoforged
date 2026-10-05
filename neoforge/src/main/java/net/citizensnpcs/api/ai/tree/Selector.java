@@ -28,6 +28,15 @@ public class Selector extends Composite {
     }
 
     @Override
+    public void removeBehavior(Behavior behavior) {
+        super.removeBehavior(behavior);
+        if (executing == behavior) {
+            executing = null;
+            stopExecution(behavior);
+        }
+    }
+
+    @Override
     public void reset() {
         super.reset();
         if (executing != null) {
@@ -44,13 +53,18 @@ public class Selector extends Composite {
             if ((executing = getNextBehavior()) == null)
                 return BehaviorStatus.FAILURE;
 
-            if (!executing.shouldExecute()) {
+            Behavior selected = executing;
+            boolean ready = selected.shouldExecute();
+            if (executing != selected) return BehaviorStatus.RUNNING;
+            if (!ready) {
                 status = BehaviorStatus.FAILURE;
             }
         }
+        Behavior current = executing;
         if (status == null) {
-            status = executing.run();
+            status = current.run();
         }
+        if (executing != current) return BehaviorStatus.RUNNING;
         switch (status) {
             case RESET_AND_REMOVE:
                 getBehaviors().remove(executing);

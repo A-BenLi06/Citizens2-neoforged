@@ -404,6 +404,11 @@ public final class CreationRuntimeAudit {
             int beforeRun = runs.get();
             behaviorTarget.getDefaultBehaviorController().run();
             check(runs.get() == beforeRun + 1, "behavior_execution_resumes_after_respawn");
+            behaviorTarget.removeTrait(BehaviorTrait.class);
+            int afterRemoval = runs.get();
+            behaviorTarget.getDefaultBehaviorController().run();
+            check(runs.get() == afterRemoval && !behaviorTarget.hasTrait(BehaviorTrait.class),
+                    "removed_behavior_trait_stops_executing");
         } finally { Files.deleteIfExists(malformed); Files.deleteIfExists(validBehavior); behaviorTarget.destroy(); }
     }
 

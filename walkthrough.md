@@ -1541,3 +1541,11 @@ BehaviorTrait now keeps detached loaded YAML and writes its tree definition on e
 Native checks compare repeated fresh snapshots, resave a loaded trait and exercise actual spawn/despawn/respawn followed by counting behavior execution. Both NeoForge 21.1.233 and 21.1.248 pass 317 creation checks. Clean ordinary test/build passes with 407 tests; Interactions audit tests pass with 100; no failures/errors/skips. Release archives remain separate and exclude probes. All invoked handles completed; no unrelated server or original data was changed.
 
 Details: docs/behavior-definition-lifecycle-2026-10-06.md. Custom behavior factory/reset exceptions remain separate concerns. The full Citizens goal remains active.
+
+## 2026-10-06 02:03:13 +08:00 — Release behavior execution when a trait or active child is removed
+
+BehaviorTrait removal now uses its runtime-root cleanup, clearing the owned reference before controller removal. Selector removes its active execution reference before resetting the removed child. It also checks ownership after admission/run callbacks to handle self-removal without dereferencing stale state or resetting a different replacement.
+
+Three controller tests cover running-child removal, reset failure and self-removal in admission/execution callbacks. Both NeoForge 21.1.233 and 21.1.248 pass 318 creation checks, including a live NPC losing BehaviorTrait and no longer executing it. Clean ordinary test/build passes with 410 tests; Interactions audit tests pass with 100; no failures/errors/skips. Release archives remain separate and exclude probes. All invoked handles completed; no unrelated server or original data was changed.
+
+Details: docs/behavior-trait-removal-2026-10-06.md. Parallel composite cleanup and arbitrary callback side effects remain separate concerns. The full Citizens goal remains active.

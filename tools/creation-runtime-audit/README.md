@@ -1,6 +1,6 @@
 # Native NPC creation runtime audit
 
-The fixture currently has 317 checks. Template coverage includes sibling definitions,
+The fixture currently has 318 checks. Template coverage includes sibling definitions,
 overwrite index consistency, and applying the updated trait value through creation.
 Behavior short-form coverage includes missing arguments/files, malformed YAML and a
 valid filename containing spaces, with target preservation on file-input failures.
@@ -8,6 +8,7 @@ Behavior replacement checks reject an unknown node while preserving execution of
 old tree, blackboard identity and saved tree data.
 Behavior lifecycle coverage includes repeated fresh saves, resaving a loaded tree,
 and resuming execution after actual despawn/respawn.
+It also removes BehaviorTrait from a live NPC and verifies execution stops.
 
 Run from the repository root with PowerShell 7 and JDK 21:
 

@@ -84,9 +84,15 @@ public class BehaviorTrait extends Trait {
     @Override
     public void onDespawn() {
         if (root != null) {
-            npc.getDefaultBehaviorController().removeBehavior(root);
+            Behavior previous = root;
             root = null;
+            npc.getDefaultBehaviorController().removeBehavior(previous);
         }
+    }
+
+    @Override
+    public void onRemove() {
+        onDespawn();
     }
 
     @Override

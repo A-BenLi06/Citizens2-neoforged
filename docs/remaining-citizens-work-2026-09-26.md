@@ -16,6 +16,8 @@ Recent follow-ups cover [`powered`, `name` and `home` options](command-options-h
 
 ## Behavior, data and integration acceptance
 
+- [Behavior trait removal](behavior-trait-removal-2026-10-06.md) releases runtime roots and clears Selector execution ownership before reset callbacks. Tests cover active removal, reset exceptions and self-removal; native coverage verifies a removed trait stops executing. Parallel composites retain separate lifecycle work.
+
 - [Behavior definition lifecycle](behavior-definition-lifecycle-2026-10-06.md) retains tree YAML across fresh snapshots and rebuilds runtime behavior after respawn. Native tests cover repeat save, load/save and execution resumption; custom provider factory/reset failures remain separate concerns.
 
 - [Molang blackboard value types](molang-memory-types-2026-10-06.md) preserve strings through mem/list bindings instead of coercing them to zero. Compiled-expression tests cover round trips, defaults, list searches/removal and null-slot success reporting; existing numeric expression regressions remain passing.
