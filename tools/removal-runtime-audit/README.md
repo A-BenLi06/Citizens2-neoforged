@@ -27,7 +27,7 @@ The dispatcher checks verify that expected Citizens failures become Brigadier
 failures and stop later dialogue actions. The public `executeSafe` handled-result
 contract is separate from this dispatcher outcome.
 
-The fixture has 85 checks. Seventeen shop-undo checks cover independent definition and
+The fixture has 86 checks. Seventeen shop-undo checks cover independent definition and
 stock restoration, conflicting definitions, canceled creation callbacks that replace
 the shop, retry, detached snapshots, empty pages, type, permission and stored items.
 The stock checks open real private/global editors simultaneously, verify edits are
@@ -42,6 +42,8 @@ cleanup to finish with the original removal reason, preserve an NPC created by a
 cleanup callback, and undo both failed cleanups.
 Three permanent-removal checks cover canceled/throwing despawn events, native entity
 and registry cleanup, and undo after the reported despawn exception.
+A template-command check preserves a captured command list and verifies leading-slash
+NPC commands target their intended NPC rather than console selection.
 Seven item-persistence checks exercise native enchantment
 components with live registries, failed inventory encoding without deleting the old
 slot, snapshot failure blocking removal and copying, retry after fixing the item,

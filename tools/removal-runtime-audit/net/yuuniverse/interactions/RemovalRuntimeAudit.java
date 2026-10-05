@@ -235,6 +235,20 @@ public final class RemovalRuntimeAudit {
         }
 
         void basicCommands() throws Exception {
+            NPC formatTarget = npc(registry, alice.getUUID(), "FormatOriginal", null);
+            NPC formatOther = npc(registry, alice.getUUID(), "FormatControl", null);
+            CitizensAPI.getDefaultNPCSelector().select(console, formatOther);
+            try {
+                var commandSource = new ArrayList<>(List.of("/npc rename FormatResult"));
+                var executor = new net.citizensnpcs.api.npc.templates.CommandListExecutor(commandSource);
+                commandSource.clear();
+                executor.accept(formatTarget);
+                check(formatTarget.getName().equals("FormatResult") && formatOther.getName().equals("FormatControl"),
+                        "template_command_snapshot_targets_prefixed_npc_command");
+            } finally {
+                CitizensAPI.getDefaultNPCSelector().deselect(console);
+                formatTarget.destroy(); formatOther.destroy();
+            }
             var worldless = new MemoryDataKey();
             worldless.setDouble("bodyYaw", 63);
             CurrentLocation location = PersistenceLoader.loadStrict(new CurrentLocation(), worldless);

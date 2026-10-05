@@ -208,14 +208,7 @@ public class Util {
     /** Queue the same command dispatch, returning its cancellation handle (or null without a server). */
     public static net.citizensnpcs.api.util.schedulers.SchedulerTask scheduleCommand(NPC npc, ServerPlayer clicker,
             String command, boolean op, boolean asPlayer) {
-        String cmd = command;
-        if (cmd.startsWith("say")) {
-            // "say X" is shorthand for making the NPC talk, not for the vanilla /say
-            cmd = "npc speak \"" + cmd.replaceFirst("say", "").trim() + "\" --target <p>";
-        }
-        if ((cmd.startsWith("npc ") || cmd.startsWith("waypoints ") || cmd.startsWith("wp ")) && !cmd.contains("--id ")) {
-            cmd += " --id <id>";
-        }
+        String cmd = net.citizensnpcs.api.util.NPCCommandFormat.prepare(command);
         MinecraftServer server = clicker != null ? clicker.getServer() : ServerLifecycleHooks.getCurrentServer();
         if (server == null)
             return null;

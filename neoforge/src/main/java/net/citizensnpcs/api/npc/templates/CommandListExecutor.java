@@ -14,8 +14,7 @@ import net.neoforged.neoforge.server.ServerLifecycleHooks;
  * <p>
  * The two rewrites are upstream's: a line starting with {@code say} is shorthand for making the NPC talk rather than for
  * vanilla {@code /say}, and a Citizens command with no {@code --id} gets one so it acts on this NPC rather than on
- * whatever the console last selected. {@code Util.runCommand} on the mod side applies the same pair; the duplication is
- * upstream's too and is kept so that this package stays inside the API layer.
+ * whatever the console last selected. The shared {@code NPCCommandFormat} applies the same rules to scheduled commands.
  * <p>
  * Dispatch raises the source to permission level 4 for the one command instead of opping anyone, which is what a command
  * source makes possible here and what upstream needs an op-list write for.
@@ -24,7 +23,7 @@ public class CommandListExecutor implements Consumer<NPC> {
     private final List<String> commands;
 
     public CommandListExecutor(List<String> commands) {
-        this.commands = commands;
+        this.commands = List.copyOf(commands);
     }
 
     @Override
@@ -34,14 +33,7 @@ public class CommandListExecutor implements Consumer<NPC> {
             return;
 
         for (String command : commands) {
-            String cmd = command;
-            if (cmd.startsWith("say")) {
-                cmd = "npc speak \"" + cmd.replaceFirst("say", "").trim() + "\" --target <p>";
-            }
-            if ((cmd.startsWith("npc ") || cmd.startsWith("waypoints ") || cmd.startsWith("wp "))
-                    && !cmd.contains("--id ")) {
-                cmd += " --id <id>";
-            }
+            String cmd = net.citizensnpcs.api.util.NPCCommandFormat.prepare(command);
             CommandSourceStack source = server.createCommandSourceStack().withPermission(4);
             String interpolated = Placeholders.replace(cmd, source, npc);
             try {

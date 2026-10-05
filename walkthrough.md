@@ -1695,3 +1695,11 @@ Three tests cover unsupported structured/short forms and successful supported fo
 Structured trait actions capture a detached definition and give each parser invocation a fresh copy. Short-form syntax is still validated during preparation, while each application receives a fresh CommandContext built from copied arguments and the current server source. Parsers cannot mutate the source or contaminate later applications through reused flags/data.
 
 Two tests cover source edits and nested parser writes, plus mutable short-form flags across repeated application. An initial structured fixture used an immutable map and was corrected to mutable DataKey input before checking isolation. All 476 ordinary tests and the normal build pass without failures/errors/skips; git diff --check passes. No fresh native/client run is claimed. Production Interactions sources and packaging are unchanged; no unrelated server or original data was changed. Updated docs/reload-templates-2026-10-05.md. The full Citizens goal remains active.
+
+## 2026-10-06 07:47:24 +08:00 — Share NPC command formatting and preserve template command snapshots
+
+Template commands and scheduled commands now use NPCCommandFormat for exact say shorthand, quoted speech encoding and target insertion. Leading slash/outer whitespace are normalized, quoted --id text is not mistaken for a real target flag, and similarly prefixed command names are not rewritten. Template command lists copy their input.
+
+Four format tests cover speech escaping, exact names, quoted flag text and prefixed aliases. Native regression verifies an externally cleared source list still executes its captured command against the intended NPC instead of console selection. Both NeoForge 21.1.233 and 21.1.248 pass 86 removal checks. Clean ordinary test/build passes with 480 tests; Interactions audit tests pass with 100; no failures/errors/skips. Release archives remain separate and exclude probes. All invoked handles completed; no unrelated server or original data was changed.
+
+Details: docs/npc-command-format-2026-10-06.md. Execution failure policy and arbitrary command side effects remain separate work. The full Citizens goal remains active.
