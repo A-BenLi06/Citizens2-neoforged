@@ -1597,3 +1597,9 @@ Three tests cover no execution beyond the limit, acceptance of success on the la
 CoalescedBehavior now copies its input child list and attempts every reset before reporting aggregated errors. External mutation of the caller's list cannot change an already constructed group or invalidate execution iteration.
 
 Two tests verify all three throwing reset callbacks execute with retained errors and that a callback clearing the original list does not skip grouped actions. All 432 ordinary tests and the normal build pass without failures/errors/skips; git diff --check passes. No fresh native/client run is claimed. Production Interactions sources and packaging are unchanged; no unrelated server or original data was changed. Updated docs/behavior-clear-recovery-2026-10-06.md. The full Citizens goal remains active.
+
+## 2026-10-06 04:05:42 +08:00 — Detach completed Selector children before terminal reset
+
+Selector now clears terminal execution ownership before child reset in SUCCESS, FAILURE and RESET_AND_REMOVE paths. Throwing cleanup cannot leave the completed child as active. If a reset callback starts a replacement, the outer call preserves it and reports RUNNING.
+
+Two tests cover all three terminal states with cleanup failure and a reset callback that starts a replacement through the selector. All 434 ordinary tests and the normal build pass without failures/errors/skips; git diff --check passes. No fresh native/client run is claimed. Production Interactions sources and packaging are unchanged; no unrelated server or original data was changed. Updated docs/behavior-clear-recovery-2026-10-06.md. The full Citizens goal remains active.

@@ -27,3 +27,8 @@ tick, and a fresh budget after a reset exception.
 CoalescedBehavior owns an immutable snapshot of its input children and attempts every
 child reset before reporting errors. Tests cover three throwing reset callbacks and
 caller-list mutation during execution without changing the constructed group.
+
+Selector's terminal completion paths now detach the completed child before reset.
+Tests cover SUCCESS, FAILURE and RESET_AND_REMOVE with throwing cleanup. A reset
+callback that starts a replacement leaves that replacement running; the outer
+completion reports RUNNING instead of clearing the replacement's execution state.

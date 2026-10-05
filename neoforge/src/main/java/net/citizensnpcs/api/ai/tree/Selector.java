@@ -74,14 +74,15 @@ public class Selector extends Composite {
         if (executing != current) return BehaviorStatus.RUNNING;
         switch (status) {
             case RESET_AND_REMOVE:
-                getBehaviors().remove(executing);
-                stopExecution(executing);
+                getBehaviors().remove(current);
                 executing = null;
-                return BehaviorStatus.SUCCESS;
+                stopExecution(current);
+                return executing == null ? BehaviorStatus.SUCCESS : BehaviorStatus.RUNNING;
             case SUCCESS:
             case FAILURE:
-                stopExecution(executing);
                 executing = null;
+                stopExecution(current);
+                return executing == null ? status : BehaviorStatus.RUNNING;
             default:
                 return status;
         }
