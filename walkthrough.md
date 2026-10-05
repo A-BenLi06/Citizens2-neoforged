@@ -1645,3 +1645,9 @@ Three tests cover direct cycles, parent/child cycles with successful repair, and
 Nested and top-level Molang lazy bindings now call ExpressionScope.get instead of bypassing its cache and evaluation guards via raw suppliers. Explicit eager nulls are installed into the engine instead of leaving a previous value behind.
 
 Three actual-expression tests verify repeated lazy reads share a cached result, resetCache permits fresh computation, and eager null overwrites an earlier value. All 453 ordinary tests and the normal build pass without failures/errors/skips; git diff --check passes. No fresh native/client run is claimed. Production Interactions sources and packaging are unchanged; no unrelated server or original data was changed. Added a concrete follow-up audit for compiled-engine reuse after variable removal or NPC-context loss. The full Citizens goal remains active.
+
+## 2026-10-06 05:32:38 +08:00 — Isolate temporary Molang bindings across sequential and nested evaluation
+
+Each compiled evaluation now snapshots overridden engine bindings and restores them in finally. Nested scopes hide omitted outer variable roots and restore the outer frame afterward. Standard bindings are preserved, and NPC-free scopes explicitly disable inventory closures rather than retaining a previous/outer NPC.
+
+Four compiled-expression tests cover removed/omitted variables, temporary standard-binding overrides, nested variable isolation and nested/later NPC-free inventory access via an interface probe. All 457 ordinary tests and the normal build pass without failures/errors/skips; git diff --check passes. No fresh native/client or concurrent-evaluation guarantee is claimed. Production Interactions sources and packaging are unchanged; no unrelated server or original data was changed. Details: docs/molang-scope-isolation-2026-10-06.md. The previously listed scope-reuse audit now has implementation/test evidence; the full Citizens goal remains active.

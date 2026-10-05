@@ -113,6 +113,8 @@ public class MolangEngine implements ExpressionEngine {
     private static class MolangCompiledExpression implements CompiledExpression {
         private final MochaEngine<?> baseEngine;
         private final MochaFunction function;
+        private final Map<String, Value> defaultVariableBindings = new HashMap<>();
+        private java.util.Set<String> activeVariableRoots = java.util.Set.of();
 
         MolangCompiledExpression(MochaFunction function, MochaEngine<?> baseEngine) {
             this.function = function;
@@ -127,7 +129,7 @@ public class MolangEngine implements ExpressionEngine {
             evalEngine.scope().set("mem", createMemBinding(memory));
             if (npc != null) {
                 evalEngine.scope().set("inv", createInvBinding(npc));
-            }
+            } else evalEngine.scope().set("inv", NumberValue.zero());
             evalEngine.scope().set("item", createItemBinding());
 
             // papi('placeholder_name')
@@ -167,14 +169,36 @@ public class MolangEngine implements ExpressionEngine {
 
         @Override
         public Object evaluate(ExpressionScope scope) {
-            bindScopeVariables(baseEngine, scope);
-            bindCustomFunctions(baseEngine, scope);
-            try {
-                return function.evaluate();
-            } catch (Exception e) {
-                e.printStackTrace();
-                return 0.0;
+            Map<String, Value> previous = new HashMap<>();
+            java.util.Set<String> roots = new java.util.HashSet<>();
+            for (String name : scope.getVariableNames()) {
+                String root = name.split("[.]", 2)[0];
+                roots.add(root);
+                defaultVariableBindings.computeIfAbsent(root, this::currentBinding);
+                previous.computeIfAbsent(root, this::currentBinding);
             }
+            java.util.Set<String> previousRoots = activeVariableRoots;
+            for (String root : previousRoots) previous.computeIfAbsent(root, this::currentBinding);
+            for (String name : java.util.List.of("list", "mem", "inv", "item", "papi"))
+                previous.computeIfAbsent(name, this::currentBinding);
+            try {
+                for (String root : previousRoots) {
+                    if (!roots.contains(root)) baseEngine.scope().set(root, defaultVariableBindings.get(root));
+                }
+                activeVariableRoots = roots;
+                bindScopeVariables(baseEngine, scope);
+                bindCustomFunctions(baseEngine, scope);
+                try { return function.evaluate(); }
+                catch (Exception e) { e.printStackTrace(); return 0.0; }
+            } finally {
+                previous.forEach((name, value) -> baseEngine.scope().set(name, value));
+                activeVariableRoots = previousRoots;
+            }
+        }
+
+        private Value currentBinding(String name) {
+            Value value = baseEngine.scope().get(name);
+            return value == null ? NumberValue.zero() : value;
         }
 
         @Override

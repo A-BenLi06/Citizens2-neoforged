@@ -130,6 +130,7 @@ Recent follow-ups cover [`powered`, `name` and `home` options](command-options-h
 
 Full Quests, GroupManager, EssentialsX, PlaceholderAPI or Sentinel replication is not an implicit Citizens completion requirement. Future-version entity variants are outside ordinary Minecraft 1.21.1 parity. No production deployment or physical-client acceptance is implied by this checklist.
 
-Open expression isolation audit: compiled Molang expressions retain an engine scope;
-check reuse after variable removal and after switching from an NPC scope to a scope
-without an NPC, so old variable or inventory bindings cannot leak into later calls.
+[Compiled Molang scope isolation](molang-scope-isolation-2026-10-06.md) now restores
+temporary bindings after evaluation and isolates nested scopes, including NPC-free
+inventory access. Four expression tests cover the previously open reuse audit;
+physical-client and concurrent-evaluation acceptance remain separate concerns.
