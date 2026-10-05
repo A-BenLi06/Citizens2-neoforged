@@ -30,6 +30,11 @@ public class TraitLoaderAction implements Consumer<NPC> {
     private final List<Function<NPC, Trait>> actions = new ArrayList<>();
 
     public TraitLoaderAction(TemplateErrorReporter errors, TemplateWorkspace workspace, DataKey traits) {
+        this(errors, workspace, traits, name -> CitizensAPI.getTraitFactory().getTemplateParser(name));
+    }
+
+    TraitLoaderAction(TemplateErrorReporter errors, TemplateWorkspace workspace, DataKey traits,
+            Function<String, TraitTemplateParser> parsers) {
         for (DataKey key : traits.getIntegerSubKeys()) {
             if (key.hasSubKeys()) {
                 if (!key.keyExists("name")) {
@@ -37,7 +42,7 @@ public class TraitLoaderAction implements Consumer<NPC> {
                     continue;
                 }
                 String traitName = key.getString("name");
-                TraitTemplateParser parser = CitizensAPI.getTraitFactory().getTemplateParser(traitName);
+                TraitTemplateParser parser = parsers.apply(traitName);
                 if (parser == null) {
                     errors.addError(key.getPath() + ": Unknown trait " + traitName);
                     continue;
@@ -45,10 +50,10 @@ public class TraitLoaderAction implements Consumer<NPC> {
                 TemplateParser tp = parser.getTemplateParser();
                 if (tp != null) {
                     actions.add(npc -> tp.apply(new TraitParserContext(npc, workspace), key));
-                }
+                } else errors.addError(key.getPath() + ": Trait " + traitName + " does not support structured templates");
             } else {
                 String[] parts = key.getString("").trim().split(" ");
-                TraitTemplateParser parser = CitizensAPI.getTraitFactory().getTemplateParser(parts[0]);
+                TraitTemplateParser parser = parsers.apply(parts[0]);
                 if (parser == null) {
                     errors.addError(key.getPath() + ": Unknown trait " + parts[0]);
                     continue;
@@ -61,7 +66,7 @@ public class TraitLoaderAction implements Consumer<NPC> {
                     CommandContext ctx = server == null ? new CommandContext(parts)
                             : new CommandContext(server.createCommandSourceStack(), parts);
                     actions.add(npc -> stp.apply(new TraitParserContext(npc, workspace), ctx));
-                }
+                } else errors.addError(key.getPath() + ": Trait " + parts[0] + " does not support short templates");
             }
         }
     }

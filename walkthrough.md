@@ -1683,3 +1683,9 @@ Template application rejects a refused despawn before actions and restores spawn
 Five interface tests cover veto, action failure, recovery failure, failed spawn and lost registration. Native tests verify an actual spawned NPC reports a failing behavior-template action and restores its entity. The initial fixture used a raw list where the template parser expects YAML-normalized numeric keys; it was corrected before validation. Both NeoForge 21.1.233 and 21.1.248 pass 323 creation checks. Clean ordinary test/build passes with 471 tests; Interactions audit tests pass with 100; no failures/errors/skips. Release archives remain separate and exclude probes. All invoked handles completed; no unrelated server or original data was changed.
 
 Details: docs/template-application-lifecycle-2026-10-06.md. The full Citizens goal remains active.
+
+## 2026-10-06 06:54:02 +08:00 — Report unsupported trait template forms instead of skipping actions
+
+TraitLoaderAction now adds a template error when a known parser lacks the requested short or structured form. Parser lookup is factored through a package-level constructor for exercising the real parsing path without a running global plugin. Normal production lookup remains unchanged.
+
+Three tests cover unsupported structured/short forms and successful supported forms. All 474 ordinary tests and the normal build pass without failures/errors/skips; git diff --check passes. No fresh native/client run is claimed. Production Interactions sources and packaging are unchanged; no unrelated server or original data was changed. Updated docs/reload-templates-2026-10-05.md. The full Citizens goal remains active.

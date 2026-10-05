@@ -20,3 +20,9 @@ occupying the template directory. Native reload checks preserve old templates/NP
 after a malformed file and publish repaired templates on retry. Migration can still
 write/rename legacy files during preparation; those disk effects are not rolled back.
 Template application side effects and physical-client behavior are separate work.
+
+Trait template parsing now reports a known trait whose parser does not support the
+requested short or structured form, rather than silently omitting its action. The
+loader's existing error aggregation rejects such candidates. Three tests cover both
+unsupported forms and successful application of supported forms, using an injected
+parser lookup with the same production parsing path.
