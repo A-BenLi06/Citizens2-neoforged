@@ -16,6 +16,8 @@ Recent follow-ups cover [`powered`, `name` and `home` options](command-options-h
 
 ## Behavior, data and integration acceptance
 
+- [Behavior clear/reset recovery](behavior-clear-recovery-2026-10-06.md) detaches old execution references before reset callbacks and aggregates parallel/selected-child errors. Tests cover failed clears and callback-added replacements; other parallel scheduling behavior remains separate work.
+
 - [Behavior trait removal](behavior-trait-removal-2026-10-06.md) releases runtime roots and clears Selector execution ownership before reset callbacks. Tests cover active removal, reset exceptions and self-removal; native coverage verifies a removed trait stops executing. Parallel composites retain separate lifecycle work.
 
 - [Behavior definition lifecycle](behavior-definition-lifecycle-2026-10-06.md) retains tree YAML across fresh snapshots and rebuilds runtime behavior after respawn. Native tests cover repeat save, load/save and execution resumption; custom provider factory/reset failures remain separate concerns.

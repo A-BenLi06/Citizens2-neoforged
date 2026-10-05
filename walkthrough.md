@@ -1549,3 +1549,9 @@ BehaviorTrait removal now uses its runtime-root cleanup, clearing the owned refe
 Three controller tests cover running-child removal, reset failure and self-removal in admission/execution callbacks. Both NeoForge 21.1.233 and 21.1.248 pass 318 creation checks, including a live NPC losing BehaviorTrait and no longer executing it. Clean ordinary test/build passes with 410 tests; Interactions audit tests pass with 100; no failures/errors/skips. Release archives remain separate and exclude probes. All invoked handles completed; no unrelated server or original data was changed.
 
 Details: docs/behavior-trait-removal-2026-10-06.md. Parallel composite cleanup and arbitrary callback side effects remain separate concerns. The full Citizens goal remains active.
+
+## 2026-10-06 02:14:54 +08:00 — Complete behavior reset despite cleanup errors
+
+Controller clear now detaches old children/execution state before callbacks. Selector and Composite reset detach active references before invoking resets and continue across parallel and selected-child failures, retaining all errors. New behavior registrations from callbacks survive rather than being erased by a later clear step.
+
+Three added tests cover clear failure without stale execution, callback-added replacement behavior, and three simultaneous reset failures followed by a harmless repeat reset. All 413 ordinary tests and the normal build pass without failures/errors/skips; git diff --check passes. No fresh native/client run is claimed. Production Interactions sources and packaging are unchanged; no unrelated server or original data was changed. Details: docs/behavior-clear-recovery-2026-10-06.md. The full Citizens goal remains active.

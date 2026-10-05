@@ -38,11 +38,18 @@ public class Selector extends Composite {
 
     @Override
     public void reset() {
-        super.reset();
-        if (executing != null) {
-            stopExecution(executing);
-        }
+        Behavior previous = executing;
         executing = null;
+        Throwable failure = null;
+        try { super.reset(); }
+        catch (RuntimeException | Error ex) { failure = ex; }
+        try { stopExecution(previous); }
+        catch (RuntimeException | Error ex) {
+            if (failure == null) failure = ex;
+            else if (failure != ex) failure.addSuppressed(ex);
+        }
+        if (failure instanceof RuntimeException ex) throw ex;
+        if (failure instanceof Error ex) throw ex;
     }
 
     @Override

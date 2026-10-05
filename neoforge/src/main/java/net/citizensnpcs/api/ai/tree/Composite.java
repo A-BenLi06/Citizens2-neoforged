@@ -45,12 +45,18 @@ public abstract class Composite implements Behavior {
 
     @Override
     public void reset() {
-        if (parallelExecuting.size() > 0) {
-            for (Behavior behavior : parallelExecuting) {
-                stopExecution(behavior);
+        List<Behavior> previous = List.copyOf(parallelExecuting);
+        parallelExecuting.clear();
+        Throwable failure = null;
+        for (Behavior behavior : previous) {
+            try { stopExecution(behavior); }
+            catch (RuntimeException | Error ex) {
+                if (failure == null) failure = ex;
+                else if (failure != ex) failure.addSuppressed(ex);
             }
-            parallelExecuting.clear();
         }
+        if (failure instanceof RuntimeException ex) throw ex;
+        if (failure instanceof Error ex) throw ex;
     }
 
     @Override

@@ -6,6 +6,46 @@ import net.citizensnpcs.api.ai.tree.Behavior;
 import net.citizensnpcs.api.ai.tree.BehaviorStatus;
 
 class BehaviorRemovalTest {
+    @Test void resetAttemptsParallelAndSelectedChildrenEvenWhenEachThrows() {
+        var first = new Running(); first.failReset = true;
+        var second = new Running(); second.failReset = true;
+        var selected = new Running(); selected.failReset = true;
+        var selector = net.citizensnpcs.api.ai.tree.Selector.selecting(
+                new net.citizensnpcs.api.ai.tree.ParallelBehaviorWrapper(first),
+                new net.citizensnpcs.api.ai.tree.ParallelBehaviorWrapper(second), selected).build();
+        assertEquals(BehaviorStatus.RUNNING, selector.run());
+        var failure = assertThrows(IllegalStateException.class, selector::reset);
+        assertEquals(2, failure.getSuppressed().length);
+        assertEquals(1, first.resets);
+        assertEquals(1, second.resets);
+        assertEquals(1, selected.resets);
+        assertDoesNotThrow(selector::reset);
+    }
+
+    @Test void clearFailureDoesNotLeaveOldBehaviorExecutable() {
+        var controller = new SimpleBehaviorController();
+        var previous = new Running(); previous.failReset = true;
+        controller.addBehavior(previous); controller.run();
+        assertThrows(IllegalStateException.class, controller::clear);
+        assertDoesNotThrow(controller::run);
+        assertDoesNotThrow(controller::clear);
+        assertEquals(1, previous.runs);
+        assertEquals(1, previous.resets);
+    }
+
+    @Test void clearPreservesBehaviorAddedByAResetCallback() {
+        var controller = new SimpleBehaviorController();
+        var next = new Running();
+        var previous = new Running() {
+            @Override public void reset() { resets++; controller.addBehavior(next); }
+        };
+        controller.addBehavior(previous); controller.run();
+        controller.clear(); controller.run();
+        assertEquals(1, previous.runs);
+        assertEquals(1, previous.resets);
+        assertEquals(1, next.runs);
+    }
+
     @Test void behaviorCanRemoveItselfFromAdmissionOrExecution() {
         for (boolean duringAdmission : new boolean[] { true, false }) {
             var controller = new SimpleBehaviorController();

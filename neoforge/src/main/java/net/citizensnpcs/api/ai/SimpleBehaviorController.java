@@ -15,9 +15,9 @@ public class SimpleBehaviorController implements BehaviorController {
 
     @Override
     public void clear() {
-        selector.reset();
-        selector.getBehaviors().clear();
         executing = false;
+        selector.getBehaviors().clear();
+        selector.reset();
     }
 
     @Override
