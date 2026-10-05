@@ -31,27 +31,65 @@ public class ExperienceAction extends NPCShopAction {
 
     @Override
     public int getMaxRepeats(Entity entity, InventoryMultiplexer inventory) {
-        if (!(entity instanceof ServerPlayer player) || exp <= 0)
-            return -1;
-        return player.experienceLevel / exp;
+        return affordableRepeats(entity instanceof ServerPlayer player ? player.experienceLevel : -1, exp);
     }
 
     @Override
     public Transaction grant(NPCShopStorage storage, Entity entity, InventoryMultiplexer inventory, int repeats) {
         if (!(entity instanceof ServerPlayer player))
             return Transaction.fail();
-        int amount = exp * repeats;
-        return Transaction.create(() -> true, () -> player.giveExperienceLevels(amount),
-                () -> player.giveExperienceLevels(-amount));
+        int amount = totalLevels(exp, repeats);
+        if (amount < 0) return Transaction.fail();
+        if (amount == 0) return Transaction.success();
+        return Transaction.create(() -> canChangeLevel(player.experienceLevel, amount), () -> changeLevels(player, amount),
+                () -> changeLevels(player, -amount));
     }
 
     @Override
     public Transaction take(NPCShopStorage storage, Entity entity, InventoryMultiplexer inventory, int repeats) {
         if (!(entity instanceof ServerPlayer player))
             return Transaction.fail();
-        int amount = exp * repeats;
-        return Transaction.create(() -> player.experienceLevel >= amount,
-                () -> player.giveExperienceLevels(-amount), () -> player.giveExperienceLevels(amount));
+        int amount = totalLevels(exp, repeats);
+        if (amount < 0) return Transaction.fail();
+        if (amount == 0) return Transaction.success();
+        return Transaction.create(() -> canChangeLevel(player.experienceLevel, -amount),
+                () -> changeLevels(player, -amount), () -> changeLevels(player, amount));
+    }
+
+    static int totalLevels(int levels, int repeats) {
+        if (levels < 0 || repeats < 0) return -1;
+        long total = (long) levels * repeats;
+        return total > Integer.MAX_VALUE ? -1 : (int) total;
+    }
+
+    static int affordableRepeats(int available, int cost) {
+        if (cost < 0) return 0;
+        if (cost == 0) return -1;
+        return available < 0 ? 0 : available / cost;
+    }
+
+    static boolean canChangeLevel(int current, int delta) {
+        long next = (long) current + delta;
+        return current >= 0 && next >= 0 && next <= Integer.MAX_VALUE;
+    }
+
+    private static void changeLevels(ServerPlayer player, int delta) {
+        if (!canChangeLevel(player.experienceLevel, delta))
+            throw new IllegalStateException("Experience level change is out of range or unaffordable");
+        int before = player.experienceLevel, points = player.totalExperience;
+        float progress = player.experienceProgress;
+        try {
+            player.giveExperienceLevels(delta);
+            if (player.experienceLevel != before + delta || player.totalExperience != points
+                    || Float.compare(player.experienceProgress, progress) != 0)
+                throw new IllegalStateException("Experience level change was cancelled or modified");
+        } catch (RuntimeException | Error failure) {
+            // Restore local XP without firing a second modifiable level-change event. This setter also requests sync.
+            player.setExperienceLevels(before);
+            player.experienceProgress = progress;
+            player.totalExperience = points;
+            throw failure;
+        }
     }
 
     public static class ExperienceActionGUI implements GUI {

@@ -16,6 +16,8 @@ Recent follow-ups cover [`powered`, `name` and `home` options](command-options-h
 
 ## Behavior, data and integration acceptance
 
+- [Experience transactions](experience-transactions-2026-10-05.md) now reject negative/overflowing level amounts and recheck execution/refund bounds before vanilla level changes. Three arithmetic tests and 49 native checks on each NeoForge version cover late affordability, preserved XP fields, shift purchases and rollback. External changes that prevent refunds, physical-client/provider acceptance and full reload transactionality remain separate work.
+
 - [Shop item quantities](shop-item-quantities-2026-10-05.md) now share exact allocation logic for duplicate costs, merge capacity, batch grants, legal stack splitting and limited-stock capacity. Wide arithmetic prevents overflow/free transfers. Eight unit tests and 16 native checks on each NeoForge version cover the change. Physical-client/custom-provider acceptance and full reload transactionality remain separate work.
 
 - [Inventory publication recovery](inventory-publication-recovery-2026-10-05.md) now restores attempted slot writes, verifies restoration, preserves errors and blocks blind retries after incomplete recovery. Item actions also compensate their stock step when player-side writing fails, including during refunds. Seven focused tests and negative controls cover these cases; both NeoForge versions pass 31 native settlement checks. Arbitrary provider side effects, reconciliation after failed restoration and full reload transactionality remain separate work.

@@ -1,0 +1,25 @@
+// Opt-in default-registry experience checks, confined to a synthetic server fixture.
+allprojects {
+    afterEvaluate { p ->
+        if (p.extensions.findByName('neoForge') == null) return
+        def fixture = p.file('../artifacts/experience-audit-server')
+        p.sourceSets.main.java.srcDir(p.file('../tools/experience-runtime-audit'))
+        p.neoForge.runs.named('server') {
+            gameDirectory = fixture
+        }
+        p.tasks.named('prepareServerRun') {
+            doLast {
+                if (!new File(fixture, 'experience-audit-fixture.txt').isFile())
+                    throw new GradleException('Prepare the isolated experience fixture first')
+            }
+        }
+        p.tasks.named('runServer') {
+            timeout = java.time.Duration.ofMinutes(4)
+            doLast {
+                def log = new File(fixture, 'logs/latest.log').getText('UTF-8')
+                if (log.contains('[EXPERIENCEAUDIT] FAILED') || !log.contains('[EXPERIENCEAUDIT] COMPLETE'))
+                    throw new GradleException('Experience audit failed or incomplete')
+            }
+        }
+    }
+}
