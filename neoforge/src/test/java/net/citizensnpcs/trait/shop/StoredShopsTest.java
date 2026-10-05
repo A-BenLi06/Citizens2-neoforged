@@ -95,6 +95,7 @@ class StoredShopsTest {
         assertEquals(0, closed.get());
         assertThrows(IllegalStateException.class, ready::publish);
         assertFalse(old.isActive());
+        assertTrue(ready.isPublished());
         assertEquals(2, closed.get());
         assertNotNull(shops.getGlobalShop("new"));
         assertNull(shops.getGlobalShop("old"));
@@ -112,6 +113,7 @@ class StoredShopsTest {
         assertThrows(IllegalStateException.class, shops::prepareLoad);
         assertThrows(IllegalStateException.class, ready::publish);
         assertThrows(IllegalStateException.class, shops::closeSessions);
+        assertFalse(ready.isPublished());
         assertTrue(old.isActive());
         old.endTrade();
         ready.publish();

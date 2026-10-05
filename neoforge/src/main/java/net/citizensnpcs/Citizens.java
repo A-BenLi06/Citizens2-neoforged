@@ -603,16 +603,19 @@ public class Citizens implements CitizensPlugin {
             Editor.leaveAll();
             ChatPrompts.abandonAll();
             Throwable cleanupFailure = null;
+            if (preparedShops != null) {
+                try { preparedShops.publish(); }
+                catch (RuntimeException | Error failure) {
+                    if (!preparedShops.isPublished()) throw failure;
+                    cleanupFailure = failure;
+                }
+            }
             publicationStarted = true;
             if (candidate != null) {
                 CitizensNPCRegistry previous = npcRegistry;
                 npcRegistry = candidate;
                 if (eventListen != null) eventListen.clearRespawnQueue(previous);
                 try { previous.retire(); }
-                catch (RuntimeException | Error failure) { cleanupFailure = failure; }
-            }
-            if (preparedShops != null) {
-                try { preparedShops.publish(); }
                 catch (RuntimeException | Error failure) {
                     if (cleanupFailure == null) cleanupFailure = failure;
                     else if (cleanupFailure != failure) cleanupFailure.addSuppressed(failure);

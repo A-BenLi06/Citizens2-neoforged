@@ -1389,3 +1389,13 @@ Runtime rollback intentionally does not overwrite operator edits/default migrati
 Both NeoForge 21.1.233 and 21.1.248 pass 34 reload checks. Clean test/build passes with 362 ordinary tests; Interactions audit tests pass with 100; no failures/errors/skips. Release archive inspection confirms independent mod contents and no reload/removal probes. All invoked handles completed; no unrelated server or production data was changed.
 
 Details: docs/reload-settings-2026-10-05.md. Skin-cache invalidation, arbitrary callback effects and all shop-publication failures are not claimed transactional. The full Citizens goal remains active.
+
+## 2026-10-05 20:41:15 +08:00 — Keep NPC and shop publication consistent on reload failure
+
+Shop publication now runs before the NPC registry swap, so stale generation/active transaction rejection occurs while the old registry can still remain active. PreparedLoad exposes whether its maps were published. If old-session cleanup reports errors after publication, reload proceeds with candidate NPC publication and aggregates shop/NPC cleanup errors instead of retaining the old registry against new shops.
+
+Native coverage invalidates shop preparation from an NPC load callback and verifies old entity/registry/settings preservation. A second scenario throws from old shop-session and NPC cleanup simultaneously, verifying publication of new shops/registry and preservation of both errors. Existing shop unit tests now assert the distinction between preflight rejection and published cleanup failure.
+
+Both NeoForge 21.1.233 and 21.1.248 pass 38 reload checks. Clean ordinary test/build passes with 362 tests; Interactions audit tests pass with 100; no failures/errors/skips. Release archives preserve independent mod classes and exclude reload/removal/shop probes. All invoked handles completed; no unrelated server or production data was changed.
+
+Details: docs/reload-shop-publication-2026-10-05.md. Editor/prompt closure, skin-cache invalidation and arbitrary provider side effects are not claimed fully transactional. The full Citizens goal remains active.

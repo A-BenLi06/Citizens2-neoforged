@@ -128,11 +128,15 @@ public class StoredShops {
     public final class PreparedLoad {
         private final StoredShops candidate;
         private final long generation;
+        private boolean published;
 
         private PreparedLoad(StoredShops candidate, long generation) {
             this.candidate = candidate;
             this.generation = generation;
         }
+
+        /** True after map replacement, including when old-session cleanup subsequently reports failure. */
+        public boolean isPublished() { return published; }
 
         public void publish() {
             requireOpen();
@@ -153,6 +157,7 @@ public class StoredShops {
                 globalShops = candidate.globalShops;
                 npcShops = candidate.npcShops;
                 sourceGeneration++;
+                published = true;
             } finally { publishing = false; }
             if (failure != null) throw new IllegalStateException("Shops restored, but previous sessions could not all close", failure);
         }

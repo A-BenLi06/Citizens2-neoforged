@@ -127,6 +127,12 @@ public final class ReloadRuntimeAudit {
                 "failed_reload_preserves_other_ownership");
         for (NPC npc : candidates) check(npc.getEntity() == null, "failed_candidate_released_" + passed);
         check(store.clears == 0 && store.records.size() == 2, "failure_preserves_records");
+        store.afterLoad = registry -> plugin.getShops().storeShops();
+        NPCLoadException stale = rejectedReload();
+        check(stale.getCause().getMessage().contains("Shop source changed"), "stale_shop_candidate_rejected");
+        check(plugin.getNPCRegistry() == old && world.getEntity() == entity && !entity.isRemoved()
+                && Setting.DEFAULT_NPC_LIMIT.asInt() == 37,
+                "shop_publication_preflight_failure_preserves_registry_and_settings");
         store.afterLoad = null;
     }
 
@@ -138,16 +144,26 @@ public final class ReloadRuntimeAudit {
         check(world.getEntity() == null && entity.isRemoved() && virtual.getEntity() == null,
                 "retirement_overrides_despawn_veto");
         check(probe.removals == 1, "old_trait_removed_once");
-        check(store.reloads == 2 && store.clears == 0 && store.records.size() == 2, "reload_preserves_store_definitions");
+        check(store.reloads == 3 && store.clears == 0 && store.records.size() == 2, "reload_preserves_store_definitions");
     }
 
     private static void cleanupFailure() throws Exception {
         NPCRegistry before = plugin.getNPCRegistry();
         NPC npc = before.getById(world.getId()); Entity previousEntity = npc.getEntity();
         Probe failing = new Probe(true); npc.addTrait(failing);
+        var oldShop = plugin.getShops().addNamedShop("reload-cleanup-shop");
+        var shopCloseCalls = net.citizensnpcs.trait.shop.ReloadShopProbe.failOnClose(oldShop);
+        plugin.getShops().storeShops();
+        plugin.getShops().saveToDiskImmediate();
         writeLimit(83);
         NPCLoadException failure = rejectedReload();
         check(Setting.DEFAULT_NPC_LIMIT.asInt() == 83, "published_cleanup_failure_keeps_new_settings");
+        check(shopCloseCalls.get() == 1 && !oldShop.isActive()
+                && plugin.getShops().getGlobalShop("reload-cleanup-shop") != oldShop
+                && plugin.getShops().getGlobalShop("reload-cleanup-shop") != null,
+                "shop_cleanup_failure_keeps_new_shop_publication");
+        check(failure.getCause().getSuppressed().length == 1,
+                "shop_and_npc_cleanup_errors_are_both_retained");
         check(failure.getMessage().contains("old NPC cleanup failed"), "published_cleanup_failure_distinguished");
         check(plugin.getNPCRegistry() != before && plugin.getNPCRegistry().getById(world.getId()) != null,
                 "cleanup_failure_keeps_successful_publication");

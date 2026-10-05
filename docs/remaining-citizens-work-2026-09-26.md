@@ -16,6 +16,8 @@ Recent follow-ups cover [`powered`, `name` and `home` options](command-options-h
 
 ## Behavior, data and integration acceptance
 
+- [Reload shop publication](reload-shop-publication-2026-10-05.md) checks and publishes shop maps before replacing the NPC registry. Stale preparation preserves old NPCs/settings; old-session cleanup errors still allow consistent new shop/NPC publication with aggregated errors. Editor closure, skin-cache invalidation and arbitrary provider effects remain separate concerns.
+
 - [Reload settings recovery](reload-settings-2026-10-05.md) restores runtime values, duration caches and messaging configuration when candidate NPC preparation fails. Candidate loading sees new values; published registries keep them after cleanup errors. Both NeoForge versions pass 34 reload checks. Disk edits, arbitrary provider effects and complete shop publication transactionality remain separate concerns.
 
 - [Permanent removal entity cleanup](permanent-removal-2026-10-05.md) completes native entity and registry cleanup even when despawn is canceled or throws, while reporting exceptions and preserving removal history. Native removal coverage includes these cases; custom NPC provider cleanup remains its own contract.

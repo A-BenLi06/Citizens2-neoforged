@@ -24,7 +24,11 @@ Configuration coverage checks new settings during candidate loading, restoration
 old values/duration caches after provider failure, and retention of new settings
 after successful publication or subsequent cleanup failure.
 
-Expected result: `[RELOADAUDIT] COMPLETE 34 checks` and `BUILD SUCCESSFUL`.
+Shop publication coverage invalidates preparation during candidate loading and
+verifies that old registry/settings survive. Combined shop/NPC cleanup failures must
+retain both errors while publishing the new shop maps and registry together.
+
+Expected result: `[RELOADAUDIT] COMPLETE 38 checks` and `BUILD SUCCESSFUL`.
 The original implementation at `deb5021` fails `failed_reload_preserves_identity`.
 The fixture does not accept shutdown, full configuration/shop transactionality, or arbitrary
 external provider side effects as verified.
