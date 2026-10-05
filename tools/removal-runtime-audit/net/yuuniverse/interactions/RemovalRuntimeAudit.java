@@ -578,7 +578,25 @@ public final class RemovalRuntimeAudit {
             live.getOrAddTrait(Spawned.class).setSpawned(true);
             if (!live.spawn(new Location(level, 2, -60, 2))) throw new AssertionError("Spawn restore setup failed");
             spawnedRestore = live.getUniqueId();
-            ok(a, "npc remove " + live.getId()); ok(a, "npc undo");
+            Entity removedEntity = live.getEntity();
+            recorder.cancelDespawn = live.getUniqueId();
+            try { ok(a, "npc remove " + live.getId()); }
+            finally { recorder.cancelDespawn = null; }
+            check(!exists(live) && live.getEntity() == null && removedEntity.isRemoved(),
+                    "permanent_removal_cleans_entity_despite_despawn_cancellation");
+            ok(a, "npc undo");
+            NPC throwingRemoval = npc(registry, alice.getUUID(), "ThrowingDespawn", level);
+            throwingRemoval.getOrAddTrait(Spawned.class).setSpawned(true);
+            if (!throwingRemoval.spawn(new Location(level, 3, -60, 3))) throw new AssertionError("Throwing removal setup failed");
+            Entity throwingEntity = throwingRemoval.getEntity();
+            UUID throwingUuid = throwingRemoval.getUniqueId();
+            recorder.throwDespawn = throwingUuid;
+            try { reject(a, "npc remove " + throwingRemoval.getId()); }
+            finally { recorder.throwDespawn = null; }
+            check(!exists(throwingRemoval) && throwingRemoval.getEntity() == null && throwingEntity.isRemoved(),
+                    "permanent_removal_cleans_entity_and_registry_after_despawn_exception");
+            ok(a, "npc undo");
+            check(registry.getByUniqueId(throwingUuid) != null, "despawn_exception_retains_removal_history_for_undo");
         }
 
         NPC npc(NPCRegistry in, UUID owner, String name, ServerLevel at) {
@@ -651,6 +669,12 @@ public final class RemovalRuntimeAudit {
         @Override public void save(DataKey key) { throw new IllegalStateException("Injected snapshot failure"); }
     }
     public static class RemovalRecorder {
+        UUID cancelDespawn;
+        UUID throwDespawn;
+        @SubscribeEvent public void despawning(net.citizensnpcs.api.event.NPCDespawnEvent event) {
+            if (event.getNPC().getUniqueId().equals(throwDespawn)) throw new IllegalStateException("Injected despawn failure");
+            if (event.getNPC().getUniqueId().equals(cancelDespawn)) event.setCanceled(true);
+        }
         UUID cancelRestore;
         boolean throwOnRestore;
         net.citizensnpcs.trait.shop.NPCShop replacement;

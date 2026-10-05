@@ -1371,3 +1371,11 @@ Details: docs/bulk-removal-lifecycle-2026-10-05.md. Arbitrary external callback 
 Expanded the native bulk-removal probe so its first throwing trait cleanup creates another NPC in the same registry. The new NPC must retain its ID and UUID bindings, while both original failing NPCs complete disposal. The fixture then explicitly removes the survivor and verifies the original removal history can still restore the batch. No production change was needed.
 
 All 82 removal checks pass on NeoForge 21.1.233 and 21.1.248. Clean ordinary test/build passes with 360 tests and no failures/errors/skips. Release archives keep Citizens and Interactions separate and contain no removal probe. All invoked handles completed; no unrelated server or original data was changed. Updated the current backlog and bulk-removal documentation. Arbitrary provider side effects and save-backend recovery remain separate work; the full Citizens goal stays active.
+
+## 2026-10-05 20:10:56 +08:00 — Complete native entity release during permanent deregistration
+
+Native registry deregistration now uses the existing complete entity-release path instead of relying solely on cancellable despawn. Entity cleanup errors do not prevent exact registry-index removal or attempted saved-record cleanup; later failures are suppressed onto the original error. Ordinary despawn remains cancellable. Custom NPC implementations retain their own despawn behavior.
+
+Three native checks cover canceled despawn, thrown despawn with complete entity/registry cleanup, and successful undo after the reported failure. All 85 removal checks pass on NeoForge 21.1.233 and 21.1.248. Clean ordinary test/build passes with 360 tests; Interactions audit tests pass with 100; no failures/errors/skips. Release archives remain independent and exclude the removal probe. All invoked handles completed; no unrelated server or original data was changed.
+
+Details: docs/permanent-removal-2026-10-05.md. Arbitrary provider side effects and backend write recovery remain separate concerns. The full Citizens goal remains active.

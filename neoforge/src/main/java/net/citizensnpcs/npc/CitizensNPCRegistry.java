@@ -143,13 +143,23 @@ public class CitizensNPCRegistry implements NPCRegistry {
     public void deregister(NPC npc) {
         npc.validateRemoval();
         NPCLifetimes.cancel(npc);
-        npc.despawn(DespawnReason.REMOVAL);
+        Throwable failure = null;
+        try {
+            if (npc instanceof CitizensNPC nativeNPC) nativeNPC.releaseForRemoval();
+            else npc.despawn(DespawnReason.REMOVAL);
+        } catch (RuntimeException | Error cleanup) { failure = cleanup; }
         boolean ownsId = npcs.get(npc.getId()) == npc;
         if (ownsId) npcs.remove(npc.getId());
         if (uniqueNPCs.get(npc.getUniqueId()) == npc) uniqueNPCs.remove(npc.getUniqueId());
         if (saves != null && ownsId && dataOperation != DataOperation.LOAD) {
-            saves.clearData(npc);
+            try { saves.clearData(npc); }
+            catch (RuntimeException | Error cleanup) {
+                if (failure == null) failure = cleanup;
+                else if (failure != cleanup) failure.addSuppressed(cleanup);
+            }
         }
+        if (failure instanceof RuntimeException exception) throw exception;
+        if (failure instanceof Error error) throw error;
     }
 
     @Override

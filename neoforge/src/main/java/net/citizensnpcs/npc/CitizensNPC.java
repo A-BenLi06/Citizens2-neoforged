@@ -104,6 +104,10 @@ public class CitizensNPC extends AbstractNPC {
         disposeFromRegistry(() -> releaseEntity(DespawnReason.REMOVAL));
     }
 
+    void releaseForRemoval() {
+        releaseEntity(DespawnReason.REMOVAL);
+    }
+
     private void releaseEntity(DespawnReason reason) {
         Throwable[] failure = { null };
         finishCleanup(() -> despawn(reason), failure);
