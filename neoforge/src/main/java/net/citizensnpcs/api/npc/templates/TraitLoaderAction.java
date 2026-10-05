@@ -49,7 +49,8 @@ public class TraitLoaderAction implements Consumer<NPC> {
                 }
                 TemplateParser tp = parser.getTemplateParser();
                 if (tp != null) {
-                    actions.add(npc -> tp.apply(new TraitParserContext(npc, workspace), key));
+                    DataKey definition = key.copyWithRoot();
+                    actions.add(npc -> tp.apply(new TraitParserContext(npc, workspace), definition.copyWithRoot()));
                 } else errors.addError(key.getPath() + ": Trait " + traitName + " does not support structured templates");
             } else {
                 String[] parts = key.getString("").trim().split(" ");
@@ -62,13 +63,17 @@ public class TraitLoaderAction implements Consumer<NPC> {
                 if (stp != null) {
                     // upstream builds this context from Bukkit's console sender; the server's own command source is the
                     // equivalent, and it may legitimately be absent while the server is still coming up
-                    MinecraftServer server = ServerLifecycleHooks.getCurrentServer();
-                    CommandContext ctx = server == null ? new CommandContext(parts)
-                            : new CommandContext(server.createCommandSourceStack(), parts);
-                    actions.add(npc -> stp.apply(new TraitParserContext(npc, workspace), ctx));
+                    commandContext(parts); // Validate syntax before accepting the action.
+                    actions.add(npc -> stp.apply(new TraitParserContext(npc, workspace), commandContext(parts)));
                 } else errors.addError(key.getPath() + ": Trait " + parts[0] + " does not support short templates");
             }
         }
+    }
+
+    private static CommandContext commandContext(String[] parts) {
+        MinecraftServer server = ServerLifecycleHooks.getCurrentServer();
+        return server == null ? new CommandContext(parts.clone())
+                : new CommandContext(server.createCommandSourceStack(), parts.clone());
     }
 
     @Override

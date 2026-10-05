@@ -26,3 +26,9 @@ requested short or structured form, rather than silently omitting its action. Th
 loader's existing error aggregation rejects such candidates. Three tests cover both
 unsupported forms and successful application of supported forms, using an injected
 parser lookup with the same production parsing path.
+
+Trait template actions now snapshot structured source data and pass a fresh copy to
+each parser invocation. Short-form command contexts are validated during preparation
+and rebuilt from copied arguments for every application, using the current server
+source. Tests verify source edits/parser writes cannot change later structured
+applications and mutable command flags are not shared between applications.

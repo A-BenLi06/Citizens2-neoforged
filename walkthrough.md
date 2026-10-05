@@ -1689,3 +1689,9 @@ Details: docs/template-application-lifecycle-2026-10-06.md. The full Citizens go
 TraitLoaderAction now adds a template error when a known parser lacks the requested short or structured form. Parser lookup is factored through a package-level constructor for exercising the real parsing path without a running global plugin. Normal production lookup remains unchanged.
 
 Three tests cover unsupported structured/short forms and successful supported forms. All 474 ordinary tests and the normal build pass without failures/errors/skips; git diff --check passes. No fresh native/client run is claimed. Production Interactions sources and packaging are unchanged; no unrelated server or original data was changed. Updated docs/reload-templates-2026-10-05.md. The full Citizens goal remains active.
+
+## 2026-10-06 07:09:01 +08:00 — Isolate trait-template input for each application
+
+Structured trait actions capture a detached definition and give each parser invocation a fresh copy. Short-form syntax is still validated during preparation, while each application receives a fresh CommandContext built from copied arguments and the current server source. Parsers cannot mutate the source or contaminate later applications through reused flags/data.
+
+Two tests cover source edits and nested parser writes, plus mutable short-form flags across repeated application. An initial structured fixture used an immutable map and was corrected to mutable DataKey input before checking isolation. All 476 ordinary tests and the normal build pass without failures/errors/skips; git diff --check passes. No fresh native/client run is claimed. Production Interactions sources and packaging are unchanged; no unrelated server or original data was changed. Updated docs/reload-templates-2026-10-05.md. The full Citizens goal remains active.

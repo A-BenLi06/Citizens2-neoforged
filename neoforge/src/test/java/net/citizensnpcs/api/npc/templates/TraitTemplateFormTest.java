@@ -10,6 +10,40 @@ import net.citizensnpcs.api.trait.TraitTemplateParser;
 import net.citizensnpcs.api.util.MemoryDataKey;
 
 class TraitTemplateFormTest {
+    @Test void structuredActionsFreezeSourceAndIsolateEachParserInvocation() {
+        var key = new MemoryDataKey(); key.setString("0.name", "known"); key.setInt("0.settings.value", 1);
+        List<Integer> observed = new ArrayList<>();
+        TraitTemplateParser parser = new TraitTemplateParser() {
+            public ShortTemplateParser getShortTemplateParser() { return null; }
+            public TemplateParser getTemplateParser() {
+                return (context, data) -> {
+                    observed.add(data.getInt("settings.value")); data.setInt("settings.value", 99); return null;
+                };
+            }
+        };
+        var action = new TraitLoaderAction(new Errors(), null, key, name -> parser);
+        key.setInt("0.settings.value", 7);
+        action.accept(null); action.accept(null);
+        assertEquals(List.of(1, 1), observed);
+        assertEquals(7, key.getInt("0.settings.value"));
+    }
+
+    @Test void shortActionsDoNotShareMutableCommandFlags() {
+        var key = new MemoryDataKey(); key.setString("0", "known --value 7");
+        List<String> observed = new ArrayList<>();
+        TraitTemplateParser parser = new TraitTemplateParser() {
+            public ShortTemplateParser getShortTemplateParser() {
+                return (context, command) -> {
+                    observed.add(command.getValueFlags().get("value")); command.getValueFlags().clear(); return null;
+                };
+            }
+            public TemplateParser getTemplateParser() { return null; }
+        };
+        var action = new TraitLoaderAction(new Errors(), null, key, name -> parser);
+        action.accept(null); action.accept(null);
+        assertEquals(List.of("7", "7"), observed);
+    }
+
     private static class Errors extends TemplateRegistry.TemplateErrorReporter {
         final List<String> messages = new ArrayList<>();
         @Override public void addError(String message) { super.addError(message); messages.add(message); }
