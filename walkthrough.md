@@ -1591,3 +1591,9 @@ Both NeoForge 21.1.233 and 21.1.248 pass all 320 creation checks. Clean ordinary
 TimeoutDecorator now resets its elapsed-tick counter before child.reset, so a throwing callback cannot retain an expired budget for a later execution. The existing tick limit and final-tick completion semantics are unchanged and explicitly tested.
 
 Three tests cover no execution beyond the limit, acceptance of success on the last allowed tick, and a fresh counter after reset failure. All 430 ordinary tests and the normal build pass without failures/errors/skips; git diff --check passes. No fresh native/client run is claimed. Production Interactions sources and packaging are unchanged; no unrelated server or original data was changed. Updated docs/behavior-clear-recovery-2026-10-06.md. The full Citizens goal remains active.
+
+## 2026-10-06 03:56:53 +08:00 — Complete coalesced behavior cleanup over a stable child snapshot
+
+CoalescedBehavior now copies its input child list and attempts every reset before reporting aggregated errors. External mutation of the caller's list cannot change an already constructed group or invalidate execution iteration.
+
+Two tests verify all three throwing reset callbacks execute with retained errors and that a callback clearing the original list does not skip grouped actions. All 432 ordinary tests and the normal build pass without failures/errors/skips; git diff --check passes. No fresh native/client run is claimed. Production Interactions sources and packaging are unchanged; no unrelated server or original data was changed. Updated docs/behavior-clear-recovery-2026-10-06.md. The full Citizens goal remains active.

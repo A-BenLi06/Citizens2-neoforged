@@ -9,14 +9,21 @@ public class CoalescedBehavior implements Behavior {
     private final List<Behavior> behaviors;
 
     public CoalescedBehavior(List<Behavior> behaviors) {
-        this.behaviors = behaviors;
+        this.behaviors = List.copyOf(behaviors);
     }
 
     @Override
     public void reset() {
+        Throwable failure = null;
         for (Behavior behavior : behaviors) {
-            behavior.reset();
+            try { behavior.reset(); }
+            catch (RuntimeException | Error ex) {
+                if (failure == null) failure = ex;
+                else if (failure != ex) failure.addSuppressed(ex);
+            }
         }
+        if (failure instanceof RuntimeException ex) throw ex;
+        if (failure instanceof Error ex) throw ex;
     }
 
     @Override

@@ -23,3 +23,7 @@ TimeoutDecorator resets its elapsed-tick counter before invoking child cleanup.
 A throwing child reset cannot leave a new execution cycle with the old expired
 budget. Three tests verify the tick limit, successful completion on the last allowed
 tick, and a fresh budget after a reset exception.
+
+CoalescedBehavior owns an immutable snapshot of its input children and attempts every
+child reset before reporting errors. Tests cover three throwing reset callbacks and
+caller-list mutation during execution without changing the constructed group.
