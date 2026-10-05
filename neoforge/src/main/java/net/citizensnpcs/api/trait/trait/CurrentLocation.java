@@ -18,7 +18,8 @@ import net.minecraft.world.entity.Entity;
 public class CurrentLocation extends Trait {
     @Persist
     private float bodyYaw = Float.NaN;
-    @Persist(value = "", required = true)
+    // A never-positioned, unspawned NPC legitimately has no saved world/location.
+    @Persist(value = "")
     private Location location = new Location(null, 0, 0, 0);
 
     public CurrentLocation() {

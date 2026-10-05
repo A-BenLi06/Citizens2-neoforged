@@ -334,6 +334,7 @@ public abstract class AbstractNPC implements NPC {
 
         String traitNames = root.getString("traitnames");
         if (traitNames.isEmpty()) {
+            if (restoringSnapshot) throw new IllegalStateException("NPC snapshot has no trait names");
             Messaging.severe("Corrupted savedata (empty trait names) for NPC", this);
             return;
         }
@@ -351,9 +352,20 @@ public abstract class AbstractNPC implements NPC {
         }
     }
 
+    private boolean restoringSnapshot;
+
+    /** Load a removal snapshot without accepting partial trait restoration as success. */
+    public final void loadForRestore(DataKey root) {
+        boolean previous = restoringSnapshot;
+        restoringSnapshot = true;
+        try { load(root); }
+        finally { restoringSnapshot = previous; }
+    }
+
     private void loadTraitFromKey(DataKey traitKey) {
         Class<? extends Trait> clazz = plugin.getTraitFactory().getTraitClass(traitKey.name());
         if (clazz == null) {
+            if (restoringSnapshot) throw new IllegalStateException("Unavailable snapshot trait: " + traitKey.name());
             Messaging.severeTr("citizens.notifications.trait-load-failed", traitKey.name(), getId());
             return;
         }
@@ -363,15 +375,21 @@ public abstract class AbstractNPC implements NPC {
         } else {
             trait = plugin.getTraitFactory().getTrait(clazz);
             if (trait == null) {
+                if (restoringSnapshot) throw new IllegalStateException("Could not create snapshot trait: " + traitKey.name());
                 Messaging.severeTr("citizens.notifications.trait-load-failed", traitKey.name(), getId());
                 return;
             }
             addTrait(trait);
         }
         try {
-            PersistenceLoader.load(trait, traitKey);
+            if (restoringSnapshot) PersistenceLoader.loadStrict(trait, traitKey);
+            else PersistenceLoader.load(trait, traitKey);
             trait.load(traitKey);
         } catch (Throwable ex) {
+            if (restoringSnapshot) {
+                if (ex instanceof Error error) throw error;
+                throw new IllegalStateException("Could not restore snapshot trait: " + traitKey.name(), ex);
+            }
             if (Messaging.isDebugging()) {
                 ex.printStackTrace();
             }

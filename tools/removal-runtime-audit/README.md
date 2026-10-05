@@ -27,11 +27,14 @@ The dispatcher checks verify that expected Citizens failures become Brigadier
 failures and stop later dialogue actions. The public `executeSafe` handled-result
 contract is separate from this dispatcher outcome.
 
-The fixture has 74 checks. Twelve shop-undo checks cover independent definition and
+The fixture has 78 checks. Sixteen shop-undo checks cover independent definition and
 stock restoration, conflicting definitions, canceled creation callbacks that replace
 the shop, retry, detached snapshots, empty pages, type, permission and stored items.
 The stock checks open real private/global editors simultaneously, verify edits are
 still buffered before removal, and verify both screens close and undo captures them.
+Creation callbacks also throw after replacing a shop, and a saved trait throws from
+load; undo must clean provisional ownership, retain the snapshot, and retry using
+the saved non-default trait value after the failure is repaired.
 Seven item-persistence checks exercise native enchantment
 components with live registries, failed inventory encoding without deleting the old
 slot, snapshot failure blocking removal and copying, retry after fixing the item,

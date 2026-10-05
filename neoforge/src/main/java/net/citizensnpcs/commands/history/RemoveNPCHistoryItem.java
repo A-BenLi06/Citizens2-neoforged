@@ -84,7 +84,9 @@ public class RemoveNPCHistoryItem implements CommandHistoryItem {
             npc = destination instanceof CitizensNPCRegistry nativeRegistry
                     ? nativeRegistry.createNPCForRestore(type, uuid, id, key.getString("name"))
                     : destination.createNPC(type, uuid, id, key.getString("name"));
-            npc.load(key.copyWithRoot());
+            if (npc instanceof net.citizensnpcs.api.npc.AbstractNPC nativeNPC)
+                nativeNPC.loadForRestore(key.copyWithRoot());
+            else npc.load(key.copyWithRoot());
             if (destination.getById(id) != npc || destination.getByUniqueId(uuid) != npc)
                 throw new IllegalStateException("Restored NPC lost registry ownership");
             if (restoredShop != null && (npc.getTraitNullable(ShopTrait.class) == null

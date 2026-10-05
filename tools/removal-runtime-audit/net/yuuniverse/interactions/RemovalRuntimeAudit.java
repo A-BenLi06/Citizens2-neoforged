@@ -150,6 +150,7 @@ public final class RemovalRuntimeAudit {
             grant(alice, "citizens.npc.undo"); grant(bob, "citizens.npc.undo");
             NeoForge.EVENT_BUS.register(recorder);
             CitizensAPI.getTraitFactory().registerTrait(brokenInfo);
+            CitizensAPI.getTraitFactory().registerTrait(TraitInfo.create(BrokenRestore.class).withName("restoreauditfailure"));
             add(this::basicCommands);
             steps.add(() -> {
                 NPC restored = registry.getByUniqueId(spawnedRestore);
@@ -232,8 +233,15 @@ public final class RemovalRuntimeAudit {
         }
 
         void basicCommands() throws Exception {
+            var worldless = new MemoryDataKey();
+            worldless.setDouble("bodyYaw", 63);
+            CurrentLocation location = PersistenceLoader.loadStrict(new CurrentLocation(), worldless);
+            check(location.getLocation() == null && location.getBodyYaw() == 63F,
+                    "worldless_snapshot_retains_orientation");
             NPC control = npc(registry, alice.getUUID(), "Control", null);
             NPC target = npc(registry, alice.getUUID(), "Target", null);
+            target.addTrait(BrokenRestore.class);
+            target.getOrAddTrait(BrokenRestore.class).value = 67;
             var originalShop = target.getOrAddTrait(net.citizensnpcs.trait.ShopTrait.class).getDefaultShop();
             originalShop.setTitle("Saved shop title");
             originalShop.getStorage().setUnlimited(false);
@@ -276,7 +284,21 @@ public final class RemovalRuntimeAudit {
                     && shops.npcShops.get(targetUuid.toString()) == recorder.replacement
                     && recorder.replacement.isActive(), "canceled_restore_preserves_callback_shop_and_cleans_registry");
             shops.removeNPCShop(targetUuid.toString(), recorder.replacement);
+            recorder.cancelRestore = targetUuid;
+            recorder.throwOnRestore = true;
+            try { reject(a, "npc undo"); }
+            finally { recorder.cancelRestore = null; recorder.throwOnRestore = false; }
+            check(registry.getById(targetId) == null && registry.getByUniqueId(targetUuid) == null
+                    && shops.npcShops.get(targetUuid.toString()) == recorder.replacement
+                    && recorder.replacement.isActive(), "throwing_creation_preserves_replacement_and_cleans_registry");
+            shops.removeNPCShop(targetUuid.toString(), recorder.replacement);
+            BrokenRestore.fail = true;
+            try { reject(a, "npc undo"); }
+            finally { BrokenRestore.fail = false; }
+            check(registry.getById(targetId) == null && registry.getByUniqueId(targetUuid) == null
+                    && !shops.npcShops.containsKey(targetUuid.toString()), "failed_trait_restore_cleans_provisional_npc_and_shop");
             ok(a, "npc undo"); target = registry.getById(targetId);
+            check(target.getOrAddTrait(BrokenRestore.class).value == 67, "failed_trait_restore_retains_snapshot_for_retry");
             var restoredShop = target.getOrAddTrait(net.citizensnpcs.trait.ShopTrait.class).getDefaultShop();
             check(restoredShop != originalShop && restoredShop.getTitle().equals("Saved shop title")
                     && restoredShop.getStorage().getBalance() == 123,
@@ -602,16 +624,26 @@ public final class RemovalRuntimeAudit {
     }
     public static class RemovalRecorder {
         UUID cancelRestore;
+        boolean throwOnRestore;
         net.citizensnpcs.trait.shop.NPCShop replacement;
         @SubscribeEvent public void created(net.citizensnpcs.api.event.NPCCreateEvent event) {
             if (!event.getNPC().getUniqueId().equals(cancelRestore)) return;
             event.getNPC().getOrAddTrait(net.citizensnpcs.trait.ShopTrait.class);
             replacement = new net.citizensnpcs.trait.shop.NPCShop(cancelRestore.toString());
             net.citizensnpcs.Citizens.getInstance().getShops().npcShops.put(cancelRestore.toString(), replacement);
+            if (throwOnRestore) throw new IllegalStateException("Injected creation callback failure");
             event.setCanceled(true);
         }
         NPC lastNpc; CommandSourceStack lastSource;
         @SubscribeEvent public void removed(NPCRemoveByCommandSenderEvent event) { lastNpc = event.getNPC(); lastSource = event.getSource(); }
+    }
+    public static class BrokenRestore extends Trait {
+        static boolean fail;
+        @net.citizensnpcs.api.persistence.Persist int value = 42;
+        public BrokenRestore() { super("restoreauditfailure"); }
+        @Override public void load(DataKey key) {
+            if (fail) throw new IllegalStateException("Injected trait restoration failure");
+        }
     }
     private static class AuditPlayer extends ServerPlayer {
         final List<String> messages = new ArrayList<>(); EmbeddedChannel channel;
