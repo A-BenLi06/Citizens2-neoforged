@@ -11,17 +11,17 @@ import net.minecraft.world.item.ItemStack;
  * Presents several containers as one flat array of slots, so a shop can charge across a player's inventory and whatever
  * else it has been given without caring where each item sits.
  * <p>
- * The point of {@link #transact} is atomicity: the action sees the whole array, and only once it returns are the changes
- * written back to the real containers. A charge that turns out to be impossible part-way through therefore leaves nothing
- * half-taken.
+ * The action edits a detached snapshot, which is written back only after the callback returns successfully. Direct
+ * external writes and arbitrary container side effects during publication are outside this callback isolation boundary.
  */
 public class InventoryMultiplexer {
     private final ItemStack[] inventory;
     private final Collection<Container> sources;
+    private boolean writing;
 
     public InventoryMultiplexer(Collection<Container> sources) {
-        this.sources = sources;
-        this.inventory = new ItemStack[sources.stream().mapToInt(Container::getContainerSize).sum()];
+        this.sources = List.copyOf(sources);
+        this.inventory = new ItemStack[this.sources.stream().mapToInt(Container::getContainerSize).sum()];
         refresh();
     }
 
@@ -35,25 +35,51 @@ public class InventoryMultiplexer {
 
     /** Re-reads the real containers, discarding anything staged but not written. */
     public void refresh() {
+        if (writing) throw new IllegalStateException("Inventory transaction is already in progress");
+        System.arraycopy(readSources(), 0, inventory, 0, inventory.length);
+    }
+
+    private ItemStack[] readSources() {
+        requireLayout();
+        ItemStack[] result = new ItemStack[inventory.length];
         int i = 0;
         for (Container source : sources) {
             for (int slot = 0; slot < source.getContainerSize(); slot++) {
-                inventory[i++] = source.getItem(slot);
+                result[i++] = source.getItem(slot).copy();
             }
         }
+        return result;
+    }
+
+    private void requireLayout() {
+        if (sources.stream().mapToInt(Container::getContainerSize).sum() != inventory.length)
+            throw new IllegalStateException("Inventory source layout changed");
     }
 
     public void transact(Consumer<ItemStack[]> action) {
-        action.accept(inventory);
-        int i = 0;
-        for (Container source : sources) {
-            for (int slot = 0; slot < source.getContainerSize(); slot++) {
-                ItemStack stack = inventory[i++];
-                source.setItem(slot, stack == null ? ItemStack.EMPTY : stack);
+        if (writing) throw new IllegalStateException("Inventory transaction is already in progress");
+        writing = true;
+        try {
+            ItemStack[] staged = copy(inventory);
+            action.accept(staged);
+            ItemStack[] published = copy(staged);
+            requireLayout();
+            int i = 0;
+            for (Container source : sources) {
+                for (int slot = 0; slot < source.getContainerSize(); slot++) {
+                    source.setItem(slot, published[i++].copy());
+                }
             }
-        }
-        for (Container source : sources) {
-            source.setChanged();
-        }
+            for (Container source : sources) {
+                source.setChanged();
+            }
+            System.arraycopy(readSources(), 0, inventory, 0, inventory.length);
+        } finally { writing = false; }
+    }
+
+    private static ItemStack[] copy(ItemStack[] source) {
+        ItemStack[] result = new ItemStack[source.length];
+        for (int i = 0; i < source.length; i++) result[i] = source[i] == null ? ItemStack.EMPTY : source[i].copy();
+        return result;
     }
 }

@@ -22,6 +22,7 @@ import net.minecraft.world.item.ItemStack;
  * {@link NPCShopAction}: every action needs the storage type, and the trait needs every action.
  */
 public class NPCShopStorage {
+    private boolean writing;
     private final ShopSessionOwner sessions = new ShopSessionOwner();
 
     public boolean isActive() { return sessions.isActive(); }
@@ -80,6 +81,7 @@ public class NPCShopStorage {
     }
 
     public void setInventory(List<ItemStack> items) {
+        if (writing) throw new IllegalStateException("Shop stock transaction is already in progress");
         this.inventory = items;
     }
 
@@ -97,16 +99,20 @@ public class NPCShopStorage {
      *            the goods. The empty slots are really provided here.
      */
     public void transact(Consumer<ItemStack[]> action, int additional) {
+        if (writing) throw new IllegalStateException("Shop stock transaction is already in progress");
         if (!isActive()) throw new IllegalStateException("Shop stock is unavailable");
         if (unlimited)
             return;
         if (hasUnavailableItems()) throw new IllegalStateException("Shop stock contains unavailable item definitions");
-        ItemStack[] items = new ItemStack[inventory.size() + Math.max(0, additional)];
-        for (int i = 0; i < items.length; i++) {
-            items[i] = i < inventory.size() ? inventory.get(i) : ItemStack.EMPTY;
-        }
-        action.accept(items);
-        inventory = Arrays.stream(items).filter(i -> i != null && !i.isEmpty()).collect(Collectors.toList());
+        writing = true;
+        try {
+            ItemStack[] items = new ItemStack[inventory.size() + Math.max(0, additional)];
+            for (int i = 0; i < items.length; i++) {
+                items[i] = i < inventory.size() ? inventory.get(i).copy() : ItemStack.EMPTY;
+            }
+            action.accept(items);
+            inventory = Arrays.stream(items).filter(i -> i != null && !i.isEmpty()).map(ItemStack::copy).collect(Collectors.toList());
+        } finally { writing = false; }
     }
 
     public void setInventorySizeLimit(int limit) {
