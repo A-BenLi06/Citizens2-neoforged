@@ -1451,3 +1451,9 @@ Updated docs/template-generation-2026-10-05.md and the current backlog. Arbitrar
 YamlReplacementAction now handles empty maps as explicit values rather than skipping them during traversal. Override-enabled templates can clear map contents, and missing empty structures are retained. Default-only nested maps and dotted paths check existing ancestors before descending, so they cannot silently replace scalar/list parents. The established dotted-path contract is unchanged.
 
 Three added tests cover empty maps, default-only ancestor preservation and explicit scalar-to-map override. All 379 ordinary tests and the normal build pass with no failures/errors/skips; git diff --check passes. These are replacement-action snapshot tests, not a fresh native/client run. Production Interactions sources and packaging are unchanged. No unrelated server or original data was changed. Details: docs/template-map-merge-2026-10-05.md. The full Citizens goal remains active.
+
+## 2026-10-05 22:31:24 +08:00 — Resolve template workspace references as regular files
+
+TemplateWorkspace now normalizes relative names and resolves them against the real namespace directory, returning only regular direct-child files. Valid ./-prefixed names work; directories, missing/invalid names and out-of-scope references return null. The existing BehaviorTrait fallback is unchanged.
+
+Three filesystem tests cover normalized file lookup, invalid/directory/missing entries and parent/nested/absolute path rejection. All 382 ordinary tests and the normal build pass with no failures/errors/skips; git diff --check passes. No new native/client or link-specific acceptance is claimed. Production Interactions sources and packaging are unchanged; no unrelated server or original data was changed. Details: docs/template-workspace-2026-10-05.md. The full Citizens goal remains active.

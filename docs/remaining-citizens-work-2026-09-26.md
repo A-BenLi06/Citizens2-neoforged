@@ -16,6 +16,8 @@ Recent follow-ups cover [`powered`, `name` and `home` options](command-options-h
 
 ## Behavior, data and integration acceptance
 
+- [Template workspace files](template-workspace-2026-10-05.md) normalize relative names and require regular direct-child files. Filesystem tests cover directories, missing/invalid entries and path scope; behavior fallback/provider execution remains separate coverage.
+
 - [Template map merging](template-map-merge-2026-10-05.md) preserves explicit empty maps and prevents default-only nested/dotted replacements from overwriting scalar ancestors. Override-enabled nested replacements remain supported. Focused snapshot tests cover these merge rules.
 
 - [Template generation](template-generation-2026-10-05.md) validates snapshots before saving and updates name/key indexes together. Overwrite preserves sibling templates, original source files and literal YAML keys, removes stale snapshot fields, and preserves disk/live state when snapshot capture fails. Both NeoForge versions pass 306 native creation checks including overwritten-template application. Partial YAML templates preserve unsaved target state through snapshot capture; arbitrary provider/client combinations remain separate acceptance work.
