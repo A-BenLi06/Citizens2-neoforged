@@ -202,6 +202,12 @@ public class Util {
      *            whether to run it as the clicker rather than as the console
      */
     public static void runCommand(NPC npc, ServerPlayer clicker, String command, boolean op, boolean asPlayer) {
+        scheduleCommand(npc, clicker, command, op, asPlayer);
+    }
+
+    /** Queue the same command dispatch, returning its cancellation handle (or null without a server). */
+    public static net.citizensnpcs.api.util.schedulers.SchedulerTask scheduleCommand(NPC npc, ServerPlayer clicker,
+            String command, boolean op, boolean asPlayer) {
         String cmd = command;
         if (cmd.startsWith("say")) {
             // "say X" is shorthand for making the NPC talk, not for the vanilla /say
@@ -212,16 +218,18 @@ public class Util {
         }
         MinecraftServer server = clicker != null ? clicker.getServer() : ServerLifecycleHooks.getCurrentServer();
         if (server == null)
-            return;
+            return null;
         CommandSourceStack base = asPlayer && clicker != null ? clicker.createCommandSourceStack()
                 : server.createCommandSourceStack();
-        String interpolated = Placeholders.replace(cmd, base, npc);
-        Messaging.idebug(() -> "Running command " + interpolated + " on NPC " + (npc == null ? -1 : npc.getId())
+        // Player sources already expand these variables; console sources still need the original clicker.
+        String prepared = asPlayer ? cmd : Placeholders.replace(cmd, clicker);
+        String interpolated = Placeholders.replace(prepared, base, npc);
+        Messaging.idebug(() -> "Scheduling command " + interpolated + " on NPC " + (npc == null ? -1 : npc.getId())
                 + " clicker " + clicker);
         // Upstream ops the player for the duration and notes the disk write that costs. A command source carries its own
         // permission level, so it can simply be raised for this one dispatch - no op list is touched at all.
         CommandSourceStack source = op ? base.withPermission(4) : base;
-        CitizensAPI.getScheduler().runTask(() -> {
+        return CitizensAPI.getScheduler().runTask(() -> {
             try {
                 server.getCommands().performPrefixedCommand(source, interpolated);
             } catch (Throwable t) {

@@ -20,8 +20,9 @@ import net.minecraft.world.item.Items;
 /**
  * Runs commands as the cost or the reward of a trade.
  * <p>
- * The commands may run as the player or as the server, and optionally with operator permissions. Nothing is charged and
- * nothing can be rolled back: a command that has run has run, so the rollback is deliberately empty.
+ * The commands may run as the player or as the server, optionally with operator permissions. Dispatch occurs on the
+ * next server tick. Rollback cancels commands still queued for that trade; effects of commands
+ * that have already run cannot be undone.
  */
 public class CommandAction extends NPCShopAction {
     @Persist
@@ -69,16 +70,22 @@ public class CommandAction extends NPCShopAction {
     private Transaction run(Entity entity, InventoryMultiplexer inventory, int repeats) {
         if (!(entity instanceof ServerPlayer player))
             return Transaction.fail();
+        List<net.citizensnpcs.api.util.schedulers.SchedulerTask> pending = new ArrayList<>();
         return Transaction.create(() -> true, () -> {
-            for (int i = 0; i < repeats; i++) {
-                for (String command : commands) {
-                    Util.runCommand(null, player, command, op, !server);
+            try {
+                List<String> snapshot = List.copyOf(commands);
+                for (int i = 0; i < repeats; i++) {
+                    for (String command : snapshot) {
+                        var task = Util.scheduleCommand(null, player, command, op, !server);
+                        if (task != null) pending.add(task);
+                    }
                 }
+                inventory.refresh();
+            } catch (RuntimeException | Error failure) {
+                pending.forEach(net.citizensnpcs.api.util.schedulers.SchedulerTask::cancel);
+                throw failure;
             }
-            // a command may well have handed the player items, so anything staged from before it ran is stale
-            inventory.refresh();
-        }, () -> {
-        });
+        }, () -> pending.forEach(net.citizensnpcs.api.util.schedulers.SchedulerTask::cancel));
     }
 
     @Menu(title = "Command editor", dimensions = { 4, 9 })
