@@ -29,6 +29,32 @@ import net.citizensnpcs.api.util.YamlStorage;
  * configuration API, writing missing keys back with their defaults, and honouring upstream's {@code migrateFrom} paths.
  */
 public class SettingsTest {
+    @Test
+    public void enclosingReloadCanRestoreRuntimeValuesAndDurationIdentity(@TempDir Path dir) throws IOException {
+        Settings settings = new Settings(dir.toFile());
+        Setting.DEFAULT_NPC_LIMIT.set(37);
+        Duration previous = Setting.DEFAULT_RANDOM_LOOK_DELAY.asDuration();
+        Runnable restore = settings.captureRuntimeRestore();
+        write(dir, "npc:\n  limits:\n    default-limit: 7\n");
+        settings.reload();
+        assertEquals(7, Setting.DEFAULT_NPC_LIMIT.asInt());
+        restore.run();
+        assertEquals(37, Setting.DEFAULT_NPC_LIMIT.asInt());
+        assertSame(previous, Setting.DEFAULT_RANDOM_LOOK_DELAY.asDuration());
+    }
+
+    @Test
+    public void runtimeRestoreDoesNotEnableSavingAnUnreadableSource(@TempDir Path dir) throws IOException {
+        Settings settings = new Settings(dir.toFile());
+        Runnable restore = settings.captureRuntimeRestore();
+        String malformed = "npc: [unterminated\n";
+        write(dir, malformed);
+        assertThrows(IllegalStateException.class, settings::reload);
+        restore.run();
+        assertThrows(IllegalStateException.class, settings::save);
+        assertEquals(malformed, read(dir));
+    }
+
     private static void write(Path dir, String yaml) throws IOException {
         Files.write(dir.resolve("config.yml"), yaml.getBytes(StandardCharsets.UTF_8));
     }

@@ -20,7 +20,11 @@ forced retirement despite despawn vetoes, unregistered trait listeners, delayed 
 cancellation, ordinary and packet transport, another registry's queued respawn with
 the same UUID/ID, and cleanup failure after publication without record deletion.
 
-Expected result: `[RELOADAUDIT] COMPLETE 30 checks` and `BUILD SUCCESSFUL`.
+Configuration coverage checks new settings during candidate loading, restoration of
+old values/duration caches after provider failure, and retention of new settings
+after successful publication or subsequent cleanup failure.
+
+Expected result: `[RELOADAUDIT] COMPLETE 34 checks` and `BUILD SUCCESSFUL`.
 The original implementation at `deb5021` fails `failed_reload_preserves_identity`.
-The fixture does not accept shutdown, configuration/shop transactionality, or arbitrary
+The fixture does not accept shutdown, full configuration/shop transactionality, or arbitrary
 external provider side effects as verified.

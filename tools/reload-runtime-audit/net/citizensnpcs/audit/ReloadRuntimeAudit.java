@@ -9,6 +9,7 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.function.Consumer;
 import net.citizensnpcs.Citizens;
+import net.citizensnpcs.Settings.Setting;
 import net.citizensnpcs.api.CitizensAPI;
 import net.citizensnpcs.api.event.NPCDespawnEvent;
 import net.citizensnpcs.api.event.NPCNeedsRespawnEvent;
@@ -101,7 +102,11 @@ public final class ReloadRuntimeAudit {
     }
 
     private static void failedReload() throws Exception {
+        Setting.DEFAULT_NPC_LIMIT.set(37);
+        var previousDuration = Setting.DEFAULT_RANDOM_LOOK_DELAY.asDuration();
+        writeLimit(71);
         store.afterLoad = registry -> {
+            check(Setting.DEFAULT_NPC_LIMIT.asInt() == 71, "candidate_load_sees_new_settings");
             check(plugin.getNPCRegistry() == old, "old_binding_visible_during_load");
             for (NPC npc : registry) candidates.add(npc);
             NPC partial = registry.createNPC(EntityType.PIG, "PartialCandidate"); candidates.add(partial);
@@ -110,6 +115,9 @@ public final class ReloadRuntimeAudit {
             throw new IllegalStateException("expected provider reload failure");
         };
         NPCLoadException failure = rejectedReload();
+        check(Setting.DEFAULT_NPC_LIMIT.asInt() == 37
+                && Setting.DEFAULT_RANDOM_LOOK_DELAY.asDuration() == previousDuration,
+                "failed_reload_restores_runtime_settings_and_duration_cache");
         check(failure.getCause().getMessage().equals("expected provider reload failure"), "original_failure_preserved");
         check(plugin.getNPCRegistry() == old && old.getById(world.getId()) == world, "failed_reload_preserves_identity");
         check(failure.getCause().getSuppressed().length == 1, "candidate_cleanup_failure_suppressed");
@@ -124,6 +132,7 @@ public final class ReloadRuntimeAudit {
 
     private static void successfulReload() throws Exception {
         veto = true; plugin.reload(); veto = false;
+        check(Setting.DEFAULT_NPC_LIMIT.asInt() == 71, "successful_reload_keeps_new_settings");
         check(plugin.getNPCRegistry() != old, "success_publishes_new_registry");
         check(!old.iterator().hasNext() && old.getByUniqueId(world.getUniqueId()) == null, "old_indexes_released");
         check(world.getEntity() == null && entity.isRemoved() && virtual.getEntity() == null,
@@ -136,7 +145,9 @@ public final class ReloadRuntimeAudit {
         NPCRegistry before = plugin.getNPCRegistry();
         NPC npc = before.getById(world.getId()); Entity previousEntity = npc.getEntity();
         Probe failing = new Probe(true); npc.addTrait(failing);
+        writeLimit(83);
         NPCLoadException failure = rejectedReload();
+        check(Setting.DEFAULT_NPC_LIMIT.asInt() == 83, "published_cleanup_failure_keeps_new_settings");
         check(failure.getMessage().contains("old NPC cleanup failed"), "published_cleanup_failure_distinguished");
         check(plugin.getNPCRegistry() != before && plugin.getNPCRegistry().getById(world.getId()) != null,
                 "cleanup_failure_keeps_successful_publication");
@@ -148,6 +159,12 @@ public final class ReloadRuntimeAudit {
     private static NPCLoadException rejectedReload() throws Exception {
         try { plugin.reload(); } catch (NPCLoadException failure) { return failure; }
         throw new AssertionError("reload_should_fail");
+    }
+    private static void writeLimit(int limit) {
+        var config = new YamlStorage(new java.io.File(plugin.getDataFolder(), "config.yml"));
+        if (!config.load()) throw new AssertionError("Could not read fixture configuration");
+        config.getKey("").setInt("npc.limits.default-limit", limit);
+        config.save();
     }
     private static Location at(int x) { return new Location(level, x, -58, 4); }
     private static void check(boolean value, String label) {

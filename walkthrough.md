@@ -1379,3 +1379,13 @@ Native registry deregistration now uses the existing complete entity-release pat
 Three native checks cover canceled despawn, thrown despawn with complete entity/registry cleanup, and successful undo after the reported failure. All 85 removal checks pass on NeoForge 21.1.233 and 21.1.248. Clean ordinary test/build passes with 360 tests; Interactions audit tests pass with 100; no failures/errors/skips. Release archives remain independent and exclude the removal probe. All invoked handles completed; no unrelated server or original data was changed.
 
 Details: docs/permanent-removal-2026-10-05.md. Arbitrary provider side effects and backend write recovery remain separate concerns. The full Citizens goal remains active.
+
+## 2026-10-05 20:27:14 +08:00 — Restore runtime settings when NPC reload preparation fails
+
+The enclosing reload captures live Setting values and parsed duration objects before configuration reload. Candidate NPCs still initialize against the new configuration. Failure before publication restores old runtime values and messaging settings after candidate disposal, preserving the original error and suppressed cleanup failures. Published registries retain new settings even when old cleanup reports an error.
+
+Runtime rollback intentionally does not overwrite operator edits/default migrations on disk or re-enable writes after a failed source read. Two Settings tests cover exact duration-cache restoration and malformed-source write protection. Native coverage verifies new settings during candidate loading, old settings after provider failure, new settings after success and new settings after published cleanup failure.
+
+Both NeoForge 21.1.233 and 21.1.248 pass 34 reload checks. Clean test/build passes with 362 ordinary tests; Interactions audit tests pass with 100; no failures/errors/skips. Release archive inspection confirms independent mod contents and no reload/removal probes. All invoked handles completed; no unrelated server or production data was changed.
+
+Details: docs/reload-settings-2026-10-05.md. Skin-cache invalidation, arbitrary callback effects and all shop-publication failures are not claimed transactional. The full Citizens goal remains active.

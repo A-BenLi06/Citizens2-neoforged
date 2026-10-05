@@ -77,6 +77,23 @@ public class Settings {
         load();
     }
 
+    /** Capture live values for the enclosing NPC reload's pre-publication rollback. */
+    Runnable captureRuntimeRestore() {
+        Map<Setting, Object> values = new LinkedHashMap<>();
+        Map<Setting, Duration> durations = new LinkedHashMap<>();
+        for (Setting setting : Setting.values()) {
+            values.put(setting, setting.value);
+            durations.put(setting, setting.duration);
+        }
+        return () -> {
+            values.forEach((setting, value) -> {
+                setting.value = value;
+                setting.duration = durations.get(setting);
+            });
+            updateMessagingSettings();
+        };
+    }
+
     public void save() {
         if (!sourceAvailable) throw new IllegalStateException("Citizens configuration has not been loaded successfully");
         DataKey root = storage.getKey("");

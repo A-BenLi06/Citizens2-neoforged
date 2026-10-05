@@ -589,6 +589,8 @@ public class Citizens implements CitizensPlugin {
         }
         CitizensNPCRegistry candidate = null;
         StoredShops.PreparedLoad preparedShops = null;
+        Runnable restoreSettings = config.captureRuntimeRestore();
+        boolean publicationStarted = false;
         try {
             config.reload();
             if (shops != null) preparedShops = shops.prepareLoad();
@@ -601,6 +603,7 @@ public class Citizens implements CitizensPlugin {
             Editor.leaveAll();
             ChatPrompts.abandonAll();
             Throwable cleanupFailure = null;
+            publicationStarted = true;
             if (candidate != null) {
                 CitizensNPCRegistry previous = npcRegistry;
                 npcRegistry = candidate;
@@ -623,6 +626,12 @@ public class Citizens implements CitizensPlugin {
                     if (eventListen != null) eventListen.clearRespawnQueue(candidate);
                     candidate.retire();
                 } catch (RuntimeException | Error cleanup) {
+                    if (cleanup != failure) failure.addSuppressed(cleanup);
+                }
+            }
+            if (!publicationStarted) {
+                try { restoreSettings.run(); }
+                catch (RuntimeException | Error cleanup) {
                     if (cleanup != failure) failure.addSuppressed(cleanup);
                 }
             }
