@@ -85,10 +85,15 @@ public class SimpleMetadataStore implements MetadataStore {
 
     @Override
     public void loadFrom(DataKey key) {
+        loadFrom(key, true);
+    }
+
+    /** Blackboard names remain string keys even when they match built-in NPC metadata names. */
+    public void loadFrom(DataKey key, boolean resolveNPCKeys) {
         metadata.entrySet().removeIf(e -> e.getValue().persistent || e.getValue().temporary);
         npcMetadata.entrySet().removeIf(e -> e.getValue().persistent || e.getValue().temporary);
         for (DataKey sub : key.getSubKeys()) {
-            NPC.Metadata meta = Metadata.byKey(sub.name());
+            NPC.Metadata meta = resolveNPCKeys ? Metadata.byKey(sub.name()) : null;
             if (meta != null) {
                 npcMetadata.put(meta, new MetadataObject(sub.getRaw(""), true));
             } else {
@@ -110,18 +115,20 @@ public class SimpleMetadataStore implements MetadataStore {
     @Override
     public void saveTo(DataKey key) {
         Objects.requireNonNull(key, "key cannot be null");
+        Map<String, Object> values = new java.util.LinkedHashMap<>(key.getValuesDeep());
         for (Entry<String, MetadataObject> entry : metadata.entrySet()) {
             if (entry.getValue().persistent) {
-                key.setRaw(entry.getKey(), entry.getValue().value);
+                values.put(entry.getKey(), entry.getValue().value);
             }
         }
         for (Entry<NPC.Metadata, MetadataObject> entry : npcMetadata.entrySet()) {
             if (entry.getValue().persistent) {
-                key.setRaw(entry.getKey().getKey(), entry.getValue().value);
+                values.put(entry.getKey().getKey(), entry.getValue().value);
             } else if (entry.getValue().temporary && entry.getValue().savedValue != null) {
-                key.setRaw(entry.getKey().getKey(), entry.getValue().savedValue);
+                values.put(entry.getKey().getKey(), entry.getValue().savedValue);
             }
         }
+        key.setRaw("", values);
     }
 
     @Override

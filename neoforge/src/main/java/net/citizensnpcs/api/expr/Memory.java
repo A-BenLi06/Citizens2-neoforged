@@ -360,7 +360,8 @@ public class Memory {
         var values = new java.util.LinkedHashMap<>(candidate.getValuesDeep());
         values.replaceAll((name, value) -> decodeList(value));
         candidate.setRaw("", values);
-        store.loadFrom(candidate);
+        if (store instanceof SimpleMetadataStore nativeStore) nativeStore.loadFrom(candidate, false);
+        else store.loadFrom(candidate);
     }
 
     private static Object decodeList(Object value) {

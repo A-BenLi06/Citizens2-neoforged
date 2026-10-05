@@ -16,6 +16,8 @@ Recent follow-ups cover [`powered`, `name` and `home` options](command-options-h
 
 ## Behavior, data and integration acceptance
 
+- [Blackboard key identity](behavior-memory-key-identity-2026-10-06.md) keeps built-in-name collisions in the string key space and preserves dotted names during metadata saving. Tests cover native and injected storage plus ordinary typed-key compatibility. Custom-store contracts and ambiguous legacy nested data remain separate scope.
+
 - [Persistent blackboard lists](behavior-memory-lists-2026-10-05.md) now survive YAML save/load, including empty lists and null elements. Owned mutable copies isolate caller and snapshot state, and invalid list mutations cannot replace a previous save. Typed/string metadata-name interactions and custom-store acceptance remain open.
 
 - [Behavior blackboard enumeration](behavior-memory-keys-2026-10-05.md) now exposes real key snapshots and clears native storage, including typed/session entries. Saving removes deleted keys from the owned data section. List persistence and typed/string metadata-name interactions still need their own acceptance before claiming complete blackboard support.

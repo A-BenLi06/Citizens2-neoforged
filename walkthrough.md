@@ -1489,3 +1489,11 @@ Memory now encodes list entries during its own atomic save without widening Meta
 Three tests cover actual YAML round trips with empty/null-containing lists and appended values, mutable/immutable caller input and saved-snapshot isolation, and invalid mutation preserving the prior save. The first memory-only tests passed; upgrading to disk round-trip testing exposed numeric-map normalization, now handled explicitly. All 392 ordinary tests and the normal build pass with no failures/errors/skips; git diff --check passes. No fresh native/client acceptance is claimed. Production Interactions sources and packaging are unchanged; no unrelated server or original data was changed.
 
 Details: docs/behavior-memory-lists-2026-10-05.md. Typed/string metadata-name interactions and custom-store acceptance remain separate work. The full Citizens goal remains active.
+
+## 2026-10-06 00:17:44 +08:00 — Preserve blackboard string-key identity across metadata loading
+
+Native metadata loading now has an explicit string-key mode used by Memory, including injected SimpleMetadataStore instances. Blackboard names matching built-in NPC metadata no longer disappear into the typed key space. Ordinary NPC loading retains typed-name resolution. Metadata saving builds a map with literal names, preserving dotted scalar/list keys instead of turning them into nested paths.
+
+Three tests cover real YAML round trips with native-name collisions and dotted keys, injected stores and ordinary typed-key compatibility. Both NeoForge 21.1.233 and 21.1.248 pass 312 creation checks. Clean ordinary test/build passes with 395 tests; Interactions audit tests pass with 100; no failures/errors/skips. Release archives remain separate and exclude probes. All invoked handles completed; no unrelated server or original data was changed. An initial test compile typo used a wrapper method on a primitive double and was corrected before validation.
+
+Details: docs/behavior-memory-key-identity-2026-10-06.md. Ambiguous legacy nested data is not automatically flattened; custom providers retain their own contracts. The full Citizens goal remains active.
