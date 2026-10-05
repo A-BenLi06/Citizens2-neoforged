@@ -32,7 +32,8 @@ public abstract class Composite implements Behavior {
     }
 
     public void addBehavior(Behavior behavior) {
-        behaviors.add(behavior);
+        if (behavior instanceof ParallelBehavior) parallel.add(behavior);
+        else behaviors.add(behavior);
     }
 
     public List<Behavior> getBehaviors() {
@@ -41,6 +42,14 @@ public abstract class Composite implements Behavior {
 
     public void removeBehavior(Behavior behavior) {
         behaviors.remove(behavior);
+        parallel.remove(behavior);
+        if (parallelExecuting.remove(behavior)) stopExecution(behavior);
+    }
+
+    public void clearBehaviors() {
+        behaviors.clear();
+        parallel.clear();
+        reset();
     }
 
     @Override
@@ -61,7 +70,7 @@ public abstract class Composite implements Behavior {
 
     @Override
     public boolean shouldExecute() {
-        return behaviors.size() > 0;
+        return !behaviors.isEmpty() || !parallel.isEmpty();
     }
 
     protected void stopExecution(Behavior behavior) {
@@ -71,19 +80,19 @@ public abstract class Composite implements Behavior {
     }
 
     protected void tickParallel() {
-        for (Behavior b : parallel) {
+        for (Behavior b : List.copyOf(parallel)) {
             tryAddParallel(b);
         }
-        Iterator<Behavior> itr = parallelExecuting.iterator();
-        while (itr.hasNext()) {
-            Behavior behavior = itr.next();
+        for (Behavior behavior : List.copyOf(parallelExecuting)) {
+            if (!parallelExecuting.contains(behavior)) continue;
             BehaviorStatus status = behavior.run();
+            if (!parallelExecuting.contains(behavior)) continue;
             switch (status) {
                 case RESET_AND_REMOVE:
-                    behaviors.remove(behavior);
+                    parallel.remove(behavior);
                 case FAILURE:
                 case SUCCESS:
-                    itr.remove();
+                    parallelExecuting.remove(behavior);
                     stopExecution(behavior);
                     break;
                 default:
@@ -93,7 +102,8 @@ public abstract class Composite implements Behavior {
     }
 
     private void tryAddParallel(Behavior behavior) {
-        if (behavior.shouldExecute() && !parallelExecuting.contains(behavior)) {
+        if (!parallel.contains(behavior) || parallelExecuting.contains(behavior)) return;
+        if (behavior.shouldExecute() && parallel.contains(behavior) && !parallelExecuting.contains(behavior)) {
             parallelExecuting.add(behavior);
         }
     }

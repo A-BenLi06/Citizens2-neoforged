@@ -58,7 +58,7 @@ public class Selector extends Composite {
         BehaviorStatus status = null;
         if (executing == null) {
             if ((executing = getNextBehavior()) == null)
-                return BehaviorStatus.FAILURE;
+                return parallelExecuting.isEmpty() ? BehaviorStatus.FAILURE : BehaviorStatus.RUNNING;
 
             Behavior selected = executing;
             boolean ready = selected.shouldExecute();

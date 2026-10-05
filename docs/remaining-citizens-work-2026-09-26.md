@@ -16,6 +16,8 @@ Recent follow-ups cover [`powered`, `name` and `home` options](command-options-h
 
 ## Behavior, data and integration acceptance
 
+- [Dynamic parallel behavior lifecycle](parallel-behavior-lifecycle-2026-10-06.md) consistently routes additions/removals, prevents terminal children restarting and handles callback mutation through snapshots. Four controller tests cover parallel-only execution, clear and callback scheduling; other composite policies retain separate coverage.
+
 - [Behavior clear/reset recovery](behavior-clear-recovery-2026-10-06.md) detaches old execution references before reset callbacks and aggregates parallel/selected-child errors. Tests cover failed clears and callback-added replacements; other parallel scheduling behavior remains separate work.
 
 - [Behavior trait removal](behavior-trait-removal-2026-10-06.md) releases runtime roots and clears Selector execution ownership before reset callbacks. Tests cover active removal, reset exceptions and self-removal; native coverage verifies a removed trait stops executing. Parallel composites retain separate lifecycle work.
