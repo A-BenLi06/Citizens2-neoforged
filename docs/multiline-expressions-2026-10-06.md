@@ -8,3 +8,7 @@ Previously a multiline wrapper could be treated as a plain nonempty string, caus
 a condition to evaluate true without compiling its expression or rejecting an unknown
 engine. Three tests cover multiline arithmetic/false conditions, whitespace around
 the wrapper, unknown-engine rejection and case-independent engine selection.
+
+An additional filesystem test loads actual YAML literal (|) and folded (>) block
+scalars, verifying false conditions remain false and explicit-engine multiline
+arithmetic produces the expected result, including YAML's trailing newline.

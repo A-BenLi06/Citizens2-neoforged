@@ -1669,3 +1669,9 @@ Two tests cover YAML-loaded integer lists queried/removed by compiled expression
 Expression matching now supports line breaks and strips only surrounding wrapper whitespace for recognition/compilation. Multiline conditions are evaluated instead of becoming truthy literal strings, and unknown engines remain rejected. Engine-name case handling was inspected and already consistent; tests now cover it explicitly.
 
 Three tests cover multiline arithmetic/false conditions, YAML-style surrounding whitespace, unknown engines and mixed-case selection. All 465 ordinary tests and the normal build pass without failures/errors/skips; git diff --check passes. No fresh native/client run is claimed. Production Interactions sources and packaging are unchanged; no unrelated server or original data was changed. Details: docs/multiline-expressions-2026-10-06.md. The full Citizens goal remains active.
+
+## 2026-10-06 06:15:22 +08:00 — Verify YAML block expressions and native expression integration
+
+Added a real-file test for YAML literal and folded block scalars, ensuring multiline false conditions do not become truthy literals and explicit-engine arithmetic still evaluates correctly. Existing production code passes without additional changes.
+
+Both NeoForge 21.1.233 and 21.1.248 pass 320 native creation checks against the recent expression/behavior changes. Clean ordinary test/build passes with 466 tests; Interactions audit tests pass with 100; no failures/errors/skips. Release archives retain separate mod classes and exclude creation/reload/removal probes. All invoked handles completed; no unrelated server or original data was changed. Updated docs/multiline-expressions-2026-10-06.md. These checks strengthen integration evidence, not complete Citizens parity or physical-client acceptance. The full goal remains active.

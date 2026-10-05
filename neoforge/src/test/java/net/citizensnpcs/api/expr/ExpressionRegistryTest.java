@@ -17,6 +17,20 @@ import net.citizensnpcs.npc.ai.tree.MolangEngine;
  */
 public class ExpressionRegistryTest {
     @Test
+    public void yamlBlockScalarsKeepTheirExpressionMeaning(@org.junit.jupiter.api.io.TempDir java.nio.file.Path directory) throws Exception {
+        var file = directory.resolve("expressions.yml");
+        java.nio.file.Files.writeString(file,
+                "literal: |\n  `1 >\n  2`\nfolded: >\n  `1 >\n  2`\nnumber: |\n  MoLaNg`1 +\n  2`\n");
+        var storage = new net.citizensnpcs.api.util.YamlStorage(file.toFile());
+        assertTrue(storage.load());
+        var data = storage.getKey("");
+        var scope = new ExpressionScope();
+        assertFalse(registry.parseValue(data.getString("literal")).evaluateAsBoolean(scope));
+        assertFalse(registry.parseValue(data.getString("folded")).evaluateAsBoolean(scope));
+        assertEquals(3D, registry.parseValue(data.getString("number")).evaluateAsNumber(scope));
+    }
+
+    @Test
     public void multilineExpressionsRemainExpressionsInsteadOfTruthyLiterals() throws ExpressionCompileException {
         String source = " \n`1 +\n2`\n";
         assertTrue(registry.isPossiblyExpression(source));
