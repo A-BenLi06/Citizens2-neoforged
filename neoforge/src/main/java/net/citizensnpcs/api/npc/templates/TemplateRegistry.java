@@ -35,12 +35,26 @@ import net.minecraft.resources.ResourceLocation;
  */
 public class TemplateRegistry {
     private final Path baseFolder;
+    private final boolean strict;
     private final Map<ResourceLocation, Template> fullyQualifiedTemplates = new HashMap<>();
     private final Multimap<String, Template> templatesByName = HashMultimap.create();
 
     public TemplateRegistry(Path folder) {
+        this(folder, false);
+    }
+
+    /** Decode a complete replacement; callers publish it only after the rest of reload is ready. */
+    public static TemplateRegistry prepareReload(Path folder) {
+        return new TemplateRegistry(folder, true);
+    }
+
+    private TemplateRegistry(Path folder, boolean strict) {
+        this.strict = strict;
         this.baseFolder = folder;
-        folder.toFile().mkdirs();
+        if (strict) {
+            try { Files.createDirectories(folder); }
+            catch (IOException failure) { throw new IllegalStateException("Unable to open template folder " + folder, failure); }
+        } else folder.toFile().mkdirs();
         loadTemplates(baseFolder);
     }
 
@@ -117,6 +131,7 @@ public class TemplateRegistry {
                         try {
                             migrateOldTemplate(folder.toFile(), namespaceFile);
                         } catch (TemplateLoadException ex) {
+                            if (strict) throw new IllegalStateException("Unable to migrate template " + namespaceFile, ex);
                             Messaging.severe("Error migrating " + namespaceFile.getName() + ": " + ex.getMessage());
                         }
                     }
@@ -135,18 +150,21 @@ public class TemplateRegistry {
                                 try {
                                     loadTemplatesFromYamlFile(namespaceFile.getName(), templateFile);
                                 } catch (TemplateLoadException ex) {
+                                    if (strict) throw new IllegalStateException("Unable to load template file " + templateFile, ex);
                                     Messaging.severe(
                                             "Error loading " + templateFile.getName() + ": " + ex.getMessage());
                                 }
                             }
                         });
                     } catch (IOException ex) {
+                        if (strict) throw new IllegalStateException("Unable to read template namespace " + namespacePath, ex);
                         ex.printStackTrace();
                     }
                 });
             }
             Messaging.log("Loaded", fullyQualifiedTemplates.size(), "templates.");
         } catch (IOException ex) {
+            if (strict) throw new IllegalStateException("Unable to read template folder " + folder, ex);
             ex.printStackTrace();
         }
     }
@@ -184,6 +202,7 @@ public class TemplateRegistry {
         destination.save();
 
         if (!template.renameTo(new File(folder, template.getName() + ".migrated"))) {
+            if (strict) throw new IllegalStateException("Unable to finish template migration " + template);
             Messaging.severe("Could not rename " + template.getName() + " after migrating it - it will migrate again");
         }
     }

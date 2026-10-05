@@ -65,6 +65,20 @@ public class PersistenceLoader {
             else strictLoad.remove();
         }
     }
+
+    /** Construct a detached candidate through its registered persister without swallowing failures. */
+    public static <T> T loadStrict(Class<T> type, DataKey root) {
+        boolean previous = strictLoad.get();
+        strictLoad.set(true);
+        try {
+            T loaded = load(type, root);
+            if (loaded == null) throw new IllegalStateException("Could not load persisted object at " + root);
+            return loaded;
+        } finally {
+            if (previous) strictLoad.set(true);
+            else strictLoad.remove();
+        }
+    }
     private static class PersistenceLoaderPersister implements Persister<Object> {
         private final Class<?> clazz;
 

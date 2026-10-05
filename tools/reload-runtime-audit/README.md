@@ -35,7 +35,10 @@ must observe the published registry and every cleanup category must still execut
 Skin-cache coverage checks a fresh candidate cache, rollback after provider/shop
 failure, and commit after success using an invalid-name entry without HTTP access.
 
-Expected result: `[RELOADAUDIT] COMPLETE 45 checks` and `BUILD SUCCESSFUL`.
+Template coverage rejects malformed files before publication, retains old template,
+NPC and setting state, and publishes a repaired template on a later successful reload.
+
+Expected result: `[RELOADAUDIT] COMPLETE 47 checks` and `BUILD SUCCESSFUL`.
 The original implementation at `deb5021` fails `failed_reload_preserves_identity`.
 The fixture does not accept shutdown, full configuration/shop transactionality, or arbitrary
 external provider side effects as verified.

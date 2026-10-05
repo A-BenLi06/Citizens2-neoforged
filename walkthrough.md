@@ -1421,3 +1421,13 @@ Details: docs/reload-skin-cache-2026-10-05.md. Live HTTP completion and physical
 Reviewed lookup scheduling: the asynchronous fetch already queues entity/result handling onto the server scheduler. Extracted that existing handler into a package-private result method without changing the thread boundary. Two additional tests feed valid synthetic texture profiles through the same handler, verifying completion of an old request after rollback and rejection of an invalidated candidate request during a subsequent attempt.
 
 All 368 ordinary tests and the normal build pass with no failures/errors/skips; git diff --check passes. These tests validate actual result acceptance/data population rather than only cache identity. They do not perform live HTTP or physical-client rendering. No server was deployed or stopped, and Interactions production sources/packaging are unchanged. Updated docs/reload-skin-cache-2026-10-05.md. The full Citizens goal remains active.
+
+## 2026-10-05 21:45:34 +08:00 — Prepare complete template replacements before reload publication
+
+Added strict detached template-registry preparation before candidate NPC loading and installed prepared templates at publication. Malformed files, duplicate keys and directory/migration errors now reject reload without replacing old templates/NPCs/settings. The existing startup constructor keeps its per-file reporting policy. YAML replacement actions use a new strict type-construction overload through their persister rather than accepting null actions.
+
+Tests exposed an unnecessary global Citizens dependency in TemplateWorkspace: two unused folder fields initialized through CitizensAPI. Removed them so the namespace workspace uses only its supplied directory. Four tests now cover valid replacement loading, malformed YAML, duplicate-key diagnostics and a file occupying the template directory.
+
+Both NeoForge 21.1.233 and 21.1.248 pass 47 reload checks, including malformed-template preservation and repaired-template publication. All 372 ordinary tests and build pass; all 100 Interactions audit tests pass; no failures/errors/skips. Release archives preserve separate mod classes and exclude audit probes. All invoked handles completed; no unrelated server or production data was changed. An initial compile failure identified the missing strict type overload; an initial unit failure identified the unused global workspace dependency, both fixed before final validation.
+
+Details: docs/reload-templates-2026-10-05.md. Legacy migration disk effects and template application side effects remain separate work. The full Citizens goal remains active.

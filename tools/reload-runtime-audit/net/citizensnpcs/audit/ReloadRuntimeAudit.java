@@ -116,6 +116,15 @@ public final class ReloadRuntimeAudit {
         Setting.DEFAULT_NPC_LIMIT.set(37);
         var previousDuration = Setting.DEFAULT_RANDOM_LOOK_DELAY.asDuration();
         writeLimit(71);
+        var oldTemplates = plugin.getTemplateRegistry();
+        Path templateFolder = Files.createDirectories(plugin.getDataFolder().toPath().resolve("templates/reloadprobe"));
+        Path templateFile = templateFolder.resolve("probe.yml");
+        Files.writeString(templateFile, "broken: [unfinished\n");
+        try {
+            rejectedReload();
+            check(plugin.getTemplateRegistry() == oldTemplates && plugin.getNPCRegistry() == old
+                    && Setting.DEFAULT_NPC_LIMIT.asInt() == 37, "invalid_template_preserves_registry_templates_and_settings");
+        } finally { Files.writeString(templateFile, "valid: {}\n"); }
         store.afterLoad = registry -> {
             check(net.citizensnpcs.npc.skin.Skin.get("") != originalSkin, "candidate_load_uses_staged_skin_cache");
             check(Setting.DEFAULT_NPC_LIMIT.asInt() == 71, "candidate_load_sees_new_settings");
@@ -156,12 +165,15 @@ public final class ReloadRuntimeAudit {
         veto = true; plugin.reload(); veto = false;
         check(net.citizensnpcs.npc.skin.Skin.get("") != originalSkin, "successful_reload_commits_skin_cache");
         check(Setting.DEFAULT_NPC_LIMIT.asInt() == 71, "successful_reload_keeps_new_settings");
+        check(plugin.getTemplateRegistry().getTemplateByKey(
+                net.minecraft.resources.ResourceLocation.fromNamespaceAndPath("reloadprobe", "valid")) != null,
+                "successful_reload_publishes_repaired_templates");
         check(plugin.getNPCRegistry() != old, "success_publishes_new_registry");
         check(!old.iterator().hasNext() && old.getByUniqueId(world.getUniqueId()) == null, "old_indexes_released");
         check(world.getEntity() == null && entity.isRemoved() && virtual.getEntity() == null,
                 "retirement_overrides_despawn_veto");
         check(probe.removals == 1, "old_trait_removed_once");
-        check(store.reloads == 3 && store.clears == 0 && store.records.size() == 2, "reload_preserves_store_definitions");
+        check(store.reloads == 4 && store.clears == 0 && store.records.size() == 2, "reload_preserves_store_definitions");
     }
 
     private static void cleanupFailure() throws Exception {

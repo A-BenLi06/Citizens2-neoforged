@@ -58,7 +58,7 @@ public class Template {
             DataKey key) {
         Template template = new Template(identifier);
         if (key.keyExists("yaml_replace")) {
-            template.addAction(PersistenceLoader.load(YamlReplacementAction.class, key.getRelative("yaml_replace")));
+            template.addAction(PersistenceLoader.loadStrict(YamlReplacementAction.class, key.getRelative("yaml_replace")));
         }
         if (key.keyExists("traits")) {
             template.addAction(new TraitLoaderAction(errors, workspace, key.getRelative("traits")));

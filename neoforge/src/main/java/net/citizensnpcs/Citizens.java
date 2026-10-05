@@ -592,9 +592,11 @@ public class Citizens implements CitizensPlugin {
         Runnable restoreSettings = config.captureRuntimeRestore();
         boolean publicationStarted = false;
         Skin.CacheReload skinReload = null;
+        TemplateRegistry preparedTemplates = null;
         try {
             config.reload();
             if (shops != null) preparedShops = shops.prepareLoad();
+            preparedTemplates = TemplateRegistry.prepareReload(new File(dataFolder, "templates").toPath());
             skinReload = Skin.beginReload();
             if (saves != null && npcRegistry != null) {
                 candidate = new CitizensNPCRegistry(saves, this, "citizens-global-" + UUID.randomUUID());
@@ -611,6 +613,7 @@ public class Citizens implements CitizensPlugin {
             }
             publicationStarted = true;
             skinReload.commit();
+            templateRegistry = preparedTemplates;
             CitizensNPCRegistry previous = candidate == null ? null : npcRegistry;
             if (candidate != null) {
                 npcRegistry = candidate;
@@ -653,7 +656,6 @@ public class Citizens implements CitizensPlugin {
         } finally {
             if (skinReload != null) skinReload.close();
         }
-        templateRegistry = new TemplateRegistry(new File(dataFolder, "templates").toPath());
         LOGGER.info("Citizens reloaded.");
     }
 

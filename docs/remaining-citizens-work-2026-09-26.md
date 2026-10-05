@@ -16,6 +16,8 @@ Recent follow-ups cover [`powered`, `name` and `home` options](command-options-h
 
 ## Behavior, data and integration acceptance
 
+- [Template reload preparation](reload-templates-2026-10-05.md) validates a detached template collection before NPC publication. Invalid files retain old templates/NPCs/settings; repair and retry publish the new collection. Legacy migration disk effects and template application side effects remain separate work.
+
 - [Staged skin cache on reload](reload-skin-cache-2026-10-05.md) preserves old cache objects and pending recipients until publication and restores them after preparation failure. Candidate generations never reactivate on later retries. Tests cover cache ownership without HTTP; live lookup completion and physical-client rendering remain separate acceptance work.
 
 - [Reload session cleanup](reload-session-cleanup-2026-10-05.md) retains world editors and chat prompts through rejected shop preparation and closes them after new shop/NPC publication. Combined cleanup errors are retained without interrupting later cleanup categories; editor callbacks see the new registry. Physical-client interaction, skin-cache invalidation and arbitrary callback effects remain separate concerns.
