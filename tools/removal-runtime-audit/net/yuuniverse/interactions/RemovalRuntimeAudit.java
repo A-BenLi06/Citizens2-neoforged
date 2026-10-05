@@ -245,8 +245,19 @@ public final class RemovalRuntimeAudit {
             target.getOrAddTrait(net.citizensnpcs.trait.ShopTrait.class).getStorage().setUnlimited(false);
             target.getOrAddTrait(net.citizensnpcs.trait.ShopTrait.class).getStorage().setBalance(45);
             UUID targetUuid = target.getUniqueId(); int targetId = target.getId();
+            originalShop.displayEditor(target.getOrAddTrait(net.citizensnpcs.trait.ShopTrait.class), alice);
+            alice.containerMenu.clicked(10, 0, net.minecraft.world.inventory.ClickType.PICKUP, alice);
+            alice.containerMenu.getSlot(0).set(new ItemStack(Items.EMERALD, 3));
+            originalShop.displayEditor(null, bob);
+            bob.containerMenu.clicked(10, 0, net.minecraft.world.inventory.ClickType.PICKUP, bob);
+            bob.containerMenu.getSlot(0).set(new ItemStack(Items.DIAMOND, 9));
+            check(target.getOrAddTrait(net.citizensnpcs.trait.ShopTrait.class).getStorage().getContents().length == 0
+                    && originalShop.getStorage().getContents()[0].getCount() == 7,
+                    "stock_editor_changes_are_buffered_before_removal");
             CitizensAPI.getDefaultNPCSelector().select(a, control);
             ok(a, "npc remove " + targetId);
+            check(alice.containerMenu == alice.inventoryMenu && bob.containerMenu == bob.inventoryMenu,
+                    "removal_closes_both_stock_editors");
             check(exists(control) && !exists(target) && CitizensAPI.getDefaultNPCSelector().getSelected(a) == control,
                     "id_argument_does_not_delete_selected_npc");
             check(recorder.lastNpc == target && recorder.lastSource.getEntity() == alice, "removal_event_carries_command_sender");
@@ -276,8 +287,10 @@ public final class RemovalRuntimeAudit {
             check("audit.shop.view".equals(restoredShop.getRequiredPermission()), "undo_restores_shop_permission");
             check(restoredShop.getPages().size() == 2 && restoredShop.getPages().get(1).getItem(4) != null,
                     "undo_restores_shop_pages");
-            check(ItemStack.matches(restoredShop.getStorage().getContents()[0], new ItemStack(Items.DIAMOND, 7)),
+            check(ItemStack.matches(restoredShop.getStorage().getContents()[0], new ItemStack(Items.DIAMOND, 9)),
                     "undo_restores_shop_items");
+            check(ItemStack.matches(target.getOrAddTrait(net.citizensnpcs.trait.ShopTrait.class).getStorage()
+                    .getContents()[0], new ItemStack(Items.EMERALD, 3)), "undo_captures_buffered_private_stock");
             check(target != null && target.getUniqueId().equals(targetUuid) && target.getName().equals("Target")
                     && target.getOrAddTrait(Owner.class).isOwnedBy(alice.getUUID()), "undo_restores_identity_name_and_owner");
             CitizensAPI.getDefaultNPCSelector().select(a, control);

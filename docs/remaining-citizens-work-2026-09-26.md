@@ -16,6 +16,8 @@ Recent follow-ups cover [`powered`, `name` and `home` options](command-options-h
 
 ## Behavior, data and integration acceptance
 
+- [Independent shop undo](shop-undo-2026-10-05.md) restores default shop definitions, page structure and stock alongside removed NPCs. Both NeoForge versions pass 74 removal checks, including buffered edits in simultaneous private/global stock editors and canceled creation that replaces a shop. Full trait-load transactionality, throwing/load callback variants and custom registry contracts remain targeted work.
+
 - [Exact item receipts](exact-item-receipts-2026-10-05.md) now preserve actual component variants across filtered payments, finite-stock rewards and refunds. Capacity uses actual variants, refunds cannot consume a different loosely matching item, and per-execution receipts prevent repeated refunds. Six unit tests and 11 native checks on each NeoForge version cover this. External item changes, physical-client/provider acceptance and full reload transactionality remain separate work.
 
 - [Experience transactions](experience-transactions-2026-10-05.md) now reject negative/overflowing level amounts and recheck execution/refund bounds before vanilla level changes. Three arithmetic tests and 49 native checks on each NeoForge version cover late affordability, preserved XP fields, shift purchases and rollback. External changes that prevent refunds, physical-client/provider acceptance and full reload transactionality remain separate work.
