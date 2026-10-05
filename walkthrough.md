@@ -1515,3 +1515,9 @@ Two tests cover Unicode Character assignment and real YAML text round-trip, plus
 Memory listSize/listContains/listGet now inspect existing values instead of using the list-creating getter. Ineffective listRemove/listRemoveAt also preserve missing/scalar state. listSet checks negative indexes before creating/replacing a list. Explicit list creation and successful mutations retain their behavior.
 
 Three tests cover missing/scalar queries, ineffective and successful removals, and negative-index failure plus valid expansion. All 402 ordinary tests and the normal build pass without failures/errors/skips; git diff --check passes. No fresh native/client run is claimed. Production Interactions sources and packaging are unchanged; no unrelated server or original data was changed. Details: docs/behavior-memory-list-queries-2026-10-06.md. The full Citizens goal remains active.
+
+## 2026-10-06 00:58:06 +08:00 — Preserve string values through Molang blackboard bindings
+
+Molang mem.set/get and list.add/get/contains/remove now retain string values rather than coercing every input/result to a number. Existing number conversion uses the same primitive path. String defaults survive mem.get without creating a missing key. list.remove_at reports successful removal by index validity, including a null slot.
+
+Two compiled-expression tests exercise actual Mocha/Molang bindings for string round trips, defaults and list operations, plus null removal and non-mutating queries. All 404 ordinary tests and the normal build pass without failures/errors/skips, including the existing numeric behavior-expression tests; git diff --check passes. No fresh native/client run is claimed. Production Interactions sources and packaging are unchanged; no unrelated server or original data was changed. Details: docs/molang-memory-types-2026-10-06.md. The full Citizens goal remains active.

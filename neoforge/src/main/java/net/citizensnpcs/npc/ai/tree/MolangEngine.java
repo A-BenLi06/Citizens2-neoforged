@@ -461,7 +461,7 @@ public class MolangEngine implements ExpressionEngine {
         binding.set("add", (Function<?>) (context, args) -> {
             if (memory == null || args.length() < 2)
                 return NumberValue.zero();
-            memory.listAdd(args.next().eval().getAsString(), args.next().eval().getAsNumber());
+            memory.listAdd(args.next().eval().getAsString(), memoryValue(args.next().eval()));
             return NumberValue.of(1);
         });
 
@@ -469,7 +469,7 @@ public class MolangEngine implements ExpressionEngine {
         binding.set("remove", (Function<?>) (context, args) -> {
             if (memory == null || args.length() < 2)
                 return NumberValue.zero();
-            return memory.listRemove(args.next().eval().getAsString(), args.next().eval().getAsNumber())
+            return memory.listRemove(args.next().eval().getAsString(), memoryValue(args.next().eval()))
                     ? NumberValue.of(1)
                     : NumberValue.zero();
         });
@@ -478,8 +478,11 @@ public class MolangEngine implements ExpressionEngine {
         binding.set("remove_at", (Function<?>) (context, args) -> {
             if (memory == null || args.length() < 2)
                 return NumberValue.zero();
-            return memory.listRemoveAt(args.next().eval().getAsString(),
-                    (int) args.next().eval().getAsNumber()) != null ? NumberValue.of(1) : NumberValue.zero();
+            String key = args.next().eval().getAsString();
+            int index = (int) args.next().eval().getAsNumber();
+            if (index < 0 || index >= memory.listSize(key)) return NumberValue.zero();
+            memory.listRemoveAt(key, index);
+            return NumberValue.of(1);
         });
 
         // list.clear(key)
@@ -502,14 +505,14 @@ public class MolangEngine implements ExpressionEngine {
             if (memory == null || args.length() < 2)
                 return NumberValue.zero();
             Object value = memory.listGet(args.next().eval().getAsString(), (int) args.next().eval().getAsNumber());
-            return value instanceof Number number ? NumberValue.of(number.doubleValue()) : NumberValue.zero();
+            return toMochaValue(value);
         });
 
         // list.contains(key, value)
         binding.set("contains", (Function<?>) (context, args) -> {
             if (memory == null || args.length() < 2)
                 return NumberValue.zero();
-            return memory.listContains(args.next().eval().getAsString(), args.next().eval().getAsNumber())
+            return memory.listContains(args.next().eval().getAsString(), memoryValue(args.next().eval()))
                     ? NumberValue.of(1)
                     : NumberValue.zero();
         });
@@ -525,9 +528,9 @@ public class MolangEngine implements ExpressionEngine {
             if (memory == null || args.length() < 2)
                 return NumberValue.zero();
             String key = args.next().eval().getAsString();
-            double value = args.next().eval().getAsNumber();
+            Object value = memoryValue(args.next().eval());
             memory.set(key, value);
-            return NumberValue.of(value);
+            return toMochaValue(value);
         });
 
         // mem.get(key) or mem.get(key, default)
@@ -535,8 +538,8 @@ public class MolangEngine implements ExpressionEngine {
             if (memory == null || args.length() < 1)
                 return NumberValue.zero();
             String key = args.next().eval().getAsString();
-            double defaultValue = args.length() > 1 ? args.next().eval().getAsNumber() : 0;
-            return NumberValue.of(memory.getNumber(key, defaultValue));
+            Object defaultValue = args.length() > 1 ? memoryValue(args.next().eval()) : 0D;
+            return toMochaValue(memory.get(key, defaultValue));
         });
 
         // mem.has(key)
@@ -567,6 +570,12 @@ public class MolangEngine implements ExpressionEngine {
             return stack;
         }
         return ItemStorage.parseItemStack(value.getAsString(), amount);
+    }
+
+    private static Object memoryValue(Value value) {
+        if (value instanceof StringValue) return value.getAsString();
+        if (value instanceof NumberValue) return value.getAsNumber();
+        throw new IllegalArgumentException("Blackboard expressions require a string or number value");
     }
 
     /** Converts a Java object to a Mocha value. */

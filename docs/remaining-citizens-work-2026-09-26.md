@@ -16,6 +16,8 @@ Recent follow-ups cover [`powered`, `name` and `home` options](command-options-h
 
 ## Behavior, data and integration acceptance
 
+- [Molang blackboard value types](molang-memory-types-2026-10-06.md) preserve strings through mem/list bindings instead of coercing them to zero. Compiled-expression tests cover round trips, defaults, list searches/removal and null-slot success reporting; existing numeric expression regressions remain passing.
+
 - [Blackboard list query isolation](behavior-memory-list-queries-2026-10-06.md) prevents read-only list helpers and ineffective removals from creating or replacing values. Invalid negative-index writes fail before mutation; focused Memory tests verify ordinary list operations still work.
 
 - [Blackboard reload replacement](behavior-memory-reload-2026-10-06.md) now removes stale native scalar/list entries absent from the incoming snapshot, with preparation failure preserving old contents. Ordinary NPC metadata transient policy is unchanged; custom-store loading remains provider-defined.
