@@ -13,3 +13,9 @@ self-removal during admission, and throwing reset during clear.
 
 These are direct sequence tests. Arbitrary nested controller execution from reset
 callbacks and external provider side effects are not covered by a transaction claim.
+
+Terminal and rejected-admission reset callbacks may start a successor. Sequence now
+keeps that active successor rather than advancing again or reporting the old failure.
+A run revision detects nested execution during admission/execution, preventing the
+outer invocation from running a callback-started successor twice. Two tests cover
+all terminal statuses and rejected admission with a running successor.

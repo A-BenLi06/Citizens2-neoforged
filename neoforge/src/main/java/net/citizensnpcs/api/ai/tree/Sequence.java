@@ -10,6 +10,7 @@ import java.util.List;
 public class Sequence extends Composite {
     private Behavior executing;
     private int executingIndex = -1;
+    private long runRevision;
 
     private Sequence(Behavior... behaviors) {
         this(Arrays.asList(behaviors));
@@ -52,10 +53,13 @@ public class Sequence extends Composite {
 
     @Override
     public BehaviorStatus run() {
+        long revision = ++runRevision;
         tickParallel();
+        if (runRevision != revision) return BehaviorStatus.RUNNING;
         List<Behavior> behaviors = getBehaviors();
         if (executing == null) {
             BehaviorStatus next = selectNext(behaviors);
+            if (runRevision != revision) return BehaviorStatus.RUNNING;
             if (next != BehaviorStatus.RUNNING) {
                 resetCurrent();
                 return next;
@@ -64,17 +68,17 @@ public class Sequence extends Composite {
         if (executing == null) return BehaviorStatus.RUNNING;
         Behavior current = executing;
         BehaviorStatus status = current.run();
-        if (executing != current) return BehaviorStatus.RUNNING;
+        if (runRevision != revision || executing != current) return BehaviorStatus.RUNNING;
         switch (status) {
             case FAILURE:
                 resetCurrent();
-                return BehaviorStatus.FAILURE;
+                return executing == null ? BehaviorStatus.FAILURE : BehaviorStatus.RUNNING;
             case RESET_AND_REMOVE:
                 removeBehavior(current);
-                return selectNext(behaviors);
+                return executing == null ? selectNext(behaviors) : BehaviorStatus.RUNNING;
             case SUCCESS:
                 resetCurrent();
-                return selectNext(behaviors);
+                return executing == null ? selectNext(behaviors) : BehaviorStatus.RUNNING;
             default:
                 return status;
         }
@@ -89,7 +93,7 @@ public class Sequence extends Composite {
         if (executing != selected) return BehaviorStatus.RUNNING;
         if (!ready) {
             resetCurrent();
-            return BehaviorStatus.FAILURE;
+            return executing == null ? BehaviorStatus.FAILURE : BehaviorStatus.RUNNING;
         }
         return BehaviorStatus.RUNNING;
     }

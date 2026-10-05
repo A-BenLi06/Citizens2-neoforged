@@ -1603,3 +1603,9 @@ Two tests verify all three throwing reset callbacks execute with retained errors
 Selector now clears terminal execution ownership before child reset in SUCCESS, FAILURE and RESET_AND_REMOVE paths. Throwing cleanup cannot leave the completed child as active. If a reset callback starts a replacement, the outer call preserves it and reports RUNNING.
 
 Two tests cover all three terminal states with cleanup failure and a reset callback that starts a replacement through the selector. All 434 ordinary tests and the normal build pass without failures/errors/skips; git diff --check passes. No fresh native/client run is claimed. Production Interactions sources and packaging are unchanged; no unrelated server or original data was changed. Updated docs/behavior-clear-recovery-2026-10-06.md. The full Citizens goal remains active.
+
+## 2026-10-06 04:16:14 +08:00 — Preserve Sequence successors started inside reset callbacks
+
+Sequence completion/admission-failure cleanup now retains a successor started by the reset callback instead of advancing past it or clearing it. Run revisions detect nested execution so the outer admission path cannot immediately run that successor a second time.
+
+Two tests cover SUCCESS, FAILURE and RESET_AND_REMOVE callbacks plus rejected admission, checking no skipped/reset successor and exactly one successor run per invocation. All 436 ordinary tests and the normal build pass without failures/errors/skips; git diff --check passes. No fresh native/client run is claimed. Production Interactions sources and packaging are unchanged; no unrelated server or original data was changed. Updated docs/sequence-removal-2026-10-06.md. The full Citizens goal remains active.
