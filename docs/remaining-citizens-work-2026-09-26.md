@@ -16,6 +16,8 @@ Recent follow-ups cover [`powered`, `name` and `home` options](command-options-h
 
 ## Behavior, data and integration acceptance
 
+- [Staged skin cache on reload](reload-skin-cache-2026-10-05.md) preserves old cache objects and pending recipients until publication and restores them after preparation failure. Candidate generations never reactivate on later retries. Tests cover cache ownership without HTTP; live lookup completion and physical-client rendering remain separate acceptance work.
+
 - [Reload session cleanup](reload-session-cleanup-2026-10-05.md) retains world editors and chat prompts through rejected shop preparation and closes them after new shop/NPC publication. Combined cleanup errors are retained without interrupting later cleanup categories; editor callbacks see the new registry. Physical-client interaction, skin-cache invalidation and arbitrary callback effects remain separate concerns.
 
 - [Reload shop publication](reload-shop-publication-2026-10-05.md) checks and publishes shop maps before replacing the NPC registry. Stale preparation preserves old NPCs/settings; old-session cleanup errors still allow consistent new shop/NPC publication with aggregated errors. Editor closure, skin-cache invalidation and arbitrary provider effects remain separate concerns.

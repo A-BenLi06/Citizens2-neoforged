@@ -591,10 +591,11 @@ public class Citizens implements CitizensPlugin {
         StoredShops.PreparedLoad preparedShops = null;
         Runnable restoreSettings = config.captureRuntimeRestore();
         boolean publicationStarted = false;
+        Skin.CacheReload skinReload = null;
         try {
             config.reload();
             if (shops != null) preparedShops = shops.prepareLoad();
-            Skin.clearCache();
+            skinReload = Skin.beginReload();
             if (saves != null && npcRegistry != null) {
                 candidate = new CitizensNPCRegistry(saves, this, "citizens-global-" + UUID.randomUUID());
                 // A provider may fail after constructing some NPCs. Keep those objects isolated until loading succeeds.
@@ -609,6 +610,7 @@ public class Citizens implements CitizensPlugin {
                 }
             }
             publicationStarted = true;
+            skinReload.commit();
             CitizensNPCRegistry previous = candidate == null ? null : npcRegistry;
             if (candidate != null) {
                 npcRegistry = candidate;
@@ -648,6 +650,8 @@ public class Citizens implements CitizensPlugin {
             if (failure instanceof Error error) throw error;
             throw new NPCLoadException(candidate != null && npcRegistry == candidate
                     ? "NPCs restored, but previous runtime cleanup failed" : "Could not restore NPCs", failure);
+        } finally {
+            if (skinReload != null) skinReload.close();
         }
         templateRegistry = new TemplateRegistry(new File(dataFolder, "templates").toPath());
         LOGGER.info("Citizens reloaded.");

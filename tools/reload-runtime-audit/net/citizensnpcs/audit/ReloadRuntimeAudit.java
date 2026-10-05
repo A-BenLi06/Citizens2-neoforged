@@ -41,6 +41,7 @@ public final class ReloadRuntimeAudit {
     private static NPC world, virtual, queued;
     private static Entity entity, packetEntity;
     private static Probe probe;
+    private static net.citizensnpcs.npc.skin.Skin originalSkin;
     private static int started, reloaded, passed, events;
     private static boolean done, forced, veto;
     private static final List<NPC> candidates = new ArrayList<>();
@@ -102,6 +103,7 @@ public final class ReloadRuntimeAudit {
     }
 
     private static void failedReload() throws Exception {
+        originalSkin = net.citizensnpcs.npc.skin.Skin.get("");
         var editorPlayer = new net.minecraft.server.level.ServerPlayer(server, level,
                 new com.mojang.authlib.GameProfile(UUID.randomUUID(), "ReloadEditor"),
                 net.minecraft.server.level.ClientInformation.createDefault());
@@ -115,6 +117,7 @@ public final class ReloadRuntimeAudit {
         var previousDuration = Setting.DEFAULT_RANDOM_LOOK_DELAY.asDuration();
         writeLimit(71);
         store.afterLoad = registry -> {
+            check(net.citizensnpcs.npc.skin.Skin.get("") != originalSkin, "candidate_load_uses_staged_skin_cache");
             check(Setting.DEFAULT_NPC_LIMIT.asInt() == 71, "candidate_load_sees_new_settings");
             check(plugin.getNPCRegistry() == old, "old_binding_visible_during_load");
             for (NPC npc : registry) candidates.add(npc);
@@ -124,6 +127,7 @@ public final class ReloadRuntimeAudit {
             throw new IllegalStateException("expected provider reload failure");
         };
         NPCLoadException failure = rejectedReload();
+        check(net.citizensnpcs.npc.skin.Skin.get("") == originalSkin, "failed_provider_restores_skin_cache");
         check(Setting.DEFAULT_NPC_LIMIT.asInt() == 37
                 && Setting.DEFAULT_RANDOM_LOOK_DELAY.asDuration() == previousDuration,
                 "failed_reload_restores_runtime_settings_and_duration_cache");
@@ -138,6 +142,7 @@ public final class ReloadRuntimeAudit {
         check(store.clears == 0 && store.records.size() == 2, "failure_preserves_records");
         store.afterLoad = registry -> plugin.getShops().storeShops();
         NPCLoadException stale = rejectedReload();
+        check(net.citizensnpcs.npc.skin.Skin.get("") == originalSkin, "failed_shop_preflight_restores_skin_cache");
         check(stale.getCause().getMessage().contains("Shop source changed"), "stale_shop_candidate_rejected");
         check(plugin.getNPCRegistry() == old && world.getEntity() == entity && !entity.isRemoved()
                 && Setting.DEFAULT_NPC_LIMIT.asInt() == 37,
@@ -149,6 +154,7 @@ public final class ReloadRuntimeAudit {
 
     private static void successfulReload() throws Exception {
         veto = true; plugin.reload(); veto = false;
+        check(net.citizensnpcs.npc.skin.Skin.get("") != originalSkin, "successful_reload_commits_skin_cache");
         check(Setting.DEFAULT_NPC_LIMIT.asInt() == 71, "successful_reload_keeps_new_settings");
         check(plugin.getNPCRegistry() != old, "success_publishes_new_registry");
         check(!old.iterator().hasNext() && old.getByUniqueId(world.getUniqueId()) == null, "old_indexes_released");

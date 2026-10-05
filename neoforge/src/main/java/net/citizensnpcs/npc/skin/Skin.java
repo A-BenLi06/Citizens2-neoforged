@@ -50,7 +50,7 @@ public class Skin {
      * @return true if the texture was applied now
      */
     public boolean apply(EntityHumanNPC entity) {
-        if (!isValid || retired || cacheGeneration != generation)
+        if (!isValid || !isCurrent())
             return false;
         if (skinData == null) {
             synchronized (pending) {
@@ -105,7 +105,7 @@ public class Skin {
         lookup.whenComplete((result, failure) -> {
             // completes on the profile-lookup thread; entity state must only be touched on the main thread
             scheduler.runTask(() -> {
-                if (retired || cacheGeneration != generation) return;
+                if (!isCurrent()) return;
                 if (failure != null || result == null || result.isEmpty()) {
                     isValid = false;
                     synchronized (pending) { pending.clear(); }
@@ -156,7 +156,7 @@ public class Skin {
                 EntityHumanNPC entity = entry.getKey();
                 Pending request = entry.getValue();
                 NPC npc = entity.getNPC();
-                if (!retired && cacheGeneration == generation && !entity.isRemoved() && npc != null && npc.getCosmeticEntity() == entity
+                if (isCurrent() && !entity.isRemoved() && npc != null && npc.getCosmeticEntity() == entity
                         && npc.getOwningRegistry().getByUniqueId(npc.getUniqueId()) == npc
                         && npc.getOwningRegistry().getById(npc.getId()) == npc
                         && npc.getTraitNullable(SkinTrait.class) == request.trait
@@ -169,11 +169,68 @@ public class Skin {
         }
     }
 
+    boolean isCurrent() { return !retired && cacheGeneration == generation; }
+
     public static void clearCache() {
         synchronized (CACHE) {
-            generation++;
-            CACHE.values().forEach(skin -> { skin.retired = true; synchronized (skin.pending) { skin.pending.clear(); } });
+            if (activeReload != null) throw new IllegalStateException("Skin cache reload is in progress");
+            generation = ++nextGeneration;
+            retire(CACHE);
             CACHE.clear();
+        }
+    }
+
+    private static void retire(Map<String, Skin> skins) {
+        skins.values().forEach(skin -> {
+            skin.retired = true;
+            synchronized (skin.pending) { skin.pending.clear(); }
+        });
+    }
+
+    /** Stage fresh lookups while retaining the previous cache for a failed NPC reload. */
+    public static CacheReload beginReload() {
+        synchronized (CACHE) {
+            if (activeReload != null) throw new IllegalStateException("Skin cache reload is in progress");
+            CacheReload reload = new CacheReload(new HashMap<>(CACHE), generation);
+            CACHE.clear();
+            generation = ++nextGeneration;
+            activeReload = reload;
+            return reload;
+        }
+    }
+
+    public static final class CacheReload implements AutoCloseable {
+        private final Map<String, Skin> previous;
+        private final long previousGeneration;
+        private boolean finished;
+
+        private CacheReload(Map<String, Skin> previous, long previousGeneration) {
+            this.previous = previous;
+            this.previousGeneration = previousGeneration;
+        }
+
+        public void commit() {
+            synchronized (CACHE) {
+                if (finished || activeReload != this) throw new IllegalStateException("Skin cache reload is no longer active");
+                retire(previous);
+                previous.clear();
+                finished = true;
+                activeReload = null;
+            }
+        }
+
+        @Override public void close() {
+            synchronized (CACHE) {
+                if (finished) return;
+                if (activeReload != this) throw new IllegalStateException("Skin cache reload lost ownership");
+                retire(CACHE);
+                CACHE.clear();
+                CACHE.putAll(previous);
+                previous.clear();
+                generation = previousGeneration;
+                finished = true;
+                activeReload = null;
+            }
         }
     }
 
@@ -204,6 +261,8 @@ public class Skin {
 
     private static final Map<String, Skin> CACHE = new HashMap<>(20);
     private static long generation;
+    private static long nextGeneration;
+    private static CacheReload activeReload;
     private record Pending(SkinTrait trait, long revision) { }
     public static final String CACHED_SKIN_UUID_METADATA = "cached-skin-uuid";
     public static final String CACHED_SKIN_UUID_NAME_METADATA = "cached-skin-uuid-name";

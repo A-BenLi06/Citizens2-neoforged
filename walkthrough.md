@@ -1407,3 +1407,11 @@ Moved world-editor and chat-prompt closure after shop and NPC registry publicati
 Native tests use a synthetic player with real session registries to verify preflight retention, throwing editor and prompt abandonment, exactly-once closure, new-registry visibility and retention of all four cleanup failures. Both NeoForge 21.1.233 and 21.1.248 pass 41 reload checks. Clean ordinary test/build passes with 362 tests; Interactions audit tests pass with 100; no failures/errors/skips. Release archives remain separate and exclude all reload/removal probes. All invoked handles completed; no unrelated server or production data was changed.
 
 Details: docs/reload-session-cleanup-2026-10-05.md. Physical-client interaction, arbitrary callback side effects and skin-cache invalidation remain separate work. The full Citizens goal remains active.
+
+## 2026-10-05 21:11:25 +08:00 — Stage skin-cache invalidation until reload publication
+
+NPC reload now opens a scoped candidate skin cache instead of clearing the old cache immediately. Commit retires old entries; rollback retires candidate entries and restores previous cache objects/generation, preserving pending recipient maps. Generation allocation remains monotonic across rollback so invalidated candidate lookups cannot become current in later attempts. Nested full resets/reloads are rejected while a scope owns the cache; finished scope closure cannot undo a later scope.
+
+Four cache tests cover identity rollback, commit/late-close isolation, nested resets and stale generations including entries already removed by name invalidation. Both NeoForge 21.1.233 and 21.1.248 pass 45 reload checks, verifying fresh candidate cache, provider/shop failure rollback and success commit. Tests deliberately use invalid-name cache entries without network lookups. Clean ordinary test/build passes with 366 tests; Interactions audit tests pass with 100; no failures/errors/skips. Release archives remain separate and exclude all audit probes. All invoked handles completed; no unrelated server or original data was changed.
+
+Details: docs/reload-skin-cache-2026-10-05.md. Live HTTP completion and physical-client rendering are not claimed verified by these cache-ownership tests. The full Citizens goal remains active.
