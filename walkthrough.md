@@ -1431,3 +1431,9 @@ Tests exposed an unnecessary global Citizens dependency in TemplateWorkspace: tw
 Both NeoForge 21.1.233 and 21.1.248 pass 47 reload checks, including malformed-template preservation and repaired-template publication. All 372 ordinary tests and build pass; all 100 Interactions audit tests pass; no failures/errors/skips. Release archives preserve separate mod classes and exclude audit probes. All invoked handles completed; no unrelated server or production data was changed. An initial compile failure identified the missing strict type overload; an initial unit failure identified the unused global workspace dependency, both fixed before final validation.
 
 Details: docs/reload-templates-2026-10-05.md. Legacy migration disk effects and template application side effects remain separate work. The full Citizens goal remains active.
+
+## 2026-10-05 21:53:04 +08:00 — Publish generated templates consistently through both indexes
+
+Template generation now validates one detached NPC snapshot before saving and updates its full-key and bare-name indexes only after the write succeeds. It no longer reloads sibling entries as duplicates or leaves stale name-index objects. Existing definitions retain their source file and literal YAML key (case/dots included); new definitions use the namespace templates file. Replacement snapshots clear stale fields and omit UUID.
+
+Three file-based tests cover repeat overwrite with siblings, both indexes, literal key/source preservation, stale field removal and snapshot failure preserving disk/index state. All 375 ordinary tests and the normal build pass with no failures/errors/skips; git diff --check passes. NPC snapshot calls use an interface test double; no fresh native/client run is claimed for this batch. Production Interactions sources and packaging are unchanged. No unrelated server or original data was changed. Details: docs/template-generation-2026-10-05.md. The full Citizens goal remains active.

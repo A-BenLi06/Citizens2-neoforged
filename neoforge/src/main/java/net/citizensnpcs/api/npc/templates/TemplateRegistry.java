@@ -20,6 +20,7 @@ import net.citizensnpcs.api.util.DataKey;
 import net.citizensnpcs.api.util.Messaging;
 import net.citizensnpcs.api.util.Storage;
 import net.citizensnpcs.api.util.YamlStorage;
+import net.citizensnpcs.api.util.MemoryDataKey;
 import net.minecraft.resources.ResourceLocation;
 
 /**
@@ -38,6 +39,8 @@ public class TemplateRegistry {
     private final boolean strict;
     private final Map<ResourceLocation, Template> fullyQualifiedTemplates = new HashMap<>();
     private final Multimap<String, Template> templatesByName = HashMultimap.create();
+    private final Map<ResourceLocation, File> templateSources = new HashMap<>();
+    private final Map<ResourceLocation, String> templateSourceKeys = new HashMap<>();
 
     public TemplateRegistry(Path folder) {
         this(folder, false);
@@ -58,27 +61,40 @@ public class TemplateRegistry {
         loadTemplates(baseFolder);
     }
 
-    /** Writes an NPC out as a {@code yaml_replace} template, then reloads the file it landed in. */
+    /** Validates and saves one NPC snapshot template, then publishes it through both lookup indexes. */
     public void generateTemplateFromNPC(ResourceLocation key, NPC npc) {
         File namespaceFolder = new File(baseFolder.toFile(), key.getNamespace());
-        namespaceFolder.mkdirs();
-        File generatedFile = new File(namespaceFolder, "templates.yml");
+        File generatedFile = templateSources.getOrDefault(key, new File(namespaceFolder, "templates.yml"));
+        generatedFile.getParentFile().mkdirs();
+        String storedKey = templateSourceKeys.getOrDefault(key, key.getPath());
         Storage templateStorage = new YamlStorage(generatedFile);
         if (!templateStorage.load())
             throw new IllegalStateException("could not load " + generatedFile);
 
-        DataKey root = templateStorage.getKey(key.getPath()).getRelative("yaml_replace");
-        npc.save(root.getRelative("replacements"));
+        Map<String, Object> entries = new java.util.LinkedHashMap<>(templateStorage.getKey("").getValuesDeep());
+        DataKey candidate = new MemoryDataKey();
+        Object existing = entries.get(storedKey);
+        if (existing != null) candidate.setRaw("", existing);
+        DataKey root = candidate.getRelative("yaml_replace");
+        root.removeKey("replacements");
+        npc.saveSnapshot(root.getRelative("replacements"));
         root.setBoolean("override", true);
         // the uuid is the one thing that must not be copied: two NPCs sharing it would collide in the registry
         root.removeKey("replacements.uuid");
-        templateStorage.save();
+        Template replacement;
         try {
-            fullyQualifiedTemplates.remove(key);
-            loadTemplatesFromYamlFile(key.getNamespace(), generatedFile);
+            replacement = decodeTemplate(generatedFile.getParentFile(), key, candidate);
         } catch (TemplateLoadException ex) {
-            Messaging.severe("Error reloading generated template " + key + ": " + ex.getMessage());
+            throw new IllegalStateException("Unable to validate generated template " + key, ex);
         }
+        entries.put(storedKey, candidate.getRaw(""));
+        templateStorage.getKey("").setRaw("", entries);
+        templateStorage.save();
+        Template previous = fullyQualifiedTemplates.put(key, replacement);
+        if (previous != null) templatesByName.remove(key.getPath(), previous);
+        templatesByName.put(key.getPath(), replacement);
+        templateSources.put(key, generatedFile);
+        templateSourceKeys.put(key, storedKey);
     }
 
     public Collection<Template> getAllTemplates() {
@@ -98,7 +114,7 @@ public class TemplateRegistry {
         return fullyQualifiedTemplates.keySet().stream().anyMatch(k -> k.getNamespace().equals(namespace));
     }
 
-    private void loadTemplate(File folder, String namespace, DataKey key) throws TemplateLoadException {
+    private void loadTemplate(File file, String namespace, DataKey key) throws TemplateLoadException {
         String path = key.name().toLowerCase(Locale.ROOT);
         ResourceLocation namespacedKey = ResourceLocation.tryBuild(namespace.toLowerCase(Locale.ROOT), path);
         if (namespacedKey == null)
@@ -107,6 +123,14 @@ public class TemplateRegistry {
         if (fullyQualifiedTemplates.containsKey(namespacedKey))
             throw new TemplateLoadException("Duplicate template key " + namespacedKey);
 
+        Template template = decodeTemplate(file.getParentFile(), namespacedKey, key);
+        fullyQualifiedTemplates.put(namespacedKey, template);
+        templatesByName.put(namespacedKey.getPath(), template);
+        templateSources.put(namespacedKey, file);
+        templateSourceKeys.put(namespacedKey, key.name());
+    }
+
+    private Template decodeTemplate(File folder, ResourceLocation namespacedKey, DataKey key) throws TemplateLoadException {
         TemplateErrorReporter errors = new TemplateErrorReporter();
         Template template;
         try {
@@ -118,8 +142,7 @@ public class TemplateRegistry {
         if (!errors.errors.isEmpty())
             throw new TemplateLoadException(Joiner.on('\n').join(errors.errors));
 
-        fullyQualifiedTemplates.put(namespacedKey, template);
-        templatesByName.put(namespacedKey.getPath(), template);
+        return template;
     }
 
     private void loadTemplates(Path folder) {
@@ -175,7 +198,7 @@ public class TemplateRegistry {
             throw new TemplateLoadException("Unable to load " + file.getName());
 
         for (DataKey templateKey : storage.getKey("").getSubKeys()) {
-            loadTemplate(file.getParentFile(), namespace, templateKey);
+            loadTemplate(file, namespace, templateKey);
         }
     }
 
