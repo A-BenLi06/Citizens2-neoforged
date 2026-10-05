@@ -1573,3 +1573,9 @@ Four new sequence tests cover terminal removal, removal of earlier/current child
 ParallelComposite now admits children before its first completion check and admits them only once per cycle. It waits for active siblings without restarting completed children, resets for another cycle, and honors permanent RESET_AND_REMOVE. Other composites retain recurring parallel admission through the default tick mode.
 
 Three direct tests cover completion timing, reset/removal and empty composites; a parser test verifies both expressions inside a YAML parallel container actually execute. All 425 ordinary tests and the normal build pass without failures/errors/skips; git diff --check passes. No fresh native/client run is claimed. Production Interactions sources and packaging are unchanged; no unrelated server or original data was changed. Details: docs/parallel-composite-cycles-2026-10-06.md. The full Citizens goal remains active.
+
+## 2026-10-06 02:52:44 +08:00 — Release IfElse branches before reset and verify parallel cycle replacement
+
+IfElse now clears its active branch reference before invoking reset, so a throwing callback cannot retain stale cleanup ownership. A focused test verifies reset is not repeated and a different branch can execute afterward. Added a parallel-composite callback-clear test verifying old siblings stop and a new child starts only in the next cycle.
+
+All 427 ordinary tests and the normal build pass without failures/errors/skips; git diff --check passes. No fresh native/client run is claimed. Production Interactions sources and packaging are unchanged; no unrelated server or original data was changed. Updated docs/behavior-clear-recovery-2026-10-06.md. The full Citizens goal remains active.

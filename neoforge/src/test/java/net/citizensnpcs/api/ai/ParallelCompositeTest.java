@@ -6,6 +6,26 @@ import org.junit.jupiter.api.Test;
 import net.citizensnpcs.api.ai.tree.*;
 
 class ParallelCompositeTest {
+    @Test void callbackClearStopsOldSiblingsAndAllowsANewCycle() {
+        final ParallelComposite[] owner = new ParallelComposite[1];
+        var next = new Child();
+        var first = new Child() {
+            @Override public BehaviorStatus run() {
+                calls++;
+                owner[0].clearBehaviors();
+                owner[0].addBehavior(new ParallelBehaviorWrapper(next));
+                return BehaviorStatus.SUCCESS;
+            }
+        };
+        var skipped = new Child();
+        owner[0] = new ParallelComposite(List.of(new ParallelBehaviorWrapper(first), new ParallelBehaviorWrapper(skipped)));
+        assertEquals(BehaviorStatus.SUCCESS, owner[0].run());
+        assertEquals(1, first.resets); assertEquals(1, skipped.resets);
+        assertEquals(0, skipped.calls); assertEquals(0, next.calls);
+        assertEquals(BehaviorStatus.RUNNING, owner[0].run());
+        assertEquals(1, next.calls);
+    }
+
     private static class Child implements Behavior {
         int calls, resets;
         BehaviorStatus status = BehaviorStatus.RUNNING;

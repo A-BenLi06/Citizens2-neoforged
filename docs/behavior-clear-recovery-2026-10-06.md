@@ -13,3 +13,8 @@ Three tests cover clear failure, callback-added replacement behavior, and combin
 parallel/selected-child reset failures with error aggregation. These exercise core
 controllers directly; arbitrary callback side effects and parallel scheduling outside
 reset are separate concerns.
+
+IfElse also detaches its active branch before reset, preventing repeated cleanup
+when that callback throws. A test verifies another branch can subsequently execute.
+An additional ParallelComposite test clears its children from an execution callback,
+verifies old siblings stop, and starts a callback-added child in the next cycle.

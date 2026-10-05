@@ -19,10 +19,9 @@ public class IfElse implements Behavior {
 
     @Override
     public void reset() {
-        if (executing != null) {
-            executing.reset();
-            executing = null;
-        }
+        Behavior previous = executing;
+        executing = null;
+        if (previous != null) previous.reset();
     }
 
     @Override
