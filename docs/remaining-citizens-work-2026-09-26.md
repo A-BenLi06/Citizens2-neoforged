@@ -16,7 +16,7 @@ Recent follow-ups cover [`powered`, `name` and `home` options](command-options-h
 
 ## Behavior, data and integration acceptance
 
-- [Bulk removal lifecycle](bulk-removal-lifecycle-2026-10-05.md) completes disposal across callback failures and reports the accumulated error after cleanup. Native removal coverage now has 81 checks on both NeoForge versions, including restoration after two throwing cleanup callbacks. External callback effects and save-backend recovery remain separate contracts.
+- [Bulk removal lifecycle](bulk-removal-lifecycle-2026-10-05.md) completes disposal across callback failures and reports the accumulated error after cleanup. Native removal coverage now has 82 checks on both NeoForge versions, including restoration after two throwing cleanup callbacks and preservation of callback-created NPCs. External callback effects and save-backend recovery remain separate contracts.
 
 - [Undo history callback boundaries](undo-history-2026-10-05.md) reject sender reentry and bound bulk undo to entries present at invocation. Callback-added entries survive, explicit discards are respected, and a failed batch preserves remaining retry order without repeating completed entries. Six focused history tests cover these contracts; external callback effects are outside this history boundary.
 

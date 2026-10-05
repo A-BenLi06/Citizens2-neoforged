@@ -19,3 +19,9 @@ Native removal checks inject throwing cleanup into two NPCs and verify both trai
 sets are cleared, the correct removal reason is delivered, the default registry is
 empty, and bulk undo restores both traits from history. Ordinary save-backend failures
 are still reported; arbitrary external callback effects are not rolled back.
+
+The fixture also creates an NPC from the first failing cleanup callback. The new
+instance must retain both ID and UUID bindings after the original batch completes.
+It is explicitly removed by the fixture before checking the emptied original
+registry and undoing the batch. This tests live registry mutation without making the
+new NPC part of the original deletion request.

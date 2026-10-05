@@ -1365,3 +1365,9 @@ Registry-wide removal now processes a fixed initial set through the common NPC d
 The native fixture injects throwing cleanup into two NPCs, verifies both trait sets are cleared with the original removal reason and the registry emptied, then verifies bulk undo restores both saved traits. All 81 removal checks pass on NeoForge 21.1.233 and 21.1.248. Clean ordinary test/build passes with 360 tests; Interactions audit tests pass with 100; no failures/errors/skips. Release archives remain separate and exclude the audit probe. All invoked handles completed; no unrelated server or original data was changed.
 
 Details: docs/bulk-removal-lifecycle-2026-10-05.md. Arbitrary external callback effects and backend write recovery remain separate contracts. The full Citizens goal remains active.
+
+## 2026-10-05 19:57:45 +08:00 — Verify callback-created NPCs survive an existing removal batch
+
+Expanded the native bulk-removal probe so its first throwing trait cleanup creates another NPC in the same registry. The new NPC must retain its ID and UUID bindings, while both original failing NPCs complete disposal. The fixture then explicitly removes the survivor and verifies the original removal history can still restore the batch. No production change was needed.
+
+All 82 removal checks pass on NeoForge 21.1.233 and 21.1.248. Clean ordinary test/build passes with 360 tests and no failures/errors/skips. Release archives keep Citizens and Interactions separate and contain no removal probe. All invoked handles completed; no unrelated server or original data was changed. Updated the current backlog and bulk-removal documentation. Arbitrary provider side effects and save-backend recovery remain separate work; the full Citizens goal stays active.

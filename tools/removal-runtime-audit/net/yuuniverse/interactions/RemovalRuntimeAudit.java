@@ -552,10 +552,16 @@ public final class RemovalRuntimeAudit {
             BrokenBulkRemoval.fail = true;
             BrokenBulkRemoval.calls = 0;
             BrokenBulkRemoval.correctReasons = true;
+            BrokenBulkRemoval.createdDuringCleanup = null;
             try { reject(b, "npc remove all"); }
             finally { BrokenBulkRemoval.fail = false; }
             check(BrokenBulkRemoval.calls == 2 && BrokenBulkRemoval.correctReasons && !failingFirst.getTraits().iterator().hasNext()
                     && !failingSecond.getTraits().iterator().hasNext(), "bulk_removal_finishes_all_lifecycles_after_callback_failure");
+            NPC survivor = BrokenBulkRemoval.createdDuringCleanup;
+            check(survivor != null && registry.getById(survivor.getId()) == survivor
+                    && registry.getByUniqueId(survivor.getUniqueId()) == survivor,
+                    "bulk_removal_preserves_callback_created_npc");
+            survivor.destroy();
             check(!registry.iterator().hasNext() && named.iterator().hasNext(), "upstream_all_permission_clears_only_default_registry");
             ok(b, "npc undo all"); all.remove();
             check(registry.getByUniqueId(failingFirst.getUniqueId()).hasTrait(BrokenBulkRemoval.class)
@@ -671,11 +677,16 @@ public final class RemovalRuntimeAudit {
         static boolean fail;
         static int calls;
         static boolean correctReasons;
+        static NPC createdDuringCleanup;
         public BrokenBulkRemoval() { super("bulkremovalaudit"); }
         @Override public void onRemove(net.citizensnpcs.api.npc.RemoveReason reason) {
             calls++;
             correctReasons &= reason == net.citizensnpcs.api.npc.RemoveReason.REMOVAL;
             if (fail) {
+                if (createdDuringCleanup == null) {
+                    createdDuringCleanup = npc.getOwningRegistry().createNPC(EntityType.PIG, "CreatedDuringCleanup");
+                    createdDuringCleanup.getOrAddTrait(Spawned.class).setSpawned(false);
+                }
                 throw new IllegalStateException("Injected bulk cleanup failure");
             }
         }
