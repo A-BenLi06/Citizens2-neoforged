@@ -22,10 +22,7 @@ import net.citizensnpcs.api.event.SpawnReason;
 import net.citizensnpcs.api.npc.NPC;
 import net.citizensnpcs.api.npc.NPCDataStore;
 import net.citizensnpcs.api.npc.NPCRegistry;
-import net.citizensnpcs.api.npc.RemoveReason;
-import net.citizensnpcs.api.trait.Trait;
 import net.citizensnpcs.api.trait.trait.MobType;
-import net.citizensnpcs.api.util.EventBusUtil;
 import net.citizensnpcs.api.util.Location;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.world.entity.Entity;
@@ -157,20 +154,19 @@ public class CitizensNPCRegistry implements NPCRegistry {
 
     @Override
     public void deregisterAll() {
-        for (NPC npc : this) npc.validateRemoval();
-        Iterator<NPC> itr = iterator();
-        while (itr.hasNext()) {
-            NPC npc = itr.next();
-            npc.despawn(DespawnReason.REMOVAL);
-            for (Trait t : npc.getTraits()) {
-                EventBusUtil.unregister(t);
-                t.onRemove(RemoveReason.REMOVAL);
-            }
-            itr.remove();
-            if (saves != null && dataOperation != DataOperation.LOAD) {
-                saves.clearData(npc);
+        var pending = new java.util.ArrayList<>(npcs.values());
+        pending.forEach(NPC::validateRemoval);
+        Throwable failure = null;
+        for (NPC npc : pending) {
+            if (npcs.get(npc.getId()) != npc && uniqueNPCs.get(npc.getUniqueId()) != npc) continue;
+            try { ((CitizensNPC) npc).removeFromRegistry(); }
+            catch (RuntimeException | Error cleanup) {
+                if (failure == null) failure = cleanup;
+                else if (failure != cleanup) failure.addSuppressed(cleanup);
             }
         }
+        if (failure instanceof RuntimeException exception) throw exception;
+        if (failure instanceof Error error) throw error;
     }
 
     @Override

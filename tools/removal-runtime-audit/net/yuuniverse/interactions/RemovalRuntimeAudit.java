@@ -152,6 +152,7 @@ public final class RemovalRuntimeAudit {
             NeoForge.EVENT_BUS.register(recorder);
             CitizensAPI.getTraitFactory().registerTrait(brokenInfo);
             CitizensAPI.getTraitFactory().registerTrait(restoreInfo);
+            CitizensAPI.getTraitFactory().registerTrait(TraitInfo.create(BrokenBulkRemoval.class).withName("bulkremovalaudit"));
             add(this::basicCommands);
             steps.add(() -> {
                 NPC restored = registry.getByUniqueId(spawnedRestore);
@@ -544,9 +545,22 @@ public final class RemovalRuntimeAudit {
             reject(a, "npc remove all");
             check(registry.iterator().hasNext(), "remove_all_requires_its_own_permission");
             var all = grant(bob, "citizens.admin.remove.all");
-            ok(b, "npc remove all");
+            NPC failingFirst = npc(registry, bob.getUUID(), "FailingBulkA", null);
+            NPC failingSecond = npc(registry, bob.getUUID(), "FailingBulkB", null);
+            failingFirst.addTrait(BrokenBulkRemoval.class);
+            failingSecond.addTrait(BrokenBulkRemoval.class);
+            BrokenBulkRemoval.fail = true;
+            BrokenBulkRemoval.calls = 0;
+            BrokenBulkRemoval.correctReasons = true;
+            try { reject(b, "npc remove all"); }
+            finally { BrokenBulkRemoval.fail = false; }
+            check(BrokenBulkRemoval.calls == 2 && BrokenBulkRemoval.correctReasons && !failingFirst.getTraits().iterator().hasNext()
+                    && !failingSecond.getTraits().iterator().hasNext(), "bulk_removal_finishes_all_lifecycles_after_callback_failure");
             check(!registry.iterator().hasNext() && named.iterator().hasNext(), "upstream_all_permission_clears_only_default_registry");
             ok(b, "npc undo all"); all.remove();
+            check(registry.getByUniqueId(failingFirst.getUniqueId()).hasTrait(BrokenBulkRemoval.class)
+                    && registry.getByUniqueId(failingSecond.getUniqueId()).hasTrait(BrokenBulkRemoval.class),
+                    "bulk_cleanup_failures_retain_complete_undo_history");
             check(registry.getByUniqueId(temporaryId) != null && !registry.getByUniqueId(temporaryId).data().get(NPC.Metadata.SHOULD_SAVE, true),
                     "bulk_undo_restores_temporary_npcs_too");
             var legacyAll = grant(bob, "citizens.npc.remove.all");
@@ -651,6 +665,19 @@ public final class RemovalRuntimeAudit {
         public BrokenRestore() { super("restoreauditfailure"); }
         @Override public void load(DataKey key) {
             if (fail) throw new IllegalStateException("Injected trait restoration failure");
+        }
+    }
+    public static class BrokenBulkRemoval extends Trait {
+        static boolean fail;
+        static int calls;
+        static boolean correctReasons;
+        public BrokenBulkRemoval() { super("bulkremovalaudit"); }
+        @Override public void onRemove(net.citizensnpcs.api.npc.RemoveReason reason) {
+            calls++;
+            correctReasons &= reason == net.citizensnpcs.api.npc.RemoveReason.REMOVAL;
+            if (fail) {
+                throw new IllegalStateException("Injected bulk cleanup failure");
+            }
         }
     }
     private static class AuditPlayer extends ServerPlayer {

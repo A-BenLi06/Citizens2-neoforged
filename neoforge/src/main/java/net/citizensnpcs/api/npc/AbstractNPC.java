@@ -174,7 +174,16 @@ public abstract class AbstractNPC implements NPC {
         dispose(releaseEntity, null, true);
     }
 
+    /** Registry-wide removal keeps its removal reason and does not emit a per-command removal event. */
+    protected final void disposeFromRegistry(Runnable releaseEntity) {
+        dispose(releaseEntity, () -> registry.deregister(this), false, RemoveReason.REMOVAL);
+    }
+
     private void dispose(Runnable beforeTraits, Runnable afterTraits, boolean retiring) {
+        dispose(beforeTraits, afterTraits, retiring, RemoveReason.DESTROYED);
+    }
+
+    private void dispose(Runnable beforeTraits, Runnable afterTraits, boolean retiring, RemoveReason reason) {
         if (destroyed) return;
         destroyed = true;
         Throwable[] failure = { null };
@@ -187,7 +196,7 @@ public abstract class AbstractNPC implements NPC {
             if (getTraitNullable(trait.getClass()) == trait)
                 finishCleanup(() -> {
                     if (retiring) trait.onRetire();
-                    else trait.onRemove(RemoveReason.DESTROYED);
+                    else trait.onRemove(reason);
                 }, failure);
         });
         traits.clear();

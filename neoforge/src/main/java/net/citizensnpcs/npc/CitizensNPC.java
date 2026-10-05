@@ -97,21 +97,27 @@ public class CitizensNPC extends AbstractNPC {
 
     /** Registry replacement is final even when a listener vetoes despawning or throws during cleanup. */
     void retire() {
-        retire(() -> {
-            Throwable[] failure = { null };
-            finishCleanup(() -> despawn(DespawnReason.RELOAD), failure);
-            if (getEntity() != null) {
-                EntityController controller = entityController;
-                Entity entity = getEntity();
-                finishCleanup(() -> new DespawnOperation(DespawnReason.RELOAD).complete(), failure);
-                if (entityController == controller && getEntity() == entity) {
-                    finishCleanup(() -> NPCRegistries.unlink(entity), failure);
-                    finishCleanup(controller::remove, failure);
-                }
+        retire(() -> releaseEntity(DespawnReason.RELOAD));
+    }
+
+    void removeFromRegistry() {
+        disposeFromRegistry(() -> releaseEntity(DespawnReason.REMOVAL));
+    }
+
+    private void releaseEntity(DespawnReason reason) {
+        Throwable[] failure = { null };
+        finishCleanup(() -> despawn(reason), failure);
+        if (getEntity() != null) {
+            EntityController controller = entityController;
+            Entity entity = getEntity();
+            finishCleanup(() -> new DespawnOperation(reason).complete(), failure);
+            if (entityController == controller && getEntity() == entity) {
+                finishCleanup(() -> NPCRegistries.unlink(entity), failure);
+                finishCleanup(controller::remove, failure);
             }
-            if (failure[0] instanceof RuntimeException exception) throw exception;
-            if (failure[0] instanceof Error error) throw error;
-        });
+        }
+        if (failure[0] instanceof RuntimeException exception) throw exception;
+        if (failure[0] instanceof Error error) throw error;
     }
 
     @Override

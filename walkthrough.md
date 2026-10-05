@@ -1357,3 +1357,11 @@ Replaced the command's unbounded history-draining loop with CommandHistory.undoA
 Three additional history tests cover same-object re-registration, partial batch failure/retry order, and callback discards. All 360 ordinary tests pass without failures/errors/skips; clean build succeeds. Native removal regression passes 79 checks on each of NeoForge 21.1.233 and 21.1.248, including real undo-all commands. Release archive inspection confirms independent Citizens/Interactions classes and no removal probe. All invoked handles completed. No unrelated server or production data was changed.
 
 Details: docs/undo-history-2026-10-05.md. This is sequential batch recovery, not rollback of arbitrary external callback effects or earlier successful undos. Full Citizens completion remains active.
+
+## 2026-10-05 19:49:38 +08:00 — Complete bulk NPC disposal across cleanup failures
+
+Registry-wide removal now processes a fixed initial set through the common NPC disposal lifecycle. It validates before mutation, skips instances that have lost registry ownership, completes remaining cleanup after callback errors, and reports accumulated failures. Bulk removal preserves RemoveReason.REMOVAL and its event contract. Runtime/entity release shares the existing forced cleanup path with registry retirement while retaining separate saved-data and trait-retirement semantics.
+
+The native fixture injects throwing cleanup into two NPCs, verifies both trait sets are cleared with the original removal reason and the registry emptied, then verifies bulk undo restores both saved traits. All 81 removal checks pass on NeoForge 21.1.233 and 21.1.248. Clean ordinary test/build passes with 360 tests; Interactions audit tests pass with 100; no failures/errors/skips. Release archives remain separate and exclude the audit probe. All invoked handles completed; no unrelated server or original data was changed.
+
+Details: docs/bulk-removal-lifecycle-2026-10-05.md. Arbitrary external callback effects and backend write recovery remain separate contracts. The full Citizens goal remains active.
