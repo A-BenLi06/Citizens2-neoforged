@@ -125,6 +125,7 @@ public final class RemovalRuntimeAudit {
         final AtomicInteger recoveredItemRewards = new AtomicInteger();
         final RemovalRecorder recorder = new RemovalRecorder();
         final TraitInfo brokenInfo = TraitInfo.create(BrokenSnapshot.class).withName("removalauditfailure");
+        final TraitInfo restoreInfo = TraitInfo.create(BrokenRestore.class).withName("restoreauditfailure");
         boolean isolated;
         NPCRegistry named;
         AuditPlayer alice, bob;
@@ -150,7 +151,7 @@ public final class RemovalRuntimeAudit {
             grant(alice, "citizens.npc.undo"); grant(bob, "citizens.npc.undo");
             NeoForge.EVENT_BUS.register(recorder);
             CitizensAPI.getTraitFactory().registerTrait(brokenInfo);
-            CitizensAPI.getTraitFactory().registerTrait(TraitInfo.create(BrokenRestore.class).withName("restoreauditfailure"));
+            CitizensAPI.getTraitFactory().registerTrait(restoreInfo);
             add(this::basicCommands);
             steps.add(() -> {
                 NPC restored = registry.getByUniqueId(spawnedRestore);
@@ -297,6 +298,13 @@ public final class RemovalRuntimeAudit {
             finally { BrokenRestore.fail = false; }
             check(registry.getById(targetId) == null && registry.getByUniqueId(targetUuid) == null
                     && !shops.npcShops.containsKey(targetUuid.toString()), "failed_trait_restore_cleans_provisional_npc_and_shop");
+            CitizensAPI.getTraitFactory().deregisterTrait(restoreInfo);
+            try {
+                reject(a, "npc undo");
+                check(registry.getById(targetId) == null && registry.getByUniqueId(targetUuid) == null
+                        && !shops.npcShops.containsKey(targetUuid.toString()),
+                        "missing_trait_provider_rejects_undo_without_partial_publication");
+            } finally { CitizensAPI.getTraitFactory().registerTrait(restoreInfo); }
             ok(a, "npc undo"); target = registry.getById(targetId);
             check(target.getOrAddTrait(BrokenRestore.class).value == 67, "failed_trait_restore_retains_snapshot_for_retry");
             var restoredShop = target.getOrAddTrait(net.citizensnpcs.trait.ShopTrait.class).getDefaultShop();
