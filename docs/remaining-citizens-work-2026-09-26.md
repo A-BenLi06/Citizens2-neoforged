@@ -16,6 +16,8 @@ Recent follow-ups cover [`powered`, `name` and `home` options](command-options-h
 
 ## Behavior, data and integration acceptance
 
+- [Blackboard list query isolation](behavior-memory-list-queries-2026-10-06.md) prevents read-only list helpers and ineffective removals from creating or replacing values. Invalid negative-index writes fail before mutation; focused Memory tests verify ordinary list operations still work.
+
 - [Blackboard reload replacement](behavior-memory-reload-2026-10-06.md) now removes stale native scalar/list entries absent from the incoming snapshot, with preparation failure preserving old contents. Ordinary NPC metadata transient policy is unchanged; custom-store loading remains provider-defined.
 
 - [Blackboard key identity](behavior-memory-key-identity-2026-10-06.md) keeps built-in-name collisions in the string key space and preserves dotted names during metadata saving. Tests cover native and injected storage plus ordinary typed-key compatibility. Custom-store contracts and ambiguous legacy nested data remain separate scope.

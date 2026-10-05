@@ -1509,3 +1509,9 @@ Two tests cover old scalar/list removal, list-to-scalar replacement, empty loads
 Aligned SimpleMetadataStore's persistent primitive validation with Memory's declared Character support. Character values can now be assigned without failing in the backing store. Unsupported objects remain rejected before existing values are changed.
 
 Two tests cover Unicode Character assignment and real YAML text round-trip, plus invalid-object rejection preserving a prior character. All 399 ordinary tests and the normal build pass with no failures/errors/skips; git diff --check passes. YAML's standard character-as-string representation is retained rather than adding Java-specific type tags. No new native/client run is claimed. Production Interactions sources and packaging are unchanged; no unrelated server or original data was changed. Details: docs/behavior-memory-characters-2026-10-06.md. The full Citizens goal remains active.
+
+## 2026-10-06 00:45:30 +08:00 — Keep list queries and failed indexed writes from mutating blackboard state
+
+Memory listSize/listContains/listGet now inspect existing values instead of using the list-creating getter. Ineffective listRemove/listRemoveAt also preserve missing/scalar state. listSet checks negative indexes before creating/replacing a list. Explicit list creation and successful mutations retain their behavior.
+
+Three tests cover missing/scalar queries, ineffective and successful removals, and negative-index failure plus valid expansion. All 402 ordinary tests and the normal build pass without failures/errors/skips; git diff --check passes. No fresh native/client run is claimed. Production Interactions sources and packaging are unchanged; no unrelated server or original data was changed. Details: docs/behavior-memory-list-queries-2026-10-06.md. The full Citizens goal remains active.

@@ -263,7 +263,7 @@ public class Memory {
      * @return true if the list contains the item
      */
     public boolean listContains(String key, Object item) {
-        return getList(key).contains(item);
+        return existingList(key).contains(item);
     }
 
     /**
@@ -276,7 +276,7 @@ public class Memory {
      * @return the item, or null if index out of bounds
      */
     public Object listGet(String key, int index) {
-        List<Object> list = getList(key);
+        List<?> list = existingList(key);
         if (index >= 0 && index < list.size()) {
             return list.get(index);
         }
@@ -293,8 +293,8 @@ public class Memory {
      * @return true if the item was removed
      */
     public boolean listRemove(String key, Object item) {
-        List<Object> list = getList(key);
-        return list.remove(item);
+        List<?> list = existingList(key);
+        return !list.isEmpty() && list.remove(item);
     }
 
     /**
@@ -307,7 +307,7 @@ public class Memory {
      * @return the removed item, or null if index out of bounds
      */
     public Object listRemoveAt(String key, int index) {
-        List<Object> list = getList(key);
+        List<?> list = existingList(key);
         if (index >= 0 && index < list.size()) {
             return list.remove(index);
         }
@@ -327,6 +327,7 @@ public class Memory {
      *             if item is not primitive
      */
     public void listSet(String key, int index, Object item) {
+        if (index < 0) throw new IndexOutOfBoundsException("List index must be non-negative: " + index);
         if (item != null && !isPrimitive(item)) {
             throw new IllegalArgumentException("List items must be primitive types");
         }
@@ -346,7 +347,12 @@ public class Memory {
      * @return the list size
      */
     public int listSize(String key) {
-        return getList(key).size();
+        return existingList(key).size();
+    }
+
+    private List<?> existingList(String key) {
+        Object value = store.get(key);
+        return value instanceof List<?> list ? list : java.util.Collections.emptyList();
     }
 
     /**
