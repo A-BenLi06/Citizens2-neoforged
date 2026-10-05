@@ -44,6 +44,18 @@ public class InventoryMultiplexer {
         return inventory;
     }
 
+    /** Capacity of a source slot for this item, including the container's placement policy. */
+    public int getSlotLimit(int index, ItemStack stack) {
+        requireLayout();
+        if (index < 0 || index >= inventory.length) throw new IndexOutOfBoundsException(index);
+        for (int i = 0; i < sources.size(); i++) {
+            if (index < sizes[i]) return sources.get(i).canPlaceItem(index, stack)
+                    ? Math.max(0, sources.get(i).getMaxStackSize(stack)) : 0;
+            index -= sizes[i];
+        }
+        throw new AssertionError("Unmapped inventory slot");
+    }
+
     /** Re-reads the real containers, discarding anything staged but not written. */
     public void refresh() {
         if (writing) throw new IllegalStateException("Inventory transaction is already in progress");

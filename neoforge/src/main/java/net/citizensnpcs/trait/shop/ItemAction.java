@@ -6,7 +6,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
-import java.util.stream.IntStream;
 
 import com.google.common.base.Joiner;
 
@@ -57,17 +56,17 @@ public class ItemAction extends NPCShopAction {
         return result;
     }
 
-    /** Whether there is room to hand over {@code items.size() * repeats} stacks. */
+    /** Simulate the same bounded placement that will be used during publication. */
     private boolean canAccept(InventoryMultiplexer im, int repeats) {
-        int free = 0;
-        for (ItemStack stack : im.getInventory()) {
-            if (isEmpty(stack)) {
-                free++;
-            }
-        }
-        return free >= items.size() * repeats;
+        return addItems(copy(im.getInventory()), repeats, im::getSlotLimit);
     }
 
+    private static ItemStack[] copy(ItemStack[] source) {
+        return Arrays.stream(source).map(stack -> isEmpty(stack) ? ItemStack.EMPTY : stack.copy()).toArray(ItemStack[]::new);
+    }
+
+    @FunctionalInterface
+    private interface SlotLimit { int get(int slot, ItemStack stack); }
     @Override
     public String describe() {
         if (hasUnavailableItems()) return Messaging.tr("citizens.items.unavailable");
@@ -86,79 +85,109 @@ public class ItemAction extends NPCShopAction {
 
     @Override
     public int getMaxRepeats(Entity entity, InventoryMultiplexer im) {
-        if (hasUnavailableItems()) return 0;
-        ItemStack[] inventory = im.getInventory();
-        List<Integer> req = items.stream().map(ItemStack::getCount).collect(Collectors.toList());
-        List<Integer> has = items.stream().map(i -> 0).collect(Collectors.toList());
-        for (ItemStack toMatch : inventory) {
-            if (isEmpty(toMatch) || tooDamaged(toMatch))
-                continue;
-            for (int j = 0; j < items.size(); j++) {
-                if (!matches(items.get(j), toMatch))
-                    continue;
-                has.set(j, has.get(j) + toMatch.getCount());
-                break;
-            }
+        if (hasUnavailableItems() || items.isEmpty()) return 0;
+        long required = items.stream().mapToLong(ItemStack::getCount).sum();
+        long available = Arrays.stream(im.getInventory()).filter(stack -> !isEmpty(stack) && !tooDamaged(stack))
+                .mapToLong(ItemStack::getCount).sum();
+        int low = 0, high = (int) Math.min(Integer.MAX_VALUE, available / required);
+        while (low < high) {
+            int middle = low + (int) (((long) high - low + 1) / 2);
+            if (takeItems(im.getInventory(), middle, false)) low = middle;
+            else high = middle - 1;
         }
-        return IntStream.range(0, req.size()).map(i -> req.get(i) == 0 ? 0 : has.get(i) / req.get(i)).reduce(Math::min)
-                .orElse(0);
+        return low;
     }
 
-    /** Adds the items to the array, merging into partial stacks first and then filling empty slots. */
-    private void giveItems(ItemStack[] inventory, int repeats) {
-        for (int i = 0; i < repeats; i++) {
-            List<ItemStack> toAdd = items.stream().map(ItemStack::copy).collect(Collectors.toList());
-            for (int j = 0; j < inventory.length; j++) {
-                if (toAdd.isEmpty())
-                    return;
-                if (isEmpty(inventory[j]))
-                    continue;
-                ItemStack last = toAdd.get(toAdd.size() - 1);
-                if (!ItemStack.isSameItemSameComponents(inventory[j], last)
-                        || inventory[j].getCount() >= inventory[j].getMaxStackSize())
-                    continue;
-                int diff = inventory[j].getMaxStackSize() - inventory[j].getCount();
-                if (diff >= last.getCount()) {
-                    inventory[j].setCount(inventory[j].getCount() + last.getCount());
-                    toAdd.remove(toAdd.size() - 1);
-                } else {
-                    inventory[j].setCount(inventory[j].getCount() + diff);
-                    last.setCount(last.getCount() - diff);
-                }
+    private boolean addItems(ItemStack[] inventory, int repeats, SlotLimit limit) {
+        if (repeats < 0) return false;
+        // Batch each template's repeated quantity, visiting templates in last-configured-first priority.
+        for (int item = items.size() - 1; item >= 0; item--) {
+            ItemStack template = items.get(item);
+            long remaining = (long) template.getCount() * repeats;
+            for (int slot = 0; slot < inventory.length && remaining > 0; slot++) {
+                ItemStack existing = inventory[slot];
+                if (isEmpty(existing) || !ItemStack.isSameItemSameComponents(existing, template)) continue;
+                int room = Math.max(0, limit.get(slot, template) - existing.getCount());
+                int moved = (int) Math.min(remaining, room);
+                if (moved != 0) { existing.grow(moved); remaining -= moved; }
             }
-            for (int j = 0; j < inventory.length; j++) {
-                if (toAdd.isEmpty())
-                    break;
-                if (isEmpty(inventory[j])) {
-                    inventory[j] = toAdd.remove(toAdd.size() - 1);
-                }
+            for (int slot = 0; slot < inventory.length && remaining > 0; slot++) {
+                if (!isEmpty(inventory[slot])) continue;
+                int moved = (int) Math.min(remaining, Math.max(0, limit.get(slot, template)));
+                if (moved == 0) continue;
+                inventory[slot] = template.copyWithCount(moved);
+                remaining -= moved;
             }
+            if (remaining != 0) return false;
         }
+        return true;
     }
 
+    private void giveItems(ItemStack[] inventory, int repeats, SlotLimit limit) {
+        if (!addItems(inventory, repeats, limit)) throw new IllegalStateException("Insufficient inventory capacity for item transfer");
+    }
+
+    /** Additional array slots needed after merging, or -1 when the stock limit cannot accommodate the transfer. */
+    private int stockAdditional(NPCShopStorage storage, int repeats) {
+        if (storage.isUnlimited()) return 0;
+        ItemStack[] current = storage.getContents();
+        long extra = 0;
+        for (ItemStack item : items) {
+            if (item.getMaxStackSize() <= 0) return -1;
+            long amount = (long) item.getCount() * repeats;
+            long needed = (amount + item.getMaxStackSize() - 1) / item.getMaxStackSize();
+            if (extra > Long.MAX_VALUE - needed) return -1;
+            extra += needed;
+        }
+        if (extra > Long.MAX_VALUE - current.length) return -1;
+        long capacity = (long) current.length + extra;
+        int maximum = storage.getInventorySizeLimit();
+        if (maximum != -1) capacity = Math.min(capacity, Math.max(current.length, maximum));
+        if (capacity > Integer.MAX_VALUE || capacity < 0) return -1;
+        ItemStack[] candidate = Arrays.copyOf(copy(current), (int) capacity);
+        Arrays.fill(candidate, current.length, candidate.length, ItemStack.EMPTY);
+        if (!addItems(candidate, repeats, (slot, stack) -> stack.getMaxStackSize())) return -1;
+        int occupied = (int) Arrays.stream(candidate).filter(stack -> !isEmpty(stack)).count();
+        if (maximum != -1 && occupied > maximum) return -1;
+        return Math.max(0, occupied - current.length);
+    }
+
+    private void deposit(NPCShopStorage storage, int repeats) {
+        int additional = stockAdditional(storage, repeats);
+        if (additional < 0) throw new IllegalStateException("Insufficient shop stock capacity");
+        storage.transact(stacks -> giveItems(stacks, repeats, (slot, stack) -> stack.getMaxStackSize()), additional);
+    }
+
+    private void removeItems(ItemStack[] inventory, int repeats) {
+        if (!takeItems(inventory, repeats, true)) throw new IllegalStateException("Insufficient items for transfer");
+    }
     @Override
     public Transaction grant(NPCShopStorage storage, Entity entity, InventoryMultiplexer im, int repeats) {
-        if (hasUnavailableItems() || storage.hasUnavailableItems()) return Transaction.fail();
-        return Transaction.create(() -> (storage.isUnlimited() || takeItems(storage.getContents(), repeats, false))
+        if (repeats < 0 || hasUnavailableItems() || storage.hasUnavailableItems()) return Transaction.fail();
+        if (repeats == 0) return Transaction.success();
+        return Transaction.create(() -> storage.isActive() && (storage.isUnlimited() || takeItems(storage.getContents(), repeats, false))
                 && canAccept(im, repeats), () -> transfer(storage, () -> {
-                    storage.transact(inventory -> takeItems(inventory, repeats, true));
-                    im.transact(inventory -> giveItems(inventory, repeats));
+                    if (!canAccept(im, repeats)) throw new IllegalStateException("Insufficient inventory capacity for reward");
+                    storage.transact(inventory -> removeItems(inventory, repeats));
+                    im.transact(inventory -> giveItems(inventory, repeats, im::getSlotLimit));
                 }), () -> transfer(storage, () -> {
-                    storage.transact(inventory -> giveItems(inventory, repeats), items.size() * repeats);
-                    im.transact(inventory -> takeItems(inventory, repeats, true));
+                    deposit(storage, repeats);
+                    im.transact(inventory -> removeItems(inventory, repeats));
                 }));
     }
 
     @Override
     public Transaction take(NPCShopStorage storage, Entity entity, InventoryMultiplexer im, int repeats) {
-        if (hasUnavailableItems() || storage.hasUnavailableItems()) return Transaction.fail();
-        return Transaction.create(() -> (storage.isUnlimited() || storage.canAdd(items.size() * repeats))
-                && takeItems(im.getInventory(), repeats, false), () -> transfer(storage, () -> {
-                    storage.transact(inventory -> giveItems(inventory, repeats), items.size() * repeats);
-                    im.transact(inventory -> takeItems(inventory, repeats, true));
+        if (repeats < 0 || hasUnavailableItems() || storage.hasUnavailableItems()) return Transaction.fail();
+        if (repeats == 0) return Transaction.success();
+        return Transaction.create(() -> storage.isActive() && takeItems(im.getInventory(), repeats, false)
+                && stockAdditional(storage, repeats) >= 0, () -> transfer(storage, () -> {
+                    if (!takeItems(im.getInventory(), repeats, false)) throw new IllegalStateException("Insufficient items for payment");
+                    deposit(storage, repeats);
+                    im.transact(inventory -> removeItems(inventory, repeats));
                 }), () -> transfer(storage, () -> {
-                    storage.transact(inventory -> takeItems(inventory, repeats, true));
-                    im.transact(inventory -> giveItems(inventory, repeats));
+                    storage.transact(inventory -> removeItems(inventory, repeats));
+                    im.transact(inventory -> giveItems(inventory, repeats, im::getSlotLimit));
                 }));
     }
 
@@ -266,35 +295,24 @@ public class ItemAction extends NPCShopAction {
         return item.getCount() + " " + item.getHoverName().getString();
     }
 
-    /** Removes the items from the array; returns whether the full amount was there. */
+    /** Allocate requirements cumulatively, using wide counts so multiplication and summation cannot wrap. */
     private boolean takeItems(ItemStack[] contents, int repeats, boolean modify) {
-        List<Integer> req = items.stream().map(i -> i.getCount() * repeats).collect(Collectors.toList());
-        for (int i = 0; i < contents.length; i++) {
-            ItemStack toMatch = contents[i];
-            if (isEmpty(toMatch) || tooDamaged(toMatch))
-                continue;
-            toMatch = toMatch.copy();
-            for (int j = 0; j < items.size(); j++) {
-                if (toMatch == null)
-                    break;
-                if (req.get(j) <= 0 || !matches(items.get(j), toMatch))
-                    continue;
-                int remaining = req.get(j);
-                int taken = Math.min(toMatch.getCount(), remaining);
-                if (toMatch.getCount() == taken) {
-                    toMatch = null;
-                } else {
-                    toMatch.setCount(toMatch.getCount() - taken);
-                }
-                if (modify) {
-                    contents[i] = toMatch == null ? ItemStack.EMPTY : toMatch.copy();
-                }
-                req.set(j, remaining - taken);
+        if (repeats < 0) return false;
+        long[] required = items.stream().mapToLong(item -> (long) item.getCount() * repeats).toArray();
+        for (int slot = 0; slot < contents.length; slot++) {
+            ItemStack stack = contents[slot];
+            if (isEmpty(stack) || tooDamaged(stack)) continue;
+            int remaining = stack.getCount();
+            for (int item = 0; item < items.size() && remaining > 0; item++) {
+                if (required[item] == 0 || !matches(items.get(item), stack)) continue;
+                int taken = (int) Math.min(remaining, required[item]);
+                remaining -= taken; required[item] -= taken;
             }
+            if (modify && remaining != stack.getCount())
+                contents[slot] = remaining == 0 ? ItemStack.EMPTY : stack.copyWithCount(remaining);
         }
-        return req.stream().mapToInt(n -> n).sum() <= 0;
+        return Arrays.stream(required).allMatch(value -> value == 0);
     }
-
     private boolean tooDamaged(ItemStack toMatch) {
         return requireUndamaged && toMatch.isDamaged();
     }

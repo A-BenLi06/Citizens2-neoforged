@@ -48,7 +48,7 @@ public class NPCShopStorage {
     }
 
     public boolean canAdd(int n) {
-        return !hasUnavailableItems() && (inventorySizeLimit == -1 || inventory.size() + n < inventorySizeLimit);
+        return n >= 0 && !hasUnavailableItems() && (inventorySizeLimit == -1 || (long) inventory.size() + n <= inventorySizeLimit);
     }
 
     public boolean hasUnavailableItems() { return !unlimited && StoredItemList.hasUnavailable(inventory); }
