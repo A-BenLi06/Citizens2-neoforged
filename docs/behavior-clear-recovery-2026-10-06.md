@@ -18,3 +18,8 @@ IfElse also detaches its active branch before reset, preventing repeated cleanup
 when that callback throws. A test verifies another branch can subsequently execute.
 An additional ParallelComposite test clears its children from an execution callback,
 verifies old siblings stop, and starts a callback-added child in the next cycle.
+
+TimeoutDecorator resets its elapsed-tick counter before invoking child cleanup.
+A throwing child reset cannot leave a new execution cycle with the old expired
+budget. Three tests verify the tick limit, successful completion on the last allowed
+tick, and a fresh budget after a reset exception.

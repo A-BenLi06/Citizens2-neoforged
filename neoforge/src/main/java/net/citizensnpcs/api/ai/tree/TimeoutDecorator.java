@@ -15,8 +15,8 @@ public class TimeoutDecorator implements Behavior {
 
     @Override
     public void reset() {
-        child.reset();
         ticksElapsed = 0;
+        child.reset();
     }
 
     @Override
