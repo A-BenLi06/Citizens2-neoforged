@@ -40,6 +40,11 @@ public class ShopTrait extends Trait {
         return shops.addNPCShop(npc.getUniqueId().toString());
     }
 
+    /** The stored definition, without creating an empty shop while taking a snapshot. */
+    public NPCShop getExistingDefaultShop() {
+        return shops.npcShops.get(npc.getUniqueId().toString());
+    }
+
     /** A named global shop, created on demand. */
     public NPCShop getShop(String name) {
         return shops.addNamedShop(name);
@@ -64,7 +69,10 @@ public class ShopTrait extends Trait {
     public void onRemove() {
         Throwable failure = null;
         try { storage.retire(); } catch (RuntimeException | Error ex) { failure = ex; }
-        try { shops.deleteShop(getDefaultShop()); } catch (RuntimeException | Error ex) {
+        try {
+            NPCShop existing = getExistingDefaultShop();
+            if (existing != null) shops.removeNPCShop(npc.getUniqueId().toString(), existing);
+        } catch (RuntimeException | Error ex) {
             if (failure == null) failure = ex;
             else if (failure != ex) failure.addSuppressed(ex);
         }

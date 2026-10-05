@@ -62,6 +62,14 @@ public class StoredShops {
         if (npcShops.remove(shop.getName(), shop) || globalShops.remove(shop.getName(), shop)) shop.retire();
     }
 
+    /** Remove only the expected per-NPC binding; another binding may still own the same definition. */
+    public void removeNPCShop(String id, NPCShop expected) {
+        expected.requireIdle();
+        if (npcShops.remove(id, expected)
+                && npcShops.values().stream().noneMatch(shop -> shop == expected)
+                && globalShops.values().stream().noneMatch(shop -> shop == expected)) expected.retire();
+    }
+
     /** Release views and editors before shutdown saving so their final edits are included. */
     public void closeSessions() {
         if (closed) return;

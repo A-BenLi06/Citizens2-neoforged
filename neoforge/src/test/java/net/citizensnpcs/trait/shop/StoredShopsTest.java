@@ -13,6 +13,55 @@ import net.citizensnpcs.api.util.YamlStorage;
 
 class StoredShopsTest {
     @Test
+    void npcRemovalUsesBindingKeyInsteadOfDefinitionName(@TempDir Path directory) {
+        StoredShops shops = new StoredShops(new YamlStorage(directory.resolve("shops.yml").toFile()));
+        NPCShop definition = new NPCShop("different-name");
+        shops.npcShops.put("npc-id", definition);
+        shops.removeNPCShop("npc-id", definition);
+        assertFalse(shops.npcShops.containsKey("npc-id"));
+        assertFalse(definition.isActive());
+    }
+
+    @Test
+    void npcRemovalPreservesOtherOwnersUntilLastBindingIsRemoved(@TempDir Path directory) {
+        StoredShops shops = new StoredShops(new YamlStorage(directory.resolve("shops.yml").toFile()));
+        NPCShop definition = shops.addNamedShop("shared");
+        shops.npcShops.put("first", definition);
+        shops.npcShops.put("second", definition);
+        shops.removeNPCShop("first", definition);
+        assertSame(definition, shops.npcShops.get("second"));
+        assertSame(definition, shops.globalShops.get("shared"));
+        assertTrue(definition.isActive());
+        shops.globalShops.remove("shared");
+        shops.removeNPCShop("second", definition);
+        assertFalse(definition.isActive());
+    }
+
+    @Test
+    void staleNpcRemovalPreservesReplacement(@TempDir Path directory) {
+        StoredShops shops = new StoredShops(new YamlStorage(directory.resolve("shops.yml").toFile()));
+        NPCShop previous = new NPCShop("npc-id");
+        NPCShop replacement = shops.addNPCShop("npc-id");
+        shops.removeNPCShop("npc-id", previous);
+        assertSame(replacement, shops.npcShops.get("npc-id"));
+        assertTrue(replacement.isActive());
+    }
+
+    @Test
+    void activeTradePreventsNpcBindingRemoval(@TempDir Path directory) {
+        StoredShops shops = new StoredShops(new YamlStorage(directory.resolve("shops.yml").toFile()));
+        NPCShop definition = shops.addNPCShop("npc-id");
+        assertTrue(definition.beginTrade());
+        try {
+            assertThrows(IllegalStateException.class, () -> shops.removeNPCShop("npc-id", definition));
+            assertSame(definition, shops.npcShops.get("npc-id"));
+            assertTrue(definition.isActive());
+        } finally { definition.endTrade(); }
+        shops.removeNPCShop("npc-id", definition);
+        assertFalse(definition.isActive());
+    }
+
+    @Test
     void publicationRetiresEverySessionEvenWhenOneCloseThrows(@TempDir Path directory) {
         YamlStorage storage = new YamlStorage(directory.resolve("shops.yml").toFile());
         StoredShops shops = new StoredShops(storage);

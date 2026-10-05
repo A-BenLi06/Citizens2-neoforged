@@ -1307,3 +1307,11 @@ This fixes template substitution and refunds that consumed an unrelated loosely 
 Validation: six new tests pass; original code fails all six. Both NeoForge 21.1.233 and 21.1.248 pass 11 native chest/merchant checks. Quantity and settlement regressions pass 16 and 31 checks. All 349 ordinary and 100 Interactions tests pass without failures/errors/skips; clean test/build succeeds. All audit/test processes terminated; the unrelated server was untouched. All 78 Interactions archive entry names/contents remain unchanged, retaining its separate NeoForge JAR and one-way Interactions -> Citizens dependency; ZIP container hashes differ. Original Citizens save hash is unchanged.
 
 Details: docs/exact-item-receipts-2026-10-05.md; reproduction: tools/item-receipt-runtime-audit/README.md; local evidence: artifacts/item-receipt-validation-summary.json and artifacts/verify-item-receipt.ps1. External changes that make the recorded item unavailable are reported rather than substituted. Physical-client/provider acceptance and full reload transactionality remain separate work. No subagents were used. The full Citizens goal remains active.
+
+## 2026-10-05 18:36:39 +08:00 — Preserve shop ownership during per-NPC removal
+
+ShopTrait now reads an existing default shop without creating an empty definition during removal. StoredShops removes the expected per-NPC binding by its actual map key instead of the shop's display/name key, and retires the definition only when no per-NPC or global binding still owns it. Identity checks preserve replacement definitions; active trades prevent removal before any map mutation.
+
+Validation: StoredShopsTest passes, including four new cases covering different binding/name keys, shared aliases, replacement ownership and active-trade rejection. Gradle completed successfully; git diff --check passed. No server was deployed or stopped. Interactions source and packaging are unchanged and retain their independent JAR.
+
+The separate, in-progress RemoveNPCHistoryItem/CitizensNPCRegistry restoration edits are not included in this commit. Full shop undo is not yet verified: creation rollback can still invoke deletion callbacks against a replacement definition, and conflict localization and native recovery coverage remain outstanding. The full Citizens completion goal remains active.
