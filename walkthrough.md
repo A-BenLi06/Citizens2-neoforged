@@ -1675,3 +1675,11 @@ Three tests cover multiline arithmetic/false conditions, YAML-style surrounding 
 Added a real-file test for YAML literal and folded block scalars, ensuring multiline false conditions do not become truthy literals and explicit-engine arithmetic still evaluates correctly. Existing production code passes without additional changes.
 
 Both NeoForge 21.1.233 and 21.1.248 pass 320 native creation checks against the recent expression/behavior changes. Clean ordinary test/build passes with 466 tests; Interactions audit tests pass with 100; no failures/errors/skips. Release archives retain separate mod classes and exclude creation/reload/removal probes. All invoked handles completed; no unrelated server or original data was changed. Updated docs/multiline-expressions-2026-10-06.md. These checks strengthen integration evidence, not complete Citizens parity or physical-client acceptance. The full goal remains active.
+
+## 2026-10-06 06:44:06 +08:00 — Recover spawned NPCs after template application failure
+
+Template application rejects a refused despawn before actions and restores spawn state after action failure only for the still-owned original instance. Failed recovery is reported or suppressed on the original action error; deleted/replaced instances are not respawned. Recovery uses current stored location and does not roll back arbitrary earlier template effects.
+
+Five interface tests cover veto, action failure, recovery failure, failed spawn and lost registration. Native tests verify an actual spawned NPC reports a failing behavior-template action and restores its entity. The initial fixture used a raw list where the template parser expects YAML-normalized numeric keys; it was corrected before validation. Both NeoForge 21.1.233 and 21.1.248 pass 323 creation checks. Clean ordinary test/build passes with 471 tests; Interactions audit tests pass with 100; no failures/errors/skips. Release archives remain separate and exclude probes. All invoked handles completed; no unrelated server or original data was changed.
+
+Details: docs/template-application-lifecycle-2026-10-06.md. The full Citizens goal remains active.

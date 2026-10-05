@@ -39,14 +39,26 @@ public class Template {
 
     public void apply(NPC npc) {
         boolean respawn = npc.isSpawned();
-        if (respawn) {
-            npc.despawn(DespawnReason.PENDING_RESPAWN);
-        }
-        for (Consumer<NPC> action : actions) {
-            action.accept(npc);
-        }
-        if (respawn) {
-            npc.spawn(npc.getStoredLocation());
+        var registry = npc.getOwningRegistry();
+        Throwable failure = null;
+        try {
+            if (respawn && !npc.despawn(DespawnReason.PENDING_RESPAWN))
+                throw new IllegalStateException("NPC despawn was rejected while applying template " + key);
+            for (Consumer<NPC> action : actions) action.accept(npc);
+        } catch (RuntimeException | Error ex) {
+            failure = ex;
+            throw ex;
+        } finally {
+            if (respawn) {
+                try {
+                    if (registry.getById(npc.getId()) == npc && registry.getByUniqueId(npc.getUniqueId()) == npc
+                            && !npc.isSpawned() && !npc.spawn(npc.getStoredLocation()))
+                        throw new IllegalStateException("NPC respawn failed after applying template " + key);
+                } catch (RuntimeException | Error recovery) {
+                    if (failure == null) throw recovery;
+                    if (failure != recovery) failure.addSuppressed(recovery);
+                }
+            }
         }
     }
 

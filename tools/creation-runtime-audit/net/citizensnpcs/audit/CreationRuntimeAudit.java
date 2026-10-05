@@ -424,6 +424,23 @@ public final class CreationRuntimeAudit {
             check(runs.get() == afterRemoval && !behaviorTarget.hasTrait(BehaviorTrait.class),
                     "removed_behavior_trait_stops_executing");
         } finally { Files.deleteIfExists(malformed); Files.deleteIfExists(validBehavior); behaviorTarget.destroy(); }
+        NPC restoreTarget = registry.createNPC(EntityType.COW, "TemplateFailureRestore");
+        try {
+            check(restoreTarget.spawn(new Location(level, 14, -58, 14)), "template_failure_restore_initial_spawn");
+            Entity originalEntity = restoreTarget.getEntity();
+            DataKey invalidTemplate = new MemoryDataKey(); invalidTemplate.setRaw("traits", Map.of("0", "behavior"));
+            var invalid = net.citizensnpcs.api.npc.templates.Template.load(
+                    new net.citizensnpcs.api.npc.templates.TemplateRegistry.TemplateErrorReporter(),
+                    new net.citizensnpcs.api.npc.templates.TemplateWorkspace(workspace.toFile()),
+                    ResourceLocation.fromNamespaceAndPath("creation_audit", "failure"), invalidTemplate);
+            boolean rejected = false;
+            try { invalid.apply(restoreTarget); }
+            catch (IllegalArgumentException expected) { rejected = expected.getMessage().contains("requires a file name"); }
+            check(rejected, "template_action_failure_is_reported");
+            check(restoreTarget.isSpawned() && exists(restoreTarget)
+                    && originalEntity.isRemoved() && restoreTarget.getEntity() != originalEntity,
+                    "template_action_failure_restores_native_spawn");
+        } finally { restoreTarget.destroy(); }
     }
 
     private static NPC create(String options) throws Exception { run("create C" + serial++ + " " + options); NPC npc = selected(); check(npc != null && exists(npc), "created_and_selected"); return npc; }

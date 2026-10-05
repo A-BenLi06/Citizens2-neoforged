@@ -16,6 +16,8 @@ Recent follow-ups cover [`powered`, `name` and `home` options](command-options-h
 
 ## Behavior, data and integration acceptance
 
+- [Template application lifecycle](template-application-lifecycle-2026-10-06.md) rejects canceled despawn before actions and restores still-owned NPCs after action failures. Recovery failures are reported/suppressed appropriately. Earlier action side effects are not rolled back.
+
 - [Parallel composite cycles](parallel-composite-cycles-2026-10-06.md) start children before reporting completion and avoid restarting finished siblings while others run. Direct and parser tests verify cycles, terminal removal and real child effects.
 
 - [Sequence removal](sequence-removal-2026-10-06.md) adjusts indices and clears active references when children are removed, including RESET_AND_REMOVE. Tests cover successor ordering, self-removal and reset failure; arbitrary nested reset callbacks remain separate concerns.
