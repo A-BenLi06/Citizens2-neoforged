@@ -1503,3 +1503,9 @@ Details: docs/behavior-memory-key-identity-2026-10-06.md. Ambiguous legacy neste
 Memory now uses a separate native metadata replacement operation, so transient-backed lists absent from the incoming snapshot cannot survive reload. The native operation reads into a candidate before replacing live entries; Memory still detaches/decodes its input first. Ordinary NPC metadata load semantics and custom-provider load contracts remain unchanged.
 
 Two tests cover old scalar/list removal, list-to-scalar replacement, empty loads, and preparation failure preserving previous values. All 397 ordinary tests and the normal build pass without failures/errors/skips; git diff --check passes. No fresh native/client run is claimed. Production Interactions sources and packaging are unchanged; no unrelated server or original data was changed. Details: docs/behavior-memory-reload-2026-10-06.md. The full Citizens goal remains active.
+
+## 2026-10-06 00:35:59 +08:00 — Honor blackboard Character value support
+
+Aligned SimpleMetadataStore's persistent primitive validation with Memory's declared Character support. Character values can now be assigned without failing in the backing store. Unsupported objects remain rejected before existing values are changed.
+
+Two tests cover Unicode Character assignment and real YAML text round-trip, plus invalid-object rejection preserving a prior character. All 399 ordinary tests and the normal build pass with no failures/errors/skips; git diff --check passes. YAML's standard character-as-string representation is retained rather than adding Java-specific type tags. No new native/client run is claimed. Production Interactions sources and packaging are unchanged; no unrelated server or original data was changed. Details: docs/behavior-memory-characters-2026-10-06.md. The full Citizens goal remains active.

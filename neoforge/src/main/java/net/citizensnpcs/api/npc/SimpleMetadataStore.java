@@ -30,7 +30,8 @@ public class SimpleMetadataStore implements MetadataStore {
 
     private void checkPrimitive(Object data) {
         Objects.requireNonNull(data, "data cannot be null");
-        boolean isPrimitive = data instanceof String || data instanceof Boolean || data instanceof Number;
+        boolean isPrimitive = data instanceof String || data instanceof Boolean || data instanceof Number
+                || data instanceof Character;
         if (!isPrimitive)
             throw new IllegalArgumentException("data is not primitive");
     }
