@@ -1603,8 +1603,7 @@ public class NPCCommands {
     public void undo(CommandContext args, CommandSourceStack sender, NPC npc,
             @Arg(value = 1, completions = "all") String action) throws CommandException {
         if ("all".equalsIgnoreCase(action)) {
-            while (history().undo(sender)) {
-            }
+            history().undoAll(sender);
             Messaging.sendTr(sender, Messages.UNDO_SUCCESSFUL);
             return;
         }

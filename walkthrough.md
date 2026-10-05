@@ -1349,3 +1349,11 @@ Both NeoForge 21.1.233 and 21.1.248 pass all 79 removal checks. The normal clean
 CommandHistory now reserves the sender's history while an undo item executes. A nested undo from the same sender fails with a translated message before executing that item again. The reservation is released in finally so exceptions cannot block future retry. Existing successful-item removal and callback-added history behavior are retained.
 
 Three new tests cover nested rejection without duplicate execution, failed-item retry with older records retained, and callback-added history surviving completion. The full ordinary test/build passes with 357 tests and no failures/errors/skips; git diff --check passes. This is command-history coverage rather than a fresh native server run. Production Interactions sources and packaging are unchanged. No unrelated server or original data was changed. The full Citizens goal remains active; batch command behavior and external callback effects require their own scope of verification.
+
+## 2026-10-05 19:33:26 +08:00 — Bound bulk undo to its initial history entries
+
+Replaced the command's unbounded history-draining loop with CommandHistory.undoAll. It captures initial entries and processes them newest first while holding the sender reservation. Callback-added entries remain for a later command, discarded entries are skipped, and failure preserves the failed and older entries without repeating successful ones. Unique entry objects distinguish repeated registrations of the same callback object.
+
+Three additional history tests cover same-object re-registration, partial batch failure/retry order, and callback discards. All 360 ordinary tests pass without failures/errors/skips; clean build succeeds. Native removal regression passes 79 checks on each of NeoForge 21.1.233 and 21.1.248, including real undo-all commands. Release archive inspection confirms independent Citizens/Interactions classes and no removal probe. All invoked handles completed. No unrelated server or production data was changed.
+
+Details: docs/undo-history-2026-10-05.md. This is sequential batch recovery, not rollback of arbitrary external callback effects or earlier successful undos. Full Citizens completion remains active.

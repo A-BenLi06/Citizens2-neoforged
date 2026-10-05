@@ -16,6 +16,8 @@ Recent follow-ups cover [`powered`, `name` and `home` options](command-options-h
 
 ## Behavior, data and integration acceptance
 
+- [Undo history callback boundaries](undo-history-2026-10-05.md) reject sender reentry and bound bulk undo to entries present at invocation. Callback-added entries survive, explicit discards are respected, and a failed batch preserves remaining retry order without repeating completed entries. Six focused history tests cover these contracts; external callback effects are outside this history boundary.
+
 - [Independent shop undo](shop-undo-2026-10-05.md) restores default shop definitions, page structure and stock alongside removed NPCs. Both NeoForge versions pass 79 removal checks, including buffered edits in simultaneous private/global stock editors, canceled/throwing creation that replaces a shop, strict trait-load failure cleanup and retry, and trait provider absence/re-registration. Arbitrary external callback side effects, deferred spawn outcomes and custom registry contracts remain targeted work.
 
 - [Exact item receipts](exact-item-receipts-2026-10-05.md) now preserve actual component variants across filtered payments, finite-stock rewards and refunds. Capacity uses actual variants, refunds cannot consume a different loosely matching item, and per-execution receipts prevent repeated refunds. Six unit tests and 11 native checks on each NeoForge version cover this. External item changes, physical-client/provider acceptance and full reload transactionality remain separate work.
