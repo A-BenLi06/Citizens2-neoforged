@@ -387,6 +387,23 @@ public final class CreationRuntimeAudit {
             DataKey savedBehavior = new MemoryDataKey(); behavior.save(savedBehavior);
             check("template_preserve_probe".equals(savedBehavior.getString("tree.root")),
                     "invalid_behavior_replacement_preserves_saved_tree");
+            DataKey secondSave = new MemoryDataKey(); behavior.save(secondSave);
+            check(savedBehavior.getRaw("tree").equals(secondSave.getRaw("tree")),
+                    "behavior_definition_survives_repeated_fresh_snapshots");
+            NPC loadedTarget = registry.createNPC(EntityType.COW, "LoadedBehavior");
+            try {
+                BehaviorTrait loadedBehavior = loadedTarget.getOrAddTrait(BehaviorTrait.class);
+                loadedBehavior.load(savedBehavior.copyWithRoot());
+                DataKey resaved = new MemoryDataKey(); loadedBehavior.save(resaved);
+                check(savedBehavior.getRaw("tree").equals(resaved.getRaw("tree")),
+                        "loaded_behavior_definition_is_resaved");
+            } finally { loadedTarget.destroy(); }
+            check(behaviorTarget.spawn(new Location(level, 12, -58, 12)), "behavior_lifecycle_initial_spawn");
+            check(behaviorTarget.despawn(DespawnReason.PENDING_RESPAWN)
+                    && behaviorTarget.spawn(new Location(level, 12, -58, 12)), "behavior_lifecycle_respawn");
+            int beforeRun = runs.get();
+            behaviorTarget.getDefaultBehaviorController().run();
+            check(runs.get() == beforeRun + 1, "behavior_execution_resumes_after_respawn");
         } finally { Files.deleteIfExists(malformed); Files.deleteIfExists(validBehavior); behaviorTarget.destroy(); }
     }
 

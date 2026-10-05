@@ -1533,3 +1533,11 @@ An initial non-finite assertion failed because Mocha normalizes NaN/infinity to 
 Added mem.size() and mem.clear() bindings so behavior expressions can use the existing blackboard count/clear implementation. Clear handles both scalar and list entries and reports whether a memory instance is available.
 
 A compiled-expression test creates scalar/list entries, counts and clears them, then saves over old data to verify no keys revive. All 407 ordinary tests and the normal build pass without failures/errors/skips; git diff --check passes. No fresh native/client run is claimed. Production Interactions sources and packaging are unchanged; no unrelated server or original data was changed. Updated docs/molang-memory-types-2026-10-06.md. The full Citizens goal remains active.
+
+## 2026-10-06 01:41:01 +08:00 — Retain behavior definitions across fresh saves and respawns
+
+BehaviorTrait now keeps detached loaded YAML and writes its tree definition on every save instead of clearing it after one write. Spawn reconstructs a missing runtime root after despawn; parsing replaces an existing root rather than adding a second copy, and explicitly empty loaded data clears old runtime behavior.
+
+Native checks compare repeated fresh snapshots, resave a loaded trait and exercise actual spawn/despawn/respawn followed by counting behavior execution. Both NeoForge 21.1.233 and 21.1.248 pass 317 creation checks. Clean ordinary test/build passes with 407 tests; Interactions audit tests pass with 100; no failures/errors/skips. Release archives remain separate and exclude probes. All invoked handles completed; no unrelated server or original data was changed.
+
+Details: docs/behavior-definition-lifecycle-2026-10-06.md. Custom behavior factory/reset exceptions remain separate concerns. The full Citizens goal remains active.

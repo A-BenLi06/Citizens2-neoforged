@@ -69,7 +69,9 @@ public class BehaviorTrait extends Trait {
     @Override
     public void load(DataKey key) {
         if (key.keyExists("tree")) {
-            parse(key.getRelative("tree"));
+            DataKey definition = key.getRelative("tree").copyWithRoot();
+            parse(definition);
+            yamlCache = definition.getValuesDeep();
         }
         if (key.keyExists("memory")) {
             if (memory == null) {
@@ -87,9 +89,21 @@ public class BehaviorTrait extends Trait {
         }
     }
 
+    @Override
+    public void onSpawn() {
+        if (root == null && yamlCache != null) {
+            DataKey definition = new net.citizensnpcs.api.util.MemoryDataKey();
+            definition.setRaw("", yamlCache);
+            parse(definition);
+        }
+    }
+
     private void parse(DataKey yaml) {
-        if (!yaml.hasSubKeys())
+        if (!yaml.hasSubKeys()) {
+            if (root != null) npc.getDefaultBehaviorController().removeBehavior(root);
+            root = null;
             return;
+        }
         if (memory == null) {
             memory = new Memory();
         }
@@ -98,6 +112,7 @@ public class BehaviorTrait extends Trait {
         Behavior parsed = parser.parse(yaml.getSubKeys().iterator().next(), npc, scope, memory);
         if (parsed == null)
             return;
+        if (root != null) npc.getDefaultBehaviorController().removeBehavior(root);
         npc.getDefaultBehaviorController().addBehavior(root = new RootBehavior(parsed, scope));
     }
 
@@ -108,7 +123,6 @@ public class BehaviorTrait extends Trait {
         }
         if (yamlCache != null) {
             key.setMap("tree", yamlCache);
-            yamlCache = null;
         }
     }
 
