@@ -12,6 +12,19 @@ import net.citizensnpcs.api.npc.NPC.Metadata;
 import net.citizensnpcs.api.util.DataKey;
 
 public class SimpleMetadataStore implements MetadataStore {
+    @Override
+    public java.util.Collection<String> getKeys() {
+        var keys = new java.util.HashSet<>(metadata.keySet());
+        npcMetadata.keySet().forEach(key -> keys.add(key.getKey()));
+        return java.util.Set.copyOf(keys);
+    }
+
+    @Override
+    public void clear() {
+        metadata.clear();
+        npcMetadata.clear();
+    }
+
     private final Map<String, MetadataObject> metadata = new HashMap<>();
     private final Map<NPC.Metadata, MetadataObject> npcMetadata = Maps.newEnumMap(NPC.Metadata.class);
 

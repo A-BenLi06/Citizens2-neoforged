@@ -7,6 +7,16 @@ import net.citizensnpcs.api.util.DataKey;
  * Represents a storage system for metadata
  */
 public interface MetadataStore {
+    /** Snapshot of stored key names, including non-persistent entries. */
+    default java.util.Collection<String> getKeys() {
+        throw new UnsupportedOperationException("This metadata store does not support key enumeration");
+    }
+
+    /** Remove all stored entries. Providers with separate key spaces should override this operation. */
+    default void clear() {
+        for (String key : java.util.List.copyOf(getKeys())) remove(key);
+    }
+
     /**
      * Copies the metadata store.
      */

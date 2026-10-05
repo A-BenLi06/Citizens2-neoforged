@@ -1473,3 +1473,11 @@ Explicit behavior replacement now parses a detached candidate through a strict p
 Three parser tests cover nested unknown rejection, restoration of compatibility mode, unavailable expression language and valid empty containers. Native tests install a counting behavior, reject an unknown replacement, and verify old execution, blackboard identity and saved data survive. Both NeoForge 21.1.233 and 21.1.248 pass 312 creation checks. Clean ordinary test/build passes with 385 tests; Interactions audit tests pass with 100; no failures/errors/skips. Release archives remain separate and exclude probes. All invoked handles completed; no unrelated server or original data was changed.
 
 Details: docs/behavior-replacement-2026-10-05.md. Custom factory side effects and controller reset exceptions are not rolled back. Source inspection also found Memory.getKeys still returns an empty list, making clear ineffective; this concrete implementation gap is now on the current backlog. The full Citizens goal remains active.
+
+## 2026-10-05 23:32:18 +08:00 — Implement blackboard key enumeration and effective clearing
+
+Added MetadataStore key-snapshot/clear contracts and native implementations covering persistent, non-persistent and typed NPC entries. Memory now delegates enumeration and clearing instead of returning an empty placeholder and looping over it. Custom providers without enumeration report that unsupported capability explicitly; default clearing uses their key snapshot.
+
+Memory.saveTo now atomically replaces its own section, so deleted/cleared values cannot survive a save and return on reload. Four tests cover stable snapshots, direct backing-store mutations, loaded/session/typed data, clear/save/reload and sibling preservation. All 389 ordinary tests and the normal build pass without failures/errors/skips; git diff --check passes. No new native/client acceptance is claimed. Production Interactions sources and packaging are unchanged; no unrelated server or original data was changed.
+
+Details: docs/behavior-memory-keys-2026-10-05.md. The former enumeration placeholder is removed from the backlog. Existing session-only list persistence and typed/string metadata-name interactions remain separate scope. The full Citizens goal remains active.

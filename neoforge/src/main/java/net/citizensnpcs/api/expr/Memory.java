@@ -23,12 +23,10 @@ public class Memory {
     }
 
     /**
-     * Clears all data from memory. Note: this creates a new backing store.
+     * Clears all data from the existing backing store.
      */
     public void clear() {
-        for (String key : getKeys()) {
-            store.remove(key);
-        }
+        store.clear();
     }
 
     /**
@@ -93,10 +91,7 @@ public class Memory {
      * @return iterable of keys
      */
     public Iterable<String> getKeys() {
-        List<String> keys = new ArrayList<>();
-        // MetadataStore doesn't expose keys directly, so we track them separately
-        // For now, this is a limitation - consider adding getKeys() to MetadataStore
-        return keys;
+        return store.getKeys();
     }
 
     /**
@@ -381,7 +376,10 @@ public class Memory {
      *            the key to save to
      */
     public void saveTo(DataKey key) {
-        store.saveTo(key);
+        key.writeAtomically(candidate -> {
+            candidate.removeKey("");
+            store.saveTo(candidate);
+        });
     }
 
     /**
