@@ -319,6 +319,7 @@ public class Citizens implements CitizensPlugin {
         server = event.getServer();
         serverStarted = false;
         stopping = false;
+        net.citizensnpcs.api.npc.templates.CommandEventAction.start();
         saveOnDisable = true;
         scheduler = new NeoForgeScheduler(server);
         Schedulers.set(scheduler);
@@ -409,6 +410,7 @@ public class Citizens implements CitizensPlugin {
         if (stopping) return;
         stopping = true;
         enabled = false;
+        shutdownStep("template event commands", net.citizensnpcs.api.npc.templates.CommandEventAction::shutdown);
         // Cleanup/provider callbacks may remove registry names; ownership at shutdown entry still must be retired.
         Iterable<NPCRegistry> retiring = getNPCRegistries();
         shutdownStep("editors", Editor::shutdown);

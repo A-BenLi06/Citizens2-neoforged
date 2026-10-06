@@ -16,6 +16,8 @@ Recent follow-ups cover [`powered`, `name` and `home` options](command-options-h
 
 ## Behavior, data and integration acceptance
 
+- [Template event shutdown](template-event-shutdown-2026-10-06.md) unregisters active and superseded template consumers, rejects subscriptions during shutdown and keeps old action objects closed across lifetimes. Reload subscription migration remains separate work.
+
 - [Shared NPC command formatting](npc-command-format-2026-10-06.md) preserves quoted speech and explicit target flags while correctly handling leading-slash commands. Template commands capture their input list. Format and native targeting tests cover these paths; command side effects/failure policy remain separate concerns.
 
 - [Template application lifecycle](template-application-lifecycle-2026-10-06.md) rejects canceled despawn before actions and restores still-owned NPCs after action failures. Recovery failures are reported/suppressed appropriately. Earlier action side effects are not rolled back.

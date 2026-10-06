@@ -21,12 +21,15 @@ and throwing editor/prompt callbacks. The failing save callback also removes a n
 registry; its NPC must still be retired. Verification runs in the later stopping listener
 and stopped event, not a substitute shutdown routine.
 
-Expected: `[SHUTDOWNAUDIT] COMPLETE 59 checks`
+Expected: `[SHUTDOWNAUDIT] COMPLETE 63 checks`
 and `BUILD SUCCESSFUL`. Four intentional error diagnostics identify editor cleanup,
 chat prompt cleanup, NPC/shop save and default-registry trait cleanup. They must not
 prevent later cleanup or other shutdown event listeners. The fixture also verifies
 idempotency, rejected reentry, task cancellation, empty queues/bindings, and 19 session
 lifecycle checks including dispatcher re-registration before the actual server stop.
+Template event checks verify that live and superseded actions both stop responding
+after shutdown, and that a retained closed action cannot register itself again.
+New template subscriptions are also rejected during shutdown.
 
 This does not simulate a full physical-client reconnect/integrated-server restart,
 an installed LuckPerms backend, arbitrary third-party side effects, or asynchronous

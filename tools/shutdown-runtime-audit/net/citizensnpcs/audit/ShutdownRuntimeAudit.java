@@ -42,6 +42,8 @@ public final class ShutdownRuntimeAudit {
     private static Store store;
     private static NeoForgeScheduler scheduler;
     private static Object listener;
+    private static net.citizensnpcs.api.npc.templates.CommandEventAction templateAction;
+    private static int templateCalls;
     private static int started, prepared, passed;
     private static boolean forced, armed, failed, verified;
 
@@ -92,6 +94,14 @@ public final class ShutdownRuntimeAudit {
         tasks.add(scheduler.runTaskLater(() -> { throw new AssertionError("pending_sync_task_ran"); }, 10000));
         tasks.add(scheduler.runTaskLaterAsynchronously(() -> { throw new AssertionError("pending_async_task_ran"); }, 10000));
         SessionShutdownChecks.prepare(server);
+        templateAction = new net.citizensnpcs.api.npc.templates.CommandEventAction(TemplateProbeEvent.class,
+                npc -> templateCalls++);
+        templateAction.accept(npcs.get(0));
+        // A superseded registry can leave an action reachable only through the event bus.
+        new net.citizensnpcs.api.npc.templates.CommandEventAction(TemplateProbeEvent.class,
+                npc -> templateCalls++).accept(npcs.get(0));
+        NeoForge.EVENT_BUS.post(new TemplateProbeEvent(npcs.get(0)));
+        check(templateCalls == 2, "template_event_actions_live_before_stop");
     }
 
     @SubscribeEvent(priority = EventPriority.LOWEST)
@@ -99,6 +109,11 @@ public final class ShutdownRuntimeAudit {
         if (failed) return;
         try {
             check(armed, "shutdown_was_requested");
+            NeoForge.EVENT_BUS.post(new TemplateProbeEvent(npcs.get(0)));
+            check(templateCalls == 2, "all_template_event_actions_stopped");
+            reject(() -> templateAction.accept(npcs.get(0)), "retired_template_action_rejects_application");
+            reject(() -> new net.citizensnpcs.api.npc.templates.CommandEventAction(TemplateProbeEvent.class,
+                    npc -> templateCalls++).accept(npcs.get(0)), "shutdown_rejects_new_template_subscriptions");
             check(store.saves == 1, "save_attempted_once_despite_failure");
             check(store.clears == 0, "retirement_does_not_delete_definitions");
             check(!plugin.isEnabled() && plugin.getNPCRegistry() == null && plugin.getTemporaryNPCRegistry() == null,
@@ -151,6 +166,10 @@ public final class ShutdownRuntimeAudit {
     private static void fail(Throwable failure) {
         failed = true; LoggerFactory.getLogger("citizens").error("[SHUTDOWNAUDIT] FAILED", failure);
     }
+    public static final class TemplateProbeEvent extends net.citizensnpcs.api.event.NPCEvent {
+        public TemplateProbeEvent(NPC npc) { super(npc); }
+    }
+
     public static final class Probe extends Trait {
         int events, removals; boolean fail;
         public Probe() { super("shutdownprobe"); }
