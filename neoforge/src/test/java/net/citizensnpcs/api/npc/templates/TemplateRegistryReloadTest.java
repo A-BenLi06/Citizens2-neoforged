@@ -8,6 +8,24 @@ import org.junit.jupiter.api.io.TempDir;
 import net.minecraft.resources.ResourceLocation;
 
 class TemplateRegistryReloadTest {
+    @Test void duplicateFileDiagnosticsFollowSortedFileOrder(@TempDir Path folder) throws Exception {
+        Path namespace = Files.createDirectories(folder.resolve("audit"));
+        Files.writeString(namespace.resolve("z-last.yml"), "same: {}\n");
+        Files.writeString(namespace.resolve("a-first.yml"), "same: {}\n");
+        var failure = assertThrows(IllegalStateException.class, () -> TemplateRegistry.prepareReload(folder));
+        assertTrue(failure.getMessage().contains("z-last.yml"));
+        assertTrue(failure.getCause().getMessage().contains("Duplicate template key audit:same"));
+    }
+
+    @Test void namespaceDiagnosticsFollowSortedNamespaceOrder(@TempDir Path folder) throws Exception {
+        Path zeta = Files.createDirectories(folder.resolve("zeta"));
+        Path alpha = Files.createDirectories(folder.resolve("alpha"));
+        Files.writeString(zeta.resolve("broken.yml"), "broken: [unfinished\n");
+        Files.writeString(alpha.resolve("broken.yml"), "broken: [unfinished\n");
+        var failure = assertThrows(IllegalStateException.class, () -> TemplateRegistry.prepareReload(folder));
+        assertTrue(failure.getMessage().contains(alpha.resolve("broken.yml").toString()));
+    }
+
     @Test void permissiveStartupDoesNotPublishPartOfAnInvalidFile(@TempDir Path folder) throws Exception {
         Path namespace = Files.createDirectories(folder.resolve("audit"));
         Files.writeString(namespace.resolve("broken.yml"), "first: {}\ninvalid: scalar\n");

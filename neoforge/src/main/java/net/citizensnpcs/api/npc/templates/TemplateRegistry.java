@@ -152,7 +152,7 @@ public class TemplateRegistry {
     private void loadTemplates(Path folder) {
         try {
             try (var loose = Files.walk(folder, 1)) {
-                loose.forEach(path -> {
+                loose.sorted().forEach(path -> {
                     File namespaceFile = path.toFile();
                     if (namespaceFile.isFile() && namespaceFile.getName().endsWith(".yml")) {
                         try {
@@ -165,13 +165,13 @@ public class TemplateRegistry {
                 });
             }
             try (var namespaces = Files.walk(folder, 1)) {
-                namespaces.forEach(namespacePath -> {
+                namespaces.sorted().forEach(namespacePath -> {
                     File namespaceFile = namespacePath.toFile();
                     if (!namespaceFile.isDirectory() || namespaceFile.getName().contains(":")
                             || namespacePath.equals(folder))
                         return;
                     try (var files = Files.walk(namespacePath, 1)) {
-                        files.forEach(templatePath -> {
+                        files.sorted().forEach(templatePath -> {
                             File templateFile = templatePath.toFile();
                             if (templateFile.isFile() && templateFile.getName().endsWith(".yml")) {
                                 try {

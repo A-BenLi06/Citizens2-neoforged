@@ -1817,3 +1817,9 @@ Two added tests cover registration and UUID-only loss during actions; existing s
 YamlReplacementAction now copies its captured replacement tree before each application. NPC loaders can mutate their supplied list values without changing the reusable action's definition or the original template data.
 
 Two tests cover successful mutating loads and mutating loads that throw before retry, verifying both later applications still receive original content. All 517 ordinary tests and the normal build pass without failures/errors/skips; git diff --check passes. No fresh native/client run is claimed. Production Interactions sources and packaging are unchanged; no unrelated server or original data was changed. Updated docs/template-generation-2026-10-05.md. The full Citizens goal remains active.
+
+## 2026-10-06 12:41:03 +08:00 — Process template paths in deterministic order
+
+Loose template migrations, namespaces and template files are sorted before processing. Existing strict duplicate rejection and permissive file handling remain unchanged, but first-error and duplicate diagnostics no longer rely on directory enumeration order.
+
+Two reverse-creation-order file tests verify duplicate-file and namespace diagnostics. All 519 ordinary tests and the normal build pass without failures/errors/skips; git diff --check passes. No fresh native/client run is claimed. Production Interactions sources and packaging are unchanged; no unrelated server or original data was changed. Updated docs/reload-templates-2026-10-05.md. The full Citizens goal remains active.

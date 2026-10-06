@@ -84,3 +84,8 @@ that file are published. Permissive startup may still skip a bad file and load o
 files, but no longer retains the valid prefix of the bad file. Duplicate normalized
 keys within one file also reject that entire file. Two file tests verify both indexes
 remain free of partial entries while independent healthy files load.
+
+Template traversal now sorts loose migration files, namespace paths and template
+file paths before processing them. This makes first-error/duplicate diagnostics
+repeatable rather than dependent on directory enumeration order. Two file tests
+create entries in reverse order and verify sorted file/namespace diagnostics.
