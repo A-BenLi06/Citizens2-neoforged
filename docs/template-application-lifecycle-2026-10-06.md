@@ -26,3 +26,9 @@ A template now guards recursive application to the same NPC instance until actio
 and spawn recovery finish. The guard uses identity, so different NPC instances may
 still receive nested applications, and finally releases it after failures. Three
 tests cover action recursion/retry, another NPC, and reentry during respawn recovery.
+
+TraitLoaderAction checks target ID/UUID ownership before and after each parser call,
+so a parser that deletes its NPC cannot attach a returned stale trait or run later
+trait parsers. Native coverage destroys a real NPC inside a parser, returns its old
+Age trait, and verifies no attachment or further invocation occurs. Unit parser
+fixtures now provide owned NPC instances instead of null targets.

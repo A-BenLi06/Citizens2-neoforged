@@ -10,6 +10,23 @@ import net.citizensnpcs.api.trait.TraitTemplateParser;
 import net.citizensnpcs.api.util.MemoryDataKey;
 
 class TraitTemplateFormTest {
+    private static net.citizensnpcs.api.npc.NPC npc() {
+        var reference = new java.util.concurrent.atomic.AtomicReference<net.citizensnpcs.api.npc.NPC>();
+        var registry = (net.citizensnpcs.api.npc.NPCRegistry) java.lang.reflect.Proxy.newProxyInstance(
+                net.citizensnpcs.api.npc.NPCRegistry.class.getClassLoader(), new Class<?>[]{net.citizensnpcs.api.npc.NPCRegistry.class},
+                (proxy, method, args) -> reference.get());
+        var uuid = java.util.UUID.randomUUID();
+        var npc = (net.citizensnpcs.api.npc.NPC) java.lang.reflect.Proxy.newProxyInstance(
+                net.citizensnpcs.api.npc.NPC.class.getClassLoader(), new Class<?>[]{net.citizensnpcs.api.npc.NPC.class},
+                (proxy, method, args) -> switch (method.getName()) {
+                    case "getOwningRegistry" -> registry;
+                    case "getId" -> 1;
+                    case "getUniqueId" -> uuid;
+                    default -> throw new AssertionError(method.getName());
+                });
+        reference.set(npc);
+        return npc;
+    }
     @Test void malformedCollectionsAndEntriesAreReportedBeforeParserLookup() {
         for (Object value : List.of("known", Map.of("named", "known"), List.of(42), List.of(List.of("known")))) {
             var container = new MemoryDataKey(); container.setRaw("traits", value);
@@ -22,7 +39,7 @@ class TraitTemplateFormTest {
     @Test void directListsSupportBothTemplateForms() {
         var container = new MemoryDataKey(); container.setRaw("traits", List.of("known argument", Map.of("name", "known")));
         var errors = new Errors(); var calls = new AtomicInteger();
-        new TraitLoaderAction(errors, null, container.getRelative("traits"), name -> parser(true, true, calls)).accept(null);
+        new TraitLoaderAction(errors, null, container.getRelative("traits"), name -> parser(true, true, calls)).accept(npc());
         assertTrue(errors.messages.isEmpty()); assertEquals(2, calls.get());
     }
 
@@ -57,7 +74,7 @@ class TraitTemplateFormTest {
         };
         var action = new TraitLoaderAction(new Errors(), null, key, name -> parser);
         key.setInt("0.settings.value", 7);
-        action.accept(null); action.accept(null);
+        action.accept(npc()); action.accept(npc());
         assertEquals(List.of(1, 1), observed);
         assertEquals(7, key.getInt("0.settings.value"));
     }
@@ -74,7 +91,7 @@ class TraitTemplateFormTest {
             public TemplateParser getTemplateParser() { return null; }
         };
         var action = new TraitLoaderAction(new Errors(), null, key, name -> parser);
-        action.accept(null); action.accept(null);
+        action.accept(npc()); action.accept(npc());
         assertEquals(List.of("7", "7"), observed);
     }
 
@@ -98,7 +115,7 @@ class TraitTemplateFormTest {
         var errors = new Errors(); var calls = new AtomicInteger(); var key = new MemoryDataKey();
         key.setRaw("0", Map.of("name", "known"));
         var action = new TraitLoaderAction(errors, null, key, name -> parser(true, false, calls));
-        action.accept(null);
+        action.accept(npc());
         assertEquals(1, errors.messages.size());
         assertTrue(errors.messages.get(0).contains("known does not support structured"));
         assertEquals(0, calls.get());
@@ -115,7 +132,7 @@ class TraitTemplateFormTest {
     @Test void supportedFormsStillApply() {
         var errors = new Errors(); var calls = new AtomicInteger(); var key = new MemoryDataKey();
         key.setRaw("0", Map.of("name", "known")); key.setString("1", "known argument");
-        new TraitLoaderAction(errors, null, key, name -> parser(true, true, calls)).accept(null);
+        new TraitLoaderAction(errors, null, key, name -> parser(true, true, calls)).accept(npc());
         assertTrue(errors.messages.isEmpty()); assertEquals(2, calls.get());
     }
 }

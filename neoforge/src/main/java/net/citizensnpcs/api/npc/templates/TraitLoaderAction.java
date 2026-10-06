@@ -102,8 +102,11 @@ public class TraitLoaderAction implements Consumer<NPC> {
 
     @Override
     public void accept(NPC npc) {
+        var registry = npc.getOwningRegistry();
         for (Function<NPC, Trait> action : actions) {
+            if (registry.getById(npc.getId()) != npc || registry.getByUniqueId(npc.getUniqueId()) != npc) return;
             Trait trait = action.apply(npc);
+            if (registry.getById(npc.getId()) != npc || registry.getByUniqueId(npc.getUniqueId()) != npc) return;
             if (trait != null) {
                 npc.addTrait(trait);
             }

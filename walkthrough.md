@@ -1841,3 +1841,9 @@ All 520 ordinary tests and the normal build pass without failures/errors/skips; 
 Template application now tracks active NPC instances by identity and rejects reentry of the same template/NPC pair before actions repeat. The guard remains active during respawn callbacks and is released even when recovery throws. Nested application to another NPC is allowed.
 
 Three tests cover action recursion with retry, independent nested targets and respawn-callback recursion followed by successful retry. All 523 ordinary tests and the normal build pass without failures/errors/skips; git diff --check passes. No fresh native/client run is claimed. Production Interactions sources and packaging are unchanged; no unrelated server or original data was changed. Updated docs/template-application-lifecycle-2026-10-06.md. The full Citizens goal remains active.
+
+## 2026-10-06 14:07:54 +08:00 — Stop trait parser actions after NPC ownership changes
+
+TraitLoaderAction validates both registry indexes before and after every parser call, preventing stale trait attachment and further parser execution after target deletion/replacement. Existing parser tests now use owned NPC interface fixtures rather than null targets.
+
+A native probe destroys its target inside a parser and returns the old Age trait; it verifies no stale attachment or subsequent invocation. The probe's initial incorrect Age import was corrected before execution. Both NeoForge 21.1.233 and 21.1.248 pass 328 creation checks. Clean ordinary test/build passes with 523 tests; Interactions audit tests pass with 100; no failures/errors/skips. Release archives remain separate and exclude all probes, including TraitOwnershipProbe. All invoked handles completed; no unrelated server or original data was changed. Updated template lifecycle documentation and fixture README. The full Citizens goal remains active.

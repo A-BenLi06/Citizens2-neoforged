@@ -317,6 +317,9 @@ public final class CreationRuntimeAudit {
     }
 
     private static void templatesAndPermissions() throws Exception {
+        NPC removedByParser = registry.createNPC(EntityType.COW, "RemovedByTemplateParser");
+        check(net.citizensnpcs.api.npc.templates.TraitOwnershipProbe.verify(removedByParser),
+                "trait_parser_cannot_attach_to_or_continue_after_removed_target");
         NPC template = registry.createNPC(EntityType.COW, "TemplateSource");
         template.getOrAddTrait(Owner.class).setOwner(alice.player.getUUID());
         template.getOrAddTrait(Age.class).setAge(-12000);
