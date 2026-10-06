@@ -231,32 +231,50 @@ public class BehaviorRegistry {
                 private String currentSignal;
                 private BehaviorSignals.SignalListener listener;
                 private boolean signalReceived = false;
+                private long generation;
 
                 @Override
-                public void reset() {
+                public synchronized void reset() {
                     signalReceived = false;
-                    if (listener != null && currentSignal != null) {
-                        signals.unlisten(context.getNPC(), currentSignal, listener);
-                        listener = null;
-                        currentSignal = null;
-                    }
+                    detach();
+                }
+
+                private void detach() {
+                    generation++;
+                    BehaviorSignals.SignalListener previous = listener;
+                    String previousSignal = currentSignal;
+                    listener = null;
+                    currentSignal = null;
+                    if (previous != null) signals.unlisten(context.getNPC(), previousSignal, previous);
                 }
 
                 @Override
-                public BehaviorStatus run() {
+                public synchronized BehaviorStatus run() {
                     if (signalReceived) {
-                        signals.unlisten(context.getNPC(), currentSignal, listener);
-                        listener = null;
+                        detach();
                         return BehaviorStatus.SUCCESS;
                     }
                     return BehaviorStatus.RUNNING;
                 }
 
                 @Override
-                public boolean shouldExecute() {
-                    currentSignal = signalHolder.evaluateAsString(context.getScope());
-                    listener = () -> signalReceived = true;
-                    signals.listen(context.getNPC(), currentSignal, listener);
+                public synchronized boolean shouldExecute() {
+                    reset();
+                    long activation = generation;
+                    String evaluatedSignal = signalHolder.evaluateAsString(context.getScope());
+                    if (generation != activation) return false;
+                    currentSignal = evaluatedSignal;
+                    listener = () -> {
+                        synchronized (this) {
+                            if (generation == activation) signalReceived = true;
+                        }
+                    };
+                    try { signals.listen(context.getNPC(), currentSignal, listener); }
+                    catch (RuntimeException | Error failure) {
+                        try { reset(); }
+                        catch (RuntimeException | Error cleanup) { if (cleanup != failure) failure.addSuppressed(cleanup); }
+                        throw failure;
+                    }
                     return true;
                 }
             };
