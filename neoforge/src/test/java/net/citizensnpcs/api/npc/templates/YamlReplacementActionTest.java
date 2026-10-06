@@ -8,6 +8,25 @@ import net.citizensnpcs.api.util.DataKey;
 import net.citizensnpcs.api.util.MemoryDataKey;
 
 class YamlReplacementActionTest {
+    @Test void yamlNullDeletesOnlyExistingPathsWhenOverrideIsEnabled(@org.junit.jupiter.api.io.TempDir java.nio.file.Path directory) throws Exception {
+        var file = directory.resolve("delete.yml");
+        java.nio.file.Files.writeString(file,
+                "replacements:\n  settings:\n    removed: null\n  missing:\n    nested: null\n  scalar:\n    nested: null\n");
+        var storage = new net.citizensnpcs.api.util.YamlStorage(file.toFile());
+        assertTrue(storage.load());
+        var replacements = storage.getKey("replacements").getValuesDeep();
+        for (boolean override : new boolean[]{false, true}) {
+            var original = new MemoryDataKey();
+            original.setInt("settings.removed", 1); original.setInt("settings.kept", 2);
+            original.setString("scalar", "keep");
+            DataKey result = apply(original.getValuesDeep(), replacements, override);
+            assertEquals(!override, result.keyExists("settings.removed"));
+            assertEquals(2, result.getInt("settings.kept"));
+            assertFalse(result.keyExists("missing"));
+            assertEquals("keep", result.getString("scalar"));
+        }
+    }
+
     @SuppressWarnings("unchecked")
     private static void verifyReplacementIsolation(boolean failFirstLoad) {
         var input = new java.util.ArrayList<Object>(java.util.List.of("original"));

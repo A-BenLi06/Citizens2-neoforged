@@ -1853,3 +1853,9 @@ A native probe destroys its target inside a parser and returns the old Age trait
 TraitTemplateParser.createDefault now uses strict class construction rather than lenient loading that could return null and be silently skipped. A native probe rejects a malformed Age field without changing the target, then repairs the input and attaches the successfully loaded trait.
 
 Both NeoForge 21.1.233 and 21.1.248 pass 329 creation checks. Clean ordinary test/build passes with 523 tests; Interactions audit tests pass with 100; no failures/errors/skips. Release archives remain separate and exclude all probes. All invoked handles completed; no unrelated server or original data was changed. Updated template reload documentation and fixture README. The full Citizens goal remains active.
+
+## 2026-10-06 14:39:09 +08:00 — Verify explicit null deletion in YAML template replacements
+
+Added a real YAML file test for null-valued replacement entries. It verifies override-enabled deletion, default-mode preservation, retained sibling fields and no new structures for nonexistent deletion paths. Existing production behavior already satisfies these rules.
+
+All 524 ordinary tests and the normal build pass without failures/errors/skips; git diff --check passes. No fresh native/client run is claimed. Production Interactions sources and packaging are unchanged; no unrelated server or original data was changed. Updated docs/template-map-merge-2026-10-05.md. The full Citizens goal remains active.

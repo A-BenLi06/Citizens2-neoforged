@@ -13,3 +13,8 @@ The existing dotted-path interpretation remains in place. Three focused tests co
 empty-map replacement/creation, preservation of existing values for nested and dotted
 defaults, and explicit overriding of scalar parents. These tests use the actual
 replacement action and in-memory NPC snapshots; no new native/client run is claimed.
+
+A real YAML null-replacement test verifies explicit deletion with override enabled,
+preservation with override disabled, retained siblings, and no creation of missing
+parents or replacement of scalar ancestors merely to delete a nonexistent child.
+The existing implementation passes without additional production changes.
