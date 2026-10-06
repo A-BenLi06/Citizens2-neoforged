@@ -86,7 +86,7 @@ public final class RelocationRuntimeAudit {
                 spawnGrant = grant(alice.player, "citizens.npc.spawn");
                 check(!PermissionUtil.hasPermission(alice.player, "citizens.admin")
                         && !PermissionUtil.hasPermission(alice.player, "citizens.npc.tphere.multiworld"), "independent_permissions");
-                spawnCommands(); playerTeleport(); relocateCommands(); prompts(); completionOwnership(); npcCommandSources(); numericTriggerInput(); teleportTriggerInput(); movetoCommands(); tptoCommands(); mountedCompletion();
+                spawnCommands(); playerTeleport(); relocateCommands(); prompts(); completionOwnership(); npcCommandSources(); chatTriggerInput(); numericTriggerInput(); teleportTriggerInput(); movetoCommands(); tptoCommands(); mountedCompletion();
             }
             if (server.getTickCount() == start + 1) mount = null;
             if (server.getTickCount() >= start + 5) {
@@ -347,6 +347,36 @@ public final class RelocationRuntimeAudit {
         automated.discard();
         reject(source, "spawn " + target.getId());
         check(!target.isSpawned(), "retired_fake_player_command_source_rejected");
+    }
+
+    private static void chatTriggerInput() {
+        String key = net.citizensnpcs.trait.waypoint.triggers.WaypointTriggerPrompt.CREATED_TRIGGER_KEY;
+        var prompt = new net.citizensnpcs.trait.waypoint.triggers.ChatTriggerPrompt();
+        var session = ChatPrompts.begin(alice.player, prompt);
+        ChatPrompts.acceptInput(alice.player, "radiusStory Must Stay");
+        ChatPrompts.acceptInput(alice.player, "RADIUS\t 8.5");
+        var persister = new net.citizensnpcs.trait.waypoint.triggers.WaypointTriggerRegistry();
+        for (String invalid : List.of("radius NaN", "radius Infinity", "radius -Infinity", "radius 4 extra", "radius")) {
+            ChatPrompts.acceptInput(alice.player, invalid);
+            DataKey snapshot = new MemoryDataKey();
+            persister.save(prompt.createFromShortInput(session, "Snapshot"), snapshot);
+            check(ChatPrompts.isActive(session) && session.getSessionData(key) == null && snapshot.getDouble("radius") == 8.5,
+                    "invalid_chat_radius_preserves_value_" + invalid);
+        }
+        ChatPrompts.acceptInput(alice.player, "Hello CASE");
+        ChatPrompts.acceptInput(alice.player, "finish");
+        DataKey saved = new MemoryDataKey();
+        persister.save((net.citizensnpcs.trait.waypoint.triggers.WaypointTrigger) session.getSessionData(key), saved);
+        check(!ChatPrompts.isActive(session) && saved.getDouble("radius") == 8.5
+                && saved.getString("lines.0").equals("radiusStory Must Stay") && saved.getString("lines.1").equals("Hello CASE"),
+                "chat_radius_keyword_preserves_ordinary_text");
+        prompt = new net.citizensnpcs.trait.waypoint.triggers.ChatTriggerPrompt();
+        session = ChatPrompts.begin(alice.player, prompt);
+        ChatPrompts.acceptInput(alice.player, "radius -1");
+        ChatPrompts.acceptInput(alice.player, "finish");
+        saved = new MemoryDataKey();
+        persister.save((net.citizensnpcs.trait.waypoint.triggers.WaypointTrigger) session.getSessionData(key), saved);
+        check(saved.getDouble("radius") == -1, "chat_radius_preserves_unlimited_range_value");
     }
 
     private static void numericTriggerInput() {

@@ -17,15 +17,17 @@ public class ChatTriggerPrompt implements WaypointTriggerPrompt {
     public ChatPrompt acceptInput(ChatPromptSession session, String input) {
         if (input.equalsIgnoreCase("back"))
             return (ChatPrompt) session.getSessionData("previous");
-        if (input.startsWith("radius")) {
-            String[] split = input.split(" ");
+        String[] split = input.trim().split("\\s+", 2);
+        if (split[0].equalsIgnoreCase("radius")) {
             if (split.length < 2) {
                 Messaging.sendErrorTr(session.getPlayer().createCommandSourceStack(),
                         Messages.WAYPOINT_TRIGGER_CHAT_NO_RADIUS);
                 return this;
             }
             try {
-                radius = Double.parseDouble(split[1]);
+                double candidate = Double.parseDouble(split[1]);
+                if (!Double.isFinite(candidate)) throw new NumberFormatException("Radius must be finite");
+                radius = candidate;
                 Messaging.sendTr(session.getPlayer().createCommandSourceStack(), Messages.CHAT_TRIGGER_RADIUS_SET,
                         radius);
             } catch (NumberFormatException ex) {

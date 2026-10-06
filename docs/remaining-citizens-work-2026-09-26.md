@@ -16,7 +16,7 @@ Recent follow-ups cover [`powered`, `name` and `home` options](command-options-h
 
 ## Behavior, data and integration acceptance
 
-- [Numeric trigger input](numeric-trigger-input-2026-10-06.md) rejects invalid/overflowing delay and speed values without replacing editor state. Valid durations, finite-negative compatibility and inline repair are covered by unit/native chat checks; external saved-data/provider validation remains separate.
+- [Numeric trigger input](numeric-trigger-input-2026-10-06.md) rejects invalid/overflowing delay and speed values and non-finite chat radii without replacing editor state. Chat radius keywords preserve ordinary text. Valid durations, finite-negative compatibility and inline repair are covered by unit/native chat checks; external saved-data/provider validation remains separate.
 
 - [Teleport trigger input](teleport-trigger-input-2026-10-06.md) preserves native dimension IDs and supports the waypoint editor's inline coordinate/here forms. Parser and native chat-session execution checks cover rejected input and correct destinations; physical-client/provider acceptance remains separate.
 
