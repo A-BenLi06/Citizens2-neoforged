@@ -12,6 +12,47 @@ import net.citizensnpcs.api.util.YamlStorage;
 import net.minecraft.resources.ResourceLocation;
 
 class TemplateGenerationTest {
+    private static net.citizensnpcs.api.expr.Memory applyMemoryTemplate(Template template) {
+        var result = new net.citizensnpcs.api.expr.Memory();
+        var target = new java.util.concurrent.atomic.AtomicReference<NPC>();
+        var registry = (net.citizensnpcs.api.npc.NPCRegistry) java.lang.reflect.Proxy.newProxyInstance(
+                NPC.class.getClassLoader(), new Class<?>[]{net.citizensnpcs.api.npc.NPCRegistry.class},
+                (proxy, method, args) -> target.get());
+        var uuid = java.util.UUID.randomUUID();
+        NPC npc = (NPC) java.lang.reflect.Proxy.newProxyInstance(NPC.class.getClassLoader(), new Class<?>[]{NPC.class},
+                (proxy, method, args) -> {
+                    switch (method.getName()) {
+                        case "getOwningRegistry": return registry;
+                        case "getId": return 1;
+                        case "getUniqueId": return uuid;
+                        case "isSpawned": return false;
+                        case "saveSnapshot": return null;
+                        case "load": result.loadFrom(((DataKey) args[0]).getRelative("traits.behavior.memory")); return null;
+                        default: throw new AssertionError(method.getName());
+                    }
+                });
+        target.set(npc); template.apply(npc);
+        return result;
+    }
+
+    @Test void generatedAndReloadedTemplatesProduceEquivalentBlackboardState(@TempDir Path folder) {
+        var registry = TemplateRegistry.prepareReload(folder);
+        var key = ResourceLocation.fromNamespaceAndPath("audit", "memory");
+        registry.generateTemplateFromNPC(key, snapshot(root -> {
+            root.setRaw("traits.behavior.memory.values", java.util.Arrays.asList("first", null, "last"));
+            root.setRaw("traits.behavior.memory.empty", java.util.List.of());
+            root.setInt("traits.behavior.memory.counter", 7);
+        }));
+        var direct = applyMemoryTemplate(registry.getTemplateByKey(key));
+        var reloaded = applyMemoryTemplate(TemplateRegistry.prepareReload(folder).getTemplateByKey(key));
+        for (var memory : java.util.List.of(direct, reloaded)) {
+            assertEquals(java.util.Arrays.asList("first", null, "last"), memory.getList("values"));
+            assertTrue(memory.has("empty"));
+            assertTrue(memory.getList("empty").isEmpty());
+            assertEquals(7D, memory.getNumber("counter"));
+        }
+    }
+
     public static final class BrokenSerialization {
         int calls;
         public String getValue() { calls++; throw new IllegalStateException("injected serialization failure"); }

@@ -43,7 +43,7 @@ public class YamlReplacementAction implements Consumer<NPC> {
             for (Entry<String, Object> entry : node.map.entrySet()) {
                 String fullKey = node.headKey.isEmpty() ? entry.getKey() : node.headKey + '.' + entry.getKey();
                 if (!override && hasScalarAncestor(memoryKey, fullKey)) continue;
-                if (entry.getValue() instanceof Map<?, ?> map && !map.isEmpty()) {
+                if (entry.getValue() instanceof Map<?, ?> map && !map.isEmpty() && !isIndexedList(map)) {
                     // Defaults must not replace an existing scalar/list just to reach a nested field.
                     if (!override && memoryKey.keyExists(fullKey) && !(memoryKey.getRaw(fullKey) instanceof Map))
                         continue;
@@ -67,6 +67,14 @@ public class YamlReplacementAction implements Consumer<NPC> {
             if (root.keyExists(parent) && !(root.getRaw(parent) instanceof Map)) return true;
         }
         return false;
+    }
+
+    /** YAML storage represents lists as contiguous string-indexed maps; their null slots are values, not deletions. */
+    private static boolean isIndexedList(Map<?, ?> map) {
+        for (int i = 0; i < map.size(); i++) {
+            if (!map.containsKey(Integer.toString(i))) return false;
+        }
+        return true;
     }
 
     private static class Node {

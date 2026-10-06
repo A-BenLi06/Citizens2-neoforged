@@ -328,6 +328,11 @@ public final class CreationRuntimeAudit {
         NPC template = registry.createNPC(EntityType.COW, "TemplateSource");
         template.getOrAddTrait(Owner.class).setOwner(alice.player.getUUID());
         template.getOrAddTrait(Age.class).setAge(-12000);
+        DataKey memoryTree = new MemoryDataKey(); memoryTree.setString("root", "succeed");
+        BehaviorTrait templateBehavior = template.getOrAddTrait(BehaviorTrait.class);
+        templateBehavior.applyBehaviorsFromKey(memoryTree);
+        templateBehavior.getMemory().set("template_list", Arrays.asList("first", null, "last"));
+        templateBehavior.getMemory().set("template_empty", List.of());
         template.spawn(new Location(level, 10, -58, 10));
         NPC selectionBeforeTemplateCheck = selected();
         var generationPermission = grant("citizens.templates.generate");
@@ -372,6 +377,16 @@ public final class CreationRuntimeAudit {
                 "unspawned_template_never_transiently_spawns");
         at(copied.getStoredLocation(), 6, -58, 6, 0, 0, "command_destination_wins_over_template_location");
         check(copied.getTraitNullable(Age.class).getAge() == -6000, "template_traits_still_apply");
+        NPC diskTemplateTarget = registry.createNPC(EntityType.COW, "DiskTemplateTarget");
+        try {
+            var diskTemplates = net.citizensnpcs.api.npc.templates.TemplateRegistry.prepareReload(
+                    CitizensAPI.getDataFolder().toPath().resolve("templates"));
+            diskTemplates.getTemplateByKey(key).apply(diskTemplateTarget);
+            var memory = diskTemplateTarget.getTraitNullable(BehaviorTrait.class).getMemory();
+            check(memory.getList("template_list").equals(Arrays.asList("first", null, "last"))
+                    && memory.has("template_empty") && memory.getList("template_empty").isEmpty(),
+                    "generated_template_disk_roundtrip_preserves_native_blackboard_lists");
+        } finally { diskTemplateTarget.destroy(); }
         NPC behaviorTarget = registry.createNPC(EntityType.COW, "BehaviorTemplateFailure");
         Path workspace = Files.createDirectories(CitizensAPI.getDataFolder().toPath().resolve("behavior-template-audit"));
         String missing = "missing-" + UUID.randomUUID() + ".yml";

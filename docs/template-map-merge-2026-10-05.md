@@ -18,3 +18,9 @@ A real YAML null-replacement test verifies explicit deletion with override enabl
 preservation with override disabled, retained siblings, and no creation of missing
 parents or replacement of scalar ancestors merely to delete a nonexistent child.
 The existing implementation passes without additional production changes.
+
+Contiguous numeric-key maps produced by YAML list normalization are now replaced as
+whole list values. Their null slots are preserved rather than interpreted as field
+deletions. This aligns freshly generated and disk-reloaded templates, including
+empty/null-containing blackboard lists; default-only replacement keeps an existing
+list intact. File/application and native NPC round-trip tests cover this distinction.

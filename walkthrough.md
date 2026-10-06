@@ -1859,3 +1859,9 @@ Both NeoForge 21.1.233 and 21.1.248 pass 329 creation checks. Clean ordinary tes
 Added a real YAML file test for null-valued replacement entries. It verifies override-enabled deletion, default-mode preservation, retained sibling fields and no new structures for nonexistent deletion paths. Existing production behavior already satisfies these rules.
 
 All 524 ordinary tests and the normal build pass without failures/errors/skips; git diff --check passes. No fresh native/client run is claimed. Production Interactions sources and packaging are unchanged; no unrelated server or original data was changed. Updated docs/template-map-merge-2026-10-05.md. The full Citizens goal remains active.
+
+## 2026-10-06 15:29:10 +08:00 — Preserve normalized lists through generated-template disk round trips
+
+A generation/save/reload/application test exposed null list slots being interpreted as deletion markers after YAML normalized lists to numeric-key maps. Replacement now treats contiguous indexed maps as whole list values, consistent with raw List input and the storage format. Default-only replacement preserves an existing list instead of merging new slots into it.
+
+Two new tests cover generated versus disk-reloaded blackboard state and indexed-list defaults. Native coverage generates a real NPC template with null/empty lists, reloads it from disk and applies it to another NPC. Both NeoForge 21.1.233 and 21.1.248 pass 330 creation checks. Clean ordinary test/build passes with 526 tests; Interactions audit tests pass with 100; no failures/errors/skips. Release archives remain separate and exclude all probes. All invoked handles completed; no unrelated server or original data was changed. Updated template map-merge documentation and fixture README. The full Citizens goal remains active.

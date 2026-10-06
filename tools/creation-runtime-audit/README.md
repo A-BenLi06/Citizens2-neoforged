@@ -1,6 +1,6 @@
 # Native NPC creation runtime audit
 
-The fixture currently has 329 checks. Template coverage includes sibling definitions,
+The fixture currently has 330 checks. Template coverage includes sibling definitions,
 overwrite index consistency, and applying the updated trait value through creation.
 Behavior short-form coverage includes missing arguments/files, malformed YAML and a
 valid filename containing spaces, with target preservation on file-input failures.
@@ -22,6 +22,8 @@ A trait-parser probe destroys its target before returning an old trait and verif
 that neither attachment nor later parser invocations continue on the removed NPC.
 The default trait parser also rejects an invalid persisted Age field and accepts a
 repaired value without altering the target on the rejected attempt.
+Generated-template disk round trips also preserve native behavior blackboard lists,
+including null slots and explicitly empty lists.
 
 Run from the repository root with PowerShell 7 and JDK 21:
 

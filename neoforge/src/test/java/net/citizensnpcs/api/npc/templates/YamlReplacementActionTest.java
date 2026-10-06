@@ -8,6 +8,13 @@ import net.citizensnpcs.api.util.DataKey;
 import net.citizensnpcs.api.util.MemoryDataKey;
 
 class YamlReplacementActionTest {
+    @Test void indexedListDefaultsDoNotMergeIntoAnExistingList() {
+        var original = java.util.Map.<String, Object>of("values", java.util.Map.of("0", "keep"));
+        var replacement = java.util.Map.<String, Object>of("values", java.util.Map.of("0", "new", "1", "extra"));
+        DataKey result = apply(original, replacement, false);
+        assertEquals(java.util.Map.of("0", "keep"), result.getRaw("values"));
+    }
+
     @Test void yamlNullDeletesOnlyExistingPathsWhenOverrideIsEnabled(@org.junit.jupiter.api.io.TempDir java.nio.file.Path directory) throws Exception {
         var file = directory.resolve("delete.yml");
         java.nio.file.Files.writeString(file,
