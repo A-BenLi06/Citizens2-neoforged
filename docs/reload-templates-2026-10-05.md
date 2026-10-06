@@ -39,3 +39,8 @@ Registration occurs once per action and failed registration may be retried. Exis
 UUID membership and exact event-class filtering remain unchanged; already-applied
 listener lifetime is not redesigned by this change. Two injected-registrar tests
 verify registration timing, repeat application, filtering and retry.
+
+Native event integration now applies a template with an on_spawn console command to
+a spawned NPC through Template.apply. It verifies first-application execution,
+exactly one execution after reapplication, and no execution for an unrelated NPC.
+Both NeoForge versions pass the expanded 326-check creation fixture.

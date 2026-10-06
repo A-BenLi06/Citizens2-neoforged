@@ -1709,3 +1709,9 @@ Details: docs/npc-command-format-2026-10-06.md. Execution failure policy and arb
 CommandEventAction now retains a registration operation during construction and installs its listener on first NPC application. Unused or rejected template candidates no longer register listeners merely by loading. Repeat applications share the one listener; registration failure leaves the action retryable. UUID and exact-event filtering are retained.
 
 Two injected-registrar tests cover construction/application timing, repeated membership, exact-class/unrelated-NPC filtering and registration retry. All 482 ordinary tests and the normal build pass without failures/errors/skips; git diff --check passes. No fresh native/client run is claimed, and applied-listener lifetime is not redesigned here. Production Interactions sources and packaging are unchanged; no unrelated server or original data was changed. Updated docs/reload-templates-2026-10-05.md. The full Citizens goal remains active.
+
+## 2026-10-06 08:24:15 +08:00 — Verify deferred template listeners on the native event bus
+
+Expanded native creation tests with an on_spawn template command using the real event bus and dispatcher. First application executes the command, repeated application adds no duplicate execution, and an unrelated NPC's spawn is ignored. No production change was required.
+
+Both NeoForge 21.1.233 and 21.1.248 pass 326 creation checks. Clean ordinary test/build passes with 482 tests; Interactions audit tests pass with 100; no failures/errors/skips. Release archives retain independent mod classes and exclude probes. All invoked handles completed; no unrelated server or original data was changed. Updated template reload documentation and the fixture README. Applied-listener lifecycle beyond these cases remains separate work; the full Citizens goal remains active.

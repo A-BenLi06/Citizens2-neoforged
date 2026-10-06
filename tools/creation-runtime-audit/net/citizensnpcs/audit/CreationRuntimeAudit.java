@@ -440,6 +440,24 @@ public final class CreationRuntimeAudit {
             check(restoreTarget.isSpawned() && exists(restoreTarget)
                     && originalEntity.isRemoved() && restoreTarget.getEntity() != originalEntity,
                     "template_action_failure_restores_native_spawn");
+            var eventCommands = new java.util.concurrent.atomic.AtomicInteger();
+            server.getCommands().getDispatcher().register(net.minecraft.commands.Commands.literal("creation_template_event")
+                    .executes(ctx -> { eventCommands.incrementAndGet(); return 1; }));
+            DataKey eventDefinition = new MemoryDataKey();
+            eventDefinition.setRaw("commands", Map.of("on_spawn", Map.of("0", "creation_template_event")));
+            var eventTemplate = net.citizensnpcs.api.npc.templates.Template.load(
+                    new net.citizensnpcs.api.npc.templates.TemplateRegistry.TemplateErrorReporter(),
+                    new net.citizensnpcs.api.npc.templates.TemplateWorkspace(workspace.toFile()),
+                    ResourceLocation.fromNamespaceAndPath("creation_audit", "event"), eventDefinition);
+            eventTemplate.apply(restoreTarget);
+            check(eventCommands.get() == 1, "template_spawn_command_runs_on_first_application");
+            eventTemplate.apply(restoreTarget);
+            check(eventCommands.get() == 2, "repeated_template_application_does_not_duplicate_listener");
+            NPC unrelated = registry.createNPC(EntityType.COW, "UnrelatedTemplateEvent");
+            try {
+                if (!unrelated.spawn(new Location(level, 16, -58, 16))) throw new AssertionError("Event isolation setup failed");
+                check(eventCommands.get() == 2, "template_spawn_command_ignores_unapplied_npc");
+            } finally { unrelated.destroy(); }
         } finally { restoreTarget.destroy(); }
     }
 
