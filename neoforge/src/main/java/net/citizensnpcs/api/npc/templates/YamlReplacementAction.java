@@ -77,6 +77,14 @@ public class YamlReplacementAction implements Consumer<NPC> {
         }
     }
 
+    static Map<String, Object> validatedValues(DataKey source) {
+        YRAPersister persister = new YRAPersister();
+        YamlReplacementAction parsed = persister.create(source);
+        DataKey normalized = new MemoryDataKey();
+        persister.save(parsed, normalized);
+        return normalized.getValuesDeep();
+    }
+
     private static class YRAPersister implements Persister<YamlReplacementAction> {
         public YRAPersister() {
         }

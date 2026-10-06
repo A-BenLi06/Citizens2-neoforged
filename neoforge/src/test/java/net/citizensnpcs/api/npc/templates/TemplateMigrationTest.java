@@ -8,6 +8,27 @@ import org.junit.jupiter.api.io.TempDir;
 import net.minecraft.resources.ResourceLocation;
 
 class TemplateMigrationTest {
+    @Test void invalidLegacyOptionsAreRejectedBeforeFilesystemChanges(@TempDir Path root) throws Exception {
+        int index = 0;
+        for (String yaml : java.util.List.of("override: perhaps\nreplacements: {}\n", "replacements: wrong-type\n")) {
+            Path folder = Files.createDirectory(root.resolve("invalid" + index++));
+            Path source = Files.writeString(folder.resolve("sample.yml"), yaml);
+            var failure = assertThrows(IllegalStateException.class, () -> TemplateRegistry.prepareReload(folder));
+            assertTrue(failure.getCause().getMessage().contains("Invalid legacy template contents"));
+            assertEquals(yaml, Files.readString(source));
+            assertFalse(Files.exists(folder.resolve("migrated")));
+            assertFalse(Files.exists(folder.resolve("sample.yml.migrated")));
+        }
+    }
+
+    @Test void migrationUsesTheSameQuotedBooleanNormalizationAsReplacementLoading(@TempDir Path folder) throws Exception {
+        Files.writeString(folder.resolve("sample.yml"), "override: ' true '\nreplacements:\n  name: Original\n");
+        TemplateRegistry.prepareReload(folder);
+        var saved = new net.citizensnpcs.api.util.YamlStorage(folder.resolve("migrated/sample.yml").toFile());
+        assertTrue(saved.load());
+        assertEquals(Boolean.TRUE, saved.getKey("").getRaw("sample.yaml_replace.override"));
+    }
+
     @Test void invalidNamesAreRejectedBeforeWritingOrArchiving(@TempDir Path root) throws Exception {
         int index = 0;
         for (String name : java.util.List.of("bad name.yml", ".yml")) {

@@ -217,6 +217,11 @@ public class TemplateRegistry {
         String templateName = template.getName().substring(0, template.getName().length() - ".yml".length());
         if (templateName.isEmpty() || ResourceLocation.tryBuild(namespaceFolder.getName(), templateName.toLowerCase(Locale.ROOT)) == null)
             throw new TemplateLoadException("Invalid legacy template name: " + template.getName());
+        Map<String, Object> migrated;
+        try { migrated = Map.of("yaml_replace", YamlReplacementAction.validatedValues(storage.getKey(""))); }
+        catch (RuntimeException failure) {
+            throw new TemplateLoadException("Invalid legacy template contents: " + template.getName(), failure);
+        }
         if (!namespaceFolder.exists() && !namespaceFolder.mkdir())
             throw new TemplateLoadException(
                     "Unable to create destination folder while migrating " + template.getName());
@@ -225,10 +230,7 @@ public class TemplateRegistry {
         if (!destination.load())
             throw new TemplateLoadException("Unable to open migration destination for " + template.getName());
 
-        DataKey from = storage.getKey("");
         Map<String, Object> templates = new java.util.LinkedHashMap<>(destination.getKey("").getValuesDeep());
-        Map<String, Object> migrated = Map.of("yaml_replace", Map.of("override", from.getBoolean("override"),
-                "replacements", from.getRelative("replacements").getValuesDeep()));
         var matches = templates.keySet().stream().filter(name -> name.equalsIgnoreCase(templateName)).toList();
         if (matches.size() > 1 || !matches.isEmpty() && !migrated.equals(templates.get(matches.get(0))))
             throw new TemplateLoadException("Conflicting migration destination for " + template.getName());

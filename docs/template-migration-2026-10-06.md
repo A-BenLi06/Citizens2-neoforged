@@ -19,3 +19,8 @@ namespace or writing/archiving files. Invalid resource paths and empty filename 
 are rejected while preserving the source. The empty-stem check is explicit because
 ResourceLocation itself permits an empty path. A test verifies both cases have no
 destination/archive side effects.
+
+Legacy contents are now validated and normalized by the same YAML replacement
+persister used for ordinary templates, before creating the destination directory.
+Invalid override/replacement types preserve source files, while accepted quoted
+Boolean values normalize consistently. Two file tests verify these paths.
