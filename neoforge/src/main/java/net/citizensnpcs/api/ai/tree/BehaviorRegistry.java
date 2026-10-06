@@ -104,6 +104,11 @@ public class BehaviorRegistry {
         return Durations.toTicks(duration);
     }
 
+    static Integer signalTargetId(Number value) {
+        try { return new java.math.BigDecimal(value.toString()).intValueExact(); }
+        catch (NumberFormatException | ArithmeticException invalid) { return null; }
+    }
+
     /**
      * Registers a behavior factory.
      *
@@ -194,7 +199,8 @@ public class BehaviorRegistry {
                         }
                     }
                 } else if (idValue instanceof Number) {
-                    int npcId = ((Number) idValue).intValue();
+                    Integer npcId = signalTargetId((Number) idValue);
+                    if (npcId == null) return BehaviorStatus.FAILURE;
                     npc = CitizensAPI.getNPCRegistry().getById(npcId);
                 }
                 if (npc == null)
