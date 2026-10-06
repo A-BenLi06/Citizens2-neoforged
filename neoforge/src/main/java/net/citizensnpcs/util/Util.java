@@ -16,8 +16,6 @@ import net.citizensnpcs.api.util.Placeholders;
 import net.citizensnpcs.api.trait.trait.Equipment.EquipmentSlot;
 import net.citizensnpcs.api.util.Location;
 import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.core.registries.Registries;
-import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.server.MinecraftServer;
@@ -113,24 +111,34 @@ public class Util {
 
     /**
      * Resolves a dimension the way a player would name one on the command line: a full id such as
-     * {@code minecraft:the_nether}, or just its path.
+     * {@code minecraft:the_nether}, or just its path. Full IDs require an exact match; bare paths prefer the default
+     * namespace and otherwise must identify exactly one loaded dimension.
      *
-     * @return the level, or null when no dimension matches
+     * @return the level, or null when no dimension matches or a bare path is ambiguous
      */
     public static ServerLevel getLevel(MinecraftServer server, String name) {
-        if (server == null || name == null || name.isEmpty())
+        if (server == null) return null;
+        return findLevel(name, server.getAllLevels(), level -> level.dimension().location());
+    }
+
+    static <T> T findLevel(String name, Iterable<T> levels, java.util.function.Function<T, ResourceLocation> identifier) {
+        if (name == null || name.isEmpty())
             return null;
-        ResourceLocation id = ResourceLocation.tryParse(name.contains(":") ? name : "minecraft:" + name);
+        boolean qualified = name.contains(":");
+        ResourceLocation id = ResourceLocation.tryParse(name);
         if (id == null)
             return null;
-        ServerLevel level = server.getLevel(ResourceKey.create(Registries.DIMENSION, id));
-        if (level != null)
-            return level;
-        for (ServerLevel candidate : server.getAllLevels()) {
-            if (candidate.dimension().location().getPath().equals(id.getPath()))
-                return candidate;
+        T match = null;
+        boolean ambiguous = false;
+        for (T candidate : levels) {
+            ResourceLocation candidateId = identifier.apply(candidate);
+            if (candidateId.equals(id)) return candidate;
+            if (!qualified && candidateId.getPath().equals(id.getPath())) {
+                if (match != null) ambiguous = true;
+                match = candidate;
+            }
         }
-        return null;
+        return ambiguous ? null : match;
     }
 
     /** A location as shown to a command sender. Upstream prints the world name; a dimension id is the counterpart. */
