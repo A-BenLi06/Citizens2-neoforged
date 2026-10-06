@@ -99,12 +99,21 @@ public class BehaviorTreeParser {
      */
     private Behavior createExpressionBehavior(String expression, BehaviorRegistry.BehaviorContext context) {
         ExpressionRegistry exprRegistry = registry.getExpressionRegistry();
-        ExpressionValue exprHolder = exprRegistry.parseValue(expression);
+        java.util.function.Function<ExpressionScope, Object> evaluate;
+        if (strict) {
+            try { evaluate = exprRegistry.compile(expression)::evaluate; }
+            catch (ExpressionCompileException failure) {
+                throw new IllegalArgumentException("Invalid behavior expression: " + expression, failure);
+            }
+        } else {
+            ExpressionValue exprHolder = exprRegistry.parseValue(expression);
+            evaluate = exprHolder::evaluate;
+        }
 
         return new InstantBehavior() {
             @Override
             public BehaviorStatus run() {
-                exprHolder.evaluate(context.getScope());
+                evaluate.apply(context.getScope());
                 return BehaviorStatus.SUCCESS;
             }
 
@@ -410,7 +419,7 @@ public class BehaviorTreeParser {
         if (name.startsWith("/"))
             return createCommandBehavior(name.substring(1), context);
 
-        if (name.startsWith("`"))
+        if (name.startsWith("`") || registry.getExpressionRegistry().isPossiblyExpression(name))
             return createExpressionBehavior(name, context);
 
         String[] parts = parseInlineArgs(name);

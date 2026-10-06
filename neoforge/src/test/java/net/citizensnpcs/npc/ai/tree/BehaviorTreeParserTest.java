@@ -22,6 +22,41 @@ import net.citizensnpcs.api.util.MemoryDataKey;
  * parser, the registry and the Molang expressions in between actually drive a tree, rather than only compiling.
  */
 public class BehaviorTreeParserTest {
+    @Test public void strictExpressionLeavesRejectMissingEnginesAndBrokenWrappers() {
+        var parser = new BehaviorTreeParser(new CitizensBehaviorRegistry(new ExpressionRegistry()));
+        for (String expression : java.util.List.of("`1`", "`unfinished", "unknown`1`")) {
+            DataKey root = new MemoryDataKey(); root.setString("step", expression);
+            org.junit.jupiter.api.Assertions.assertThrows(IllegalArgumentException.class,
+                    () -> parser.parseStrict(root.getRelative("step"), null, new ExpressionScope(), new Memory()));
+        }
+    }
+
+    @Test public void strictExpressionLeavesRetainCompilerFailure() {
+        var expressions = new ExpressionRegistry();
+        var failure = new net.citizensnpcs.api.expr.ExpressionEngine.ExpressionCompileException("bad expression");
+        expressions.registerEngine(new net.citizensnpcs.api.expr.ExpressionEngine() {
+            public String getName() { return "rejecting"; }
+            public net.citizensnpcs.api.expr.CompiledExpression compile(String source)
+                    throws net.citizensnpcs.api.expr.ExpressionEngine.ExpressionCompileException { throw failure; }
+        });
+        expressions.setDefaultEngine("rejecting");
+        var parser = new BehaviorTreeParser(new CitizensBehaviorRegistry(expressions));
+        DataKey root = new MemoryDataKey(); root.setString("step", "`invalid`");
+        var actual = org.junit.jupiter.api.Assertions.assertThrows(IllegalArgumentException.class,
+                () -> parser.parseStrict(root.getRelative("step"), null, new ExpressionScope(), new Memory()));
+        org.junit.jupiter.api.Assertions.assertSame(failure, actual.getCause());
+    }
+
+    @Test public void strictPrefixedExpressionLeavesCompileWithoutExecutingUntilRun() {
+        var expressions = new ExpressionRegistry(); expressions.registerEngine(new MolangEngine());
+        var parser = new BehaviorTreeParser(new CitizensBehaviorRegistry(expressions));
+        Memory memory = new Memory();
+        DataKey root = new MemoryDataKey(); root.setString("step", "molang`mem.set('direct', 9)`");
+        Behavior behavior = parser.parseStrict(root.getRelative("step"), null, new ExpressionScope(), memory);
+        assertEquals(0D, memory.getNumber("direct"));
+        assertEquals(BehaviorStatus.SUCCESS, behavior.run());
+        assertEquals(9D, memory.getNumber("direct"));
+    }
     @Test public void quotedEmptyArgumentsRemainExplicitValues() {
         Memory memory = new Memory(); memory.set("empty", "old"); memory.set("single", "old");
         finish(parse(map("sequence", map("0", "set empty \"\"", "1", "set single ''",
