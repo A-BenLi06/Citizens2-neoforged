@@ -855,14 +855,13 @@ public class NPCCommands {
             parsePlaceholders = true)
     @Requirements
     public void tpto(CommandContext args, CommandSourceStack sender, NPC npc) throws CommandException {
+        if (!currentCommandSource(sender)) throw new NoPermissionsException();
         Entity from = npc == null ? null : npc.getEntity();
         Entity to = null;
-        boolean firstWasPlayer = false;
         Entity first = resolveEntity(sender, args.getString(1));
         if (first == null)
             throw new CommandException(args.argsLength() == 2 ? Messages.TPTO_ENTITY_NOT_FOUND
                     : Messages.FROM_ENTITY_NOT_FOUND);
-        firstWasPlayer = first instanceof ServerPlayer;
         if (args.argsLength() == 2) {
             to = first;
         } else {
@@ -873,14 +872,21 @@ public class NPCCommands {
             throw new CommandException(Messages.FROM_ENTITY_NOT_FOUND);
         if (to == null)
             throw new CommandException(Messages.TPTO_ENTITY_NOT_FOUND);
-        NPC fromNPC = CitizensAPI.getNPCRegistry().getNPC(from);
+        NPC fromNPC = net.citizensnpcs.npc.NPCRegistries.lookup(from);
+        Location destination = commandLocation(Location.of(to));
+        java.util.function.Consumer<Entity> completed = entity -> {
+            if (currentCommandSource(sender) && (fromNPC == null
+                    || isCurrentTarget(fromNPC) && fromNPC.getEntity() == entity))
+                Messaging.sendTr(sender, Messages.TPTO_SUCCESS);
+        };
         if (fromNPC != null) {
-            fromNPC.teleport(Location.of(to), TeleportCause.COMMAND);
+            if (!isCurrentTarget(fromNPC) || fromNPC.getEntity() != from)
+                throw new CommandException(Messages.NPC_NOT_FOUND);
+            fromNPC.teleport(destination, TeleportCause.COMMAND, completed);
         } else {
-            from.teleportTo((net.minecraft.server.level.ServerLevel) to.level(), to.getX(), to.getY(), to.getZ(),
-                    java.util.Set.of(), to.getYRot(), to.getXRot());
+            Entity moved = EntityUtil.teleport(from, destination);
+            if (moved != null) completed.accept(moved);
         }
-        Messaging.sendTr(sender, Messages.TPTO_SUCCESS);
     }
 
     /** An NPC id or a player name, which is what the teleport commands accept on both sides. */

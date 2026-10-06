@@ -86,7 +86,7 @@ public final class RelocationRuntimeAudit {
                 spawnGrant = grant(alice.player, "citizens.npc.spawn");
                 check(!PermissionUtil.hasPermission(alice.player, "citizens.admin")
                         && !PermissionUtil.hasPermission(alice.player, "citizens.npc.tphere.multiworld"), "independent_permissions");
-                spawnCommands(); playerTeleport(); relocateCommands(); prompts(); completionOwnership(); npcCommandSources(); mountedCompletion();
+                spawnCommands(); playerTeleport(); relocateCommands(); prompts(); completionOwnership(); npcCommandSources(); tptoCommands(); mountedCompletion();
             }
             if (server.getTickCount() == start + 1) mount = null;
             if (server.getTickCount() >= start + 5) {
@@ -347,6 +347,41 @@ public final class RelocationRuntimeAudit {
         automated.discard();
         reject(source, "spawn " + target.getId());
         check(!target.isSpawned(), "retired_fake_player_command_source_rejected");
+    }
+
+    private static void tptoCommands() throws Exception {
+        grant(alice.player, "citizens.npc.tpto");
+        CommandSourceStack source = alice.player.createCommandSourceStack();
+        NPC destination = npc(registry, EntityType.COW, false, alice.player, true);
+        destination.teleport(new Location(level, 12, -58, 12, 60, 15), TeleportCause.PLUGIN);
+        Location expected = Location.of(destination.getEntity());
+        for (EntityType<?> type : List.of(EntityType.COW, EntityType.PLAYER)) {
+            for (boolean packet : new boolean[] { false, true }) {
+                NPC target = npc(named, type, packet, alice.player, true);
+                select(source, target);
+                Location before = target.getStoredLocation(); int messages = alice.player.messages.size();
+                teleport = event -> { if (event.getNPC() == target) event.setCanceled(true); };
+                try { run(source, "tpto " + destination.getId()); }
+                finally { teleport = null; }
+                at(target.getStoredLocation(), before, "tpto_cancellation_preserves_target_" + type + packet);
+                check(alice.player.messages.size() == messages, "canceled_tpto_has_no_success_" + type + packet);
+                run(source, "tpto " + destination.getId());
+                at(target.getStoredLocation(), expected, "tpto_moves_selected_named_registry_npc_" + type + packet);
+                check(alice.player.messages.size() == messages + 1, "completed_tpto_reports_once_" + type + packet);
+            }
+        }
+        destination.teleport(new Location(nether, 4, 70, 4), TeleportCause.PLUGIN);
+        check(destination.getEntity().level() == nether, "tpto_cross_world_destination_setup");
+        Location before = Location.of(alice.player); int messages = alice.player.messages.size();
+        travel = event -> { if (event.getEntity() == alice.player) event.setCanceled(true); };
+        try { run(source, "tpto " + alice.player.getGameProfile().getName() + " " + destination.getId()); }
+        finally { travel = null; }
+        at(Location.of(alice.player), before, "tpto_native_player_cancellation_preserves_location");
+        check(alice.player.messages.size() == messages, "tpto_native_player_cancellation_has_no_success");
+        run(source, "tpto " + alice.player.getGameProfile().getName() + " " + destination.getId());
+        at(Location.of(alice.player), Location.of(destination.getEntity()), "tpto_native_player_cross_world_completion");
+        check(alice.player.messages.size() == messages + 1, "tpto_native_player_success_reports_once");
+        moveAlice(before);
     }
 
     private static void mountedCompletion() throws Exception {
