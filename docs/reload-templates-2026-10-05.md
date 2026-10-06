@@ -44,3 +44,8 @@ Native event integration now applies a template with an on_spawn console command
 a spawned NPC through Template.apply. It verifies first-application execution,
 exactly one execution after reapplication, and no execution for an unrelated NPC.
 Both NeoForge versions pass the expanded 326-check creation fixture.
+
+Unknown command-event keys now enter TemplateErrorReporter instead of being silently
+ignored. Strict registry preparation rejects misspelled event names. File-based tests
+cover a misspelled on_spawn key and successful preparation of all six supported
+command event/application names.

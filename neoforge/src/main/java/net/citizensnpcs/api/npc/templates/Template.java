@@ -76,12 +76,12 @@ public class Template {
             template.addAction(new TraitLoaderAction(errors, workspace, key.getRelative("traits")));
         }
         if (key.keyExists("commands")) {
-            loadCommands(template, key.getRelative("commands"));
+            loadCommands(template, key.getRelative("commands"), errors);
         }
         return template;
     }
 
-    private static void loadCommands(Template template, DataKey key) {
+    private static void loadCommands(Template template, DataKey key, TemplateErrorReporter errors) {
         for (DataKey sub : key.getSubKeys()) {
             List<String> commands = new ArrayList<>();
             for (DataKey line : sub.getIntegerSubKeys()) {
@@ -111,6 +111,7 @@ public class Template {
                     template.addAction(cle::accept);
                     break;
                 default:
+                    errors.addError(sub.getPath() + ": Unknown template command event " + sub.name());
                     break;
             }
         }

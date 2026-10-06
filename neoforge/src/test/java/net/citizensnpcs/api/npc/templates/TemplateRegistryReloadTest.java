@@ -8,6 +8,22 @@ import org.junit.jupiter.api.io.TempDir;
 import net.minecraft.resources.ResourceLocation;
 
 class TemplateRegistryReloadTest {
+    @Test void misspelledCommandEventsRejectTheCandidate(@TempDir Path folder) throws Exception {
+        Path namespace = Files.createDirectories(folder.resolve("audit"));
+        Files.writeString(namespace.resolve("bad.yml"), "bad:\n  commands:\n    on_spwan:\n      - say hello\n");
+        var failure = assertThrows(IllegalStateException.class, () -> TemplateRegistry.prepareReload(folder));
+        assertTrue(failure.getCause().getMessage().contains("Unknown template command event on_spwan"));
+    }
+
+    @Test void supportedCommandEventsCanAllBePreparedWithoutRegisteringThem(@TempDir Path folder) throws Exception {
+        Path namespace = Files.createDirectories(folder.resolve("audit"));
+        StringBuilder yaml = new StringBuilder("valid:\n  commands:\n");
+        for (String event : java.util.List.of("on_spawn", "on_death", "on_damage", "on_left_click", "on_right_click", "on_template_apply"))
+            yaml.append("    ").append(event).append(":\n      - say hello\n");
+        Files.writeString(namespace.resolve("valid.yml"), yaml);
+        assertEquals(1, TemplateRegistry.prepareReload(folder).getAllTemplates().size());
+    }
+
     @Test void replacementTemplateLoadsThroughItsPersister(@TempDir Path folder) throws Exception {
         Path namespace = Files.createDirectories(folder.resolve("audit"));
         Files.writeString(namespace.resolve("valid.yml"), "valid:\n  yaml_replace:\n    override: true\n    replacements:\n      name: Changed\n");
