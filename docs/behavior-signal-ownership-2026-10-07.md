@@ -10,5 +10,7 @@ UUID, and emitGlobal notifies all registered instances. Callers that already hav
 should use emit(NPC, signal) when they require exact-instance delivery.
 
 Tests cover colliding UUIDs, independent removal of the same callback object, explicit
-UUID/global delivery and existing snapshot/failure behavior. Native/provider combinations
-remain separate acceptance. Interactions remains an independent NeoForge JAR.
+UUID/global delivery and existing snapshot/failure behavior. The native creation fixture
+also verifies these routing boundaries with real same-UUID NPCs and resumes ordinary/
+packet NPC behavior trees after signal delivery. Arbitrary provider combinations remain
+separate acceptance. Interactions remains an independent NeoForge JAR.

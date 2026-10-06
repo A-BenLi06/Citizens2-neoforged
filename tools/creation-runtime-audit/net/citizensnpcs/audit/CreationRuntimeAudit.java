@@ -571,6 +571,27 @@ public final class CreationRuntimeAudit {
         new net.citizensnpcs.api.npc.templates.CommandListExecutor(List.of("npc rename ExplicitDefault --id " + original.getId())).accept(namedTarget);
         check(original.getName().equals("ExplicitDefault") && namedTarget.getName().equals("ExactTarget"), "explicit_id_keeps_default_registry_lookup");
         original.setName("DefaultCommandTarget");
+        var signals = CitizensAPI.getBehaviorRegistry().getSignalManager();
+        int[] delivered = new int[2];
+        signals.listen(original, "signal_instance_audit", () -> delivered[0]++);
+        signals.listen(namedTarget, "signal_instance_audit", () -> delivered[1]++);
+        try {
+            DataKey params = new MemoryDataKey();
+            params.setString("npc", Integer.toString(original.getId()));
+            params.setString("signal", "signal_instance_audit");
+            var context = new net.citizensnpcs.api.ai.tree.BehaviorRegistry.BehaviorContext(namedTarget,
+                    new net.citizensnpcs.api.expr.ExpressionScope(), CitizensAPI.getExpressionRegistry(),
+                    new net.citizensnpcs.api.expr.Memory());
+            var emit = CitizensAPI.getBehaviorRegistry().createBehavior("emit_signal_to", params, context);
+            check(emit.run() == net.citizensnpcs.api.ai.tree.BehaviorStatus.SUCCESS && delivered[0] == 1 && delivered[1] == 0,
+                    "directed_signal_behavior_uses_resolved_instance");
+            signals.emit(namedTarget, "signal_instance_audit");
+            check(delivered[0] == 1 && delivered[1] == 1, "native_signal_instance_emission_isolated");
+            signals.emitToNPC(original.getUniqueId(), "signal_instance_audit");
+            check(delivered[0] == 2 && delivered[1] == 2, "native_explicit_uuid_signal_matches_instances");
+            signals.clearListeners(original); signals.emit(namedTarget, "signal_instance_audit");
+            check(delivered[0] == 2 && delivered[1] == 3, "native_signal_cleanup_preserves_other_instance");
+        } finally { signals.clearListeners(original); signals.clearListeners(namedTarget); }
     }
 
     private static void repeatedBehaviorTicks() {
@@ -583,7 +604,9 @@ public final class CreationRuntimeAudit {
                     "0", Map.of("repeat 0", Map.of("0", "set skipped `1`")),
                     "1", Map.of("repeat 3", Map.of("0", "wait `2`", "1", "set repetitions `mem.get('repetitions') + 1`")),
                     "2", "set repeat_finished `1`",
-                    "3", "wait_for_signal repeat_audit_hold"));
+                    "3", "wait_for_signal repeat_audit_hold",
+                    "4", "set signal_finished `1`",
+                    "5", "wait_for_signal repeat_audit_final_hold"));
             behavior.applyBehaviorsFromKey(definition);
             behavior.getMemory().set("repetitions", 0D);
             check(target.spawn(new Location(level, 22, -58, 4)), "repeat_behavior_spawn_" + packet);
@@ -595,6 +618,11 @@ public final class CreationRuntimeAudit {
                         && behavior.getMemory().getNumber("repeat_finished") == 1
                         && behavior.getMemory().getNumber("skipped") == 0,
                         "repeat_body_completes_exactly_three_times_" + packet);
+                CitizensAPI.getBehaviorRegistry().getSignalManager().emit(target, "repeat_audit_hold");
+            });
+            atTick(23, () -> {
+                check(behavior.getMemory().getNumber("signal_finished") == 1,
+                        "native_signal_resumes_waiting_tree_" + packet);
                 target.destroy();
             });
         }
