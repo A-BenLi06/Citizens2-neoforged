@@ -31,3 +31,7 @@ internal index views. External clear/remove operations cannot corrupt only one i
 and previously obtained query results remain stable when a template is replaced.
 Two tests cover mutation rejection and snapshot stability; command callers were
 checked to use these collections read-only.
+
+Namespace existence queries now use the same Locale.ROOT case normalization as loaded
+keys and bare-name lookup. A test switches the default locale to Turkish and verifies
+mixed-case namespace/name lookup, absent namespaces and null input returning false.

@@ -8,6 +8,21 @@ import org.junit.jupiter.api.io.TempDir;
 import net.minecraft.resources.ResourceLocation;
 
 class TemplateRegistryReloadTest {
+    @Test void namespaceQueriesUseTheSameLocaleIndependentNormalizationAsLoading(@TempDir Path folder) throws Exception {
+        Path namespace = Files.createDirectories(folder.resolve("Mixed"));
+        Files.writeString(namespace.resolve("templates.yml"), "Item: {}\n");
+        var registry = TemplateRegistry.prepareReload(folder);
+        var previous = java.util.Locale.getDefault();
+        try {
+            java.util.Locale.setDefault(java.util.Locale.forLanguageTag("tr-TR"));
+            assertTrue(registry.hasNamespace("MIXED"));
+            assertTrue(registry.hasNamespace("mixed"));
+            assertEquals(1, registry.getTemplates("ITEM").size());
+            assertFalse(registry.hasNamespace("missing"));
+            assertFalse(registry.hasNamespace(null));
+        } finally { java.util.Locale.setDefault(previous); }
+    }
+
     @Test void runtimeParserFailureRetainsTemplateIdentityAndOriginalCause(@TempDir Path folder) throws Exception {
         Path namespace = Files.createDirectories(folder.resolve("audit"));
         Files.writeString(namespace.resolve("runtime.yml"), "requires_runtime:\n  traits:\n    - name: behavior\n");
