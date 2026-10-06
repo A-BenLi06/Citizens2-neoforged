@@ -9,6 +9,22 @@ import net.citizensnpcs.api.util.MemoryDataKey;
 
 /** Opt-in probe for a parser that destroys its target before returning a trait. */
 public final class TraitOwnershipProbe {
+    public static boolean verifyDefaultParser(NPC npc) {
+        var parser = TraitTemplateParser.createDefault(Age.class).getTemplateParser();
+        var context = new TraitTemplateParser.TraitParserContext(npc, null);
+        var key = new MemoryDataKey(); key.setString("age", "not-an-age");
+        Age before = npc.getTraitNullable(Age.class);
+        boolean rejected = false;
+        try { parser.apply(context, key); }
+        catch (IllegalStateException expected) { rejected = expected.getMessage().contains("age"); }
+        if (!rejected || npc.getTraitNullable(Age.class) != before) return false;
+        key.setInt("age", -6000);
+        var parsed = parser.apply(context, key);
+        if (!(parsed instanceof Age age) || age.getAge() != -6000) return false;
+        npc.addTrait(age);
+        return npc.getTraitNullable(Age.class) == age;
+    }
+
     public static boolean verify(NPC npc) {
         var calls = new AtomicInteger();
         var definition = new MemoryDataKey();

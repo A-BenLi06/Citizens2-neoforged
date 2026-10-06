@@ -1847,3 +1847,9 @@ Three tests cover action recursion with retry, independent nested targets and re
 TraitLoaderAction validates both registry indexes before and after every parser call, preventing stale trait attachment and further parser execution after target deletion/replacement. Existing parser tests now use owned NPC interface fixtures rather than null targets.
 
 A native probe destroys its target inside a parser and returns the old Age trait; it verifies no stale attachment or subsequent invocation. The probe's initial incorrect Age import was corrected before execution. Both NeoForge 21.1.233 and 21.1.248 pass 328 creation checks. Clean ordinary test/build passes with 523 tests; Interactions audit tests pass with 100; no failures/errors/skips. Release archives remain separate and exclude all probes, including TraitOwnershipProbe. All invoked handles completed; no unrelated server or original data was changed. Updated template lifecycle documentation and fixture README. The full Citizens goal remains active.
+
+## 2026-10-06 14:29:59 +08:00 — Propagate default trait-template persistence failures
+
+TraitTemplateParser.createDefault now uses strict class construction rather than lenient loading that could return null and be silently skipped. A native probe rejects a malformed Age field without changing the target, then repairs the input and attaches the successfully loaded trait.
+
+Both NeoForge 21.1.233 and 21.1.248 pass 329 creation checks. Clean ordinary test/build passes with 523 tests; Interactions audit tests pass with 100; no failures/errors/skips. Release archives remain separate and exclude all probes. All invoked handles completed; no unrelated server or original data was changed. Updated template reload documentation and fixture README. The full Citizens goal remains active.

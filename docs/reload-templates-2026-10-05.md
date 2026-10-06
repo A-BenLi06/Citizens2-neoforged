@@ -94,3 +94,8 @@ Native reload integration now rejects malformed YAML, scalar template entries af
 a valid prefix, and unknown command events while retaining old template/registry,
 entity, settings, editor/prompt and skin-cache state. Both NeoForge versions pass the
 expanded 49-check reload fixture; repair still permits the later successful reload.
+
+Default structured trait parsers now use strict persistence construction so invalid
+fields cannot become a null result that is silently skipped. A native Age parser
+probe verifies rejected input leaves the target unchanged and repaired input can be
+constructed and attached successfully.

@@ -38,7 +38,7 @@ public interface TraitTemplateParser {
 
             @Override
             public TemplateParser getTemplateParser() {
-                return (ctx, key) -> PersistenceLoader.load(traitClass, key);
+                return (ctx, key) -> PersistenceLoader.loadStrict(traitClass, key);
             }
         };
     }

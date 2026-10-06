@@ -320,6 +320,11 @@ public final class CreationRuntimeAudit {
         NPC removedByParser = registry.createNPC(EntityType.COW, "RemovedByTemplateParser");
         check(net.citizensnpcs.api.npc.templates.TraitOwnershipProbe.verify(removedByParser),
                 "trait_parser_cannot_attach_to_or_continue_after_removed_target");
+        NPC defaultParserTarget = registry.createNPC(EntityType.COW, "DefaultTemplateParser");
+        try {
+            check(net.citizensnpcs.api.npc.templates.TraitOwnershipProbe.verifyDefaultParser(defaultParserTarget),
+                    "default_trait_template_rejects_invalid_fields_and_accepts_repair");
+        } finally { defaultParserTarget.destroy(); }
         NPC template = registry.createNPC(EntityType.COW, "TemplateSource");
         template.getOrAddTrait(Owner.class).setOwner(alice.player.getUUID());
         template.getOrAddTrait(Age.class).setAge(-12000);
