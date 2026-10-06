@@ -100,6 +100,30 @@ public final class WaypointLifecycleRuntimeAudit {
     }
 
     private static void providers() {
+        steps.add(()-> {
+            current=npc(false,false); trait=current.getOrAddTrait(Waypoints.class);
+            var route=(LinearWaypointProvider)trait.getCurrentProvider();
+            var point=new Waypoint(new Location(level,8,-58,8)); point.addTrigger(new DelayTrigger(5)); route.addWaypoint(point);
+            DataKey source=new MemoryDataKey(); trait.save(source);
+            DataKey trigger=source.getRelative("linear.points.0.triggers.0");
+            trigger.setString("type","missing_fixture_trigger");
+            var unavailable=source.copy().getValuesDeep();
+            trait.load(source);
+            check(trait.getCurrentProvider()==null,"unknown_trigger_disables_incomplete_route");
+            DataKey saved=new MemoryDataKey(); trait.save(saved);
+            check(saved.getValuesDeep().equals(unavailable),"unknown_trigger_preserves_complete_route_data");
+            trigger.setString("type","delay"); trigger.setString("delay","broken");
+            var malformed=source.copy().getValuesDeep(); trait.load(source);
+            check(trait.getCurrentProvider()==null,"malformed_trigger_disables_incomplete_route");
+            saved=new MemoryDataKey(); trait.save(saved);
+            check(saved.getValuesDeep().equals(malformed),"malformed_trigger_preserves_complete_route_data");
+            trigger.setInt("delay",5); trait.load(source);
+            var restored=(LinearWaypointProvider)trait.getCurrentProvider();
+            check(restored!=null && restored.waypoints().iterator().next().getTriggers().size()==1
+                    && ((DelayTrigger)restored.waypoints().iterator().next().getTriggers().get(0)).getDelay()==5,
+                    "repaired_trigger_restores_route");
+            current.destroy();
+        });
         for(boolean packet:new boolean[]{false,true}) steps.add(()-> {
             current=npc(packet,false); trait=current.getOrAddTrait(Waypoints.class);
             CountingProvider first=new CountingProvider(); Waypoints.registerWaypointProvider(()->first,"audit-first");

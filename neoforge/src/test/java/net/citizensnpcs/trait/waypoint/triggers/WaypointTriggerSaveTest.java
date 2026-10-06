@@ -10,6 +10,20 @@ import net.citizensnpcs.api.util.Location;
 import net.citizensnpcs.api.util.MemoryDataKey;
 
 class WaypointTriggerSaveTest {
+    @Test void malformedKnownTriggersCannotLoadAsDefaultValues() {
+        var registry = new WaypointTriggerRegistry(); var root = new MemoryDataKey();
+        root.setString("type", "delay"); root.setString("delay", "broken");
+        var before = root.copy().getValuesDeep();
+        assertThrows(IllegalStateException.class, () -> registry.create(root));
+        assertEquals(before, root.getValuesDeep());
+        root.setInt("delay", 8);
+        assertEquals(8, ((DelayTrigger) registry.create(root)).getDelay());
+        var invalidLines = new MemoryDataKey(); invalidLines.setString("type", "chat");
+        invalidLines.setString("lines", "not-a-list");
+        assertThrows(IllegalStateException.class, () -> registry.create(invalidLines));
+        registry.save(new ChatTrigger(-1, java.util.List.of()), root);
+        assertInstanceOf(ChatTrigger.class, registry.create(root));
+    }
     public static class UnknownTrigger implements WaypointTrigger {
         @Persist public String value = "new value";
         public String description() { return "unknown"; }

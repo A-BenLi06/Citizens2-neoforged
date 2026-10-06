@@ -9,7 +9,11 @@ Run from the repository root with PowerShell 7 and JDK 21:
 
 Omit the version override for default 21.1.233. The fixture uses `artifacts/waypoint-lifecycle-audit-server`, loopback port 25629, world `waypoint-lifecycle-world` and marker `waypoint-lifecycle-audit-fixture.txt`. It requires an empty default registry and releases its NPCs, player, grant and forced chunk before shutdown.
 
-Success requires `[WAYPOINTLIFECYCLEAUDIT] COMPLETE 127 checks`, no failure marker and successful Gradle completion. Commands use real dispatch and an admitted synthetic player. Controlled native navigation strategies let tests deterministically complete/cancel routes and replace them from navigation-begin callbacks; cached paths also pass through the actual supplied-path backend.
+Success requires `[WAYPOINTLIFECYCLEAUDIT] COMPLETE 132 checks`, no failure marker and successful Gradle completion. Commands use real dispatch and an admitted synthetic player. Controlled native navigation strategies let tests deterministically complete/cancel routes and replace them from navigation-begin callbacks; cached paths also pass through the actual supplied-path backend.
+
+Strict loading checks retain complete provider data when a trigger type is absent or
+a known trigger has malformed fields. The route stays unavailable instead of losing
+its failed children, and a corrected record restores its trigger on retry.
 
 Coverage includes invalid-command atomicity, unspawned locations, ordered insertion and removal, provider factory/switch/load/despawn/removal behavior, callback reentry, unavailable/disabled provider saves, nested list isolation, guided point replacement/reload, linear/guided/wander delays for world/virtual NPCs, existing/later pauses, route edits and recursive arrivals, trigger snapshots, cancellation versus arrival, cached-route replay, early configuration callbacks and preservation of replacement navigation.
 

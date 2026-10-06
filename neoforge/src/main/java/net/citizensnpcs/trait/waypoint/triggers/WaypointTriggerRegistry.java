@@ -21,7 +21,7 @@ public class WaypointTriggerRegistry implements Persister<WaypointTrigger> {
     @Override
     public WaypointTrigger create(DataKey root) {
         Class<? extends WaypointTrigger> clazz = TRIGGERS.get(root.getString("type"));
-        return clazz == null ? null : PersistenceLoader.load(clazz, root);
+        return clazz == null ? null : PersistenceLoader.loadStrict(clazz, root);
     }
 
     @Override

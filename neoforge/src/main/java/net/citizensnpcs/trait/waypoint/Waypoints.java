@@ -79,7 +79,13 @@ public class Waypoints extends Trait {
         long before = revision;
         String name = key.getString("provider", "linear");
         WaypointProvider candidate = create(name);
-        if (candidate != null && PersistenceLoader.load(candidate, key.getRelative(name)) == null) candidate = null;
+        if (candidate != null) {
+            try { PersistenceLoader.loadStrict(candidate, key.getRelative(name)); }
+            catch (RuntimeException failure) {
+                Messaging.severe("Unable to load waypoint provider", name, failure);
+                candidate = null;
+            }
+        }
         install(candidate, name, candidate == null && !name.isEmpty() ? key.copy() : null, before);
     }
 
