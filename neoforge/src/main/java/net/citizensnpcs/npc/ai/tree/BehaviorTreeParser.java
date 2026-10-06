@@ -312,16 +312,7 @@ public class BehaviorTreeParser {
 
         Behavior ifBehavior;
         if (ifKey.hasSubKeys()) {
-            List<Behavior> children = new ArrayList<>();
-            for (DataKey sub : ifKey.getIntegerSubKeys()) {
-                if (sub.hasSubKeys()) {
-                    sub = sub.getSubKeys().iterator().next();
-                }
-                Behavior child = parseNode(sub, context);
-                if (child != null) {
-                    children.add(child);
-                }
-            }
+            List<Behavior> children = parseContainerChildren(ifKey, context);
             ifBehavior = children.size() == 1 ? children.get(0) : Sequence.createSequence(children);
         } else {
             String value = ifKey.getString("");
@@ -330,16 +321,7 @@ public class BehaviorTreeParser {
         Behavior elseBehavior = null;
         if (elseKey != null) {
             if (elseKey.hasSubKeys()) {
-                List<Behavior> children = new ArrayList<>();
-                for (DataKey sub : elseKey.getIntegerSubKeys()) {
-                    if (sub.hasSubKeys()) {
-                        sub = sub.getSubKeys().iterator().next();
-                    }
-                    Behavior child = parseNode(sub, context);
-                    if (child != null) {
-                        children.add(child);
-                    }
-                }
+                List<Behavior> children = parseContainerChildren(elseKey, context);
                 elseBehavior = children.size() == 1 ? children.get(0) : Sequence.createSequence(children);
             } else {
                 String value = elseKey.getString("");

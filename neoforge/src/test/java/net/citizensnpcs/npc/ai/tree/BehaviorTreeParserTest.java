@@ -22,6 +22,30 @@ import net.citizensnpcs.api.util.MemoryDataKey;
  * parser, the registry and the Molang expressions in between actually drive a tree, rather than only compiling.
  */
 public class BehaviorTreeParserTest {
+    @Test public void nestedConditionsWorkInsideEitherOuterBranch() {
+        for (boolean outer : new boolean[]{false, true}) {
+            Memory memory = new Memory();
+            Map<String, Object> nested = map("0", map("if false", "set wrong `1`"),
+                    "1", map("else", "set chosen `2`"), "2", "set after `3`");
+            Map<String, Object> unused = map("0", "set outer_wrong `1`");
+            finish(parse(map("sequence", map("if " + outer, outer ? nested : unused,
+                    "else", outer ? unused : nested)), memory));
+            assertEquals(0D, memory.getNumber("wrong"));
+            assertEquals(0D, memory.getNumber("outer_wrong"));
+            assertEquals(2D, memory.getNumber("chosen"));
+            assertEquals(3D, memory.getNumber("after"));
+        }
+    }
+
+    @Test public void nestedRepeatAndConditionalSiblingsRetainTheirStructure() {
+        Memory memory = new Memory(); memory.set("counter", 0D);
+        finish(parse(map("sequence", map("if true", map(
+                "0", map("repeat 2", map("0", map("if true", "set counter `mem.get('counter') + 1`"))),
+                "1", map("if true", "set selected `1`"), "2", "set after `2`"))), memory));
+        assertEquals(2D, memory.getNumber("counter"));
+        assertEquals(1D, memory.getNumber("selected"));
+        assertEquals(2D, memory.getNumber("after"));
+    }
     @Test public void repeatRunsItsConfiguredBodyTheRequestedNumberOfTimes() {
         Memory memory = new Memory(); memory.set("counter", 0D);
         finish(parse(map("repeat 3", map("0", "set counter `mem.get('counter') + 1`")), memory));
