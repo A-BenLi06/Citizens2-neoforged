@@ -1787,3 +1787,9 @@ Two file tests cover invalid contents preserving the original with no destinatio
 TemplateRegistry now rejects empty template-name paths during normal file loading and before generation performs any snapshot or directory operation. This extends the migration name check to the other registry entry points rather than relying on ResourceLocation to reject an empty path.
 
 Two tests cover preserving an invalid-name source file and rejecting generation before snapshot/directory mutation. All 509 ordinary tests and the normal build pass without failures/errors/skips; git diff --check passes. No fresh native/client run is claimed. Production Interactions sources and packaging are unchanged; no unrelated server or original data was changed. Updated docs/template-generation-2026-10-05.md. The full Citizens goal remains active.
+
+## 2026-10-06 11:32:13 +08:00 — Report empty template generation names through normal command errors
+
+TemplateCommands.generate now rejects an empty resource path before registry/NPC access, using the existing localized template error. A unit test covers empty, namespace-only and malformed names. Native dispatcher coverage verifies the rendered error and no generation directory creation. The first native assertion compared markup source to rendered error text and was corrected to use the normal text conversion path.
+
+Both NeoForge 21.1.233 and 21.1.248 pass 327 creation checks. Clean ordinary test/build passes with 510 tests; Interactions audit tests pass with 100; no failures/errors/skips. Release archives remain separate and exclude probes. All invoked handles completed; no unrelated server or original data was changed. Updated template-generation documentation and fixture README. The full Citizens goal remains active.

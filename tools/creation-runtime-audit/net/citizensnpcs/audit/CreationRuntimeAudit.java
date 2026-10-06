@@ -321,6 +321,28 @@ public final class CreationRuntimeAudit {
         template.getOrAddTrait(Owner.class).setOwner(alice.player.getUUID());
         template.getOrAddTrait(Age.class).setAge(-12000);
         template.spawn(new Location(level, 10, -58, 10));
+        NPC selectionBeforeTemplateCheck = selected();
+        var generationPermission = grant("citizens.templates.generate");
+        CitizensAPI.getDefaultNPCSelector().select(source, template);
+        String emptyNamespace = "empty_name_audit_" + UUID.randomUUID();
+        boolean expectedTemplateError = false;
+        String observedTemplateError = "command did not fail";
+        try {
+            try { server.getCommands().getDispatcher().execute("template generate " + emptyNamespace + ":", source); }
+            catch (CommandSyntaxException failure) {
+                observedTemplateError = failure.getMessage();
+                expectedTemplateError = failure.getMessage().equals(TextParser.parse(Messaging.convertLegacyCodes(
+                        Messaging.tryTranslate(net.citizensnpcs.util.Messages.TEMPLATE_MISSING))).getString());
+            }
+            if (!expectedTemplateError) throw new AssertionError("Unexpected template command response: " + observedTemplateError);
+            check(expectedTemplateError && !Files.exists(CitizensAPI.getDataFolder().toPath().resolve("templates").resolve(emptyNamespace)),
+                    "empty_template_name_is_a_command_error_without_filesystem_changes");
+        } finally {
+            generationPermission.remove();
+            if (selectionBeforeTemplateCheck != null && exists(selectionBeforeTemplateCheck))
+                CitizensAPI.getDefaultNPCSelector().select(source, selectionBeforeTemplateCheck);
+            else CitizensAPI.getDefaultNPCSelector().deselect(source);
+        }
         ResourceLocation key = ResourceLocation.fromNamespaceAndPath("creation_audit", "stored_spawn");
         CitizensAPI.getTemplateRegistry().generateTemplateFromNPC(key, template);
         CitizensAPI.getTemplateRegistry().generateTemplateFromNPC(

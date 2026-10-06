@@ -84,7 +84,7 @@ public class TemplateCommands {
         String raw = templateName.toLowerCase(Locale.ROOT);
         ResourceLocation key = raw.contains(":") ? ResourceLocation.tryParse(raw)
                 : ResourceLocation.tryBuild("generated", raw);
-        if (key == null)
+        if (key == null || key.getPath().isEmpty())
             throw new CommandException(Messages.TEMPLATE_MISSING);
 
         TemplateRegistry registry = plugin.getTemplateRegistry();

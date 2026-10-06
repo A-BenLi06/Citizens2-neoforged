@@ -39,3 +39,8 @@ mixed-case namespace/name lookup, absent namespaces and null input returning fal
 Normal template loading and generation reject empty template names explicitly, since
 ResourceLocation permits an empty path. File tests verify rejection preserves the
 input; generation tests verify the NPC snapshot and namespace directory are untouched.
+
+The generate command rejects empty paths with the existing localized template error
+before accessing the registry/NPC. Native dispatcher coverage checks that rendered
+error and verifies no namespace directory is created. The expected message is rendered
+through the same text pipeline as Brigadier rather than compared to markup source.
