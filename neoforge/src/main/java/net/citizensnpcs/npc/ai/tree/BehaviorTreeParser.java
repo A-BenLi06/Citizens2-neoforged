@@ -234,7 +234,8 @@ public class BehaviorTreeParser {
                 sub = sub.getSubKeys().iterator().next();
             }
             if (ifKey != null) {
-                if (sub.name().equals("else")) {
+                boolean isElse = sub.name().equals("else");
+                if (isElse) {
                     elseKey = sub;
                 }
                 Behavior child = parseIfElse(ifKey, elseKey, context);
@@ -243,7 +244,7 @@ public class BehaviorTreeParser {
                 }
                 ifKey = null;
                 elseKey = null;
-                continue;
+                if (isElse) continue;
             }
             if (sub.name().startsWith("if ")) {
                 ifKey = sub;

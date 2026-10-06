@@ -22,6 +22,44 @@ import net.citizensnpcs.api.util.MemoryDataKey;
  * parser, the registry and the Molang expressions in between actually drive a tree, rather than only compiling.
  */
 public class BehaviorTreeParserTest {
+    private static void finish(Behavior tree) {
+        assertTrue(tree.shouldExecute());
+        for (int i = 0; i < 20; i++) {
+            BehaviorStatus status = tree.run();
+            if (status == BehaviorStatus.SUCCESS) return;
+            assertEquals(BehaviorStatus.RUNNING, status);
+        }
+        org.junit.jupiter.api.Assertions.fail("Tree did not finish");
+    }
+
+    @Test public void conditionalWithoutElseKeepsTheFollowingSibling() {
+        Memory memory = new Memory();
+        Behavior tree = parse(map("sequence", map("0", map("if true", "set first `1`"),
+                "1", "set after `2`")), memory);
+        finish(tree);
+        assertEquals(1D, memory.getNumber("first"));
+        assertEquals(2D, memory.getNumber("after"));
+    }
+
+    @Test public void consecutiveConditionalsKeepBothBranchesAndTheFollowingNode() {
+        Memory memory = new Memory();
+        Behavior tree = parse(map("sequence", map("0", map("if true", "set first `1`"),
+                "1", map("if true", "set second `2`"), "2", "set after `3`")), memory);
+        finish(tree);
+        assertEquals(1D, memory.getNumber("first"));
+        assertEquals(2D, memory.getNumber("second"));
+        assertEquals(3D, memory.getNumber("after"));
+    }
+
+    @Test public void elseIsConsumedOnlyAsItsConditionalsAlternate() {
+        Memory memory = new Memory();
+        Behavior tree = parse(map("sequence", map("0", map("if false", "set wrong `1`"),
+                "1", map("else", "set selected `2`"), "2", "set after `3`")), memory);
+        finish(tree);
+        assertEquals(0D, memory.getNumber("wrong"));
+        assertEquals(2D, memory.getNumber("selected"));
+        assertEquals(3D, memory.getNumber("after"));
+    }
     @Test public void parsedWaitUsesItsShortFormMolangDuration() {
         Memory memory = new Memory();
         Behavior tree = parse(map("sequence", map("0", "wait `2`", "1", "set waited `1`")), memory);
