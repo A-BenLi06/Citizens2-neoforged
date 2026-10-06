@@ -1811,3 +1811,9 @@ Two file tests cover invalid-file prefix rejection alongside a healthy file and 
 Template.apply now checks ID and UUID ownership before initial mutation and before each action, sharing the same ownership predicate with respawn recovery. Deleted/replaced targets do not receive later actions, and stale initial instances are left untouched. A package-level prepared-action constructor supports direct action-chain verification without global parser dependencies.
 
 Two added tests cover registration and UUID-only loss during actions; existing stale-target coverage now checks no snapshot or despawn occurs. All 515 ordinary tests and the normal build pass without failures/errors/skips; git diff --check passes. No fresh native/client run is claimed. Production Interactions sources and packaging are unchanged; no unrelated server or original data was changed. Updated docs/template-application-lifecycle-2026-10-06.md. The full Citizens goal remains active.
+
+## 2026-10-06 12:21:31 +08:00 — Isolate mutable YAML replacement values per NPC application
+
+YamlReplacementAction now copies its captured replacement tree before each application. NPC loaders can mutate their supplied list values without changing the reusable action's definition or the original template data.
+
+Two tests cover successful mutating loads and mutating loads that throw before retry, verifying both later applications still receive original content. All 517 ordinary tests and the normal build pass without failures/errors/skips; git diff --check passes. No fresh native/client run is claimed. Production Interactions sources and packaging are unchanged; no unrelated server or original data was changed. Updated docs/template-generation-2026-10-05.md. The full Citizens goal remains active.

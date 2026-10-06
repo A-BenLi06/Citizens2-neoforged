@@ -8,6 +8,40 @@ import net.citizensnpcs.api.util.DataKey;
 import net.citizensnpcs.api.util.MemoryDataKey;
 
 class YamlReplacementActionTest {
+    @SuppressWarnings("unchecked")
+    private static void verifyReplacementIsolation(boolean failFirstLoad) {
+        var input = new java.util.ArrayList<Object>(java.util.List.of("original"));
+        DataKey definition = new MemoryDataKey(); definition.setRaw("replacements.items", input);
+        var action = PersistenceLoader.loadStrict(YamlReplacementAction.class, definition);
+        input.add("external edit");
+        var observed = new java.util.ArrayList<java.util.List<Object>>();
+        NPC npc = (NPC) java.lang.reflect.Proxy.newProxyInstance(NPC.class.getClassLoader(), new Class<?>[]{NPC.class},
+                (proxy, method, args) -> {
+                    if (method.getName().equals("saveSnapshot")) return null;
+                    if (method.getName().equals("load")) {
+                        var values = (java.util.List<Object>) ((DataKey) args[0]).getRaw("items");
+                        observed.add(new java.util.ArrayList<>(values));
+                        values.add("load mutation");
+                        if (failFirstLoad && observed.size() == 1) throw new IllegalStateException("load failure");
+                        return null;
+                    }
+                    throw new AssertionError(method.getName());
+                });
+        if (failFirstLoad) assertThrows(IllegalStateException.class, () -> action.accept(npc));
+        else action.accept(npc);
+        action.accept(npc);
+        assertEquals(java.util.List.of(java.util.List.of("original"), java.util.List.of("original")), observed);
+        assertEquals(java.util.List.of("original", "external edit"), input);
+    }
+
+    @Test void replacementListsAreIndependentForEveryApplication() {
+        verifyReplacementIsolation(false);
+    }
+
+    @Test void aMutatingFailedLoadCannotPoisonTheNextApplication() {
+        verifyReplacementIsolation(true);
+    }
+
     private static DataKey apply(java.util.Map<String, Object> original,
             java.util.Map<String, Object> replacements, boolean override) {
         DataKey definition = new MemoryDataKey();

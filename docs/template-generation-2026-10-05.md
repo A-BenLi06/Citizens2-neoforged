@@ -48,3 +48,8 @@ through the same text pipeline as Brigadier rather than compared to markup sourc
 Template query snapshots are ordered by fully qualified key. Listing, completion and
 ambiguous-name choices therefore share deterministic ordering rather than HashMap
 iteration order. A multi-namespace file test verifies both full and bare-name queries.
+
+YAML replacement actions now deep-copy their captured replacement tree for each
+application before passing values into NPC loading. Mutable list changes by a loader,
+including a loader that subsequently throws, cannot contaminate later applications.
+Two tests verify per-application isolation and retained source independence.

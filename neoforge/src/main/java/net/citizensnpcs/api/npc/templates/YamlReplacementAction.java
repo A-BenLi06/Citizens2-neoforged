@@ -35,7 +35,9 @@ public class YamlReplacementAction implements Consumer<NPC> {
         npc.saveSnapshot(memoryKey);
         // breadth-first over the replacement tree, so a nested map becomes dotted keys the data key understands
         List<Node> queue = new ArrayList<>();
-        queue.add(new Node("", replacements));
+        DataKey replacementCopy = new MemoryDataKey();
+        replacementCopy.setRaw("", replacements);
+        queue.add(new Node("", replacementCopy.getValuesDeep()));
         for (int i = 0; i < queue.size(); i++) {
             Node node = queue.get(i);
             for (Entry<String, Object> entry : node.map.entrySet()) {
