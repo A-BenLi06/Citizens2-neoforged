@@ -8,6 +8,18 @@ import org.junit.jupiter.api.io.TempDir;
 import net.minecraft.resources.ResourceLocation;
 
 class TemplateRegistryReloadTest {
+    @Test void collectionQueriesAreOrderedByFullyQualifiedKey(@TempDir Path folder) throws Exception {
+        Path z = Files.createDirectories(folder.resolve("zeta"));
+        Path a = Files.createDirectories(folder.resolve("alpha"));
+        Files.writeString(z.resolve("templates.yml"), "shared: {}\nfirst: {}\n");
+        Files.writeString(a.resolve("templates.yml"), "shared: {}\nlast: {}\n");
+        var registry = TemplateRegistry.prepareReload(folder);
+        assertEquals(java.util.List.of("alpha:last", "alpha:shared", "zeta:first", "zeta:shared"),
+                registry.getAllTemplates().stream().map(template -> template.getKey().toString()).toList());
+        assertEquals(java.util.List.of("alpha:shared", "zeta:shared"),
+                registry.getTemplates("shared").stream().map(template -> template.getKey().toString()).toList());
+    }
+
     @Test void emptyTemplateNamesAreRejected(@TempDir Path folder) throws Exception {
         Path namespace = Files.createDirectories(folder.resolve("audit"));
         Path file = Files.writeString(namespace.resolve("empty-name.yml"), "'': {}\n");

@@ -98,9 +98,9 @@ public class TemplateRegistry {
         templateSourceKeys.put(key, storedKey);
     }
 
-    /** @return an immutable snapshot of the currently loaded templates */
+    /** @return an immutable snapshot ordered by fully qualified template key */
     public Collection<Template> getAllTemplates() {
-        return List.copyOf(fullyQualifiedTemplates.values());
+        return orderedTemplates(fullyQualifiedTemplates.values());
     }
 
     public Template getTemplateByKey(ResourceLocation key) {
@@ -109,7 +109,11 @@ public class TemplateRegistry {
 
     /** @return an immutable snapshot of every template with this bare name, across all namespaces */
     public Collection<Template> getTemplates(String name) {
-        return List.copyOf(templatesByName.get(name.toLowerCase(Locale.ROOT)));
+        return orderedTemplates(templatesByName.get(name.toLowerCase(Locale.ROOT)));
+    }
+
+    private static List<Template> orderedTemplates(Collection<Template> templates) {
+        return templates.stream().sorted(java.util.Comparator.comparing(template -> template.getKey().toString())).toList();
     }
 
     public boolean hasNamespace(String namespace) {

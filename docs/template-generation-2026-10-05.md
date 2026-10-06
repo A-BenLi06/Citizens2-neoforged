@@ -44,3 +44,7 @@ The generate command rejects empty paths with the existing localized template er
 before accessing the registry/NPC. Native dispatcher coverage checks that rendered
 error and verifies no namespace directory is created. The expected message is rendered
 through the same text pipeline as Brigadier rather than compared to markup source.
+
+Template query snapshots are ordered by fully qualified key. Listing, completion and
+ambiguous-name choices therefore share deterministic ordering rather than HashMap
+iteration order. A multi-namespace file test verifies both full and bare-name queries.
