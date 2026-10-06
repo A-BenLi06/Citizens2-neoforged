@@ -119,11 +119,18 @@ public final class ReloadRuntimeAudit {
         var oldTemplates = plugin.getTemplateRegistry();
         Path templateFolder = Files.createDirectories(plugin.getDataFolder().toPath().resolve("templates/reloadprobe"));
         Path templateFile = templateFolder.resolve("probe.yml");
-        Files.writeString(templateFile, "broken: [unfinished\n");
         try {
-            rejectedReload();
-            check(plugin.getTemplateRegistry() == oldTemplates && plugin.getNPCRegistry() == old
-                    && Setting.DEFAULT_NPC_LIMIT.asInt() == 37, "invalid_template_preserves_registry_templates_and_settings");
+            int invalidIndex = 0;
+            for (String invalid : List.of("broken: [unfinished\n", "valid_prefix: {}\nbroken: 42\n",
+                    "broken:\n  commands:\n    on_typo: []\n")) {
+                Files.writeString(templateFile, invalid);
+                rejectedReload();
+                check(plugin.getTemplateRegistry() == oldTemplates && plugin.getNPCRegistry() == old
+                        && Setting.DEFAULT_NPC_LIMIT.asInt() == 37 && world.getEntity() == entity && !entity.isRemoved()
+                        && net.citizensnpcs.editor.Editor.getEditor(editorPlayer) == editor && ChatPrompts.isActive(prompt)
+                        && net.citizensnpcs.npc.skin.Skin.get("") == originalSkin,
+                        "invalid_template_preserves_all_live_state_" + invalidIndex++);
+            }
         } finally { Files.writeString(templateFile, "valid: {}\n"); }
         store.afterLoad = registry -> {
             check(net.citizensnpcs.npc.skin.Skin.get("") != originalSkin, "candidate_load_uses_staged_skin_cache");
@@ -173,7 +180,7 @@ public final class ReloadRuntimeAudit {
         check(world.getEntity() == null && entity.isRemoved() && virtual.getEntity() == null,
                 "retirement_overrides_despawn_veto");
         check(probe.removals == 1, "old_trait_removed_once");
-        check(store.reloads == 4 && store.clears == 0 && store.records.size() == 2, "reload_preserves_store_definitions");
+        check(store.reloads == 6 && store.clears == 0 && store.records.size() == 2, "reload_preserves_store_definitions");
     }
 
     private static void cleanupFailure() throws Exception {

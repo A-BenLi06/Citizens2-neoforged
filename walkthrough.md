@@ -1823,3 +1823,9 @@ Two tests cover successful mutating loads and mutating loads that throw before r
 Loose template migrations, namespaces and template files are sorted before processing. Existing strict duplicate rejection and permissive file handling remain unchanged, but first-error and duplicate diagnostics no longer rely on directory enumeration order.
 
 Two reverse-creation-order file tests verify duplicate-file and namespace diagnostics. All 519 ordinary tests and the normal build pass without failures/errors/skips; git diff --check passes. No fresh native/client run is claimed. Production Interactions sources and packaging are unchanged; no unrelated server or original data was changed. Updated docs/reload-templates-2026-10-05.md. The full Citizens goal remains active.
+
+## 2026-10-06 13:10:15 +08:00 — Verify recent template validation against native reload recovery
+
+Expanded native reload cases from malformed YAML to scalar template entries after a valid prefix and unknown command events. Each failure now asserts preservation of old templates, registry/entity, runtime setting values, editor/prompt sessions and skin-cache identity. Existing repair/success publication checks remain in the fixture.
+
+Both NeoForge 21.1.233 and 21.1.248 pass 49 reload checks. Clean ordinary test/build passes with 519 tests; Interactions audit tests pass with 100; no failures/errors/skips. Release archives preserve independent mod classes and exclude probes. All invoked handles completed; no unrelated server or original data was changed. Updated template reload documentation and fixture README. No new production change was required. The full Citizens goal remains active.

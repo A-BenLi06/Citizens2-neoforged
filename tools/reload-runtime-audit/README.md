@@ -38,7 +38,11 @@ failure, and commit after success using an invalid-name entry without HTTP acces
 Template coverage rejects malformed files before publication, retains old template,
 NPC and setting state, and publishes a repaired template on a later successful reload.
 
-Expected result: `[RELOADAUDIT] COMPLETE 47 checks` and `BUILD SUCCESSFUL`.
+Invalid-template cases include malformed YAML, a scalar entry after a valid prefix,
+and an unknown command event. Each must preserve the old registry/entity, templates,
+settings, editor, prompt and skin-cache identity.
+
+Expected result: `[RELOADAUDIT] COMPLETE 49 checks` and `BUILD SUCCESSFUL`.
 The original implementation at `deb5021` fails `failed_reload_preserves_identity`.
 The fixture does not accept shutdown, full configuration/shop transactionality, or arbitrary
 external provider side effects as verified.

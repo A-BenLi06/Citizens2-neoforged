@@ -89,3 +89,8 @@ Template traversal now sorts loose migration files, namespace paths and template
 file paths before processing them. This makes first-error/duplicate diagnostics
 repeatable rather than dependent on directory enumeration order. Two file tests
 create entries in reverse order and verify sorted file/namespace diagnostics.
+
+Native reload integration now rejects malformed YAML, scalar template entries after
+a valid prefix, and unknown command events while retaining old template/registry,
+entity, settings, editor/prompt and skin-cache state. Both NeoForge versions pass the
+expanded 49-check reload fixture; repair still permits the later successful reload.
