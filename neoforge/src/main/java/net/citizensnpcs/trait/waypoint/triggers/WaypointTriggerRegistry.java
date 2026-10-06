@@ -8,6 +8,7 @@ import java.util.function.Supplier;
 import net.citizensnpcs.api.persistence.PersistenceLoader;
 import net.citizensnpcs.api.persistence.Persister;
 import net.citizensnpcs.api.util.DataKey;
+import net.citizensnpcs.api.util.MemoryDataKey;
 
 /**
  * The known {@link WaypointTrigger} types, and how each is persisted and configured.
@@ -25,13 +26,18 @@ public class WaypointTriggerRegistry implements Persister<WaypointTrigger> {
 
     @Override
     public void save(WaypointTrigger instance, DataKey root) {
-        PersistenceLoader.save(instance, root);
+        String type = null;
         for (Map.Entry<String, Class<? extends WaypointTrigger>> entry : TRIGGERS.entrySet()) {
             if (entry.getValue() == instance.getClass()) {
-                root.setString("type", entry.getKey());
+                type = entry.getKey();
                 break;
             }
         }
+        if (type == null) throw new IllegalArgumentException("Unregistered waypoint trigger: " + instance.getClass().getName());
+        DataKey candidate = new MemoryDataKey();
+        PersistenceLoader.save(instance, candidate);
+        candidate.setString("type", type);
+        root.setRaw("", candidate.getRaw(""));
     }
 
     public static void addTrigger(String name, Class<? extends WaypointTrigger> triggerClass,
