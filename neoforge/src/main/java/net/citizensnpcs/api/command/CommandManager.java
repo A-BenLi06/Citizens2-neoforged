@@ -147,6 +147,12 @@ public class CommandManager {
         if (!hasPermission(info, sender))
             throw new NoPermissionsException();
 
+        if (implicitTarget != null) {
+            if (!NPCCommandTarget.isCurrent(implicitTarget))
+                throw new CommandException(CommandMessages.ID_NOT_FOUND, implicitTarget.getId());
+            if (methodArgs.length > 2) methodArgs[2] = implicitTarget;
+        }
+
         Command cmd = info.commandAnnotation;
         if (cmd.parsePlaceholders()) {
             NPC npc = methodArgs.length > 2 && methodArgs[2] instanceof NPC ? (NPC) methodArgs[2] : null;

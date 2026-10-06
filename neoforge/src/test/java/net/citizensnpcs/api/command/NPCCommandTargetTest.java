@@ -7,10 +7,32 @@ import java.util.concurrent.atomic.AtomicReference;
 import org.junit.jupiter.api.Test;
 import net.citizensnpcs.api.npc.NPC;
 import net.citizensnpcs.api.npc.NPCRegistry;
+import net.citizensnpcs.api.command.exception.CommandException;
+import net.minecraft.commands.CommandSource;
+import net.minecraft.commands.CommandSourceStack;
+import net.minecraft.network.chat.Component;
+import net.minecraft.world.phys.Vec2;
+import net.minecraft.world.phys.Vec3;
 
 class NPCCommandTargetTest {
     private static final String COMMAND = "npc rename changed --id 3";
     private static String context() { return COMMAND; }
+    private static NPC receivedTarget;
+    private static String receivedText;
+
+    public static class Fixture {
+        @Command(aliases = "targetaudit", modifiers = "read", desc = "", parsePlaceholders = true,
+                permission = "citizens.targetaudit")
+        public static void read(CommandContext context, CommandSourceStack source, NPC npc) {
+            receivedTarget = npc;
+            receivedText = context.getString(1);
+        }
+    }
+
+    private static CommandSourceStack source(int permission) {
+        return new CommandSourceStack(CommandSource.NULL, Vec3.ZERO, Vec2.ZERO, null, permission,
+                "Audit", Component.literal("Audit"), null, null);
+    }
 
     private NPC target(AtomicReference<NPC> owner) {
         NPCRegistry registry = (NPCRegistry) Proxy.newProxyInstance(NPCRegistry.class.getClassLoader(),
@@ -52,5 +74,43 @@ class NPCCommandTargetTest {
         NPCCommandTarget.dispatch(old, COMMAND, () -> fail("retired target dispatched"));
         target(owner);
         NPCCommandTarget.dispatch(old, COMMAND, () -> fail("replacement target dispatched"));
+    }
+
+    @Test void implicitTargetDrivesPlaceholdersAndHandlerWhileOrdinarySelectionStillWorks() throws CommandException {
+        var manager = new CommandManager(); manager.register(Fixture.class);
+        NPC selected = target(new AtomicReference<>()), bound = target(new AtomicReference<>());
+        var source = source(4);
+        manager.executeWithTarget(bound, "targetaudit", new String[] { "", "", "read", "<uuid>" },
+                source, source, selected);
+        assertSame(bound, receivedTarget);
+        assertEquals(bound.getUniqueId().toString(), receivedText);
+        manager.execute("targetaudit", new String[] { "read", "<uuid>" }, source, source, selected);
+        assertSame(selected, receivedTarget);
+        assertEquals(selected.getUniqueId().toString(), receivedText);
+    }
+
+    @Test void retiredTargetIsRejectedBeforePlaceholderOrHandlerAccess() {
+        var manager = new CommandManager(); manager.register(Fixture.class);
+        var owner = new AtomicReference<NPC>();
+        NPC bound = target(owner); owner.set(null);
+        var source = source(4);
+        receivedTarget = null;
+        // <npc> would call getFullName, deliberately unsupported by this proxy.
+        assertThrows(CommandException.class, () -> manager.executeWithTarget(bound, "targetaudit",
+                new String[] { "read", "<npc>" }, source, source, (NPC) null));
+        assertNull(receivedTarget);
+    }
+
+    @Test void commandPermissionIsCheckedBeforeTargetAndPlaceholderAccess() {
+        var manager = new CommandManager(); manager.register(Fixture.class);
+        NPC inaccessible = (NPC) Proxy.newProxyInstance(NPC.class.getClassLoader(), new Class<?>[] { NPC.class },
+                (proxy, method, args) -> { throw new AssertionError("Access before permission: " + method.getName()); });
+        // A missing source is denied by PermissionUtil; console sources are intentionally unrestricted.
+        CommandSourceStack source = null;
+        receivedTarget = null;
+        assertThrows(net.citizensnpcs.api.command.exception.NoPermissionsException.class,
+                () -> manager.executeWithTarget(inaccessible, "targetaudit", new String[] { "read", "<npc>" },
+                        source, source, (NPC) null));
+        assertNull(receivedTarget);
     }
 }
