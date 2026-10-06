@@ -16,6 +16,8 @@ Recent follow-ups cover [`powered`, `name` and `home` options](command-options-h
 
 ## Behavior, data and integration acceptance
 
+- [Wander command validation](wander-validation-2026-10-06.md) checks complete input before attaching or replacing route state, preserves unavailable data on rejection and validates provider publication before applying edits. Native tests cover invalid and successful operations; custom callback effects remain separate acceptance.
+
 - [Waypoint trigger loading](waypoint-trigger-loading-2026-10-06.md) strictly decodes providers and preserves their complete source data when a trigger is unavailable or malformed. Repair/reload restores the route. Arbitrary numeric semantics and custom provider side effects remain separate acceptance work.
 
 - [Numeric trigger input](numeric-trigger-input-2026-10-06.md) rejects invalid/overflowing delay and speed values and non-finite chat radii without replacing editor state. Chat radius keywords preserve ordinary text. Valid durations, finite-negative compatibility and inline repair are covered by unit/native chat checks; external saved-data/provider validation remains separate.

@@ -71,7 +71,7 @@ public final class WaypointLifecycleRuntimeAudit {
     }
     private static void setup() {
         registry=CitizensAPI.getNPCRegistry(); alice=actor("WaypointAlice"); source=alice.player.createCommandSourceStack();
-        grant=PermissionUtil.grantTemporary(alice.player,List.of("citizens.waypoints.add","citizens.waypoints.remove","citizens.waypoints.provider"));
+        grant=PermissionUtil.grantTemporary(alice.player,List.of("citizens.waypoints.add","citizens.waypoints.remove","citizens.waypoints.provider","citizens.npc.wander"));
         steps.add(()-> {
             current=npc(false,false); select(current); Waypoints trait=current.getOrAddTrait(Waypoints.class);
             LinearWaypointProvider route=(LinearWaypointProvider)trait.getCurrentProvider(); route.addWaypoint(new Waypoint(new Location(level,8,-58,8)));
@@ -83,6 +83,33 @@ public final class WaypointLifecycleRuntimeAudit {
     }
 
     private static void commands() {
+        steps.add(()-> {
+            current=npc(false,false); select(current);
+            var invalid=List.of("unknown", "add 1 2", "add bad 2 3", "add 1 2 3 missing:overworld",
+                    "xyrange -1 2", "xyrange 2", "pathfind wrong", "pathfind true --typo x",
+                    "delay invalid", "delay 999999999999s", "delay -0.01s");
+            for(String input:invalid) {
+                reject("npc wander "+input);
+                check(!current.hasTrait(Waypoints.class),"invalid_wander_does_not_attach_trait_"+input);
+            }
+            trait=current.getOrAddTrait(Waypoints.class);
+            var route=(LinearWaypointProvider)trait.getCurrentProvider(); route.addWaypoint(new Waypoint(new Location(level,8,-58,8)));
+            for(String input:invalid) {
+                reject("npc wander "+input);
+                check(trait.getCurrentProvider()==route && route.waypoints().iterator().hasNext(),"invalid_wander_preserves_route_"+input);
+            }
+            DataKey unavailable=new MemoryDataKey(); unavailable.setString("provider","missing_wander_fixture"); unavailable.setString("payload","preserve");
+            trait.load(unavailable); reject("npc wander pathfind wrong");
+            DataKey saved=new MemoryDataKey(); trait.save(saved);
+            check(saved.getValuesDeep().equals(unavailable.getValuesDeep()),"invalid_wander_preserves_unavailable_data");
+            run("npc wander pathfind true");
+            var wander=(WanderWaypointProvider)trait.getCurrentProvider(); check(wander.isPathfind(),"valid_wander_switches_after_validation");
+            run("npc wander delay 2"); check(wander.getDelay()==40,"wander_bare_delay_retains_seconds");
+            run("npc wander delay 3t"); check(wander.getDelay()==3,"wander_explicit_ticks_supported");
+            run("npc wander xyrange 4 2"); check(wander.getXRange()==4&&wander.getYRange()==2,"wander_ranges_apply");
+            run("npc wander add 8 -58 8 minecraft:overworld"); check(wander.getRegionCentres().size()==1,"wander_region_applies");
+            current.destroy();
+        });
         steps.add(()-> {
             current=npc(false,false); select(current);
             reject("wp add invalid 0 0"); reject("waypoints add 1 2 3 unknown:world"); reject("wp add 1 2 3 --index 9");

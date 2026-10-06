@@ -4234,29 +4234,28 @@ public class NPCCommands {
 
     @Command(
             aliases = { "npc" },
-            usage = "wander (add x y z (world)) | (xyrange [xrange] [yrange]) | (pathfind [true|false]) | (delay [ticks])",
+            usage = "wander (add x y z (world)) | (xyrange [xrange] [yrange]) | (pathfind [true|false]) | (delay [duration])",
             desc = "",
             modifiers = { "wander" },
+            strictArguments = true,
             min = 1,
             max = 6,
             permission = "citizens.npc.wander")
     public void wander(CommandContext args, CommandSourceStack sender, NPC npc,
             @Arg(value = 1, completions = { "add", "xyrange", "pathfind", "delay" }) String command)
             throws CommandException {
-        Waypoints trait = npc.getOrAddTrait(Waypoints.class);
         if (args.argsLength() == 1) {
+            Waypoints trait = npc.getOrAddTrait(Waypoints.class);
             ServerPlayer player = sender.getPlayer();
             if (player != null && Editor.hasEditor(player)) {
                 Editor.leave(player);
             }
-            trait.setWaypointProvider(trait.getCurrentProviderName().equals("wander") ? "linear" : "wander");
-            Messaging.sendTr(sender, Messages.WAYPOINT_PROVIDER_SET, trait.getCurrentProviderName());
+            if (isCurrentTarget(npc) && trait.isCurrent()
+                    && trait.setWaypointProvider(trait.getCurrentProviderName().equals("wander") ? "linear" : "wander"))
+                Messaging.sendTr(sender, Messages.WAYPOINT_PROVIDER_SET, trait.getCurrentProviderName());
             return;
         }
-        if (!(trait.getCurrentProvider() instanceof WanderWaypointProvider)) {
-            trait.setWaypointProvider("wander");
-        }
-        WanderWaypointProvider provider = (WanderWaypointProvider) trait.getCurrentProvider();
+        java.util.function.Consumer<WanderWaypointProvider> apply;
         if (command.equals("add")) {
             if (args.argsLength() < 5)
                 throw new CommandUsageException();
@@ -4267,29 +4266,58 @@ public class NPCCommands {
                 throw new CommandException(Messages.WORLD_NOT_FOUND);
 
             Location loc = new Location(level, args.getInteger(2), args.getInteger(3), args.getInteger(4));
-            provider.addRegionCentre(loc);
-            Messaging.sendTr(sender, Messages.WAYPOINT_ADDED, Util.prettyPrintLocation(loc));
+            apply = provider -> {
+                provider.addRegionCentre(loc);
+                Messaging.sendTr(sender, Messages.WAYPOINT_ADDED, Util.prettyPrintLocation(loc));
+            };
         } else if (command.equals("xyrange")) {
             if (args.argsLength() != 4)
                 throw new CommandUsageException();
 
-            provider.setXYRange(args.getInteger(2), args.getInteger(3));
-            Messaging.sendTr(sender, Messages.WANDER_XY_RANGE_SET, provider.getXRange(), provider.getYRange());
+            int xRange = args.getInteger(2), yRange = args.getInteger(3);
+            if (xRange < 0 || yRange < 0) throw new CommandException(CommandMessages.INVALID_NUMBER);
+            apply = provider -> {
+                provider.setXYRange(xRange, yRange);
+                Messaging.sendTr(sender, Messages.WANDER_XY_RANGE_SET, provider.getXRange(), provider.getYRange());
+            };
         } else if (command.equals("pathfind")) {
             if (args.argsLength() != 3)
                 throw new CommandUsageException();
 
-            provider.setPathfind(Boolean.parseBoolean(args.getString(2)));
-            Messaging.sendTr(sender, Messages.WANDER_PATHFIND_SET, provider.isPathfind());
+            String value = args.getString(2);
+            if (!value.equalsIgnoreCase("true") && !value.equalsIgnoreCase("false"))
+                throw new CommandException(CommandMessages.INVALID_VALUE, "pathfind", value);
+            boolean pathfind = Boolean.parseBoolean(value);
+            apply = provider -> {
+                provider.setPathfind(pathfind);
+                Messaging.sendTr(sender, Messages.WANDER_PATHFIND_SET, provider.isPathfind());
+            };
         } else if (command.equals("delay")) {
             if (args.argsLength() != 3)
                 throw new CommandUsageException();
 
-            provider.setDelay(Durations.toTicks(Durations.parse(args.getString(2), TimeUnit.SECONDS)));
-            Messaging.sendTr(sender, Messages.WANDER_DELAY_SET, provider.getDelay());
+            int delay;
+            try {
+                Duration duration = Durations.parse(args.getString(2), TimeUnit.SECONDS);
+                if (duration.isNegative()) throw new IllegalArgumentException("Negative delay");
+                delay = Math.toIntExact(duration.toMillis() / 50);
+            }
+            catch (RuntimeException invalid) { throw new CommandException(CommandMessages.INVALID_VALUE, "delay", args.getString(2)); }
+            apply = provider -> {
+                provider.setDelay(delay);
+                Messaging.sendTr(sender, Messages.WANDER_DELAY_SET, provider.getDelay());
+            };
         } else {
             throw new CommandUsageException();
         }
+        Waypoints trait = npc.getOrAddTrait(Waypoints.class);
+        if (!isCurrentTarget(npc) || !trait.isCurrent()) return;
+        if (!(trait.getCurrentProvider() instanceof WanderWaypointProvider)
+                && !trait.setWaypointProvider("wander")) return;
+        if (!isCurrentTarget(npc) || !trait.isCurrent()) return;
+        if (!(trait.getCurrentProvider() instanceof WanderWaypointProvider provider))
+            throw new CommandException(Messages.WAYPOINT_PROVIDER_NOT_FOUND, "wander");
+        apply.accept(provider);
     }
 
     @Command(
