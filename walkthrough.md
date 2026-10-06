@@ -1877,3 +1877,9 @@ All 528 ordinary tests and the normal build pass without failures/errors/skips; 
 Legacy migration retry comparison now normalizes known destination replacement options before equality checking, avoiding false conflicts for equivalent quoted Boolean values. Extra fields/actions are retained in the comparison, so a genuinely different destination is still preserved as a conflict.
 
 Two real-file tests verify equivalent retry without rewriting target bytes and extra-action conflict preserving both files. All 530 ordinary tests and the normal build pass without failures/errors/skips; git diff --check passes. No fresh native/client run is claimed. Production Interactions sources and packaging are unchanged; no unrelated server or original data was changed. Updated docs/template-migration-2026-10-06.md. The full Citizens goal remains active.
+
+## 2026-10-06 16:15:44 +08:00 — Verify migration defaults and extra-option conflict preservation
+
+Added file tests confirming omitted default replacement options permit identical migration retry without destination rewriting, while extra destination replacement options still prevent migration and preserve source/target bytes. Existing production normalization passes both cases.
+
+All 532 ordinary tests and the normal build pass without failures/errors/skips; git diff --check passes. No fresh native/client run is claimed. Production Interactions sources and packaging are unchanged; no unrelated server or original data was changed. Updated docs/template-migration-2026-10-06.md. The full Citizens goal remains active.

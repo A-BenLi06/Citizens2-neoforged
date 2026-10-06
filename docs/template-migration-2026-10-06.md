@@ -30,3 +30,7 @@ through the same persister, allowing equivalent quoted/Boolean values without
 rewriting destination bytes. Extra destination fields/actions remain in the compared
 structure and still cause a conflict. Two file tests verify equivalence and conservative
 conflict preservation.
+
+Additional retry tests verify omitted default options are accepted without rewriting
+the destination, while extra fields inside yaml_replace still cause a conservative
+conflict and preserve both files. No additional production changes were required.
