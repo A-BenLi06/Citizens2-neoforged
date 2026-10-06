@@ -16,7 +16,7 @@ Recent follow-ups cover [`powered`, `name` and `home` options](command-options-h
 
 ## Behavior, data and integration acceptance
 
-- [Walkto request preparation](walkto-preparation-2026-10-07.md) validates values and configures local options before native strategy construction, preserving defaults and existing requests on invalid input. Direct/native tests cover ordinary/packet NPCs; completion/cancellation ownership remains separate work.
+- [Walkto request lifecycle](walkto-preparation-2026-10-07.md) validates/configures before strategy construction, cancels only its owned request on reset and distinguishes confirmed arrival from cancellation/replacement. Direct/native tests cover ordinary/packet NPCs, including begin callbacks and pending preparation; arbitrary providers remain separate acceptance.
 
 - [Native behavior-chain coverage](../tools/creation-runtime-audit/README.md) combines repeat, Molang waits, grouped conditionals, timeout completion, first/subsequent cooldown checks, inversion and signal resumption on ordinary/packet NPCs. These positive integration cases do not establish every external provider or physical-client combination.
 

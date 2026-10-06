@@ -53,6 +53,7 @@ public final class WaypointLifecycleRuntimeAudit {
     private static WaypointProvider provider;
     private static int actions;
     private static Probe probe;
+    private static net.citizensnpcs.api.ai.tree.Behavior walking;
     private static java.util.function.Consumer<net.citizensnpcs.api.ai.event.NavigationBeginEvent> begin;
     @SubscribeEvent public static void began(net.citizensnpcs.api.ai.event.NavigationBeginEvent event) { if(begin!=null) begin.accept(event); }
     @FunctionalInterface private interface Step { void run() throws Exception; }
@@ -239,6 +240,43 @@ public final class WaypointLifecycleRuntimeAudit {
     }
 
     private static void navigation() {
+        for(boolean packet:new boolean[]{false,true}) {
+            steps.add(()-> {
+                current=npc(packet,true);
+                var navigator=current.getNavigator();
+                navigator.getDefaultParameters().locationStrategyFactory((npc,parameters,target)->probe=new Probe(target));
+                var context=new net.citizensnpcs.api.ai.tree.BehaviorRegistry.BehaviorContext(current,
+                        new net.citizensnpcs.api.expr.ExpressionScope(),CitizensAPI.getExpressionRegistry(),new net.citizensnpcs.api.expr.Memory());
+                context.setArgs(new String[]{"12","-58","4"});
+                walking=CitizensAPI.getBehaviorRegistry().createBehavior("walkto",null,context);
+                walking.shouldExecute(); walking.run(); walking.reset();
+                check(!navigator.isNavigating(),"walkto_reset_cancels_owned_request_"+packet);
+                walking.shouldExecute(); walking.run(); navigator.setTarget(new Location(level,20,-58,4));
+                var replacement=navigator.getPathStrategy();
+                check(walking.run()==net.citizensnpcs.api.ai.tree.BehaviorStatus.FAILURE,"walkto_replacement_is_not_arrival_"+packet);
+                walking.reset(); check(navigator.getPathStrategy()==replacement,"walkto_reset_preserves_foreign_request_"+packet);
+                navigator.cancelNavigation(); walking.shouldExecute();
+                begin=event->{begin=null; event.getNavigator().cancelNavigation();};
+                check(walking.run()==net.citizensnpcs.api.ai.tree.BehaviorStatus.FAILURE,"walkto_begin_cancellation_is_not_success_"+packet);
+                walking.shouldExecute();
+                begin=event->{begin=null; event.getNavigator().setTarget(new Location(level,20,-58,4));};
+                check(walking.run()==net.citizensnpcs.api.ai.tree.BehaviorStatus.FAILURE,"walkto_begin_replacement_is_not_success_"+packet);
+                replacement=navigator.getPathStrategy(); walking.reset();
+                check(navigator.getPathStrategy()==replacement,"walkto_begin_replacement_survives_reset_"+packet);
+                navigator.cancelNavigation();
+                navigator.getDefaultParameters().locationStrategyFactory((npc,parameters,target)->{walking.reset(); return new Probe(target);});
+                walking.shouldExecute(); walking.run();
+                check(!navigator.isNavigating(),"walkto_reset_during_preparation_cancels_pending_request_"+packet);
+                navigator.getDefaultParameters().locationStrategyFactory((npc,parameters,target)->probe=new Probe(target));
+                walking.shouldExecute(); walking.run(); probe.done=true;
+                waiting=()->!current.getNavigator().isNavigating();
+            });
+            steps.add(()-> {
+                check(walking.run()==net.citizensnpcs.api.ai.tree.BehaviorStatus.SUCCESS
+                        && walking.run()==net.citizensnpcs.api.ai.tree.BehaviorStatus.SUCCESS,"walkto_confirms_actual_arrival_"+packet);
+                walking.reset(); current.destroy();
+            });
+        }
         for(boolean packet:new boolean[]{false,true}) steps.add(()-> {
             current=npc(packet,true);
             var navigator=current.getNavigator(); var defaults=navigator.getDefaultParameters();

@@ -480,10 +480,19 @@ public class BehaviorRegistry {
 
             return new Behavior() {
                 private boolean started = false;
+                private net.citizensnpcs.api.ai.NavigatorParameters ownedParameters;
+                private BehaviorStatus result;
+                private long generation;
 
                 @Override
                 public void reset() {
+                    generation++;
                     started = false;
+                    result = null;
+                    var previous = ownedParameters;
+                    ownedParameters = null;
+                    if (previous != null && context.getNPC().getNavigator().getLocalParameters() == previous)
+                        context.getNPC().getNavigator().cancelNavigation();
                 }
 
                 @Override
@@ -491,6 +500,7 @@ public class BehaviorRegistry {
                     NPC npc = context.getNPC();
                     if (!npc.isSpawned()) return BehaviorStatus.FAILURE;
                     if (!started) {
+                        long activation = generation;
                         double x = xHolder.evaluateAsNumber(context.getScope());
                         double y = yHolder.evaluateAsNumber(context.getScope());
                         double z = zHolder.evaluateAsNumber(context.getScope());
@@ -503,20 +513,42 @@ public class BehaviorRegistry {
                                 || margin != null && (!Double.isFinite(margin) || margin < 0)) return BehaviorStatus.FAILURE;
                         Location current = npc.getStoredLocation();
                         if (current == null || current.getWorld() == null) return BehaviorStatus.FAILURE;
+                        if (generation != activation || !npc.isSpawned()) return BehaviorStatus.FAILURE;
+                        var navigator = npc.getNavigator();
+                        if (navigator.isNavigating()) return BehaviorStatus.FAILURE;
                         Location target = new Location(current.getWorld(), x, y, z);
-                        npc.getNavigator().setTarget(target, parameters -> {
-                            if (speed != null) parameters.speedModifier(speed);
-                            if (range != null) parameters.range(range);
-                            if (margin != null) parameters.distanceMargin(margin);
-                        });
                         started = true;
+                        try {
+                            navigator.setTarget(target, parameters -> {
+                                ownedParameters = parameters;
+                                if (speed != null) parameters.speedModifier(speed);
+                                if (range != null) parameters.range(range);
+                                if (margin != null) parameters.distanceMargin(margin);
+                                parameters.addSingleUseCallback(reason -> {
+                                    if (generation == activation && ownedParameters == parameters)
+                                        result = reason == null ? BehaviorStatus.SUCCESS : BehaviorStatus.FAILURE;
+                                });
+                            });
+                        } catch (RuntimeException | Error failure) {
+                            if (generation == activation) {
+                                try { reset(); }
+                                catch (RuntimeException | Error cleanup) { if (cleanup != failure) failure.addSuppressed(cleanup); }
+                            }
+                            throw failure;
+                        }
+                        if (generation != activation) return BehaviorStatus.RUNNING;
                     }
-                    return npc.getNavigator().isNavigating() ? BehaviorStatus.RUNNING : BehaviorStatus.SUCCESS;
+                    if (result != null) return result;
+                    if (ownedParameters == null || npc.getNavigator().getLocalParameters() != ownedParameters
+                            || !npc.getNavigator().isNavigating()) return result = BehaviorStatus.FAILURE;
+                    return BehaviorStatus.RUNNING;
                 }
 
                 @Override
                 public boolean shouldExecute() {
-                    return context.getNPC().isSpawned() && !context.getNPC().getNavigator().isNavigating();
+                    if (!context.getNPC().isSpawned() || context.getNPC().getNavigator().isNavigating()) return false;
+                    reset();
+                    return true;
                 }
             };
         });
