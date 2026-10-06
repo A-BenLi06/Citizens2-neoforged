@@ -17,7 +17,14 @@ public final class NPCCommandFormat {
         }
         if (verb.equals("npc") || verb.equals("waypoints") || verb.equals("wp")) {
             CommandContext context = new CommandContext(result.split(" "));
-            if (!context.hasValueFlag("id") && !context.hasValueFlag("uuid")) result += " --id <id>";
+            // Selection accepts a positional target or --name in addition to the shared identity flags.
+            // Adding an ID would turn those valid commands into conflicting-selector errors.
+            boolean explicitSelection = verb.equals("npc")
+                    && (context.getString(0, "").equalsIgnoreCase("select")
+                            || context.getString(0, "").equalsIgnoreCase("sel"))
+                    && (context.argsLength() > 1 || context.hasValueFlag("name"));
+            if (!context.hasValueFlag("id") && !context.hasValueFlag("uuid") && !explicitSelection)
+                result += " --id <id>";
         }
         return result;
     }

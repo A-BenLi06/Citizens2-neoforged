@@ -335,6 +335,21 @@ public final class CreationRuntimeAudit {
         templateBehavior.getMemory().set("template_empty", List.of());
         template.spawn(new Location(level, 10, -58, 10));
         NPC selectionBeforeTemplateCheck = selected();
+        var consoleSource = server.createCommandSourceStack();
+        NPC previousConsoleSelection = CitizensAPI.getDefaultNPCSelector().getSelected(consoleSource);
+        try {
+            for (String selector : List.of("select " + template.getId(), "sel --name TemplateSource",
+                    "select --uuid " + template.getUniqueId(), "select TemplateSource")) {
+                CitizensAPI.getDefaultNPCSelector().deselect(consoleSource);
+                new net.citizensnpcs.api.npc.templates.CommandListExecutor(List.of("npc " + selector)).accept(template);
+                check(CitizensAPI.getDefaultNPCSelector().getSelected(consoleSource) == template,
+                        "template_command_preserves_explicit_selector_" + selector);
+            }
+        } finally {
+            if (previousConsoleSelection != null && exists(previousConsoleSelection))
+                CitizensAPI.getDefaultNPCSelector().select(consoleSource, previousConsoleSelection);
+            else CitizensAPI.getDefaultNPCSelector().deselect(consoleSource);
+        }
         var generationPermission = grant("citizens.templates.generate");
         CitizensAPI.getDefaultNPCSelector().select(source, template);
         String emptyNamespace = "empty_name_audit_" + UUID.randomUUID();

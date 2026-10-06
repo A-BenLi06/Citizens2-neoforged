@@ -46,4 +46,15 @@ class NPCCommandFormatTest {
         assertEquals("npc speak \"literal --uuid value\" --id <id>",
                 NPCCommandFormat.prepare("npc speak \"literal --uuid value\""));
     }
+
+    @Test void selectionKeepsItsExplicitPositionalAndNamedTargets() {
+        for (String modifier : new String[] { "select", "sel" }) {
+            for (String target : new String[] { "17", "\"Two Words\"", "--name \"Two Words\"" }) {
+                String command = "npc " + modifier + " " + target;
+                assertEquals(command, NPCCommandFormat.prepare(command));
+            }
+            assertEquals("npc " + modifier + " --id <id>", NPCCommandFormat.prepare("npc " + modifier));
+        }
+        assertEquals("npc rename \"Two Words\" --id <id>", NPCCommandFormat.prepare("npc rename \"Two Words\""));
+    }
 }
