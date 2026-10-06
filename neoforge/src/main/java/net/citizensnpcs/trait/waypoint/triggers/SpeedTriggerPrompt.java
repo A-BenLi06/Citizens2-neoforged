@@ -20,8 +20,12 @@ public class SpeedTriggerPrompt implements WaypointTriggerPrompt {
 
     @Override
     public WaypointTrigger createFromShortInput(ChatPromptSession session, String input) {
+        if (input == null || input.isBlank()) return null;
         try {
-            return new SpeedTrigger((float) Math.max(Double.parseDouble(input.trim()), 0));
+            double parsed = Double.parseDouble(input.trim());
+            if (!Double.isFinite(parsed)) return null;
+            float speed = (float) Math.max(parsed, 0);
+            return Float.isFinite(speed) ? new SpeedTrigger(speed) : null;
         } catch (NumberFormatException ex) {
             return null;
         }

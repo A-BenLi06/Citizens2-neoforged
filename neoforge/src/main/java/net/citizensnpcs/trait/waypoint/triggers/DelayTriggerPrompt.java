@@ -9,13 +9,25 @@ import net.citizensnpcs.util.Messages;
 public class DelayTriggerPrompt implements WaypointTriggerPrompt {
     @Override
     public ChatPrompt acceptInput(ChatPromptSession session, String input) {
-        session.setSessionData(CREATED_TRIGGER_KEY, new DelayTrigger(parseTicks(input)));
+        WaypointTrigger trigger = createFromShortInput(session, input);
+        if (trigger == null) {
+            Messaging.sendErrorTr(session.getPlayer().createCommandSourceStack(), Messages.DELAY_TRIGGER_PROMPT);
+            return this;
+        }
+        session.setSessionData(CREATED_TRIGGER_KEY, trigger);
         return (ChatPrompt) session.getSessionData(RETURN_PROMPT_KEY);
     }
 
     @Override
     public WaypointTrigger createFromShortInput(ChatPromptSession session, String input) {
-        return new DelayTrigger(parseTicks(input));
+        if (input == null || input.isBlank()) return null;
+        try {
+            java.time.Duration duration = Durations.parse(input.trim());
+            int ticks = duration.isNegative() ? 0 : Math.toIntExact(duration.toMillis() / 50);
+            return new DelayTrigger(ticks);
+        } catch (java.time.DateTimeException | IllegalArgumentException | ArithmeticException invalid) {
+            return null;
+        }
     }
 
     @Override
@@ -24,12 +36,4 @@ public class DelayTriggerPrompt implements WaypointTriggerPrompt {
         return "";
     }
 
-    /** Accepts a bare tick count or a duration such as {@code 3s}, which is what upstream's parseTicks does. */
-    private static int parseTicks(String input) {
-        try {
-            return Math.max(0, Durations.toTicks(Durations.parse(input.trim())));
-        } catch (RuntimeException ex) {
-            return 0;
-        }
-    }
 }

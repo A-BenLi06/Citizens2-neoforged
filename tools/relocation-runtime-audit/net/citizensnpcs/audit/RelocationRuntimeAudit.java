@@ -86,7 +86,7 @@ public final class RelocationRuntimeAudit {
                 spawnGrant = grant(alice.player, "citizens.npc.spawn");
                 check(!PermissionUtil.hasPermission(alice.player, "citizens.admin")
                         && !PermissionUtil.hasPermission(alice.player, "citizens.npc.tphere.multiworld"), "independent_permissions");
-                spawnCommands(); playerTeleport(); relocateCommands(); prompts(); completionOwnership(); npcCommandSources(); teleportTriggerInput(); movetoCommands(); tptoCommands(); mountedCompletion();
+                spawnCommands(); playerTeleport(); relocateCommands(); prompts(); completionOwnership(); npcCommandSources(); numericTriggerInput(); teleportTriggerInput(); movetoCommands(); tptoCommands(); mountedCompletion();
             }
             if (server.getTickCount() == start + 1) mount = null;
             if (server.getTickCount() >= start + 5) {
@@ -347,6 +347,40 @@ public final class RelocationRuntimeAudit {
         automated.discard();
         reject(source, "spawn " + target.getId());
         check(!target.isSpawned(), "retired_fake_player_command_source_rejected");
+    }
+
+    private static void numericTriggerInput() {
+        String key = net.citizensnpcs.trait.waypoint.triggers.WaypointTriggerPrompt.CREATED_TRIGGER_KEY;
+        for (boolean speed : new boolean[]{false, true}) {
+            net.citizensnpcs.trait.waypoint.triggers.WaypointTriggerPrompt prompt = speed
+                    ? new net.citizensnpcs.trait.waypoint.triggers.SpeedTriggerPrompt()
+                    : new net.citizensnpcs.trait.waypoint.triggers.DelayTriggerPrompt();
+            Object sentinel = new net.citizensnpcs.trait.waypoint.triggers.DelayTrigger(7);
+            var session = ChatPrompts.begin(alice.player, prompt, Map.of(key, sentinel));
+            for (String invalid : List.of("invalid", "NaN", "Infinity", "1e100")) {
+                ChatPrompts.acceptInput(alice.player, invalid);
+                check(ChatPrompts.isActive(session) && session.getSessionData(key) == sentinel,
+                        "invalid_numeric_trigger_preserves_session_" + speed + invalid);
+            }
+            ChatPrompts.acceptInput(alice.player, speed ? "1.25" : "3s");
+            Object created = session.getSessionData(key);
+            check(!ChatPrompts.isActive(session) && (speed
+                    ? created instanceof net.citizensnpcs.trait.waypoint.triggers.SpeedTrigger speedTrigger && speedTrigger.getSpeed() == 1.25F
+                    : created instanceof net.citizensnpcs.trait.waypoint.triggers.DelayTrigger delayTrigger && delayTrigger.getDelay() == 60),
+                    "valid_numeric_trigger_completes_" + speed);
+            if (speed) {
+                NPC target = npc(registry, EntityType.COW, false, alice.player, true);
+                ((net.citizensnpcs.trait.waypoint.triggers.WaypointTrigger) created).onWaypointReached(target, null);
+                check(target.getNavigator().getDefaultParameters().speedModifier() == 1.25F, "validated_speed_trigger_executes");
+            }
+        }
+        var session = ChatPrompts.begin(alice.player, new net.citizensnpcs.trait.waypoint.triggers.TriggerAddPrompt());
+        ChatPrompts.acceptInput(alice.player, "delay invalid");
+        check(ChatPrompts.isActive(session) && session.getSessionData(key) == null, "invalid_inline_delay_keeps_editing");
+        ChatPrompts.acceptInput(alice.player, "3s");
+        check(!ChatPrompts.isActive(session)
+                && session.getSessionData(key) instanceof net.citizensnpcs.trait.waypoint.triggers.DelayTrigger trigger
+                && trigger.getDelay() == 60, "invalid_inline_delay_can_be_repaired");
     }
 
     private static void teleportTriggerInput() {

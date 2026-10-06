@@ -20,7 +20,9 @@ strict dimension resolution, both positional forms, flag rotations, unspawned
 teleport/spawn vetoes, spawned teleport vetoes and confirmed cross-world completion.
 Teleport-trigger chat coverage preserves namespaced dimension IDs, rejects invalid
 input without replacing session data, and executes both prompted and inline forms,
-including `teleport here`. The expanded fixture has 471 checks on each supported
+including `teleport here`. Numeric-trigger chat coverage preserves session data after
+invalid delay/speed input, permits repair, and executes a validated speed trigger.
+The expanded fixture has 485 checks on each supported
 NeoForge version.
 
 Coverage includes ID/name/quoted name/UUID/global-ID targets, both registries, ownership and permission revalidation, ambiguous-name prompts and replaced identity, canceled spawns, location overrides and invalid input, front/exact player teleport, cursor/fluid/miss behavior, center/front precedence, console contexts, cross-world permission checks, unspawned teleport events, truthful success feedback, native admission rejection, deferred/superseded callbacks, mounted rollback/remount completion, live/retired NPC and native fake-player command sources, and player-NPC sender transport during cross-world teleport.
