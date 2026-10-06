@@ -489,25 +489,26 @@ public class BehaviorRegistry {
                 @Override
                 public BehaviorStatus run() {
                     NPC npc = context.getNPC();
+                    if (!npc.isSpawned()) return BehaviorStatus.FAILURE;
                     if (!started) {
                         double x = xHolder.evaluateAsNumber(context.getScope());
                         double y = yHolder.evaluateAsNumber(context.getScope());
                         double z = zHolder.evaluateAsNumber(context.getScope());
-                        Location target = new Location(npc.getStoredLocation().getWorld(), x, y, z);
-
-                        npc.getNavigator().setTarget(target);
-                        if (speedHolder != null) {
-                            npc.getNavigator().getLocalParameters()
-                                    .speedModifier((float) speedHolder.evaluateAsNumber(context.getScope()));
-                        }
-                        if (rangeHolder != null) {
-                            npc.getNavigator().getLocalParameters()
-                                    .range((float) rangeHolder.evaluateAsNumber(context.getScope()));
-                        }
-                        if (distanceMarginHolder != null) {
-                            npc.getNavigator().getLocalParameters()
-                                    .distanceMargin(distanceMarginHolder.evaluateAsNumber(context.getScope()));
-                        }
+                        Float speed = speedHolder == null ? null : (float) speedHolder.evaluateAsNumber(context.getScope());
+                        Float range = rangeHolder == null ? null : (float) rangeHolder.evaluateAsNumber(context.getScope());
+                        Double margin = distanceMarginHolder == null ? null : distanceMarginHolder.evaluateAsNumber(context.getScope());
+                        if (!Double.isFinite(x) || !Double.isFinite(y) || !Double.isFinite(z)
+                                || speed != null && (!Float.isFinite(speed) || speed < 0)
+                                || range != null && (!Float.isFinite(range) || range < 0)
+                                || margin != null && (!Double.isFinite(margin) || margin < 0)) return BehaviorStatus.FAILURE;
+                        Location current = npc.getStoredLocation();
+                        if (current == null || current.getWorld() == null) return BehaviorStatus.FAILURE;
+                        Location target = new Location(current.getWorld(), x, y, z);
+                        npc.getNavigator().setTarget(target, parameters -> {
+                            if (speed != null) parameters.speedModifier(speed);
+                            if (range != null) parameters.range(range);
+                            if (margin != null) parameters.distanceMargin(margin);
+                        });
                         started = true;
                     }
                     return npc.getNavigator().isNavigating() ? BehaviorStatus.RUNNING : BehaviorStatus.SUCCESS;

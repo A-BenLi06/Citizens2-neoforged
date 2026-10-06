@@ -16,6 +16,8 @@ Recent follow-ups cover [`powered`, `name` and `home` options](command-options-h
 
 ## Behavior, data and integration acceptance
 
+- [Walkto request preparation](walkto-preparation-2026-10-07.md) validates values and configures local options before native strategy construction, preserving defaults and existing requests on invalid input. Direct/native tests cover ordinary/packet NPCs; completion/cancellation ownership remains separate work.
+
 - [Native behavior-chain coverage](../tools/creation-runtime-audit/README.md) combines repeat, Molang waits, grouped conditionals, timeout completion, first/subsequent cooldown checks, inversion and signal resumption on ordinary/packet NPCs. These positive integration cases do not establish every external provider or physical-client combination.
 
 - [Behavior signal ownership](behavior-signal-ownership-2026-10-07.md) isolates NPC-based delivery and cleanup by object identity, while explicit UUID/global APIs retain their matching scopes. Direct and native tests cover colliding UUIDs, directed emission and ordinary/packet waiting-tree resumption; arbitrary provider combinations remain separate acceptance.

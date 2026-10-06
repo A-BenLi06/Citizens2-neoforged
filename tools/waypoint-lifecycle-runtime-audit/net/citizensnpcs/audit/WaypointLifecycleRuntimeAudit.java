@@ -239,6 +239,32 @@ public final class WaypointLifecycleRuntimeAudit {
     }
 
     private static void navigation() {
+        for(boolean packet:new boolean[]{false,true}) steps.add(()-> {
+            current=npc(packet,true);
+            var navigator=current.getNavigator(); var defaults=navigator.getDefaultParameters();
+            float defaultSpeed=defaults.speedModifier(), defaultRange=defaults.range(); double defaultMargin=defaults.distanceMargin();
+            var starts=new java.util.concurrent.atomic.AtomicInteger();
+            defaults.locationStrategyFactory((npc,parameters,target)-> {
+                starts.incrementAndGet();
+                check(parameters.speedModifier()==1.5F && parameters.range()==33F && parameters.distanceMargin()==0.75
+                        && target.getWorld()==level && target.getX()==12,"walkto_options_configured_before_strategy_"+packet);
+                return new Probe(target);
+            });
+            var context=new net.citizensnpcs.api.ai.tree.BehaviorRegistry.BehaviorContext(current,
+                    new net.citizensnpcs.api.expr.ExpressionScope(),CitizensAPI.getExpressionRegistry(),new net.citizensnpcs.api.expr.Memory());
+            context.setArgs(new String[]{"12","-58","4","speed=1.5","range=33","distance_margin=0.75"});
+            var walk=CitizensAPI.getBehaviorRegistry().createBehavior("walkto",null,context);
+            check(walk.shouldExecute(),"walkto_admits_idle_spawned_npc_"+packet);
+            check(walk.run()==net.citizensnpcs.api.ai.tree.BehaviorStatus.RUNNING,"walkto_starts_native_request_"+packet);
+            check(defaults.speedModifier()==defaultSpeed && defaults.range()==defaultRange && defaults.distanceMargin()==defaultMargin,
+                    "walkto_keeps_default_parameters_"+packet);
+            var active=navigator.getPathStrategy();
+            context.setArgs(new String[]{"12","-58","4","speed=NaN"});
+            var invalid=CitizensAPI.getBehaviorRegistry().createBehavior("walkto",null,context);
+            check(invalid.run()==net.citizensnpcs.api.ai.tree.BehaviorStatus.FAILURE && navigator.getPathStrategy()==active && starts.get()==1,
+                    "invalid_walkto_preserves_native_request_"+packet);
+            current.destroy();
+        });
         for(String name:List.of("linear","guided")) {
             steps.add(()-> {
                 current=npc(false,true); trait=current.getOrAddTrait(Waypoints.class); trait.setWaypointProvider(name); provider=trait.getCurrentProvider(); actions=0; probe=null;
