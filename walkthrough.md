@@ -1733,3 +1733,9 @@ Three tests cover four malformed shapes, valid empty lists and direct list input
 TraitLoaderAction now validates list/indexed-map structure and string-or-mapping entries before parser lookup. Direct List input is normalized to the same indexed representation used by YAML. Empty collections remain valid; structured names must be nonempty strings. Invalid data cannot silently become an empty action list.
 
 Four tests cover malformed collections/entries, direct short/structured lists, empty collections and invalid names. All 491 ordinary tests and the normal build pass without failures/errors/skips; git diff --check passes. No fresh native/client run is claimed. Production Interactions sources and packaging are unchanged; no unrelated server or original data was changed. Updated docs/reload-templates-2026-10-05.md. The full Citizens goal remains active.
+
+## 2026-10-06 09:05:55 +08:00 — Preserve template decode exception causes and identity
+
+TemplateRegistry's decode wrapper now includes the full template key and retains the underlying exception as its cause instead of discarding it after printing. Existing file-level wrapping therefore exposes a complete diagnostic chain.
+
+One focused test uses a runtime-dependent trait in the intentionally offline unit environment to verify template identity and the original missing-runtime exception survive wrapping. All 492 ordinary tests and the normal build pass without failures/errors/skips; git diff --check passes. No fresh native/client run is claimed. Production Interactions sources and packaging are unchanged; no unrelated server or original data was changed. Updated docs/reload-templates-2026-10-05.md. The full Citizens goal remains active.

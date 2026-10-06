@@ -62,3 +62,8 @@ collections. Scalars, non-indexed maps, nested-list entries and invalid structur
 names produce errors rather than disappearing. Structured names must be nonempty
 strings. Four tests cover rejected shapes, direct mixed-form lists, empty collections
 and invalid names.
+
+Template decode errors now retain the original exception as their cause and name the
+fully qualified template key. A test deliberately loads a runtime-dependent trait
+without an enabled Citizens instance and verifies that the outer file error retains
+both template identity and the original runtime exception.

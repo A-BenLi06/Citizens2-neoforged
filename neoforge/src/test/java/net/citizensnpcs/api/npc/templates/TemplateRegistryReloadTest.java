@@ -8,6 +8,16 @@ import org.junit.jupiter.api.io.TempDir;
 import net.minecraft.resources.ResourceLocation;
 
 class TemplateRegistryReloadTest {
+    @Test void runtimeParserFailureRetainsTemplateIdentityAndOriginalCause(@TempDir Path folder) throws Exception {
+        Path namespace = Files.createDirectories(folder.resolve("audit"));
+        Files.writeString(namespace.resolve("runtime.yml"), "requires_runtime:\n  traits:\n    - name: behavior\n");
+        // This file needs a live trait factory; the unit environment deliberately has no enabled Citizens instance.
+        var failure = assertThrows(IllegalStateException.class, () -> TemplateRegistry.prepareReload(folder));
+        assertTrue(failure.getCause().getMessage().contains("audit:requires_runtime"));
+        assertInstanceOf(IllegalStateException.class, failure.getCause().getCause());
+        assertTrue(failure.getCause().getCause().getMessage().contains("Citizens is not enabled"));
+    }
+
     @Test void malformedCommandShapesCannotBecomeEmptyActions(@TempDir Path folder) throws Exception {
         Path namespace = Files.createDirectories(folder.resolve("audit"));
         Path file = namespace.resolve("bad.yml");

@@ -137,7 +137,7 @@ public class TemplateRegistry {
             template = Template.load(errors, new TemplateWorkspace(folder), namespacedKey, key);
         } catch (Exception exception) {
             exception.printStackTrace();
-            throw new TemplateLoadException(String.valueOf(exception.getMessage()));
+            throw new TemplateLoadException("Unable to decode template " + namespacedKey + ": " + exception.getMessage(), exception);
         }
         if (!errors.errors.isEmpty())
             throw new TemplateLoadException(Joiner.on('\n').join(errors.errors));
@@ -242,6 +242,10 @@ public class TemplateRegistry {
     private static class TemplateLoadException extends Exception {
         public TemplateLoadException(String message) {
             super(message);
+        }
+
+        public TemplateLoadException(String message, Throwable cause) {
+            super(message, cause);
         }
     }
 }
