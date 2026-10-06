@@ -22,6 +22,15 @@ import net.citizensnpcs.api.util.MemoryDataKey;
  * parser, the registry and the Molang expressions in between actually drive a tree, rather than only compiling.
  */
 public class BehaviorTreeParserTest {
+    @Test public void parsedWaitUsesItsShortFormMolangDuration() {
+        Memory memory = new Memory();
+        Behavior tree = parse(map("sequence", map("0", "wait `2`", "1", "set waited `1`")), memory);
+        assertTrue(tree.shouldExecute());
+        assertEquals(BehaviorStatus.RUNNING, tree.run());
+        assertEquals(0D, memory.getNumber("waited"));
+        for (int i = 0; i < 3; i++) tree.run();
+        assertEquals(1D, memory.getNumber("waited"));
+    }
     @Test
     public void strictTimeoutsRejectInvalidLiteralTickCounts() {
         var parser = new BehaviorTreeParser(new CitizensBehaviorRegistry(new ExpressionRegistry()));

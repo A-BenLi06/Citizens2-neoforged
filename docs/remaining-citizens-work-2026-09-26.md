@@ -16,6 +16,8 @@ Recent follow-ups cover [`powered`, `name` and `home` options](command-options-h
 
 ## Behavior, data and integration acceptance
 
+- [Behavior wait lifecycle](behavior-wait-2026-10-06.md) evaluates scalar/short-form dynamic durations once per activation, clears without reevaluation and lets zero waits complete. Parser/Molang and direct lifecycle tests cover these paths; native/provider combinations remain separate acceptance.
+
 - [Wander command validation](wander-validation-2026-10-06.md) checks complete input before attaching or replacing route state, preserves unavailable data on rejection and validates provider publication before applying edits. Native tests cover invalid and successful operations; custom callback effects remain separate acceptance.
 
 - [Waypoint trigger loading](waypoint-trigger-loading-2026-10-06.md) strictly decodes providers and preserves their complete source data when a trigger is unavailable or malformed. Repair/reload restores the route. Arbitrary numeric semantics and custom provider side effects remain separate acceptance work.

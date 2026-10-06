@@ -82,19 +82,26 @@ public class BehaviorRegistry {
     }
 
     /**
-     * Helper to parse duration with time unit support (e.g., "5s", "10m", "100t"). Falls back to expression evaluation
-     * if not a valid duration string.
+     * Parses literal durations or expressions producing an integer tick count or a duration string.
      */
     protected int parseDuration(String durationStr, ExpressionScope scope) {
         if (durationStr == null || durationStr.isEmpty())
             return 20;
 
-        int ticks = Durations.toTicks(Durations.parse(durationStr));
-        if (ticks >= 0)
-            return ticks;
+        return durationTicks(expressions.parseValue(durationStr).evaluate(scope));
+    }
 
-        ExpressionValue holder = expressions.parseValue(durationStr);
-        return (int) holder.evaluateAsNumber(scope);
+    private static int durationTicks(Object value) {
+        if (value instanceof Number number) {
+            double ticks = number.doubleValue();
+            if (!Double.isFinite(ticks) || ticks < 0 || ticks > Integer.MAX_VALUE || ticks != Math.rint(ticks))
+                throw new IllegalArgumentException("Wait duration must be a non-negative integer tick count");
+            return (int) ticks;
+        }
+        if (!(value instanceof String text)) throw new IllegalArgumentException("Invalid wait duration: " + value);
+        Duration duration = Durations.parse(text);
+        if (duration.isNegative()) throw new IllegalArgumentException("Wait duration must not be negative");
+        return Durations.toTicks(duration);
     }
 
     /**
@@ -115,20 +122,23 @@ public class BehaviorRegistry {
     protected void registerDefaults() {
         // Wait behavior - waits for a number of ticks
         registerBehavior("wait", (params, context) -> {
-            String durationStr = params != null ? params.getString("") : "20";
-            ExpressionRegistry.ExpressionValue durationHolder = expressions.parseValue(durationStr);
+            String[] args = context.getArgs();
+            String durationStr = args != null && args.length > 0 ? args[0] : params != null ? params.getString("") : "20";
+            ExpressionRegistry.ExpressionValue durationHolder = expressions.parseValue(
+                    durationStr == null || durationStr.isBlank() ? "20" : durationStr);
 
             return new Behavior() {
                 private int ticksRemaining;
 
                 @Override
                 public void reset() {
-                    ticksRemaining = Durations.toTicks(Durations.parse(durationHolder.evaluateAsString(context.getScope())));
+                    ticksRemaining = 0;
                 }
 
                 @Override
                 public BehaviorStatus run() {
-                    if (--ticksRemaining <= 0)
+                    if (ticksRemaining > 0) ticksRemaining--;
+                    if (ticksRemaining == 0)
                         return BehaviorStatus.SUCCESS;
 
                     return BehaviorStatus.RUNNING;
@@ -136,8 +146,9 @@ public class BehaviorRegistry {
 
                 @Override
                 public boolean shouldExecute() {
-                    ticksRemaining = parseDuration(durationStr, context.getScope());
-                    return ticksRemaining > 0;
+                    ticksRemaining = 0;
+                    ticksRemaining = durationTicks(durationHolder.evaluate(context.getScope()));
+                    return true;
                 }
             };
         });
