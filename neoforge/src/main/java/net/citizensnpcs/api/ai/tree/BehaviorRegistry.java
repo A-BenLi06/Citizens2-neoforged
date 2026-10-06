@@ -128,7 +128,7 @@ public class BehaviorRegistry {
      *            the factory to create behavior instances
      */
     public void registerBehavior(String name, BehaviorFactory factory) {
-        behaviors.put(name.toLowerCase(), factory);
+        behaviors.put(name.toLowerCase(Locale.ROOT), factory);
     }
 
     /**
@@ -430,7 +430,7 @@ public class BehaviorRegistry {
                     String arg = args[i];
                     if (arg.contains("=")) {
                         String[] parts = arg.split("=", 2);
-                        String key = parts[0].toLowerCase();
+                        String key = parts[0].toLowerCase(Locale.ROOT);
                         String value = parts[1];
 
                         switch (key) {
@@ -692,7 +692,7 @@ public class BehaviorRegistry {
                     String arg = args[i];
                     if (arg.contains("=")) {
                         String[] parts = arg.split("=", 2);
-                        result.put(parts[0].toLowerCase(), parts[1]);
+                        result.put(parts[0].toLowerCase(Locale.ROOT), parts[1]);
                     }
                 }
             } else if (params != null) {

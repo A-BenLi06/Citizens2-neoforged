@@ -8,6 +8,33 @@ import net.citizensnpcs.api.expr.Memory;
 import net.citizensnpcs.api.util.MemoryDataKey;
 
 class BehaviorContextTest {
+    @Test void registrationAndLookupUseTheSameLocaleIndependentNames() {
+        java.util.Locale previous = java.util.Locale.getDefault();
+        try {
+            java.util.Locale.setDefault(java.util.Locale.forLanguageTag("tr-TR"));
+            var registry = new BehaviorRegistry(new ExpressionRegistry());
+            var calls = new java.util.concurrent.atomic.AtomicInteger();
+            registry.registerBehavior("SIGNAL_ALIAS", (params, context) -> (InstantBehavior) () -> {
+                calls.incrementAndGet(); return BehaviorStatus.SUCCESS;
+            });
+            assertTrue(registry.hasBehavior("signal_alias"));
+            assertEquals(BehaviorStatus.SUCCESS, registry.createBehavior("SIGNAL_ALIAS", null, context()).run());
+            assertEquals(1, calls.get());
+        } finally { java.util.Locale.setDefault(previous); }
+    }
+
+    @Test void namedOptionsNormalizeKeysWithoutChangingValues() {
+        java.util.Locale previous = java.util.Locale.getDefault();
+        try {
+            java.util.Locale.setDefault(java.util.Locale.forLanguageTag("tr-TR"));
+            var context = context();
+            context.setArgs(new String[]{"OriginalPosition", "DISTANCE_MARGIN=KeepCase", "PRIORITY=I"});
+            var parsed = context.parseArgs(1, null);
+            assertEquals("OriginalPosition", parsed.get("0"));
+            assertEquals("KeepCase", parsed.get("distance_margin"));
+            assertEquals("I", parsed.get("priority"));
+        } finally { java.util.Locale.setDefault(previous); }
+    }
     private static BehaviorRegistry.BehaviorContext context() {
         return new BehaviorRegistry.BehaviorContext(null, new ExpressionScope(), new ExpressionRegistry(), new Memory());
     }
