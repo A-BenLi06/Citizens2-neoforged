@@ -8,6 +8,29 @@ import org.junit.jupiter.api.io.TempDir;
 import net.minecraft.resources.ResourceLocation;
 
 class TemplateMigrationTest {
+    @Test void equivalentQuotedDestinationBooleanAllowsRetryWithoutRewriting(@TempDir Path folder) throws Exception {
+        Files.writeString(folder.resolve("sample.yml"), SOURCE);
+        Path namespace = Files.createDirectory(folder.resolve("migrated"));
+        Path target = Files.writeString(namespace.resolve("sample.yml"),
+                "sample:\n  yaml_replace:\n    override: ' TRUE '\n    replacements:\n      name: Original\n");
+        byte[] before = Files.readAllBytes(target);
+        TemplateRegistry.prepareReload(folder);
+        assertArrayEquals(before, Files.readAllBytes(target));
+        assertTrue(Files.exists(folder.resolve("sample.yml.migrated")));
+    }
+
+    @Test void normalizationDoesNotIgnoreAdditionalDestinationActions(@TempDir Path folder) throws Exception {
+        Path source = Files.writeString(folder.resolve("sample.yml"), SOURCE);
+        Path namespace = Files.createDirectory(folder.resolve("migrated"));
+        Path target = Files.writeString(namespace.resolve("sample.yml"),
+                "sample:\n  commands:\n    on_spawn: []\n  yaml_replace:\n    override: 'true'\n    replacements:\n      name: Original\n");
+        byte[] before = Files.readAllBytes(target);
+        assertThrows(IllegalStateException.class, () -> TemplateRegistry.prepareReload(folder));
+        assertArrayEquals(before, Files.readAllBytes(target));
+        assertEquals(SOURCE, Files.readString(source));
+        assertFalse(Files.exists(folder.resolve("sample.yml.migrated")));
+    }
+
     @Test void invalidLegacyOptionsAreRejectedBeforeFilesystemChanges(@TempDir Path root) throws Exception {
         int index = 0;
         for (String yaml : java.util.List.of("override: perhaps\nreplacements: {}\n", "replacements: wrong-type\n")) {

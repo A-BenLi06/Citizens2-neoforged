@@ -24,3 +24,9 @@ Legacy contents are now validated and normalized by the same YAML replacement
 persister used for ordinary templates, before creating the destination directory.
 Invalid override/replacement types preserve source files, while accepted quoted
 Boolean values normalize consistently. Two file tests verify these paths.
+
+Retry comparison now normalizes the destination's known YAML replacement options
+through the same persister, allowing equivalent quoted/Boolean values without
+rewriting destination bytes. Extra destination fields/actions remain in the compared
+structure and still cause a conflict. Two file tests verify equivalence and conservative
+conflict preservation.

@@ -244,7 +244,7 @@ public class TemplateRegistry {
 
         Map<String, Object> templates = new java.util.LinkedHashMap<>(destination.getKey("").getValuesDeep());
         var matches = templates.keySet().stream().filter(name -> name.equalsIgnoreCase(templateName)).toList();
-        if (matches.size() > 1 || !matches.isEmpty() && !migrated.equals(templates.get(matches.get(0))))
+        if (matches.size() > 1 || !matches.isEmpty() && !sameMigration(migrated, templates.get(matches.get(0))))
             throw new TemplateLoadException("Conflicting migration destination for " + template.getName());
         if (matches.isEmpty()) {
             templates.put(templateName, migrated);
@@ -254,6 +254,18 @@ public class TemplateRegistry {
 
         try { Files.move(template.toPath(), archive.toPath()); }
         catch (IOException failure) { throw new TemplateLoadException("Unable to finish template migration " + template, failure); }
+    }
+
+    private static boolean sameMigration(Map<String, Object> migrated, Object existing) {
+        if (!(existing instanceof Map)) return false;
+        DataKey normalized = new MemoryDataKey();
+        normalized.setRaw("", existing);
+        DataKey action = normalized.getRelative("yaml_replace");
+        Map<String, Object> fields = new java.util.LinkedHashMap<>(action.getValuesDeep());
+        try { fields.putAll(YamlReplacementAction.validatedValues(action)); }
+        catch (IllegalArgumentException invalid) { return false; }
+        normalized.setRaw("yaml_replace", fields);
+        return migrated.equals(normalized.getValuesDeep());
     }
 
     public static class TemplateErrorReporter {
