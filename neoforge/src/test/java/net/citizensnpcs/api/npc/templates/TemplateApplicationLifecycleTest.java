@@ -19,13 +19,14 @@ class TemplateApplicationLifecycleTest {
 
     private static class Target {
         boolean spawned = true, allowDespawn = true, allowSpawn = true, registered = true;
+        boolean ownsUuid = true;
         int saves, spawns;
         RuntimeException saveFailure, spawnFailure;
         NPC npc;
         Target() {
             UUID uuid = UUID.randomUUID();
             NPCRegistry registry = (NPCRegistry) Proxy.newProxyInstance(NPCRegistry.class.getClassLoader(), new Class<?>[]{NPCRegistry.class},
-                    (proxy, method, args) -> registered ? npc : null);
+                    (proxy, method, args) -> registered && (!method.getName().equals("getByUniqueId") || ownsUuid) ? npc : null);
             npc = (NPC) Proxy.newProxyInstance(NPC.class.getClassLoader(), new Class<?>[]{NPC.class}, (proxy, method, args) -> {
                 switch (method.getName()) {
                     case "isSpawned": return spawned;
@@ -73,5 +74,23 @@ class TemplateApplicationLifecycleTest {
         var target = new Target(); target.registered = false;
         template().apply(target.npc);
         assertEquals(0, target.spawns);
+        assertEquals(0, target.saves);
+        assertTrue(target.spawned);
+    }
+
+    @Test void lostRegistrationStopsTheRemainingActions() {
+        var target = new Target(); var laterCalls = new java.util.concurrent.atomic.AtomicInteger();
+        var action = new Template(ResourceLocation.fromNamespaceAndPath("test", "ownership"), java.util.List.of(
+                npc -> target.registered = false, npc -> laterCalls.incrementAndGet()));
+        action.apply(target.npc);
+        assertEquals(0, laterCalls.get()); assertEquals(0, target.spawns);
+    }
+
+    @Test void losingOnlyUuidOwnershipAlsoStopsTheRemainingActions() {
+        var target = new Target(); var laterCalls = new java.util.concurrent.atomic.AtomicInteger();
+        var action = new Template(ResourceLocation.fromNamespaceAndPath("test", "uuid"), java.util.List.of(
+                npc -> target.ownsUuid = false, npc -> laterCalls.incrementAndGet()));
+        action.apply(target.npc);
+        assertEquals(0, laterCalls.get()); assertEquals(0, target.spawns);
     }
 }

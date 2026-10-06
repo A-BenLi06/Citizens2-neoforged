@@ -15,3 +15,9 @@ reported spawn failure and lost registration. Native creation checks apply a fai
 behavior template to a spawned NPC and verify both error reporting and a restored
 entity. The fixture uses the numeric-key sequence representation produced by YAML
 loading; an initial raw-list fixture did not execute the intended action and was fixed.
+
+Template application now verifies both registry indexes before starting and before
+each action. An action that removes/replaces the target stops later actions, and
+an already-unregistered instance is not despawned or modified. Two action-chain tests
+cover complete registration loss and UUID-only loss; the stale-target test also
+verifies snapshot capture and despawn are skipped.

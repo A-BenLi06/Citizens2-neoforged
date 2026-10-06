@@ -1805,3 +1805,9 @@ One multi-namespace file test verifies complete and bare-name query ordering. Al
 Template file loading now stages decoded templates and source keys locally before updating the registry indexes. Invalid later entries and duplicate normalized keys cannot leave earlier entries from that file partially published. Permissive startup continues to load independent healthy files; strict whole-reload behavior is retained.
 
 Two file tests cover invalid-file prefix rejection alongside a healthy file and same-file normalized-name duplicates. All 513 ordinary tests and the normal build pass without failures/errors/skips; git diff --check passes. No fresh native/client run is claimed. Production Interactions sources and packaging are unchanged; no unrelated server or original data was changed. Updated docs/reload-templates-2026-10-05.md. The full Citizens goal remains active.
+
+## 2026-10-06 12:12:13 +08:00 — Stop template action chains after target ownership is lost
+
+Template.apply now checks ID and UUID ownership before initial mutation and before each action, sharing the same ownership predicate with respawn recovery. Deleted/replaced targets do not receive later actions, and stale initial instances are left untouched. A package-level prepared-action constructor supports direct action-chain verification without global parser dependencies.
+
+Two added tests cover registration and UUID-only loss during actions; existing stale-target coverage now checks no snapshot or despawn occurs. All 515 ordinary tests and the normal build pass without failures/errors/skips; git diff --check passes. No fresh native/client run is claimed. Production Interactions sources and packaging are unchanged; no unrelated server or original data was changed. Updated docs/template-application-lifecycle-2026-10-06.md. The full Citizens goal remains active.
