@@ -119,6 +119,17 @@ public class BehaviorRegistry {
         }
     }
 
+    private static long cooldownMillis(Object value) {
+        Duration duration;
+        if (value instanceof Number number)
+            duration = Duration.ofMillis(new java.math.BigDecimal(number.toString()).longValueExact());
+        else if (value instanceof String text)
+            duration = Durations.parse(text, TimeUnit.MILLISECONDS);
+        else throw new IllegalArgumentException("Invalid cooldown duration: " + value);
+        if (duration.isNegative()) throw new IllegalArgumentException("Cooldown duration must not be negative");
+        return duration.toMillis();
+    }
+
     /**
      * Registers a behavior factory.
      *
@@ -370,12 +381,12 @@ public class BehaviorRegistry {
             String cooldownKey = "cooldown." + key;
 
             return (InstantBehavior) () -> {
+                long duration = cooldownMillis(durationHolder.evaluate(context.getScope()));
+                long now = System.currentTimeMillis();
+                boolean used = context.getMemory().has(cooldownKey);
                 long lastUsed = (long) context.getMemory().getNumber(cooldownKey, 0);
-                Duration duration = Durations.parse(durationHolder.evaluateAsString(context.getScope()),
-                        TimeUnit.MILLISECONDS);
-
-                if (System.currentTimeMillis() - lastUsed >= duration.toMillis()) {
-                    context.getMemory().set(cooldownKey, System.currentTimeMillis());
+                if (!used || now - lastUsed >= duration) {
+                    context.getMemory().set(cooldownKey, now);
                     return BehaviorStatus.SUCCESS;
                 }
                 return BehaviorStatus.FAILURE;
