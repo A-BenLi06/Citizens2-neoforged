@@ -24,3 +24,8 @@ whole list values. Their null slots are preserved rather than interpreted as fie
 deletions. This aligns freshly generated and disk-reloaded templates, including
 empty/null-containing blackboard lists; default-only replacement keeps an existing
 list intact. File/application and native NPC round-trip tests cover this distinction.
+
+Cross-representation tests verify raw Lists and contiguous indexed maps follow the
+same override/default rules in every pairing. Sparse numeric maps remain ordinary
+mergeable maps, preserving unrelated keys and respecting override on existing entries.
+These checks pass without further production changes.

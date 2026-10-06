@@ -1865,3 +1865,9 @@ All 524 ordinary tests and the normal build pass without failures/errors/skips; 
 A generation/save/reload/application test exposed null list slots being interpreted as deletion markers after YAML normalized lists to numeric-key maps. Replacement now treats contiguous indexed maps as whole list values, consistent with raw List input and the storage format. Default-only replacement preserves an existing list instead of merging new slots into it.
 
 Two new tests cover generated versus disk-reloaded blackboard state and indexed-list defaults. Native coverage generates a real NPC template with null/empty lists, reloads it from disk and applies it to another NPC. Both NeoForge 21.1.233 and 21.1.248 pass 330 creation checks. Clean ordinary test/build passes with 526 tests; Interactions audit tests pass with 100; no failures/errors/skips. Release archives remain separate and exclude all probes. All invoked handles completed; no unrelated server or original data was changed. Updated template map-merge documentation and fixture README. The full Citizens goal remains active.
+
+## 2026-10-06 15:43:55 +08:00 — Verify template list representation compatibility and sparse-map behavior
+
+Added cross-product tests for raw versus indexed lists under override/default modes, plus sparse numeric-map merge checks. Existing production code applies list replacement consistently while retaining sparse-map field merging; no production change was needed.
+
+All 528 ordinary tests and the normal build pass without failures/errors/skips; git diff --check passes. No fresh native/client run is claimed. Production Interactions sources and packaging are unchanged; no unrelated server or original data was changed. Updated docs/template-map-merge-2026-10-05.md. The full Citizens goal remains active.

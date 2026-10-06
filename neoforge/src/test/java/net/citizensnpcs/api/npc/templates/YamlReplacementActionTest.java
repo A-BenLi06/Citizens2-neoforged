@@ -8,6 +8,29 @@ import net.citizensnpcs.api.util.DataKey;
 import net.citizensnpcs.api.util.MemoryDataKey;
 
 class YamlReplacementActionTest {
+    @Test void rawAndIndexedListsHaveMatchingOverrideRules() {
+        for (Object original : java.util.List.of(java.util.List.of("old", "tail"), java.util.Map.of("0", "old", "1", "tail"))) {
+            for (Object replacement : java.util.List.of(java.util.List.of("new"), java.util.Map.of("0", "new"))) {
+                for (boolean override : new boolean[]{false, true}) {
+                    DataKey result = apply(java.util.Map.of("values", original), java.util.Map.of("values", replacement), override);
+                    assertEquals(override ? replacement : original, result.getRaw("values"));
+                }
+            }
+        }
+    }
+
+    @Test void sparseNumericMapsRemainMergeableMaps() {
+        for (boolean override : new boolean[]{false, true}) {
+            var original = new MemoryDataKey();
+            original.setString("values.0", "first"); original.setString("values.2", "third");
+            var replacement = java.util.Map.<String, Object>of("values", java.util.Map.of("2", "changed", "3", "new"));
+            DataKey result = apply(original.getValuesDeep(), replacement, override);
+            assertEquals("first", result.getString("values.0"));
+            assertEquals(override ? "changed" : "third", result.getString("values.2"));
+            assertEquals("new", result.getString("values.3"));
+        }
+    }
+
     @Test void indexedListDefaultsDoNotMergeIntoAnExistingList() {
         var original = java.util.Map.<String, Object>of("values", java.util.Map.of("0", "keep"));
         var replacement = java.util.Map.<String, Object>of("values", java.util.Map.of("0", "new", "1", "extra"));
