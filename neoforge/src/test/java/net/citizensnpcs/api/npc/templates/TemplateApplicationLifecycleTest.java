@@ -22,6 +22,7 @@ class TemplateApplicationLifecycleTest {
         boolean ownsUuid = true;
         int saves, spawns;
         RuntimeException saveFailure, spawnFailure;
+        Runnable afterSpawn = () -> {};
         NPC npc;
         Target() {
             UUID uuid = UUID.randomUUID();
@@ -35,13 +36,45 @@ class TemplateApplicationLifecycleTest {
                     case "getUniqueId": return uuid;
                     case "getStoredLocation": return null;
                     case "despawn": if (allowDespawn) spawned = false; return allowDespawn;
-                    case "spawn": spawns++; if (spawnFailure != null) throw spawnFailure; spawned = allowSpawn; return allowSpawn;
+                    case "spawn": spawns++; if (spawnFailure != null) throw spawnFailure; spawned = allowSpawn; afterSpawn.run(); return allowSpawn;
                     case "saveSnapshot": saves++; if (saveFailure != null) throw saveFailure; return null;
                     case "load": return null;
                     default: throw new AssertionError(method.getName());
                 }
             });
         }
+    }
+
+    @Test void recursiveApplicationFailsBeforeRepeatingActionsAndCanRetry() {
+        var target = new Target(); var calls = new java.util.concurrent.atomic.AtomicInteger();
+        Template[] template = new Template[1];
+        template[0] = new Template(ResourceLocation.fromNamespaceAndPath("test", "recursive"), java.util.List.of(npc -> {
+            if (calls.incrementAndGet() == 1) template[0].apply(npc);
+        }));
+        assertThrows(IllegalStateException.class, () -> template[0].apply(target.npc));
+        assertEquals(1, calls.get()); assertTrue(target.spawned);
+        assertDoesNotThrow(() -> template[0].apply(target.npc));
+        assertEquals(2, calls.get());
+    }
+
+    @Test void nestedApplicationToAnotherNpcRemainsAllowed() {
+        var first = new Target(); var second = new Target(); var calls = new java.util.concurrent.atomic.AtomicInteger();
+        Template[] template = new Template[1];
+        template[0] = new Template(ResourceLocation.fromNamespaceAndPath("test", "nested"), java.util.List.of(npc -> {
+            calls.incrementAndGet();
+            if (npc == first.npc) template[0].apply(second.npc);
+        }));
+        template[0].apply(first.npc);
+        assertEquals(2, calls.get()); assertTrue(first.spawned); assertTrue(second.spawned);
+    }
+
+    @Test void reentryDuringRespawnIsGuardedAndFailureStillReleasesTheGuard() {
+        var target = new Target(); var template = template();
+        target.afterSpawn = () -> template.apply(target.npc);
+        assertThrows(IllegalStateException.class, () -> template.apply(target.npc));
+        target.afterSpawn = () -> {};
+        assertDoesNotThrow(() -> template.apply(target.npc));
+        assertEquals(2, target.saves);
     }
 
     @Test void rejectedDespawnDoesNotApplyActions() {

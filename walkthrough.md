@@ -1835,3 +1835,9 @@ Both NeoForge 21.1.233 and 21.1.248 pass 49 reload checks. Clean ordinary test/b
 Added a template-generation test that reaches the YAML serializer and throws from a bean property. It verifies prior file bytes and both lookup indexes remain intact, then checks a corrected retry writes and publishes the replacement. Existing production ordering passes without modification.
 
 All 520 ordinary tests and the normal build pass without failures/errors/skips; git diff --check passes. No fresh native/client run is claimed. Production Interactions sources and packaging are unchanged; no unrelated server or original data was changed. Updated docs/template-generation-2026-10-05.md. The full Citizens goal remains active.
+
+## 2026-10-06 13:39:01 +08:00 — Guard recursive template application through spawn recovery
+
+Template application now tracks active NPC instances by identity and rejects reentry of the same template/NPC pair before actions repeat. The guard remains active during respawn callbacks and is released even when recovery throws. Nested application to another NPC is allowed.
+
+Three tests cover action recursion with retry, independent nested targets and respawn-callback recursion followed by successful retry. All 523 ordinary tests and the normal build pass without failures/errors/skips; git diff --check passes. No fresh native/client run is claimed. Production Interactions sources and packaging are unchanged; no unrelated server or original data was changed. Updated docs/template-application-lifecycle-2026-10-06.md. The full Citizens goal remains active.

@@ -21,3 +21,8 @@ each action. An action that removes/replaces the target stops later actions, and
 an already-unregistered instance is not despawned or modified. Two action-chain tests
 cover complete registration loss and UUID-only loss; the stale-target test also
 verifies snapshot capture and despawn are skipped.
+
+A template now guards recursive application to the same NPC instance until actions
+and spawn recovery finish. The guard uses identity, so different NPC instances may
+still receive nested applications, and finally releases it after failures. Three
+tests cover action recursion/retry, another NPC, and reentry during respawn recovery.

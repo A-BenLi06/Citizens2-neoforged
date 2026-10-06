@@ -28,6 +28,7 @@ import net.minecraft.resources.ResourceLocation;
 public class Template {
     private final List<Consumer<NPC>> actions = new ArrayList<>();
     private final ResourceLocation key;
+    private final java.util.Set<NPC> applying = java.util.Collections.newSetFromMap(new java.util.IdentityHashMap<>());
 
     private Template(ResourceLocation key) {
         this(key, List.of());
@@ -46,6 +47,7 @@ public class Template {
         var registry = npc.getOwningRegistry();
         if (!owns(registry, npc)) return;
         boolean respawn = npc.isSpawned();
+        if (!applying.add(npc)) throw new IllegalStateException("Template " + key + " is already being applied to NPC " + npc.getId());
         Throwable failure = null;
         try {
             if (respawn && !npc.despawn(DespawnReason.PENDING_RESPAWN))
@@ -58,16 +60,18 @@ public class Template {
             failure = ex;
             throw ex;
         } finally {
-            if (respawn) {
-                try {
-                    if (owns(registry, npc)
-                            && !npc.isSpawned() && !npc.spawn(npc.getStoredLocation()))
-                        throw new IllegalStateException("NPC respawn failed after applying template " + key);
-                } catch (RuntimeException | Error recovery) {
-                    if (failure == null) throw recovery;
-                    if (failure != recovery) failure.addSuppressed(recovery);
+            try {
+                if (respawn) {
+                    try {
+                        if (owns(registry, npc)
+                                && !npc.isSpawned() && !npc.spawn(npc.getStoredLocation()))
+                            throw new IllegalStateException("NPC respawn failed after applying template " + key);
+                    } catch (RuntimeException | Error recovery) {
+                        if (failure == null) throw recovery;
+                        if (failure != recovery) failure.addSuppressed(recovery);
+                    }
                 }
-            }
+            } finally { applying.remove(npc); }
         }
     }
 
