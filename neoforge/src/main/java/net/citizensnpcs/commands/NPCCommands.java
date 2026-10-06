@@ -2858,21 +2858,19 @@ public class NPCCommands {
             desc = "",
             modifiers = "moveto",
             min = 1,
+            strictArguments = true,
             valueFlags = { "x", "y", "z", "yaw", "pitch", "world" },
             permission = "citizens.npc.moveto")
     public void moveto(CommandContext args, CommandSourceStack sender, NPC npc) throws CommandException {
-        if (!npc.isSpawned()) {
-            npc.spawn(npc.getOrAddTrait(net.citizensnpcs.api.trait.trait.CurrentLocation.class).getLocation(), SpawnReason.COMMAND);
-            if (!npc.isSpawned())
-                throw new CommandException(Messages.MOVETO_FORMAT);
-        }
-        Location current = npc.getStoredLocation();
+        requireOwnedTarget(sender, npc, "citizens.npc.moveto");
+        Location current = commandLocation(npc.getStoredLocation());
         Location to;
         if (args.argsLength() > 1) {
-            String[] parts = args.getJoinedStrings(1, ':').split(":");
+            String[] parts = args.getJoinedStrings(1, ':').split(":", 4);
             if (parts.length != 4 && parts.length != 3)
                 throw new CommandException(Messages.MOVETO_FORMAT);
-            ServerLevel level = parts.length == 4 ? Util.getLevel(sender.getServer(), parts[3]) : current.getWorld();
+            ServerLevel level = parts.length == 4
+                    ? net.citizensnpcs.api.persistence.LocationPersister.resolveStrict(parts[3]) : current.getWorld();
             if (level == null)
                 throw new CommandException(Messages.WORLD_NOT_FOUND);
             to = new Location(level, Double.parseDouble(parts[0]), Double.parseDouble(parts[1]),
@@ -2895,15 +2893,28 @@ public class NPCCommands {
                 to.setPitch((float) args.getFlagDouble("pitch"));
             }
             if (args.hasValueFlag("world")) {
-                ServerLevel level = Util.getLevel(sender.getServer(), args.getFlag("world"));
+                ServerLevel level = net.citizensnpcs.api.persistence.LocationPersister.resolveStrict(args.getFlag("world"));
                 if (level == null)
                     throw new CommandException(Messages.WORLD_NOT_FOUND);
                 to.setWorld(level);
             }
         }
-        npc.teleport(to, TeleportCause.COMMAND);
-        npc.faceLocation(to);
-        Messaging.sendTr(sender, Messages.MOVETO_TELEPORTED, npc.getName(), Util.prettyPrintLocation(to));
+        to = commandLocation(to);
+        java.util.function.Consumer<Entity> completed = entity -> {
+            if (isCurrentTarget(npc) && npc.getEntity() == entity && currentCommandSource(sender))
+                Messaging.sendTr(sender, Messages.MOVETO_TELEPORTED, npc.getName(),
+                        Util.prettyPrintLocation(Location.of(entity)));
+        };
+        if (!npc.isSpawned()) {
+            if (npc.getEntity() != null) return;
+            var event = new net.citizensnpcs.api.event.NPCTeleportEvent(npc, to);
+            NeoForge.EVENT_BUS.post(event);
+            if (event.isCanceled() || !isCurrentTarget(npc) || npc.getEntity() != null) return;
+            requireOwnedTarget(sender, npc, "citizens.npc.moveto");
+            npc.spawn(commandLocation(event.getTo()), SpawnReason.COMMAND, completed);
+        } else {
+            npc.teleport(to, TeleportCause.COMMAND, completed);
+        }
     }
 
     @Command(

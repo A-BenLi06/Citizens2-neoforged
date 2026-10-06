@@ -86,7 +86,7 @@ public final class RelocationRuntimeAudit {
                 spawnGrant = grant(alice.player, "citizens.npc.spawn");
                 check(!PermissionUtil.hasPermission(alice.player, "citizens.admin")
                         && !PermissionUtil.hasPermission(alice.player, "citizens.npc.tphere.multiworld"), "independent_permissions");
-                spawnCommands(); playerTeleport(); relocateCommands(); prompts(); completionOwnership(); npcCommandSources(); tptoCommands(); mountedCompletion();
+                spawnCommands(); playerTeleport(); relocateCommands(); prompts(); completionOwnership(); npcCommandSources(); movetoCommands(); tptoCommands(); mountedCompletion();
             }
             if (server.getTickCount() == start + 1) mount = null;
             if (server.getTickCount() >= start + 5) {
@@ -347,6 +347,46 @@ public final class RelocationRuntimeAudit {
         automated.discard();
         reject(source, "spawn " + target.getId());
         check(!target.isSpawned(), "retired_fake_player_command_source_rejected");
+    }
+
+    private static void movetoCommands() throws Exception {
+        grant(alice.player, "citizens.npc.moveto");
+        CommandSourceStack source = alice.player.createCommandSourceStack();
+        for (EntityType<?> type : List.of(EntityType.COW, EntityType.PLAYER)) {
+            for (boolean packet : new boolean[] { false, true }) {
+                NPC target = npc(named, type, packet, alice.player, false);
+                select(source, target); Location before = target.getStoredLocation();
+                for (String invalid : List.of("1:2", "--x NaN", "--yaw 1e100", "--world missing:overworld", "--unknown 1")) {
+                    reject(source, "moveto " + invalid);
+                    check(!target.isSpawned() && target.getEntity() == null, "invalid_moveto_does_not_spawn_" + invalid + type + packet);
+                    at(target.getStoredLocation(), before, "invalid_moveto_preserves_location_" + invalid + type + packet);
+                }
+                int messages = alice.player.messages.size();
+                teleport = event -> { if (event.getNPC() == target) event.setCanceled(true); };
+                try { run(source, "moveto 7.25 -58 6.5 minecraft:overworld"); }
+                finally { teleport = null; }
+                check(!target.isSpawned() && alice.player.messages.size() == messages, "canceled_unspawned_moveto_has_no_effect_" + type + packet);
+                spawn = event -> { if (event.getNPC() == target) event.setCanceled(true); };
+                try { run(source, "moveto 7.25 -58 6.5 minecraft:overworld"); }
+                finally { spawn = null; }
+                check(!target.isSpawned() && target.getEntity() == null && alice.player.messages.size() == messages,
+                        "canceled_moveto_spawn_has_no_success_" + type + packet);
+                run(source, "moveto 7.25 -58 6.5 minecraft:overworld");
+                at(target.getStoredLocation(), new Location(level, 7.25, -58, 6.5), "moveto_spawns_at_validated_destination_" + type + packet);
+                check(target.isSpawned() && alice.player.messages.size() == messages + 1, "moveto_spawn_reports_once_" + type + packet);
+                run(source, "moveto --x 8.5 --yaw 90 --pitch 20");
+                at(Location.of(target.getEntity()), new Location(level, 8.5, -58, 6.5, 90, 20), "moveto_flags_preserve_requested_rotation_" + type + packet);
+                messages = alice.player.messages.size(); before = target.getStoredLocation();
+                teleport = event -> { if (event.getNPC() == target) event.setCanceled(true); };
+                try { run(source, "moveto 4:70:4:minecraft:the_nether"); }
+                finally { teleport = null; }
+                at(target.getStoredLocation(), before, "canceled_spawned_moveto_preserves_location_" + type + packet);
+                check(alice.player.messages.size() == messages, "canceled_spawned_moveto_has_no_success_" + type + packet);
+                run(source, "moveto 4:70:4:minecraft:the_nether");
+                at(target.getStoredLocation(), new Location(nether, 4, 70, 4, 90, 20), "moveto_supports_namespaced_colon_destination_" + type + packet);
+                check(alice.player.messages.size() == messages + 1, "moveto_cross_world_reports_once_" + type + packet);
+            }
+        }
     }
 
     private static void tptoCommands() throws Exception {
