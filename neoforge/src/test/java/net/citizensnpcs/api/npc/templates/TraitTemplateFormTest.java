@@ -10,6 +10,40 @@ import net.citizensnpcs.api.trait.TraitTemplateParser;
 import net.citizensnpcs.api.util.MemoryDataKey;
 
 class TraitTemplateFormTest {
+    @Test void malformedCollectionsAndEntriesAreReportedBeforeParserLookup() {
+        for (Object value : List.of("known", Map.of("named", "known"), List.of(42), List.of(List.of("known")))) {
+            var container = new MemoryDataKey(); container.setRaw("traits", value);
+            var errors = new Errors();
+            new TraitLoaderAction(errors, null, container.getRelative("traits"), name -> { fail("Unexpected parser lookup"); return null; });
+            assertFalse(errors.messages.isEmpty());
+        }
+    }
+
+    @Test void directListsSupportBothTemplateForms() {
+        var container = new MemoryDataKey(); container.setRaw("traits", List.of("known argument", Map.of("name", "known")));
+        var errors = new Errors(); var calls = new AtomicInteger();
+        new TraitLoaderAction(errors, null, container.getRelative("traits"), name -> parser(true, true, calls)).accept(null);
+        assertTrue(errors.messages.isEmpty()); assertEquals(2, calls.get());
+    }
+
+    @Test void emptyCollectionsRemainValid() {
+        for (Object value : List.of(List.of(), Map.of())) {
+            var container = new MemoryDataKey(); container.setRaw("traits", value);
+            var errors = new Errors();
+            new TraitLoaderAction(errors, null, container.getRelative("traits"), name -> { fail("Unexpected parser lookup"); return null; });
+            assertTrue(errors.messages.isEmpty());
+        }
+    }
+
+    @Test void structuredTraitNameMustBeANonemptyString() {
+        for (Object name : List.of(42, " ")) {
+            var container = new MemoryDataKey(); container.setRaw("0", Map.of("name", name));
+            var errors = new Errors();
+            new TraitLoaderAction(errors, null, container, value -> { fail("Unexpected parser lookup"); return null; });
+            assertTrue(errors.messages.get(0).contains("non-empty string"));
+        }
+    }
+
     @Test void structuredActionsFreezeSourceAndIsolateEachParserInvocation() {
         var key = new MemoryDataKey(); key.setString("0.name", "known"); key.setInt("0.settings.value", 1);
         List<Integer> observed = new ArrayList<>();

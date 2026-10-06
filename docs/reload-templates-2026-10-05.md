@@ -55,3 +55,10 @@ contents, non-indexed maps and non-string command entries are reported instead o
 silently becoming empty actions. Empty lists, YAML-normalized numeric-key maps and
 direct List values remain supported. Three tests cover invalid shapes, empty lists
 and direct non-normalized list input.
+
+Trait blocks now validate their collection shape and entry types before parser lookup.
+Both direct Lists and YAML-normalized indexed maps are accepted, including empty
+collections. Scalars, non-indexed maps, nested-list entries and invalid structured
+names produce errors rather than disappearing. Structured names must be nonempty
+strings. Four tests cover rejected shapes, direct mixed-form lists, empty collections
+and invalid names.

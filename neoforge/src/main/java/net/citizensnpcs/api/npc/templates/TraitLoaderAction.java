@@ -35,13 +35,33 @@ public class TraitLoaderAction implements Consumer<NPC> {
 
     TraitLoaderAction(TemplateErrorReporter errors, TemplateWorkspace workspace, DataKey traits,
             Function<String, TraitTemplateParser> parsers) {
-        for (DataKey key : traits.getIntegerSubKeys()) {
-            if (key.hasSubKeys()) {
+        Object raw = traits.getRaw("");
+        DataKey entries = traits;
+        if (raw instanceof List<?> list) {
+            var indexed = new java.util.LinkedHashMap<String, Object>();
+            for (int i = 0; i < list.size(); i++) indexed.put(Integer.toString(i), list.get(i));
+            entries = new net.citizensnpcs.api.util.MemoryDataKey();
+            entries.setRaw("", indexed);
+        } else if (!(raw instanceof java.util.Map)) {
+            errors.addError(traits.getPath() + ": Expected trait template list");
+            return;
+        }
+        List<DataKey> ordered = new ArrayList<>();
+        entries.getIntegerSubKeys().forEach(ordered::add);
+        if (raw instanceof java.util.Map<?, ?> map && ordered.size() != map.size()) {
+            errors.addError(traits.getPath() + ": Expected indexed trait template list");
+            return;
+        }
+        for (DataKey key : ordered) {
+            if (key.getRaw("") instanceof java.util.Map) {
                 if (!key.keyExists("name")) {
                     errors.addError(key.getPath() + ": Missing trait name");
                     continue;
                 }
-                String traitName = key.getString("name");
+                if (!(key.getRaw("name") instanceof String traitName) || traitName.isBlank()) {
+                    errors.addError(key.getPath() + ": Trait name must be a non-empty string");
+                    continue;
+                }
                 TraitTemplateParser parser = parsers.apply(traitName);
                 if (parser == null) {
                     errors.addError(key.getPath() + ": Unknown trait " + traitName);
@@ -53,7 +73,11 @@ public class TraitLoaderAction implements Consumer<NPC> {
                     actions.add(npc -> tp.apply(new TraitParserContext(npc, workspace), definition.copyWithRoot()));
                 } else errors.addError(key.getPath() + ": Trait " + traitName + " does not support structured templates");
             } else {
-                String[] parts = key.getString("").trim().split(" ");
+                if (!(key.getRaw("") instanceof String text) || text.isBlank()) {
+                    errors.addError(key.getPath() + ": Expected a non-empty short trait template or mapping");
+                    continue;
+                }
+                String[] parts = text.trim().split(" ");
                 TraitTemplateParser parser = parsers.apply(parts[0]);
                 if (parser == null) {
                     errors.addError(key.getPath() + ": Unknown trait " + parts[0]);
