@@ -122,8 +122,7 @@ public class BehaviorRegistry {
     protected void registerDefaults() {
         // Wait behavior - waits for a number of ticks
         registerBehavior("wait", (params, context) -> {
-            String[] args = context.getArgs();
-            String durationStr = args != null && args.length > 0 ? args[0] : params != null ? params.getString("") : "20";
+            String durationStr = context.getArgOrParam(0, "", params, "20");
             ExpressionRegistry.ExpressionValue durationHolder = expressions.parseValue(
                     durationStr == null || durationStr.isBlank() ? "20" : durationStr);
 
@@ -625,8 +624,8 @@ public class BehaviorRegistry {
             if (args != null && index < args.length)
                 return args[index];
 
-            if (params != null)
-                return params.getString(name, defaultValue);
+            if (params != null && (params.getRaw(name) != null || params.keyExists(name)))
+                return params.getString(name);
 
             return defaultValue;
         }
