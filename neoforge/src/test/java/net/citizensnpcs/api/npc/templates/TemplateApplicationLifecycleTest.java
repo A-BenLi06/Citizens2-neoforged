@@ -25,7 +25,9 @@ class TemplateApplicationLifecycleTest {
         Runnable afterSpawn = () -> {};
         NPC npc;
         Target() {
-            UUID uuid = UUID.randomUUID();
+            this(UUID.randomUUID());
+        }
+        Target(UUID uuid) {
             NPCRegistry registry = (NPCRegistry) Proxy.newProxyInstance(NPCRegistry.class.getClassLoader(), new Class<?>[]{NPCRegistry.class},
                     (proxy, method, args) -> registered && (!method.getName().equals("getByUniqueId") || ownsUuid) ? npc : null);
             npc = (NPC) Proxy.newProxyInstance(NPC.class.getClassLoader(), new Class<?>[]{NPC.class}, (proxy, method, args) -> {
@@ -58,7 +60,8 @@ class TemplateApplicationLifecycleTest {
     }
 
     @Test void nestedApplicationToAnotherNpcRemainsAllowed() {
-        var first = new Target(); var second = new Target(); var calls = new java.util.concurrent.atomic.AtomicInteger();
+        UUID uuid = UUID.randomUUID();
+        var first = new Target(uuid); var second = new Target(uuid); var calls = new java.util.concurrent.atomic.AtomicInteger();
         Template[] template = new Template[1];
         template[0] = new Template(ResourceLocation.fromNamespaceAndPath("test", "nested"), java.util.List.of(npc -> {
             calls.incrementAndGet();
@@ -66,6 +69,37 @@ class TemplateApplicationLifecycleTest {
         }));
         template[0].apply(first.npc);
         assertEquals(2, calls.get()); assertTrue(first.spawned); assertTrue(second.spawned);
+    }
+
+    @Test void anotherInstanceOfTheSameTemplateCannotReenterAndCanRetryAfterward() {
+        var target = new Target(); var calls = new java.util.concurrent.atomic.AtomicInteger();
+        var key = ResourceLocation.fromNamespaceAndPath("test", "replacement");
+        var replacement = new Template(key, java.util.List.of(npc -> calls.incrementAndGet()));
+        var original = new Template(key, java.util.List.of(replacement::apply));
+        assertThrows(IllegalStateException.class, () -> original.apply(target.npc));
+        assertEquals(0, calls.get()); assertTrue(target.spawned);
+        replacement.apply(target.npc);
+        assertEquals(1, calls.get());
+    }
+
+    @Test void differentTemplateKeysCanNestOnTheSameNpc() {
+        var target = new Target(); var calls = new java.util.concurrent.atomic.AtomicInteger();
+        var nested = new Template(ResourceLocation.fromNamespaceAndPath("test", "nested_key"),
+                java.util.List.of(npc -> calls.incrementAndGet()));
+        var outer = new Template(ResourceLocation.fromNamespaceAndPath("test", "outer_key"),
+                java.util.List.of(nested::apply, npc -> calls.incrementAndGet()));
+        outer.apply(target.npc);
+        assertEquals(2, calls.get()); assertTrue(target.spawned);
+    }
+
+    @Test void replacementInstanceCannotReenterDuringRespawnRecovery() {
+        var target = new Target(); var original = template(); var replacement = template();
+        target.afterSpawn = () -> replacement.apply(target.npc);
+        assertThrows(IllegalStateException.class, () -> original.apply(target.npc));
+        assertEquals(1, target.saves);
+        target.afterSpawn = () -> {};
+        replacement.apply(target.npc);
+        assertEquals(2, target.saves);
     }
 
     @Test void reentryDuringRespawnIsGuardedAndFailureStillReleasesTheGuard() {

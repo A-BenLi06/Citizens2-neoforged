@@ -28,7 +28,7 @@ import net.minecraft.resources.ResourceLocation;
 public class Template {
     private final List<Consumer<NPC>> actions = new ArrayList<>();
     private final ResourceLocation key;
-    private final java.util.Set<NPC> applying = java.util.Collections.newSetFromMap(new java.util.IdentityHashMap<>());
+    private static final java.util.Map<NPC, java.util.Set<ResourceLocation>> APPLYING = new java.util.IdentityHashMap<>();
 
     private Template(ResourceLocation key) {
         this(key, List.of());
@@ -48,7 +48,10 @@ public class Template {
         var registry = npc.getOwningRegistry();
         if (!owns(registry, npc)) return;
         boolean respawn = npc.isSpawned();
-        if (!applying.add(npc)) throw new IllegalStateException("Template " + key + " is already being applied to NPC " + npc.getId());
+        synchronized (APPLYING) {
+            if (!APPLYING.computeIfAbsent(npc, unused -> new java.util.HashSet<>()).add(key))
+                throw new IllegalStateException("Template " + key + " is already being applied to NPC " + npc.getId());
+        }
         Throwable failure = null;
         try {
             if (respawn && !npc.despawn(DespawnReason.PENDING_RESPAWN))
@@ -75,7 +78,13 @@ public class Template {
                         if (failure != recovery) failure.addSuppressed(recovery);
                     }
                 }
-            } finally { applying.remove(npc); }
+            } finally {
+                synchronized (APPLYING) {
+                    java.util.Set<ResourceLocation> keys = APPLYING.get(npc);
+                    keys.remove(key);
+                    if (keys.isEmpty()) APPLYING.remove(npc);
+                }
+            }
         }
     }
 
