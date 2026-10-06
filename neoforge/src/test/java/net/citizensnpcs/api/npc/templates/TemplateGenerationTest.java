@@ -12,6 +12,30 @@ import net.citizensnpcs.api.util.YamlStorage;
 import net.minecraft.resources.ResourceLocation;
 
 class TemplateGenerationTest {
+    @Test void queryCollectionsCannotMutateEitherIndex(@TempDir Path folder) {
+        var registry = TemplateRegistry.prepareReload(folder);
+        var key = ResourceLocation.fromNamespaceAndPath("audit", "saved");
+        registry.generateTemplateFromNPC(key, snapshot(root -> root.setString("name", "Original")));
+        Template template = registry.getTemplateByKey(key);
+        assertThrows(UnsupportedOperationException.class, () -> registry.getAllTemplates().clear());
+        assertThrows(UnsupportedOperationException.class, () -> registry.getTemplates("saved").remove(template));
+        assertSame(template, registry.getTemplateByKey(key));
+        assertEquals(java.util.List.of(template), java.util.List.copyOf(registry.getTemplates("saved")));
+    }
+
+    @Test void querySnapshotsRemainStableWhenATemplateIsReplaced(@TempDir Path folder) {
+        var registry = TemplateRegistry.prepareReload(folder);
+        var key = ResourceLocation.fromNamespaceAndPath("audit", "saved");
+        registry.generateTemplateFromNPC(key, snapshot(root -> root.setString("name", "Old")));
+        Template previous = registry.getTemplateByKey(key);
+        var all = registry.getAllTemplates(); var named = registry.getTemplates("saved");
+        registry.generateTemplateFromNPC(key, snapshot(root -> root.setString("name", "New")));
+        assertEquals(java.util.List.of(previous), java.util.List.copyOf(all));
+        assertEquals(java.util.List.of(previous), java.util.List.copyOf(named));
+        assertNotSame(previous, registry.getTemplateByKey(key));
+        assertEquals(java.util.List.of(registry.getTemplateByKey(key)), java.util.List.copyOf(registry.getTemplates("saved")));
+    }
+
     private static NPC snapshot(Consumer<DataKey> save) {
         return (NPC) java.lang.reflect.Proxy.newProxyInstance(NPC.class.getClassLoader(), new Class<?>[] { NPC.class },
                 (proxy, method, args) -> {

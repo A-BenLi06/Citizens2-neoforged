@@ -1745,3 +1745,9 @@ One focused test uses a runtime-dependent trait in the intentionally offline uni
 Legacy migration rejects archive collisions and conflicting destination definitions rather than overwriting them. An identical destination is reused without rewriting, allowing retry to finish archiving. Literal template keys preserve dots, only the final extension is removed, and Files.move is used without replacement for the archive step.
 
 Four real-file tests cover conflicts preserving both files, identical retry preserving destination bytes, archive collisions and dotted/internal-extension filenames. All 496 ordinary tests and the normal build pass without failures/errors/skips; git diff --check passes. No fresh native/client run is claimed. Migration's separate write/archive steps and external concurrent writers are not claimed atomic. Production Interactions sources and packaging are unchanged; no unrelated server or original data was changed. Details: docs/template-migration-2026-10-06.md. The full Citizens goal remains active.
+
+## 2026-10-06 09:22:12 +08:00 — Keep template index collections private behind query snapshots
+
+getAllTemplates/getTemplates now return immutable snapshots, preventing external collection mutation from corrupting one lookup index independently of the other. Existing command callers were inspected and only read these collections. Previously returned collections remain stable across template replacement.
+
+Two tests cover rejected external mutations and stable old snapshots with fresh new lookup results. All 498 ordinary tests and the normal build pass without failures/errors/skips; git diff --check passes. No fresh native/client run is claimed. Production Interactions sources and packaging are unchanged; no unrelated server or original data was changed. Updated docs/template-generation-2026-10-05.md. The full Citizens goal remains active.

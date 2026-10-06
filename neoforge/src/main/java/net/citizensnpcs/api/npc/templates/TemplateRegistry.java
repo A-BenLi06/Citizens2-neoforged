@@ -97,17 +97,18 @@ public class TemplateRegistry {
         templateSourceKeys.put(key, storedKey);
     }
 
+    /** @return an immutable snapshot of the currently loaded templates */
     public Collection<Template> getAllTemplates() {
-        return fullyQualifiedTemplates.values();
+        return List.copyOf(fullyQualifiedTemplates.values());
     }
 
     public Template getTemplateByKey(ResourceLocation key) {
         return fullyQualifiedTemplates.get(key);
     }
 
-    /** @return every template with this bare name, across all namespaces */
+    /** @return an immutable snapshot of every template with this bare name, across all namespaces */
     public Collection<Template> getTemplates(String name) {
-        return templatesByName.get(name.toLowerCase(Locale.ROOT));
+        return List.copyOf(templatesByName.get(name.toLowerCase(Locale.ROOT)));
     }
 
     public boolean hasNamespace(String namespace) {

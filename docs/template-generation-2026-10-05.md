@@ -25,3 +25,9 @@ YAML replacement application captures its target through saveSnapshot instead of
 ordinary persistence. A partial template can therefore preserve the name, owner
 and save policy of an unsaved/temporary target. A focused test covers this contract
 with an NPC interface double that intentionally omits ordinary saves.
+
+Template collection queries now return immutable snapshots instead of exposing the
+internal index views. External clear/remove operations cannot corrupt only one index,
+and previously obtained query results remain stable when a template is replaced.
+Two tests cover mutation rejection and snapshot stability; command callers were
+checked to use these collections read-only.
