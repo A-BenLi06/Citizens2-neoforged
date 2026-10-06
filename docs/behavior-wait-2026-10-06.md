@@ -12,5 +12,6 @@ is installed. Missing/blank literal parameters keep the existing 20-tick default
 
 Tests cover scalar/short duration input, countdowns, zero-wait sequences, expression
 evaluation counts, reset and invalid results. A parsed sequence uses a real Molang wait
-expression and then updates its blackboard. Native-server scheduling and arbitrary
+expression and then updates its blackboard. The native creation fixture also runs
+wait nodes inside counted repetition and a timeout on ordinary/packet NPCs. Arbitrary
 expression-provider callbacks remain separate acceptance; Interactions stays independent.

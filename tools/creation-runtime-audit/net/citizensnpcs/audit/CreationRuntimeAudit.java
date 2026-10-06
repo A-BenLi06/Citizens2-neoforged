@@ -603,10 +603,14 @@ public final class CreationRuntimeAudit {
             definition.setRaw("sequence", Map.of(
                     "0", Map.of("repeat 0", Map.of("0", "set skipped `1`")),
                     "1", Map.of("repeat 3", Map.of("0", "wait `2`", "1", "set repetitions `mem.get('repetitions') + 1`")),
-                    "2", "set repeat_finished `1`",
-                    "3", "wait_for_signal repeat_audit_hold",
-                    "4", "set signal_finished `1`",
-                    "5", "wait_for_signal repeat_audit_final_hold"));
+                    "2", Map.of("if false", "set branch_wrong `1`", "else", "set branch_selected `1`"),
+                    "3", Map.of("timeout 5", Map.of("0", "wait `2`", "1", "set timed_finished `1`")),
+                    "4", "cooldown audit_gate 100000d",
+                    "5", Map.of("invert", Map.of("0", "cooldown audit_gate 100000d")),
+                    "6", "set repeat_finished `1`",
+                    "7", "wait_for_signal repeat_audit_hold",
+                    "8", "set signal_finished `1`",
+                    "9", "wait_for_signal repeat_audit_final_hold"));
             behavior.applyBehaviorsFromKey(definition);
             behavior.getMemory().set("repetitions", 0D);
             check(target.spawn(new Location(level, 22, -58, 4)), "repeat_behavior_spawn_" + packet);
@@ -618,6 +622,11 @@ public final class CreationRuntimeAudit {
                         && behavior.getMemory().getNumber("repeat_finished") == 1
                         && behavior.getMemory().getNumber("skipped") == 0,
                         "repeat_body_completes_exactly_three_times_" + packet);
+                check(behavior.getMemory().getNumber("branch_wrong") == 0
+                        && behavior.getMemory().getNumber("branch_selected") == 1
+                        && behavior.getMemory().getNumber("timed_finished") == 1
+                        && behavior.getMemory().getNumber("cooldown.audit_gate") > 0,
+                        "native_conditional_timeout_cooldown_chain_completes_" + packet);
                 CitizensAPI.getBehaviorRegistry().getSignalManager().emit(target, "repeat_audit_hold");
             });
             atTick(23, () -> {
