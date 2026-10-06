@@ -22,6 +22,33 @@ import net.citizensnpcs.api.util.MemoryDataKey;
  * parser, the registry and the Molang expressions in between actually drive a tree, rather than only compiling.
  */
 public class BehaviorTreeParserTest {
+    @Test public void strictBuiltinContainersRejectUnrecognizedChildKeys() {
+        var expressions = new ExpressionRegistry(); expressions.registerEngine(new MolangEngine());
+        var parser = new BehaviorTreeParser(new CitizensBehaviorRegistry(expressions));
+        for (String name : java.util.List.of("sequence", "seq", "selector", "random", "parallel", "invert", "loop true", "timeout 3", "eval molang")) {
+            DataKey root = new MemoryDataKey(); root.setRaw(name, map("typo", "succeed"));
+            var failure = org.junit.jupiter.api.Assertions.assertThrows(IllegalArgumentException.class,
+                    () -> parser.parseStrict(root.getRelative(name), null, new ExpressionScope(), new Memory()));
+            assertTrue(failure.getMessage().contains("indexed behavior child"));
+        }
+    }
+
+    @Test public void strictConditionalBodiesRejectUnrecognizedChildKeys() {
+        var parser = new BehaviorTreeParser(new CitizensBehaviorRegistry(new ExpressionRegistry()));
+        DataKey root = new MemoryDataKey(); root.setRaw("sequence", map("if true", map("typo", "succeed")));
+        org.junit.jupiter.api.Assertions.assertThrows(IllegalArgumentException.class,
+                () -> parser.parseStrict(root.getRelative("sequence"), null, new ExpressionScope(), new Memory()));
+    }
+
+    @Test public void customFactoriesKeepTheirNamedParametersAlongsideChildren() {
+        var registry = new CitizensBehaviorRegistry(new ExpressionRegistry());
+        registry.registerBehavior("custom_container", (params, context) -> {
+            assertEquals("configured", params.getString("option"));
+            return net.citizensnpcs.api.ai.tree.Sequence.createSequence(context.parseChildren(params));
+        });
+        DataKey root = new MemoryDataKey(); root.setRaw("custom_container", map("option", "configured", "0", "succeed"));
+        finish(new BehaviorTreeParser(registry).parseStrict(root.getRelative("custom_container"), null, new ExpressionScope(), new Memory()));
+    }
     @Test public void deferredChildParsingKeepsItsOriginalStrictness() {
         var registry = new CitizensBehaviorRegistry(new ExpressionRegistry());
         registry.registerBehavior("deferred", (params, context) -> (net.citizensnpcs.api.ai.tree.InstantBehavior) () -> {

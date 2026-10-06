@@ -224,13 +224,13 @@ public class BehaviorTreeParser {
                 throw new IllegalArgumentException("Behavior timeout must be a non-negative integer tick count: " + timeoutStr);
             int ticks = (int) evaluated;
 
-            List<Behavior> children = parseContainerChildren(key, context);
+            List<Behavior> children = parseIndexedChildren(key, context);
             Behavior body = children.size() == 1 ? children.get(0)
                     : Sequence.createSequence(coalesceInstantBehaviors(children));
             return new TimeoutDecorator(body, ticks);
         }
         if (name.equalsIgnoreCase("invert")) {
-            List<Behavior> children = parseContainerChildren(key, context);
+            List<Behavior> children = parseIndexedChildren(key, context);
             Behavior body = children.size() == 1 ? children.get(0)
                     : Sequence.createSequence(coalesceInstantBehaviors(children));
             return new InverterDecorator(body);
@@ -239,22 +239,22 @@ public class BehaviorTreeParser {
             String conditionStr = name.substring(5).trim();
             Supplier<Boolean> condition = parseCondition(conditionStr, context);
 
-            List<Behavior> children = parseContainerChildren(key, context);
+            List<Behavior> children = parseIndexedChildren(key, context);
             Behavior body = children.size() == 1 ? children.get(0)
                     : Sequence.createSequence(coalesceInstantBehaviors(children));
             return Loop.createWithCondition(body, condition);
         }
         if (name.equalsIgnoreCase("sequence") || name.equalsIgnoreCase("seq")) {
-            List<Behavior> children = parseContainerChildren(key, context);
+            List<Behavior> children = parseIndexedChildren(key, context);
             return Sequence.createSequence(coalesceInstantBehaviors(children));
         }
         if (name.equalsIgnoreCase("random") || name.equalsIgnoreCase("selector")) {
-            List<Behavior> children = parseContainerChildren(key, context);
+            List<Behavior> children = parseIndexedChildren(key, context);
             return Selector.selecting(children).build();
         }
         if (name.equalsIgnoreCase("parallel")) {
             List<Behavior> parallelWrapped = new ArrayList<>();
-            for (Behavior child : parseContainerChildren(key, context)) {
+            for (Behavior child : parseIndexedChildren(key, context)) {
                 parallelWrapped.add(new ParallelBehaviorWrapper(child));
             }
             return new ParallelComposite(parallelWrapped);
@@ -267,6 +267,19 @@ public class BehaviorTreeParser {
             return parseEvalBlock(key, language, context);
         }
         return parseLeaf(name, key, context);
+    }
+
+    private void validateIndexedChildren(DataKey key) {
+        if (!strict) return;
+        for (DataKey child : key.getSubKeys()) {
+            if (com.google.common.primitives.Ints.tryParse(child.name()) == null)
+                throw new IllegalArgumentException("Expected indexed behavior child at " + child.getPath());
+        }
+    }
+
+    private List<Behavior> parseIndexedChildren(DataKey key, BehaviorRegistry.BehaviorContext context) {
+        validateIndexedChildren(key);
+        return parseContainerChildren(key, context);
     }
 
     private List<Behavior> parseContainerChildren(DataKey key, BehaviorRegistry.BehaviorContext context) {
@@ -323,6 +336,7 @@ public class BehaviorTreeParser {
      *            the behavior context
      */
     private Behavior parseEvalBlock(DataKey key, String language, BehaviorRegistry.BehaviorContext context) {
+        validateIndexedChildren(key);
         ExpressionRegistry exprRegistry = registry.getExpressionRegistry();
         List<CompiledExpression> expressions = new ArrayList<>();
 
@@ -358,7 +372,7 @@ public class BehaviorTreeParser {
 
         Behavior ifBehavior;
         if (ifKey.hasSubKeys()) {
-            List<Behavior> children = parseContainerChildren(ifKey, context);
+            List<Behavior> children = parseIndexedChildren(ifKey, context);
             ifBehavior = children.size() == 1 ? children.get(0) : Sequence.createSequence(children);
         } else {
             String value = ifKey.getString("");
@@ -367,7 +381,7 @@ public class BehaviorTreeParser {
         Behavior elseBehavior = null;
         if (elseKey != null) {
             if (elseKey.hasSubKeys()) {
-                List<Behavior> children = parseContainerChildren(elseKey, context);
+                List<Behavior> children = parseIndexedChildren(elseKey, context);
                 elseBehavior = children.size() == 1 ? children.get(0) : Sequence.createSequence(children);
             } else {
                 String value = elseKey.getString("");
