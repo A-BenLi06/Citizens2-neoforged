@@ -1,6 +1,6 @@
 # Native NPC creation runtime audit
 
-The fixture currently has 345 checks. Template coverage includes sibling definitions,
+The fixture currently has 351 checks. Template coverage includes sibling definitions,
 overwrite index consistency, and applying the updated trait value through creation.
 Behavior short-form coverage includes missing arguments/files, malformed YAML and a
 valid filename containing spaces, with target preservation on file-input failures.
@@ -9,6 +9,9 @@ old tree, blackboard identity and saved tree data.
 Behavior lifecycle coverage includes repeated fresh saves, resaving a loaded tree,
 and resuming execution after actual despawn/respawn.
 It also removes BehaviorTrait from a live NPC and verifies execution stops.
+Ordinary and packet NPCs execute a repeated subtree containing a Molang wait over
+real server ticks. The fixture verifies early non-completion, exactly three body
+effects, a skipped zero-count body and progression to a signal-waiting successor.
 Native integration also executes a parsed parallel tree that updates two blackboard
 values and a string list, then restores that list from a BehaviorTrait snapshot.
 Template lifecycle checks apply a failing action to a spawned NPC and verify the

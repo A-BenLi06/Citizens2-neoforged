@@ -95,7 +95,7 @@ public final class CreationRuntimeAudit {
                 grant("citizens.npc.create", "citizens.npc.spawn", "citizens.npc.undo");
                 types = grant("citizens.npc.create.*"); limits = grant("citizens.admin.avoid-limits");
                 admin = grant("citizens.npc.admin");
-                basic(); items(); lifetimes(); vetoAndHistory(); templatesAndPermissions(); commandRegistryTargets();
+                basic(); items(); lifetimes(); vetoAndHistory(); templatesAndPermissions(); commandRegistryTargets(); repeatedBehaviorTicks();
             }
             List<Runnable> due = checks.remove(server.getTickCount() - start);
             if (due != null) due.forEach(Runnable::run);
@@ -571,6 +571,33 @@ public final class CreationRuntimeAudit {
         new net.citizensnpcs.api.npc.templates.CommandListExecutor(List.of("npc rename ExplicitDefault --id " + original.getId())).accept(namedTarget);
         check(original.getName().equals("ExplicitDefault") && namedTarget.getName().equals("ExactTarget"), "explicit_id_keeps_default_registry_lookup");
         original.setName("DefaultCommandTarget");
+    }
+
+    private static void repeatedBehaviorTicks() {
+        for (boolean packet : new boolean[]{false, true}) {
+            NPC target = registry.createNPC(EntityType.COW, "RepeatedBehavior" + packet);
+            if (packet) target.getOrAddTrait(PacketNPC.class);
+            var behavior = target.getOrAddTrait(BehaviorTrait.class);
+            DataKey definition = new MemoryDataKey();
+            definition.setRaw("sequence", Map.of(
+                    "0", Map.of("repeat 0", Map.of("0", "set skipped `1`")),
+                    "1", Map.of("repeat 3", Map.of("0", "wait `2`", "1", "set repetitions `mem.get('repetitions') + 1`")),
+                    "2", "set repeat_finished `1`",
+                    "3", "wait_for_signal repeat_audit_hold"));
+            behavior.applyBehaviorsFromKey(definition);
+            behavior.getMemory().set("repetitions", 0D);
+            check(target.spawn(new Location(level, 22, -58, 4)), "repeat_behavior_spawn_" + packet);
+            atTick(2, () -> check(behavior.getMemory().getNumber("repetitions") < 3
+                    && behavior.getMemory().getNumber("repeat_finished") == 0,
+                    "repeat_wait_yields_across_server_ticks_" + packet));
+            atTick(20, () -> {
+                check(behavior.getMemory().getNumber("repetitions") == 3
+                        && behavior.getMemory().getNumber("repeat_finished") == 1
+                        && behavior.getMemory().getNumber("skipped") == 0,
+                        "repeat_body_completes_exactly_three_times_" + packet);
+                target.destroy();
+            });
+        }
     }
 
     private static NPC selected() { return CitizensAPI.getDefaultNPCSelector().getSelected(source); }

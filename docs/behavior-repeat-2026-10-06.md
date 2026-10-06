@@ -22,5 +22,7 @@ or cancellation performed during child cleanup.
 
 Direct lifecycle tests cover multi-tick children, dynamic/zero counts, failure/removal,
 reset and cleanup reentry. Parser/Molang tests verify real child effects, mapped dynamic
-counts and strict invalid-count/unknown-child rejection. Native-server scheduling and
-arbitrary provider effects remain separate acceptance. Interactions remains independent.
+counts and strict invalid-count/unknown-child rejection. The native creation fixture
+also runs ordinary and packet NPC behavior trees over server ticks, checking delayed
+progress, exactly three effects, zero-count skipping and the following node. Arbitrary
+provider effects remain separate acceptance. Interactions remains independent.
