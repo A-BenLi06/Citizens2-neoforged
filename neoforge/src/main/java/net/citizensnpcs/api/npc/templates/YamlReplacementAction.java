@@ -83,7 +83,18 @@ public class YamlReplacementAction implements Consumer<NPC> {
 
         @Override
         public YamlReplacementAction create(DataKey root) {
-            return new YamlReplacementAction(root.getBoolean("override"),
+            if (!(root.getRaw("") instanceof Map))
+                throw new IllegalArgumentException("YAML replacement action must be a mapping");
+            Object replacements = root.getRaw("replacements");
+            if (replacements != null && !(replacements instanceof Map))
+                throw new IllegalArgumentException("YAML replacements must be a mapping");
+            Object value = root.getRaw("override");
+            boolean override = false;
+            if (value instanceof Boolean flag) override = flag;
+            else if (value instanceof String text && (text.strip().equalsIgnoreCase("true") || text.strip().equalsIgnoreCase("false")))
+                override = Boolean.parseBoolean(text.strip());
+            else if (value != null) throw new IllegalArgumentException("YAML replacement override must be a boolean");
+            return new YamlReplacementAction(override,
                     root.getRelative("replacements").getValuesDeep());
         }
 

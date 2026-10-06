@@ -72,3 +72,9 @@ Template entries themselves now require a mapping. String, number, boolean and n
 scalars are reported with the full template key instead of becoming empty successful
 templates. An explicit empty mapping remains valid. Two file tests cover these root
 shape cases.
+
+The YAML replacement persister now validates its action/replacements mapping shapes
+and override value. Missing options keep their defaults; Boolean and trimmed
+true/false strings are accepted, while invalid values are reported rather than
+silently coerced to false or an empty replacement. Three tests cover bad maps,
+invalid overrides and actual replacement behavior for valid Boolean forms.

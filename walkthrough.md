@@ -1769,3 +1769,9 @@ One file test covers invalid and empty names preserving source bytes with no des
 Template.load now requires a mapping for each template entry and reports the full key on invalid root types. Explicit empty mappings remain valid; scalar string/number/boolean/null entries cannot silently load as no-op templates.
 
 Two file tests cover four invalid scalar kinds and a valid empty mapping. All 502 ordinary tests and the normal build pass without failures/errors/skips; git diff --check passes. No fresh native/client run is claimed. Production Interactions sources and packaging are unchanged; no unrelated server or original data was changed. Updated docs/reload-templates-2026-10-05.md. The full Citizens goal remains active.
+
+## 2026-10-06 10:15:19 +08:00 — Validate YAML replacement mapping and override options
+
+The replacement persister now requires mapping structures and validates override as a Boolean or explicit true/false string. Missing values retain the existing defaults. Invalid scalar/list replacement data and ambiguous Boolean options no longer silently become empty/false actions.
+
+Three tests cover invalid replacement maps, invalid overrides and actual target overwrite behavior for supported Boolean forms. All 505 ordinary tests and the normal build pass without failures/errors/skips; git diff --check passes. No fresh native/client run is claimed. Production Interactions sources and packaging are unchanged; no unrelated server or original data was changed. Updated docs/reload-templates-2026-10-05.md. The full Citizens goal remains active.
