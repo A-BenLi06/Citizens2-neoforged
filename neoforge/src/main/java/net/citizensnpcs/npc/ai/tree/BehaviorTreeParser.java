@@ -232,7 +232,10 @@ public class BehaviorTreeParser {
         DataKey elseKey = null;
         for (DataKey sub : key.getIntegerSubKeys()) {
             if (sub.hasSubKeys()) {
-                sub = sub.getSubKeys().iterator().next();
+                var entries = sub.getSubKeys().iterator();
+                DataKey first = entries.next();
+                // A grouped if/else is one child node; only unwrap single-entry wrappers.
+                if (!entries.hasNext()) sub = first;
             }
             if (ifKey != null) {
                 boolean isElse = sub.name().equals("else");

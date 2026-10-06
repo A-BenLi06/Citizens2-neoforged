@@ -22,6 +22,23 @@ import net.citizensnpcs.api.util.MemoryDataKey;
  * parser, the registry and the Molang expressions in between actually drive a tree, rather than only compiling.
  */
 public class BehaviorTreeParserTest {
+    @Test public void groupedConditionalKeepsItsElseAndFollowingSibling() {
+        for (boolean condition : new boolean[]{false, true}) {
+            Memory memory = new Memory();
+            finish(parse(map("sequence", map("0", map("if " + condition, "set chosen `1`",
+                    "else", "set chosen `2`"), "1", "set after `3`")), memory));
+            assertEquals(condition ? 1D : 2D, memory.getNumber("chosen"));
+            assertEquals(3D, memory.getNumber("after"));
+        }
+    }
+
+    @Test public void groupedConditionalRemainsWholeInsideRepeat() {
+        Memory memory = new Memory(); memory.set("counter", 0D);
+        finish(parse(map("repeat 2", map("0", map("if false", "set wrong `1`",
+                "else", "set counter `mem.get('counter') + 1`"))), memory));
+        assertEquals(0D, memory.getNumber("wrong"));
+        assertEquals(2D, memory.getNumber("counter"));
+    }
     @Test public void nestedConditionsWorkInsideEitherOuterBranch() {
         for (boolean outer : new boolean[]{false, true}) {
             Memory memory = new Memory();
