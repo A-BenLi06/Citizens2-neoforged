@@ -1739,3 +1739,9 @@ Four tests cover malformed collections/entries, direct short/structured lists, e
 TemplateRegistry's decode wrapper now includes the full template key and retains the underlying exception as its cause instead of discarding it after printing. Existing file-level wrapping therefore exposes a complete diagnostic chain.
 
 One focused test uses a runtime-dependent trait in the intentionally offline unit environment to verify template identity and the original missing-runtime exception survive wrapping. All 492 ordinary tests and the normal build pass without failures/errors/skips; git diff --check passes. No fresh native/client run is claimed. Production Interactions sources and packaging are unchanged; no unrelated server or original data was changed. Updated docs/reload-templates-2026-10-05.md. The full Citizens goal remains active.
+
+## 2026-10-06 09:12:45 +08:00 — Preserve conflicting legacy template migration files and support retry
+
+Legacy migration rejects archive collisions and conflicting destination definitions rather than overwriting them. An identical destination is reused without rewriting, allowing retry to finish archiving. Literal template keys preserve dots, only the final extension is removed, and Files.move is used without replacement for the archive step.
+
+Four real-file tests cover conflicts preserving both files, identical retry preserving destination bytes, archive collisions and dotted/internal-extension filenames. All 496 ordinary tests and the normal build pass without failures/errors/skips; git diff --check passes. No fresh native/client run is claimed. Migration's separate write/archive steps and external concurrent writers are not claimed atomic. Production Interactions sources and packaging are unchanged; no unrelated server or original data was changed. Details: docs/template-migration-2026-10-06.md. The full Citizens goal remains active.

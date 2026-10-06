@@ -204,6 +204,8 @@ public class TemplateRegistry {
 
     private void migrateOldTemplate(File folder, File template) throws TemplateLoadException {
         Messaging.log("Migrating template", template.getName());
+        File archive = new File(folder, template.getName() + ".migrated");
+        if (archive.exists()) throw new TemplateLoadException("Migration archive already exists: " + archive);
         Storage storage = new YamlStorage(template);
         if (!storage.load())
             throw new TemplateLoadException("Unable to migrate " + template.getName());
@@ -213,21 +215,26 @@ public class TemplateRegistry {
             throw new TemplateLoadException(
                     "Unable to create destination folder while migrating " + template.getName());
 
-        String templateName = template.getName().replace(".yml", "");
+        String templateName = template.getName().substring(0, template.getName().length() - ".yml".length());
         Storage destination = new YamlStorage(new File(namespaceFolder, template.getName()));
         if (!destination.load())
             throw new TemplateLoadException("Unable to open migration destination for " + template.getName());
 
         DataKey from = storage.getKey("");
-        DataKey dest = destination.getKey(templateName + ".yaml_replace");
-        dest.setBoolean("override", from.getBoolean("override"));
-        dest.setRaw("replacements", from.getRelative("replacements").getValuesDeep());
-        destination.save();
-
-        if (!template.renameTo(new File(folder, template.getName() + ".migrated"))) {
-            if (strict) throw new IllegalStateException("Unable to finish template migration " + template);
-            Messaging.severe("Could not rename " + template.getName() + " after migrating it - it will migrate again");
+        Map<String, Object> templates = new java.util.LinkedHashMap<>(destination.getKey("").getValuesDeep());
+        Map<String, Object> migrated = Map.of("yaml_replace", Map.of("override", from.getBoolean("override"),
+                "replacements", from.getRelative("replacements").getValuesDeep()));
+        var matches = templates.keySet().stream().filter(name -> name.equalsIgnoreCase(templateName)).toList();
+        if (matches.size() > 1 || !matches.isEmpty() && !migrated.equals(templates.get(matches.get(0))))
+            throw new TemplateLoadException("Conflicting migration destination for " + template.getName());
+        if (matches.isEmpty()) {
+            templates.put(templateName, migrated);
+            destination.getKey("").setRaw("", templates);
+            destination.save();
         }
+
+        try { Files.move(template.toPath(), archive.toPath()); }
+        catch (IOException failure) { throw new TemplateLoadException("Unable to finish template migration " + template, failure); }
     }
 
     public static class TemplateErrorReporter {
