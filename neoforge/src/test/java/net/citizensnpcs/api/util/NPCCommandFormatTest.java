@@ -29,4 +29,21 @@ class NPCCommandFormatTest {
         assertEquals("wp list --id <id>", NPCCommandFormat.prepare("/wp list"));
         assertEquals("waypoints list --id <id>", NPCCommandFormat.prepare("waypoints list"));
     }
+
+    @Test void explicitUuidTargetsDoNotGainAConflictingId() {
+        String uuid = "28dfd633-8f97-42f1-a05d-2c3d978bcad3";
+        for (String command : new String[] { "npc select", "npc equip", "waypoints list", "wp list" }) {
+            String explicit = command + " --uuid " + uuid + " --registry visitors";
+            String prepared = NPCCommandFormat.prepare(" /" + explicit + " ");
+            assertEquals(explicit, prepared);
+            var context = new CommandContext(prepared.split(" "));
+            assertEquals(uuid, context.getValueFlags().get("uuid"));
+            assertFalse(context.hasValueFlag("id"));
+        }
+    }
+
+    @Test void quotedUuidTextStillReceivesAnAutomaticTarget() {
+        assertEquals("npc speak \"literal --uuid value\" --id <id>",
+                NPCCommandFormat.prepare("npc speak \"literal --uuid value\""));
+    }
 }

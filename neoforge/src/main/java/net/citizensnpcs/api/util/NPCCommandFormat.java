@@ -15,8 +15,10 @@ public final class NPCCommandFormat {
             result = "npc speak " + CommandContext.quoteArgument(message) + " --target <p>";
             verb = "npc";
         }
-        if ((verb.equals("npc") || verb.equals("waypoints") || verb.equals("wp"))
-                && !new CommandContext(result.split(" ")).hasValueFlag("id")) result += " --id <id>";
+        if (verb.equals("npc") || verb.equals("waypoints") || verb.equals("wp")) {
+            CommandContext context = new CommandContext(result.split(" "));
+            if (!context.hasValueFlag("id") && !context.hasValueFlag("uuid")) result += " --id <id>";
+        }
         return result;
     }
 }
