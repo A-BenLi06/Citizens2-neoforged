@@ -122,7 +122,7 @@ public class TemplateRegistry {
         return fullyQualifiedTemplates.keySet().stream().anyMatch(k -> k.getNamespace().equals(normalized));
     }
 
-    private void loadTemplate(File file, String namespace, DataKey key) throws TemplateLoadException {
+    private Template readTemplate(File file, String namespace, DataKey key) throws TemplateLoadException {
         String path = key.name().toLowerCase(Locale.ROOT);
         ResourceLocation namespacedKey = ResourceLocation.tryBuild(namespace.toLowerCase(Locale.ROOT), path);
         if (path.isEmpty() || namespacedKey == null)
@@ -131,11 +131,7 @@ public class TemplateRegistry {
         if (fullyQualifiedTemplates.containsKey(namespacedKey))
             throw new TemplateLoadException("Duplicate template key " + namespacedKey);
 
-        Template template = decodeTemplate(file.getParentFile(), namespacedKey, key);
-        fullyQualifiedTemplates.put(namespacedKey, template);
-        templatesByName.put(namespacedKey.getPath(), template);
-        templateSources.put(namespacedKey, file);
-        templateSourceKeys.put(namespacedKey, key.name());
+        return decodeTemplate(file.getParentFile(), namespacedKey, key);
     }
 
     private Template decodeTemplate(File folder, ResourceLocation namespacedKey, DataKey key) throws TemplateLoadException {
@@ -205,9 +201,20 @@ public class TemplateRegistry {
         if (!storage.load())
             throw new TemplateLoadException("Unable to load " + file.getName());
 
+        Map<ResourceLocation, Template> prepared = new java.util.LinkedHashMap<>();
+        Map<ResourceLocation, String> sourceKeys = new HashMap<>();
         for (DataKey templateKey : storage.getKey("").getSubKeys()) {
-            loadTemplate(file, namespace, templateKey);
+            Template template = readTemplate(file, namespace, templateKey);
+            if (prepared.putIfAbsent(template.getKey(), template) != null)
+                throw new TemplateLoadException("Duplicate template key " + template.getKey());
+            sourceKeys.put(template.getKey(), templateKey.name());
         }
+        fullyQualifiedTemplates.putAll(prepared);
+        prepared.forEach((key, template) -> {
+            templatesByName.put(key.getPath(), template);
+            templateSources.put(key, file);
+            templateSourceKeys.put(key, sourceKeys.get(key));
+        });
     }
 
     private void migrateOldTemplate(File folder, File template) throws TemplateLoadException {

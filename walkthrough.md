@@ -1799,3 +1799,9 @@ Both NeoForge 21.1.233 and 21.1.248 pass 327 creation checks. Clean ordinary tes
 Template collection queries now sort by fully qualified key while retaining immutable snapshot semantics. Existing list/completion/ambiguity callers consequently receive stable ordering without independent formatting rules.
 
 One multi-namespace file test verifies complete and bare-name query ordering. All 511 ordinary tests and the normal build pass without failures/errors/skips; git diff --check passes. No fresh native/client run is claimed. Production Interactions sources and packaging are unchanged; no unrelated server or original data was changed. Updated docs/template-generation-2026-10-05.md. The full Citizens goal remains active.
+
+## 2026-10-06 11:58:16 +08:00 — Publish template files only after all their entries validate
+
+Template file loading now stages decoded templates and source keys locally before updating the registry indexes. Invalid later entries and duplicate normalized keys cannot leave earlier entries from that file partially published. Permissive startup continues to load independent healthy files; strict whole-reload behavior is retained.
+
+Two file tests cover invalid-file prefix rejection alongside a healthy file and same-file normalized-name duplicates. All 513 ordinary tests and the normal build pass without failures/errors/skips; git diff --check passes. No fresh native/client run is claimed. Production Interactions sources and packaging are unchanged; no unrelated server or original data was changed. Updated docs/reload-templates-2026-10-05.md. The full Citizens goal remains active.

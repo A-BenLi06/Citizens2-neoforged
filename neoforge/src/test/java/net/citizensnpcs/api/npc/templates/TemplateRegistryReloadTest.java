@@ -8,6 +8,25 @@ import org.junit.jupiter.api.io.TempDir;
 import net.minecraft.resources.ResourceLocation;
 
 class TemplateRegistryReloadTest {
+    @Test void permissiveStartupDoesNotPublishPartOfAnInvalidFile(@TempDir Path folder) throws Exception {
+        Path namespace = Files.createDirectories(folder.resolve("audit"));
+        Files.writeString(namespace.resolve("broken.yml"), "first: {}\ninvalid: scalar\n");
+        Files.writeString(namespace.resolve("healthy.yml"), "healthy: {}\n");
+        var registry = new TemplateRegistry(folder);
+        assertNull(registry.getTemplateByKey(ResourceLocation.fromNamespaceAndPath("audit", "first")));
+        assertTrue(registry.getTemplates("first").isEmpty());
+        assertNotNull(registry.getTemplateByKey(ResourceLocation.fromNamespaceAndPath("audit", "healthy")));
+        assertEquals(1, registry.getAllTemplates().size());
+    }
+
+    @Test void duplicateNormalizedNamesRejectTheWholeFile(@TempDir Path folder) throws Exception {
+        Path namespace = Files.createDirectories(folder.resolve("audit"));
+        Files.writeString(namespace.resolve("duplicates.yml"), "Duplicate: {}\nduplicate: {}\n");
+        var registry = new TemplateRegistry(folder);
+        assertTrue(registry.getAllTemplates().isEmpty());
+        assertTrue(registry.getTemplates("duplicate").isEmpty());
+    }
+
     @Test void collectionQueriesAreOrderedByFullyQualifiedKey(@TempDir Path folder) throws Exception {
         Path z = Files.createDirectories(folder.resolve("zeta"));
         Path a = Files.createDirectories(folder.resolve("alpha"));

@@ -78,3 +78,9 @@ and override value. Missing options keep their defaults; Boolean and trimmed
 true/false strings are accepted, while invalid values are reported rather than
 silently coerced to false or an empty replacement. Three tests cover bad maps,
 invalid overrides and actual replacement behavior for valid Boolean forms.
+
+Each template file is now decoded into local candidate maps before any entries from
+that file are published. Permissive startup may still skip a bad file and load other
+files, but no longer retains the valid prefix of the bad file. Duplicate normalized
+keys within one file also reject that entire file. Two file tests verify both indexes
+remain free of partial entries while independent healthy files load.
