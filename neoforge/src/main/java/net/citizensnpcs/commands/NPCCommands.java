@@ -4300,7 +4300,7 @@ public class NPCCommands {
             try {
                 Duration duration = Durations.parse(args.getString(2), TimeUnit.SECONDS);
                 if (duration.isNegative()) throw new IllegalArgumentException("Negative delay");
-                delay = Math.toIntExact(duration.toMillis() / 50);
+                delay = Durations.toTicks(duration);
             }
             catch (RuntimeException invalid) { throw new CommandException(CommandMessages.INVALID_VALUE, "delay", args.getString(2)); }
             apply = provider -> {

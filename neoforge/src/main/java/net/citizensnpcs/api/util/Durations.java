@@ -47,11 +47,11 @@ public class Durations {
     }
 
     public static int toTicks(Duration duration) {
-        return (int) (duration.toMillis() / 50);
+        return Math.toIntExact(duration.toMillis() / 50);
     }
 
     public static int toSeconds(Duration duration) {
-        return (int) duration.getSeconds();
+        return Math.toIntExact(duration.getSeconds());
     }
 
     private static ChronoUnit toChronoUnit(TimeUnit unit) {

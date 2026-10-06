@@ -23,7 +23,7 @@ public class DelayTriggerPrompt implements WaypointTriggerPrompt {
         if (input == null || input.isBlank()) return null;
         try {
             java.time.Duration duration = Durations.parse(input.trim());
-            int ticks = duration.isNegative() ? 0 : Math.toIntExact(duration.toMillis() / 50);
+            int ticks = duration.isNegative() ? 0 : Durations.toTicks(duration);
             return new DelayTrigger(ticks);
         } catch (java.time.DateTimeException | IllegalArgumentException | ArithmeticException invalid) {
             return null;
