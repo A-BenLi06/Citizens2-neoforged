@@ -12,12 +12,12 @@ import net.citizensnpcs.util.Messages;
 public class TriggerAddPrompt implements ChatPrompt {
     @Override
     public ChatPrompt acceptInput(ChatPromptSession session, String rawInput) {
-        String input = rawInput.toLowerCase().trim();
+        String input = rawInput.trim();
         if (input.equalsIgnoreCase("back")) {
             session.setSessionData("said", false);
             return (ChatPrompt) session.getSessionData("previous");
         }
-        String[] split = input.split(" ", 2);
+        String[] split = input.split("\\s+", 2);
         WaypointTriggerPrompt prompt = WaypointTriggerRegistry.getTriggerPromptFrom(split[0]);
         String extra = split.length > 1 ? split[1].trim() : "";
         session.setSessionData("said", false);

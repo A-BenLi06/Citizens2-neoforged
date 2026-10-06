@@ -2,6 +2,7 @@ package net.citizensnpcs.trait.waypoint.triggers;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.Locale;
 import java.util.function.Supplier;
 
 import net.citizensnpcs.api.persistence.PersistenceLoader;
@@ -45,7 +46,7 @@ public class WaypointTriggerRegistry implements Persister<WaypointTrigger> {
 
     /** @return a fresh configuration prompt for that trigger name, or null when the name is unknown */
     public static WaypointTriggerPrompt getTriggerPromptFrom(String input) {
-        Supplier<WaypointTriggerPrompt> factory = TRIGGER_PROMPTS.get(input == null ? "" : input.toLowerCase());
+        Supplier<WaypointTriggerPrompt> factory = TRIGGER_PROMPTS.get(input == null ? "" : input.toLowerCase(Locale.ROOT));
         return factory == null ? null : factory.get();
     }
 
