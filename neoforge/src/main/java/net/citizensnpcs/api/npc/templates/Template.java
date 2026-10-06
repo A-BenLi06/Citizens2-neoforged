@@ -69,6 +69,10 @@ public class Template {
     public static Template load(TemplateErrorReporter errors, TemplateWorkspace workspace, ResourceLocation identifier,
             DataKey key) {
         Template template = new Template(identifier);
+        if (!(key.getRaw("") instanceof java.util.Map)) {
+            errors.addError(identifier + ": Expected template mapping");
+            return template;
+        }
         if (key.keyExists("yaml_replace")) {
             template.addAction(PersistenceLoader.loadStrict(YamlReplacementAction.class, key.getRelative("yaml_replace")));
         }

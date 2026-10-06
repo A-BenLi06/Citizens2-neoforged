@@ -1763,3 +1763,9 @@ One test exercises mixed-case lookups under a Turkish default locale, missing na
 Migration now validates the filename-derived template key before creating the migrated namespace, writing a destination or archiving the source. Empty stems are explicitly rejected in addition to invalid resource paths; testing showed ResourceLocation permits an empty path and cannot enforce that constraint alone.
 
 One file test covers invalid and empty names preserving source bytes with no destination directory/archive. All 500 ordinary tests and the normal build pass without failures/errors/skips; git diff --check passes. No fresh native/client run is claimed. Production Interactions sources and packaging are unchanged; no unrelated server or original data was changed. Updated docs/template-migration-2026-10-06.md. The full Citizens goal remains active.
+
+## 2026-10-06 10:03:41 +08:00 — Reject scalar template roots instead of accepting empty actions
+
+Template.load now requires a mapping for each template entry and reports the full key on invalid root types. Explicit empty mappings remain valid; scalar string/number/boolean/null entries cannot silently load as no-op templates.
+
+Two file tests cover four invalid scalar kinds and a valid empty mapping. All 502 ordinary tests and the normal build pass without failures/errors/skips; git diff --check passes. No fresh native/client run is claimed. Production Interactions sources and packaging are unchanged; no unrelated server or original data was changed. Updated docs/reload-templates-2026-10-05.md. The full Citizens goal remains active.

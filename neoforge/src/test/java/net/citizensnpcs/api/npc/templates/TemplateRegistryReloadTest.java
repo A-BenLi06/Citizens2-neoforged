@@ -8,6 +8,23 @@ import org.junit.jupiter.api.io.TempDir;
 import net.minecraft.resources.ResourceLocation;
 
 class TemplateRegistryReloadTest {
+    @Test void scalarTemplateEntriesCannotBecomeSuccessfulNoOps(@TempDir Path folder) throws Exception {
+        Path namespace = Files.createDirectories(folder.resolve("audit"));
+        Path file = namespace.resolve("bad.yml");
+        for (String value : java.util.List.of("plain-text", "42", "true", "null")) {
+            Files.writeString(file, "bad: " + value + "\n");
+            var failure = assertThrows(IllegalStateException.class, () -> TemplateRegistry.prepareReload(folder));
+            assertTrue(failure.getCause().getMessage().contains("audit:bad: Expected template mapping"));
+        }
+    }
+
+    @Test void explicitEmptyMappingIsAValidTemplate(@TempDir Path folder) throws Exception {
+        Path namespace = Files.createDirectories(folder.resolve("audit"));
+        Files.writeString(namespace.resolve("empty.yml"), "empty: {}\n");
+        assertNotNull(TemplateRegistry.prepareReload(folder)
+                .getTemplateByKey(ResourceLocation.fromNamespaceAndPath("audit", "empty")));
+    }
+
     @Test void namespaceQueriesUseTheSameLocaleIndependentNormalizationAsLoading(@TempDir Path folder) throws Exception {
         Path namespace = Files.createDirectories(folder.resolve("Mixed"));
         Files.writeString(namespace.resolve("templates.yml"), "Item: {}\n");

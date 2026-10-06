@@ -67,3 +67,8 @@ Template decode errors now retain the original exception as their cause and name
 fully qualified template key. A test deliberately loads a runtime-dependent trait
 without an enabled Citizens instance and verifies that the outer file error retains
 both template identity and the original runtime exception.
+
+Template entries themselves now require a mapping. String, number, boolean and null
+scalars are reported with the full template key instead of becoming empty successful
+templates. An explicit empty mapping remains valid. Two file tests cover these root
+shape cases.
