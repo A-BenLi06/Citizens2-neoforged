@@ -9,16 +9,28 @@ import java.util.function.Consumer;
 import org.junit.jupiter.api.Test;
 import net.citizensnpcs.api.event.NPCEvent;
 import net.citizensnpcs.api.npc.NPC;
+import net.citizensnpcs.api.npc.NPCRegistry;
 
 class CommandEventRegistrationTest {
     @org.junit.jupiter.api.BeforeEach void start() { CommandEventAction.start(); }
     @org.junit.jupiter.api.AfterEach void cleanup() { CommandEventAction.shutdown(); }
     private static class Event extends NPCEvent { Event(NPC npc) { super(npc); } }
     private static class SubEvent extends Event { SubEvent(NPC npc) { super(npc); } }
+    private static final NPCRegistry DEFAULT_REGISTRY = registry();
+    private static NPCRegistry registry() {
+        return (NPCRegistry) Proxy.newProxyInstance(NPCRegistry.class.getClassLoader(), new Class<?>[]{NPCRegistry.class},
+                (proxy, method, args) -> { throw new AssertionError(method.getName()); });
+    }
     private static NPC npc() {
-        UUID uuid = UUID.randomUUID();
+        return npc(DEFAULT_REGISTRY, UUID.randomUUID());
+    }
+    private static NPC npc(NPCRegistry registry, UUID uuid) {
         return (NPC) Proxy.newProxyInstance(NPC.class.getClassLoader(), new Class<?>[]{NPC.class},
-                (proxy, method, args) -> { if (method.getName().equals("getUniqueId")) return uuid; throw new AssertionError(method.getName()); });
+                (proxy, method, args) -> {
+                    if (method.getName().equals("getUniqueId")) return uuid;
+                    if (method.getName().equals("getOwningRegistry")) return registry;
+                    throw new AssertionError(method.getName());
+                });
     }
 
     @Test void constructionDoesNotRegisterAndRepeatedApplicationsRegisterOnlyOnce() {
@@ -97,5 +109,51 @@ class CommandEventRegistrationTest {
         assertThrows(IllegalStateException.class, () -> old.accept(target));
         fresh.accept(target);
         assertEquals(2, registrations.get());
+    }
+
+    @Test void equalUuidsInDifferentRegistriesDoNotShareSubscriptions() {
+        var listener = new AtomicReference<Consumer<Event>>();
+        var calls = new AtomicInteger();
+        var action = new CommandEventAction(Event.class, npc -> calls.incrementAndGet(),
+                (type, consumer) -> listener.set(consumer));
+        UUID uuid = UUID.randomUUID();
+        NPC first = npc(registry(), uuid), second = npc(registry(), uuid);
+        action.accept(first);
+        listener.get().accept(new Event(second));
+        assertEquals(0, calls.get());
+        listener.get().accept(new Event(first));
+        assertEquals(1, calls.get());
+        action.accept(second);
+        listener.get().accept(new Event(second));
+        assertEquals(2, calls.get());
+    }
+
+    @Test void registryTransferRollsBackOrCommitsWithoutTouchingOtherRegistries() {
+        var listener = new AtomicReference<Consumer<Event>>();
+        var calls = new AtomicInteger();
+        var action = new CommandEventAction(Event.class, npc -> calls.incrementAndGet(),
+                (type, consumer) -> listener.set(consumer));
+        NPCRegistry old = registry(), candidate = registry(), other = registry();
+        UUID uuid = UUID.randomUUID();
+        NPC before = npc(old, uuid), after = npc(candidate, uuid), unrelated = npc(other, uuid);
+        action.accept(before); action.accept(unrelated);
+        try (var transfer = CommandEventAction.prepareRegistryTransfer(old, candidate)) {
+            listener.get().accept(new Event(after));
+            assertEquals(1, calls.get());
+        }
+        listener.get().accept(new Event(after));
+        listener.get().accept(new Event(before));
+        listener.get().accept(new Event(unrelated));
+        assertEquals(3, calls.get());
+        NPC addedDuringLoad = npc(old, UUID.randomUUID());
+        try (var transfer = CommandEventAction.prepareRegistryTransfer(old, candidate)) {
+            action.accept(addedDuringLoad);
+            transfer.commit();
+        }
+        listener.get().accept(new Event(before));
+        listener.get().accept(new Event(after));
+        listener.get().accept(new Event(unrelated));
+        listener.get().accept(new Event(npc(candidate, addedDuringLoad.getUniqueId())));
+        assertEquals(6, calls.get());
     }
 }

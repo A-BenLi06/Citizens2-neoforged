@@ -43,6 +43,7 @@ public final class ReloadRuntimeAudit {
     private static Probe probe;
     private static net.citizensnpcs.npc.skin.Skin originalSkin;
     private static int started, reloaded, passed, events;
+    private static int templateCalls;
     private static boolean done, forced, veto;
     private static final List<NPC> candidates = new ArrayList<>();
 
@@ -79,6 +80,7 @@ public final class ReloadRuntimeAudit {
                 check(restoredVirtual.isSpawned() && level.getEntity(restoredVirtual.getEntity().getUUID()) == null,
                         "restored_packet_transport");
                 cleanupFailure();
+                replacementSubscriptions();
                 close();
                 LoggerFactory.getLogger("citizens").info("[RELOADAUDIT] COMPLETE {} checks phase=runtime", passed);
             }
@@ -100,6 +102,14 @@ public final class ReloadRuntimeAudit {
         queued.getOrAddTrait(PacketNPC.class);
         queued.getOrAddTrait(net.citizensnpcs.api.trait.trait.CurrentLocation.class).setLocation(at(640));
         NeoForge.EVENT_BUS.post(new NPCNeedsRespawnEvent(queued, at(640)));
+        var action = new net.citizensnpcs.api.npc.templates.CommandEventAction(TemplateProbeEvent.class,
+                npc -> templateCalls++);
+        action.accept(world);
+        NeoForge.EVENT_BUS.post(new TemplateProbeEvent(queued));
+        check(templateCalls == 0, "template_event_excludes_same_uuid_in_other_registry");
+        NeoForge.EVENT_BUS.post(new TemplateProbeEvent(world));
+        check(templateCalls == 1, "template_event_runs_for_applied_registry");
+        action.accept(queued);
     }
 
     private static void failedReload() throws Exception {
@@ -133,6 +143,9 @@ public final class ReloadRuntimeAudit {
             }
         } finally { Files.writeString(templateFile, "valid: {}\n"); }
         store.afterLoad = registry -> {
+            int before = templateCalls;
+            NeoForge.EVENT_BUS.post(new TemplateProbeEvent(registry.getById(world.getId())));
+            check(templateCalls == before + 1, "candidate_load_inherits_template_event_subscription");
             check(net.citizensnpcs.npc.skin.Skin.get("") != originalSkin, "candidate_load_uses_staged_skin_cache");
             check(Setting.DEFAULT_NPC_LIMIT.asInt() == 71, "candidate_load_sees_new_settings");
             check(plugin.getNPCRegistry() == old, "old_binding_visible_during_load");
@@ -143,6 +156,11 @@ public final class ReloadRuntimeAudit {
             throw new IllegalStateException("expected provider reload failure");
         };
         NPCLoadException failure = rejectedReload();
+        int beforeTemplates = templateCalls;
+        for (NPC npc : candidates) NeoForge.EVENT_BUS.post(new TemplateProbeEvent(npc));
+        NeoForge.EVENT_BUS.post(new TemplateProbeEvent(world));
+        NeoForge.EVENT_BUS.post(new TemplateProbeEvent(queued));
+        check(templateCalls == beforeTemplates + 2, "failed_reload_rolls_back_template_subscriptions");
         check(net.citizensnpcs.npc.skin.Skin.get("") == originalSkin, "failed_provider_restores_skin_cache");
         check(Setting.DEFAULT_NPC_LIMIT.asInt() == 37
                 && Setting.DEFAULT_RANDOM_LOOK_DELAY.asDuration() == previousDuration,
@@ -176,6 +194,11 @@ public final class ReloadRuntimeAudit {
                 net.minecraft.resources.ResourceLocation.fromNamespaceAndPath("reloadprobe", "valid")) != null,
                 "successful_reload_publishes_repaired_templates");
         check(plugin.getNPCRegistry() != old, "success_publishes_new_registry");
+        int beforeTemplates = templateCalls;
+        NeoForge.EVENT_BUS.post(new TemplateProbeEvent(world));
+        NeoForge.EVENT_BUS.post(new TemplateProbeEvent(plugin.getNPCRegistry().getById(world.getId())));
+        NeoForge.EVENT_BUS.post(new TemplateProbeEvent(queued));
+        check(templateCalls == beforeTemplates + 2, "successful_reload_moves_template_subscriptions");
         check(!old.iterator().hasNext() && old.getByUniqueId(world.getUniqueId()) == null, "old_indexes_released");
         check(world.getEntity() == null && entity.isRemoved() && virtual.getEntity() == null,
                 "retirement_overrides_despawn_veto");
@@ -225,6 +248,40 @@ public final class ReloadRuntimeAudit {
         check(npc.getEntity() == null && previousEntity.isRemoved() && failing.removals == 1,
                 "throwing_cleanup_still_releases_runtime");
         check(store.clears == 0 && store.records.size() == 2, "cleanup_failure_preserves_records");
+        int beforeTemplates = templateCalls;
+        NeoForge.EVENT_BUS.post(new TemplateProbeEvent(npc));
+        NeoForge.EVENT_BUS.post(new TemplateProbeEvent(plugin.getNPCRegistry().getById(world.getId())));
+        check(templateCalls == beforeTemplates + 1, "published_cleanup_failure_keeps_template_subscriptions");
+    }
+
+    private static void replacementSubscriptions() {
+        NPC before = plugin.getNPCRegistry().getById(world.getId());
+        Store replacement = new Store();
+        replacement.records.putAll(store.records);
+        List<NPC> rejected = new ArrayList<>();
+        replacement.afterLoad = registry -> {
+            registry.forEach(rejected::add);
+            throw new IllegalStateException("expected replacement load failure");
+        };
+        try {
+            plugin.setDefaultNPCDataStore(replacement);
+            throw new AssertionError("replacement should fail");
+        } catch (RuntimeException expected) { }
+        int beforeTemplates = templateCalls;
+        for (NPC npc : rejected) NeoForge.EVENT_BUS.post(new TemplateProbeEvent(npc));
+        NeoForge.EVENT_BUS.post(new TemplateProbeEvent(before));
+        check(templateCalls == beforeTemplates + 1 && plugin.getNPCRegistry() == before.getOwningRegistry(),
+                "failed_store_replacement_preserves_template_subscription");
+        replacement.afterLoad = null;
+        plugin.setDefaultNPCDataStore(replacement);
+        beforeTemplates = templateCalls;
+        NeoForge.EVENT_BUS.post(new TemplateProbeEvent(before));
+        NeoForge.EVENT_BUS.post(new TemplateProbeEvent(plugin.getNPCRegistry().getById(world.getId())));
+        check(templateCalls == beforeTemplates + 1, "store_replacement_moves_template_subscription");
+    }
+
+    public static final class TemplateProbeEvent extends net.citizensnpcs.api.event.NPCEvent {
+        public TemplateProbeEvent(NPC npc) { super(npc); }
     }
 
     private static NPCLoadException rejectedReload() throws Exception {

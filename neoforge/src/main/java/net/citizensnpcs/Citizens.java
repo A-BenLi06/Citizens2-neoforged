@@ -503,6 +503,7 @@ public class Citizens implements CitizensPlugin {
         beginNPCDataOperation();
         CitizensNPCRegistry candidate = null;
         List<Runnable> resumeShopSessions = new ArrayList<>();
+        net.citizensnpcs.api.npc.templates.CommandEventAction.RegistryTransfer templateSubscriptions = null;
         try {
             if (saves == store) return;
             if (server == null || npcRegistry == null) {
@@ -516,6 +517,7 @@ public class Citizens implements CitizensPlugin {
             }
             privateStocks.forEach(net.citizensnpcs.trait.shop.NPCShopStorage::requireIdle);
             candidate = new CitizensNPCRegistry(store, this, "citizens-global-" + UUID.randomUUID());
+            templateSubscriptions = net.citizensnpcs.api.npc.templates.CommandEventAction.prepareRegistryTransfer(npcRegistry, candidate);
             // Providers populate the supplied registry. Until that succeeds, global lookups still see the old NPCs.
             if (serverStarted) candidate.loadFromStore();
             if (serverStarted || npcRegistry.iterator().hasNext()) {
@@ -527,10 +529,12 @@ public class Citizens implements CitizensPlugin {
             CitizensNPCRegistry previous = npcRegistry;
             configuredNPCDataStore = saves = store;
             npcRegistry = candidate;
+            templateSubscriptions.commit();
             if (eventListen != null) eventListen.clearRespawnQueue(previous);
             previous.retire();
         } catch (RuntimeException | Error failure) {
             if (candidate != null && npcRegistry != candidate) {
+                if (templateSubscriptions != null) templateSubscriptions.close();
                 try {
                     if (eventListen != null) eventListen.clearRespawnQueue(candidate);
                     candidate.retire();
@@ -540,6 +544,7 @@ public class Citizens implements CitizensPlugin {
             }
             throw failure;
         } finally {
+            if (templateSubscriptions != null) templateSubscriptions.close();
             resumeShopSessions.forEach(Runnable::run);
             npcDataOperation = false;
         }
@@ -595,6 +600,7 @@ public class Citizens implements CitizensPlugin {
         boolean publicationStarted = false;
         Skin.CacheReload skinReload = null;
         TemplateRegistry preparedTemplates = null;
+        net.citizensnpcs.api.npc.templates.CommandEventAction.RegistryTransfer templateSubscriptions = null;
         try {
             config.reload();
             if (shops != null) preparedShops = shops.prepareLoad();
@@ -602,6 +608,7 @@ public class Citizens implements CitizensPlugin {
             skinReload = Skin.beginReload();
             if (saves != null && npcRegistry != null) {
                 candidate = new CitizensNPCRegistry(saves, this, "citizens-global-" + UUID.randomUUID());
+                templateSubscriptions = net.citizensnpcs.api.npc.templates.CommandEventAction.prepareRegistryTransfer(npcRegistry, candidate);
                 // A provider may fail after constructing some NPCs. Keep those objects isolated until loading succeeds.
                 candidate.loadFromStore();
             }
@@ -619,6 +626,7 @@ public class Citizens implements CitizensPlugin {
             CitizensNPCRegistry previous = candidate == null ? null : npcRegistry;
             if (candidate != null) {
                 npcRegistry = candidate;
+                templateSubscriptions.commit();
                 if (eventListen != null) eventListen.clearRespawnQueue(previous);
             }
             for (Runnable cleanup : java.util.List.<Runnable>of(Editor::leaveAll, ChatPrompts::abandonAll)) {
@@ -639,6 +647,7 @@ public class Citizens implements CitizensPlugin {
             if (cleanupFailure instanceof Error failure) throw failure;
         } catch (RuntimeException | Error failure) {
             if (candidate != null && npcRegistry != candidate) {
+                if (templateSubscriptions != null) templateSubscriptions.close();
                 try {
                     if (eventListen != null) eventListen.clearRespawnQueue(candidate);
                     candidate.retire();
@@ -656,6 +665,7 @@ public class Citizens implements CitizensPlugin {
             throw new NPCLoadException(candidate != null && npcRegistry == candidate
                     ? "NPCs restored, but previous runtime cleanup failed" : "Could not restore NPCs", failure);
         } finally {
+            if (templateSubscriptions != null) templateSubscriptions.close();
             if (skinReload != null) skinReload.close();
         }
         LOGGER.info("Citizens reloaded.");

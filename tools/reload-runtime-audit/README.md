@@ -42,7 +42,12 @@ Invalid-template cases include malformed YAML, a scalar entry after a valid pref
 and an unknown command event. Each must preserve the old registry/entity, templates,
 settings, editor, prompt and skin-cache identity.
 
-Expected result: `[RELOADAUDIT] COMPLETE 49 checks` and `BUILD SUCCESSFUL`.
+Template event coverage isolates identical UUIDs across registry identities and checks
+subscription copying during candidate loading, rollback on failure, publication and
+cleanup failure after publication. Default-store replacement exercises both rejection
+and successful subscription transfer as well.
+
+Expected result: `[RELOADAUDIT] COMPLETE 57 checks` and `BUILD SUCCESSFUL`.
 The original implementation at `deb5021` fails `failed_reload_preserves_identity`.
 The fixture does not accept shutdown, full configuration/shop transactionality, or arbitrary
 external provider side effects as verified.

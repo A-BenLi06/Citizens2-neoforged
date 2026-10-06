@@ -8,6 +8,7 @@ import java.util.function.BiConsumer;
 
 import net.citizensnpcs.api.event.NPCEvent;
 import net.citizensnpcs.api.npc.NPC;
+import net.citizensnpcs.api.npc.NPCRegistry;
 import net.neoforged.neoforge.common.NeoForge;
 
 /**
@@ -18,13 +19,14 @@ import net.neoforged.neoforge.common.NeoForge;
  * event class is only known at runtime. NeoForge's bus takes the class directly, so the whole construction collapses into
  * one {@code addListener} call and {@code getNPC()} is a plain virtual call.
  * <p>
- * The set of UUIDs is the same design as upstream: one listener is registered per template action, and it filters to the
- * NPCs the template has actually been applied to.
+ * One listener is registered per template action. UUID subscriptions are scoped to registry identity so independent
+ * registries may contain the same UUID without sharing commands.
  */
 public class CommandEventAction implements Consumer<NPC>, AutoCloseable {
     private static final Set<CommandEventAction> LIVE = new java.util.LinkedHashSet<>();
     private static volatile boolean accepting = true;
-    private final Set<UUID> uuids = new HashSet<>();
+    private final java.util.Map<NPCRegistry, Set<UUID>> targets = new com.google.common.collect.MapMaker()
+            .weakKeys().makeMap();
     private final Runnable register;
     private final Runnable unregister;
     private boolean registered;
@@ -59,6 +61,7 @@ public class CommandEventAction implements Consumer<NPC>, AutoCloseable {
     public synchronized void accept(NPC npc) {
         if (closed) throw new IllegalStateException("Template event action is closed");
         UUID uuid = npc.getUniqueId();
+        NPCRegistry registry = java.util.Objects.requireNonNull(npc.getOwningRegistry(), "NPC registry");
         synchronized (LIVE) {
             if (!accepting) throw new IllegalStateException("Template event actions are unavailable during shutdown");
             if (!registered) {
@@ -66,18 +69,19 @@ public class CommandEventAction implements Consumer<NPC>, AutoCloseable {
                 registered = true;
                 LIVE.add(this);
             }
-            uuids.add(uuid);
+            targets.computeIfAbsent(registry, unused -> new HashSet<>()).add(uuid);
         }
     }
 
     private synchronized boolean accepts(NPC npc) {
-        return !closed && uuids.contains(npc.getUniqueId());
+        Set<UUID> uuids = targets.get(npc.getOwningRegistry());
+        return !closed && uuids != null && uuids.contains(npc.getUniqueId());
     }
 
     @Override
     public synchronized void close() {
         closed = true;
-        uuids.clear();
+        targets.clear();
         if (registered) {
             unregister.run();
             registered = false;
@@ -108,5 +112,57 @@ public class CommandEventAction implements Consumer<NPC>, AutoCloseable {
     public static void start() {
         shutdown();
         accepting = true;
+    }
+
+    /** Copy subscription ownership to a fresh candidate while preserving rollback to the original registry. */
+    public static RegistryTransfer prepareRegistryTransfer(NPCRegistry previous, NPCRegistry candidate) {
+        if (previous == candidate) throw new IllegalArgumentException("Registry candidate must be distinct");
+        var transfer = new RegistryTransfer(previous, candidate);
+        transfer.copy();
+        return transfer;
+    }
+
+    public static final class RegistryTransfer implements AutoCloseable {
+        private final NPCRegistry previous, candidate;
+        private boolean finished;
+
+        private RegistryTransfer(NPCRegistry previous, NPCRegistry candidate) {
+            this.previous = java.util.Objects.requireNonNull(previous);
+            this.candidate = java.util.Objects.requireNonNull(candidate);
+        }
+
+        private void copy() {
+            for (CommandEventAction action : liveActions()) {
+                synchronized (action) {
+                    Set<UUID> old = action.targets.get(previous);
+                    if (!action.closed && old != null)
+                        action.targets.computeIfAbsent(candidate, unused -> new HashSet<>()).addAll(old);
+                }
+            }
+        }
+
+        public void commit() {
+            if (finished) throw new IllegalStateException("Template subscription transfer is finished");
+            copy();
+            remove(previous);
+            finished = true;
+        }
+
+        @Override public void close() {
+            if (!finished) {
+                remove(candidate);
+                finished = true;
+            }
+        }
+
+        private static void remove(NPCRegistry registry) {
+            for (CommandEventAction action : liveActions()) {
+                synchronized (action) { action.targets.remove(registry); }
+            }
+        }
+    }
+
+    private static java.util.List<CommandEventAction> liveActions() {
+        synchronized (LIVE) { return java.util.List.copyOf(LIVE); }
     }
 }
