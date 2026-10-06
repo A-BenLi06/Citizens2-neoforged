@@ -82,11 +82,36 @@ public class Template {
     }
 
     private static void loadCommands(Template template, DataKey key, TemplateErrorReporter errors) {
+        if (!(key.getRaw("") instanceof java.util.Map)) {
+            errors.addError(key.getPath() + ": Expected command event mapping");
+            return;
+        }
         for (DataKey sub : key.getSubKeys()) {
-            List<String> commands = new ArrayList<>();
-            for (DataKey line : sub.getIntegerSubKeys()) {
-                commands.add(line.getString(""));
+            Object raw = sub.getRaw("");
+            List<?> values;
+            if (raw instanceof List<?> list) {
+                values = list;
+            } else if (raw instanceof java.util.Map<?, ?> map) {
+                List<Object> ordered = new ArrayList<>();
+                for (DataKey line : sub.getIntegerSubKeys()) ordered.add(line.getRaw(""));
+                if (ordered.size() != map.size()) {
+                    errors.addError(sub.getPath() + ": Expected indexed command list");
+                    continue;
+                }
+                values = ordered;
+            } else {
+                errors.addError(sub.getPath() + ": Expected command list");
+                continue;
             }
+            List<String> commands = new ArrayList<>();
+            boolean valid = true;
+            for (Object value : values) {
+                if (!(value instanceof String command)) {
+                    errors.addError(sub.getPath() + ": Command entries must be strings");
+                    valid = false;
+                } else commands.add(command);
+            }
+            if (!valid) continue;
             switch (sub.name()) {
                 case "on_spawn":
                     template.addAction(new CommandEventAction(NPCSpawnEvent.class, new CommandListExecutor(commands)));

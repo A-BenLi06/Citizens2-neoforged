@@ -8,6 +8,34 @@ import org.junit.jupiter.api.io.TempDir;
 import net.minecraft.resources.ResourceLocation;
 
 class TemplateRegistryReloadTest {
+    @Test void malformedCommandShapesCannotBecomeEmptyActions(@TempDir Path folder) throws Exception {
+        Path namespace = Files.createDirectories(folder.resolve("audit"));
+        Path file = namespace.resolve("bad.yml");
+        String[] bodies = { "  commands: say hello\n", "  commands:\n    on_spawn: say hello\n",
+                "  commands:\n    on_spawn:\n      message: say hello\n",
+                "  commands:\n    on_spawn:\n      - command: say hello\n" };
+        for (String body : bodies) {
+            Files.writeString(file, "bad:\n" + body);
+            var failure = assertThrows(IllegalStateException.class, () -> TemplateRegistry.prepareReload(folder));
+            assertTrue(failure.getCause().getMessage().toLowerCase().contains("command"));
+        }
+    }
+
+    @Test void explicitlyEmptyCommandListsRemainValid(@TempDir Path folder) throws Exception {
+        Path namespace = Files.createDirectories(folder.resolve("audit"));
+        Files.writeString(namespace.resolve("empty.yml"), "empty:\n  commands:\n    on_spawn: []\n");
+        assertEquals(1, TemplateRegistry.prepareReload(folder).getAllTemplates().size());
+    }
+
+    @Test void directListDataCanBeUsedWithoutYamlNormalization() {
+        var key = new net.citizensnpcs.api.util.MemoryDataKey();
+        key.setRaw("commands", java.util.Map.of("on_spawn", java.util.List.of("say hello")));
+        var errors = new TemplateRegistry.TemplateErrorReporter() {
+            @Override public void addError(String message) { fail(message); }
+        };
+        assertNotNull(Template.load(errors, null, ResourceLocation.fromNamespaceAndPath("audit", "direct"), key));
+    }
+
     @Test void misspelledCommandEventsRejectTheCandidate(@TempDir Path folder) throws Exception {
         Path namespace = Files.createDirectories(folder.resolve("audit"));
         Files.writeString(namespace.resolve("bad.yml"), "bad:\n  commands:\n    on_spwan:\n      - say hello\n");

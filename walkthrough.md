@@ -1721,3 +1721,9 @@ Both NeoForge 21.1.233 and 21.1.248 pass 326 creation checks. Clean ordinary tes
 Template command parsing now records unsupported event keys in the existing error reporter, so candidate loading fails instead of silently dropping misspelled command blocks. Supported event/application names keep their existing behavior.
 
 Two file-based tests cover misspelled-event rejection and preparation of all six supported names. All 484 ordinary tests and the normal build pass without failures/errors/skips; git diff --check passes. No fresh native/client run is claimed. Production Interactions sources and packaging are unchanged; no unrelated server or original data was changed. Updated docs/reload-templates-2026-10-05.md. The full Citizens goal remains active.
+
+## 2026-10-06 08:46:41 +08:00 — Validate template command block structure and entry types
+
+Template commands now require an event mapping with string-list contents. Invalid scalars, non-indexed maps and non-string entries enter the error reporter rather than being skipped. Explicit empty lists and both YAML-normalized numeric maps/direct Lists remain supported.
+
+Three tests cover four malformed shapes, valid empty lists and direct list input. All 487 ordinary tests and the normal build pass without failures/errors/skips; git diff --check passes. No fresh native/client run is claimed. Production Interactions sources and packaging are unchanged; no unrelated server or original data was changed. Updated docs/reload-templates-2026-10-05.md. The full Citizens goal remains active.

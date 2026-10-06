@@ -49,3 +49,9 @@ Unknown command-event keys now enter TemplateErrorReporter instead of being sile
 ignored. Strict registry preparation rejects misspelled event names. File-based tests
 cover a misspelled on_spawn key and successful preparation of all six supported
 command event/application names.
+
+Command blocks now validate an event mapping and string-list contents. Scalar event
+contents, non-indexed maps and non-string command entries are reported instead of
+silently becoming empty actions. Empty lists, YAML-normalized numeric-key maps and
+direct List values remain supported. Three tests cover invalid shapes, empty lists
+and direct non-normalized list input.
