@@ -9,9 +9,43 @@ import net.citizensnpcs.api.npc.NPC;
 
 class BehaviorSignalsTest {
     private static NPC npc() {
-        UUID id = UUID.randomUUID();
+        return npc(UUID.randomUUID());
+    }
+    private static NPC npc(UUID id) {
         return (NPC) Proxy.newProxyInstance(NPC.class.getClassLoader(), new Class<?>[]{NPC.class},
                 (proxy, method, args) -> { if (method.getName().equals("getUniqueId")) return id; throw new AssertionError(method.getName()); });
+    }
+
+    @Test void instanceEmissionAndCleanupDoNotAffectAnotherNpcWithTheSameUuid() {
+        var signals = new BehaviorSignals(); UUID uuid = UUID.randomUUID();
+        NPC first = npc(uuid), second = npc(uuid);
+        var firstCalls = new AtomicInteger(); var secondCalls = new AtomicInteger();
+        signals.listen(first, "ready", firstCalls::incrementAndGet);
+        signals.listen(second, "ready", secondCalls::incrementAndGet);
+        signals.emit(first, "ready");
+        assertEquals(1, firstCalls.get()); assertEquals(0, secondCalls.get());
+        signals.clearListeners(first); signals.emit(second, "ready");
+        assertEquals(1, firstCalls.get()); assertEquals(1, secondCalls.get());
+    }
+
+    @Test void identicalCallbackObjectsCanBeRemovedIndependently() {
+        var signals = new BehaviorSignals(); UUID uuid = UUID.randomUUID();
+        NPC first = npc(uuid), second = npc(uuid); var calls = new AtomicInteger();
+        BehaviorSignals.SignalListener listener = calls::incrementAndGet;
+        signals.listen(first, "ready", listener); signals.listen(second, "ready", listener);
+        signals.unlisten(first, "ready", listener);
+        signals.emit(second, "ready"); assertEquals(1, calls.get());
+    }
+
+    @Test void explicitUuidAndGlobalEmissionRetainMatchingInstanceSemantics() {
+        var signals = new BehaviorSignals(); UUID uuid = UUID.randomUUID();
+        NPC first = npc(uuid), second = npc(uuid); var calls = new AtomicInteger();
+        signals.listen(first, "ready", calls::incrementAndGet);
+        signals.listen(second, "ready", calls::incrementAndGet);
+        signals.emitToNPC(uuid, "ready"); assertEquals(2, calls.get());
+        signals.emitGlobal("ready"); assertEquals(4, calls.get());
+        java.lang.ref.Reference.reachabilityFence(first);
+        java.lang.ref.Reference.reachabilityFence(second);
     }
 
     @Test void listenersCanRemoveThemselvesAndAddTheirSuccessor() {
@@ -35,6 +69,7 @@ class BehaviorSignalsTest {
         signals.emitGlobal("ready"); assertEquals(1, late.get());
         signals.clearListeners(second);
         signals.emitToNPC(second.getUniqueId(), "ready"); assertEquals(1, late.get());
+        java.lang.ref.Reference.reachabilityFence(first);
     }
 
     @Test void failingListenerCannotPreventOtherNotifications() {
@@ -46,5 +81,6 @@ class BehaviorSignalsTest {
         assertEquals(1, calls.get());
         assertSame(failure, assertThrows(IllegalStateException.class, () -> signals.emitGlobal("ready")));
         assertEquals(2, calls.get());
+        java.lang.ref.Reference.reachabilityFence(npc);
     }
 }

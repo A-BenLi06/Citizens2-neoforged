@@ -3,7 +3,6 @@ package net.citizensnpcs.api.ai.tree;
 import java.util.Collection;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
@@ -16,7 +15,8 @@ import net.citizensnpcs.api.npc.NPC;
  * Manages signals for behavior trees. Signals allow behavior trees to communicate and wait for events.
  */
 public class BehaviorSignals {
-    private final Map<UUID, Multimap<String, SignalListener>> listeners = new HashMap<>();
+    private final Map<NPC, Multimap<String, SignalListener>> listeners = new com.google.common.collect.MapMaker()
+            .weakKeys().makeMap();
 
     /**
      * Clears all listeners for a specific NPC.
@@ -25,7 +25,7 @@ public class BehaviorSignals {
      *            the NPC
      */
     public synchronized void clearListeners(NPC npc) {
-        listeners.remove(npc.getUniqueId());
+        listeners.remove(npc);
     }
 
     /**
@@ -37,7 +37,13 @@ public class BehaviorSignals {
      *            the signal name
      */
     public void emit(NPC npc, String signal) {
-        emitToNPC(npc.getUniqueId(), signal);
+        List<SignalListener> snapshot;
+        synchronized (this) {
+            Multimap<String, SignalListener> bySignal = listeners.get(npc);
+            if (bySignal == null) return;
+            snapshot = List.copyOf(bySignal.get(signal));
+        }
+        dispatch(snapshot);
     }
 
     /**
@@ -55,7 +61,7 @@ public class BehaviorSignals {
     }
 
     /**
-     * Emits a signal to a specific NPC by ID. All behaviors waiting for this signal will be notified.
+     * Emits to all registered instances matching a UUID. Use {@link #emit(NPC, String)} for an exact instance.
      *
      * @param npcId
      *            the NPC ID
@@ -63,11 +69,12 @@ public class BehaviorSignals {
      *            the signal name
      */
     public void emitToNPC(UUID npcId, String signal) {
-        List<SignalListener> snapshot;
+        if (npcId == null) return;
+        List<SignalListener> snapshot = new ArrayList<>();
         synchronized (this) {
-            Multimap<String, SignalListener> npcListeners = listeners.get(npcId);
-            if (npcListeners == null) return;
-            snapshot = List.copyOf(npcListeners.get(signal));
+            for (var entry : listeners.entrySet()) {
+                if (npcId.equals(entry.getKey().getUniqueId())) snapshot.addAll(entry.getValue().get(signal));
+            }
         }
         dispatch(snapshot);
     }
@@ -84,7 +91,7 @@ public class BehaviorSignals {
      */
     public synchronized void listen(NPC npc, String signal, SignalListener listener) {
         java.util.Objects.requireNonNull(listener, "Signal listener");
-        listeners.computeIfAbsent(npc.getUniqueId(), k -> HashMultimap.create()).put(signal, listener);
+        listeners.computeIfAbsent(npc, k -> HashMultimap.create()).put(signal, listener);
     }
 
     /**
@@ -98,7 +105,7 @@ public class BehaviorSignals {
      *            the listener to remove
      */
     public synchronized void unlisten(NPC npc, String signal, SignalListener listener) {
-        Multimap<String, SignalListener> bySignal = listeners.get(npc.getUniqueId());
+        Multimap<String, SignalListener> bySignal = listeners.get(npc);
         if (bySignal == null)
             return;
 
@@ -107,7 +114,7 @@ public class BehaviorSignals {
             signals.remove(listener);
         }
         if (bySignal.isEmpty()) {
-            listeners.remove(npc.getUniqueId());
+            listeners.remove(npc);
         }
     }
 

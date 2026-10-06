@@ -16,6 +16,8 @@ Recent follow-ups cover [`powered`, `name` and `home` options](command-options-h
 
 ## Behavior, data and integration acceptance
 
+- [Behavior signal ownership](behavior-signal-ownership-2026-10-07.md) isolates NPC-based delivery and cleanup by object identity, while explicit UUID/global APIs retain their matching scopes. Direct tests cover colliding UUIDs and callbacks; native/provider combinations remain separate acceptance.
+
 - [Counted repeat behavior](behavior-repeat-2026-10-06.md) now executes its configured children instead of merely counting ticks. Lifecycle and parser/Molang tests cover counts, zero, failures, resets and cleanup reentry. Native ordinary/packet NPC tests verify repeated effects and waits across server ticks; arbitrary provider combinations remain separate acceptance.
 
 - [Behavior wait lifecycle](behavior-wait-2026-10-06.md) evaluates scalar/short-form dynamic durations once per activation, clears without reevaluation and lets zero waits complete. Parser/Molang and direct lifecycle tests cover these paths; native/provider combinations remain separate acceptance.

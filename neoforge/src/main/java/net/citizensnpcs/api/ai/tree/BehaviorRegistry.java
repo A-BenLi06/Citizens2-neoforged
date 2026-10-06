@@ -215,7 +215,7 @@ public class BehaviorRegistry {
                 }
                 if (npc == null)
                     return BehaviorStatus.FAILURE;
-                signals.emitToNPC(npc.getUniqueId(), signalHolder.evaluateAsString(context.getScope()));
+                signals.emit(npc, signalHolder.evaluateAsString(context.getScope()));
                 return BehaviorStatus.SUCCESS;
             };
         });
