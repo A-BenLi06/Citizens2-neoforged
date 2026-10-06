@@ -1781,3 +1781,9 @@ Three tests cover invalid replacement maps, invalid overrides and actual target 
 Legacy migration now uses the replacement persister to validate and normalize source contents before creating the destination directory, saving or archiving. Invalid override/replacement types can no longer be coerced away by migration. Accepted quoted Boolean normalization is shared rather than duplicated.
 
 Two file tests cover invalid contents preserving the original with no destination/archive and normalization of a quoted Boolean. All 507 ordinary tests and the normal build pass without failures/errors/skips; git diff --check passes. No fresh native/client run is claimed. Production Interactions sources and packaging are unchanged; no unrelated server or original data was changed. Updated docs/template-migration-2026-10-06.md. The full Citizens goal remains active.
+
+## 2026-10-06 10:45:53 +08:00 — Reject empty names in normal template loading and generation
+
+TemplateRegistry now rejects empty template-name paths during normal file loading and before generation performs any snapshot or directory operation. This extends the migration name check to the other registry entry points rather than relying on ResourceLocation to reject an empty path.
+
+Two tests cover preserving an invalid-name source file and rejecting generation before snapshot/directory mutation. All 509 ordinary tests and the normal build pass without failures/errors/skips; git diff --check passes. No fresh native/client run is claimed. Production Interactions sources and packaging are unchanged; no unrelated server or original data was changed. Updated docs/template-generation-2026-10-05.md. The full Citizens goal remains active.

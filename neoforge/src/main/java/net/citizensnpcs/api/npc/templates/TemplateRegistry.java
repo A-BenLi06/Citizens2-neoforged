@@ -63,6 +63,7 @@ public class TemplateRegistry {
 
     /** Validates and saves one NPC snapshot template, then publishes it through both lookup indexes. */
     public void generateTemplateFromNPC(ResourceLocation key, NPC npc) {
+        if (key.getPath().isEmpty()) throw new IllegalArgumentException("Template name must not be empty");
         File namespaceFolder = new File(baseFolder.toFile(), key.getNamespace());
         File generatedFile = templateSources.getOrDefault(key, new File(namespaceFolder, "templates.yml"));
         generatedFile.getParentFile().mkdirs();
@@ -120,7 +121,7 @@ public class TemplateRegistry {
     private void loadTemplate(File file, String namespace, DataKey key) throws TemplateLoadException {
         String path = key.name().toLowerCase(Locale.ROOT);
         ResourceLocation namespacedKey = ResourceLocation.tryBuild(namespace.toLowerCase(Locale.ROOT), path);
-        if (namespacedKey == null)
+        if (path.isEmpty() || namespacedKey == null)
             throw new TemplateLoadException(
                     "Template name '" + key.name() + "' in namespace '" + namespace + "' is not a valid key");
         if (fullyQualifiedTemplates.containsKey(namespacedKey))

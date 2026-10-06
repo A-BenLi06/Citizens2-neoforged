@@ -35,3 +35,7 @@ checked to use these collections read-only.
 Namespace existence queries now use the same Locale.ROOT case normalization as loaded
 keys and bare-name lookup. A test switches the default locale to Turkish and verifies
 mixed-case namespace/name lookup, absent namespaces and null input returning false.
+
+Normal template loading and generation reject empty template names explicitly, since
+ResourceLocation permits an empty path. File tests verify rejection preserves the
+input; generation tests verify the NPC snapshot and namespace directory are untouched.

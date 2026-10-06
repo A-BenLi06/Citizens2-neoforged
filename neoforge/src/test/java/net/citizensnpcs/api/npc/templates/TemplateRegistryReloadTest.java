@@ -8,6 +8,14 @@ import org.junit.jupiter.api.io.TempDir;
 import net.minecraft.resources.ResourceLocation;
 
 class TemplateRegistryReloadTest {
+    @Test void emptyTemplateNamesAreRejected(@TempDir Path folder) throws Exception {
+        Path namespace = Files.createDirectories(folder.resolve("audit"));
+        Path file = Files.writeString(namespace.resolve("empty-name.yml"), "'': {}\n");
+        var failure = assertThrows(IllegalStateException.class, () -> TemplateRegistry.prepareReload(folder));
+        assertTrue(failure.getCause().getMessage().contains("not a valid key"));
+        assertEquals("'': {}\n", Files.readString(file));
+    }
+
     @Test void scalarTemplateEntriesCannotBecomeSuccessfulNoOps(@TempDir Path folder) throws Exception {
         Path namespace = Files.createDirectories(folder.resolve("audit"));
         Path file = namespace.resolve("bad.yml");

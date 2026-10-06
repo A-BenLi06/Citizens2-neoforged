@@ -12,6 +12,15 @@ import net.citizensnpcs.api.util.YamlStorage;
 import net.minecraft.resources.ResourceLocation;
 
 class TemplateGenerationTest {
+    @Test void emptyNameGenerationFailsBeforeSnapshotOrDirectoryCreation(@TempDir Path folder) {
+        var registry = TemplateRegistry.prepareReload(folder);
+        var empty = ResourceLocation.fromNamespaceAndPath("audit", "");
+        assertThrows(IllegalArgumentException.class,
+                () -> registry.generateTemplateFromNPC(empty, snapshot(root -> fail("Snapshot should not run"))));
+        assertFalse(Files.exists(folder.resolve("audit")));
+        assertTrue(registry.getAllTemplates().isEmpty());
+    }
+
     @Test void queryCollectionsCannotMutateEitherIndex(@TempDir Path folder) {
         var registry = TemplateRegistry.prepareReload(folder);
         var key = ResourceLocation.fromNamespaceAndPath("audit", "saved");
