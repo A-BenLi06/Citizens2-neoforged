@@ -8,6 +8,19 @@ import org.junit.jupiter.api.io.TempDir;
 import net.minecraft.resources.ResourceLocation;
 
 class TemplateMigrationTest {
+    @Test void invalidNamesAreRejectedBeforeWritingOrArchiving(@TempDir Path root) throws Exception {
+        int index = 0;
+        for (String name : java.util.List.of("bad name.yml", ".yml")) {
+            Path folder = Files.createDirectory(root.resolve("case" + index++));
+            Path source = Files.writeString(folder.resolve(name), SOURCE);
+            var failure = assertThrows(IllegalStateException.class, () -> TemplateRegistry.prepareReload(folder));
+            assertTrue(failure.getCause().getMessage().contains("Invalid legacy template name"));
+            assertEquals(SOURCE, Files.readString(source));
+            assertFalse(Files.exists(folder.resolve("migrated")));
+            assertFalse(Files.exists(folder.resolve(name + ".migrated")));
+        }
+    }
+
     private static final String SOURCE = "override: true\nreplacements:\n  name: Original\n";
 
     @Test void conflictingDestinationPreservesBothFiles(@TempDir Path folder) throws Exception {

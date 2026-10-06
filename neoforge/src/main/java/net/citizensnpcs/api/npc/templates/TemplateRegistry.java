@@ -214,11 +214,13 @@ public class TemplateRegistry {
             throw new TemplateLoadException("Unable to migrate " + template.getName());
 
         File namespaceFolder = new File(folder, "migrated");
+        String templateName = template.getName().substring(0, template.getName().length() - ".yml".length());
+        if (templateName.isEmpty() || ResourceLocation.tryBuild(namespaceFolder.getName(), templateName.toLowerCase(Locale.ROOT)) == null)
+            throw new TemplateLoadException("Invalid legacy template name: " + template.getName());
         if (!namespaceFolder.exists() && !namespaceFolder.mkdir())
             throw new TemplateLoadException(
                     "Unable to create destination folder while migrating " + template.getName());
 
-        String templateName = template.getName().substring(0, template.getName().length() - ".yml".length());
         Storage destination = new YamlStorage(new File(namespaceFolder, template.getName()));
         if (!destination.load())
             throw new TemplateLoadException("Unable to open migration destination for " + template.getName());

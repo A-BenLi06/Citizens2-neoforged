@@ -1757,3 +1757,9 @@ Two tests cover rejected external mutations and stable old snapshots with fresh 
 TemplateRegistry.hasNamespace now uses Locale.ROOT normalization like template loading and bare-name queries, retaining false for null input. Command entry points were inspected and already normalize their names; this aligns the registry API.
 
 One test exercises mixed-case lookups under a Turkish default locale, missing names and null input. All 499 ordinary tests and the normal build pass without failures/errors/skips; git diff --check passes. No fresh native/client run is claimed. Production Interactions sources and packaging are unchanged; no unrelated server or original data was changed. Updated docs/template-generation-2026-10-05.md. The full Citizens goal remains active.
+
+## 2026-10-06 09:49:48 +08:00 — Validate legacy template names before migration writes
+
+Migration now validates the filename-derived template key before creating the migrated namespace, writing a destination or archiving the source. Empty stems are explicitly rejected in addition to invalid resource paths; testing showed ResourceLocation permits an empty path and cannot enforce that constraint alone.
+
+One file test covers invalid and empty names preserving source bytes with no destination directory/archive. All 500 ordinary tests and the normal build pass without failures/errors/skips; git diff --check passes. No fresh native/client run is claimed. Production Interactions sources and packaging are unchanged; no unrelated server or original data was changed. Updated docs/template-migration-2026-10-06.md. The full Citizens goal remains active.
