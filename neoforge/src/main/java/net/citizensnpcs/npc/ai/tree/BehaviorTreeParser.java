@@ -45,10 +45,15 @@ import net.citizensnpcs.util.Util;
  */
 public class BehaviorTreeParser {
     private final BehaviorRegistry registry;
-    private boolean strict;
+    private final boolean strict;
 
     public BehaviorTreeParser(BehaviorRegistry registry) {
+        this(registry, false);
+    }
+
+    private BehaviorTreeParser(BehaviorRegistry registry, boolean strict) {
         this.registry = registry;
+        this.strict = strict;
     }
 
     private List<Behavior> coalesceInstantBehaviors(List<Behavior> behaviors) {
@@ -137,10 +142,7 @@ public class BehaviorTreeParser {
     }
 
     public Behavior parseStrict(DataKey root, NPC npc, ExpressionScope scope, Memory blackboard) {
-        boolean previous = strict;
-        strict = true;
-        try { return parse(root, npc, scope, blackboard); }
-        finally { strict = previous; }
+        return new BehaviorTreeParser(registry, true).parse(root, npc, scope, blackboard);
     }
 
     private Supplier<Boolean> parseCondition(String conditionStr, BehaviorRegistry.BehaviorContext context) {

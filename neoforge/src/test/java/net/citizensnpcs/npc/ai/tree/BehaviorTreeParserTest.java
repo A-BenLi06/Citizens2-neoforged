@@ -22,6 +22,34 @@ import net.citizensnpcs.api.util.MemoryDataKey;
  * parser, the registry and the Molang expressions in between actually drive a tree, rather than only compiling.
  */
 public class BehaviorTreeParserTest {
+    @Test public void deferredChildParsingKeepsItsOriginalStrictness() {
+        var registry = new CitizensBehaviorRegistry(new ExpressionRegistry());
+        registry.registerBehavior("deferred", (params, context) -> (net.citizensnpcs.api.ai.tree.InstantBehavior) () -> {
+            context.parseChildren(params); return BehaviorStatus.SUCCESS;
+        });
+        var parser = new BehaviorTreeParser(registry);
+        DataKey root = new MemoryDataKey(); root.setRaw("deferred", map("0", "missing_deferred_child"));
+        Behavior strict = parser.parseStrict(root.getRelative("deferred"), null, new ExpressionScope(), new Memory());
+        Behavior compatible = parser.parse(root.getRelative("deferred"), null, new ExpressionScope(), new Memory());
+        assertEquals(BehaviorStatus.SUCCESS, compatible.run());
+        org.junit.jupiter.api.Assertions.assertThrows(IllegalArgumentException.class, strict::run);
+    }
+
+    @Test public void nestedCompatibilityParsingDoesNotInheritAnOuterStrictCall() {
+        var registry = new CitizensBehaviorRegistry(new ExpressionRegistry());
+        var parser = new BehaviorTreeParser(registry);
+        var nestedCalls = new java.util.concurrent.atomic.AtomicInteger();
+        registry.registerBehavior("nested_parse", (params, context) -> {
+            DataKey nested = new MemoryDataKey(); nested.setString("step", "missing_compatibility_child");
+            parser.parse(nested.getRelative("step"), null, new ExpressionScope(), new Memory());
+            nestedCalls.incrementAndGet();
+            return net.citizensnpcs.api.ai.tree.Sequence.createSequence(context.parseChildren(params));
+        });
+        DataKey root = new MemoryDataKey(); root.setRaw("nested_parse", map("0", "missing_strict_child"));
+        org.junit.jupiter.api.Assertions.assertThrows(IllegalArgumentException.class,
+                () -> parser.parseStrict(root.getRelative("nested_parse"), null, new ExpressionScope(), new Memory()));
+        assertEquals(1, nestedCalls.get());
+    }
     @Test public void retainedFactoryContextsKeepTheirOwnSiblingArguments() {
         var calls = new java.util.ArrayList<String>();
         var registry = new CitizensBehaviorRegistry(new ExpressionRegistry());
