@@ -22,6 +22,39 @@ import net.citizensnpcs.api.util.MemoryDataKey;
  * parser, the registry and the Molang expressions in between actually drive a tree, rather than only compiling.
  */
 public class BehaviorTreeParserTest {
+    @Test public void retainedFactoryContextsKeepTheirOwnSiblingArguments() {
+        var calls = new java.util.ArrayList<String>();
+        var registry = new CitizensBehaviorRegistry(new ExpressionRegistry());
+        registry.registerBehavior("capture", (params, context) -> (net.citizensnpcs.api.ai.tree.InstantBehavior) () -> {
+            calls.add(context.getArgs() == null ? "none" : context.getArgs()[0]);
+            return BehaviorStatus.SUCCESS;
+        });
+        DataKey root = new MemoryDataKey();
+        root.setRaw("sequence", map("0", "capture first", "1", "capture second", "2", "capture"));
+        finish(new BehaviorTreeParser(registry).parseStrict(root.getRelative("sequence"), null, new ExpressionScope(), new Memory()));
+        assertEquals(java.util.List.of("first", "second", "none"), calls);
+    }
+
+    @Test public void parsingChildrenDoesNotOverwriteParentFactoryArguments() {
+        var calls = new java.util.ArrayList<String>(); Memory memory = new Memory();
+        var registry = new CitizensBehaviorRegistry(new ExpressionRegistry());
+        registry.registerBehavior("capture", (params, context) -> (net.citizensnpcs.api.ai.tree.InstantBehavior) () -> {
+            org.junit.jupiter.api.Assertions.assertSame(memory, context.getMemory());
+            calls.add(context.getArgs()[0]); return BehaviorStatus.SUCCESS;
+        });
+        registry.registerBehavior("parent", (params, context) -> {
+            var children = new java.util.ArrayList<Behavior>(context.parseChildren(params));
+            net.citizensnpcs.api.ai.tree.InstantBehavior record = () -> {
+                org.junit.jupiter.api.Assertions.assertSame(memory, context.getMemory());
+                calls.add(context.getArgs()[0]); return BehaviorStatus.SUCCESS;
+            };
+            children.add(0, record); children.add(record);
+            return net.citizensnpcs.api.ai.tree.Sequence.createSequence(children);
+        });
+        DataKey root = new MemoryDataKey(); root.setRaw("parent outer", map("0", "capture child"));
+        finish(new BehaviorTreeParser(registry).parseStrict(root.getRelative("parent outer"), null, new ExpressionScope(), memory));
+        assertEquals(java.util.List.of("outer", "child", "outer"), calls);
+    }
     @Test public void strictExpressionLeavesRejectMissingEnginesAndBrokenWrappers() {
         var parser = new BehaviorTreeParser(new CitizensBehaviorRegistry(new ExpressionRegistry()));
         for (String expression : java.util.List.of("`1`", "`unfinished", "unknown`1`")) {

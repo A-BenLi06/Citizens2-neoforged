@@ -424,15 +424,18 @@ public class BehaviorTreeParser {
 
         String[] parts = parseInlineArgs(name);
         String behaviorName = parts[0];
+        BehaviorRegistry.BehaviorContext nodeContext = new BehaviorRegistry.BehaviorContext(context.getNPC(),
+                context.getScope(), context.getExpressionRegistry(), context.getMemory());
+        nodeContext.setChildParser(key -> parseContainerChildren(key, nodeContext));
 
         if (parts.length > 1) {
             String[] args = new String[parts.length - 1];
             System.arraycopy(parts, 1, args, 0, parts.length - 1);
-            context.setArgs(args);
+            nodeContext.setArgs(args);
         } else {
-            context.setArgs(null);
+            nodeContext.setArgs(null);
         }
-        Behavior behavior = registry.createBehavior(behaviorName, params, context);
+        Behavior behavior = registry.createBehavior(behaviorName, params, nodeContext);
         if (behavior == null) {
             if (strict) throw new IllegalArgumentException("Unknown behavior: " + behaviorName);
             Messaging.severe("Unknown behavior", behaviorName);
