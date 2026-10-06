@@ -22,6 +22,30 @@ import net.citizensnpcs.api.util.MemoryDataKey;
  * parser, the registry and the Molang expressions in between actually drive a tree, rather than only compiling.
  */
 public class BehaviorTreeParserTest {
+    @Test public void strictParsingRejectsOrphanElseInRootAndContainerForms() {
+        var parser = new BehaviorTreeParser(new CitizensBehaviorRegistry(new ExpressionRegistry()));
+        for (Map<String, Object> definition : java.util.List.of(
+                map("else", "set wrong `1`"),
+                map("sequence", map("0", map("else", "set wrong `1`"))),
+                map("sequence", map("else", "set wrong `1`", "0", "succeed")))) {
+            DataKey root = new MemoryDataKey(); root.setRaw("tree", definition);
+            var failure = org.junit.jupiter.api.Assertions.assertThrows(IllegalArgumentException.class,
+                    () -> parser.parseStrict(root.getRelative("tree").getSubKeys().iterator().next(),
+                            null, new ExpressionScope(), new Memory()));
+            assertTrue(failure.getMessage().contains("no matching if"));
+        }
+    }
+
+    @Test public void compatibilityParsingDoesNotExecuteAnOrphanElseBody() {
+        for (Map<String, Object> body : java.util.List.of(
+                map("0", map("else", "set wrong `1`"), "1", "set after `2`"),
+                map("else", "set wrong `1`", "0", "set after `2`"))) {
+            Memory memory = new Memory();
+            finish(parse(map("sequence", body), memory));
+            assertEquals(0D, memory.getNumber("wrong"));
+            assertEquals(2D, memory.getNumber("after"));
+        }
+    }
     @Test public void groupedConditionalKeepsItsElseAndFollowingSibling() {
         for (boolean condition : new boolean[]{false, true}) {
             Memory memory = new Memory();

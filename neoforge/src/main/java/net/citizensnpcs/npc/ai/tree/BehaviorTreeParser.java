@@ -425,6 +425,7 @@ public class BehaviorTreeParser {
     }
 
     private Behavior parseNode(DataKey key, BehaviorRegistry.BehaviorContext context) {
+        if (key.name().equals("else")) return orphanElse(key);
         if (key.hasSubKeys() || key.getRaw("") instanceof java.util.Map
                 || key.getRaw("") instanceof java.util.Collection) {
             DataKey ifKey = null;
@@ -439,6 +440,7 @@ public class BehaviorTreeParser {
             }
             if (ifKey != null)
                 return parseIfElse(ifKey, elseKey, context);
+            if (elseKey != null) orphanElse(elseKey);
 
             return parseContainer(key.name(), key, context);
         } else {
@@ -447,6 +449,13 @@ public class BehaviorTreeParser {
                 return parseLeaf(value, null, context);
             return parseLeaf(key.name(), key, context);
         }
+    }
+
+    private Behavior orphanElse(DataKey key) {
+        String message = "Behavior else has no matching if at " + key.getPath();
+        if (strict) throw new IllegalArgumentException(message);
+        Messaging.severe(message);
+        return EMPTY;
     }
 
     private static final Behavior EMPTY = new Behavior() {
