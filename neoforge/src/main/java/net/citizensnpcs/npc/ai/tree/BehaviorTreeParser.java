@@ -85,9 +85,10 @@ public class BehaviorTreeParser {
             @Override
             public BehaviorStatus run() {
                 String command = commandHolder.evaluateAsString(context.getScope());
+                ExecutionFlags flags = executionFlags(command);
                 Util.runCommand(context.getNPC(),
                         context.getNPC().getEntity() instanceof ServerPlayer player ? player : null,
-                        command, command.contains("-o"), command.contains("-p"));
+                        command, flags.operator(), flags.player());
                 return BehaviorStatus.SUCCESS;
             }
 
@@ -96,6 +97,37 @@ public class BehaviorTreeParser {
                 return "CommandBehavior[" + command + "]";
             }
         };
+    }
+
+    record ExecutionFlags(boolean operator, boolean player) { }
+
+    static ExecutionFlags executionFlags(String command) {
+        java.util.Set<String> tokens = new java.util.HashSet<>();
+        StringBuilder token = new StringBuilder();
+        char quote = 0;
+        boolean escaped = false;
+        for (int i = 0; i < command.length(); i++) {
+            char c = command.charAt(i);
+            if (escaped) {
+                token.append(c); escaped = false; continue;
+            }
+            if (c == '\\') {
+                token.append(c); escaped = true; continue;
+            }
+            if (quote != 0) {
+                token.append(c);
+                if (c == quote) quote = 0;
+                continue;
+            }
+            if (c == '\'' || c == '"' || c == '`') {
+                quote = c; token.append(c); continue;
+            }
+            if (Character.isWhitespace(c)) {
+                if (token.length() > 0) { tokens.add(token.toString()); token.setLength(0); }
+            } else token.append(c);
+        }
+        if (token.length() > 0) tokens.add(token.toString());
+        return new ExecutionFlags(tokens.contains("-o"), tokens.contains("-p"));
     }
 
     /**
