@@ -123,6 +123,7 @@ public class BehaviorTreeParser {
         scope.setNPC(npc);
         BehaviorRegistry.BehaviorContext context = new BehaviorRegistry.BehaviorContext(npc, scope,
                 registry.getExpressionRegistry(), blackboard);
+        context.setChildParser(key -> parseContainerChildren(key, context));
         return parseNode(root, context);
     }
 

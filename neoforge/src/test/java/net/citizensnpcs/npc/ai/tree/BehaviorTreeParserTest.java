@@ -22,6 +22,32 @@ import net.citizensnpcs.api.util.MemoryDataKey;
  * parser, the registry and the Molang expressions in between actually drive a tree, rather than only compiling.
  */
 public class BehaviorTreeParserTest {
+    @Test public void repeatRunsItsConfiguredBodyTheRequestedNumberOfTimes() {
+        Memory memory = new Memory(); memory.set("counter", 0D);
+        finish(parse(map("repeat 3", map("0", "set counter `mem.get('counter') + 1`")), memory));
+        assertEquals(3D, memory.getNumber("counter"));
+    }
+
+    @Test public void repeatSupportsDynamicNamedCountsAndZeroIterations() {
+        Memory memory = new Memory(); memory.set("counter", 0D); memory.set("iterations", 2D);
+        Behavior tree = parse(map("repeat", map("count", "`mem.get('iterations')`",
+                "0", "set counter `mem.get('counter') + 1`")), memory);
+        finish(tree); assertEquals(2D, memory.getNumber("counter"));
+        memory.set("iterations", 0D); tree.reset(); finish(tree);
+        assertEquals(2D, memory.getNumber("counter"));
+    }
+
+    @Test public void repeatRejectsInvalidLiteralCountsAndUnknownChildren() {
+        var parser = new BehaviorTreeParser(new CitizensBehaviorRegistry(new ExpressionRegistry()));
+        for (String count : java.util.List.of("-1", "0.5", "2147483648", "NaN")) {
+            DataKey root = new MemoryDataKey(); root.setRaw("repeat " + count, map("0", "succeed"));
+            org.junit.jupiter.api.Assertions.assertThrows(IllegalArgumentException.class,
+                    () -> parser.parseStrict(root.getRelative("repeat " + count), null, new ExpressionScope(), new Memory()));
+        }
+        DataKey root = new MemoryDataKey(); root.setRaw("repeat 2", map("0", "unknown_repeat_child"));
+        org.junit.jupiter.api.Assertions.assertThrows(IllegalArgumentException.class,
+                () -> parser.parseStrict(root.getRelative("repeat 2"), null, new ExpressionScope(), new Memory()));
+    }
     private static void finish(Behavior tree) {
         assertTrue(tree.shouldExecute());
         for (int i = 0; i < 20; i++) {

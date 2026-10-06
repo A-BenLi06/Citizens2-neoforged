@@ -109,6 +109,16 @@ public class BehaviorRegistry {
         catch (NumberFormatException | ArithmeticException invalid) { return null; }
     }
 
+    private static int repetitionCount(Object value) {
+        try {
+            int count = new java.math.BigDecimal(String.valueOf(value)).intValueExact();
+            if (count < 0) throw new IllegalArgumentException("Repeat count must not be negative");
+            return count;
+        } catch (NumberFormatException | ArithmeticException invalid) {
+            throw new IllegalArgumentException("Repeat count must be a non-negative integer", invalid);
+        }
+    }
+
     /**
      * Registers a behavior factory.
      *
@@ -292,37 +302,14 @@ public class BehaviorRegistry {
         // Repeats x times
         registerBehavior("repeat", (params, context) -> {
             String countStr = context.getArgOrParam(0, "count", params, "1");
-            ExpressionValue countHolder = CitizensAPI.getExpressionRegistry().parseValue(countStr);
+            ExpressionValue countHolder = expressions.parseValue(countStr);
 
-            if (params == null || !params.hasSubKeys())
+            if (params == null)
                 return null;
-
-            return new Behavior() {
-                private int remaining;
-                private int total;
-
-                @Override
-                public void reset() {
-                    total = (int) countHolder.evaluateAsNumber(context.getScope());
-                    remaining = total;
-                }
-
-                @Override
-                public BehaviorStatus run() {
-                    if (remaining <= 0)
-                        return BehaviorStatus.SUCCESS;
-
-                    remaining--;
-                    return BehaviorStatus.RUNNING;
-                }
-
-                @Override
-                public boolean shouldExecute() {
-                    total = (int) countHolder.evaluateAsNumber(context.getScope());
-                    remaining = total;
-                    return total > 0;
-                }
-            };
+            if (!countHolder.isExpression()) repetitionCount(countHolder.evaluate(context.getScope()));
+            java.util.List<Behavior> children = context.parseChildren(params);
+            Behavior body = children.size() == 1 ? children.get(0) : Sequence.createSequence(children);
+            return new Repeat(body, () -> repetitionCount(countHolder.evaluate(context.getScope())));
         });
 
         // Always fails
@@ -632,6 +619,7 @@ public class BehaviorRegistry {
      */
     public static class BehaviorContext {
         private String[] args;
+        private java.util.function.Function<DataKey, java.util.List<Behavior>> childParser;
         private final ExpressionRegistry expressionRegistry;
         private final Memory memory;
         private final NPC npc;
@@ -652,6 +640,15 @@ public class BehaviorRegistry {
                 return params.getString(name);
 
             return defaultValue;
+        }
+
+        public void setChildParser(java.util.function.Function<DataKey, java.util.List<Behavior>> parser) {
+            childParser = parser;
+        }
+
+        public java.util.List<Behavior> parseChildren(DataKey key) {
+            if (childParser == null) throw new IllegalStateException("No child behavior parser is configured");
+            return childParser.apply(key);
         }
 
         public String[] getArgs() {

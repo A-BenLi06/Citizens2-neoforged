@@ -16,6 +16,8 @@ Recent follow-ups cover [`powered`, `name` and `home` options](command-options-h
 
 ## Behavior, data and integration acceptance
 
+- [Counted repeat behavior](behavior-repeat-2026-10-06.md) now executes its configured children instead of merely counting ticks. Lifecycle and parser/Molang tests cover counts, zero, failures, resets and cleanup reentry; native/provider scheduling remains separate acceptance.
+
 - [Behavior wait lifecycle](behavior-wait-2026-10-06.md) evaluates scalar/short-form dynamic durations once per activation, clears without reevaluation and lets zero waits complete. Parser/Molang and direct lifecycle tests cover these paths; native/provider combinations remain separate acceptance.
 
 - [Wander command validation](wander-validation-2026-10-06.md) checks complete input before attaching or replacing route state, preserves unavailable data on rejection and validates provider publication before applying edits. Native tests cover invalid and successful operations; custom callback effects remain separate acceptance.
