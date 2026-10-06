@@ -33,11 +33,13 @@ public class CommandListExecutor implements Consumer<NPC> {
             return;
 
         for (String command : commands) {
-            String cmd = net.citizensnpcs.api.util.NPCCommandFormat.prepare(command);
+            var prepared = net.citizensnpcs.api.util.NPCCommandFormat.prepareInvocation(command);
+            String cmd = prepared.command();
             CommandSourceStack source = server.createCommandSourceStack().withPermission(4);
             String interpolated = Placeholders.replace(cmd, source, npc);
             try {
-                server.getCommands().performPrefixedCommand(source, interpolated);
+                net.citizensnpcs.api.command.NPCCommandTarget.dispatch(prepared.implicitTarget() ? npc : null,
+                        interpolated, () -> server.getCommands().performPrefixedCommand(source, interpolated));
             } catch (Throwable ex) {
                 ex.printStackTrace();
             }

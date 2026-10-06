@@ -105,16 +105,24 @@ public class CommandManager {
      */
     public void execute(String rootCommand, String[] args, CommandSourceStack sender, Object... methodArgs)
             throws CommandException {
-        String[] newArgs = new String[args.length + 1];
-        System.arraycopy(args, 0, newArgs, 1, args.length);
+        executeWithTarget(null, rootCommand, args, sender, methodArgs);
+    }
+
+    /** Dispatch with an exact automatic target captured by the native command bridge. */
+    public void executeWithTarget(NPC implicitTarget, String rootCommand, String[] args, CommandSourceStack sender,
+            Object... methodArgs) throws CommandException {
+        int first = 0;
+        while (first < args.length && args[first].isEmpty()) first++;
+        String[] newArgs = new String[args.length - first + 1];
+        System.arraycopy(args, first, newArgs, 1, args.length - first);
         newArgs[0] = rootCommand.toLowerCase(Locale.ROOT);
 
         Object[] newMethodArgs = new Object[methodArgs.length + 1];
         System.arraycopy(methodArgs, 0, newMethodArgs, 1, methodArgs.length);
-        executeCommand(newArgs, sender, newMethodArgs);
+        executeCommand(newArgs, sender, newMethodArgs, implicitTarget);
     }
 
-    private void executeCommand(String[] args, CommandSourceStack sender, Object[] methodArgs) throws CommandException {
+    private void executeCommand(String[] args, CommandSourceStack sender, Object[] methodArgs, NPC implicitTarget) throws CommandException {
         String cmdName = args[0].toLowerCase(Locale.ROOT);
         String modifier = args.length > 1 ? args[1] : "";
         boolean help = modifier.equalsIgnoreCase("help");
@@ -147,6 +155,7 @@ public class CommandManager {
             }
         }
         CommandContext context = new CommandContext(sender, args);
+        context.implicitTarget = implicitTarget;
 
         if (cmd.requiresFlags() && !context.hasAnyFlags())
             throw new CommandUsageException("", getUsage(args, cmd));

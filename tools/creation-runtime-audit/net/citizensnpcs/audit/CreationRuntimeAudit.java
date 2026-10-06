@@ -95,7 +95,7 @@ public final class CreationRuntimeAudit {
                 grant("citizens.npc.create", "citizens.npc.spawn", "citizens.npc.undo");
                 types = grant("citizens.npc.create.*"); limits = grant("citizens.admin.avoid-limits");
                 admin = grant("citizens.npc.admin");
-                basic(); items(); lifetimes(); vetoAndHistory(); templatesAndPermissions();
+                basic(); items(); lifetimes(); vetoAndHistory(); templatesAndPermissions(); commandRegistryTargets();
             }
             List<Runnable> due = checks.remove(server.getTickCount() - start);
             if (due != null) due.forEach(Runnable::run);
@@ -522,6 +522,33 @@ public final class CreationRuntimeAudit {
     }
 
     private static NPC create(String options) throws Exception { run("create C" + serial++ + " " + options); NPC npc = selected(); check(npc != null && exists(npc), "created_and_selected"); return npc; }
+    private static void commandRegistryTargets() {
+        NPC original = registry.createNPC(EntityType.COW, "DefaultCommandTarget");
+        String name = "command_targets_" + UUID.randomUUID();
+        NPCRegistry named = CitizensAPI.createInMemoryNPCRegistry(name);
+        registries.add(name);
+        NPCRegistry anonymous = CitizensAPI.createAnonymousNPCRegistry(new net.citizensnpcs.api.npc.MemoryNPCDataStore());
+        for (NPCRegistry other : List.of(named, anonymous, temporary)) {
+            NPC target = other.createNPC(EntityType.COW, original.getUniqueId(), original.getId(), "OtherCommandTarget");
+            new net.citizensnpcs.api.npc.templates.CommandListExecutor(List.of("npc   rename ExactTarget")).accept(target);
+            check(target.getName().equals("ExactTarget") && original.getName().equals("DefaultCommandTarget"),
+                    "implicit_template_target_keeps_registry_identity_" + other.getName());
+            net.citizensnpcs.util.Util.scheduleCommand(target, null, "npc rename ScheduledTarget", true, false);
+            atTick(3, () -> check(target.getName().equals("ScheduledTarget") && original.getName().equals("DefaultCommandTarget"),
+                    "scheduled_target_keeps_registry_identity_" + other.getName()));
+        }
+        NPC retired = named.createNPC(EntityType.COW, "RetiredCommandTarget");
+        int id = retired.getId(); UUID uuid = retired.getUniqueId();
+        net.citizensnpcs.util.Util.scheduleCommand(retired, null, "npc rename WrongReplacement", true, false);
+        retired.destroy();
+        NPC replacement = named.createNPC(EntityType.COW, uuid, id, "ReplacementCommandTarget");
+        atTick(3, () -> check(replacement.getName().equals("ReplacementCommandTarget"), "scheduled_target_rejects_replacement"));
+        NPC namedTarget = named.getById(original.getId());
+        new net.citizensnpcs.api.npc.templates.CommandListExecutor(List.of("npc rename ExplicitDefault --id " + original.getId())).accept(namedTarget);
+        check(original.getName().equals("ExplicitDefault") && namedTarget.getName().equals("ExactTarget"), "explicit_id_keeps_default_registry_lookup");
+        original.setName("DefaultCommandTarget");
+    }
+
     private static NPC selected() { return CitizensAPI.getDefaultNPCSelector().getSelected(source); }
     private static void run(String command) throws Exception { check(server.getCommands().getDispatcher().execute("npc " + command, source) == 1, "dispatch_" + command); alice.pump(); }
     private static void reject(String command) throws Exception {

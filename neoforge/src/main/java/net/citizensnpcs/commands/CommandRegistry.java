@@ -50,22 +50,23 @@ public class CommandRegistry {
     public void register(CommandDispatcher<CommandSourceStack> dispatcher) {
         for (String root : commands.getRootCommands()) {
             LiteralArgumentBuilder<CommandSourceStack> node = Commands.literal(root)
-                    .executes(ctx -> run(ctx.getSource(), root, new String[] { "help" }));
+                    .executes(ctx -> run(ctx.getSource(), root, new String[] { "help" }, ctx.getInput()));
             node.then(Commands.argument("args", StringArgumentType.greedyString())
                     .suggests((ctx, builder) -> suggest(ctx, builder, root))
                     .executes(ctx -> run(ctx.getSource(), root,
-                            splitArgs(StringArgumentType.getString(ctx, "args")))));
+                            splitArgs(StringArgumentType.getString(ctx, "args")), ctx.getInput())));
             dispatcher.register(node);
         }
     }
 
-    private int run(CommandSourceStack source, String root, String[] args) throws CommandSyntaxException {
+    private int run(CommandSourceStack source, String root, String[] args, String input) throws CommandSyntaxException {
+        NPC implicitTarget = net.citizensnpcs.api.command.NPCCommandTarget.consume(input);
         NPC selected = CitizensAPI.getDefaultNPCSelector().getSelected(source);
         // command methods are (CommandContext, sender, NPC); the manager fills the context slot itself, so the sender
         // and the selected NPC are what it needs from here
         try {
             // executeSafe reports whether an invocation was handled, even when it failed. Brigadier needs the outcome.
-            commands.execute(root, args, source, source, selected);
+            commands.executeWithTarget(implicitTarget, root, args, source, source, selected);
             return 1;
         } catch (CommandException failure) {
             String message = failure.getMessage();

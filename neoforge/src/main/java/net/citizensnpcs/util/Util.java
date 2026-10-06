@@ -208,7 +208,8 @@ public class Util {
     /** Queue the same command dispatch, returning its cancellation handle (or null without a server). */
     public static net.citizensnpcs.api.util.schedulers.SchedulerTask scheduleCommand(NPC npc, ServerPlayer clicker,
             String command, boolean op, boolean asPlayer) {
-        String cmd = net.citizensnpcs.api.util.NPCCommandFormat.prepare(command);
+        var invocation = net.citizensnpcs.api.util.NPCCommandFormat.prepareInvocation(command);
+        String cmd = invocation.command();
         MinecraftServer server = clicker != null ? clicker.getServer() : ServerLifecycleHooks.getCurrentServer();
         if (server == null)
             return null;
@@ -224,7 +225,8 @@ public class Util {
         CommandSourceStack source = op ? base.withPermission(4) : base;
         return CitizensAPI.getScheduler().runTask(() -> {
             try {
-                server.getCommands().performPrefixedCommand(source, interpolated);
+                net.citizensnpcs.api.command.NPCCommandTarget.dispatch(invocation.implicitTarget() ? npc : null,
+                        interpolated, () -> server.getCommands().performPrefixedCommand(source, interpolated));
             } catch (Throwable t) {
                 t.printStackTrace();
             }

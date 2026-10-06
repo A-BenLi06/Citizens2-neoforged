@@ -49,6 +49,7 @@ import net.minecraft.world.phys.Vec3;
  */
 public class CommandContext {
     protected String[] args;
+    net.citizensnpcs.api.npc.NPC implicitTarget;
     protected final Set<Character> flags = new HashSet<>();
     private Location location = null;
     private Location targetLocation;

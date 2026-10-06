@@ -1,6 +1,6 @@
 # Native NPC creation runtime audit
 
-The fixture currently has 334 checks. Template coverage includes sibling definitions,
+The fixture currently has 342 checks. Template coverage includes sibling definitions,
 overwrite index consistency, and applying the updated trait value through creation.
 Behavior short-form coverage includes missing arguments/files, malformed YAML and a
 valid filename containing spaces, with target preservation on file-input failures.
@@ -26,6 +26,9 @@ Generated-template disk round trips also preserve native behavior blackboard lis
 including null slots and explicitly empty lists.
 Template command dispatch also verifies explicit selection by numeric ID, positional
 name, named flag and UUID through the native command dispatcher.
+Implicit template/scheduled targets are checked across named, anonymous and temporary
+registries with colliding IDs and UUIDs, including extra command whitespace, explicit
+default-registry targeting and replacement of a target before the scheduled tick.
 
 Run from the repository root with PowerShell 7 and JDK 21:
 

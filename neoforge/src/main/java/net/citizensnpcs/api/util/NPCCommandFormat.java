@@ -7,7 +7,14 @@ public final class NPCCommandFormat {
     private NPCCommandFormat() { }
 
     public static String prepare(String command) {
+        return prepareInvocation(command).command();
+    }
+
+    public record Prepared(String command, boolean implicitTarget) { }
+
+    public static Prepared prepareInvocation(String command) {
         String result = command.strip();
+        boolean implicitTarget = false;
         if (result.startsWith("/")) result = result.substring(1);
         String verb = result.split("\\s+", 2)[0];
         if (verb.equals("say")) {
@@ -23,9 +30,11 @@ public final class NPCCommandFormat {
                     && (context.getString(0, "").equalsIgnoreCase("select")
                             || context.getString(0, "").equalsIgnoreCase("sel"))
                     && (context.argsLength() > 1 || context.hasValueFlag("name"));
-            if (!context.hasValueFlag("id") && !context.hasValueFlag("uuid") && !explicitSelection)
+            if (!context.hasValueFlag("id") && !context.hasValueFlag("uuid") && !explicitSelection) {
                 result += " --id <id>";
+                implicitTarget = !context.hasValueFlag("registry");
+            }
         }
-        return result;
+        return new Prepared(result, implicitTarget);
     }
 }

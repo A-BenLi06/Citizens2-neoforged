@@ -47,6 +47,15 @@ class NPCCommandFormatTest {
                 NPCCommandFormat.prepare("npc speak \"literal --uuid value\""));
     }
 
+    @Test void onlyAutomaticUnqualifiedTargetsCarryAnInstanceBinding() {
+        assertTrue(NPCCommandFormat.prepareInvocation("npc rename test").implicitTarget());
+        assertTrue(NPCCommandFormat.prepareInvocation("say hello").implicitTarget());
+        for (String command : new String[] { "npc rename test --id 7", "npc rename test --uuid <uuid>",
+                "npc rename test --registry other", "npc select Named", "minecraft:say hello" }) {
+            assertFalse(NPCCommandFormat.prepareInvocation(command).implicitTarget(), command);
+        }
+    }
+
     @Test void selectionKeepsItsExplicitPositionalAndNamedTargets() {
         for (String modifier : new String[] { "select", "sel" }) {
             for (String target : new String[] { "17", "\"Two Words\"", "--name \"Two Words\"" }) {
