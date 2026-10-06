@@ -518,6 +518,30 @@ public final class CreationRuntimeAudit {
                 if (!unrelated.spawn(new Location(level, 16, -58, 16))) throw new AssertionError("Event isolation setup failed");
                 check(eventCommands.get() == 2, "template_spawn_command_ignores_unapplied_npc");
             } finally { unrelated.destroy(); }
+            NPC shared = registry.createNPC(EntityType.COW, "SharedTemplateEvent");
+            try {
+                if (!shared.spawn(new Location(level, 18, -58, 16))) throw new AssertionError("Shared template setup failed");
+                eventTemplate.apply(shared);
+                var replacementCommands = new java.util.concurrent.atomic.AtomicInteger();
+                server.getCommands().getDispatcher().register(net.minecraft.commands.Commands.literal("creation_template_replacement")
+                        .executes(ctx -> { replacementCommands.incrementAndGet(); return 1; }));
+                Path eventFolder = workspace.resolve("event-reload");
+                Files.createDirectories(eventFolder.resolve("creation_audit"));
+                Path eventFile = eventFolder.resolve("creation_audit/events.yml");
+                Files.writeString(eventFile, "event:\n  commands:\n    on_spawn:\n      - creation_template_replacement\n");
+                var reloadedEvents = net.citizensnpcs.api.npc.templates.TemplateRegistry.prepareReload(eventFolder);
+                reloadedEvents.getTemplateByKey(eventTemplate.getKey()).apply(restoreTarget);
+                check(eventCommands.get() == 3 && replacementCommands.get() == 1,
+                        "reloaded_template_reapplication_replaces_old_spawn_commands");
+                eventTemplate.apply(shared);
+                check(eventCommands.get() == 4 && replacementCommands.get() == 1,
+                        "reapplication_preserves_other_npc_template_commands");
+                Files.writeString(eventFile, "event: {}\n");
+                net.citizensnpcs.api.npc.templates.TemplateRegistry.prepareReload(eventFolder)
+                        .getTemplateByKey(eventTemplate.getKey()).apply(restoreTarget);
+                check(eventCommands.get() == 4 && replacementCommands.get() == 1,
+                        "reapplication_removes_deleted_event_commands");
+            } finally { shared.destroy(); }
         } finally { restoreTarget.destroy(); }
     }
 

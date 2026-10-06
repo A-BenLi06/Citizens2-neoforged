@@ -24,6 +24,7 @@ import net.neoforged.neoforge.common.NeoForge;
  */
 public class CommandEventAction implements Consumer<NPC>, AutoCloseable {
     private static final Set<CommandEventAction> LIVE = new java.util.LinkedHashSet<>();
+    private static final java.util.Map<NPCRegistry, RegistryTransfer> TRANSFERS = new java.util.IdentityHashMap<>();
     private static volatile boolean accepting = true;
     private final java.util.Map<NPCRegistry, Set<UUID>> targets = new com.google.common.collect.MapMaker()
             .weakKeys().makeMap();
@@ -31,6 +32,7 @@ public class CommandEventAction implements Consumer<NPC>, AutoCloseable {
     private final Runnable unregister;
     private boolean registered;
     private boolean closed;
+    private net.minecraft.resources.ResourceLocation templateKey;
 
     public <T extends NPCEvent> CommandEventAction(Class<T> clazz, Consumer<NPC> commands) {
         this(clazz, commands, (type, listener) -> NeoForge.EVENT_BUS.addListener(type, listener),
@@ -78,6 +80,64 @@ public class CommandEventAction implements Consumer<NPC>, AutoCloseable {
         return !closed && uuids != null && uuids.contains(npc.getUniqueId());
     }
 
+    synchronized void bindTemplate(net.minecraft.resources.ResourceLocation key) {
+        if (templateKey != null && !templateKey.equals(key))
+            throw new IllegalArgumentException("Event action already belongs to another template");
+        templateKey = key;
+    }
+
+    /** Publish event bindings only after the template's other actions have succeeded. */
+    static void replaceSubscriptions(net.minecraft.resources.ResourceLocation key, NPC npc,
+            java.util.List<CommandEventAction> replacements) {
+        var previous = new java.util.ArrayList<CommandEventAction>();
+        for (CommandEventAction action : liveActions()) {
+            if (key.equals(action.templateKey) && action.accepts(npc)) previous.add(action);
+        }
+        var added = new java.util.ArrayList<CommandEventAction>();
+        try {
+            for (CommandEventAction action : replacements) {
+                boolean alreadyApplied = action.accepts(npc);
+                action.accept(npc);
+                if (!alreadyApplied) added.add(action);
+            }
+        } catch (RuntimeException | Error failure) {
+            for (CommandEventAction action : added) {
+                try { action.removeTarget(npc); }
+                catch (RuntimeException | Error cleanup) { if (cleanup != failure) failure.addSuppressed(cleanup); }
+            }
+            throw failure;
+        }
+        synchronized (LIVE) {
+            RegistryTransfer transfer = TRANSFERS.get(npc.getOwningRegistry());
+            if (transfer != null) transfer.reapplied.add(new TemplateTarget(key, npc.getUniqueId()));
+        }
+        Throwable failure = null;
+        for (CommandEventAction action : previous) {
+            if (replacements.contains(action)) continue;
+            try { action.removeTarget(npc); }
+            catch (RuntimeException | Error cleanup) {
+                if (failure == null) failure = cleanup;
+                else if (failure != cleanup) failure.addSuppressed(cleanup);
+            }
+        }
+        if (failure instanceof RuntimeException ex) throw ex;
+        if (failure instanceof Error ex) throw ex;
+    }
+
+    private synchronized void removeTarget(NPC npc) {
+        NPCRegistry registry = npc.getOwningRegistry();
+        Set<UUID> uuids = targets.get(registry);
+        if (uuids != null) {
+            uuids.remove(npc.getUniqueId());
+            if (uuids.isEmpty()) targets.remove(registry);
+        }
+        if (targets.isEmpty() && registered) {
+            unregister.run();
+            registered = false;
+            synchronized (LIVE) { LIVE.remove(this); }
+        }
+    }
+
     @Override
     public synchronized void close() {
         closed = true;
@@ -118,13 +178,24 @@ public class CommandEventAction implements Consumer<NPC>, AutoCloseable {
     public static RegistryTransfer prepareRegistryTransfer(NPCRegistry previous, NPCRegistry candidate) {
         if (previous == candidate) throw new IllegalArgumentException("Registry candidate must be distinct");
         var transfer = new RegistryTransfer(previous, candidate);
-        transfer.copy();
+        synchronized (LIVE) {
+            if (TRANSFERS.containsKey(candidate)) throw new IllegalStateException("Registry already has a subscription transfer");
+            TRANSFERS.put(candidate, transfer);
+        }
+        try { transfer.copy(); }
+        catch (RuntimeException | Error failure) {
+            transfer.close();
+            throw failure;
+        }
         return transfer;
     }
+
+    private record TemplateTarget(net.minecraft.resources.ResourceLocation key, UUID uuid) { }
 
     public static final class RegistryTransfer implements AutoCloseable {
         private final NPCRegistry previous, candidate;
         private boolean finished;
+        private final Set<TemplateTarget> reapplied = java.util.concurrent.ConcurrentHashMap.newKeySet();
 
         private RegistryTransfer(NPCRegistry previous, NPCRegistry candidate) {
             this.previous = java.util.Objects.requireNonNull(previous);
@@ -135,8 +206,12 @@ public class CommandEventAction implements Consumer<NPC>, AutoCloseable {
             for (CommandEventAction action : liveActions()) {
                 synchronized (action) {
                     Set<UUID> old = action.targets.get(previous);
-                    if (!action.closed && old != null)
-                        action.targets.computeIfAbsent(candidate, unused -> new HashSet<>()).addAll(old);
+                    if (!action.closed && old != null) {
+                        for (UUID uuid : old) {
+                            if (action.templateKey == null || !reapplied.contains(new TemplateTarget(action.templateKey, uuid)))
+                                action.targets.computeIfAbsent(candidate, unused -> new HashSet<>()).add(uuid);
+                        }
+                    }
                 }
             }
         }
@@ -146,12 +221,14 @@ public class CommandEventAction implements Consumer<NPC>, AutoCloseable {
             copy();
             remove(previous);
             finished = true;
+            synchronized (LIVE) { TRANSFERS.remove(candidate, this); }
         }
 
         @Override public void close() {
             if (!finished) {
                 remove(candidate);
                 finished = true;
+                synchronized (LIVE) { TRANSFERS.remove(candidate, this); }
             }
         }
 

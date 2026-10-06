@@ -16,9 +16,11 @@ Recent follow-ups cover [`powered`, `name` and `home` options](command-options-h
 
 ## Behavior, data and integration acceptance
 
-- [Registry-scoped template events](template-event-registry-2026-10-06.md) isolate identical UUIDs across registries and transfer subscriptions through reload/default-store replacement with preparation rollback. Template definition replacement and persistent application records remain separate work.
+- [Template event reapplication](template-event-reapplication-2026-10-06.md) replaces the same template's old event bindings on the reapplied NPC, preserves other subscriptions and rolls back failed registration. Candidate registry publication respects explicit reapplication. File reload alone does not reapply templates or persist application records across restart.
 
-- [Template event shutdown](template-event-shutdown-2026-10-06.md) unregisters active and superseded template consumers, rejects subscriptions during shutdown and keeps old action objects closed across lifetimes. Reload subscription migration remains separate work.
+- [Registry-scoped template events](template-event-registry-2026-10-06.md) isolate identical UUIDs across registries and transfer subscriptions through reload/default-store replacement with preparation rollback. Definition reapplication is covered by the follow-up above; persistent application records remain separate work.
+
+- [Template event shutdown](template-event-shutdown-2026-10-06.md) unregisters active and superseded template consumers, rejects subscriptions during shutdown and keeps old action objects closed across lifetimes. Registry migration and explicit reapplication are covered by the follow-ups above.
 
 - [Shared NPC command formatting](npc-command-format-2026-10-06.md) preserves quoted speech and explicit target flags while correctly handling leading-slash commands. Template commands capture their input list. Format and native targeting tests cover these paths; command side effects/failure policy remain separate concerns.
 

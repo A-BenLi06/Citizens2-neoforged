@@ -36,10 +36,11 @@ public class Template {
 
     Template(ResourceLocation key, List<Consumer<NPC>> actions) {
         this.key = key;
-        this.actions.addAll(actions);
+        actions.forEach(this::addAction);
     }
 
     private void addAction(Consumer<NPC> action) {
+        if (action instanceof CommandEventAction event) event.bindTemplate(key);
         actions.add(action);
     }
 
@@ -52,10 +53,13 @@ public class Template {
         try {
             if (respawn && !npc.despawn(DespawnReason.PENDING_RESPAWN))
                 throw new IllegalStateException("NPC despawn was rejected while applying template " + key);
+            List<CommandEventAction> eventActions = new ArrayList<>();
             for (Consumer<NPC> action : actions) {
                 if (!owns(registry, npc)) return;
-                action.accept(npc);
+                if (action instanceof CommandEventAction event) eventActions.add(event);
+                else action.accept(npc);
             }
+            if (owns(registry, npc)) CommandEventAction.replaceSubscriptions(key, npc, eventActions);
         } catch (RuntimeException | Error ex) {
             failure = ex;
             throw ex;
