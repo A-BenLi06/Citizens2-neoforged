@@ -5,9 +5,6 @@ import java.time.temporal.ChronoUnit;
 import java.util.concurrent.TimeUnit;
 import java.util.regex.Pattern;
 
-import com.google.common.primitives.Ints;
-import com.google.common.primitives.Longs;
-
 /**
  * Parses the duration strings Citizens accepts in its config and commands — {@code "3s"}, {@code "10m"}, {@code "1d"},
  * {@code "40t"}, or a bare tick count.
@@ -26,20 +23,19 @@ public class Durations {
      *            unit to read a bare number as; null means ticks
      */
     public static Duration parse(String raw, TimeUnit defaultUnits) {
-        if (defaultUnits == null) {
-            Integer ticks = Ints.tryParse(raw);
-            if (ticks != null)
-                return Duration.ofMillis(ticks * 50L);
-        } else if (NUMBER_MATCHER.matcher(raw).matches()) {
-            return Duration.of(Longs.tryParse(raw), toChronoUnit(defaultUnits));
+        if (raw == null || raw.isBlank()) throw new IllegalArgumentException("Duration must not be blank");
+        raw = raw.trim();
+        if (NUMBER_MATCHER.matcher(raw).matches()) {
+            return defaultUnits == null ? Duration.ofMillis(Integer.parseInt(raw) * 50L)
+                    : Duration.of(Long.parseLong(raw), toChronoUnit(defaultUnits));
         }
+        raw = raw.replace("min", "m").replace("hr", "h");
+        int prefix = raw.charAt(0) == '+' || raw.charAt(0) == '-' ? 1 : 0;
+        if (prefix < raw.length() && (raw.charAt(prefix) == 'P' || raw.charAt(prefix) == 'p'))
+            return Duration.parse(raw);
         if (raw.endsWith("t"))
             return Duration.ofMillis(Integer.parseInt(raw.substring(0, raw.length() - 1)) * 50L);
-        raw = DAY_MATCHER.matcher(raw).replaceFirst("P$1").replace("min", "m").replace("hr", "h");
-        if (raw.charAt(0) != 'P') {
-            raw = "PT" + raw;
-        }
-        return Duration.parse(raw);
+        return Duration.parse((DAY_MATCHER.matcher(raw).find() ? "P" : "PT") + raw);
     }
 
     public static Duration parse(String raw) {
@@ -75,6 +71,6 @@ public class Durations {
         }
     }
 
-    private static final Pattern DAY_MATCHER = Pattern.compile("(\\d+d)");
-    private static final Pattern NUMBER_MATCHER = Pattern.compile("(\\d+)");
+    private static final Pattern DAY_MATCHER = Pattern.compile("^[+-]?\\d+d", Pattern.CASE_INSENSITIVE);
+    private static final Pattern NUMBER_MATCHER = Pattern.compile("[+-]?\\d+");
 }
