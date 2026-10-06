@@ -12,6 +12,31 @@ import net.citizensnpcs.api.util.YamlStorage;
 import net.minecraft.resources.ResourceLocation;
 
 class TemplateGenerationTest {
+    public static final class BrokenSerialization {
+        int calls;
+        public String getValue() { calls++; throw new IllegalStateException("injected serialization failure"); }
+        public void setValue(String unused) { }
+    }
+
+    @Test void failedFileSerializationPreservesIndexesAndAllowsRetry(@TempDir Path folder) throws Exception {
+        var registry = TemplateRegistry.prepareReload(folder);
+        var key = ResourceLocation.fromNamespaceAndPath("audit", "saved");
+        registry.generateTemplateFromNPC(key, snapshot(root -> root.setString("name", "Old")));
+        Template previous = registry.getTemplateByKey(key);
+        Path file = folder.resolve("audit/templates.yml");
+        byte[] before = Files.readAllBytes(file);
+        var broken = new BrokenSerialization();
+        assertThrows(RuntimeException.class, () -> registry.generateTemplateFromNPC(key, snapshot(root -> root.setRaw("broken", broken))));
+        assertTrue(broken.calls > 0, "Failure must reach the YAML writer");
+        assertArrayEquals(before, Files.readAllBytes(file));
+        assertSame(previous, registry.getTemplateByKey(key));
+        assertEquals(java.util.List.of(previous), java.util.List.copyOf(registry.getTemplates("saved")));
+        registry.generateTemplateFromNPC(key, snapshot(root -> root.setString("name", "Recovered")));
+        assertNotSame(previous, registry.getTemplateByKey(key));
+        var saved = new YamlStorage(file.toFile()); assertTrue(saved.load());
+        assertEquals("Recovered", saved.getKey("").getString("saved.yaml_replace.replacements.name"));
+    }
+
     @Test void emptyNameGenerationFailsBeforeSnapshotOrDirectoryCreation(@TempDir Path folder) {
         var registry = TemplateRegistry.prepareReload(folder);
         var empty = ResourceLocation.fromNamespaceAndPath("audit", "");

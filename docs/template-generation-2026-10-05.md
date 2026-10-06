@@ -53,3 +53,8 @@ YAML replacement actions now deep-copy their captured replacement tree for each
 application before passing values into NPC loading. Mutable list changes by a loader,
 including a loader that subsequently throws, cannot contaminate later applications.
 Two tests verify per-application isolation and retained source independence.
+
+A writer-failure test now injects a JavaBean that throws during actual YAML
+serialization. It verifies that generation preserves the prior file bytes and both
+indexes, then succeeds on a repaired retry. An invocation counter proves the failure
+reaches the writer rather than failing earlier during snapshot/validation.

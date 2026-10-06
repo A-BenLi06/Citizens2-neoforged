@@ -1829,3 +1829,9 @@ Two reverse-creation-order file tests verify duplicate-file and namespace diagno
 Expanded native reload cases from malformed YAML to scalar template entries after a valid prefix and unknown command events. Each failure now asserts preservation of old templates, registry/entity, runtime setting values, editor/prompt sessions and skin-cache identity. Existing repair/success publication checks remain in the fixture.
 
 Both NeoForge 21.1.233 and 21.1.248 pass 49 reload checks. Clean ordinary test/build passes with 519 tests; Interactions audit tests pass with 100; no failures/errors/skips. Release archives preserve independent mod classes and exclude probes. All invoked handles completed; no unrelated server or original data was changed. Updated template reload documentation and fixture README. No new production change was required. The full Citizens goal remains active.
+
+## 2026-10-06 13:26:03 +08:00 — Verify template generation recovery after actual writer failure
+
+Added a template-generation test that reaches the YAML serializer and throws from a bean property. It verifies prior file bytes and both lookup indexes remain intact, then checks a corrected retry writes and publishes the replacement. Existing production ordering passes without modification.
+
+All 520 ordinary tests and the normal build pass without failures/errors/skips; git diff --check passes. No fresh native/client run is claimed. Production Interactions sources and packaging are unchanged; no unrelated server or original data was changed. Updated docs/template-generation-2026-10-05.md. The full Citizens goal remains active.
