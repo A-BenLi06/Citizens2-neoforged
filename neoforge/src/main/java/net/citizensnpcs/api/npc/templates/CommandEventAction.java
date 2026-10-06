@@ -4,6 +4,7 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
 import java.util.function.Consumer;
+import java.util.function.BiConsumer;
 
 import net.citizensnpcs.api.event.NPCEvent;
 import net.citizensnpcs.api.npc.NPC;
@@ -22,9 +23,16 @@ import net.neoforged.neoforge.common.NeoForge;
  */
 public class CommandEventAction implements Consumer<NPC> {
     private final Set<UUID> uuids = new HashSet<>();
+    private final Runnable register;
+    private boolean registered;
 
     public <T extends NPCEvent> CommandEventAction(Class<T> clazz, Consumer<NPC> commands) {
-        NeoForge.EVENT_BUS.addListener(clazz, event -> {
+        this(clazz, commands, (type, listener) -> NeoForge.EVENT_BUS.addListener(type, listener));
+    }
+
+    <T extends NPCEvent> CommandEventAction(Class<T> clazz, Consumer<NPC> commands,
+            BiConsumer<Class<T>, Consumer<T>> registrar) {
+        register = () -> registrar.accept(clazz, event -> {
             // exact class only, so a subclass event does not trigger its parent's template commands as well
             if (event.getClass() != clazz)
                 return;
@@ -36,7 +44,12 @@ public class CommandEventAction implements Consumer<NPC> {
     }
 
     @Override
-    public void accept(NPC npc) {
-        uuids.add(npc.getUniqueId());
+    public synchronized void accept(NPC npc) {
+        UUID uuid = npc.getUniqueId();
+        if (!registered) {
+            register.run();
+            registered = true;
+        }
+        uuids.add(uuid);
     }
 }

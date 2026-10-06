@@ -32,3 +32,10 @@ each parser invocation. Short-form command contexts are validated during prepara
 and rebuilt from copied arguments for every application, using the current server
 source. Tests verify source edits/parser writes cannot change later structured
 applications and mutable command flags are not shared between applications.
+
+CommandEventAction delays event-bus registration until its first NPC application.
+Loading or discarding an unused template no longer installs its command listener.
+Registration occurs once per action and failed registration may be retried. Existing
+UUID membership and exact event-class filtering remain unchanged; already-applied
+listener lifetime is not redesigned by this change. Two injected-registrar tests
+verify registration timing, repeat application, filtering and retry.

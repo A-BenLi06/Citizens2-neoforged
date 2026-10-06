@@ -1703,3 +1703,9 @@ Template commands and scheduled commands now use NPCCommandFormat for exact say 
 Four format tests cover speech escaping, exact names, quoted flag text and prefixed aliases. Native regression verifies an externally cleared source list still executes its captured command against the intended NPC instead of console selection. Both NeoForge 21.1.233 and 21.1.248 pass 86 removal checks. Clean ordinary test/build passes with 480 tests; Interactions audit tests pass with 100; no failures/errors/skips. Release archives remain separate and exclude probes. All invoked handles completed; no unrelated server or original data was changed.
 
 Details: docs/npc-command-format-2026-10-06.md. Execution failure policy and arbitrary command side effects remain separate work. The full Citizens goal remains active.
+
+## 2026-10-06 08:00:24 +08:00 — Register template command listeners only when first applied
+
+CommandEventAction now retains a registration operation during construction and installs its listener on first NPC application. Unused or rejected template candidates no longer register listeners merely by loading. Repeat applications share the one listener; registration failure leaves the action retryable. UUID and exact-event filtering are retained.
+
+Two injected-registrar tests cover construction/application timing, repeated membership, exact-class/unrelated-NPC filtering and registration retry. All 482 ordinary tests and the normal build pass without failures/errors/skips; git diff --check passes. No fresh native/client run is claimed, and applied-listener lifetime is not redesigned here. Production Interactions sources and packaging are unchanged; no unrelated server or original data was changed. Updated docs/reload-templates-2026-10-05.md. The full Citizens goal remains active.
