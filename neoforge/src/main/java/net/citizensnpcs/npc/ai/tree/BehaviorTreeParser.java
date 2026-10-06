@@ -351,6 +351,7 @@ public class BehaviorTreeParser {
         boolean inQuotes = false;
         char quoteChar = 0;
         boolean escaped = false;
+        boolean tokenStarted = false;
 
         for (int i = 0; i < input.length(); i++) {
             char c = input.charAt(i);
@@ -361,10 +362,12 @@ public class BehaviorTreeParser {
                 continue;
             }
             if (c == '\\') {
+                tokenStarted = true;
                 escaped = true;
                 continue;
             }
             if (!inQuotes && (c == '"' || c == '\'' || c == '`')) {
+                tokenStarted = true;
                 inQuotes = true;
                 quoteChar = c;
                 if (c == '`') {
@@ -381,22 +384,27 @@ public class BehaviorTreeParser {
                 continue;
             }
             if (!inQuotes && Character.isWhitespace(c)) {
-                if (current.length() > 0) {
+                if (tokenStarted) {
                     args.add(current.toString());
                     current = new StringBuilder();
+                    tokenStarted = false;
                 }
                 continue;
             }
             current.append(c);
+            tokenStarted = true;
         }
-        if (current.length() > 0) {
+        if (strict && (inQuotes || escaped))
+            throw new IllegalArgumentException("Unterminated quote or escape in behavior arguments: " + input);
+        if (escaped) current.append('\\');
+        if (tokenStarted) {
             args.add(current.toString());
         }
         return args.toArray(new String[0]);
     }
 
     private Behavior parseLeaf(String name, DataKey params, BehaviorRegistry.BehaviorContext context) {
-        if (name == null || name.isEmpty())
+        if (name == null || name.isBlank())
             return EMPTY;
 
         if (name.startsWith("/"))

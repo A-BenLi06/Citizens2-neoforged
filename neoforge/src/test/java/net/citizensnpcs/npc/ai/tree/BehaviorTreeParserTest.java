@@ -22,6 +22,35 @@ import net.citizensnpcs.api.util.MemoryDataKey;
  * parser, the registry and the Molang expressions in between actually drive a tree, rather than only compiling.
  */
 public class BehaviorTreeParserTest {
+    @Test public void quotedEmptyArgumentsRemainExplicitValues() {
+        Memory memory = new Memory(); memory.set("empty", "old"); memory.set("single", "old");
+        finish(parse(map("sequence", map("0", "set empty \"\"", "1", "set single ''",
+                "2", "set text \"A \\\"quoted\\\" value\"")), memory));
+        assertEquals("", memory.getString("empty"));
+        assertEquals("", memory.getString("single"));
+        assertEquals("A \"quoted\" value", memory.getString("text"));
+    }
+
+    @Test public void strictArgumentsRejectUnfinishedSyntaxBeforeFactoryInvocation() {
+        var calls = new java.util.concurrent.atomic.AtomicInteger();
+        var registry = new CitizensBehaviorRegistry(new ExpressionRegistry());
+        registry.registerBehavior("capture", (params, context) -> {
+            calls.incrementAndGet(); return (net.citizensnpcs.api.ai.tree.InstantBehavior) () -> BehaviorStatus.SUCCESS;
+        });
+        var parser = new BehaviorTreeParser(registry);
+        for (String input : java.util.List.of("capture \"unfinished", "capture 'unfinished", "capture `unfinished", "capture tail\\")) {
+            DataKey root = new MemoryDataKey(); root.setString("step", input);
+            org.junit.jupiter.api.Assertions.assertThrows(IllegalArgumentException.class,
+                    () -> parser.parseStrict(root.getRelative("step"), null, new ExpressionScope(), new Memory()));
+        }
+        assertEquals(0, calls.get());
+    }
+
+    @Test public void compatibilityArgumentsPreserveATrailingBackslash() {
+        Memory memory = new Memory();
+        finish(parse(map("sequence", map("0", "set path tail\\")), memory));
+        assertEquals("tail\\", memory.getString("path"));
+    }
     @Test public void strictParsingRejectsOrphanElseInRootAndContainerForms() {
         var parser = new BehaviorTreeParser(new CitizensBehaviorRegistry(new ExpressionRegistry()));
         for (Map<String, Object> definition : java.util.List.of(
