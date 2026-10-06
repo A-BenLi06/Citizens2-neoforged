@@ -22,32 +22,46 @@ public class TeleportTriggerPrompt implements WaypointTriggerPrompt {
             session.setSessionData(CREATED_TRIGGER_KEY, new TeleportTrigger(Location.of(player)));
             return (ChatPrompt) session.getSessionData(RETURN_PROMPT_KEY);
         }
-        String[] parts = input.split(":");
-        if (parts.length != 4) {
+        Destination destination;
+        try {
+            destination = parseDestination(input);
+        } catch (IllegalArgumentException invalid) {
             Messaging.sendErrorTr(player.createCommandSourceStack(), Messages.INVALID_TRIGGER_TELEPORT_FORMAT);
             return this;
         }
-        ServerLevel level = Util.getLevel(player.getServer(), parts[0]);
-        if (level == null) {
+        TeleportTrigger trigger = resolve(player, destination);
+        if (trigger == null) {
             Messaging.sendErrorTr(player.createCommandSourceStack(), Messages.WORLD_NOT_FOUND);
             return this;
         }
-        try {
-            Location at = new Location(level, Integer.parseInt(parts[1]), Integer.parseInt(parts[2]),
-                    Integer.parseInt(parts[3]));
-            // upstream stores a bare Location here rather than a trigger, which makes the coordinate form unusable -
-            // only its "here" branch wraps it. Wrapped in both.
-            session.setSessionData(CREATED_TRIGGER_KEY, new TeleportTrigger(at));
-        } catch (NumberFormatException ex) {
-            Messaging.sendErrorTr(player.createCommandSourceStack(), Messages.INVALID_TRIGGER_TELEPORT_FORMAT);
-            return this;
-        }
+        session.setSessionData(CREATED_TRIGGER_KEY, trigger);
         return (ChatPrompt) session.getSessionData(RETURN_PROMPT_KEY);
     }
 
     @Override
     public WaypointTrigger createFromShortInput(ChatPromptSession session, String input) {
-        return null;
+        if (input == null) return null;
+        if (input.trim().equalsIgnoreCase("here")) return new TeleportTrigger(Location.of(session.getPlayer()));
+        try { return resolve(session.getPlayer(), parseDestination(input)); }
+        catch (IllegalArgumentException invalid) { return null; }
+    }
+
+    private static TeleportTrigger resolve(ServerPlayer player, Destination destination) {
+        ServerLevel level = Util.getLevel(player.getServer(), destination.world());
+        return level == null ? null : new TeleportTrigger(new Location(level, destination.x(), destination.y(), destination.z()));
+    }
+
+    record Destination(String world, int x, int y, int z) { }
+
+    static Destination parseDestination(String input) {
+        if (input == null) throw new IllegalArgumentException("Missing teleport destination");
+        String value = input.trim();
+        int z = value.lastIndexOf(':');
+        int y = z < 0 ? -1 : value.lastIndexOf(':', z - 1);
+        int x = y < 0 ? -1 : value.lastIndexOf(':', y - 1);
+        if (x <= 0 || value.substring(0, x).isBlank()) throw new IllegalArgumentException("Expected world:x:y:z");
+        return new Destination(value.substring(0, x).trim(), Integer.parseInt(value.substring(x + 1, y).trim()),
+                Integer.parseInt(value.substring(y + 1, z).trim()), Integer.parseInt(value.substring(z + 1).trim()));
     }
 
     @Override

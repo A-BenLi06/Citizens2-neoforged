@@ -86,7 +86,7 @@ public final class RelocationRuntimeAudit {
                 spawnGrant = grant(alice.player, "citizens.npc.spawn");
                 check(!PermissionUtil.hasPermission(alice.player, "citizens.admin")
                         && !PermissionUtil.hasPermission(alice.player, "citizens.npc.tphere.multiworld"), "independent_permissions");
-                spawnCommands(); playerTeleport(); relocateCommands(); prompts(); completionOwnership(); npcCommandSources(); movetoCommands(); tptoCommands(); mountedCompletion();
+                spawnCommands(); playerTeleport(); relocateCommands(); prompts(); completionOwnership(); npcCommandSources(); teleportTriggerInput(); movetoCommands(); tptoCommands(); mountedCompletion();
             }
             if (server.getTickCount() == start + 1) mount = null;
             if (server.getTickCount() >= start + 5) {
@@ -347,6 +347,42 @@ public final class RelocationRuntimeAudit {
         automated.discard();
         reject(source, "spawn " + target.getId());
         check(!target.isSpawned(), "retired_fake_player_command_source_rejected");
+    }
+
+    private static void teleportTriggerInput() {
+        String createdKey = net.citizensnpcs.trait.waypoint.triggers.WaypointTriggerPrompt.CREATED_TRIGGER_KEY;
+        var prompt = new net.citizensnpcs.trait.waypoint.triggers.TeleportTriggerPrompt();
+        var sentinel = new net.citizensnpcs.trait.waypoint.triggers.TeleportTrigger(Location.of(alice.player));
+        var session = ChatPrompts.begin(alice.player, prompt, Map.of(createdKey, sentinel));
+        for (String invalid : List.of("minecraft:the_nether:1:2", "missing:overworld:1:2:3",
+                "overworld:NaN:2:3", "minecraft:overworld::2:3")) {
+            ChatPrompts.acceptInput(alice.player, invalid);
+            check(ChatPrompts.isActive(session) && session.getSessionData(createdKey) == sentinel,
+                    "invalid_teleport_trigger_input_preserves_session_" + invalid);
+        }
+        ChatPrompts.acceptInput(alice.player, "minecraft:the_nether:4:70:4");
+        check(!ChatPrompts.isActive(session) && session.getSessionData(createdKey) instanceof net.citizensnpcs.trait.waypoint.triggers.TeleportTrigger,
+                "namespaced_teleport_trigger_prompt_completes");
+        NPC target = npc(registry, EntityType.COW, false, alice.player, true);
+        ((net.citizensnpcs.trait.waypoint.triggers.WaypointTrigger) session.getSessionData(createdKey)).onWaypointReached(target, null);
+        at(target.getStoredLocation(), new Location(nether, 4, 70, 4), "namespaced_teleport_trigger_executes");
+        session = ChatPrompts.begin(alice.player, new net.citizensnpcs.trait.waypoint.triggers.TriggerAddPrompt());
+        ChatPrompts.acceptInput(alice.player, "teleport minecraft:overworld:6:-58:6");
+        check(!ChatPrompts.isActive(session) && session.getSessionData(createdKey) instanceof net.citizensnpcs.trait.waypoint.triggers.TeleportTrigger,
+                "inline_teleport_trigger_completes");
+        ((net.citizensnpcs.trait.waypoint.triggers.WaypointTrigger) session.getSessionData(createdKey)).onWaypointReached(target, null);
+        at(target.getStoredLocation(), new Location(level, 6, -58, 6), "inline_teleport_trigger_executes");
+        Location here = Location.of(alice.player);
+        session = ChatPrompts.begin(alice.player, new net.citizensnpcs.trait.waypoint.triggers.TriggerAddPrompt());
+        ChatPrompts.acceptInput(alice.player, "teleport here");
+        check(!ChatPrompts.isActive(session) && session.getSessionData(createdKey) instanceof net.citizensnpcs.trait.waypoint.triggers.TeleportTrigger,
+                "inline_here_trigger_completes");
+        ((net.citizensnpcs.trait.waypoint.triggers.WaypointTrigger) session.getSessionData(createdKey)).onWaypointReached(target, null);
+        at(target.getStoredLocation(), here, "inline_here_trigger_captures_player_location");
+        session = ChatPrompts.begin(alice.player, new net.citizensnpcs.trait.waypoint.triggers.TriggerAddPrompt());
+        ChatPrompts.acceptInput(alice.player, "teleport missing:overworld:1:2:3");
+        check(ChatPrompts.isActive(session) && session.getSessionData(createdKey) == null, "invalid_inline_trigger_keeps_editing");
+        ChatPrompts.abandon(session);
     }
 
     private static void movetoCommands() throws Exception {

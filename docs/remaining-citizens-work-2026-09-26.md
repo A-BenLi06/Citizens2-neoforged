@@ -16,6 +16,8 @@ Recent follow-ups cover [`powered`, `name` and `home` options](command-options-h
 
 ## Behavior, data and integration acceptance
 
+- [Teleport trigger input](teleport-trigger-input-2026-10-06.md) preserves native dimension IDs and supports the waypoint editor's inline coordinate/here forms. Parser and native chat-session execution checks cover rejected input and correct destinations; physical-client/provider acceptance remains separate.
+
 - [Validated moveto lifecycle](moveto-lifecycle-2026-10-06.md) validates before spawning, supports strict namespaced dimensions, preserves requested rotation and reports only confirmed movement. Native coverage includes invalid input, spawn/teleport cancellation and ordinary/packet NPC transport; physical-client/provider acceptance remains separate.
 
 - [Confirmed tpto completion](tpto-completion-2026-10-06.md) sends success only after NPC/native-player teleport completion, suppresses canceled-transfer feedback and preserves live source identity. Native relocation coverage includes named-registry NPCs, packet transport and player cross-world transfers; physical-client/provider acceptance remains separate.
