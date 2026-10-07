@@ -130,6 +130,10 @@ public class BehaviorRegistry {
         return duration.toMillis();
     }
 
+    private static String readParameter(DataKey params, String name, String fallback) {
+        return params != null && (params.getRaw(name) != null || params.keyExists(name)) ? params.getString(name) : fallback;
+    }
+
     /**
      * Registers a behavior factory.
      *
@@ -459,12 +463,12 @@ public class BehaviorRegistry {
                     }
                 }
             } else if (params != null) {
-                xStr = params.getString("x", null);
-                yStr = params.getString("y", null);
-                zStr = params.getString("z", null);
-                speedStr = params.getString("speed", null);
-                rangeStr = params.getString("range", null);
-                distanceMarginStr = params.getString("distance_margin", null);
+                xStr = readParameter(params, "x", null);
+                yStr = readParameter(params, "y", null);
+                zStr = readParameter(params, "z", null);
+                speedStr = readParameter(params, "speed", null);
+                rangeStr = readParameter(params, "range", null);
+                distanceMarginStr = readParameter(params, "distance_margin", null);
             }
             if (xStr == null || yStr == null || zStr == null)
                 return null;
@@ -680,10 +684,7 @@ public class BehaviorRegistry {
             if (args != null && index < args.length)
                 return args[index];
 
-            if (params != null && (params.getRaw(name) != null || params.keyExists(name)))
-                return params.getString(name);
-
-            return defaultValue;
+            return readParameter(params, name, defaultValue);
         }
 
         public void setChildParser(java.util.function.Function<DataKey, java.util.List<Behavior>> parser) {
