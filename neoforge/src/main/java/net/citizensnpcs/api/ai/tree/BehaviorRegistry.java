@@ -134,6 +134,14 @@ public class BehaviorRegistry {
         return params != null && (params.getRaw(name) != null || params.keyExists(name)) ? params.getString(name) : fallback;
     }
 
+    static BlockPos blockPosition(double x, double y, double z) {
+        for (double coordinate : new double[]{x, y, z}) {
+            double block = Math.floor(coordinate);
+            if (!Double.isFinite(block) || block < Integer.MIN_VALUE || block > Integer.MAX_VALUE) return null;
+        }
+        return BlockPos.containing(x, y, z);
+    }
+
     /**
      * Registers a behavior factory.
      *
@@ -641,6 +649,8 @@ public class BehaviorRegistry {
             String yStr = context.getFromParsedArgs(parsedArgs, "1", "y");
             String zStr = context.getFromParsedArgs(parsedArgs, "2", "z");
             String radiusStr = context.getFromParsedArgs(parsedArgs, "3", "radius");
+            if (context.getArgs() != null && context.getArgs().length > 3 && !context.getArgs()[3].contains("="))
+                radiusStr = context.getArgs()[3];
 
             if (xStr == null || yStr == null || zStr == null) {
                 return null;
@@ -671,13 +681,15 @@ public class BehaviorRegistry {
                         return BehaviorStatus.FAILURE;
 
                     if (breaker == null) {
-                        int x = (int) xHolder.evaluateAsNumber(context.getScope());
-                        int y = (int) yHolder.evaluateAsNumber(context.getScope());
-                        int z = (int) zHolder.evaluateAsNumber(context.getScope());
+                        double x = xHolder.evaluateAsNumber(context.getScope());
+                        double y = yHolder.evaluateAsNumber(context.getScope());
+                        double z = zHolder.evaluateAsNumber(context.getScope());
                         double radius = radiusHolder.evaluateAsNumber(context.getScope());
 
-                        BlockPos target = new BlockPos(x, y, z);
+                        BlockPos target = blockPosition(x, y, z);
+                        if (target == null || !Double.isFinite(radius) || radius < 0) return BehaviorStatus.FAILURE;
                         ServerLevel level = (ServerLevel) npc.getEntity().level();
+                        if (level.isOutsideBuildHeight(target)) return BehaviorStatus.FAILURE;
                         if (level.getBlockState(target).isAir())
                             return BehaviorStatus.SUCCESS;
 
