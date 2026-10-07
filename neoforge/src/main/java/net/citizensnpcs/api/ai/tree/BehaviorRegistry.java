@@ -665,9 +665,14 @@ public class BehaviorRegistry {
 
             return new Behavior() {
                 private BlockBreaker breaker = null;
+                private long generation;
+                private boolean running;
+                private BehaviorStatus terminal;
 
                 @Override
                 public void reset() {
+                    generation++;
+                    terminal = null;
                     BlockBreaker previous = breaker;
                     breaker = null;
                     if (previous != null) previous.reset();
@@ -675,35 +680,64 @@ public class BehaviorRegistry {
 
                 @Override
                 public BehaviorStatus run() {
+                    if (running) return BehaviorStatus.RUNNING;
+                    running = true;
+                    try { return runOnce(); }
+                    finally { running = false; }
+                }
+
+                private BehaviorStatus runOnce() {
+                    if (terminal != null) return terminal;
+                    long activation = generation;
                     NPC npc = context.getNPC();
                     if (!npc.isSpawned())
-                        return BehaviorStatus.FAILURE;
+                        return finish(BehaviorStatus.FAILURE, activation);
 
                     if (breaker == null) {
                         double x = xHolder.evaluateAsNumber(context.getScope());
                         double y = yHolder.evaluateAsNumber(context.getScope());
                         double z = zHolder.evaluateAsNumber(context.getScope());
                         double radius = radiusHolder.evaluateAsNumber(context.getScope());
+                        if (generation != activation) return BehaviorStatus.RUNNING;
 
                         BlockPos target = blockPosition(x, y, z);
-                        if (target == null || !Double.isFinite(radius) || radius < 0) return BehaviorStatus.FAILURE;
+                        if (target == null || !Double.isFinite(radius) || radius < 0) return finish(BehaviorStatus.FAILURE, activation);
+                        if (!npc.isSpawned()) return finish(BehaviorStatus.FAILURE, activation);
                         ServerLevel level = (ServerLevel) npc.getEntity().level();
-                        if (level.isOutsideBuildHeight(target)) return BehaviorStatus.FAILURE;
+                        if (level.isOutsideBuildHeight(target)) return finish(BehaviorStatus.FAILURE, activation);
                         if (level.getBlockState(target).isAir())
-                            return BehaviorStatus.SUCCESS;
+                            return finish(BehaviorStatus.SUCCESS, activation);
+                        if (generation != activation) return BehaviorStatus.RUNNING;
 
                         BlockBreakerConfiguration cfg = new BlockBreakerConfiguration();
                         if (radius > 0) {
                             cfg.radius(radius);
                         }
-                        breaker = npc.getBlockBreaker(target, cfg);
+                        BlockBreaker candidate = npc.getBlockBreaker(target, cfg);
+                        if (generation != activation) {
+                            if (candidate != null && candidate != breaker) candidate.reset();
+                            return BehaviorStatus.RUNNING;
+                        }
+                        if (candidate == null) return finish(BehaviorStatus.FAILURE, activation);
+                        breaker = candidate;
                     }
-                    return breaker.run();
+                    BlockBreaker current = breaker;
+                    BehaviorStatus status = current.run();
+                    if (generation != activation || breaker != current) return BehaviorStatus.RUNNING;
+                    if (status != BehaviorStatus.RUNNING) terminal = status;
+                    return status;
+                }
+
+                private BehaviorStatus finish(BehaviorStatus status, long activation) {
+                    if (generation != activation) return BehaviorStatus.RUNNING;
+                    return terminal = status;
                 }
 
                 @Override
                 public boolean shouldExecute() {
-                    return context.getNPC().isSpawned();
+                    long activation = generation + 1;
+                    reset();
+                    return generation == activation && context.getNPC().isSpawned();
                 }
             };
         });

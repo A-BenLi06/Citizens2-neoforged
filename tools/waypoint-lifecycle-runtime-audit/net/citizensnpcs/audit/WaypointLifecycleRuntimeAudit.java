@@ -434,10 +434,13 @@ public final class WaypointLifecycleRuntimeAudit {
                 failing.reset();
                 check(failedCallbacks[0]==1 && !navigator.isNavigating(),"breaker_cleanup_failure_does_not_repeat_callback_"+packet);
 
-                int[] adapterResets={0}; net.citizensnpcs.api.ai.tree.Behavior[] adapter=new net.citizensnpcs.api.ai.tree.Behavior[1];
+                int[] adapterResets={0}, adapterRuns={0};
+                boolean[] resetDuringRun={false}, resetDuringCreate={false};
+                var suppliedStatus=new java.util.concurrent.atomic.AtomicReference<>(net.citizensnpcs.api.ai.tree.BehaviorStatus.RUNNING);
+                net.citizensnpcs.api.ai.tree.Behavior[] adapter=new net.citizensnpcs.api.ai.tree.Behavior[1];
                 BlockBreaker supplied=new BlockBreaker() {
                     public boolean shouldExecute(){return true;}
-                    public net.citizensnpcs.api.ai.tree.BehaviorStatus run(){return net.citizensnpcs.api.ai.tree.BehaviorStatus.RUNNING;}
+                    public net.citizensnpcs.api.ai.tree.BehaviorStatus run(){adapterRuns[0]++; if(resetDuringRun[0]) adapter[0].reset(); return suppliedStatus.get();}
                     public void reset(){adapterResets[0]++; if(adapterResets[0]==1) adapter[0].reset();}
                 };
                 var entity=current.getEntity();
@@ -448,6 +451,7 @@ public final class WaypointLifecycleRuntimeAudit {
                         case "getBlockBreaker":
                             check(target.equals(args[0]) && ((BlockBreaker.BlockBreakerConfiguration)args[1]).radius()==0,
                                     "block_behavior_uses_native_flooring_and_positional_radius_"+packet);
+                            if(resetDuringCreate[0]) adapter[0].reset();
                             return supplied;
                         default: throw new AssertionError(method.getName());
                     }
@@ -458,6 +462,22 @@ public final class WaypointLifecycleRuntimeAudit {
                 adapter[0]=CitizensAPI.getBehaviorRegistry().createBehavior("break_block",null,context);
                 adapter[0].run(); adapter[0].reset();
                 check(adapterResets[0]==1,"block_behavior_reset_detaches_before_provider_callback_"+packet);
+                suppliedStatus.set(net.citizensnpcs.api.ai.tree.BehaviorStatus.SUCCESS); resetDuringRun[0]=true;
+                check(adapter[0].run()==net.citizensnpcs.api.ai.tree.BehaviorStatus.RUNNING && adapterResets[0]==2,
+                        "block_behavior_ignores_superseded_run_success_"+packet);
+                resetDuringRun[0]=false;
+                check(adapter[0].run()==net.citizensnpcs.api.ai.tree.BehaviorStatus.SUCCESS
+                        && adapter[0].run()==net.citizensnpcs.api.ai.tree.BehaviorStatus.SUCCESS && adapterRuns[0]==3,
+                        "block_behavior_does_not_repeat_terminal_provider_"+packet);
+                adapter[0].shouldExecute(); resetDuringCreate[0]=true;
+                int beforeRuns=adapterRuns[0], beforeResets=adapterResets[0];
+                check(adapter[0].run()==net.citizensnpcs.api.ai.tree.BehaviorStatus.RUNNING
+                        && adapterRuns[0]==beforeRuns && adapterResets[0]==beforeResets+1,
+                        "block_behavior_releases_superseded_creation_"+packet);
+                resetDuringCreate[0]=false;
+                check(adapter[0].run()==net.citizensnpcs.api.ai.tree.BehaviorStatus.SUCCESS,
+                        "block_behavior_retries_after_creation_reset_"+packet);
+                adapter[0].reset();
             } finally { begin=null; level.setBlock(target,originalBlock,3); current.destroy(); }
         });
     }

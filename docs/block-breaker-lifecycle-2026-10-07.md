@@ -14,11 +14,14 @@ the task closed before cleanup or callbacks; visual cracks clear before callback
 start a replacement task. Cleanup attempts all categories and reports combined errors.
 The behavior wrapper detaches its breaker reference before invoking provider reset,
 preventing recursive cleanup from resetting the same object again.
+The wrapper additionally tracks activation generation, ignores results invalidated by
+reset, releases a breaker returned after superseded creation and retains terminal results
+until the next activation. Reentrant run calls cannot duplicate provider execution.
 
 Native tests run on ordinary/packet NPCs with a restored fixture block and counting
 break callbacks. They exercise ownership, disappearance, terminal effects, reset reentry
 and cleanup errors. A supplied breaker verifies behavior-coordinate flooring and radius
-forwarding. Physical-client crack rendering and arbitrary modded break-provider semantics
+forwarding, plus resets during creation/run and successful retry. Physical-client crack rendering and arbitrary modded break-provider semantics
 remain separate acceptance. Interactions stays in its independent NeoForge JAR.
 The relocation fixture additionally verifies rejection after a real player dimension
 transfer and rejection of a mismatched NPC/entity pair without invoking the break effect.
