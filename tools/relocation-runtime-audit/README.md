@@ -24,7 +24,9 @@ including `teleport here`. Numeric-trigger chat coverage preserves session data 
 invalid delay/speed input, permits repair, and executes a validated speed trigger.
 Chat-radius checks preserve text beginning with a similar word, recognize mixed-case
 settings and reject malformed/non-finite radii without losing the previous value.
-The expanded fixture has 492 checks on each supported
+Block-breaker entity checks use a restored fixture block and counting callbacks to
+reject a task after its player changes dimension or when its NPC/entity pair differs.
+The expanded fixture has 498 checks on each supported
 NeoForge version.
 
 Coverage includes ID/name/quoted name/UUID/global-ID targets, both registries, ownership and permission revalidation, ambiguous-name prompts and replaced identity, canceled spawns, location overrides and invalid input, front/exact player teleport, cursor/fluid/miss behavior, center/front precedence, console contexts, cross-world permission checks, unspawned teleport events, truthful success feedback, native admission rejection, deferred/superseded callbacks, mounted rollback/remount completion, live/retired NPC and native fake-player command sources, and player-NPC sender transport during cross-world teleport.

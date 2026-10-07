@@ -86,7 +86,7 @@ public final class RelocationRuntimeAudit {
                 spawnGrant = grant(alice.player, "citizens.npc.spawn");
                 check(!PermissionUtil.hasPermission(alice.player, "citizens.admin")
                         && !PermissionUtil.hasPermission(alice.player, "citizens.npc.tphere.multiworld"), "independent_permissions");
-                spawnCommands(); playerTeleport(); relocateCommands(); prompts(); completionOwnership(); npcCommandSources(); chatTriggerInput(); numericTriggerInput(); teleportTriggerInput(); movetoCommands(); tptoCommands(); mountedCompletion();
+                spawnCommands(); playerTeleport(); relocateCommands(); prompts(); completionOwnership(); npcCommandSources(); chatTriggerInput(); numericTriggerInput(); teleportTriggerInput(); movetoCommands(); tptoCommands(); blockBreakerEntityOwnership(); mountedCompletion();
             }
             if (server.getTickCount() == start + 1) mount = null;
             if (server.getTickCount() >= start + 5) {
@@ -522,6 +522,31 @@ public final class RelocationRuntimeAudit {
         at(Location.of(alice.player), Location.of(destination.getEntity()), "tpto_native_player_cross_world_completion");
         check(alice.player.messages.size() == messages + 1, "tpto_native_player_success_reports_once");
         moveAlice(before);
+    }
+
+    private static void blockBreakerEntityOwnership() {
+        BlockPos target = new BlockPos(14,-58,14);
+        BlockState beforeBlock = level.getBlockState(target);
+        blocks.putIfAbsent(target, beforeBlock);
+        Location beforePlayer = Location.of(alice.player);
+        level.setBlock(target, Blocks.STONE.defaultBlockState(), 3);
+        int[] effects = {0};
+        var config = new BlockBreaker.BlockBreakerConfiguration().blockStrengthModifier(1000000);
+        config.blockBreaker((block,item) -> effects[0]++);
+        var breaker = new net.citizensnpcs.npc.CitizensBlockBreaker(null, alice.player, level, target, config);
+        try {
+            check(breaker.shouldExecute(), "player_block_breaker_admitted_in_captured_world");
+            moveAlice(new Location(nether,4,70,4));
+            check(!breaker.shouldExecute() && breaker.run() == net.citizensnpcs.api.ai.tree.BehaviorStatus.FAILURE
+                    && effects[0] == 0 && !level.getBlockState(target).isAir(), "block_breaker_rejects_transferred_player_entity");
+        } finally { breaker.reset(); moveAlice(beforePlayer); }
+        try {
+            NPC owner = npc(registry, EntityType.COW, false, alice.player, true);
+            var mismatched = new net.citizensnpcs.npc.CitizensBlockBreaker(owner, alice.player, level, target, config);
+            check(!mismatched.shouldExecute() && mismatched.run() == net.citizensnpcs.api.ai.tree.BehaviorStatus.FAILURE
+                    && effects[0] == 0, "block_breaker_rejects_mismatched_npc_entity");
+            mismatched.reset();
+        } finally { level.setBlock(target, beforeBlock, 3); }
     }
 
     private static void mountedCompletion() throws Exception {

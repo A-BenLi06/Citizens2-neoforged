@@ -114,8 +114,11 @@ public class CitizensBlockBreaker extends BlockBreaker {
     @Override
     public BehaviorStatus run() {
         if (terminal != null) return terminal;
-        if (entity == null || entity.isRemoved())
-            return terminal = BehaviorStatus.FAILURE;
+        if (!isCurrentEntity()) {
+            terminal = BehaviorStatus.FAILURE;
+            cancelNavigation();
+            return terminal;
+        }
         if (level.getBlockState(pos).isAir()) {
             terminal = BehaviorStatus.SUCCESS;
             cancelNavigation();
@@ -175,7 +178,12 @@ public class CitizensBlockBreaker extends BlockBreaker {
 
     @Override
     public boolean shouldExecute() {
-        return terminal == null && !level.getBlockState(pos).isAir();
+        return terminal == null && isCurrentEntity() && !level.getBlockState(pos).isAir();
+    }
+
+    private boolean isCurrentEntity() {
+        return entity != null && !entity.isRemoved() && entity.level() == level
+                && (npc == null || npc.isSpawned() && npc.getEntity() == entity);
     }
 
     /** The tool's speed against this block, adjusted for enchantments, potion effects and footing, as vanilla does. */
