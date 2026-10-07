@@ -9,7 +9,12 @@ Run from the repository root with PowerShell 7 and JDK 21:
 
 Omit the version override for default 21.1.233. The fixture uses `artifacts/waypoint-lifecycle-audit-server`, loopback port 25629, world `waypoint-lifecycle-world` and marker `waypoint-lifecycle-audit-fixture.txt`. It requires an empty default registry and releases its NPCs, player, grant and forced chunk before shutdown.
 
-Success requires `[WAYPOINTLIFECYCLEAUDIT] COMPLETE 218 checks`, no failure marker and successful Gradle completion. Commands use real dispatch and an admitted synthetic player. Controlled native navigation strategies let tests deterministically complete/cancel routes and replace them from navigation-begin callbacks; cached paths also pass through the actual supplied-path backend.
+Success requires `[WAYPOINTLIFECYCLEAUDIT] COMPLETE 232 checks`, no failure marker and successful Gradle completion. Commands use real dispatch and an admitted synthetic player. Controlled native navigation strategies let tests deterministically complete/cancel routes and replace them from navigation-begin callbacks; cached paths also pass through the actual supplied-path backend.
+
+Wander behavior cases verify goal startup/run, owned cancellation, preservation of a
+foreign request, reset during NavigationBegin and positional/named pathfind=false.
+Direct-movement admission retries through normal server ticks when random destination
+selection temporarily finds no valid standing position.
 
 Walkto behavior checks assert speed/range/margin values at native strategy construction,
 unchanged default parameters and preservation of an active request after invalid input,

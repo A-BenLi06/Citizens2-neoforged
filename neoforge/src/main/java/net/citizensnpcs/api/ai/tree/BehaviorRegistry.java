@@ -562,18 +562,24 @@ public class BehaviorRegistry {
             Map<String, String> parsedArgs = context.parseArgs(1, params);
             String radiusStr = context.getFromParsedArgs(parsedArgs, "0", "radius");
             String pathfindStr = context.getFromParsedArgs(parsedArgs, "1", "pathfind");
+            if (context.getArgs() != null && context.getArgs().length > 1 && !context.getArgs()[1].contains("="))
+                pathfindStr = context.getArgs()[1];
             if (radiusStr == null) {
                 radiusStr = "10";
             }
             ExpressionRegistry.ExpressionValue radiusHolder = expressions.parseValue(radiusStr);
-            ExpressionRegistry.ExpressionValue pathfindHolder = expressions.parseValue(pathfindStr);
+            ExpressionRegistry.ExpressionValue pathfindHolder = pathfindStr == null ? null : expressions.parseValue(pathfindStr);
 
             return new Behavior() {
                 private WanderGoal wander = null;
+                private long generation;
 
                 @Override
                 public void reset() {
+                    generation++;
+                    WanderGoal previous = wander;
                     wander = null;
+                    if (previous != null) previous.pause();
                 }
 
                 @Override
@@ -582,17 +588,48 @@ public class BehaviorRegistry {
                     if (!npc.isSpawned())
                         return BehaviorStatus.FAILURE;
 
-                    if (wander == null) {
-                        int radius = (int) radiusHolder.evaluateAsNumber(context.getScope());
-                        wander = WanderGoal.builder(npc).xrange(radius).yrange(radius)
-                                .pathfind(pathfindHolder.evaluateAsBoolean(context.getScope())).build();
-                    }
+                    if (wander == null) return BehaviorStatus.FAILURE;
                     return wander.run();
                 }
 
                 @Override
                 public boolean shouldExecute() {
-                    return context.getNPC().isSpawned();
+                    long activation = generation + 1;
+                    reset();
+                    if (generation != activation || !context.getNPC().isSpawned()) return false;
+                    int radius;
+                    try {
+                        radius = new java.math.BigDecimal(String.valueOf(radiusHolder.evaluate(context.getScope()))).intValueExact();
+                        if (radius < 0) return false;
+                        Math.addExact(Math.multiplyExact(radius, 2), 1);
+                    } catch (NumberFormatException | ArithmeticException invalid) { return false; }
+                    var builder = WanderGoal.builder(context.getNPC()).xrange(radius).yrange(radius);
+                    if (pathfindHolder != null) {
+                        Object value = pathfindHolder.evaluate(context.getScope());
+                        boolean pathfind;
+                        if (value instanceof Boolean flag) pathfind = flag;
+                        else if (value instanceof Number number && Double.isFinite(number.doubleValue()))
+                            pathfind = number.doubleValue() != 0;
+                        else if (value instanceof String text && (text.equalsIgnoreCase("true") || text.equalsIgnoreCase("false")))
+                            pathfind = Boolean.parseBoolean(text);
+                        else return false;
+                        builder.pathfind(pathfind);
+                    }
+                    if (generation != activation || !context.getNPC().isSpawned()) return false;
+                    WanderGoal candidate = builder.build();
+                    wander = candidate;
+                    boolean ready;
+                    try { ready = candidate.shouldExecute(); }
+                    catch (RuntimeException | Error failure) {
+                        if (generation == activation && wander == candidate) {
+                            try { reset(); }
+                            catch (RuntimeException | Error cleanup) { if (cleanup != failure) failure.addSuppressed(cleanup); }
+                        }
+                        throw failure;
+                    }
+                    if (generation != activation || wander != candidate) return false;
+                    if (!ready) reset();
+                    return ready;
                 }
             };
         });

@@ -78,12 +78,10 @@ public class WanderGoal implements Behavior {
 
     public void pause() {
         this.paused = true;
-        if (target == null)
-            return;
         if (pathfind) {
             if (ownedParameters != null && npc.getNavigator().getLocalParameters() == ownedParameters)
                 npc.getNavigator().cancelNavigation();
-        } else {
+        } else if (target != null) {
             npc.setMoveDestination(null);
         }
     }
