@@ -81,7 +81,7 @@ public final class WaypointLifecycleRuntimeAudit {
             check(trait.getCurrentProvider()==route && route.waypoints().iterator().hasNext(),"unknown_provider_preserves_route");
             current.destroy();
         });
-        commands(); providers(); delays(); navigation();
+        commands(); providers(); delays(); navigation(); blockBreaking();
     }
 
     private static void commands() {
@@ -387,6 +387,78 @@ public final class WaypointLifecycleRuntimeAudit {
             var goal=net.citizensnpcs.api.ai.goals.WanderGoal.builder(current).destinationPicker(npc->new Location(level,12,-58,4)).build();
             check(goal.shouldExecute(),"wander_starts_owned_request"); current.getNavigator().setTarget(new Location(level,20,-58,4));
             var foreign=current.getNavigator().getPathStrategy(); goal.pause(); check(current.getNavigator().getPathStrategy()==foreign,"wander_pause_preserves_replacement_navigation"); current.destroy();
+        });
+    }
+
+    private static void blockBreaking() {
+        for(boolean packet:new boolean[]{false,true}) steps.add(()-> {
+            current=npc(packet,true); current.teleport(new Location(level,4.5,-60,4.5),TeleportCause.PLUGIN);
+            BlockPos target=new BlockPos(12,-60,4);
+            var originalBlock=level.getBlockState(target);
+            level.setBlock(target,net.minecraft.world.level.block.Blocks.STONE.defaultBlockState(),3);
+            try {
+                var navigator=current.getNavigator();
+                navigator.getDefaultParameters().locationStrategyFactory((npc,parameters,destination)->new Probe(destination));
+                var moving=current.getBlockBreaker(target,new BlockBreaker.BlockBreakerConfiguration().radius(1));
+                moving.run(); moving.reset();
+                check(!navigator.isNavigating(),"breaker_reset_cancels_owned_navigation_"+packet);
+                var vanished=current.getBlockBreaker(target,new BlockBreaker.BlockBreakerConfiguration().radius(1));
+                vanished.run(); level.setBlock(target,net.minecraft.world.level.block.Blocks.AIR.defaultBlockState(),3);
+                check(vanished.run()==net.citizensnpcs.api.ai.tree.BehaviorStatus.SUCCESS && !navigator.isNavigating(),
+                        "breaker_stops_approach_when_target_disappears_"+packet);
+                vanished.reset(); level.setBlock(target,net.minecraft.world.level.block.Blocks.STONE.defaultBlockState(),3);
+                moving=current.getBlockBreaker(target,new BlockBreaker.BlockBreakerConfiguration().radius(1));
+                moving.run(); navigator.setTarget(new Location(level,20,-60,4));
+                var foreign=navigator.getPathStrategy(); moving.reset();
+                check(navigator.getPathStrategy()==foreign,"breaker_reset_preserves_foreign_navigation_"+packet);
+                navigator.cancelNavigation();
+                var pending=current.getBlockBreaker(target,new BlockBreaker.BlockBreakerConfiguration().radius(1));
+                begin=event->{begin=null; pending.reset();}; pending.run();
+                check(!navigator.isNavigating(),"breaker_reset_during_begin_cancels_pending_navigation_"+packet);
+
+                int[] effects={0}, callbacks={0}; BlockBreaker[] reference=new BlockBreaker[1];
+                var config=new BlockBreaker.BlockBreakerConfiguration().blockStrengthModifier(1000000);
+                config.blockBreaker((block,item)->effects[0]++);
+                config.callback(()->{callbacks[0]++; if(callbacks[0]==1) reference[0].reset();});
+                reference[0]=current.getBlockBreaker(target,config);
+                check(reference[0].run()==net.citizensnpcs.api.ai.tree.BehaviorStatus.SUCCESS
+                        && reference[0].run()==net.citizensnpcs.api.ai.tree.BehaviorStatus.SUCCESS && effects[0]==1,
+                        "breaker_effect_runs_only_once_"+packet);
+                reference[0].reset(); reference[0].reset();
+                check(callbacks[0]==1 && !reference[0].shouldExecute(),"breaker_reset_callback_is_terminal_and_idempotent_"+packet);
+                int[] failedCallbacks={0};
+                var failing=current.getBlockBreaker(target,new BlockBreaker.BlockBreakerConfiguration().radius(1)
+                        .callback(()->{failedCallbacks[0]++; throw new IllegalStateException("expected breaker cleanup failure");}));
+                failing.run();
+                try { failing.reset(); throw new AssertionError("cleanup_should_fail"); } catch(IllegalStateException expected) { }
+                failing.reset();
+                check(failedCallbacks[0]==1 && !navigator.isNavigating(),"breaker_cleanup_failure_does_not_repeat_callback_"+packet);
+
+                int[] adapterResets={0}; net.citizensnpcs.api.ai.tree.Behavior[] adapter=new net.citizensnpcs.api.ai.tree.Behavior[1];
+                BlockBreaker supplied=new BlockBreaker() {
+                    public boolean shouldExecute(){return true;}
+                    public net.citizensnpcs.api.ai.tree.BehaviorStatus run(){return net.citizensnpcs.api.ai.tree.BehaviorStatus.RUNNING;}
+                    public void reset(){adapterResets[0]++; if(adapterResets[0]==1) adapter[0].reset();}
+                };
+                var entity=current.getEntity();
+                NPC provider=(NPC)java.lang.reflect.Proxy.newProxyInstance(NPC.class.getClassLoader(),new Class<?>[]{NPC.class},(proxy,method,args)->{
+                    switch(method.getName()) {
+                        case "isSpawned": return true;
+                        case "getEntity": return entity;
+                        case "getBlockBreaker":
+                            check(target.equals(args[0]) && ((BlockBreaker.BlockBreakerConfiguration)args[1]).radius()==0,
+                                    "block_behavior_uses_native_flooring_and_positional_radius_"+packet);
+                            return supplied;
+                        default: throw new AssertionError(method.getName());
+                    }
+                });
+                var context=new net.citizensnpcs.api.ai.tree.BehaviorRegistry.BehaviorContext(provider,
+                        new net.citizensnpcs.api.expr.ExpressionScope(),CitizensAPI.getExpressionRegistry(),new net.citizensnpcs.api.expr.Memory());
+                context.setArgs(new String[]{"12.9","-59.1","4.9","0"});
+                adapter[0]=CitizensAPI.getBehaviorRegistry().createBehavior("break_block",null,context);
+                adapter[0].run(); adapter[0].reset();
+                check(adapterResets[0]==1,"block_behavior_reset_detaches_before_provider_callback_"+packet);
+            } finally { begin=null; level.setBlock(target,originalBlock,3); current.destroy(); }
         });
     }
 

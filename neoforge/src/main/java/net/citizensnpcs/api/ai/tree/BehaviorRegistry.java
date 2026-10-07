@@ -668,10 +668,9 @@ public class BehaviorRegistry {
 
                 @Override
                 public void reset() {
-                    if (breaker != null) {
-                        breaker.reset();
-                        breaker = null;
-                    }
+                    BlockBreaker previous = breaker;
+                    breaker = null;
+                    if (previous != null) previous.reset();
                 }
 
                 @Override

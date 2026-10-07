@@ -16,6 +16,8 @@ Recent follow-ups cover [`powered`, `name` and `home` options](command-options-h
 
 ## Behavior, data and integration acceptance
 
+- [Block-breaker lifecycle](block-breaker-lifecycle-2026-10-07.md) owns its approach request, latches terminal effects and performs idempotent reset with cleanup isolation. Native ordinary/packet tests cover cancellation, replacement, disappearance and callback reentry; physical rendering/modded break-provider semantics remain separate acceptance.
+
 - [Wander behavior activation](wander-behavior-2026-10-07.md) now starts its actual goal, validates radius/options and pauses owned work on reset. Native ordinary/packet checks cover startup, cancellation/replacement and explicit direct movement; physical-client/provider combinations remain separate acceptance.
 
 - [Walkto request lifecycle](walkto-preparation-2026-10-07.md) validates/configures before strategy construction, cancels only its owned request on reset and distinguishes confirmed arrival from cancellation/replacement. Direct/native tests cover ordinary/packet NPCs, including begin callbacks and pending preparation; arbitrary providers remain separate acceptance.

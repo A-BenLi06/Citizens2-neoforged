@@ -30,11 +30,12 @@ public class CitizensBlockBreaker extends BlockBreaker {
     private final BlockBreakerConfiguration configuration;
     private int currentDamage;
     private final Entity entity;
-    private boolean isDigging = true;
+    private boolean resetComplete;
+    private BehaviorStatus terminal;
     private final ServerLevel level;
     private final NPC npc;
     private final BlockPos pos;
-    private boolean setTarget;
+    private net.citizensnpcs.api.ai.NavigatorParameters ownedParameters;
     private int startDigTick;
 
     public CitizensBlockBreaker(NPC npc, Entity entity, ServerLevel level, BlockPos pos,
@@ -48,10 +49,11 @@ public class CitizensBlockBreaker extends BlockBreaker {
     }
 
     private void cancelNavigation() {
-        if (setTarget && npc != null && npc.getNavigator().isNavigating()) {
+        var previous = ownedParameters;
+        ownedParameters = null;
+        if (previous != null && npc != null && npc.getNavigator().getLocalParameters() == previous) {
             npc.getNavigator().cancelNavigation();
         }
-        setTarget = false;
     }
 
     /** Milliseconds rather than the server tick counter, so a lagging server does not dig faster. */
@@ -92,20 +94,33 @@ public class CitizensBlockBreaker extends BlockBreaker {
 
     @Override
     public void reset() {
-        cancelNavigation();
-        if (configuration.callback() != null) {
-            configuration.callback().run();
+        if (resetComplete) return;
+        resetComplete = true;
+        if (terminal == null) terminal = BehaviorStatus.SUCCESS;
+        Throwable failure = null;
+        // Clear presentation before callbacks can start a replacement using the same entity/block.
+        for (Runnable cleanup : java.util.List.<Runnable>of(() -> setBlockDamage(currentDamage = -1),
+                this::cancelNavigation, () -> { if (configuration.callback() != null) configuration.callback().run(); })) {
+            try { cleanup.run(); }
+            catch (RuntimeException | Error ex) {
+                if (failure == null) failure = ex;
+                else if (failure != ex) failure.addSuppressed(ex);
+            }
         }
-        isDigging = false;
-        setBlockDamage(currentDamage = -1);
+        if (failure instanceof RuntimeException ex) throw ex;
+        if (failure instanceof Error ex) throw ex;
     }
 
     @Override
     public BehaviorStatus run() {
+        if (terminal != null) return terminal;
         if (entity == null || entity.isRemoved())
-            return BehaviorStatus.FAILURE;
-        if (!isDigging)
-            return BehaviorStatus.SUCCESS;
+            return terminal = BehaviorStatus.FAILURE;
+        if (level.getBlockState(pos).isAir()) {
+            terminal = BehaviorStatus.SUCCESS;
+            cancelNavigation();
+            return terminal;
+        }
 
         int currentTick = currentTick();
         if (configuration.radius() > 0) {
@@ -113,31 +128,37 @@ public class CitizensBlockBreaker extends BlockBreaker {
                 // out of reach: walk closer, and do not count the time spent walking as progress
                 startDigTick = currentTick;
                 if (npc != null && !npc.getNavigator().isNavigating()) {
-                    npc.getNavigator().setTarget(Location.fromBlockPos(level, pos));
-                    npc.getNavigator().getLocalParameters().pathDistanceMargin(
-                            Math.max(1, npc.getNavigator().getLocalParameters().pathDistanceMargin()));
-                    npc.getNavigator().getLocalParameters().distanceMargin(Math.max(configuration.radius() - 1, 0.75));
-                    setTarget = true;
+                    npc.getNavigator().setTarget(Location.fromBlockPos(level, pos), parameters -> {
+                        ownedParameters = parameters;
+                        parameters.pathDistanceMargin(Math.max(1, parameters.pathDistanceMargin()));
+                        parameters.distanceMargin(Math.max(configuration.radius() - 1, 0.75));
+                        parameters.addSingleUseCallback(reason -> {
+                            if (ownedParameters == parameters) ownedParameters = null;
+                        });
+                    });
                 }
-                return BehaviorStatus.RUNNING;
+                return terminal == null ? BehaviorStatus.RUNNING : terminal;
             }
-            if (setTarget) {
+            if (ownedParameters != null) {
                 cancelNavigation();
             }
         }
+        if (terminal != null) return terminal;
         if (npc != null) {
             npc.faceLocation(Util.getCenterLocation(level, pos));
         }
         if (entity instanceof ServerPlayer player && currentTick % 5 == 0) {
             PlayerAnimation.ARM_SWING.play(player);
         }
+        if (terminal != null) return terminal;
         if (level.getBlockState(pos).isAir())
-            return BehaviorStatus.SUCCESS;
+            return terminal = BehaviorStatus.SUCCESS;
 
         float damage = getDamage(currentTick - startDigTick);
         if (damage >= 1F) {
+            terminal = BehaviorStatus.FAILURE;
             configuration.blockBreaker().accept(new BlockTarget(level, pos), getItemStack());
-            return BehaviorStatus.SUCCESS;
+            return terminal = BehaviorStatus.SUCCESS;
         }
         int modifiedDamage = (int) (damage * 10.0F);
         if (modifiedDamage != currentDamage) {
@@ -154,7 +175,7 @@ public class CitizensBlockBreaker extends BlockBreaker {
 
     @Override
     public boolean shouldExecute() {
-        return !level.getBlockState(pos).isAir();
+        return terminal == null && !level.getBlockState(pos).isAir();
     }
 
     /** The tool's speed against this block, adjusted for enchantments, potion effects and footing, as vanilla does. */
