@@ -212,9 +212,24 @@ public class BehaviorTreeParser {
         if (name.startsWith("timeout ")) {
             String timeoutStr = name.substring(8).trim();
             ExpressionRegistry exprRegistry = registry.getExpressionRegistry();
-            ExpressionValue timeoutHolder = exprRegistry.parseValue(timeoutStr);
-            java.util.function.IntSupplier ticks = () -> timeoutTicks(timeoutHolder, timeoutStr, context);
-            if (!timeoutHolder.isExpression()) ticks.getAsInt();
+            java.util.function.IntSupplier ticks;
+            boolean expression = exprRegistry.isPossiblyExpression(timeoutStr);
+            if (strict) {
+                Supplier<Object> value;
+                if (expression) {
+                    try {
+                        CompiledExpression compiled = exprRegistry.compile(timeoutStr);
+                        value = () -> compiled.evaluate(context.getScope());
+                    } catch (ExpressionCompileException failure) {
+                        throw new IllegalArgumentException("Invalid behavior timeout: " + timeoutStr, failure);
+                    }
+                } else value = () -> timeoutStr;
+                ticks = () -> timeoutTicks(value.get(), timeoutStr);
+            } else {
+                ExpressionValue timeoutHolder = exprRegistry.parseValue(timeoutStr);
+                ticks = () -> (int) timeoutHolder.evaluateAsNumber(context.getScope());
+            }
+            if (!expression) ticks.getAsInt();
 
             List<Behavior> children = parseIndexedChildren(key, context);
             Behavior body = children.size() == 1 ? children.get(0)
@@ -266,17 +281,16 @@ public class BehaviorTreeParser {
         return conditional != null ? conditional : parseLeaf(name, key, context);
     }
 
-    private int timeoutTicks(ExpressionValue value, String source, BehaviorRegistry.BehaviorContext context) {
-        double evaluated;
-        try { evaluated = value.evaluateAsNumber(context.getScope()); }
-        catch (RuntimeException failure) {
-            if (strict) throw new IllegalArgumentException("Invalid behavior timeout: " + source, failure);
-            throw failure;
-        }
-        if (strict && (!Double.isFinite(evaluated) || evaluated < 0 || evaluated > Integer.MAX_VALUE
-                || evaluated != Math.rint(evaluated)))
+    private int timeoutTicks(Object value, String source) {
+        if (!(value instanceof Number || value instanceof String))
             throw new IllegalArgumentException("Behavior timeout must be a non-negative integer tick count: " + source);
-        return (int) evaluated;
+        try {
+            int ticks = new java.math.BigDecimal(value.toString().strip()).intValueExact();
+            if (ticks < 0) throw new IllegalArgumentException("Behavior timeout must not be negative: " + source);
+            return ticks;
+        } catch (NumberFormatException | ArithmeticException failure) {
+            throw new IllegalArgumentException("Invalid behavior timeout: " + source, failure);
+        }
     }
 
     private void validateIndexedChildren(DataKey key) {

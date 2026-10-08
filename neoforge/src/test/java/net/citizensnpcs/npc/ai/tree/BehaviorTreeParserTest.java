@@ -22,6 +22,46 @@ import net.citizensnpcs.api.util.MemoryDataKey;
  * parser, the registry and the Molang expressions in between actually drive a tree, rather than only compiling.
  */
 public class BehaviorTreeParserTest {
+    @Test public void strictTimeoutRejectsNonNumericAndInexactExpressionResults() {
+        var value = new java.util.concurrent.atomic.AtomicReference<Object>();
+        var evaluations = new java.util.concurrent.atomic.AtomicInteger();
+        var expressions = new ExpressionRegistry();
+        expressions.registerEngine(new net.citizensnpcs.api.expr.ExpressionEngine() {
+            public String getName() { return "budgetprobe"; }
+            public net.citizensnpcs.api.expr.CompiledExpression compile(String source) {
+                return scope -> { evaluations.incrementAndGet(); return value.get(); };
+            }
+        });
+        expressions.setDefaultEngine("budgetprobe");
+        var parser = new BehaviorTreeParser(new CitizensBehaviorRegistry(expressions));
+        DataKey root = new MemoryDataKey(); root.setRaw("timeout `budget`", map("0", "succeed"));
+        Behavior tree = parser.parseStrict(root.getRelative("timeout `budget`"), null, new ExpressionScope(), new Memory());
+        assertEquals(0, evaluations.get());
+        for (Object invalid : new Object[] { null, true, "wrong", Double.NaN,
+                new java.math.BigDecimal("1.00000000000000000001"), "2147483648", "-1" }) {
+            value.set(invalid);
+            org.junit.jupiter.api.Assertions.assertThrows(IllegalArgumentException.class, tree::shouldExecute);
+            assertEquals(BehaviorStatus.FAILURE, tree.run());
+        }
+        value.set("2"); finish(tree);
+    }
+
+    @Test public void strictTimeoutPreservesExpressionCompilationFailure() {
+        var expressions = new ExpressionRegistry();
+        var cause = new net.citizensnpcs.api.expr.ExpressionEngine.ExpressionCompileException("broken budget");
+        expressions.registerEngine(new net.citizensnpcs.api.expr.ExpressionEngine() {
+            public String getName() { return "brokenbudget"; }
+            public net.citizensnpcs.api.expr.CompiledExpression compile(String source)
+                    throws net.citizensnpcs.api.expr.ExpressionEngine.ExpressionCompileException { throw cause; }
+        });
+        expressions.setDefaultEngine("brokenbudget");
+        var parser = new BehaviorTreeParser(new CitizensBehaviorRegistry(expressions));
+        DataKey root = new MemoryDataKey(); root.setRaw("timeout `budget`", map("0", "succeed"));
+        var failure = org.junit.jupiter.api.Assertions.assertThrows(IllegalArgumentException.class,
+                () -> parser.parseStrict(root.getRelative("timeout `budget`"), null, new ExpressionScope(), new Memory()));
+        org.junit.jupiter.api.Assertions.assertSame(cause, failure.getCause());
+    }
+
     @Test public void timeoutReadsMemoryWhenItsPrecedingActionsHaveExecuted() {
         var expressions = new ExpressionRegistry(); expressions.registerEngine(new MolangEngine());
         var parser = new BehaviorTreeParser(new CitizensBehaviorRegistry(expressions));
