@@ -134,6 +134,11 @@ public class BehaviorRegistry {
         return params != null && (params.getRaw(name) != null || params.keyExists(name)) ? params.getString(name) : fallback;
     }
 
+    private static boolean isScalarParameter(DataKey params) {
+        Object value = params == null ? null : params.getRaw("");
+        return value != null && !(value instanceof Map) && !(value instanceof java.util.Collection);
+    }
+
     static BlockPos blockPosition(double x, double y, double z) {
         for (double coordinate : new double[]{x, y, z}) {
             double block = Math.floor(coordinate);
@@ -770,6 +775,7 @@ public class BehaviorRegistry {
         public String getArgOrParam(int index, String name, DataKey params, String defaultValue) {
             if (args != null && index < args.length)
                 return args[index];
+            if (index == 0 && isScalarParameter(params)) return params.getString("");
 
             return readParameter(params, name, defaultValue);
         }
@@ -828,9 +834,8 @@ public class BehaviorRegistry {
                     }
                 }
             } else if (params != null) {
-                for (DataKey sub : params.getSubKeys()) {
-                    result.put(sub.name(), params.getString(sub.name()));
-                }
+                if (positionalCount > 0 && isScalarParameter(params)) result.put("0", params.getString(""));
+                else for (DataKey sub : params.getSubKeys()) result.put(sub.name(), params.getString(sub.name()));
             }
             return result;
         }

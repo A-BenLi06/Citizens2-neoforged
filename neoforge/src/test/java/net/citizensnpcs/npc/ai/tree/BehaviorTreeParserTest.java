@@ -22,6 +22,16 @@ import net.citizensnpcs.api.util.MemoryDataKey;
  * parser, the registry and the Molang expressions in between actually drive a tree, rather than only compiling.
  */
 public class BehaviorTreeParserTest {
+    @Test public void scalarSingleArgumentBuiltinsUseTheirOwnParameter() {
+        var parser = new BehaviorTreeParser(new CitizensBehaviorRegistry(new ExpressionRegistry()));
+        DataKey root = new MemoryDataKey(); root.setBoolean("wait_until", false);
+        Behavior wait = parser.parseStrict(root.getRelative("wait_until"), null, new ExpressionScope(), new Memory());
+        assertTrue(wait.shouldExecute()); assertEquals(BehaviorStatus.RUNNING, wait.run());
+        Memory memory = new Memory(); memory.set("remembered", 5);
+        root.setString("forget", "remembered");
+        finish(parser.parseStrict(root.getRelative("forget"), null, new ExpressionScope(), memory));
+        org.junit.jupiter.api.Assertions.assertFalse(memory.has("remembered"));
+    }
     @Test public void registeredScalarNodesPassTheirValueToTheBehaviorFactory() {
         var parser = new BehaviorTreeParser(new CitizensBehaviorRegistry(new ExpressionRegistry()));
         DataKey root = new MemoryDataKey(); root.setString("wait", "2");

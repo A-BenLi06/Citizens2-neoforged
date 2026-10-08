@@ -8,6 +8,23 @@ import net.citizensnpcs.api.expr.Memory;
 import net.citizensnpcs.api.util.MemoryDataKey;
 
 class BehaviorContextTest {
+    @Test void scalarValuesFillOnlyTheFirstPositionalParameter() {
+        var root = new MemoryDataKey(java.util.Map.of("node", "original"));
+        var params = root.getRelative("node"); var context = context();
+        assertEquals("original", context.getArgOrParam(0, "key", params, "fallback"));
+        assertEquals("default-duration", context.getArgOrParam(1, "duration", params, "default-duration"));
+        assertEquals(java.util.Map.of("node", "original"), root.getValuesDeep());
+        context.setArgs(new String[]{"override"});
+        assertEquals("override", context.getArgOrParam(0, "key", params, "fallback"));
+    }
+
+    @Test void scalarArgumentMapsDoNotInventAdditionalPositions() {
+        var root = new MemoryDataKey(java.util.Map.of("node", 12));
+        var context = context();
+        assertEquals(java.util.Map.of("0", "12"), context.parseArgs(3, root.getRelative("node")));
+        assertTrue(context.parseArgs(0, root.getRelative("node")).isEmpty());
+        assertEquals(java.util.Map.of("node", 12), root.getValuesDeep());
+    }
     @Test void registrationAndLookupUseTheSameLocaleIndependentNames() {
         java.util.Locale previous = java.util.Locale.getDefault();
         try {
