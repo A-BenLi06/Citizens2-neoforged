@@ -43,11 +43,14 @@ public class BehaviorTrait extends Trait {
 
     public void applyBehaviorsFromKey(DataKey key) {
         DataKey candidate = key.copyWithRoot();
-        if (!candidate.hasSubKeys()) throw new IllegalArgumentException("Behavior tree is empty");
+        var roots = candidate.getSubKeys().iterator();
+        if (!roots.hasNext()) throw new IllegalArgumentException("Behavior tree is empty");
+        DataKey rootKey = roots.next();
+        if (roots.hasNext()) throw new IllegalArgumentException("Behavior tree must contain exactly one root node");
         Memory candidateMemory = memory == null ? new Memory() : memory;
         ExpressionScope scope = NPCExpressionScope.createFor(npc);
         Behavior parsed = new BehaviorTreeParser(CitizensAPI.getBehaviorRegistry()).parseStrict(
-                candidate.getSubKeys().iterator().next(), npc, scope, candidateMemory);
+                rootKey, npc, scope, candidateMemory);
         if (parsed == null) throw new IllegalArgumentException("Behavior tree could not be parsed");
         RootBehavior replacement = new RootBehavior(parsed, scope);
         if (root != null) {

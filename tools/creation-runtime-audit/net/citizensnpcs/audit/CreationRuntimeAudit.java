@@ -447,6 +447,18 @@ public final class CreationRuntimeAudit {
             DataKey savedBehavior = new MemoryDataKey(); behavior.save(savedBehavior);
             check("template_preserve_probe".equals(savedBehavior.getString("tree.root")),
                     "invalid_behavior_replacement_preserves_saved_tree");
+            DataKey ambiguousTree = new MemoryDataKey();
+            ambiguousTree.setRaw("", Map.of("sequence", Map.of("0", "succeed"), "invert", Map.of("0", "fail")));
+            rejected = false;
+            try { behavior.applyBehaviorsFromKey(ambiguousTree); }
+            catch (IllegalArgumentException expected) { rejected = expected.getMessage().contains("exactly one root"); }
+            int beforeAmbiguousRun = runs.get();
+            behaviorTarget.getDefaultBehaviorController().run();
+            check(rejected && runs.get() == beforeAmbiguousRun + 1 && behavior.getMemory() == oldMemory,
+                    "multiple_behavior_roots_preserve_running_tree");
+            DataKey afterAmbiguous = new MemoryDataKey(); behavior.save(afterAmbiguous);
+            check(savedBehavior.getRaw("tree").equals(afterAmbiguous.getRaw("tree")),
+                    "multiple_behavior_roots_preserve_saved_definition");
             DataKey secondSave = new MemoryDataKey(); behavior.save(secondSave);
             check(savedBehavior.getRaw("tree").equals(secondSave.getRaw("tree")),
                     "behavior_definition_survives_repeated_fresh_snapshots");

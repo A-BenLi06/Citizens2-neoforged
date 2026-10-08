@@ -2,6 +2,8 @@
 
 This is the current command and acceptance checklist for Minecraft 1.21.1. The September 13 audit contains historical gaps; later follow-ups supersede those rows. See the [ecosystem scope](neoforge-ecosystem-replacements-2026-09-22.md) for provider ownership.
 
+- New behavior definitions must contain exactly one root node; multiple actions belong under an explicit container. Replacement rejects ambiguous roots before parser/factory execution and preserves the old tree, memory and saved definition. The creation fixture covers this rejection on a live NPC. Legacy persisted-tree compatibility loading remains a separate path.
+
 - Direct conditional container execution now has native coverage on NeoForge 21.1.233 and 21.1.248: the [creation fixture](../tools/creation-runtime-audit/README.md) passes 377 checks per version. Ordinary/packet NPCs preserve timeout/invert controls and execute waiting repeat/loop bodies exactly three times before remaining stopped at a signal wait. Callback failure recovery remains unit-tested; physical-client and arbitrary provider acceptance remain open.
 
 [Interactions remains an independent NeoForge mod/JAR](independent-interactions-jar-2026-10-04.md), with dependency Interactions → Citizens. Its dedicated artifact now includes the release version in its own manifest. This packaging follow-up changes no gameplay classes/resources and leaves both Citizens artifacts byte-identical to the preceding validated build.
