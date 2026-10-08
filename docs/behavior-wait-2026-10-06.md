@@ -15,3 +15,7 @@ evaluation counts, reset and invalid results. A parsed sequence uses a real Mola
 expression and then updates its blackboard. The native creation fixture also runs
 wait nodes inside counted repetition and a timeout on ordinary/packet NPCs. Arbitrary
 expression-provider callbacks remain separate acceptance; Interactions stays independent.
+
+Scalar `wait: 0` and `wait_until: false/true` forms are also exercised on live ordinary
+and packet NPCs. The false condition blocks the following action; replacing the tree
+with a true condition lets the following action complete on subsequent server ticks.

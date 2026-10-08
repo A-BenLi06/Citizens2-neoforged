@@ -95,7 +95,7 @@ public final class CreationRuntimeAudit {
                 grant("citizens.npc.create", "citizens.npc.spawn", "citizens.npc.undo");
                 types = grant("citizens.npc.create.*"); limits = grant("citizens.admin.avoid-limits");
                 admin = grant("citizens.npc.admin");
-                basic(); items(); lifetimes(); vetoAndHistory(); templatesAndPermissions(); commandRegistryTargets(); repeatedBehaviorTicks();
+                basic(); items(); lifetimes(); vetoAndHistory(); templatesAndPermissions(); commandRegistryTargets(); repeatedBehaviorTicks(); scalarBehaviorTicks();
             }
             List<Runnable> due = checks.remove(server.getTickCount() - start);
             if (due != null) due.forEach(Runnable::run);
@@ -632,6 +632,32 @@ public final class CreationRuntimeAudit {
             atTick(23, () -> {
                 check(behavior.getMemory().getNumber("signal_finished") == 1,
                         "native_signal_resumes_waiting_tree_" + packet);
+                target.destroy();
+            });
+        }
+    }
+
+    private static void scalarBehaviorTicks() {
+        for (boolean packet : new boolean[]{false, true}) {
+            NPC target = registry.createNPC(EntityType.COW, "ScalarBehavior" + packet);
+            if (packet) target.getOrAddTrait(PacketNPC.class);
+            var behavior = target.getOrAddTrait(BehaviorTrait.class);
+            DataKey definition = new MemoryDataKey();
+            definition.setRaw("sequence", Map.of("0", Map.of("wait", 0), "1", Map.of("wait_until", false),
+                    "2", "set scalar_finished `1`", "3", "wait_for_signal scalar_audit_hold"));
+            behavior.applyBehaviorsFromKey(definition);
+            check(target.spawn(new Location(level, 24, -58, 4)), "scalar_behavior_spawn_" + packet);
+            atTick(10, () -> check(behavior.getMemory().getNumber("scalar_finished") == 0,
+                    "scalar_false_condition_keeps_native_tree_waiting_" + packet));
+            atTick(20, () -> {
+                DataKey replacement = new MemoryDataKey();
+                replacement.setRaw("sequence", Map.of("0", Map.of("wait", 0), "1", Map.of("wait_until", true),
+                        "2", "set scalar_finished `1`", "3", "wait_for_signal scalar_audit_hold"));
+                behavior.applyBehaviorsFromKey(replacement);
+            });
+            atTick(24, () -> {
+                check(behavior.getMemory().getNumber("scalar_finished") == 1,
+                        "scalar_zero_wait_and_true_condition_advance_native_tree_" + packet);
                 target.destroy();
             });
         }
