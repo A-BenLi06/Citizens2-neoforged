@@ -22,6 +22,62 @@ import net.citizensnpcs.api.util.MemoryDataKey;
  * parser, the registry and the Molang expressions in between actually drive a tree, rather than only compiling.
  */
 public class BehaviorTreeParserTest {
+    @Test public void directConditionalBodiesKeepTheirOuterControl() {
+        for (boolean strict : new boolean[] { false, true }) {
+            var expressions = new ExpressionRegistry(); expressions.registerEngine(new MolangEngine());
+            var parser = new BehaviorTreeParser(new CitizensBehaviorRegistry(expressions));
+            for (String header : java.util.List.of("timeout 0", "invert", "repeat 3", "repeat",
+                    "loop `mem.get('counter') < 3`")) {
+                Memory memory = new Memory(); memory.set("counter", 0D);
+                DataKey root = new MemoryDataKey();
+                Map<String, Object> body = map("if true", "set counter `mem.get('counter') + 1`",
+                        "else", "fail");
+                if (header.equals("repeat")) body.put("count", 3);
+                root.setRaw("", map(header, body));
+                DataKey node = root.getSubKeys().iterator().next();
+                Behavior tree = strict
+                        ? parser.parseStrict(node, null, new ExpressionScope(), memory)
+                        : parser.parse(node, null, new ExpressionScope(), memory);
+                assertTrue(tree.shouldExecute());
+                if (header.equals("timeout 0") || header.equals("invert")) {
+                    assertEquals(BehaviorStatus.FAILURE, tree.run(), header);
+                    assertEquals(header.equals("timeout 0") ? 0D : 1D, memory.getNumber("counter"), header);
+                } else {
+                    BehaviorStatus status = BehaviorStatus.RUNNING;
+                    for (int tick = 0; tick < 20 && status == BehaviorStatus.RUNNING; tick++) status = tree.run();
+                    assertEquals(BehaviorStatus.SUCCESS, status, header);
+                    assertEquals(3D, memory.getNumber("counter"), header);
+                }
+            }
+        }
+    }
+
+    @Test public void customConditionalContainerRetainsFactoryAndNamedParameters() {
+        var registry = new CitizensBehaviorRegistry(new ExpressionRegistry());
+        var calls = new java.util.concurrent.atomic.AtomicInteger();
+        registry.registerBehavior("custom", (params, context) -> {
+            calls.incrementAndGet();
+            assertEquals("kept", params.getString("option"));
+            assertEquals("inline", context.getArgs()[0]);
+            return new net.citizensnpcs.api.ai.tree.InverterDecorator(context.parseChildren(params).get(0));
+        });
+        DataKey root = new MemoryDataKey();
+        root.setRaw("custom inline", map("option", "kept", "if false", "succeed", "else", "fail"));
+        finish(new BehaviorTreeParser(registry).parseStrict(root.getRelative("custom inline"), null,
+                new ExpressionScope(), new Memory()));
+        assertEquals(1, calls.get());
+    }
+
+    @Test public void directConditionalContainersRejectAmbiguousIndexedSiblings() {
+        var parser = new BehaviorTreeParser(new CitizensBehaviorRegistry(new ExpressionRegistry()));
+        for (String header : java.util.List.of("timeout 1", "invert", "repeat 3", "sequence")) {
+            DataKey root = new MemoryDataKey();
+            root.setRaw(header, map("if true", "succeed", "0", "fail"));
+            org.junit.jupiter.api.Assertions.assertThrows(IllegalArgumentException.class,
+                    () -> parser.parseStrict(root.getRelative(header), null, new ExpressionScope(), new Memory()));
+        }
+    }
+
     @Test public void strictConditionalGroupsRejectMultipleBranchesAndExtraFields() {
         var parser = new BehaviorTreeParser(new CitizensBehaviorRegistry(new ExpressionRegistry()));
         for (Map<String, Object> fields : java.util.List.of(

@@ -266,7 +266,12 @@ public class BehaviorTreeParser {
             }
             return parseEvalBlock(key, language, context);
         }
-        return parseLeaf(name, key, context);
+        // A factory owns its parameters and must decide how to parse its children.
+        if (com.google.common.primitives.Ints.tryParse(name) == null
+                && !name.isBlank() && registry.hasBehavior(parseInlineArgs(name)[0]))
+            return parseLeaf(name, key, context);
+        Behavior conditional = parseConditionalGroup(key, context, false);
+        return conditional != null ? conditional : parseLeaf(name, key, context);
     }
 
     private void validateIndexedChildren(DataKey key) {
@@ -278,11 +283,18 @@ public class BehaviorTreeParser {
     }
 
     private List<Behavior> parseIndexedChildren(DataKey key, BehaviorRegistry.BehaviorContext context) {
+        Behavior conditional = parseConditionalGroup(key, context, false);
+        if (conditional != null) return List.of(conditional);
         validateIndexedChildren(key);
-        return parseContainerChildren(key, context);
+        return parseIntegerChildren(key, context);
     }
 
     private List<Behavior> parseContainerChildren(DataKey key, BehaviorRegistry.BehaviorContext context) {
+        Behavior conditional = parseConditionalGroup(key, context, true);
+        return conditional != null ? List.of(conditional) : parseIntegerChildren(key, context);
+    }
+
+    private List<Behavior> parseIntegerChildren(DataKey key, BehaviorRegistry.BehaviorContext context) {
         List<Behavior> children = new ArrayList<>();
         DataKey ifKey = null;
         DataKey elseKey = null;
@@ -496,28 +508,6 @@ public class BehaviorTreeParser {
         if (key.name().equals("else")) return orphanElse(key);
         if (key.hasSubKeys() || key.getRaw("") instanceof java.util.Map
                 || key.getRaw("") instanceof java.util.Collection) {
-            DataKey ifKey = null;
-            DataKey elseKey = null;
-            String unexpectedConditionalField = null;
-            for (DataKey sub : key.getSubKeys()) {
-                String name = sub.name();
-                if (name.startsWith("if ")) {
-                    if (strict && ifKey != null)
-                        throw new IllegalArgumentException("Multiple if branches in behavior node at " + key.getPath());
-                    ifKey = sub;
-                } else if (name.equals("else")) {
-                    elseKey = sub;
-                } else {
-                    unexpectedConditionalField = sub.getPath();
-                }
-            }
-            if (ifKey != null) {
-                if (strict && unexpectedConditionalField != null)
-                    throw new IllegalArgumentException("Unexpected field in conditional behavior: " + unexpectedConditionalField);
-                return parseIfElse(ifKey, elseKey, context);
-            }
-            if (elseKey != null) orphanElse(elseKey);
-
             return parseContainer(key.name(), key, context);
         } else {
             String value = key.getString("");
@@ -528,6 +518,33 @@ public class BehaviorTreeParser {
             }
             return parseLeaf(key.name(), key, context);
         }
+    }
+
+    private Behavior parseConditionalGroup(DataKey key, BehaviorRegistry.BehaviorContext context,
+            boolean allowNamedParameters) {
+        DataKey ifKey = null;
+        DataKey elseKey = null;
+        String unexpectedConditionalField = null;
+        for (DataKey sub : key.getSubKeys()) {
+            String name = sub.name();
+            if (name.startsWith("if ")) {
+                if (strict && ifKey != null)
+                    throw new IllegalArgumentException("Multiple if branches in behavior node at " + key.getPath());
+                ifKey = sub;
+            } else if (name.equals("else")) {
+                elseKey = sub;
+            } else if (!allowNamedParameters || com.google.common.primitives.Ints.tryParse(name) != null) {
+                unexpectedConditionalField = sub.getPath();
+            }
+        }
+        if (ifKey != null) {
+            if (strict && unexpectedConditionalField != null)
+                throw new IllegalArgumentException("Unexpected field in conditional behavior: " + unexpectedConditionalField);
+            return parseIfElse(ifKey, elseKey, context);
+        }
+        if (elseKey != null) orphanElse(elseKey);
+
+        return null;
     }
 
     private Behavior orphanElse(DataKey key) {
