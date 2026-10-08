@@ -388,20 +388,29 @@ public class BehaviorRegistry {
             };
 
             return new Behavior() {
+                private long revision;
+                private boolean evaluating;
+
                 @Override
                 public void reset() {
+                    revision++;
                 }
 
                 @Override
                 public BehaviorStatus run() {
-                    if (literalCondition != null ? literalCondition : conditionHolder.evaluateAsBoolean(context.getScope()))
-                        return BehaviorStatus.SUCCESS;
-
-                    return BehaviorStatus.RUNNING;
+                    if (evaluating) return BehaviorStatus.RUNNING;
+                    long before = revision;
+                    evaluating = true;
+                    try {
+                        boolean ready = literalCondition != null ? literalCondition
+                                : conditionHolder.evaluateAsBoolean(context.getScope());
+                        return revision == before && ready ? BehaviorStatus.SUCCESS : BehaviorStatus.RUNNING;
+                    } finally { evaluating = false; }
                 }
 
                 @Override
                 public boolean shouldExecute() {
+                    reset();
                     return true;
                 }
             };

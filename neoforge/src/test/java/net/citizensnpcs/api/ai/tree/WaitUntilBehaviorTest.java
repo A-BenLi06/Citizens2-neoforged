@@ -7,6 +7,59 @@ import net.citizensnpcs.api.util.MemoryDataKey;
 import net.citizensnpcs.npc.ai.tree.*;
 
 class WaitUntilBehaviorTest {
+    private static Behavior dynamic(java.util.function.Supplier<Object> condition) {
+        var expressions = new ExpressionRegistry();
+        expressions.registerEngine(new ExpressionEngine() {
+            public String getName() { return "conditionprobe"; }
+            public CompiledExpression compile(String source) { return scope -> condition.get(); }
+        });
+        expressions.setDefaultEngine("conditionprobe");
+        var context = new BehaviorRegistry.BehaviorContext(null, new ExpressionScope(), expressions, new Memory());
+        context.setArgs(new String[] { "`condition`" });
+        return new BehaviorRegistry(expressions).createBehavior("wait_until", null, context);
+    }
+
+    @Test void resetOrRestartDuringConditionEvaluationDiscardsOldSuccess() {
+        for (boolean restart : new boolean[] { false, true }) {
+            Behavior[] holder = new Behavior[1];
+            var calls = new java.util.concurrent.atomic.AtomicInteger();
+            holder[0] = dynamic(() -> {
+                if (calls.incrementAndGet() == 1) {
+                    if (restart) assertTrue(holder[0].shouldExecute()); else holder[0].reset();
+                    return true;
+                }
+                return false;
+            });
+            assertTrue(holder[0].shouldExecute());
+            assertEquals(BehaviorStatus.RUNNING, holder[0].run());
+            assertEquals(BehaviorStatus.RUNNING, holder[0].run());
+            assertEquals(2, calls.get());
+        }
+    }
+
+    @Test void recursiveRunCannotEvaluateConditionAgain() {
+        Behavior[] holder = new Behavior[1]; var calls = new java.util.concurrent.atomic.AtomicInteger();
+        holder[0] = dynamic(() -> {
+            calls.incrementAndGet();
+            assertEquals(BehaviorStatus.RUNNING, holder[0].run());
+            return true;
+        });
+        assertTrue(holder[0].shouldExecute()); assertEquals(BehaviorStatus.SUCCESS, holder[0].run());
+        assertEquals(1, calls.get());
+    }
+
+    @Test void conditionFailureDoesNotLeaveEvaluationGuardLocked() {
+        var calls = new java.util.concurrent.atomic.AtomicInteger();
+        var failure = new IllegalStateException("condition");
+        Behavior wait = dynamic(() -> {
+            if (calls.incrementAndGet() == 1) throw failure;
+            return true;
+        });
+        assertSame(failure, assertThrows(IllegalStateException.class, wait::run));
+        wait.reset(); assertTrue(wait.shouldExecute());
+        assertEquals(BehaviorStatus.SUCCESS, wait.run()); assertEquals(2, calls.get());
+    }
+
     @Test void literalFalseAndZeroWaitWhileTrueAndOneComplete() {
         var expressions = new ExpressionRegistry(); var registry = new BehaviorRegistry(expressions);
         for (String value : new String[]{"false", " FALSE ", "0", "true", "TRUE", "1"}) {
