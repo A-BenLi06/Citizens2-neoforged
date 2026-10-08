@@ -1,11 +1,13 @@
 # Native NPC creation runtime audit
 
-The fixture currently has 379 checks. Template coverage includes sibling definitions,
+The fixture currently has 385 checks. Template coverage includes sibling definitions,
 overwrite index consistency, and applying the updated trait value through creation.
 Behavior short-form coverage includes missing arguments/files, malformed YAML and a
 valid filename containing spaces, with target preservation on file-input failures.
 Behavior replacement checks reject an unknown node while preserving execution of the
 old tree, blackboard identity and saved tree data.
+Negative, malformed and overflowing wait literals are also rejected before replacing
+the old execution, memory or saved definition.
 Replacement also rejects multiple root nodes before choosing any of them, preserving
 the running tree, blackboard and saved definition. Group multiple actions under a
 single sequence or another explicit container.
@@ -19,7 +21,9 @@ The same live tree selects a grouped conditional's else branch, completes a time
 subtree and checks first-use/blocked-repeat cooldown behavior through an inverter.
 Additional ordinary/packet trees place conditional groups directly under timeout,
 invert, named-count repeat and loop nodes. Zero timeout prevents child effects;
-repeat and loop each execute their waiting bodies three times on native ticks.
+The repeat body sets a dynamic timeout budget to 4, 3, 2 and 1 ticks across four
+attempts at a two-tick wait. Exactly three effects complete; the fourth times out,
+and its enclosing inverter allows progression. Loop executes its waiting body three times.
 Later ticks verify that the completed containers remain stopped at a signal wait.
 Separate ordinary/packet trees use scalar wait and wait_until configuration: false
 keeps the tree blocked, while replacing it with true advances through the zero wait.

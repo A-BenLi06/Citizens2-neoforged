@@ -459,6 +459,19 @@ public final class CreationRuntimeAudit {
             DataKey afterAmbiguous = new MemoryDataKey(); behavior.save(afterAmbiguous);
             check(savedBehavior.getRaw("tree").equals(afterAmbiguous.getRaw("tree")),
                     "multiple_behavior_roots_preserve_saved_definition");
+            for (String duration : List.of("-1", "not-a-duration", "2147483648")) {
+                DataKey invalidWait = new MemoryDataKey(); invalidWait.setString("wait", duration);
+                rejected = false;
+                try { behavior.applyBehaviorsFromKey(invalidWait); }
+                catch (IllegalArgumentException expected) { rejected = true; }
+                int beforeInvalidWait = runs.get();
+                behaviorTarget.getDefaultBehaviorController().run();
+                check(rejected && runs.get() == beforeInvalidWait + 1 && behavior.getMemory() == oldMemory,
+                        "invalid_wait_literal_preserves_running_tree_" + duration);
+                DataKey afterWait = new MemoryDataKey(); behavior.save(afterWait);
+                check(savedBehavior.getRaw("tree").equals(afterWait.getRaw("tree")),
+                        "invalid_wait_literal_preserves_saved_definition_" + duration);
+            }
             DataKey secondSave = new MemoryDataKey(); behavior.save(secondSave);
             check(savedBehavior.getRaw("tree").equals(secondSave.getRaw("tree")),
                     "behavior_definition_survives_repeated_fresh_snapshots");
@@ -659,8 +672,10 @@ public final class CreationRuntimeAudit {
                     "0", Map.of("invert", Map.of("0", Map.of("timeout 0",
                             Map.of("if true", "set timeout_wrong `1`")))),
                     "1", Map.of("invert", Map.of("if false", "succeed", "else", "fail")),
-                    "2", Map.of("repeat", Map.of("count", 3, "if true", Map.of(
-                            "0", "wait 2", "1", "set repetitions `mem.get('repetitions') + 1`"))),
+                    "2", Map.of("invert", Map.of("0", Map.of("repeat", Map.of("count", 4, "if true", Map.of(
+                            "0", "set budget `4 - mem.get('repetitions')`",
+                            "1", Map.of("timeout `mem.get('budget')`", Map.of("0", "wait 2")),
+                            "2", "set repetitions `mem.get('repetitions') + 1`"))))),
                     "3", Map.of("loop `mem.get('loops') < 3`", Map.of("if true", Map.of(
                             "0", "wait 2", "1", "set loops `mem.get('loops') + 1`"))),
                     "4", "set containers_finished `1`",
@@ -672,8 +687,9 @@ public final class CreationRuntimeAudit {
             atTick(2, () -> check(behavior.getMemory().getNumber("containers_finished") == 0,
                     "conditional_containers_yield_across_ticks_" + packet));
             atTick(40, () -> {
-                check(behavior.getMemory().getNumber("repetitions") == 3,
-                        "direct_conditional_repeat_retains_named_count_" + packet);
+                check(behavior.getMemory().getNumber("repetitions") == 3
+                        && behavior.getMemory().getNumber("budget") == 1,
+                        "dynamic_timeout_rechecks_budget_and_stops_fourth_iteration_" + packet);
                 check(behavior.getMemory().getNumber("loops") == 3,
                         "direct_conditional_loop_restarts_waiting_body_" + packet);
                 check(behavior.getMemory().getNumber("timeout_wrong") == 0
