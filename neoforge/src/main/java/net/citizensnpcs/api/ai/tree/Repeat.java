@@ -25,6 +25,17 @@ public final class Repeat implements Behavior {
         if (release) child.reset();
     }
 
+    private void abort(long before, Throwable failure) {
+        if (revision != before) return;
+        remaining = 0;
+        finished = true;
+        terminal = BehaviorStatus.FAILURE;
+        try { releaseChild(); }
+        catch (RuntimeException | Error cleanup) {
+            if (cleanup != failure) failure.addSuppressed(cleanup);
+        }
+    }
+
     @Override public void reset() {
         revision++;
         remaining = 0;
@@ -51,18 +62,28 @@ public final class Repeat implements Behavior {
         reset();
         if (revision != requested) return false;
         long before = revision;
-        int repetitions = count.getAsInt();
-        if (revision != before) return false;
-        if (repetitions < 0) throw new IllegalArgumentException("Repeat count must not be negative");
-        remaining = repetitions;
-        finished = remaining == 0;
-        return finished || startChild();
+        try {
+            int repetitions = count.getAsInt();
+            if (revision != before) return false;
+            if (repetitions < 0) throw new IllegalArgumentException("Repeat count must not be negative");
+            remaining = repetitions;
+            finished = remaining == 0;
+            return finished || startChild();
+        } catch (RuntimeException | Error failure) {
+            abort(before, failure);
+            throw failure;
+        }
     }
 
     @Override public BehaviorStatus run() {
         if (running) return BehaviorStatus.RUNNING;
         running = true;
+        long before = revision;
         try { return runOnce(); }
+        catch (RuntimeException | Error failure) {
+            abort(before, failure);
+            throw failure;
+        }
         finally { running = false; }
     }
 
