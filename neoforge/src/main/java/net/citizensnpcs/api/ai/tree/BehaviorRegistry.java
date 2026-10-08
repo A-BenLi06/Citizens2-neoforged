@@ -93,15 +93,22 @@ public class BehaviorRegistry {
 
     private static int durationTicks(Object value) {
         if (value instanceof Number number) {
-            double ticks = number.doubleValue();
-            if (!Double.isFinite(ticks) || ticks < 0 || ticks > Integer.MAX_VALUE || ticks != Math.rint(ticks))
-                throw new IllegalArgumentException("Wait duration must be a non-negative integer tick count");
-            return (int) ticks;
+            try {
+                int ticks = new java.math.BigDecimal(number.toString()).intValueExact();
+                if (ticks < 0) throw new IllegalArgumentException("Wait duration must not be negative");
+                return ticks;
+            } catch (NumberFormatException | ArithmeticException invalid) {
+                throw new IllegalArgumentException("Wait duration must be a non-negative integer tick count", invalid);
+            }
         }
         if (!(value instanceof String text)) throw new IllegalArgumentException("Invalid wait duration: " + value);
-        Duration duration = Durations.parse(text);
-        if (duration.isNegative()) throw new IllegalArgumentException("Wait duration must not be negative");
-        return Durations.toTicks(duration);
+        try {
+            Duration duration = Durations.parse(text);
+            if (duration.isNegative()) throw new IllegalArgumentException("Wait duration must not be negative");
+            return Durations.toTicks(duration);
+        } catch (java.time.DateTimeException | ArithmeticException invalid) {
+            throw new IllegalArgumentException("Invalid wait duration: " + text, invalid);
+        }
     }
 
     static Integer signalTargetId(Number value) {
@@ -168,6 +175,7 @@ public class BehaviorRegistry {
             String durationStr = context.getArgOrParam(0, "", params, "20");
             ExpressionRegistry.ExpressionValue durationHolder = expressions.parseValue(
                     durationStr == null || durationStr.isBlank() ? "20" : durationStr);
+            if (!durationHolder.isExpression()) durationTicks(durationHolder.evaluate(context.getScope()));
 
             return new Behavior() {
                 private int ticksRemaining;

@@ -8,6 +8,36 @@ import net.citizensnpcs.api.expr.*;
 import net.citizensnpcs.api.util.MemoryDataKey;
 
 class WaitBehaviorTest {
+    @Test void invalidLiteralDurationsAreRejectedBeforeExecution() {
+        for (boolean shortForm : new boolean[] { false, true }) {
+            for (String input : new String[] { "-1", "not-a-duration", "-0.01s", "2147483648", "100000000d" }) {
+                assertThrows(IllegalArgumentException.class, () -> waitFor(new ExpressionRegistry(), input, shortForm), input);
+            }
+        }
+    }
+
+    @Test void expressionNumbersMustBeExactlyRepresentableAsIntegerTicks() {
+        var value = new AtomicReference<Object>();
+        var expressions = new ExpressionRegistry();
+        expressions.registerEngine(new ExpressionEngine() {
+            public String getName() { return "exactwait"; }
+            public CompiledExpression compile(String source) { return scope -> value.get(); }
+        });
+        expressions.setDefaultEngine("exactwait");
+        Behavior wait = waitFor(expressions, "`duration`", true);
+        for (String invalid : new String[] { "1.00000000000000000001", "2147483647.00000001", "-0.00000000000000000001" }) {
+            value.set(new java.math.BigDecimal(invalid));
+            assertThrows(IllegalArgumentException.class, wait::shouldExecute, invalid);
+        }
+        value.set(new java.math.BigDecimal("2.00000000000000000000"));
+        assertTrue(wait.shouldExecute());
+        assertEquals(BehaviorStatus.RUNNING, wait.run());
+        assertEquals(BehaviorStatus.SUCCESS, wait.run());
+        value.set(java.math.BigInteger.valueOf(Integer.MAX_VALUE));
+        assertTrue(wait.shouldExecute()); assertEquals(BehaviorStatus.RUNNING, wait.run());
+        wait.reset();
+    }
+
     private static Behavior waitFor(ExpressionRegistry expressions, String input, boolean shortForm) {
         var registry = new BehaviorRegistry(expressions);
         var context = new BehaviorRegistry.BehaviorContext(null, new ExpressionScope(), expressions, new Memory());
