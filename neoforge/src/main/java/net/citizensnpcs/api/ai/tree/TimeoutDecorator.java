@@ -12,6 +12,7 @@ public class TimeoutDecorator implements Behavior {
     private boolean budgetReady;
     private int ticksElapsed;
     private boolean active;
+    private boolean running;
     private BehaviorStatus terminal;
     private long revision;
 
@@ -56,6 +57,26 @@ public class TimeoutDecorator implements Behavior {
 
     @Override
     public BehaviorStatus run() {
+        if (running) return BehaviorStatus.RUNNING;
+        running = true;
+        long before = revision;
+        try { return runOnce(); }
+        catch (RuntimeException | Error failure) {
+            abort(before, failure);
+            throw failure;
+        } finally { running = false; }
+    }
+
+    private void abort(long before, Throwable failure) {
+        if (revision != before) return;
+        terminal = BehaviorStatus.FAILURE;
+        try { releaseChild(); }
+        catch (RuntimeException | Error cleanup) {
+            if (cleanup != failure) failure.addSuppressed(cleanup);
+        }
+    }
+
+    private BehaviorStatus runOnce() {
         if (terminal != null) return terminal;
         if (!prepareBudget()) return BehaviorStatus.RUNNING;
         long before = revision;
@@ -87,11 +108,7 @@ public class TimeoutDecorator implements Behavior {
         boolean ready;
         try { ready = child.shouldExecute(); }
         catch (RuntimeException | Error failure) {
-            if (revision == requested) {
-                terminal = BehaviorStatus.FAILURE;
-                try { releaseChild(); }
-                catch (RuntimeException | Error cleanup) { if (cleanup != failure) failure.addSuppressed(cleanup); }
-            }
+            abort(requested, failure);
             throw failure;
         }
         if (revision != requested) return false;

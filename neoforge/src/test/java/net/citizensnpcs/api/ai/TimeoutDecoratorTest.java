@@ -5,6 +5,60 @@ import org.junit.jupiter.api.Test;
 import net.citizensnpcs.api.ai.tree.*;
 
 class TimeoutDecoratorTest {
+    @Test void nestedRunDoesNotConsumeBudgetOrExecuteTheChildAgain() {
+        TimeoutDecorator[] holder = new TimeoutDecorator[1];
+        var child = new Child() {
+            @Override public BehaviorStatus run() {
+                calls++;
+                assertEquals(BehaviorStatus.RUNNING, holder[0].run());
+                return BehaviorStatus.RUNNING;
+            }
+        };
+        holder[0] = new TimeoutDecorator(child, 2);
+        assertTrue(holder[0].shouldExecute());
+        assertEquals(BehaviorStatus.RUNNING, holder[0].run());
+        assertEquals(BehaviorStatus.RUNNING, holder[0].run());
+        assertEquals(BehaviorStatus.FAILURE, holder[0].run());
+        assertEquals(2, child.calls); assertEquals(1, child.resets);
+    }
+
+    @Test void runFailureReleasesChildAndPreservesCleanupFailure() {
+        var primary = new IllegalStateException("run");
+        var cleanup = new AssertionError("cleanup");
+        var child = new Child() {
+            @Override public BehaviorStatus run() { calls++; throw primary; }
+            @Override public void reset() { resets++; throw cleanup; }
+        };
+        var timeout = new TimeoutDecorator(child, 5);
+        assertTrue(timeout.shouldExecute());
+        assertSame(primary, assertThrows(IllegalStateException.class, timeout::run));
+        assertArrayEquals(new Throwable[] { cleanup }, primary.getSuppressed());
+        assertEquals(BehaviorStatus.FAILURE, timeout.run());
+        timeout.reset(); assertEquals(1, child.calls); assertEquals(1, child.resets);
+    }
+
+    @Test void staleRunFailureDoesNotAbortAReplacementActivation() {
+        TimeoutDecorator[] holder = new TimeoutDecorator[1];
+        var first = new java.util.concurrent.atomic.AtomicBoolean(true);
+        var primary = new IllegalStateException("old run");
+        var child = new Child() {
+            @Override public BehaviorStatus run() {
+                calls++;
+                if (first.getAndSet(false)) {
+                    assertTrue(holder[0].shouldExecute());
+                    throw primary;
+                }
+                return BehaviorStatus.SUCCESS;
+            }
+        };
+        holder[0] = new TimeoutDecorator(child, 1);
+        assertTrue(holder[0].shouldExecute());
+        assertSame(primary, assertThrows(IllegalStateException.class, holder[0]::run));
+        assertEquals(1, child.resets);
+        assertEquals(BehaviorStatus.SUCCESS, holder[0].run());
+        assertEquals(2, child.calls); assertEquals(2, child.resets);
+    }
+
     @Test void dynamicBudgetIsCapturedPerActivationAndResetDoesNotEvaluate() {
         var child = new Child(); var budget = new java.util.concurrent.atomic.AtomicInteger(2);
         var evaluations = new java.util.concurrent.atomic.AtomicInteger();
