@@ -22,6 +22,38 @@ import net.citizensnpcs.api.util.MemoryDataKey;
  * parser, the registry and the Molang expressions in between actually drive a tree, rather than only compiling.
  */
 public class BehaviorTreeParserTest {
+    @Test public void explicitEmptyConditionalBranchesSucceedAndReachTheirSuccessor() {
+        for (boolean strict : new boolean[] { false, true }) {
+            for (boolean selectedIf : new boolean[] { false, true }) {
+                for (Object empty : java.util.List.of(Map.of(), java.util.List.of())) {
+                    var expressions = new ExpressionRegistry(); expressions.registerEngine(new MolangEngine());
+                    var parser = new BehaviorTreeParser(new CitizensBehaviorRegistry(expressions));
+                    Memory memory = new Memory(); DataKey root = new MemoryDataKey();
+                    root.setRaw("sequence", map("0", map("if " + selectedIf,
+                            selectedIf ? empty : "fail", "else", selectedIf ? "fail" : empty),
+                            "1", "set after `1`"));
+                    Behavior tree = strict
+                            ? parser.parseStrict(root.getRelative("sequence"), null, new ExpressionScope(), memory)
+                            : parser.parse(root.getRelative("sequence"), null, new ExpressionScope(), memory);
+                    finish(tree);
+                    assertEquals(1D, memory.getNumber("after"));
+                }
+            }
+        }
+    }
+
+    @Test public void emptyYamlElseBranchRemainsExecutableAfterLoading(@org.junit.jupiter.api.io.TempDir java.nio.file.Path directory)
+            throws java.io.IOException {
+        for (String empty : java.util.List.of("{}", "[]")) {
+            java.nio.file.Path file = directory.resolve("empty-branch.yml");
+            java.nio.file.Files.writeString(file, "sequence:\n  - if false: fail\n    else: " + empty + "\n  - succeed\n");
+            var storage = new net.citizensnpcs.api.util.YamlStorage(file.toFile());
+            assertTrue(storage.load());
+            var parser = new BehaviorTreeParser(new CitizensBehaviorRegistry(new ExpressionRegistry()));
+            finish(parser.parseStrict(storage.getKey("sequence"), null, new ExpressionScope(), new Memory()));
+        }
+    }
+
     @Test public void directConditionalBodiesKeepTheirOuterControl() {
         for (boolean strict : new boolean[] { false, true }) {
             var expressions = new ExpressionRegistry(); expressions.registerEngine(new MolangEngine());

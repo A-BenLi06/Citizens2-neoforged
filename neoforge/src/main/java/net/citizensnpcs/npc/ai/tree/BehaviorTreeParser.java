@@ -383,18 +383,20 @@ public class BehaviorTreeParser {
         Supplier<Boolean> condition = parseCondition(conditionStr, context);
 
         Behavior ifBehavior;
-        if (ifKey.hasSubKeys()) {
+        if (isBranchContainer(ifKey)) {
             List<Behavior> children = parseIndexedChildren(ifKey, context);
-            ifBehavior = children.size() == 1 ? children.get(0) : Sequence.createSequence(children);
+            ifBehavior = children.isEmpty() ? EMPTY
+                    : children.size() == 1 ? children.get(0) : Sequence.createSequence(children);
         } else {
             String value = ifKey.getString("");
             ifBehavior = parseLeaf(value, null, context);
         }
         Behavior elseBehavior = null;
         if (elseKey != null) {
-            if (elseKey.hasSubKeys()) {
+            if (isBranchContainer(elseKey)) {
                 List<Behavior> children = parseIndexedChildren(elseKey, context);
-                elseBehavior = children.size() == 1 ? children.get(0) : Sequence.createSequence(children);
+                elseBehavior = children.isEmpty() ? EMPTY
+                        : children.size() == 1 ? children.get(0) : Sequence.createSequence(children);
             } else {
                 String value = elseKey.getString("");
                 if (value != null && !value.isEmpty()) {
@@ -518,6 +520,11 @@ public class BehaviorTreeParser {
             }
             return parseLeaf(key.name(), key, context);
         }
+    }
+
+    private boolean isBranchContainer(DataKey key) {
+        return key.hasSubKeys() || key.getRaw("") instanceof java.util.Map
+                || key.getRaw("") instanceof java.util.Collection<?> values && values.isEmpty();
     }
 
     private Behavior parseConditionalGroup(DataKey key, BehaviorRegistry.BehaviorContext context,
