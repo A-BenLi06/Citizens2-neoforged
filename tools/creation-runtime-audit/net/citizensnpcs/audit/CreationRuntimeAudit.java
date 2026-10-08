@@ -95,7 +95,7 @@ public final class CreationRuntimeAudit {
                 grant("citizens.npc.create", "citizens.npc.spawn", "citizens.npc.undo");
                 types = grant("citizens.npc.create.*"); limits = grant("citizens.admin.avoid-limits");
                 admin = grant("citizens.npc.admin");
-                basic(); items(); lifetimes(); vetoAndHistory(); templatesAndPermissions(); commandRegistryTargets(); repeatedBehaviorTicks(); scalarBehaviorTicks();
+                basic(); items(); lifetimes(); vetoAndHistory(); templatesAndPermissions(); commandRegistryTargets(); repeatedBehaviorTicks(); scalarBehaviorTicks(); conditionalContainerTicks();
             }
             List<Runnable> due = checks.remove(server.getTickCount() - start);
             if (due != null) due.forEach(Runnable::run);
@@ -632,6 +632,47 @@ public final class CreationRuntimeAudit {
             atTick(23, () -> {
                 check(behavior.getMemory().getNumber("signal_finished") == 1,
                         "native_signal_resumes_waiting_tree_" + packet);
+                target.destroy();
+            });
+        }
+    }
+
+    private static void conditionalContainerTicks() {
+        for (boolean packet : new boolean[] { false, true }) {
+            NPC target = registry.createNPC(EntityType.COW, "ConditionalContainers" + packet);
+            if (packet) target.getOrAddTrait(PacketNPC.class);
+            var behavior = target.getOrAddTrait(BehaviorTrait.class);
+            DataKey definition = new MemoryDataKey();
+            definition.setRaw("sequence", Map.of(
+                    "0", Map.of("invert", Map.of("0", Map.of("timeout 0",
+                            Map.of("if true", "set timeout_wrong `1`")))),
+                    "1", Map.of("invert", Map.of("if false", "succeed", "else", "fail")),
+                    "2", Map.of("repeat", Map.of("count", 3, "if true", Map.of(
+                            "0", "wait 2", "1", "set repetitions `mem.get('repetitions') + 1`"))),
+                    "3", Map.of("loop `mem.get('loops') < 3`", Map.of("if true", Map.of(
+                            "0", "wait 2", "1", "set loops `mem.get('loops') + 1`"))),
+                    "4", "set containers_finished `1`",
+                    "5", "wait_for_signal conditional_containers_hold"));
+            behavior.applyBehaviorsFromKey(definition);
+            behavior.getMemory().set("repetitions", 0D);
+            behavior.getMemory().set("loops", 0D);
+            check(target.spawn(new Location(level, 26, -58, 4)), "conditional_containers_spawn_" + packet);
+            atTick(2, () -> check(behavior.getMemory().getNumber("containers_finished") == 0,
+                    "conditional_containers_yield_across_ticks_" + packet));
+            atTick(40, () -> {
+                check(behavior.getMemory().getNumber("repetitions") == 3,
+                        "direct_conditional_repeat_retains_named_count_" + packet);
+                check(behavior.getMemory().getNumber("loops") == 3,
+                        "direct_conditional_loop_restarts_waiting_body_" + packet);
+                check(behavior.getMemory().getNumber("timeout_wrong") == 0
+                        && behavior.getMemory().getNumber("containers_finished") == 1,
+                        "direct_conditional_timeout_and_invert_keep_outer_control_" + packet);
+            });
+            atTick(44, () -> {
+                check(behavior.getMemory().getNumber("repetitions") == 3
+                        && behavior.getMemory().getNumber("loops") == 3
+                        && behavior.getMemory().getNumber("containers_finished") == 1,
+                        "completed_conditional_containers_do_not_restart_" + packet);
                 target.destroy();
             });
         }
