@@ -513,8 +513,11 @@ public class BehaviorTreeParser {
             return parseContainer(key.name(), key, context);
         } else {
             String value = key.getString("");
-            if (value != null && !value.isEmpty())
+            if (value != null && !value.isEmpty()) {
+                if (com.google.common.primitives.Ints.tryParse(key.name()) == null && registry.hasBehavior(key.name()))
+                    return parseLeaf(key.name(), key, context);
                 return parseLeaf(value, null, context);
+            }
             return parseLeaf(key.name(), key, context);
         }
     }

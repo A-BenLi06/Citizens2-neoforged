@@ -22,6 +22,47 @@ import net.citizensnpcs.api.util.MemoryDataKey;
  * parser, the registry and the Molang expressions in between actually drive a tree, rather than only compiling.
  */
 public class BehaviorTreeParserTest {
+    @Test public void registeredScalarNodesPassTheirValueToTheBehaviorFactory() {
+        var parser = new BehaviorTreeParser(new CitizensBehaviorRegistry(new ExpressionRegistry()));
+        DataKey root = new MemoryDataKey(); root.setString("wait", "2");
+        Behavior wait = parser.parseStrict(root.getRelative("wait"), null, new ExpressionScope(), new Memory());
+        assertTrue(wait.shouldExecute());
+        assertEquals(BehaviorStatus.RUNNING, wait.run());
+        assertEquals(BehaviorStatus.SUCCESS, wait.run());
+        root.setString("root", "wait 1");
+        Behavior wrapped = parser.parseStrict(root.getRelative("root"), null, new ExpressionScope(), new Memory());
+        assertTrue(wrapped.shouldExecute()); assertEquals(BehaviorStatus.SUCCESS, wrapped.run());
+        root.setString("repeat", "3");
+        org.junit.jupiter.api.Assertions.assertThrows(IllegalArgumentException.class,
+                () -> parser.parseStrict(root.getRelative("repeat"), null, new ExpressionScope(), new Memory()));
+    }
+
+    @Test public void customScalarParametersKeepTheirOriginalValue() {
+        var registry = new CitizensBehaviorRegistry(new ExpressionRegistry()); Memory memory = new Memory();
+        registry.registerBehavior("scalar_capture", (params, context) -> {
+            String value = params.getString("");
+            return (net.citizensnpcs.api.ai.tree.InstantBehavior) () -> {
+                context.getMemory().set("captured", value); return BehaviorStatus.SUCCESS;
+            };
+        });
+        DataKey root = new MemoryDataKey(java.util.Map.of("SCALAR_CAPTURE", "Keep Mixed CASE"));
+        finish(new BehaviorTreeParser(registry).parseStrict(root.getRelative("SCALAR_CAPTURE"), null, new ExpressionScope(), memory));
+        assertEquals("Keep Mixed CASE", memory.getString("captured"));
+    }
+
+    @Test public void numericListKeysStillUseTheirLeafValues() {
+        var registry = new CitizensBehaviorRegistry(new ExpressionRegistry()); Memory memory = new Memory();
+        var wrong = new java.util.concurrent.atomic.AtomicInteger();
+        registry.registerBehavior("0", (params, context) -> {
+            wrong.incrementAndGet(); return (net.citizensnpcs.api.ai.tree.InstantBehavior) () -> BehaviorStatus.SUCCESS;
+        });
+        registry.registerBehavior("ordinary", (params, context) -> (net.citizensnpcs.api.ai.tree.InstantBehavior) () -> {
+            context.getMemory().set("after", 1D); return BehaviorStatus.SUCCESS;
+        });
+        DataKey root = new MemoryDataKey(); root.setRaw("sequence", map("0", "ordinary"));
+        finish(new BehaviorTreeParser(registry).parseStrict(root.getRelative("sequence"), null, new ExpressionScope(), memory));
+        assertEquals(0, wrong.get()); assertEquals(1D, memory.getNumber("after"));
+    }
     @Test public void strictBuiltinContainersRejectUnrecognizedChildKeys() {
         var expressions = new ExpressionRegistry(); expressions.registerEngine(new MolangEngine());
         var parser = new BehaviorTreeParser(new CitizensBehaviorRegistry(expressions));

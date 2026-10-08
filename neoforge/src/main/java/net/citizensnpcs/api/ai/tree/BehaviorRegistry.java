@@ -327,7 +327,7 @@ public class BehaviorRegistry {
             String countStr = context.getArgOrParam(0, "count", params, "1");
             ExpressionValue countHolder = expressions.parseValue(countStr);
 
-            if (params == null)
+            if (params == null || !(params.getRaw("") instanceof Map || params.getRaw("") instanceof java.util.Collection))
                 return null;
             if (!countHolder.isExpression()) repetitionCount(countHolder.evaluate(context.getScope()));
             java.util.List<Behavior> children = context.parseChildren(params);
