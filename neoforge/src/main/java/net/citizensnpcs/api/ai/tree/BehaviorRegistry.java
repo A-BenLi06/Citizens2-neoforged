@@ -179,9 +179,11 @@ public class BehaviorRegistry {
 
             return new Behavior() {
                 private int ticksRemaining;
+                private long revision;
 
                 @Override
                 public void reset() {
+                    revision++;
                     ticksRemaining = 0;
                 }
 
@@ -196,8 +198,13 @@ public class BehaviorRegistry {
 
                 @Override
                 public boolean shouldExecute() {
-                    ticksRemaining = 0;
-                    ticksRemaining = durationTicks(durationHolder.evaluate(context.getScope()));
+                    reset();
+                    long before = revision;
+                    Object value = durationHolder.evaluate(context.getScope());
+                    if (revision != before) return false;
+                    int ticks = durationTicks(value);
+                    if (revision != before) return false;
+                    ticksRemaining = ticks;
                     return true;
                 }
             };

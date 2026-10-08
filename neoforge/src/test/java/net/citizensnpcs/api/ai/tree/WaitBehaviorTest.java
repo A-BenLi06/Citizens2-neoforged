@@ -8,6 +8,45 @@ import net.citizensnpcs.api.expr.*;
 import net.citizensnpcs.api.util.MemoryDataKey;
 
 class WaitBehaviorTest {
+    @Test void resetDuringDurationEvaluationDiscardsTheOldResult() {
+        Behavior[] holder = new Behavior[1];
+        var expressions = new ExpressionRegistry();
+        expressions.registerEngine(new ExpressionEngine() {
+            public String getName() { return "resetwait"; }
+            public CompiledExpression compile(String source) {
+                return scope -> { holder[0].reset(); return "invalid stale duration"; };
+            }
+        });
+        expressions.setDefaultEngine("resetwait");
+        holder[0] = waitFor(expressions, "`duration`", true);
+        assertFalse(holder[0].shouldExecute());
+        assertEquals(BehaviorStatus.SUCCESS, holder[0].run());
+    }
+
+    @Test void nestedActivationRetainsItsOwnDuration() {
+        Behavior[] holder = new Behavior[1];
+        var evaluations = new AtomicInteger();
+        var expressions = new ExpressionRegistry();
+        expressions.registerEngine(new ExpressionEngine() {
+            public String getName() { return "nestedwait"; }
+            public CompiledExpression compile(String source) {
+                return scope -> {
+                    if (evaluations.incrementAndGet() == 1) {
+                        assertTrue(holder[0].shouldExecute());
+                        return 100;
+                    }
+                    return 2;
+                };
+            }
+        });
+        expressions.setDefaultEngine("nestedwait");
+        holder[0] = waitFor(expressions, "`duration`", true);
+        assertFalse(holder[0].shouldExecute());
+        assertEquals(BehaviorStatus.RUNNING, holder[0].run());
+        assertEquals(BehaviorStatus.SUCCESS, holder[0].run());
+        assertEquals(2, evaluations.get());
+    }
+
     @Test void invalidLiteralDurationsAreRejectedBeforeExecution() {
         for (boolean shortForm : new boolean[] { false, true }) {
             for (String input : new String[] { "-1", "not-a-duration", "-0.01s", "2147483648", "100000000d" }) {
