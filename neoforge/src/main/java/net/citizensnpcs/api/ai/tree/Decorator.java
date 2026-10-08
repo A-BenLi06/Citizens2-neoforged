@@ -3,6 +3,7 @@ package net.citizensnpcs.api.ai.tree;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.List;
 import java.util.function.Function;
 import java.util.function.Predicate;
 
@@ -24,18 +25,29 @@ public class Decorator implements Behavior {
             Collection<Function<BehaviorStatus, BehaviorStatus>> statusTransformers,
             Collection<Predicate<Boolean>> shouldExecutePredicates, Collection<Runnable> resetCallbacks) {
         this.wrapping = toWrap;
-        this.runCallbacks = runCallbacks;
-        this.statusTransformers = statusTransformers;
-        this.shouldExecutePredicates = shouldExecutePredicates;
-        this.resetCallbacks = resetCallbacks;
+        this.runCallbacks = List.copyOf(runCallbacks);
+        this.statusTransformers = List.copyOf(statusTransformers);
+        this.shouldExecutePredicates = List.copyOf(shouldExecutePredicates);
+        this.resetCallbacks = List.copyOf(resetCallbacks);
     }
 
     @Override
     public void reset() {
+        Throwable failure = null;
         for (Runnable runnable : resetCallbacks) {
-            runnable.run();
+            try { runnable.run(); }
+            catch (RuntimeException | Error thrown) {
+                if (failure == null) failure = thrown;
+                else if (failure != thrown) failure.addSuppressed(thrown);
+            }
         }
-        wrapping.reset();
+        try { wrapping.reset(); }
+        catch (RuntimeException | Error thrown) {
+            if (failure == null) failure = thrown;
+            else if (failure != thrown) failure.addSuppressed(thrown);
+        }
+        if (failure instanceof RuntimeException runtime) throw runtime;
+        if (failure instanceof Error error) throw error;
     }
 
     @Override
