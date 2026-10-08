@@ -22,6 +22,16 @@ import net.citizensnpcs.api.util.MemoryDataKey;
  * parser, the registry and the Molang expressions in between actually drive a tree, rather than only compiling.
  */
 public class BehaviorTreeParserTest {
+    @Test public void timeoutReadsMemoryWhenItsPrecedingActionsHaveExecuted() {
+        var expressions = new ExpressionRegistry(); expressions.registerEngine(new MolangEngine());
+        var parser = new BehaviorTreeParser(new CitizensBehaviorRegistry(expressions));
+        Memory memory = new Memory(); DataKey root = new MemoryDataKey();
+        root.setRaw("sequence", map("0", "set budget `3`", "1",
+                map("timeout `mem.get('budget')`", map("0", "wait 2", "1", "set finished `1`"))));
+        finish(parser.parseStrict(root.getRelative("sequence"), null, new ExpressionScope(), memory));
+        assertEquals(1D, memory.getNumber("finished"));
+    }
+
     @Test public void explicitEmptyConditionalBranchesSucceedAndReachTheirSuccessor() {
         for (boolean strict : new boolean[] { false, true }) {
             for (boolean selectedIf : new boolean[] { false, true }) {

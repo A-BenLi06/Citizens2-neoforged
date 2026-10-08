@@ -5,6 +5,46 @@ import org.junit.jupiter.api.Test;
 import net.citizensnpcs.api.ai.tree.*;
 
 class TimeoutDecoratorTest {
+    @Test void dynamicBudgetIsCapturedPerActivationAndResetDoesNotEvaluate() {
+        var child = new Child(); var budget = new java.util.concurrent.atomic.AtomicInteger(2);
+        var evaluations = new java.util.concurrent.atomic.AtomicInteger();
+        var timeout = new TimeoutDecorator(child, () -> { evaluations.incrementAndGet(); return budget.get(); });
+        assertEquals(0, evaluations.get()); assertTrue(timeout.shouldExecute());
+        budget.set(0);
+        assertEquals(BehaviorStatus.RUNNING, timeout.run());
+        assertEquals(BehaviorStatus.RUNNING, timeout.run());
+        assertEquals(BehaviorStatus.FAILURE, timeout.run());
+        timeout.reset(); assertEquals(1, evaluations.get());
+        assertTrue(timeout.shouldExecute()); assertEquals(BehaviorStatus.FAILURE, timeout.run());
+        assertEquals(2, child.calls); assertEquals(2, evaluations.get());
+    }
+
+    @Test void throwingBudgetStopsUntilExplicitReactivation() {
+        var child = new Child(); var fail = new java.util.concurrent.atomic.AtomicBoolean(true);
+        var evaluations = new java.util.concurrent.atomic.AtomicInteger();
+        var timeout = new TimeoutDecorator(child, () -> {
+            evaluations.incrementAndGet();
+            if (fail.get()) throw new IllegalArgumentException("budget");
+            return 1;
+        });
+        assertThrows(IllegalArgumentException.class, timeout::shouldExecute);
+        assertEquals(BehaviorStatus.FAILURE, timeout.run()); assertEquals(0, child.calls);
+        timeout.reset(); assertEquals(1, evaluations.get());
+        fail.set(false); assertTrue(timeout.shouldExecute());
+        assertEquals(BehaviorStatus.RUNNING, timeout.run()); assertEquals(BehaviorStatus.FAILURE, timeout.run());
+    }
+
+    @Test void resetInsideBudgetCallbackDiscardsTheStaleResult() {
+        var child = new Child(); TimeoutDecorator[] holder = new TimeoutDecorator[1];
+        var first = new java.util.concurrent.atomic.AtomicBoolean(true);
+        holder[0] = new TimeoutDecorator(child, () -> {
+            if (first.getAndSet(false)) { holder[0].reset(); return 100; }
+            return 0;
+        });
+        assertFalse(holder[0].shouldExecute());
+        assertEquals(BehaviorStatus.FAILURE, holder[0].run()); assertEquals(0, child.calls);
+    }
+
     private static class Child implements Behavior {
         int calls;
         int resets;

@@ -213,16 +213,8 @@ public class BehaviorTreeParser {
             String timeoutStr = name.substring(8).trim();
             ExpressionRegistry exprRegistry = registry.getExpressionRegistry();
             ExpressionValue timeoutHolder = exprRegistry.parseValue(timeoutStr);
-            double evaluated;
-            try { evaluated = timeoutHolder.evaluateAsNumber(context.getScope()); }
-            catch (RuntimeException failure) {
-                if (strict) throw new IllegalArgumentException("Invalid behavior timeout: " + timeoutStr, failure);
-                throw failure;
-            }
-            if (strict && (!Double.isFinite(evaluated) || evaluated < 0 || evaluated > Integer.MAX_VALUE
-                    || evaluated != Math.rint(evaluated)))
-                throw new IllegalArgumentException("Behavior timeout must be a non-negative integer tick count: " + timeoutStr);
-            int ticks = (int) evaluated;
+            java.util.function.IntSupplier ticks = () -> timeoutTicks(timeoutHolder, timeoutStr, context);
+            if (!timeoutHolder.isExpression()) ticks.getAsInt();
 
             List<Behavior> children = parseIndexedChildren(key, context);
             Behavior body = children.size() == 1 ? children.get(0)
@@ -272,6 +264,19 @@ public class BehaviorTreeParser {
             return parseLeaf(name, key, context);
         Behavior conditional = parseConditionalGroup(key, context, false);
         return conditional != null ? conditional : parseLeaf(name, key, context);
+    }
+
+    private int timeoutTicks(ExpressionValue value, String source, BehaviorRegistry.BehaviorContext context) {
+        double evaluated;
+        try { evaluated = value.evaluateAsNumber(context.getScope()); }
+        catch (RuntimeException failure) {
+            if (strict) throw new IllegalArgumentException("Invalid behavior timeout: " + source, failure);
+            throw failure;
+        }
+        if (strict && (!Double.isFinite(evaluated) || evaluated < 0 || evaluated > Integer.MAX_VALUE
+                || evaluated != Math.rint(evaluated)))
+            throw new IllegalArgumentException("Behavior timeout must be a non-negative integer tick count: " + source);
+        return (int) evaluated;
     }
 
     private void validateIndexedChildren(DataKey key) {
