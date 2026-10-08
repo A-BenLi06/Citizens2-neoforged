@@ -498,16 +498,24 @@ public class BehaviorTreeParser {
                 || key.getRaw("") instanceof java.util.Collection) {
             DataKey ifKey = null;
             DataKey elseKey = null;
+            String unexpectedConditionalField = null;
             for (DataKey sub : key.getSubKeys()) {
                 String name = sub.name();
                 if (name.startsWith("if ")) {
+                    if (strict && ifKey != null)
+                        throw new IllegalArgumentException("Multiple if branches in behavior node at " + key.getPath());
                     ifKey = sub;
                 } else if (name.equals("else")) {
                     elseKey = sub;
+                } else {
+                    unexpectedConditionalField = sub.getPath();
                 }
             }
-            if (ifKey != null)
+            if (ifKey != null) {
+                if (strict && unexpectedConditionalField != null)
+                    throw new IllegalArgumentException("Unexpected field in conditional behavior: " + unexpectedConditionalField);
                 return parseIfElse(ifKey, elseKey, context);
+            }
             if (elseKey != null) orphanElse(elseKey);
 
             return parseContainer(key.name(), key, context);

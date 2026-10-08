@@ -22,6 +22,29 @@ import net.citizensnpcs.api.util.MemoryDataKey;
  * parser, the registry and the Molang expressions in between actually drive a tree, rather than only compiling.
  */
 public class BehaviorTreeParserTest {
+    @Test public void strictConditionalGroupsRejectMultipleBranchesAndExtraFields() {
+        var parser = new BehaviorTreeParser(new CitizensBehaviorRegistry(new ExpressionRegistry()));
+        for (Map<String, Object> fields : java.util.List.of(
+                map("if true", "succeed", "if false", "fail"),
+                map("if true", "succeed", "els", "fail"),
+                map("if true", "succeed", "0", "fail"))) {
+            DataKey root = new MemoryDataKey(); root.setRaw("group", fields);
+            org.junit.jupiter.api.Assertions.assertThrows(IllegalArgumentException.class,
+                    () -> parser.parseStrict(root.getRelative("group"), null, new ExpressionScope(), new Memory()));
+        }
+    }
+
+    @Test public void invalidConditionalShapeIsRejectedBeforeBranchFactoriesRun() {
+        var calls = new java.util.concurrent.atomic.AtomicInteger();
+        var registry = new CitizensBehaviorRegistry(new ExpressionRegistry());
+        registry.registerBehavior("capture", (params, context) -> {
+            calls.incrementAndGet(); return (net.citizensnpcs.api.ai.tree.InstantBehavior) () -> BehaviorStatus.SUCCESS;
+        });
+        DataKey root = new MemoryDataKey(); root.setRaw("group", map("if true", "capture", "unexpected", "capture"));
+        org.junit.jupiter.api.Assertions.assertThrows(IllegalArgumentException.class,
+                () -> new BehaviorTreeParser(registry).parseStrict(root.getRelative("group"), null, new ExpressionScope(), new Memory()));
+        assertEquals(0, calls.get());
+    }
     @Test public void scalarSingleArgumentBuiltinsUseTheirOwnParameter() {
         var parser = new BehaviorTreeParser(new CitizensBehaviorRegistry(new ExpressionRegistry()));
         DataKey root = new MemoryDataKey(); root.setBoolean("wait_until", false);
