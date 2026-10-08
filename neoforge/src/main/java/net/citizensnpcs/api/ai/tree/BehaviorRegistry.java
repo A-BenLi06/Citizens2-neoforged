@@ -361,6 +361,11 @@ public class BehaviorRegistry {
                 return null;
 
             ExpressionRegistry.ExpressionValue conditionHolder = expressions.parseValue(conditionStr);
+            Boolean literalCondition = switch (conditionStr.trim().toLowerCase(Locale.ROOT)) {
+                case "true", "1" -> true;
+                case "false", "0" -> false;
+                default -> null;
+            };
 
             return new Behavior() {
                 @Override
@@ -369,7 +374,7 @@ public class BehaviorRegistry {
 
                 @Override
                 public BehaviorStatus run() {
-                    if (conditionHolder.evaluateAsBoolean(context.getScope()))
+                    if (literalCondition != null ? literalCondition : conditionHolder.evaluateAsBoolean(context.getScope()))
                         return BehaviorStatus.SUCCESS;
 
                     return BehaviorStatus.RUNNING;
