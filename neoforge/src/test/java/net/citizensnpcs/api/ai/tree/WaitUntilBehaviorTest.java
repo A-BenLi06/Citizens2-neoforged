@@ -7,6 +7,29 @@ import net.citizensnpcs.api.util.MemoryDataKey;
 import net.citizensnpcs.npc.ai.tree.*;
 
 class WaitUntilBehaviorTest {
+    @Test void brokenConditionCompilationIsRejectedWithItsCause() {
+        var expressions = new ExpressionRegistry();
+        var cause = new ExpressionEngine.ExpressionCompileException("invalid condition");
+        expressions.registerEngine(new ExpressionEngine() {
+            public String getName() { return "brokencondition"; }
+            public CompiledExpression compile(String source) throws ExpressionCompileException { throw cause; }
+        });
+        expressions.setDefaultEngine("brokencondition");
+        var parser = new BehaviorTreeParser(new CitizensBehaviorRegistry(expressions));
+        var root = new MemoryDataKey(); root.setString("wait_until", "`broken`" );
+        var failure = assertThrows(IllegalArgumentException.class,
+                () -> parser.parseStrict(root.getRelative("wait_until"), null, new ExpressionScope(), new Memory()));
+        assertSame(cause, failure.getCause());
+    }
+
+    @Test void unavailableConditionLanguageIsRejectedInsteadOfWaitingForever() {
+        var expressions = new ExpressionRegistry(); expressions.registerEngine(new MolangEngine());
+        var parser = new BehaviorTreeParser(new CitizensBehaviorRegistry(expressions));
+        var root = new MemoryDataKey(); root.setString("wait_until", "missinglanguage`1`" );
+        assertThrows(IllegalArgumentException.class,
+                () -> parser.parseStrict(root.getRelative("wait_until"), null, new ExpressionScope(), new Memory()));
+    }
+
     private static Behavior dynamic(java.util.function.Supplier<Object> condition) {
         var expressions = new ExpressionRegistry();
         expressions.registerEngine(new ExpressionEngine() {

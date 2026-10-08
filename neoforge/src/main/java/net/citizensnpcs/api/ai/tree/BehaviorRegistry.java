@@ -380,12 +380,24 @@ public class BehaviorRegistry {
             if (conditionStr == null)
                 return null;
 
-            ExpressionRegistry.ExpressionValue conditionHolder = expressions.parseValue(conditionStr);
             Boolean literalCondition = switch (conditionStr.trim().toLowerCase(Locale.ROOT)) {
                 case "true", "1" -> true;
                 case "false", "0" -> false;
                 default -> null;
             };
+            java.util.function.BooleanSupplier condition;
+            if (literalCondition != null) condition = () -> literalCondition;
+            else if (expressions.isPossiblyExpression(conditionStr)) {
+                try {
+                    var compiled = expressions.compile(conditionStr);
+                    condition = () -> compiled.evaluateAsBoolean(context.getScope());
+                } catch (net.citizensnpcs.api.expr.ExpressionEngine.ExpressionCompileException failure) {
+                    throw new IllegalArgumentException("Invalid wait_until condition: " + conditionStr, failure);
+                }
+            } else {
+                ExpressionValue literal = expressions.parseValue(conditionStr);
+                condition = () -> literal.evaluateAsBoolean(context.getScope());
+            }
 
             return new Behavior() {
                 private long revision;
@@ -402,8 +414,7 @@ public class BehaviorRegistry {
                     long before = revision;
                     evaluating = true;
                     try {
-                        boolean ready = literalCondition != null ? literalCondition
-                                : conditionHolder.evaluateAsBoolean(context.getScope());
+                        boolean ready = condition.getAsBoolean();
                         return revision == before && ready ? BehaviorStatus.SUCCESS : BehaviorStatus.RUNNING;
                     } finally { evaluating = false; }
                 }
