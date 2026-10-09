@@ -136,8 +136,8 @@ public class BehaviorTrait extends Trait {
     }
 
     private static class RootBehavior implements Behavior {
-        boolean failed;
-        BehaviorStatus lastStatus;
+        boolean active, admitting, failed, reported, running;
+        long revision;
         final Behavior root;
         final ExpressionScope scope;
 
@@ -148,32 +148,66 @@ public class BehaviorTrait extends Trait {
 
         @Override
         public void reset() {
-            root.reset();
-            lastStatus = null;
+            revision++;
+            boolean release = active;
+            active = false;
+            if (release) {
+                try { root.reset(); }
+                catch (RuntimeException | Error failure) {
+                    failed = true;
+                    throw failure;
+                }
+            }
+        }
+
+        private void fail(Throwable failure, long before) {
+            if (revision == before) {
+                failed = true;
+                try { reset(); }
+                catch (RuntimeException | Error cleanup) {
+                    if (cleanup != failure) failure.addSuppressed(cleanup);
+                }
+            }
+            if (!reported) {
+                reported = true;
+                Messaging.severe("Error while running behavior tree:");
+                failure.printStackTrace();
+            }
         }
 
         @Override
         public BehaviorStatus run() {
-            scope.resetCache();
+            if (running || admitting) return BehaviorStatus.RUNNING;
+            if (failed || !active) return BehaviorStatus.FAILURE;
+            long before = revision;
+            running = true;
             try {
-                lastStatus = root.run();
+                scope.resetCache();
+                BehaviorStatus status = root.run();
+                return revision == before ? status : BehaviorStatus.RUNNING;
             } catch (Throwable t) {
-                if (!failed) {
-                    Messaging.severe("Error while running behavior tree:");
-                    t.printStackTrace();
-                    failed = true;
-                }
-                lastStatus = BehaviorStatus.FAILURE;
-            }
-            if (lastStatus == BehaviorStatus.SUCCESS || lastStatus == BehaviorStatus.FAILURE) {
-                root.reset();
-            }
-            return lastStatus;
+                boolean owned = revision == before;
+                fail(t, before);
+                return owned ? BehaviorStatus.FAILURE : BehaviorStatus.RUNNING;
+            } finally { running = false; }
         }
 
         @Override
         public boolean shouldExecute() {
-            return !failed && root != null && root.shouldExecute();
+            if (failed || admitting) return false;
+            long requested = revision + 1;
+            reset();
+            if (revision != requested || failed) return false;
+            active = true;
+            admitting = true;
+            try {
+                scope.resetCache();
+                boolean ready = root.shouldExecute();
+                return revision == requested && ready;
+            } catch (Throwable t) {
+                fail(t, requested);
+                return false;
+            } finally { admitting = false; }
         }
     }
 

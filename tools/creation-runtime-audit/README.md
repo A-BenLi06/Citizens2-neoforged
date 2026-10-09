@@ -1,6 +1,6 @@
 # Native NPC creation runtime audit
 
-The fixture currently has 385 checks. Template coverage includes sibling definitions,
+The fixture currently has 473 checks. Template coverage includes sibling definitions,
 overwrite index consistency, and applying the updated trait value through creation.
 Behavior short-form coverage includes missing arguments/files, malformed YAML and a
 valid filename containing spaces, with target preservation on file-input failures.
@@ -14,6 +14,12 @@ single sequence or another explicit container.
 Behavior lifecycle coverage includes repeated fresh saves, resaving a loaded tree,
 and resuming execution after actual despawn/respawn.
 It also removes BehaviorTrait from a live NPC and verifies execution stops.
+Root lifecycle probes run through each native NPC's behavior controller. Ordinary
+and packet NPCs cover success, failure, removal, and exceptions during admission,
+execution and cleanup. They verify one root cleanup per activation, no automatic
+retry after an exception/removal, fresh NPC properties during admission, and recovery
+after replacement and despawn/respawn. The pre-fix implementation fails the first
+single-cleanup assertion; its log is retained as a negative control.
 Ordinary and packet NPCs execute a repeated subtree containing a Molang wait over
 real server ticks. The fixture verifies early non-completion, exactly three body
 effects, a skipped zero-count body and progression to a signal-waiting successor.
@@ -62,7 +68,7 @@ Run from the repository root with PowerShell 7 and JDK 21:
 
 Omit the override to test default 21.1.233. The fixture uses loopback port 25625, `artifacts/creation-audit-server`, world `creation-world` and marker `creation-audit-fixture.txt`. Preparation validates existing server identity. The audit refuses a nonempty default registry and only tracks NPCs created after it begins. It cleans its NPCs, grants and block edits before shutdown.
 
-Success requires `[CREATIONAUDIT] COMPLETE`, no `[CREATIONAUDIT] FAILED`, and successful Gradle completion. Expected creation/removal listener exceptions are deliberately exercised and logged; they must be followed by cleanup assertions and successful completion.
+Success requires `[CREATIONAUDIT] COMPLETE`, no `[CREATIONAUDIT] FAILED`, and successful Gradle completion. Expected creation/removal listener and behavior-root exceptions are deliberately exercised and logged; they must be followed by cleanup assertions and successful completion.
 
 Coverage uses the real command dispatcher and native ticks: unspawned/baby/silent/packet/center options, partial collision shapes, item components and block-state projection, supported item carriers, default item providers, native falling/spawner controls, type/admin/limit checks, generic and command vetoes, creator events, callback removal/replacement, prepared templates, undo and nested history, zero/short/large lifetimes and replacement safety. The fixture generates its own template through the native template registry.
 

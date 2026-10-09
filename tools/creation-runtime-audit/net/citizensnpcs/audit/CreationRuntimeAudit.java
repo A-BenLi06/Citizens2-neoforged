@@ -95,7 +95,7 @@ public final class CreationRuntimeAudit {
                 grant("citizens.npc.create", "citizens.npc.spawn", "citizens.npc.undo");
                 types = grant("citizens.npc.create.*"); limits = grant("citizens.admin.avoid-limits");
                 admin = grant("citizens.npc.admin");
-                basic(); items(); lifetimes(); vetoAndHistory(); templatesAndPermissions(); commandRegistryTargets(); repeatedBehaviorTicks(); scalarBehaviorTicks(); conditionalContainerTicks();
+                basic(); items(); lifetimes(); vetoAndHistory(); templatesAndPermissions(); commandRegistryTargets(); behaviorRootLifecycle(); repeatedBehaviorTicks(); scalarBehaviorTicks(); conditionalContainerTicks();
             }
             List<Runnable> due = checks.remove(server.getTickCount() - start);
             if (due != null) due.forEach(Runnable::run);
@@ -617,6 +617,88 @@ public final class CreationRuntimeAudit {
             signals.clearListeners(original); signals.emit(namedTarget, "signal_instance_audit");
             check(delivered[0] == 2 && delivered[1] == 3, "native_signal_cleanup_preserves_other_instance");
         } finally { signals.clearListeners(original); signals.clearListeners(namedTarget); }
+    }
+
+    private static void behaviorRootLifecycle() {
+        var probes = new IdentityHashMap<NPC, RootProbe>();
+        CitizensAPI.getBehaviorRegistry().registerBehavior("creation_root_lifecycle", (params, context) -> {
+            RootProbe probe = probes.get(context.getNPC());
+            probe.scope = context.getScope();
+            return probe;
+        });
+        for (boolean packet : new boolean[] { false, true }) {
+            for (String phase : List.of("success", "failure", "remove", "start_error", "run_error", "reset_error")) {
+                NPC target = registry.createNPC(EntityType.COW, "RootLifecycle" + packet + phase);
+                if (packet) target.getOrAddTrait(PacketNPC.class);
+                RootProbe probe = new RootProbe(phase);
+                probes.put(target, probe);
+                try {
+                    var behavior = target.getOrAddTrait(BehaviorTrait.class);
+                    DataKey definition = new MemoryDataKey(); definition.setString("root", "creation_root_lifecycle");
+                    behavior.applyBehaviorsFromKey(definition);
+                    check(target.spawn(new Location(level, 28, -58, 4)), "root_lifecycle_spawn_" + phase + "_" + packet);
+                    Throwable escaped = null;
+                    try { target.getDefaultBehaviorController().run(); }
+                    catch (RuntimeException | Error failure) { escaped = failure; }
+                    check(phase.equals("reset_error") ? escaped == probe.error : escaped == null,
+                            "root_lifecycle_failure_policy_" + phase + "_" + packet);
+                    check(probe.starts == 1 && probe.runs == (phase.equals("start_error") ? 0 : 1) && probe.resets == 1,
+                            "root_lifecycle_single_cleanup_" + phase + "_" + packet);
+                    String previousName = target.getFullName();
+                    target.setName("RootRenamed" + packet + phase);
+                    target.getDefaultBehaviorController().run();
+                    boolean repeats = phase.equals("success") || phase.equals("failure");
+                    check(probe.starts == (repeats ? 2 : 1) && probe.resets == (repeats ? 2 : 1)
+                            && probe.runs == (repeats ? 2 : phase.equals("start_error") ? 0 : 1),
+                            "root_lifecycle_no_retry_after_error_or_removal_" + phase + "_" + packet);
+                    if (repeats) {
+                        check(probe.names.equals(List.of(previousName, target.getFullName())),
+                                "root_lifecycle_admission_refreshes_scope_" + phase + "_" + packet);
+                    }
+                    RootProbe replacement = new RootProbe("success"); probes.put(target, replacement);
+                    behavior.applyBehaviorsFromKey(definition);
+                    target.getDefaultBehaviorController().run();
+                    check(replacement.starts == 1 && replacement.runs == 1 && replacement.resets == 1,
+                            "root_lifecycle_replacement_recovers_" + phase + "_" + packet);
+                    check(target.despawn(DespawnReason.PENDING_RESPAWN) && target.spawn(new Location(level, 28, -58, 4)),
+                            "root_lifecycle_respawns_" + phase + "_" + packet);
+                    target.getDefaultBehaviorController().run();
+                    check(replacement.starts == 2 && replacement.runs == 2 && replacement.resets == 2,
+                            "root_lifecycle_respawn_cleanup_once_" + phase + "_" + packet);
+                } finally {
+                    target.destroy(); probes.remove(target);
+                }
+            }
+        }
+    }
+
+    private static final class RootProbe implements net.citizensnpcs.api.ai.tree.Behavior {
+        final IllegalStateException error;
+        final List<String> names = new ArrayList<>();
+        final String phase;
+        net.citizensnpcs.api.expr.ExpressionScope scope;
+        int starts, runs, resets;
+
+        RootProbe(String phase) { this.phase = phase; error = new IllegalStateException("expected root lifecycle " + phase); }
+        public boolean shouldExecute() {
+            starts++;
+            names.add(String.valueOf(scope.get("npc.name")));
+            if (phase.equals("start_error")) throw error;
+            return true;
+        }
+        public net.citizensnpcs.api.ai.tree.BehaviorStatus run() {
+            runs++; scope.get("npc.name");
+            if (phase.equals("run_error")) throw error;
+            return switch (phase) {
+                case "failure" -> net.citizensnpcs.api.ai.tree.BehaviorStatus.FAILURE;
+                case "remove" -> net.citizensnpcs.api.ai.tree.BehaviorStatus.RESET_AND_REMOVE;
+                default -> net.citizensnpcs.api.ai.tree.BehaviorStatus.SUCCESS;
+            };
+        }
+        public void reset() {
+            resets++;
+            if (phase.equals("reset_error")) throw error;
+        }
     }
 
     private static void repeatedBehaviorTicks() {
