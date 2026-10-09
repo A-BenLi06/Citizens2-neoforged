@@ -8,6 +8,41 @@ import org.junit.jupiter.api.Test;
 import net.citizensnpcs.api.ai.tree.*;
 
 class CoalescedBehaviorTest {
+    @Test void resetFromAnActionStopsRemainingEffectsUntilNextRun() {
+        var first = new AtomicInteger(); var second = new AtomicInteger();
+        CoalescedBehavior[] group = new CoalescedBehavior[1];
+        group[0] = new CoalescedBehavior(List.of(
+                (InstantBehavior) () -> {
+                    if (first.incrementAndGet() == 1) group[0].reset();
+                    return BehaviorStatus.SUCCESS;
+                },
+                (InstantBehavior) () -> { second.incrementAndGet(); return BehaviorStatus.SUCCESS; }));
+        assertEquals(BehaviorStatus.RUNNING, group[0].run()); assertEquals(0, second.get());
+        assertEquals(BehaviorStatus.SUCCESS, group[0].run());
+        assertEquals(2, first.get()); assertEquals(1, second.get());
+    }
+
+    @Test void recursiveRunDoesNotRepeatActionsAndExceptionReleasesGuard() {
+        var calls = new AtomicInteger(); CoalescedBehavior[] group = new CoalescedBehavior[1];
+        var failure = new IllegalStateException("action");
+        group[0] = new CoalescedBehavior(List.of((InstantBehavior) () -> {
+            assertEquals(BehaviorStatus.RUNNING, group[0].run());
+            if (calls.incrementAndGet() == 1) throw failure;
+            return BehaviorStatus.SUCCESS;
+        }));
+        assertSame(failure, assertThrows(IllegalStateException.class, group[0]::run));
+        assertEquals(BehaviorStatus.SUCCESS, group[0].run()); assertEquals(2, calls.get());
+    }
+
+    @Test void resetDuringAdmissionRejectsTheStaleResult() {
+        CoalescedBehavior[] group = new CoalescedBehavior[1];
+        group[0] = new CoalescedBehavior(List.of(new InstantBehavior() {
+            public boolean shouldExecute() { group[0].reset(); return true; }
+            public BehaviorStatus run() { fail("stale admission must not execute"); return BehaviorStatus.SUCCESS; }
+        }));
+        assertFalse(group[0].shouldExecute());
+    }
+
     @Test void resetAttemptsEveryChildAndRetainsAllErrors() {
         AtomicInteger resets = new AtomicInteger();
         List<Behavior> children = new ArrayList<>();

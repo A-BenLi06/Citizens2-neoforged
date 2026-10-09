@@ -7,6 +7,8 @@ import java.util.List;
  */
 public class CoalescedBehavior implements Behavior {
     private final List<Behavior> behaviors;
+    private long revision;
+    private boolean running;
 
     public CoalescedBehavior(List<Behavior> behaviors) {
         this.behaviors = List.copyOf(behaviors);
@@ -14,6 +16,7 @@ public class CoalescedBehavior implements Behavior {
 
     @Override
     public void reset() {
+        revision++;
         Throwable failure = null;
         for (Behavior behavior : behaviors) {
             try { behavior.reset(); }
@@ -28,18 +31,27 @@ public class CoalescedBehavior implements Behavior {
 
     @Override
     public BehaviorStatus run() {
-        for (Behavior behavior : behaviors) {
-            BehaviorStatus status = behavior.run();
-            if (status == BehaviorStatus.FAILURE || status == BehaviorStatus.RESET_AND_REMOVE)
-                return status;
-        }
-        return BehaviorStatus.SUCCESS;
+        if (running) return BehaviorStatus.RUNNING;
+        running = true;
+        long before = revision;
+        try {
+            for (Behavior behavior : behaviors) {
+                BehaviorStatus status = behavior.run();
+                if (revision != before) return BehaviorStatus.RUNNING;
+                if (status == BehaviorStatus.FAILURE || status == BehaviorStatus.RESET_AND_REMOVE)
+                    return status;
+            }
+            return BehaviorStatus.SUCCESS;
+        } finally { running = false; }
     }
 
     @Override
     public boolean shouldExecute() {
+        long before = revision;
         for (Behavior behavior : behaviors) {
-            if (behavior.shouldExecute())
+            boolean ready = behavior.shouldExecute();
+            if (revision != before) return false;
+            if (ready)
                 return true;
         }
         return false;
