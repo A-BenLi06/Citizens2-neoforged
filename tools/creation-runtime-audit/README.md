@@ -1,6 +1,6 @@
 # Native NPC creation runtime audit
 
-The fixture currently has 521 checks. Template coverage includes sibling definitions,
+The fixture currently has 546 checks. Template coverage includes sibling definitions,
 overwrite index consistency, and applying the updated trait value through creation.
 Behavior short-form coverage includes missing arguments/files, malformed YAML and a
 valid filename containing spaces, with target preservation on file-input failures.
@@ -42,6 +42,12 @@ complete a one-tick action, reactivate the same two-tick timer across three wait
 skip zero-budget effects and continue after an over-budget wait expires. The old
 implementation fails the one-tick action assertion. This also uses existing APIs
 without registering a production YAML node.
+Global command cooldown coverage uses two connected mock players. Commands added
+through `--gcooldown` block the second player's reward and per-command experience
+charge, retain the duration and last-use time across trait restoration, allow an
+expired cooldown, and respect history reset, explicit bypass and NPC isolation.
+The unchanged production code passes these checks; the initial log is positive
+acceptance evidence, not a reproduced setter defect.
 Additional ordinary/packet trees place conditional groups directly under timeout,
 invert, named-count repeat and loop nodes. Zero timeout prevents child effects;
 The repeat body sets a dynamic timeout budget to 4, 3, 2 and 1 ticks across four

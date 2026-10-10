@@ -59,7 +59,7 @@ public final class CreationRuntimeAudit {
     private static MinecraftServer server;
     private static ServerLevel level;
     private static NPCRegistry registry, temporary;
-    private static Actor alice;
+    private static Actor alice, cooldownPlayer;
     private static CommandSourceStack source;
     private static PermissionUtil.Attachment admin;
     private static PermissionUtil.Attachment types, limits;
@@ -89,13 +89,14 @@ public final class CreationRuntimeAudit {
             if (server.getTickCount() > deadline) throw new AssertionError("fixture_timeout");
             if (!level.isPositionEntityTicking(new BlockPos(4, -58, 4))) return;
             if (alice != null) alice.pump();
+            if (cooldownPlayer != null) cooldownPlayer.pump();
             if (start < 0) {
                 start = server.getTickCount(); registry = CitizensAPI.getNPCRegistry(); temporary = CitizensAPI.getTemporaryNPCRegistry();
                 alice = actor("CreationAlice"); source = alice.player.createCommandSourceStack();
                 grant("citizens.npc.create", "citizens.npc.spawn", "citizens.npc.undo");
                 types = grant("citizens.npc.create.*"); limits = grant("citizens.admin.avoid-limits");
                 admin = grant("citizens.npc.admin");
-                basic(); items(); lifetimes(); vetoAndHistory(); templatesAndPermissions(); commandRegistryTargets(); behaviorSnapshotMemory(); behaviorRootLifecycle(); repeatedBehaviorTicks(); scalarBehaviorTicks(); conditionalContainerTicks(); retryBehaviorTicks(); timerBehaviorTicks();
+                basic(); items(); lifetimes(); vetoAndHistory(); templatesAndPermissions(); commandRegistryTargets(); behaviorSnapshotMemory(); behaviorRootLifecycle(); repeatedBehaviorTicks(); scalarBehaviorTicks(); conditionalContainerTicks(); retryBehaviorTicks(); timerBehaviorTicks(); globalCommandCooldown();
             }
             List<Runnable> due = checks.remove(server.getTickCount() - start);
             if (due != null) due.forEach(Runnable::run);
@@ -806,6 +807,81 @@ public final class CreationRuntimeAudit {
         }
     }
 
+    private static void globalCommandCooldown() throws Exception {
+        cooldownPlayer = actor("CooldownBob");
+        var bob = cooldownPlayer.player;
+        check(!PermissionUtil.hasPermission(alice.player, "citizens.npc.command.ignoreerrors.globalcooldown")
+                && !PermissionUtil.hasPermission(bob, "citizens.npc.command.ignoreerrors.globalcooldown"),
+                "global_cooldown_players_have_no_bypass");
+        for (boolean packet : new boolean[] { false, true }) {
+            var rewards = new java.util.concurrent.atomic.AtomicInteger();
+            String reward = "creation_global_cooldown_" + packet;
+            server.getCommands().getDispatcher().register(net.minecraft.commands.Commands.literal(reward)
+                    .executes(ctx -> rewards.incrementAndGet()));
+            NPC target = registry.createNPC(EntityType.COW, "GlobalCooldown" + packet);
+            NPC independent = registry.createNPC(EntityType.COW, "IndependentCooldown" + packet);
+            if (packet) { target.getOrAddTrait(PacketNPC.class); independent.getOrAddTrait(PacketNPC.class); }
+            check(target.spawn(new Location(level, 23, -58, 4)) && independent.spawn(new Location(level, 23, -58, 6)),
+                    "global_cooldown_npcs_spawn_" + packet);
+            check(server.getCommands().getDispatcher().execute("npc command add " + reward
+                    + " --gcooldown 1h --expcost 2 --id " + target.getId(), server.createCommandSourceStack()) == 1,
+                    "global_cooldown_command_add_" + packet);
+            var commands = target.getOrAddTrait(CommandTrait.class);
+            independent.getOrAddTrait(CommandTrait.class).addCommand(new CommandTrait.NPCCommandBuilder(reward,
+                    CommandTrait.Hand.RIGHT).globalCooldown(3600).experienceCost(2));
+            alice.player.setExperienceLevels(20); bob.setExperienceLevels(20);
+            commands.dispatch(alice.player, CommandTrait.Hand.RIGHT);
+            check(alice.player.experienceLevel == 18, "global_cooldown_first_command_charges_once_" + packet);
+            DataKey saved = new MemoryDataKey(); net.citizensnpcs.api.persistence.PersistenceLoader.save(commands, saved);
+            commands.dispatch(bob, CommandTrait.Hand.RIGHT);
+            int blockedLevels = bob.experienceLevel;
+            CommandTrait[] current = { commands };
+            java.util.function.Function<DataKey, CommandTrait> restore = snapshot -> {
+                var restored = new CommandTrait();
+                net.citizensnpcs.api.persistence.PersistenceLoader.loadStrict(restored, snapshot);
+                target.addTrait(restored);
+                return restored;
+            };
+            atTick(5, () -> {
+                check(rewards.get() == 1, "global_cooldown_blocks_another_players_reward_" + packet);
+                check(blockedLevels == 20, "global_cooldown_blocks_per_command_charge_" + packet);
+                check(saved.getInt("commands.0.globalcooldown") == 3600 && saved.getRelative("globalCooldowns").hasSubKeys(),
+                        "global_cooldown_persists_duration_and_use_time_" + packet);
+                current[0] = restore.apply(saved.copyWithRoot());
+                int before = bob.experienceLevel; current[0].dispatch(bob, CommandTrait.Hand.RIGHT);
+                check(bob.experienceLevel == before, "global_cooldown_restored_state_still_blocks_" + packet);
+                DataKey expired = saved.copyWithRoot();
+                for (DataKey time : expired.getRelative("globalCooldowns").getSubKeys())
+                    time.setLong("", System.currentTimeMillis() / 1000 - 3601);
+                current[0] = restore.apply(expired);
+                current[0].dispatch(bob, CommandTrait.Hand.RIGHT);
+                check(bob.experienceLevel == before - 2, "global_cooldown_expired_state_allows_payment_" + packet);
+            });
+            atTick(8, () -> {
+                check(rewards.get() == 2, "global_cooldown_expiry_dispatches_one_reward_" + packet);
+                current[0].clearHistory(CommandTrait.CommandTraitError.ON_GLOBAL_COOLDOWN, null);
+                current[0].clearHistory(CommandTrait.CommandTraitError.ON_COOLDOWN, bob.getUUID());
+                current[0].dispatch(bob, CommandTrait.Hand.RIGHT);
+            });
+            atTick(10, () -> {
+                check(rewards.get() == 3, "global_cooldown_clear_allows_next_command_" + packet);
+                var bypass = PermissionUtil.grantTemporary(bob, List.of("citizens.npc.command.ignoreerrors.globalcooldown"));
+                try {
+                    current[0].clearHistory(CommandTrait.CommandTraitError.ON_COOLDOWN, bob.getUUID());
+                    current[0].dispatch(bob, CommandTrait.Hand.RIGHT);
+                } finally { bypass.remove(); }
+            });
+            atTick(12, () -> {
+                check(rewards.get() == 4, "global_cooldown_permission_bypasses_global_gate_" + packet);
+                independent.getOrAddTrait(CommandTrait.class).dispatch(bob, CommandTrait.Hand.RIGHT);
+            });
+            atTick(15, () -> {
+                check(rewards.get() == 5, "global_cooldown_does_not_block_another_npc_" + packet);
+                target.destroy(); independent.destroy();
+            });
+        }
+    }
+
     private static void timerBehaviorTicks() {
         CitizensAPI.getBehaviorRegistry().registerBehavior("creation_timer", (params, context) -> {
             int budget = Integer.parseInt(context.getArgOrParam(0, "limit", params, "1"));
@@ -1032,7 +1108,9 @@ public final class CreationRuntimeAudit {
             for (String name : registries) if (CitizensAPI.getNamedNPCRegistry(name) != null) CitizensAPI.removeNamedNPCRegistry(name);
             blocks.forEach((pos, state) -> level.setBlock(pos, state, 3));
             grants.forEach(PermissionUtil.Attachment::remove);
-            if (alice != null) { server.getPlayerList().remove(alice.player); alice.channel.finishAndReleaseAll(); }
+            for (Actor actor : new Actor[] { alice, cooldownPlayer }) {
+                if (actor != null) { server.getPlayerList().remove(actor.player); actor.channel.finishAndReleaseAll(); }
+            }
             if (forced) level.setChunkForced(0, 0, false);
         } catch (Throwable failure) { LoggerFactory.getLogger("citizens").error("[CREATIONAUDIT] FAILED cleanup", failure); }
         finally { server.halt(false); }
