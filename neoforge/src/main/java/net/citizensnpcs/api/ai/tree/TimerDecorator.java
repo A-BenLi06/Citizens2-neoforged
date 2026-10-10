@@ -1,35 +1,29 @@
 package net.citizensnpcs.api.ai.tree;
 
 /**
- * Wraps a {@link Behavior} and enforces a tick limit, after which it will return {@link BehaviorStatus#FAILURE} and
- * reset the child {@link Behavior}.
+ * Allows a child up to the configured number of ticks, accepting completion on the final permitted tick.
+ * An unfinished child is reset on timeout; nonpositive budgets fail without starting the child.
  */
 public class TimerDecorator implements Behavior {
-    private final int limit;
-    private int ticks;
-    private final Behavior wrapping;
+    private final TimeoutDecorator timer;
 
     private TimerDecorator(Behavior wrapping, int tickLimit) {
-        this.limit = tickLimit;
-        this.wrapping = wrapping;
+        this.timer = new TimeoutDecorator(wrapping, tickLimit);
     }
 
     @Override
     public void reset() {
-        ticks = 0;
-        wrapping.reset();
+        timer.reset();
     }
 
     @Override
     public BehaviorStatus run() {
-        if (++ticks >= limit)
-            return BehaviorStatus.FAILURE;
-        return wrapping.run();
+        return timer.run();
     }
 
     @Override
     public boolean shouldExecute() {
-        return wrapping.shouldExecute();
+        return timer.shouldExecute();
     }
 
     public static TimerDecorator tickLimiter(Behavior wrapping, int tickLimit) {

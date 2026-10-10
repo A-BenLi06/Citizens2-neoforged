@@ -95,7 +95,7 @@ public final class CreationRuntimeAudit {
                 grant("citizens.npc.create", "citizens.npc.spawn", "citizens.npc.undo");
                 types = grant("citizens.npc.create.*"); limits = grant("citizens.admin.avoid-limits");
                 admin = grant("citizens.npc.admin");
-                basic(); items(); lifetimes(); vetoAndHistory(); templatesAndPermissions(); commandRegistryTargets(); behaviorSnapshotMemory(); behaviorRootLifecycle(); repeatedBehaviorTicks(); scalarBehaviorTicks(); conditionalContainerTicks(); retryBehaviorTicks();
+                basic(); items(); lifetimes(); vetoAndHistory(); templatesAndPermissions(); commandRegistryTargets(); behaviorSnapshotMemory(); behaviorRootLifecycle(); repeatedBehaviorTicks(); scalarBehaviorTicks(); conditionalContainerTicks(); retryBehaviorTicks(); timerBehaviorTicks();
             }
             List<Runnable> due = checks.remove(server.getTickCount() - start);
             if (due != null) due.forEach(Runnable::run);
@@ -803,6 +803,52 @@ public final class CreationRuntimeAudit {
         public void reset() {
             resets++;
             if (phase.equals("reset_error")) throw error;
+        }
+    }
+
+    private static void timerBehaviorTicks() {
+        CitizensAPI.getBehaviorRegistry().registerBehavior("creation_timer", (params, context) -> {
+            int budget = Integer.parseInt(context.getArgOrParam(0, "limit", params, "1"));
+            var children = context.parseChildren(params);
+            var child = children.size() == 1 ? children.get(0)
+                    : net.citizensnpcs.api.ai.tree.Sequence.createSequence(children);
+            return net.citizensnpcs.api.ai.tree.TimerDecorator.tickLimiter(child, budget);
+        });
+        for (boolean packet : new boolean[] { false, true }) {
+            NPC target = registry.createNPC(EntityType.COW, "TimerBehavior" + packet);
+            if (packet) target.getOrAddTrait(PacketNPC.class);
+            var behavior = target.getOrAddTrait(BehaviorTrait.class);
+            DataKey definition = new MemoryDataKey();
+            definition.setRaw("sequence", Map.of(
+                    "0", Map.of("creation_timer 1", Map.of("0", "set first_tick `1`")),
+                    "1", Map.of("repeat 3", Map.of(
+                            "0", Map.of("creation_timer 2", Map.of("0", "wait 2")),
+                            "1", "set timer_iterations `mem.get('timer_iterations') + 1`")),
+                    "2", Map.of("invert", Map.of("0", Map.of("creation_timer 0", Map.of("0", "set zero_tick `1`")))),
+                    "3", Map.of("invert", Map.of("0", Map.of("creation_timer 1", Map.of("0", "wait 2")))),
+                    "4", "set timer_finished `1`",
+                    "5", "wait_for_signal timer_audit_hold"));
+            behavior.applyBehaviorsFromKey(definition);
+            behavior.getMemory().set("timer_iterations", 0D);
+            check(target.spawn(new Location(level, 25, -58, 4)), "timer_behavior_spawn_" + packet);
+            atTick(2, () -> check(behavior.getMemory().getNumber("timer_finished") == 0
+                    && behavior.getMemory().getNumber("timer_iterations") < 3,
+                    "timer_wait_yields_across_ticks_" + packet));
+            atTick(35, () -> {
+                check(behavior.getMemory().getNumber("first_tick") == 1,
+                        "timer_accepts_single_tick_child_" + packet);
+                check(behavior.getMemory().getNumber("timer_iterations") == 3,
+                        "timer_reactivation_completes_three_boundary_waits_" + packet);
+                check(behavior.getMemory().getNumber("zero_tick") == 0
+                        && behavior.getMemory().getNumber("timer_finished") == 1,
+                        "timer_expiration_and_zero_budget_allow_only_successors_" + packet);
+            });
+            atTick(38, () -> {
+                check(behavior.getMemory().getNumber("timer_iterations") == 3
+                        && behavior.getMemory().getNumber("timer_finished") == 1,
+                        "timer_completed_sequence_stays_stopped_" + packet);
+                target.destroy();
+            });
         }
     }
 

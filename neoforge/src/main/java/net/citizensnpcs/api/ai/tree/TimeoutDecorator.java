@@ -12,6 +12,7 @@ public class TimeoutDecorator implements Behavior {
     private boolean budgetReady;
     private int ticksElapsed;
     private boolean active;
+    private boolean admitting;
     private boolean running;
     private BehaviorStatus terminal;
     private long revision;
@@ -57,7 +58,7 @@ public class TimeoutDecorator implements Behavior {
 
     @Override
     public BehaviorStatus run() {
-        if (running) return BehaviorStatus.RUNNING;
+        if (running || admitting) return BehaviorStatus.RUNNING;
         running = true;
         long before = revision;
         try { return runOnce(); }
@@ -99,6 +100,7 @@ public class TimeoutDecorator implements Behavior {
 
     @Override
     public boolean shouldExecute() {
+        if (admitting) return false;
         long requested = revision + 1;
         reset();
         if (revision != requested) return false;
@@ -106,8 +108,11 @@ public class TimeoutDecorator implements Behavior {
         if (maxTicks <= 0) return true;
         active = true;
         boolean ready;
-        try { ready = child.shouldExecute(); }
-        catch (RuntimeException | Error failure) {
+        try {
+            admitting = true;
+            try { ready = child.shouldExecute(); }
+            finally { admitting = false; }
+        } catch (RuntimeException | Error failure) {
             abort(requested, failure);
             throw failure;
         }
