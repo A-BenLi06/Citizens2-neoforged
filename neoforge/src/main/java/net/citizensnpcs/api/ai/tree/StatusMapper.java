@@ -3,7 +3,7 @@ package net.citizensnpcs.api.ai.tree;
 import java.util.function.Supplier;
 
 /**
- * Wraps an {@link Behavior} and returns a supplied {@link BehaviorStatus} instead of the underlying status.
+ * Runs a wrapped {@link Behavior}, then returns a supplied {@link BehaviorStatus} instead of the child's status.
  */
 public class StatusMapper implements Behavior {
     private final Supplier<BehaviorStatus> to;
@@ -21,6 +21,7 @@ public class StatusMapper implements Behavior {
 
     @Override
     public BehaviorStatus run() {
+        wrapping.run();
         return to.get();
     }
 

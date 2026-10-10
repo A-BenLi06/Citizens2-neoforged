@@ -96,7 +96,7 @@ public final class CreationRuntimeAudit {
                 grant("citizens.npc.create", "citizens.npc.spawn", "citizens.npc.undo");
                 types = grant("citizens.npc.create.*"); limits = grant("citizens.admin.avoid-limits");
                 admin = grant("citizens.npc.admin");
-                basic(); items(); lifetimes(); vetoAndHistory(); templatesAndPermissions(); commandRegistryTargets(); behaviorSnapshotMemory(); behaviorRootLifecycle(); repeatedBehaviorTicks(); scalarBehaviorTicks(); conditionalContainerTicks(); retryBehaviorTicks(); timerBehaviorTicks(); globalCommandCooldown();
+                basic(); items(); lifetimes(); vetoAndHistory(); templatesAndPermissions(); commandRegistryTargets(); behaviorSnapshotMemory(); behaviorRootLifecycle(); repeatedBehaviorTicks(); scalarBehaviorTicks(); conditionalContainerTicks(); retryBehaviorTicks(); timerBehaviorTicks(); globalCommandCooldown(); mappedBehaviorTicks();
             }
             List<Runnable> due = checks.remove(server.getTickCount() - start);
             if (due != null) due.forEach(Runnable::run);
@@ -804,6 +804,50 @@ public final class CreationRuntimeAudit {
         public void reset() {
             resets++;
             if (phase.equals("reset_error")) throw error;
+        }
+    }
+
+    private static void mappedBehaviorTicks() {
+        CitizensAPI.getBehaviorRegistry().registerBehavior("creation_mapping", (params, context) -> {
+            var result = net.citizensnpcs.api.ai.tree.BehaviorStatus.valueOf(
+                    context.getArgOrParam(0, "status", params, "SUCCESS"));
+            var children = context.parseChildren(params);
+            var child = children.size() == 1 ? children.get(0)
+                    : net.citizensnpcs.api.ai.tree.Sequence.createSequence(children);
+            return net.citizensnpcs.api.ai.tree.StatusMapper.mapping(child, () -> result);
+        });
+        for (boolean packet : new boolean[] { false, true }) {
+            NPC target = registry.createNPC(EntityType.COW, "MappedBehavior" + packet);
+            if (packet) target.getOrAddTrait(PacketNPC.class);
+            var behavior = target.getOrAddTrait(BehaviorTrait.class);
+            DataKey definition = new MemoryDataKey();
+            definition.setRaw("sequence", Map.of(
+                    "0", Map.of("repeat 3", Map.of(
+                            "0", Map.of("invert", Map.of("0", Map.of("creation_mapping FAILURE",
+                                    Map.of("0", "set mapped_executions `mem.get('mapped_executions') + 1`")))),
+                            "1", "wait 2")),
+                    "1", Map.of("creation_mapping SUCCESS", Map.of("0", "set mapped_effect `1`", "1", "fail")),
+                    "2", "set mapped_finished `1`",
+                    "3", "wait_for_signal mapped_audit_hold"));
+            behavior.applyBehaviorsFromKey(definition);
+            behavior.getMemory().set("mapped_executions", 0D);
+            check(target.spawn(new Location(level, 24, -58, 6)), "mapped_behavior_spawn_" + packet);
+            atTick(2, () -> check(behavior.getMemory().getNumber("mapped_executions") < 3
+                    && behavior.getMemory().getNumber("mapped_finished") == 0,
+                    "mapped_behavior_sequence_preserves_waits_" + packet));
+            atTick(30, () -> {
+                check(behavior.getMemory().getNumber("mapped_executions") == 3,
+                        "mapped_failure_runs_successful_child_on_each_attempt_" + packet);
+                check(behavior.getMemory().getNumber("mapped_effect") == 1
+                        && behavior.getMemory().getNumber("mapped_finished") == 1,
+                        "mapped_success_keeps_failing_child_effects_and_advances_" + packet);
+            });
+            atTick(33, () -> {
+                check(behavior.getMemory().getNumber("mapped_executions") == 3
+                        && behavior.getMemory().getNumber("mapped_effect") == 1,
+                        "mapped_behavior_sequence_stays_at_signal_wait_" + packet);
+                target.destroy();
+            });
         }
     }
 

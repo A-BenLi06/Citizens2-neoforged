@@ -1,6 +1,6 @@
 # Native NPC creation runtime audit
 
-The fixture currently has 546 checks. Template coverage includes sibling definitions,
+The fixture currently has 556 checks. Template coverage includes sibling definitions,
 overwrite index consistency, and applying the updated trait value through creation.
 Behavior short-form coverage includes missing arguments/files, malformed YAML and a
 valid filename containing spaces, with target preservation on file-input failures.
@@ -48,6 +48,11 @@ charge, retain the duration and last-use time across trait restoration, allow an
 expired cooldown, and respect history reset, explicit bypass and NPC isolation.
 The unchanged production code passes these checks; the initial log is positive
 acceptance evidence, not a reproduced setter defect.
+Status mapping coverage invokes the existing API through a fixture factory. It
+verifies child effects occur before success/failure substitution: three mapped
+failure iterations retain their waits, and a mapped success preserves the failing
+child's effect before the sequence reaches a signal wait. Both ordinary and packet
+NPCs must produce the effects, not merely report the expected statuses.
 Additional ordinary/packet trees place conditional groups directly under timeout,
 invert, named-count repeat and loop nodes. Zero timeout prevents child effects;
 The repeat body sets a dynamic timeout budget to 4, 3, 2 and 1 ticks across four
