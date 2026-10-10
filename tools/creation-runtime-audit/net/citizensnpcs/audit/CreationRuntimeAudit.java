@@ -95,7 +95,7 @@ public final class CreationRuntimeAudit {
                 grant("citizens.npc.create", "citizens.npc.spawn", "citizens.npc.undo");
                 types = grant("citizens.npc.create.*"); limits = grant("citizens.admin.avoid-limits");
                 admin = grant("citizens.npc.admin");
-                basic(); items(); lifetimes(); vetoAndHistory(); templatesAndPermissions(); commandRegistryTargets(); behaviorSnapshotMemory(); behaviorRootLifecycle(); repeatedBehaviorTicks(); scalarBehaviorTicks(); conditionalContainerTicks();
+                basic(); items(); lifetimes(); vetoAndHistory(); templatesAndPermissions(); commandRegistryTargets(); behaviorSnapshotMemory(); behaviorRootLifecycle(); repeatedBehaviorTicks(); scalarBehaviorTicks(); conditionalContainerTicks(); retryBehaviorTicks();
             }
             List<Runnable> due = checks.remove(server.getTickCount() - start);
             if (due != null) due.forEach(Runnable::run);
@@ -803,6 +803,47 @@ public final class CreationRuntimeAudit {
         public void reset() {
             resets++;
             if (phase.equals("reset_error")) throw error;
+        }
+    }
+
+    private static void retryBehaviorTicks() {
+        // Exercise the public decorator through a provider factory; this does not add a production YAML node.
+        CitizensAPI.getBehaviorRegistry().registerBehavior("creation_retry_three", (params, context) ->
+                net.citizensnpcs.api.ai.tree.RetryDecorator.retry(
+                        net.citizensnpcs.api.ai.tree.Sequence.createSequence(context.parseChildren(params)), 3));
+        for (boolean packet : new boolean[] { false, true }) {
+            NPC target = registry.createNPC(EntityType.COW, "RetryBehavior" + packet);
+            if (packet) target.getOrAddTrait(PacketNPC.class);
+            var behavior = target.getOrAddTrait(BehaviorTrait.class);
+            DataKey definition = new MemoryDataKey();
+            definition.setRaw("sequence", Map.of(
+                    "0", Map.of("invert", Map.of("0", Map.of("creation_retry_three", Map.of(
+                            "0", "wait 2", "1", "set failed_attempts `mem.get('failed_attempts') + 1`", "2", "fail")))),
+                    "1", Map.of("creation_retry_three", Map.of(
+                            "0", "wait 2", "1", "set recovered_attempts `mem.get('recovered_attempts') + 1`",
+                            "2", Map.of("if `mem.get('recovered_attempts') >= 3`", "succeed", "else", "fail"))),
+                    "2", "set retry_finished `1`",
+                    "3", "wait_for_signal retry_audit_hold"));
+            behavior.applyBehaviorsFromKey(definition);
+            behavior.getMemory().set("failed_attempts", 0D);
+            behavior.getMemory().set("recovered_attempts", 0D);
+            check(target.spawn(new Location(level, 24, -58, 4)), "retry_behavior_spawn_" + packet);
+            atTick(2, () -> check(behavior.getMemory().getNumber("retry_finished") == 0
+                    && behavior.getMemory().getNumber("failed_attempts") < 3,
+                    "retry_wait_yields_across_ticks_" + packet));
+            atTick(60, () -> {
+                check(behavior.getMemory().getNumber("failed_attempts") == 3,
+                        "retry_stops_at_configured_failure_budget_" + packet);
+                check(behavior.getMemory().getNumber("recovered_attempts") == 3
+                        && behavior.getMemory().getNumber("retry_finished") == 1,
+                        "retry_stateful_child_recovers_on_last_attempt_" + packet);
+            });
+            atTick(63, () -> {
+                check(behavior.getMemory().getNumber("failed_attempts") == 3
+                        && behavior.getMemory().getNumber("recovered_attempts") == 3,
+                        "retry_terminal_children_stay_stopped_" + packet);
+                target.destroy();
+            });
         }
     }
 

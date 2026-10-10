@@ -2,6 +2,8 @@
 
 This is the current command and acceptance checklist for Minecraft 1.21.1. The September 13 audit contains historical gaps; later follow-ups supersede those rows. See the [ecosystem scope](neoforge-ecosystem-replacements-2026-09-22.md) for provider ownership.
 
+- [Behavior retry attempts](behavior-retry-2026-10-10.md) now preserve finite budgets while reinitializing each child attempt. Terminal results, cancellation, rejection and callback failures release owned work without restarting completed children. Unit tests and native ordinary/packet wait/action sequences cover exhaustion and later success. The fixture uses the existing public decorator API; arbitrary provider and physical-client acceptance remain separate work.
+
 - [Behavior snapshot memory](behavior-snapshot-memory-2026-10-09.md) is restored before its tree factories run. Full-load preparation failures preserve the live root, blackboard and saved definition; partial loads and respawn retain existing memory identity. The native fixture covers ordinary and packet NPCs with a retained pre-fix failure. Arbitrary factory world side effects and controller/reset callback transactions remain separate concerns.
 
 - [Behavior root lifecycle](behavior-root-lifecycle-2026-10-09.md) now owns admission and cleanup, stops retrying failed roots, and refreshes expression bindings before activation. The native creation fixture covers ordinary/packet controller execution, replacement and respawn with a retained pre-fix failure. Arbitrary provider side effects and physical-client acceptance remain separate work.

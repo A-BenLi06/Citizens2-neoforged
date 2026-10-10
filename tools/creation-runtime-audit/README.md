@@ -1,6 +1,6 @@
 # Native NPC creation runtime audit
 
-The fixture currently has 499 checks. Template coverage includes sibling definitions,
+The fixture currently has 509 checks. Template coverage includes sibling definitions,
 overwrite index consistency, and applying the updated trait value through creation.
 Behavior short-form coverage includes missing arguments/files, malformed YAML and a
 valid filename containing spaces, with target preservation on file-input failures.
@@ -32,6 +32,11 @@ real server ticks. The fixture verifies early non-completion, exactly three body
 effects, a skipped zero-count body and progression to a signal-waiting successor.
 The same live tree selects a grouped conditional's else branch, completes a timed
 subtree and checks first-use/blocked-repeat cooldown behavior through an inverter.
+The public retry decorator is also exercised through a fixture-only provider factory.
+Ordinary and packet NPCs exhaust exactly three failed wait/action attempts, continue
+to a sequence that succeeds on its third attempt, and stay stopped at a signal wait.
+The retained pre-fix native log fails the finite-attempt assertion. This coverage
+does not introduce a new built-in YAML behavior node.
 Additional ordinary/packet trees place conditional groups directly under timeout,
 invert, named-count repeat and loop nodes. Zero timeout prevents child effects;
 The repeat body sets a dynamic timeout budget to 4, 3, 2 and 1 ticks across four
