@@ -64,6 +64,7 @@ public class BehaviorTrait extends Trait {
 
     /**
      * @return the blackboard memory for this NPC's behavior tree
+     *         (a successful full snapshot load replaces this instance)
      */
     public Memory getMemory() {
         return memory;
@@ -73,14 +74,19 @@ public class BehaviorTrait extends Trait {
     public void load(DataKey key) {
         if (key.keyExists("tree")) {
             DataKey definition = key.getRelative("tree").copyWithRoot();
-            parse(definition);
-            yamlCache = definition.getValuesDeep();
-        }
-        if (key.keyExists("memory")) {
-            if (memory == null) {
-                memory = new Memory();
+            Map<String, Object> candidateCache = definition.getValuesDeep();
+            Memory candidateMemory = memory;
+            if (key.keyExists("memory")) {
+                // Factories must see restored values without exposing a rejected candidate to the live tree.
+                candidateMemory = new Memory();
+                candidateMemory.loadFrom(key.getRelative("memory"));
             }
-            memory.loadFrom(key.getRelative("memory"));
+            if (parse(definition, candidateMemory)) yamlCache = candidateCache;
+        } else if (key.keyExists("memory")) {
+            // A memory-only update must retain the instance used by the existing behavior context.
+            Memory candidateMemory = memory == null ? new Memory() : memory;
+            candidateMemory.loadFrom(key.getRelative("memory"));
+            memory = candidateMemory;
         }
     }
 
@@ -103,26 +109,31 @@ public class BehaviorTrait extends Trait {
         if (root == null && yamlCache != null) {
             DataKey definition = new net.citizensnpcs.api.util.MemoryDataKey();
             definition.setRaw("", yamlCache);
-            parse(definition);
+            parse(definition, memory);
         }
     }
 
-    private void parse(DataKey yaml) {
+    private boolean parse(DataKey yaml, Memory candidateMemory) {
         if (!yaml.hasSubKeys()) {
             if (root != null) npc.getDefaultBehaviorController().removeBehavior(root);
             root = null;
-            return;
+            memory = candidateMemory;
+            return true;
         }
-        if (memory == null) {
-            memory = new Memory();
+        if (candidateMemory == null) {
+            candidateMemory = new Memory();
         }
         ExpressionScope scope = NPCExpressionScope.createFor(npc);
         BehaviorTreeParser parser = new BehaviorTreeParser(CitizensAPI.getBehaviorRegistry());
-        Behavior parsed = parser.parse(yaml.getSubKeys().iterator().next(), npc, scope, memory);
+        Behavior parsed = parser.parse(yaml.getSubKeys().iterator().next(), npc, scope, candidateMemory);
         if (parsed == null)
-            return;
+            return false;
+        RootBehavior replacement = new RootBehavior(parsed, scope);
         if (root != null) npc.getDefaultBehaviorController().removeBehavior(root);
-        npc.getDefaultBehaviorController().addBehavior(root = new RootBehavior(parsed, scope));
+        npc.getDefaultBehaviorController().addBehavior(replacement);
+        root = replacement;
+        memory = candidateMemory;
+        return true;
     }
 
     @Override

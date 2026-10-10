@@ -1,6 +1,6 @@
 # Native NPC creation runtime audit
 
-The fixture currently has 473 checks. Template coverage includes sibling definitions,
+The fixture currently has 499 checks. Template coverage includes sibling definitions,
 overwrite index consistency, and applying the updated trait value through creation.
 Behavior short-form coverage includes missing arguments/files, malformed YAML and a
 valid filename containing spaces, with target preservation on file-input failures.
@@ -14,6 +14,13 @@ single sequence or another explicit container.
 Behavior lifecycle coverage includes repeated fresh saves, resaving a loaded tree,
 and resuming execution after actual despawn/respawn.
 It also removes BehaviorTrait from a live NPC and verifies execution stops.
+Snapshot factories capture saved scalar/list values during construction on ordinary
+and packet NPCs. Full restoration uses incoming memory rather than an empty or old
+blackboard. Rejected factories and unreadable memory preserve the old tree, memory
+identity and saved snapshot; candidate factory writes stay isolated. Memory-only
+loads keep the current behavior context, tree-only loads and respawn use existing
+memory, and explicit empty trees clear execution while restoring incoming memory.
+The retained pre-fix log fails the first factory-capture assertion.
 Root lifecycle probes run through each native NPC's behavior controller. Ordinary
 and packet NPCs cover success, failure, removal, and exceptions during admission,
 execution and cleanup. They verify one root cleanup per activation, no automatic

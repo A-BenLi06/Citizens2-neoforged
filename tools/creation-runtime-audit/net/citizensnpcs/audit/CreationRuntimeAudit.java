@@ -95,7 +95,7 @@ public final class CreationRuntimeAudit {
                 grant("citizens.npc.create", "citizens.npc.spawn", "citizens.npc.undo");
                 types = grant("citizens.npc.create.*"); limits = grant("citizens.admin.avoid-limits");
                 admin = grant("citizens.npc.admin");
-                basic(); items(); lifetimes(); vetoAndHistory(); templatesAndPermissions(); commandRegistryTargets(); behaviorRootLifecycle(); repeatedBehaviorTicks(); scalarBehaviorTicks(); conditionalContainerTicks();
+                basic(); items(); lifetimes(); vetoAndHistory(); templatesAndPermissions(); commandRegistryTargets(); behaviorSnapshotMemory(); behaviorRootLifecycle(); repeatedBehaviorTicks(); scalarBehaviorTicks(); conditionalContainerTicks();
             }
             List<Runnable> due = checks.remove(server.getTickCount() - start);
             if (due != null) due.forEach(Runnable::run);
@@ -617,6 +617,111 @@ public final class CreationRuntimeAudit {
             signals.clearListeners(original); signals.emit(namedTarget, "signal_instance_audit");
             check(delivered[0] == 2 && delivered[1] == 3, "native_signal_cleanup_preserves_other_instance");
         } finally { signals.clearListeners(original); signals.clearListeners(namedTarget); }
+    }
+
+    private static void behaviorSnapshotMemory() {
+        var builds = new java.util.concurrent.atomic.AtomicInteger();
+        var runs = new java.util.concurrent.atomic.AtomicInteger();
+        var rejectedInput = new java.util.concurrent.atomic.AtomicInteger();
+        CitizensAPI.getBehaviorRegistry().registerBehavior("creation_snapshot_capture", (params, context) -> {
+            builds.incrementAndGet();
+            double captured = context.getMemory().getNumber("snapshot_input", -1);
+            Object raw = context.getMemory().get("snapshot_list");
+            var list = raw instanceof List<?> values ? new ArrayList<>(values) : List.of();
+            return (net.citizensnpcs.api.ai.tree.InstantBehavior) () -> {
+                runs.incrementAndGet();
+                context.getMemory().set("factory_input", captured);
+                context.getMemory().set("factory_list", list);
+                return net.citizensnpcs.api.ai.tree.BehaviorStatus.SUCCESS;
+            };
+        });
+        CitizensAPI.getBehaviorRegistry().registerBehavior("creation_snapshot_reject", (params, context) -> {
+            rejectedInput.set((int) context.getMemory().getNumber("snapshot_input", -1));
+            context.getMemory().set("rejected_factory_write", 1);
+            throw new IllegalArgumentException("expected snapshot factory rejection");
+        });
+        for (boolean packet : new boolean[] { false, true }) {
+            NPC original = registry.createNPC(EntityType.COW, "SnapshotOriginal" + packet);
+            NPC restored = registry.createNPC(EntityType.COW, "SnapshotRestored" + packet);
+            if (packet) { original.getOrAddTrait(PacketNPC.class); restored.getOrAddTrait(PacketNPC.class); }
+            try {
+                var originalBehavior = original.getOrAddTrait(BehaviorTrait.class);
+                DataKey initial = new MemoryDataKey(); initial.setString("root", "succeed");
+                originalBehavior.applyBehaviorsFromKey(initial);
+                originalBehavior.getMemory().set("snapshot_input", 7);
+                originalBehavior.getMemory().set("snapshot_list", Arrays.asList("saved", null, "list"));
+                DataKey definition = new MemoryDataKey(); definition.setString("root", "creation_snapshot_capture");
+                originalBehavior.applyBehaviorsFromKey(definition);
+                DataKey snapshot = new MemoryDataKey(); originalBehavior.save(snapshot);
+                var behavior = restored.getOrAddTrait(BehaviorTrait.class);
+                behavior.load(snapshot.copyWithRoot());
+                check(restored.spawn(new Location(level, 30, -58, 4)), "snapshot_memory_spawn_" + packet);
+                restored.getDefaultBehaviorController().run();
+                check(behavior.getMemory().getNumber("factory_input") == 7
+                        && behavior.getMemory().get("factory_list").equals(Arrays.asList("saved", null, "list")),
+                        "snapshot_factory_sees_restored_scalar_and_list_" + packet);
+                DataKey changed = snapshot.copyWithRoot(); changed.setInt("memory.snapshot_input", 11);
+                behavior.load(changed);
+                restored.getDefaultBehaviorController().run();
+                check(behavior.getMemory().getNumber("factory_input") == 11,
+                        "snapshot_factory_sees_incoming_not_previous_memory_" + packet);
+                var previousMemory = behavior.getMemory();
+                DataKey before = new MemoryDataKey(); behavior.save(before);
+                DataKey rejected = snapshot.copyWithRoot(); rejected.setInt("memory.snapshot_input", 23);
+                rejected.setString("tree.root", "creation_snapshot_reject");
+                boolean failed = false;
+                try { behavior.load(rejected); }
+                catch (IllegalArgumentException expected) { failed = true; }
+                check(failed && rejectedInput.get() == 23 && behavior.getMemory() == previousMemory
+                        && behavior.getMemory().getNumber("snapshot_input") == 11
+                        && !behavior.getMemory().has("rejected_factory_write"),
+                        "rejected_snapshot_factory_preserves_live_memory_" + packet);
+                int beforeRun = runs.get(); restored.getDefaultBehaviorController().run();
+                check(runs.get() == beforeRun + 1 && behavior.getMemory().getNumber("factory_input") == 11,
+                        "rejected_snapshot_preserves_live_tree_" + packet);
+                DataKey after = new MemoryDataKey(); behavior.save(after);
+                check(before.getValuesDeep().equals(after.getValuesDeep()), "rejected_snapshot_preserves_saved_state_" + packet);
+
+                DataKey unreadable = new MemoryDataKey(snapshot.getValuesDeep()) {
+                    @Override public MemoryDataKey getRelative(String relative) {
+                        if (relative.equals("memory")) return new MemoryDataKey() {
+                            @Override public MemoryDataKey copyWithRoot() { throw new IllegalStateException("expected memory read failure"); }
+                        };
+                        return super.getRelative(relative);
+                    }
+                };
+                int beforeBuild = builds.get(); failed = false;
+                try { behavior.load(unreadable); }
+                catch (IllegalStateException expected) { failed = true; }
+                check(failed && builds.get() == beforeBuild && behavior.getMemory() == previousMemory,
+                        "unreadable_snapshot_memory_rejects_before_tree_construction_" + packet);
+                DataKey afterUnreadable = new MemoryDataKey(); behavior.save(afterUnreadable);
+                check(before.getValuesDeep().equals(afterUnreadable.getValuesDeep()),
+                        "unreadable_snapshot_memory_preserves_saved_state_" + packet);
+
+                DataKey memoryOnly = new MemoryDataKey(); memoryOnly.setRaw("memory", changed.getRaw("memory"));
+                memoryOnly.setInt("memory.snapshot_input", 17);
+                behavior.load(memoryOnly);
+                check(behavior.getMemory() == previousMemory && builds.get() == beforeBuild
+                        && previousMemory.getNumber("snapshot_input") == 17,
+                        "memory_only_load_keeps_existing_behavior_context_" + packet);
+                DataKey treeOnly = new MemoryDataKey(); treeOnly.setRaw("tree", snapshot.getRaw("tree"));
+                behavior.load(treeOnly);
+                restored.getDefaultBehaviorController().run();
+                check(behavior.getMemory() == previousMemory && previousMemory.getNumber("factory_input") == 17,
+                        "tree_only_load_uses_current_memory_" + packet);
+                check(restored.despawn(DespawnReason.PENDING_RESPAWN) && restored.spawn(new Location(level, 30, -58, 4)),
+                        "snapshot_memory_respawn_" + packet);
+                restored.getDefaultBehaviorController().run();
+                check(behavior.getMemory() == previousMemory && previousMemory.getNumber("factory_input") == 17,
+                        "snapshot_factory_memory_survives_respawn_" + packet);
+
+                DataKey empty = new MemoryDataKey(); empty.setRaw("tree", Map.of()); empty.setInt("memory.snapshot_input", 29);
+                beforeRun = runs.get(); behavior.load(empty); restored.getDefaultBehaviorController().run();
+                check(runs.get() == beforeRun && behavior.getMemory().getNumber("snapshot_input") == 29,
+                        "empty_snapshot_tree_clears_execution_and_restores_memory_" + packet);
+            } finally { original.destroy(); restored.destroy(); }
+        }
     }
 
     private static void behaviorRootLifecycle() {

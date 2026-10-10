@@ -2,6 +2,8 @@
 
 This is the current command and acceptance checklist for Minecraft 1.21.1. The September 13 audit contains historical gaps; later follow-ups supersede those rows. See the [ecosystem scope](neoforge-ecosystem-replacements-2026-09-22.md) for provider ownership.
 
+- [Behavior snapshot memory](behavior-snapshot-memory-2026-10-09.md) is restored before its tree factories run. Full-load preparation failures preserve the live root, blackboard and saved definition; partial loads and respawn retain existing memory identity. The native fixture covers ordinary and packet NPCs with a retained pre-fix failure. Arbitrary factory world side effects and controller/reset callback transactions remain separate concerns.
+
 - [Behavior root lifecycle](behavior-root-lifecycle-2026-10-09.md) now owns admission and cleanup, stops retrying failed roots, and refreshes expression bindings before activation. The native creation fixture covers ordinary/packet controller execution, replacement and respawn with a retained pre-fix failure. Arbitrary provider side effects and physical-client acceptance remain separate work.
 
 - Dynamic timeout reactivation and early wait-literal rejection have native coverage on NeoForge 21.1.233 and 21.1.248 (385 creation checks each). Ordinary/packet NPCs complete three two-tick waits with budgets 4/3/2, then stop on a fourth budget of 1. Invalid wait replacement preserves execution, memory and persisted definition. Callback failure and physical-client/provider acceptance remain separate coverage.
