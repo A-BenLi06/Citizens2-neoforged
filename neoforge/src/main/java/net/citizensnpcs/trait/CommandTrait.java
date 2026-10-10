@@ -66,6 +66,7 @@ public class CommandTrait extends Trait {
     private double cost = -1;
     @Persist(keyType = CommandTraitError.class)
     private final Map<CommandTraitError, String> customErrorMessages = new EnumMap<>(CommandTraitError.class);
+    private final Set<String> executingCommands = new HashSet<>();
     private final Map<String, Set<CommandTraitError>> executionErrors = new HashMap<>();
     @Persist
     private ExecutionMode executionMode = ExecutionMode.LINEAR;
@@ -330,24 +331,12 @@ public class CommandTrait extends Trait {
                 }
                 for (NPCCommand command : commandList) {
                     PlayerNPCCommand info = null;
-                    if (executionMode == ExecutionMode.CYCLE) {
-                        if (command.id <= lastUsedId) {
-                            if (lastUsedId != max)
-                                continue;
-                            lastUsedId = -1;
-                        }
-                    }
+                    if (executionMode == ExecutionMode.CYCLE && command.id <= lastUsedId && lastUsedId < max)
+                        continue;
                     if (executionMode == ExecutionMode.SEQUENTIAL
                             && (info = playerTracking.get(player.getUUID())) != null) {
-                        if (info.lastUsedHand != hand) {
-                            info.lastUsedHand = hand;
-                            info.lastUsedId = -1;
-                        }
-                        if (command.id <= info.lastUsedId) {
-                            if (info.lastUsedId != max)
-                                continue;
-                            info.lastUsedId = -1;
-                        }
+                        if (info.lastUsedHand == hand && command.id <= info.lastUsedId && info.lastUsedId < max)
+                            continue;
                     }
                     runCommand(player, hand, command);
                     if (executionMode == ExecutionMode.SEQUENTIAL || executionMode == ExecutionMode.CYCLE
@@ -360,41 +349,51 @@ public class CommandTrait extends Trait {
                 Runnable runnable = () -> {
                     if (failedCharge)
                         return;
-                    PlayerNPCCommand info = playerTracking.get(player.getUUID());
-                    if (info == null && (executionMode == ExecutionMode.SEQUENTIAL
-                            || PlayerNPCCommand.requiresTracking(command))) {
-                        playerTracking.put(player.getUUID(), info = new PlayerNPCCommand());
-                    }
-                    Transaction charge = null;
-                    if (!failedCharge) {
-                        charge = chargeCommandCosts(player, hand, command);
+                    String commandKey = command.getEncodedKey();
+                    // Payment providers can call back into dispatch before usage is committed.
+                    if (!executingCommands.add(commandKey))
+                        return;
+                    try {
+                        PlayerNPCCommand info = playerTracking.get(player.getUUID());
+                        if (info == null && (executionMode == ExecutionMode.SEQUENTIAL
+                                || PlayerNPCCommand.requiresTracking(command))) {
+                            info = new PlayerNPCCommand();
+                        }
+                        Transaction charge = chargeCommandCosts(player, hand, command);
                         if (!charge.isPossible()) {
                             failedCharge = true;
                             return;
                         }
-                    }
-                    if (info != null && !info.canUse(CommandTrait.this, player, hand, command))
-                        return;
+                        if (info != null && !info.canUse(CommandTrait.this, player, command))
+                            return;
 
-                    if (!failedCharge) {
                         if (!runCharge(charge)) {
                             failedCharge = true;
                             return;
                         }
-                    }
-                    if (!temporaryPermissions.isEmpty()) {
-                        PermissionUtil.Attachment attachment = PermissionUtil.grantTemporary(player,
-                                temporaryPermissions);
-                        command.run(npc, player);
-                        if (temporaryPermissionsDuration <= 0) {
-                            attachment.remove();
-                        } else {
-                            CitizensAPI.getScheduler().runEntityTaskLater(player, attachment::remove,
-                                    temporaryPermissionsDuration);
+                        if (info != null) {
+                            playerTracking.computeIfAbsent(player.getUUID(), ignored -> new PlayerNPCCommand())
+                                    .recordUse(CommandTrait.this, hand, command);
                         }
-                        return;
+                        if (executionMode == ExecutionMode.CYCLE) {
+                            lastUsedId = command.id;
+                        }
+                        if (!temporaryPermissions.isEmpty()) {
+                            PermissionUtil.Attachment attachment = PermissionUtil.grantTemporary(player,
+                                    temporaryPermissions);
+                            command.run(npc, player);
+                            if (temporaryPermissionsDuration <= 0) {
+                                attachment.remove();
+                            } else {
+                                CitizensAPI.getScheduler().runEntityTaskLater(player, attachment::remove,
+                                        temporaryPermissionsDuration);
+                            }
+                            return;
+                        }
+                        command.run(npc, player);
+                    } finally {
+                        executingCommands.remove(commandKey);
                     }
-                    command.run(npc, player);
                 };
                 if (command.delay <= 0) {
                     runnable.run();
@@ -852,7 +851,7 @@ public class CommandTrait extends Trait {
         public PlayerNPCCommand() {
         }
 
-        public boolean canUse(CommandTrait trait, ServerPlayer player, Hand hand, NPCCommand command) {
+        public boolean canUse(CommandTrait trait, ServerPlayer player, NPCCommand command) {
             for (String perm : command.perms) {
                 if (!PermissionUtil.hasPermission(player, perm)) {
                     trait.sendErrorMessage(player, CommandTraitError.NO_PERMISSION, null);
@@ -872,7 +871,6 @@ public class CommandTrait extends Trait {
                             new TimeVariableFormatter(seconds, TimeUnit.SECONDS), seconds);
                     return false;
                 }
-                lastUsed.remove(commandKey);
             }
             if (!PermissionUtil.hasPermission(player, "citizens.npc.command.ignoreerrors.globalcooldown")
                     && command.globalCooldown > 0 && trait.globalCooldowns.containsKey(commandKey)) {
@@ -883,7 +881,6 @@ public class CommandTrait extends Trait {
                             new TimeVariableFormatter(seconds, TimeUnit.SECONDS), seconds);
                     return false;
                 }
-                trait.globalCooldowns.remove(commandKey);
             }
             int timesUsed = nUsed.getOrDefault(commandKey, 0);
             if (!PermissionUtil.hasPermission(player, "citizens.npc.command.ignoreerrors.nused") && command.n > 0
@@ -898,6 +895,13 @@ public class CommandTrait extends Trait {
                 trait.sendErrorMessage(player, CommandTraitError.GLOBAL_MAXIMUM_TIMES_USED, null, command.gn);
                 return false;
             }
+            return true;
+        }
+
+        public void recordUse(CommandTrait trait, Hand hand, NPCCommand command) {
+            long globalDelay = Setting.NPC_COMMAND_GLOBAL_COMMAND_COOLDOWN.asSeconds();
+            long currentTimeSec = System.currentTimeMillis() / 1000;
+            String commandKey = command.getEncodedKey();
             if (command.cooldown > 0 || globalDelay > 0) {
                 lastUsed.put(commandKey, currentTimeSec);
             }
@@ -905,14 +909,13 @@ public class CommandTrait extends Trait {
                 trait.globalCooldowns.put(commandKey, currentTimeSec);
             }
             if (command.n > 0) {
-                nUsed.put(commandKey, timesUsed + 1);
+                nUsed.put(commandKey, nUsed.getOrDefault(commandKey, 0) + 1);
             }
             if (command.gn > 0) {
                 trait.globalUses.put(commandKey, trait.globalUses.getOrDefault(commandKey, 0) + 1);
             }
             lastUsedId = command.id;
             lastUsedHand = hand;
-            return true;
         }
 
         public void pruneCooldowns(Map<String, Long> globalCooldowns, Collection<NPCCommand> commands) {

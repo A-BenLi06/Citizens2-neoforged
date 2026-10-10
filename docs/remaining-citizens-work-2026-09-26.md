@@ -2,6 +2,8 @@
 
 This is the current command and acceptance checklist for Minecraft 1.21.1. The September 13 audit contains historical gaps; later follow-ups supersede those rows. See the [ecosystem scope](neoforge-ecosystem-replacements-2026-09-22.md) for provider ownership.
 
+- [Command payment and usage](command-payment-usage-2026-10-10.md) now records cooldowns, use counts and sequence positions after per-command payment succeeds. Rejected withdrawals preserve history, and a provider callback cannot charge the same command again while payment is in flight. Native ordinary/packet probes cover retry, rejected wrap/hand changes and rotation after highest-ID deletion; CYCLE now advances its shared position. Global click costs, delayed-command retirement, post-payment failures and physical-client/provider acceptance remain separate work.
+
 - [Behavior status mapping](behavior-status-mapping-2026-10-10.md) now executes the wrapped child before returning a supplied status. Tests cover child effects, state-dependent mappings and exception ordering; native ordinary/packet sequences verify effects under both success/failure substitutions. The existing unconditional mapping and separate single-use contracts remain intact; arbitrary provider/callback and physical-client combinations retain separate acceptance.
 
 - [Global command cooldown acceptance](command-global-cooldown-2026-10-10.md) confirms the existing `--gcooldown` implementation across two players, saved trait restoration, expiry, history clearing, bypass permission and independent NPCs. The new native scenario required no gameplay fix. Global click-cost policy, delayed commands and physical-client/provider combinations retain separate acceptance.

@@ -1,6 +1,6 @@
 # Native NPC creation runtime audit
 
-The fixture currently has 556 checks. Template coverage includes sibling definitions,
+The fixture currently has 586 checks. Template coverage includes sibling definitions,
 overwrite index consistency, and applying the updated trait value through creation.
 Behavior short-form coverage includes missing arguments/files, malformed YAML and a
 valid filename containing spaces, with target preservation on file-input failures.
@@ -48,6 +48,13 @@ charge, retain the duration and last-use time across trait restoration, allow an
 expired cooldown, and respect history reset, explicit bypass and NPC isolation.
 The unchanged production code passes these checks; the initial log is positive
 acceptance evidence, not a reproduced setter defect.
+Per-command payment probes use a rejecting economy provider and saved-state
+snapshots. Rejection preserves cooldowns, use counts and sequence position; a
+successful retry charges/runs once and blocks same-command provider reentry for
+either player. Rejected wrapping and other-hand payment preserve the prior
+sequence. CYCLE shares rotation across players, SEQUENTIAL keeps player positions,
+and both wrap after deleting the highest command ID. Ordinary and packet NPCs
+exercise all paths. The retained pre-fix log fails payment-state preservation.
 Status mapping coverage invokes the existing API through a fixture factory. It
 verifies child effects occur before success/failure substitution: three mapped
 failure iterations retain their waits, and a mapped success preserves the failing
@@ -96,7 +103,7 @@ Run from the repository root with PowerShell 7 and JDK 21:
 
 Omit the override to test default 21.1.233. The fixture uses loopback port 25625, `artifacts/creation-audit-server`, world `creation-world` and marker `creation-audit-fixture.txt`. Preparation validates existing server identity. The audit refuses a nonempty default registry and only tracks NPCs created after it begins. It cleans its NPCs, grants and block edits before shutdown.
 
-Success requires `[CREATIONAUDIT] COMPLETE`, no `[CREATIONAUDIT] FAILED`, and successful Gradle completion. Expected creation/removal listener and behavior-root exceptions are deliberately exercised and logged; they must be followed by cleanup assertions and successful completion.
+Success requires `[CREATIONAUDIT] COMPLETE`, no `[CREATIONAUDIT] FAILED`, and successful Gradle completion. Expected creation/removal listener, behavior-root and rejected-payment exceptions are deliberately exercised and logged; they must be followed by cleanup assertions and successful completion.
 
 Coverage uses the real command dispatcher and native ticks: unspawned/baby/silent/packet/center options, partial collision shapes, item components and block-state projection, supported item carriers, default item providers, native falling/spawner controls, type/admin/limit checks, generic and command vetoes, creator events, callback removal/replacement, prepared templates, undo and nested history, zero/short/large lifetimes and replacement safety. The fixture generates its own template through the native template registry.
 

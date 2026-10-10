@@ -96,7 +96,7 @@ public final class CreationRuntimeAudit {
                 grant("citizens.npc.create", "citizens.npc.spawn", "citizens.npc.undo");
                 types = grant("citizens.npc.create.*"); limits = grant("citizens.admin.avoid-limits");
                 admin = grant("citizens.npc.admin");
-                basic(); items(); lifetimes(); vetoAndHistory(); templatesAndPermissions(); commandRegistryTargets(); behaviorSnapshotMemory(); behaviorRootLifecycle(); repeatedBehaviorTicks(); scalarBehaviorTicks(); conditionalContainerTicks(); retryBehaviorTicks(); timerBehaviorTicks(); globalCommandCooldown(); mappedBehaviorTicks();
+                basic(); items(); lifetimes(); vetoAndHistory(); templatesAndPermissions(); commandRegistryTargets(); behaviorSnapshotMemory(); behaviorRootLifecycle(); repeatedBehaviorTicks(); scalarBehaviorTicks(); conditionalContainerTicks(); retryBehaviorTicks(); timerBehaviorTicks(); globalCommandCooldown(); mappedBehaviorTicks(); commandPaymentUsage();
             }
             List<Runnable> due = checks.remove(server.getTickCount() - start);
             if (due != null) due.forEach(Runnable::run);
@@ -804,6 +804,137 @@ public final class CreationRuntimeAudit {
         public void reset() {
             resets++;
             if (phase.equals("reset_error")) throw error;
+        }
+    }
+
+    private static DataKey commandState(CommandTrait commands) {
+        DataKey saved = new MemoryDataKey();
+        net.citizensnpcs.api.persistence.PersistenceLoader.save(commands, saved);
+        return saved;
+    }
+
+    private static void withEconomy(EconomyProvider provider, Runnable operation) {
+        EconomyProvider previous = EconomyProvider.getProvider();
+        EconomyProvider.setProvider(provider);
+        try { operation.run(); }
+        finally { EconomyProvider.setProvider(previous); }
+    }
+
+    private static final class CommandPaymentEconomy implements EconomyProvider {
+        final Map<UUID, Double> balances = new HashMap<>();
+        int withdrawals;
+        boolean accepting;
+        Runnable beforeWithdrawal = () -> { };
+        public double getBalance(ServerPlayer player) { return balances.getOrDefault(player.getUUID(), 100D); }
+        public boolean deposit(ServerPlayer player, double amount) {
+            balances.put(player.getUUID(), getBalance(player) + amount); return true;
+        }
+        public String format(double amount) { return Double.toString(amount); }
+        public boolean withdraw(ServerPlayer player, double amount) {
+            withdrawals++;
+            if (!accepting) return false;
+            beforeWithdrawal.run();
+            balances.put(player.getUUID(), getBalance(player) - amount); return true;
+        }
+    }
+
+    private static void commandPaymentUsage() {
+        for (boolean packet : new boolean[] { false, true }) {
+            var rewards = new java.util.concurrent.atomic.AtomicInteger();
+            var successors = new java.util.concurrent.atomic.AtomicInteger();
+            String reward = "creation_paid_usage_" + packet, successor = "creation_paid_successor_" + packet;
+            server.getCommands().getDispatcher().register(net.minecraft.commands.Commands.literal(reward)
+                    .executes(ctx -> rewards.incrementAndGet()));
+            server.getCommands().getDispatcher().register(net.minecraft.commands.Commands.literal(successor)
+                    .executes(ctx -> successors.incrementAndGet()));
+            NPC target = registry.createNPC(EntityType.COW, "CommandPayment" + packet);
+            if (packet) target.getOrAddTrait(PacketNPC.class);
+            check(target.spawn(new Location(level, 21, -58, 6)), "command_payment_npc_spawn_" + packet);
+            var commands = target.getOrAddTrait(CommandTrait.class);
+            commands.setExecutionMode(CommandTrait.ExecutionMode.SEQUENTIAL);
+            commands.addCommand(new CommandTrait.NPCCommandBuilder(reward, CommandTrait.Hand.RIGHT)
+                    .cost(5).cooldown(3600).globalCooldown(3600).n(1).globalN(1));
+            commands.addCommand(new CommandTrait.NPCCommandBuilder(successor, CommandTrait.Hand.RIGHT).cooldown(-1));
+            commands.addCommand(new CommandTrait.NPCCommandBuilder(reward, CommandTrait.Hand.LEFT).cost(5).cooldown(-1));
+            var economy = new CommandPaymentEconomy();
+            DataKey before = commandState(commands);
+            withEconomy(economy, () -> commands.dispatch(alice.player, CommandTrait.Hand.RIGHT));
+            check(economy.withdrawals == 1 && economy.getBalance(alice.player) == 100,
+                    "rejected_command_withdrawal_keeps_balance_" + packet);
+            check(before.getValuesDeep().equals(commandState(commands).getValuesDeep()),
+                    "failed_command_payment_preserves_saved_usage_" + packet);
+            economy.accepting = true;
+            economy.beforeWithdrawal = () -> {
+                economy.beforeWithdrawal = () -> { };
+                check(before.getValuesDeep().equals(commandState(commands).getValuesDeep()),
+                        "command_usage_is_not_persisted_before_payment_completes_" + packet);
+                commands.dispatch(alice.player, CommandTrait.Hand.RIGHT);
+                commands.dispatch(cooldownPlayer.player, CommandTrait.Hand.RIGHT);
+            };
+            withEconomy(economy, () -> commands.dispatch(alice.player, CommandTrait.Hand.RIGHT));
+            check(economy.withdrawals == 2 && economy.getBalance(alice.player) == 95
+                    && economy.getBalance(cooldownPlayer.player) == 100,
+                    "command_payment_reentry_cannot_charge_same_command_twice_" + packet);
+            DataKey paid = commandState(commands);
+            String commandKey = Base64.getEncoder().encodeToString(reward.getBytes(java.nio.charset.StandardCharsets.UTF_8));
+            check(paid.getInt("globalUses." + commandKey) == 1
+                    && paid.getInt("cooldowns." + alice.player.getUUID() + ".nUsed." + commandKey) == 1
+                    && paid.getInt("cooldowns." + alice.player.getUUID() + ".lastUsedId") == 0,
+                    "paid_command_commits_one_use_and_sequence_position_" + packet);
+            atTick(3, () -> {
+                check(rewards.get() == 1 && successors.get() == 0,
+                        "payment_retry_runs_original_command_without_skipping_" + packet);
+                commands.dispatch(alice.player, CommandTrait.Hand.RIGHT);
+            });
+            atTick(6, () -> {
+                check(rewards.get() == 1 && successors.get() == 1,
+                        "successful_payment_advances_sequence_once_" + packet);
+                DataKey state = commandState(commands);
+                withEconomy(economy, () -> commands.dispatch(alice.player, CommandTrait.Hand.RIGHT));
+                check(state.getValuesDeep().equals(commandState(commands).getValuesDeep()),
+                        "rejected_sequence_wrap_preserves_previous_position_" + packet);
+                economy.accepting = false;
+                withEconomy(economy, () -> commands.dispatch(alice.player, CommandTrait.Hand.LEFT));
+                check(economy.withdrawals == 3 && economy.getBalance(alice.player) == 95
+                        && state.getValuesDeep().equals(commandState(commands).getValuesDeep()),
+                        "rejected_other_hand_payment_preserves_previous_sequence_" + packet);
+                economy.accepting = true;
+                withEconomy(economy, () -> commands.dispatch(alice.player, CommandTrait.Hand.RIGHT));
+            });
+            atTick(9, () -> {
+                check(rewards.get() == 1 && successors.get() == 1 && economy.withdrawals == 3,
+                        "paid_command_limits_block_later_charges_and_rewards_" + packet);
+                target.destroy();
+            });
+
+            for (var mode : List.of(CommandTrait.ExecutionMode.CYCLE, CommandTrait.ExecutionMode.SEQUENTIAL)) {
+                var executions = new ArrayList<String>();
+                String first = "creation_order_first_" + mode.name().toLowerCase(Locale.ROOT) + "_" + packet;
+                String second = "creation_order_second_" + mode.name().toLowerCase(Locale.ROOT) + "_" + packet;
+                server.getCommands().getDispatcher().register(net.minecraft.commands.Commands.literal(first)
+                        .executes(ctx -> { executions.add("first"); return 1; }));
+                server.getCommands().getDispatcher().register(net.minecraft.commands.Commands.literal(second)
+                        .executes(ctx -> { executions.add("second"); return 1; }));
+                NPC ordered = registry.createNPC(EntityType.COW, "CommandOrder" + mode + packet);
+                if (packet) ordered.getOrAddTrait(PacketNPC.class);
+                check(ordered.spawn(new Location(level, 20, -58, 6)), "ordered_command_npc_spawn_" + mode + "_" + packet);
+                var order = ordered.getOrAddTrait(CommandTrait.class); order.setExecutionMode(mode);
+                order.addCommand(new CommandTrait.NPCCommandBuilder(first, CommandTrait.Hand.RIGHT).cooldown(-1));
+                int last = order.addCommand(new CommandTrait.NPCCommandBuilder(second, CommandTrait.Hand.RIGHT).cooldown(-1));
+                order.dispatch(alice.player, CommandTrait.Hand.RIGHT);
+                order.dispatch(mode == CommandTrait.ExecutionMode.CYCLE ? cooldownPlayer.player : alice.player, CommandTrait.Hand.RIGHT);
+                order.dispatch(cooldownPlayer.player, CommandTrait.Hand.RIGHT);
+                if (mode == CommandTrait.ExecutionMode.CYCLE) order.dispatch(alice.player, CommandTrait.Hand.RIGHT);
+                order.removeCommandById(last);
+                order.dispatch(alice.player, CommandTrait.Hand.RIGHT);
+                atTick(3, () -> {
+                    List<String> expected = mode == CommandTrait.ExecutionMode.CYCLE
+                            ? List.of("first", "second", "first", "second", "first")
+                            : List.of("first", "second", "first", "first");
+                    check(executions.equals(expected), "command_order_wraps_after_deleted_last_id_" + mode + "_" + packet);
+                    ordered.destroy();
+                });
+            }
         }
     }
 
