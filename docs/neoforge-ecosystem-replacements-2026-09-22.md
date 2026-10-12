@@ -1,5 +1,7 @@
 # Citizens NeoForge scope and ecosystem replacements
 
+Inventory/version update: [October 12 review](citizens-next-work-2026-10-12.md) supersedes this report's installed-provider and candidate-version observations. Paradigm 2.5.0 and CMDCam 2.2.9 are now present in the inspected target directory. The provider-ownership decisions below remain applicable.
+
 Reviewed: 2026-09-22 19:43:17 +08:00 (UTC+08:00).
 Target: Minecraft 1.21.1. The repository declares NeoForge 21.1.233; the existing server/runtime-audit record uses 21.1.248.
 

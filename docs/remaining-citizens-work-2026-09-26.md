@@ -1,5 +1,7 @@
 # Remaining Citizens work
 
+Current planning review: [October 12 progress, ordered work and plugin alternatives](citizens-next-work-2026-10-12.md). It records the uncommitted delayed-command draft, artifact differences and refreshed provider inventory; the detailed acceptance history below remains applicable.
+
 This is the current command and acceptance checklist for Minecraft 1.21.1. The September 13 audit contains historical gaps; later follow-ups supersede those rows. See the [ecosystem scope](neoforge-ecosystem-replacements-2026-09-22.md) for provider ownership.
 
 - [Command payment and usage](command-payment-usage-2026-10-10.md) now records cooldowns, use counts and sequence positions after per-command payment succeeds. Rejected withdrawals preserve history, and a provider callback cannot charge the same command again while payment is in flight. Native ordinary/packet probes cover retry, rejected wrap/hand changes and rotation after highest-ID deletion; CYCLE now advances its shared position. Global click costs, delayed-command retirement, post-payment failures and physical-client/provider acceptance remain separate work.
