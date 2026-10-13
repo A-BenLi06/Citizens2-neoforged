@@ -256,9 +256,9 @@
     "evidence": {
       "server-smoke-grieflogger-conflict.log": "c451ecc63bbce69aee624d3ef5920bf56db7e0de5931351a5516364049cb2eed",
       "grieflogger-build.log": "22d8e0ce0a2cc779c47eaced5383a42cb718b466cde58fcd5c7980ee020ea5a0",
-      "server-smoke.log": "102fd949043c0e718a478ba300d48809ce4b72f7b5fa1dd627763991b0a75325",
-      "server-smoke-result.json": "4889b9ad21b9bb71712ac55650bea16a326a9371d8cd73cc7ad7e6b44e347578",
-      "database-checks.json": "6b36e8bf9e2ee7a385e1be2fb6f0d1a33c3f2bc97effc7953b8ff139dd956405"
+      "database-checks.json": "6b36e8bf9e2ee7a385e1be2fb6f0d1a33c3f2bc97effc7953b8ff139dd956405",
+      "server-smoke-economy041.log": "102fd949043c0e718a478ba300d48809ce4b72f7b5fa1dd627763991b0a75325",
+      "server-smoke-economy041-result.json": "4889b9ad21b9bb71712ac55650bea16a326a9371d8cd73cc7ad7e6b44e347578"
     }
   }
 }

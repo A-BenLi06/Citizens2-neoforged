@@ -1,0 +1,25 @@
+{
+  "preparedAt": "2026-10-13T20:22:22.256713+08:00",
+  "status": "PREPARED_FOR_PLANNED_RESTART",
+  "package": "E:\\yunniverse-server\\updates\\economy-0.5.0-2026-10-13",
+  "artifact": "[自研]yuuniverse-economy-0.5.0-SNAPSHOT.jar",
+  "artifactSha256": "a93ad9b2b190c46d6b5f1be3bfcdabfcd9119116858e8eda1be4f68cd17d896c",
+  "packageManifestSha256": "563119e4df5dc36984831cf4fecdd1db0b22efd59c13732bb499875805fe59f3",
+  "toolingCommit": "9d501be",
+  "gameplaySourceCommit": "072703c",
+  "productionActivated": false,
+  "validation": {
+    "unitTests": 79,
+    "unitFailures": 0,
+    "unitErrors": 0,
+    "unitSkipped": 0,
+    "nativeServiceChecks": 36,
+    "fullModpackStartupExitCode": 0,
+    "rehearsalSections": 40,
+    "rehearsalPages": 88,
+    "originalTablesUnchanged": 26,
+    "rollbackRestoredOriginalHashes": true
+  },
+  "serviceLogSha256": "f20acb062b18d41d1a2af9feae6177acddb41d177f4723ec90bddaae7c704dce",
+  "fullStackLogSha256": "3937692a58f75a8c8543dcdf9db07b12c7c2182aa391d58967020cc579f7376a"
+}

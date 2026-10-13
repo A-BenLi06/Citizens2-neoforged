@@ -2,6 +2,7 @@
 
 Decision recorded: 2026-10-12, UTC+08:00.
 Confirmed as the selected porting target: 2026-10-13, UTC+08:00. See the [adopted integration backlog and installation record](ecosystem-adaptation-goals-2026-10-13.md).
+Update: v0.5.0 has now passed its 79-test build, the combined-stack startup and 36 actual-provider service checks; its upgrade is [prepared for the next planned restart](economy-v050-preparation-2026-10-13.json). The APIs proposed below remain development requirements, not newly implemented signatures.
 Target: Minecraft 1.21.1 / NeoForge; consumer projects are Citizens, the separate Yuuniverse Interactions mod, FTB Quests and KubeJS/FTB XMod Compat.
 
 **Yuuniverse Economy owns the replacement for both EconomyShopGUI Premium and QuickShop:** shop browsing, quantity selection, buying/selling, coordinate shops, administration, stock, limits, tax, money and delivery. Consumers open Economy's menus or request Economy-owned transactions. They must not construct another shop GUI, keep parallel balances/stock, or manipulate the database directly.

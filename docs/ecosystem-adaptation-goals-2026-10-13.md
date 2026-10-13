@@ -10,7 +10,7 @@ Citizens retains NPC behavior and its existing native extension contracts. Yuuni
 
 | Provider | Selected version | Deployment role |
 |---|---|---|
-| Yuuniverse Economy | Existing installed 0.4.1-SNAPSHOT retained; source 0.5.0-SNAPSHOT at `072703c` defines the next API baseline | Server economy/GUI owner. No untested Economy upgrade is included in this installation. |
+| Yuuniverse Economy | Active 0.4.1-SNAPSHOT; validated 0.5.0-SNAPSHOT prepared from `072703c`, tooling `9d501be` | Server economy/GUI owner. The user-authorized update is staged for the next planned restart; see the preparation record below. |
 | Paradigm | Existing 2.5.0 retained | Server. Its JAR already supplies `PlaceholderService.register(namespace, key, resolver)`, `ExternalPlaceholderResolver` and registration handles. There is no additional PlaceholderAPI JAR to install. |
 | FTB Quests | 2101.1.36 | Both sides. Quest definitions/progress/rewards; adapt legacy quest IDs/content explicitly. |
 | FTB Library / FTB Teams | 2101.1.37 / 2101.1.11 | Both sides; required FTB dependencies. |
@@ -61,7 +61,15 @@ Old JEI server and hosted-client JARs are preserved under `E:/yunniverse-server/
 
 Validation: GriefLogger `:neoforge:build` succeeds. The unchanged release fails module resolution; the patched full 65-JAR server set reaches `Done`, registers the queried FTB/KubeJS/GriefLogger/shop commands, initializes GriefLogger, NeoProtect and Economy databases, and exits with code 0 after `stop`. Read-only SQLite `quick_check` returns `ok` for the fixture's GriefLogger, Economy and Paradigm databases. Logs retain existing/default-fixture issues involving client-class probing, MTS/MTR messages, a generated Paradigm hologram configuration, missing liquor recipes/tags and slow WorldEdit/CopyFoxies state enumeration. This is startup/database evidence, not clean-modpack, logging gameplay, migration, GUI, VR or physical-client acceptance.
 
-Local evidence: `artifacts/ecosystem-2026-10-13/{server-smoke-grieflogger-conflict.log,grieflogger-build.log,server-smoke.log,server-smoke-result.json,database-checks.json,installation-receipt.json}`. The tracked installation receipt includes the key evidence hashes.
+Local initial-installation evidence: `artifacts/ecosystem-2026-10-13/{server-smoke-grieflogger-conflict.log,grieflogger-build.log,server-smoke-economy041.log,server-smoke-economy041-result.json,database-checks.json,installation-receipt.json}`. The tracked installation receipt includes the key evidence hashes.
+
+### Authorized v0.5.0 follow-up
+
+The [preparation record](economy-v050-preparation-2026-10-13.json) pins the package at `E:/yunniverse-server/updates/economy-0.5.0-2026-10-13`. The Economy repository's `docs/gui-upgrade-2026-10-13.md` documents activation and rollback; `docs/shop-integration-roadmap.md` carries the adopted API backlog. The package includes its own README and scripts. It is prepared for a planned stop, not activated on the running server.
+
+Validation: the v0.5.0 clean build passes 79 tests; the complete selected mod set starts/stops with exit 0; the actual-provider Citizens/Interactions audit passes 36 checks for shop menus, preflight/payment boundaries, currencies, offline identities and camera coexistence. The ordinary Citizens artifacts were rebuilt without the opt-in service probe afterward; they were not deployed or committed over the pre-existing gameplay draft.
+
+An online read-only backup was used solely for rehearsal. The upgrade migrates schema 8→9 and restores 40 source-verified shop sections/88 pages; all 26 original tables outside schema/presentation/audit bookkeeping retain their row hashes, including money, transactions and coordinate shops. The portable upgrade/rollback restores the exact original database and artifact hashes. The production update takes a fresh stopped-server backup and enriches the ledger present at activation time. The package contains no rehearsal/player database. Remaining adapters and physical-client/gameplay acceptance are still the future goals listed above.
 
 ## Primary sources
 
