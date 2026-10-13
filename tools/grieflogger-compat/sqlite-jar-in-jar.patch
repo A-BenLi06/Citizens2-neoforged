@@ -1,0 +1,35 @@
+diff --git a/gradle.properties b/gradle.properties
+index 34e0ad9..3d7d2fb 100644
+--- a/gradle.properties
++++ b/gradle.properties
+@@ -4,7 +4,7 @@ minecraft_version=1.21.1
+ enabled_platforms=fabric,neoforge
+ 
+ archives_base_name=grieflogger
+-mod_version=1.2.10-1.21.1
++mod_version=1.2.10-1.21.1-yuuniverse.1
+ maven_group=com.daqem.grieflogger
+ mod_name=GriefLogger
+ 
+diff --git a/neoforge/build.gradle b/neoforge/build.gradle
+index 971b47a..1290b62 100644
+--- a/neoforge/build.gradle
++++ b/neoforge/build.gradle
+@@ -41,7 +41,9 @@ dependencies {
+     shadowBundle project(path: ':common', configuration: 'transformProductionNeoForge')
+ 
+     implementation "org.xerial:sqlite-jdbc:3.47.2.0"
+-    shadowBundle "org.xerial:sqlite-jdbc:3.47.2.0"
++    // Keep the JDBC driver as a NeoForge Jar-in-Jar dependency so the loader can
++    // select one compatible module alongside other SQLite consumers.
++    include "org.xerial:sqlite-jdbc:3.47.2.0"
+ 
+     implementation "com.mysql:mysql-connector-j:8.4.0"
+     shadowBundle "com.mysql:mysql-connector-j:8.4.0"
+@@ -78,4 +80,4 @@ remapSourcesJar {
+     archiveClassifier = "neoforge-sources"
+ }
+ 
+-apply from: rootProject.file("gradle/scripts/publishing.gradle")
+\ No newline at end of file
++apply from: rootProject.file("gradle/scripts/publishing.gradle")

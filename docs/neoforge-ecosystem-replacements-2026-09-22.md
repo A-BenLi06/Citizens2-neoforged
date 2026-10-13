@@ -1,5 +1,7 @@
 # Citizens NeoForge scope and ecosystem replacements
 
+Selected-stack update: [October 13 adopted integrations and installation](ecosystem-adaptation-goals-2026-10-13.md) supersedes this report's optional-candidate wording. Economy GUI owns both EconomyShopGUI and QuickShop replacement; the requested provider set is now an explicit adaptation backlog.
+
 Inventory/version update: [October 12 review](citizens-next-work-2026-10-12.md) supersedes this report's installed-provider and candidate-version observations. Paradigm 2.5.0 and CMDCam 2.2.9 are now present in the inspected target directory. The provider-ownership decisions below remain applicable.
 
 Reviewed: 2026-09-22 19:43:17 +08:00 (UTC+08:00).

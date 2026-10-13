@@ -1,0 +1,287 @@
+{
+  "minecraft": "1.21.1",
+  "neoforge": "21.1.248",
+  "recordedAt": "2026-10-13T10:52:09.2877884+08:00",
+  "artifacts": [
+    {
+      "name": "rsitemeditor",
+      "version": "1.0.1",
+      "filename": "rsitemeditor-1.0.1.jar",
+      "modIds": [
+        "rsitemeditor"
+      ],
+      "url": "https://cdn.modrinth.com/data/aiutP179/versions/KEpGvGgz/rsitemeditor-1.0.1.jar",
+      "source": "https://modrinth.com/mod/aiutP179/version/KEpGvGgz",
+      "sha256": "c2194c5f97a06b1472a5c7bc39c6fd2f3866e237c1ccf9c70787a09fc3109472",
+      "sha512": "51c8ea20b597e378493b5ec61395aaa0e83993bf1c33163809bfcc9e56636559a55081f902c22dcd4509dd477dc4fa54ff369727e10eef9ba5a0fb6d3056a79b",
+      "destinations": [
+        "server"
+      ]
+    },
+    {
+      "name": "guard-villagers",
+      "version": "2.4.12",
+      "filename": "guardvillagers-2.4.12-1.21.1.jar",
+      "modIds": [
+        "guardvillagers"
+      ],
+      "url": "https://cdn.modrinth.com/data/H1sntfo8/versions/JyXugpy2/guardvillagers-2.4.12-1.21.1.jar",
+      "source": "https://modrinth.com/mod/H1sntfo8/version/JyXugpy2",
+      "sha256": "aab03d59216bd931a05434b2527e0d5b7641793bd0178a9958100579c4f11407",
+      "sha512": "2b25eaace0b7ec4ca09ad9c428bd3ee64567bc540bf03e21231b098498a4f95f9f02da5161841e8ec48eabce6e64b49b59995d13a4cebf4efd49feb0dca1e13e",
+      "destinations": [
+        "server",
+        "client",
+        "hosted-client"
+      ]
+    },
+    {
+      "name": "neoprotect",
+      "version": "1.0.4",
+      "filename": "neoprotect-1.0.4-mc1.21.1-neoforge.jar",
+      "modIds": [
+        "neoprotect"
+      ],
+      "url": "https://cdn.modrinth.com/data/HrCGPXRQ/versions/TK4G6K3x/neoprotect-1.0.4-mc1.21.1-neoforge.jar",
+      "source": "https://modrinth.com/mod/HrCGPXRQ/version/TK4G6K3x",
+      "sha256": "2cbcec7aeef26ef3f5b54dae90fc16da353a1534462353b9f516d7d2e0a138ce",
+      "sha512": "3b84f0a983d1cfe52f1e307855ef021dbc4cbf50edf4eb6a5ed8157f0fd667d7f82d18a60c3a05814c497f716928219140752a0c4ad7ff5257d1238afc028f4b",
+      "destinations": [
+        "server"
+      ]
+    },
+    {
+      "name": "grieflogger",
+      "modIds": [
+        "grieflogger"
+      ],
+      "source": "https://modrinth.com/mod/8oGVUFuX/version/IrRNGJIR",
+      "destinations": [
+        "server"
+      ],
+      "upstreamRelease": {
+        "version": "1.2.10-1.21.1",
+        "filename": "grieflogger-1.2.10-1.21.1-neoforge.jar",
+        "url": "https://cdn.modrinth.com/data/8oGVUFuX/versions/IrRNGJIR/grieflogger-1.2.10-1.21.1-neoforge.jar",
+        "sha256": "fd252bc5466bb94e38d2386bafb9926b798bc250b26e1a3aa80f878ebccbc4a5",
+        "sha512": "7de200b30c7ee63f8b2900e2a61fc0950b700db0cb73989e7c1070af410912a077bfda1a53bf1de1595a1b6fca1d03c5c73a509d4414e5679733e12da9b6c7d5"
+      },
+      "version": "1.2.10-1.21.1-yuuniverse.1",
+      "filename": "[自修改]grieflogger-1.2.10-1.21.1-yuuniverse.1-neoforge.jar",
+      "sha256": "a897f22fca7705144b26749f7baa097b4e1cc0d16eed1ddeed3a9fed270806e0",
+      "sha512": "a9ffe0ab0d5451801386610d55bf7ca2672ff38f582dc3aab08f53e3f81a0ec7633faf71f9f285ae99a60cba4d2cf7af6965b4c9d49f9de42da8fec71cafaed0",
+      "sourceCommit": "e913b78806a8f7646b7e3adc0d6721d1b386f29d",
+      "patch": "tools/grieflogger-compat/sqlite-jar-in-jar.patch"
+    },
+    {
+      "name": "vivecraft",
+      "version": "1.21.1-1.3.15-neoforge",
+      "filename": "vivecraft-1.21.1-1.3.15-neoforge.jar",
+      "modIds": [
+        "vivecraft"
+      ],
+      "url": "https://cdn.modrinth.com/data/wGoQDPN5/versions/LjqlbRAO/vivecraft-1.21.1-1.3.15-neoforge.jar",
+      "source": "https://modrinth.com/mod/wGoQDPN5/version/LjqlbRAO",
+      "sha256": "0712a6167421bf337477ab1766293887441514f5186ec94b13e081c0779a6474",
+      "sha512": "c37acbd6adf71d0f60924caceaa16e2614594586fb077de6d21467d18c1832911c7db8f96ec063e69bcf87236e58cbdef500f9733cc14b9a082fed1f82a886d7",
+      "destinations": [
+        "server",
+        "client",
+        "hosted-client"
+      ]
+    },
+    {
+      "name": "kubejs",
+      "version": "2101.7.2-build.377",
+      "filename": "kubejs-neoforge-2101.7.2-build.377.jar",
+      "modIds": [
+        "kubejs"
+      ],
+      "url": "https://cdn.modrinth.com/data/umyGl7zF/versions/THIGFPwf/kubejs-neoforge-2101.7.2-build.377.jar",
+      "source": "https://modrinth.com/mod/umyGl7zF/version/THIGFPwf",
+      "sha256": "df9a8458b1f83fed06ba54684977911795a5153a462b81a610895f5b1f2f0cbf",
+      "sha512": "fcdbee8790f8f39c106ab4bf606808c9c5bf0f13a41e216207a6fe4d15bf4a5722ce57078781e3a1823e7fdd2928e8e042d104d8ae255a36db8f12a9f46d8089",
+      "destinations": [
+        "server",
+        "client",
+        "hosted-client"
+      ]
+    },
+    {
+      "name": "kotlin-for-forge",
+      "version": "5.12.0",
+      "filename": "kotlinforforge-5.12.0-all.jar",
+      "modIds": [
+        "kotlinforforge"
+      ],
+      "url": "https://cdn.modrinth.com/data/ordsPcFz/versions/uhJhCT7X/kotlinforforge-5.12.0-all.jar",
+      "source": "https://modrinth.com/mod/ordsPcFz/version/uhJhCT7X",
+      "sha256": "2785a4dd6de5c6c56065fd8eb789c82771bd2ee773c30794c23160a3b2c39139",
+      "sha512": "b8c3942f4d33179edf3f102f3d870b99dd436f8b8236dbbd31aa51b888162c692cfd88927295f24dc8b4375232f4c6c17360c5d6c4823f93cbcd7cf4bdc8bd14",
+      "destinations": [
+        "server"
+      ]
+    },
+    {
+      "name": "rhino",
+      "version": "2101.2.7-build.85+Rhino-1.21",
+      "filename": "rhino-2101.2.7-build.85.jar",
+      "modIds": [
+        "rhino"
+      ],
+      "url": "https://cdn.modrinth.com/data/sk9knFPE/versions/cQ4POTah/rhino-2101.2.7-build.85.jar",
+      "source": "https://modrinth.com/mod/sk9knFPE/version/cQ4POTah",
+      "sha256": "e0e9b0e78edd380440266c0f4ea8d489dac851ef075a4566a66a6dae2f7bbb66",
+      "sha512": "0a6c7f4410281aeb03b815ec03487a8e80a4d3dae013d81282e447bf9c08144ef57318af614ea6d40b7d9a8c25031c557890ec792a5895a82467c1643116f693",
+      "destinations": [
+        "server",
+        "client",
+        "hosted-client"
+      ]
+    },
+    {
+      "name": "better-advanced-tooltips",
+      "version": "2101.1.0-build.5",
+      "filename": "better-advanced-tooltips-2101.1.0-build.5.jar",
+      "modIds": [
+        "betteradvancedtooltips"
+      ],
+      "url": "https://cdn.modrinth.com/data/iHLDc0eo/versions/uPFbnD32/better-advanced-tooltips-2101.1.0-build.5.jar",
+      "source": "https://modrinth.com/mod/iHLDc0eo/version/uPFbnD32",
+      "sha256": "0f76d46f2f18eb67e67c7974170d7b27deb66473396461c8dc50d6949de1449b",
+      "sha512": "05b5cdad948d1735eab7a67a16aaf32814678c392014ec2ada61b8341c0ed1c1ac181cab1de9da3f2c4632592f4a1a5db254bd0543e6778897c8ccd260894142",
+      "destinations": [
+        "client",
+        "hosted-client"
+      ]
+    },
+    {
+      "name": "supermartijn642-config-lib",
+      "version": "1.1.8-neoforge-mc1.21",
+      "filename": "supermartijn642configlib-1.1.8-neoforge-mc1.21.jar",
+      "modIds": [
+        "supermartijn642configlib"
+      ],
+      "url": "https://cdn.modrinth.com/data/LN9BxssP/versions/qKL9jM75/supermartijn642configlib-1.1.8-neoforge-mc1.21.jar",
+      "source": "https://modrinth.com/mod/LN9BxssP/version/qKL9jM75",
+      "sha256": "d2ba7b839a2268e4e223457e813d11aa2476c3bf708a7bba691d8fc851778a4b",
+      "sha512": "768d8ca178c5e653986f5131b7aeb7fa57ce7d32c16ed399ced01b273565a2b640130c55c7092747efeff40dbb0348876b18b415f59b0d16dd2c7f32f1798ce2",
+      "destinations": [
+        "server"
+      ]
+    },
+    {
+      "name": "jei",
+      "version": "19.53.0.425",
+      "filename": "jei-1.21.1-neoforge-19.53.0.425.jar",
+      "modIds": [
+        "jei"
+      ],
+      "url": "https://cdn.modrinth.com/data/u6dRKJwZ/versions/5ULZJRXC/jei-1.21.1-neoforge-19.53.0.425.jar",
+      "source": "https://modrinth.com/mod/u6dRKJwZ/version/5ULZJRXC",
+      "sha256": "3683c743c1b6192913abc2a969486344eee98aa2924e8deb5087109645c3abc6",
+      "sha512": "0b847b07a27ea1c825ed022b94ed6e5154a54809d8d505dadfe3326844e2a210c996ce2eb7eb705809a1dc79fd5774b51b46762a07fa969b7edf8e059bb6ee08",
+      "destinations": [
+        "server",
+        "client",
+        "hosted-client"
+      ]
+    },
+    {
+      "name": "ftb-quests-neoforge",
+      "version": "2101.1.36",
+      "filename": "ftb-quests-neoforge-2101.1.36.jar",
+      "modIds": [
+        "ftbquests"
+      ],
+      "url": "https://maven.ftb.dev/releases/dev/ftb/mods/ftb-quests-neoforge/2101.1.36/ftb-quests-neoforge-2101.1.36.jar",
+      "source": "https://maven.ftb.dev/releases/dev/ftb/mods/ftb-quests-neoforge/2101.1.36/ftb-quests-neoforge-2101.1.36.module",
+      "sha256": "6a39982c4b3afc00b1e788041a4f0d394e1659e3b3a6e5d078cd790bc36d0018",
+      "sha512": "35298874f77fc15d1b66478092ec447db73ddaf699431e1529e41a5b4c421abf9cddc0d491385e45862eec816ade0bfbb92f267a035bfe2587b2b82683b61ad1",
+      "destinations": [
+        "server",
+        "client",
+        "hosted-client"
+      ]
+    },
+    {
+      "name": "ftb-library-neoforge",
+      "version": "2101.1.37",
+      "filename": "ftb-library-neoforge-2101.1.37.jar",
+      "modIds": [
+        "ftblibrary"
+      ],
+      "url": "https://maven.ftb.dev/releases/dev/ftb/mods/ftb-library-neoforge/2101.1.37/ftb-library-neoforge-2101.1.37.jar",
+      "source": "https://maven.ftb.dev/releases/dev/ftb/mods/ftb-library-neoforge/2101.1.37/ftb-library-neoforge-2101.1.37.module",
+      "sha256": "624c2d2d1cbadb946d967e17757bd5b2d129d4d3ed71f2da0c70607d04476ac2",
+      "sha512": "36f7e2fd41de638b044ad2b391f69f276ab28df3d86cf9d83638a2e0432ef151e1737ce60d671901d0a3b49424c9ba1a09c0293fc0c6637871020b46feae9159",
+      "destinations": [
+        "server",
+        "client",
+        "hosted-client"
+      ]
+    },
+    {
+      "name": "ftb-teams-neoforge",
+      "version": "2101.1.11",
+      "filename": "ftb-teams-neoforge-2101.1.11.jar",
+      "modIds": [
+        "ftbteams"
+      ],
+      "url": "https://maven.ftb.dev/releases/dev/ftb/mods/ftb-teams-neoforge/2101.1.11/ftb-teams-neoforge-2101.1.11.jar",
+      "source": "https://maven.ftb.dev/releases/dev/ftb/mods/ftb-teams-neoforge/2101.1.11/ftb-teams-neoforge-2101.1.11.module",
+      "sha256": "e6bcd670493624e6906df872a9c6af4a33fe6405cac57a32c59cd4cd5838c655",
+      "sha512": "21c9350c6c7ec54ee54b74f2bdc0a44f91005bedda3caf27d673b2f2bcad1dbef5aec970201ec8e959db2a1743ceb2e24ae99a9e36744dce740a0ab1dad01c52",
+      "destinations": [
+        "server",
+        "client",
+        "hosted-client"
+      ]
+    },
+    {
+      "name": "ftb-xmod-compat-neoforge",
+      "version": "21.1.12",
+      "filename": "ftb-xmod-compat-neoforge-21.1.12.jar",
+      "modIds": [
+        "ftbxmodcompat"
+      ],
+      "url": "https://maven.ftb.dev/releases/dev/ftb/mods/ftb-xmod-compat-neoforge/21.1.12/ftb-xmod-compat-neoforge-21.1.12.jar",
+      "source": "https://maven.ftb.dev/releases/dev/ftb/mods/ftb-xmod-compat-neoforge/21.1.12/ftb-xmod-compat-neoforge-21.1.12.module",
+      "sha256": "f587e13131101bac33d4cc7a04d13d06c00f8f88a892be90d6ffc8ad96119ae8",
+      "sha512": "1fd5269769bb7c036a2366c17de45add12e5349856161f40c6a517faf3ed978ed8536f8c613c1b74b6c2cd4c6ba71b400fdbcdf915a9f9b8a9bbd0030bfd2409",
+      "destinations": [
+        "server",
+        "client",
+        "hosted-client"
+      ]
+    },
+    {
+      "name": "architectury",
+      "version": "13.0.11",
+      "filename": "architectury-13.0.11-neoforge.jar",
+      "modIds": [
+        "architectury"
+      ],
+      "source": "existing server artifact",
+      "sha256": "9cc92f2c09533fc5482c60f993bd891c655a0e32b637037cdcb7c2b23adedeeb",
+      "sha512": "d9f7c3bb8162577dfb461ffdf04bd6a3563c7586934a0e2a744c14421beffb8286f0d88d4c758317003f20f99fe8072a39b9d675af061e036970d36db36027f0",
+      "destinations": [
+        "server",
+        "client",
+        "hosted-client"
+      ]
+    }
+  ],
+  "replacedArtifacts": [
+    {
+      "source": "E:\\yunniverse-server\\mods\\jei-1.21.1-neoforge-19.51.0.418.jar",
+      "sha256": "8bc3936d869e4040a5649c58b7e8be1c78c82a245c0dc07bdd68ab49121a222c",
+      "backup": "E:\\yunniverse-server\\archive\\ecosystem-2026-10-13\\server\\jei-1.21.1-neoforge-19.51.0.418.jar"
+    },
+    {
+      "source": "E:\\yunniverse-server\\automodpack\\host-modpack\\main\\mods\\jei-1.21.1-neoforge-19.51.0.418.jar",
+      "sha256": "8bc3936d869e4040a5649c58b7e8be1c78c82a245c0dc07bdd68ab49121a222c",
+      "backup": "E:\\yunniverse-server\\archive\\ecosystem-2026-10-13\\hosted-client\\jei-1.21.1-neoforge-19.51.0.418.jar"
+    }
+  ]
+}

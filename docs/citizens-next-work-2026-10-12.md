@@ -1,5 +1,7 @@
 # Citizens NeoForge progress, next work and plugin alternatives
 
+Selection update, 2026-10-13 (UTC+08:00): the user has adopted Economy GUI, FTB Quests, RSItemEditor, Paradigm placeholders, Guard Villagers, NeoProtect, GriefLogger, Vivecraft, KubeJS and FTB XMod Compat. See the [adopted goals and installation record](ecosystem-adaptation-goals-2026-10-13.md) and [ordered Economy GUI API requirements](yuuniverse-economy-gui-api-requirements-2026-10-12.md). The candidate/absence observations below are historical; adoption does not establish completed adapters.
+
 Reviewed: 2026-10-12 11:05 +08:00 (UTC+08:00).
 Target: Minecraft 1.21.1; repository baseline NeoForge 21.1.233, existing acceptance target 21.1.248.
 Implementation baseline: `cb63529` on `neoforge-port`, plus the pre-existing, uncommitted delayed-command changes described below.

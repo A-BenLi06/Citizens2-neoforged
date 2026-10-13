@@ -1,5 +1,7 @@
 # Remaining Citizens work
 
+Adopted integration goals: [October 13 selected stack, installation and acceptance gates](ecosystem-adaptation-goals-2026-10-13.md), including [Economy GUI API demands and mod-crafting task contracts](yuuniverse-economy-gui-api-requirements-2026-10-12.md). These extend the provider adaptation plan; the core correctness work below remains open.
+
 Current planning review: [October 12 progress, ordered work and plugin alternatives](citizens-next-work-2026-10-12.md). It records the uncommitted delayed-command draft, artifact differences and refreshed provider inventory; the detailed acceptance history below remains applicable.
 
 This is the current command and acceptance checklist for Minecraft 1.21.1. The September 13 audit contains historical gaps; later follow-ups supersede those rows. See the [ecosystem scope](neoforge-ecosystem-replacements-2026-09-22.md) for provider ownership.

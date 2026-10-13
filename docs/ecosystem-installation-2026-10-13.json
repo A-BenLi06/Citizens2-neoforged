@@ -1,0 +1,264 @@
+{
+  "installedAt": "2026-10-13T10:52:09.2877884+08:00",
+  "activation": "Files installed; production restart and client synchronization pending",
+  "productionRestarted": false,
+  "files": [
+    {
+      "name": "rsitemeditor",
+      "path": "E:\\yunniverse-server\\mods\\rsitemeditor-1.0.1.jar",
+      "sha256": "c2194c5f97a06b1472a5c7bc39c6fd2f3866e237c1ccf9c70787a09fc3109472",
+      "status": "installed"
+    },
+    {
+      "name": "guard-villagers",
+      "path": "E:\\yunniverse-server\\mods\\guardvillagers-2.4.12-1.21.1.jar",
+      "sha256": "aab03d59216bd931a05434b2527e0d5b7641793bd0178a9958100579c4f11407",
+      "status": "installed"
+    },
+    {
+      "name": "guard-villagers",
+      "path": "E:\\yunniverse-server\\client-pack\\mods\\guardvillagers-2.4.12-1.21.1.jar",
+      "sha256": "aab03d59216bd931a05434b2527e0d5b7641793bd0178a9958100579c4f11407",
+      "status": "installed"
+    },
+    {
+      "name": "guard-villagers",
+      "path": "E:\\yunniverse-server\\automodpack\\host-modpack\\main\\mods\\guardvillagers-2.4.12-1.21.1.jar",
+      "sha256": "aab03d59216bd931a05434b2527e0d5b7641793bd0178a9958100579c4f11407",
+      "status": "installed"
+    },
+    {
+      "name": "neoprotect",
+      "path": "E:\\yunniverse-server\\mods\\neoprotect-1.0.4-mc1.21.1-neoforge.jar",
+      "sha256": "2cbcec7aeef26ef3f5b54dae90fc16da353a1534462353b9f516d7d2e0a138ce",
+      "status": "installed"
+    },
+    {
+      "name": "grieflogger",
+      "path": "E:\\yunniverse-server\\mods\\[自修改]grieflogger-1.2.10-1.21.1-yuuniverse.1-neoforge.jar",
+      "sha256": "a897f22fca7705144b26749f7baa097b4e1cc0d16eed1ddeed3a9fed270806e0",
+      "status": "installed"
+    },
+    {
+      "name": "vivecraft",
+      "path": "E:\\yunniverse-server\\mods\\vivecraft-1.21.1-1.3.15-neoforge.jar",
+      "sha256": "0712a6167421bf337477ab1766293887441514f5186ec94b13e081c0779a6474",
+      "status": "installed"
+    },
+    {
+      "name": "vivecraft",
+      "path": "E:\\yunniverse-server\\client-pack\\mods\\vivecraft-1.21.1-1.3.15-neoforge.jar",
+      "sha256": "0712a6167421bf337477ab1766293887441514f5186ec94b13e081c0779a6474",
+      "status": "installed"
+    },
+    {
+      "name": "vivecraft",
+      "path": "E:\\yunniverse-server\\automodpack\\host-modpack\\main\\mods\\vivecraft-1.21.1-1.3.15-neoforge.jar",
+      "sha256": "0712a6167421bf337477ab1766293887441514f5186ec94b13e081c0779a6474",
+      "status": "installed"
+    },
+    {
+      "name": "kubejs",
+      "path": "E:\\yunniverse-server\\mods\\kubejs-neoforge-2101.7.2-build.377.jar",
+      "sha256": "df9a8458b1f83fed06ba54684977911795a5153a462b81a610895f5b1f2f0cbf",
+      "status": "installed"
+    },
+    {
+      "name": "kubejs",
+      "path": "E:\\yunniverse-server\\client-pack\\mods\\kubejs-neoforge-2101.7.2-build.377.jar",
+      "sha256": "df9a8458b1f83fed06ba54684977911795a5153a462b81a610895f5b1f2f0cbf",
+      "status": "installed"
+    },
+    {
+      "name": "kubejs",
+      "path": "E:\\yunniverse-server\\automodpack\\host-modpack\\main\\mods\\kubejs-neoforge-2101.7.2-build.377.jar",
+      "sha256": "df9a8458b1f83fed06ba54684977911795a5153a462b81a610895f5b1f2f0cbf",
+      "status": "installed"
+    },
+    {
+      "name": "kotlin-for-forge",
+      "path": "E:\\yunniverse-server\\mods\\kotlinforforge-5.12.0-all.jar",
+      "sha256": "2785a4dd6de5c6c56065fd8eb789c82771bd2ee773c30794c23160a3b2c39139",
+      "status": "installed"
+    },
+    {
+      "name": "rhino",
+      "path": "E:\\yunniverse-server\\mods\\rhino-2101.2.7-build.85.jar",
+      "sha256": "e0e9b0e78edd380440266c0f4ea8d489dac851ef075a4566a66a6dae2f7bbb66",
+      "status": "installed"
+    },
+    {
+      "name": "rhino",
+      "path": "E:\\yunniverse-server\\client-pack\\mods\\rhino-2101.2.7-build.85.jar",
+      "sha256": "e0e9b0e78edd380440266c0f4ea8d489dac851ef075a4566a66a6dae2f7bbb66",
+      "status": "installed"
+    },
+    {
+      "name": "rhino",
+      "path": "E:\\yunniverse-server\\automodpack\\host-modpack\\main\\mods\\rhino-2101.2.7-build.85.jar",
+      "sha256": "e0e9b0e78edd380440266c0f4ea8d489dac851ef075a4566a66a6dae2f7bbb66",
+      "status": "installed"
+    },
+    {
+      "name": "better-advanced-tooltips",
+      "path": "E:\\yunniverse-server\\client-pack\\mods\\better-advanced-tooltips-2101.1.0-build.5.jar",
+      "sha256": "0f76d46f2f18eb67e67c7974170d7b27deb66473396461c8dc50d6949de1449b",
+      "status": "installed"
+    },
+    {
+      "name": "better-advanced-tooltips",
+      "path": "E:\\yunniverse-server\\automodpack\\host-modpack\\main\\mods\\better-advanced-tooltips-2101.1.0-build.5.jar",
+      "sha256": "0f76d46f2f18eb67e67c7974170d7b27deb66473396461c8dc50d6949de1449b",
+      "status": "installed"
+    },
+    {
+      "name": "supermartijn642-config-lib",
+      "path": "E:\\yunniverse-server\\mods\\supermartijn642configlib-1.1.8-neoforge-mc1.21.jar",
+      "sha256": "d2ba7b839a2268e4e223457e813d11aa2476c3bf708a7bba691d8fc851778a4b",
+      "status": "installed"
+    },
+    {
+      "name": "jei",
+      "path": "E:\\yunniverse-server\\mods\\jei-1.21.1-neoforge-19.53.0.425.jar",
+      "sha256": "3683c743c1b6192913abc2a969486344eee98aa2924e8deb5087109645c3abc6",
+      "status": "installed"
+    },
+    {
+      "name": "jei",
+      "path": "E:\\yunniverse-server\\client-pack\\mods\\jei-1.21.1-neoforge-19.53.0.425.jar",
+      "sha256": "3683c743c1b6192913abc2a969486344eee98aa2924e8deb5087109645c3abc6",
+      "status": "installed"
+    },
+    {
+      "name": "jei",
+      "path": "E:\\yunniverse-server\\automodpack\\host-modpack\\main\\mods\\jei-1.21.1-neoforge-19.53.0.425.jar",
+      "sha256": "3683c743c1b6192913abc2a969486344eee98aa2924e8deb5087109645c3abc6",
+      "status": "installed"
+    },
+    {
+      "name": "ftb-quests-neoforge",
+      "path": "E:\\yunniverse-server\\mods\\ftb-quests-neoforge-2101.1.36.jar",
+      "sha256": "6a39982c4b3afc00b1e788041a4f0d394e1659e3b3a6e5d078cd790bc36d0018",
+      "status": "installed"
+    },
+    {
+      "name": "ftb-quests-neoforge",
+      "path": "E:\\yunniverse-server\\client-pack\\mods\\ftb-quests-neoforge-2101.1.36.jar",
+      "sha256": "6a39982c4b3afc00b1e788041a4f0d394e1659e3b3a6e5d078cd790bc36d0018",
+      "status": "installed"
+    },
+    {
+      "name": "ftb-quests-neoforge",
+      "path": "E:\\yunniverse-server\\automodpack\\host-modpack\\main\\mods\\ftb-quests-neoforge-2101.1.36.jar",
+      "sha256": "6a39982c4b3afc00b1e788041a4f0d394e1659e3b3a6e5d078cd790bc36d0018",
+      "status": "installed"
+    },
+    {
+      "name": "ftb-library-neoforge",
+      "path": "E:\\yunniverse-server\\mods\\ftb-library-neoforge-2101.1.37.jar",
+      "sha256": "624c2d2d1cbadb946d967e17757bd5b2d129d4d3ed71f2da0c70607d04476ac2",
+      "status": "installed"
+    },
+    {
+      "name": "ftb-library-neoforge",
+      "path": "E:\\yunniverse-server\\client-pack\\mods\\ftb-library-neoforge-2101.1.37.jar",
+      "sha256": "624c2d2d1cbadb946d967e17757bd5b2d129d4d3ed71f2da0c70607d04476ac2",
+      "status": "installed"
+    },
+    {
+      "name": "ftb-library-neoforge",
+      "path": "E:\\yunniverse-server\\automodpack\\host-modpack\\main\\mods\\ftb-library-neoforge-2101.1.37.jar",
+      "sha256": "624c2d2d1cbadb946d967e17757bd5b2d129d4d3ed71f2da0c70607d04476ac2",
+      "status": "installed"
+    },
+    {
+      "name": "ftb-teams-neoforge",
+      "path": "E:\\yunniverse-server\\mods\\ftb-teams-neoforge-2101.1.11.jar",
+      "sha256": "e6bcd670493624e6906df872a9c6af4a33fe6405cac57a32c59cd4cd5838c655",
+      "status": "installed"
+    },
+    {
+      "name": "ftb-teams-neoforge",
+      "path": "E:\\yunniverse-server\\client-pack\\mods\\ftb-teams-neoforge-2101.1.11.jar",
+      "sha256": "e6bcd670493624e6906df872a9c6af4a33fe6405cac57a32c59cd4cd5838c655",
+      "status": "installed"
+    },
+    {
+      "name": "ftb-teams-neoforge",
+      "path": "E:\\yunniverse-server\\automodpack\\host-modpack\\main\\mods\\ftb-teams-neoforge-2101.1.11.jar",
+      "sha256": "e6bcd670493624e6906df872a9c6af4a33fe6405cac57a32c59cd4cd5838c655",
+      "status": "installed"
+    },
+    {
+      "name": "ftb-xmod-compat-neoforge",
+      "path": "E:\\yunniverse-server\\mods\\ftb-xmod-compat-neoforge-21.1.12.jar",
+      "sha256": "f587e13131101bac33d4cc7a04d13d06c00f8f88a892be90d6ffc8ad96119ae8",
+      "status": "installed"
+    },
+    {
+      "name": "ftb-xmod-compat-neoforge",
+      "path": "E:\\yunniverse-server\\client-pack\\mods\\ftb-xmod-compat-neoforge-21.1.12.jar",
+      "sha256": "f587e13131101bac33d4cc7a04d13d06c00f8f88a892be90d6ffc8ad96119ae8",
+      "status": "installed"
+    },
+    {
+      "name": "ftb-xmod-compat-neoforge",
+      "path": "E:\\yunniverse-server\\automodpack\\host-modpack\\main\\mods\\ftb-xmod-compat-neoforge-21.1.12.jar",
+      "sha256": "f587e13131101bac33d4cc7a04d13d06c00f8f88a892be90d6ffc8ad96119ae8",
+      "status": "installed"
+    },
+    {
+      "name": "architectury",
+      "path": "E:\\yunniverse-server\\mods\\architectury-13.0.11-neoforge.jar",
+      "sha256": "9cc92f2c09533fc5482c60f993bd891c655a0e32b637037cdcb7c2b23adedeeb",
+      "status": "retained"
+    },
+    {
+      "name": "architectury",
+      "path": "E:\\yunniverse-server\\client-pack\\mods\\architectury-13.0.11-neoforge.jar",
+      "sha256": "9cc92f2c09533fc5482c60f993bd891c655a0e32b637037cdcb7c2b23adedeeb",
+      "status": "installed"
+    },
+    {
+      "name": "architectury",
+      "path": "E:\\yunniverse-server\\automodpack\\host-modpack\\main\\mods\\architectury-13.0.11-neoforge.jar",
+      "sha256": "9cc92f2c09533fc5482c60f993bd891c655a0e32b637037cdcb7c2b23adedeeb",
+      "status": "retained"
+    }
+  ],
+  "backups": [
+    {
+      "source": "E:\\yunniverse-server\\mods\\jei-1.21.1-neoforge-19.51.0.418.jar",
+      "sha256": "8bc3936d869e4040a5649c58b7e8be1c78c82a245c0dc07bdd68ab49121a222c",
+      "backup": "E:\\yunniverse-server\\archive\\ecosystem-2026-10-13\\server\\jei-1.21.1-neoforge-19.51.0.418.jar"
+    },
+    {
+      "source": "E:\\yunniverse-server\\automodpack\\host-modpack\\main\\mods\\jei-1.21.1-neoforge-19.51.0.418.jar",
+      "sha256": "8bc3936d869e4040a5649c58b7e8be1c78c82a245c0dc07bdd68ab49121a222c",
+      "backup": "E:\\yunniverse-server\\archive\\ecosystem-2026-10-13\\hosted-client\\jei-1.21.1-neoforge-19.51.0.418.jar"
+    }
+  ],
+  "validation": {
+    "smoke": {
+      "ready": true,
+      "exitCode": 0,
+      "durationSeconds": 126,
+      "command": [
+        "C:\\Users\\ben_l\\Saved Games\\Yuuniverse 1.20.1 Shenyang\\porting-output\\work\\tools\\jdk21\\jdk-21.0.11+10\\bin\\java.exe",
+        "-Xms512m",
+        "-Xmx4g",
+        "-Dfile.encoding=UTF-8",
+        "@libraries/net/neoforged/neoforge/21.1.248/win_args.txt",
+        "nogui"
+      ],
+      "world": "isolated synthetic world; no production config/data copied"
+    },
+    "evidence": {
+      "server-smoke-grieflogger-conflict.log": "c451ecc63bbce69aee624d3ef5920bf56db7e0de5931351a5516364049cb2eed",
+      "grieflogger-build.log": "22d8e0ce0a2cc779c47eaced5383a42cb718b466cde58fcd5c7980ee020ea5a0",
+      "server-smoke.log": "102fd949043c0e718a478ba300d48809ce4b72f7b5fa1dd627763991b0a75325",
+      "server-smoke-result.json": "4889b9ad21b9bb71712ac55650bea16a326a9371d8cd73cc7ad7e6b44e347578",
+      "database-checks.json": "6b36e8bf9e2ee7a385e1be2fb6f0d1a33c3f2bc97effc7953b8ff139dd956405"
+    }
+  }
+}

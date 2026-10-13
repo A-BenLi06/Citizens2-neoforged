@@ -1,0 +1,71 @@
+# Adopted NeoForge integrations and porting goals
+
+Decision: 2026-10-13, UTC+08:00. Target: Minecraft 1.21.1, Java 21, deployed NeoForge 21.1.248; Citizens' existing 21.1.233 baseline remains separate.
+
+The user selected **Yuuniverse Economy GUI to replace EconomyShopGUI Premium and QuickShop**, and selected **FTB Quests, RSItemEditor, Paradigm's placeholder API, Guard Villagers, NeoProtect, GriefLogger, Vivecraft NeoForge, KubeJS and FTB XMod Compat** for adaptation. These are now the chosen integration targets, superseding the optional-candidate wording in the [October 12 review](citizens-next-work-2026-10-12.md) and [September ecosystem report](neoforge-ecosystem-replacements-2026-09-22.md).
+
+Citizens retains NPC behavior and its existing native extension contracts. Yuuniverse Interactions remains a separate dialogue mod. Economy owns money, system/player shops, stock, settlement and its GUI; Paradigm owns permissions and placeholder registration; FTB owns quest/team progress. Installing a provider establishes neither an adapter nor automatic import of Bukkit data.
+
+## Selected artifacts and sides
+
+| Provider | Selected version | Deployment role |
+|---|---|---|
+| Yuuniverse Economy | Existing installed 0.4.1-SNAPSHOT retained; source 0.5.0-SNAPSHOT at `072703c` defines the next API baseline | Server economy/GUI owner. No untested Economy upgrade is included in this installation. |
+| Paradigm | Existing 2.5.0 retained | Server. Its JAR already supplies `PlaceholderService.register(namespace, key, resolver)`, `ExternalPlaceholderResolver` and registration handles. There is no additional PlaceholderAPI JAR to install. |
+| FTB Quests | 2101.1.36 | Both sides. Quest definitions/progress/rewards; adapt legacy quest IDs/content explicitly. |
+| FTB Library / FTB Teams | 2101.1.37 / 2101.1.11 | Both sides; required FTB dependencies. |
+| FTB XMod Compat | 21.1.12 | Both sides in this pack; connects FTB and KubeJS. |
+| RSItemEditor | 1.0.1 | Server; requires Kotlin for Forge 5.12.0, which satisfies the JAR's 5.3.0 minimum. |
+| Guard Villagers | 2.4.12 | Both sides. Separate guard entities; not an automatic Citizens/Sentinel AI replacement. |
+| NeoProtect | 1.0.4 | Server; requires NeoForge 21.1.228+. |
+| GriefLogger | 1.2.10-1.21.1-yuuniverse.1 (local source build) | Server; requires Architectury and SuperMartijn642's Config Lib 1.1.8. SQLite packaging repair validated below. |
+| Vivecraft | 1.21.1-1.3.15 NeoForge | Server support and client pack. VR is a client choice; ordinary players need not enable VR. |
+| KubeJS / Rhino | 2101.7.2-build.377 / 2101.2.7-build.85 | Both sides for the selected quest/content integration. KubeJS requires NeoForge 21.1.199+ and Rhino build 81+. |
+| Better Advanced Tooltips | 2101.1.0-build.5 | Client only. Modrinth labels it required for KubeJS; the actual KubeJS descriptor calls it optional/client. Included with client tooling, excluded from the server. |
+| Architectury | Existing 13.0.11 retained; same artifact for clients | Both sides. Satisfies the FTB and GriefLogger version floors. |
+| JEI | 19.53.0.425 | Both sides. Minimum matching XMod 21.1.12's optional-if-present dependency; replaces installed 19.51.0.418. The release is labeled beta upstream. |
+
+Exact artifact sources, SHA-512/SHA-256 hashes and installation paths are recorded in the [artifact lock](ecosystem-mods-1.21.1.lock.json) and [installation receipt](ecosystem-installation-2026-10-13.json). Runtime data and private mod JARs are not committed to this repository.
+
+## Ordered adaptation backlog
+
+All rows are accepted goals. An unchecked row means adaptation remains to be implemented/validated, even when its provider is installed.
+
+| Order / ID | Owner and task | Completion gate |
+|---|---|---|
+| 1 / ADAPT-01 | Economy: publish the [ordered Economy API backlog](yuuniverse-economy-gui-api-requirements-2026-10-12.md), starting with ECO-01–03. | Stable shop lookup and Economy-owned browser/system/coordinate menu entry points exist in a versioned provider JAR. Old/absent providers fail without payment. NPC/dialogue paths use the same menus as Economy commands. |
+| 2 / ADAPT-02 | Citizens + Interactions: bind typed shop references and optional provider lifecycle. | Ordinary and packet NPC clicks and dialogue actions open the intended system/player shop; invalid IDs, permissions, distance, disconnect and provider retirement have defined results. Keep dialogue code in its own JAR and retain distinct Citizens-owned inventory-shop functionality. |
+| 3 / ADAPT-03 | Economy: expose quotes, execution, receipts, pending deliveries and post-commit reconciliation (ECO-04–08). | One system-shop buy/sell and one finite player-shop trade settle exact money, item components, stock, tax and limits; duplicate requests and full inventories recover across restart without duplicate money/items. |
+| 4 / ADAPT-04 | FTB Quests + Interactions: task query/advancement and monetary reward adapters. | One NPC delivery and dialogue condition share authoritative player/team state. Item consumption, party changes, repeatable quests and reward generation have explicit semantics. Imported Bukkit quest references are mapped with provenance; unsupported content is reported. |
+| 5 / ADAPT-05 | KubeJS + FTB XMod Compat: supported script bindings and real mod-crafting task support. | Expose only public Citizens/Economy/FTB contracts. Verify version-specific `FTBQuestsEvents.customTask`, `customReward`, `started`, `completed` bindings. Implement CRAFT-01–06 in the Economy API document: registry recipe lookup, supported machine adapters, actual craft evidence and repeat-safe progress/rewards. Buying an item cannot masquerade as crafting it. |
+| 6 / ADAPT-06 | RSItemEditor: item-library adapter and legacy ItemEdit content conversion. | Preserve complete components, quantities and shared/personal ownership. Resolve saved-item references explicitly and return defensive copies. Deletion/redefinition follows a stated snapshot/reference policy; missing mods/items retain recoverable source data. Check Paradigm command permissions. |
+| 7 / ADAPT-07 | Paradigm: retain owned NPC placeholder exports and add configured Economy/quest values. | Registration handles release on shutdown/provider replacement; worker-thread formatting uses immutable snapshots. Resolve economy/quest data from their owners. Installed 2.5.0's `PlaceholderService` has registration only; inbound text evaluation needs a separately supported API, not private formatter reflection. |
+| 8 / ADAPT-08 | Guard Villagers: coexistence and explicit guard workflows. | Test spawn, recruitment, equipment, patrol/follow, faction/target policy, protection and friendly fire around Citizens NPCs. Document which entities own combat. Do not attach Guard Villagers AI to Citizens through guessed internals or claim full Sentinel parity. |
+| 9 / ADAPT-09 | NeoProtect + GriefLogger: compatible logging and attribution boundaries. | Both mods load together with Economy. Test ordinary/modded blocks, inventories and entities, operator permissions, lookup, retention, restart and throughput. NeoProtect owns selected world rollback; GriefLogger supplies independent logs. Define duplicate-event handling and correlate Economy receipts; world rollback must not silently reverse ledger payments. |
+| 10 / ADAPT-10 | Vivecraft: native VR/non-VR interaction acceptance. | Verify VR aim/reach and both-hand NPC interaction, container/menu clicks, teleport/mounts, dialogue/cameras and reconnect with the target pack. Check server policy and ordinary-client coexistence; do not assume the Spigot extension's data/config transfers. |
+| 11 / ADAPT-11 | Integrated migration and release acceptance. | Pin server/client/provider hashes, reconcile old IDs/accounts/items and migrated data, test permissions/quests/economy across reconnect and restart, and run physical VR/non-VR clients. Record exact limitations and rollback files before claiming full migration. |
+
+ADAPT-01–05 provide the first usable NPC → shop → quest/craft → reward workflow. The specialist integrations can proceed after their contracts are known. The existing delayed-command and transaction correctness work in [remaining Citizens work](remaining-citizens-work-2026-09-26.md) remains required; selecting these mods does not mark core parity complete.
+
+## Installation and validation record
+
+Official Modrinth release metadata and FTB Maven Gradle module metadata supplied download URLs and SHA-512 hashes. JAR descriptors were inspected for mod IDs, loader versions and transitive requirements. Inspection found XMod's JEI floor and the client-only tooltip distinction that project-level dependency lists alone omit.
+
+An isolated copy of the deployed mod JAR set, a fresh synthetic world and fresh configuration is used for startup checks on 21.1.248. Production worlds, permission databases, economy ledgers and configuration are not copied into the fixture. The live server process is not restarted by this task. File installation takes effect on its next restart; physical-client acceptance and integration implementation remain separate gates.
+
+The unmodified GriefLogger release fails during module resolution: `Modules grieflogger and org.xerial.sqlitejdbc export package org.sqlite`. Its 1.21.1 source at `e913b78806a8f7646b7e3adc0d6721d1b386f29d` flattens SQLite 3.47.2.0 into the root JAR via `shadowBundle`. Economy already includes SQLite as a selectable Jar-in-Jar dependency with range `[3.46.1.3,)`. The [source patch and rebuild instructions](../tools/grieflogger-compat/README.md) switch the driver to Loom's `include` and mark the custom version. The built JAR retains the complete JDBC dependency and its native resources; module resolution selects one SQLite 3.47.2.0 module.
+
+**Installed at 2026-10-13 10:52:09 +08:00 (UTC+08:00):** 35 artifact copies across the three destinations, with two identical Architectury copies retained. The server now contains 65 mod JARs. The hosted AutoModpack source at `E:/yunniverse-server/automodpack/host-modpack/main/mods` contains 57. The supplemental `client-pack/mods` folder previously contained only one MTR JAR despite its stale 42-JAR README; it now contains 12 and is not a complete client pack. Both client destinations contain the 11 selected client integration/dependency JARs. AutoModpack regeneration/client synchronization and loading new server mods await the next normal restart.
+
+Old JEI server and hosted-client JARs are preserved under `E:/yunniverse-server/archive/ecosystem-2026-10-13/{server,hosted-client}`. GriefLogger source provenance and the patch are retained under `E:/yunniverse-server/source-patches/grieflogger-2026-10-13`. Retained Citizens, Interactions, Economy and Paradigm artifacts were not replaced in this batch. The user's subsequent authorization to update Economy from v0.5.0 is a separate follow-up batch.
+
+Validation: GriefLogger `:neoforge:build` succeeds. The unchanged release fails module resolution; the patched full 65-JAR server set reaches `Done`, registers the queried FTB/KubeJS/GriefLogger/shop commands, initializes GriefLogger, NeoProtect and Economy databases, and exits with code 0 after `stop`. Read-only SQLite `quick_check` returns `ok` for the fixture's GriefLogger, Economy and Paradigm databases. Logs retain existing/default-fixture issues involving client-class probing, MTS/MTR messages, a generated Paradigm hologram configuration, missing liquor recipes/tags and slow WorldEdit/CopyFoxies state enumeration. This is startup/database evidence, not clean-modpack, logging gameplay, migration, GUI, VR or physical-client acceptance.
+
+Local evidence: `artifacts/ecosystem-2026-10-13/{server-smoke-grieflogger-conflict.log,grieflogger-build.log,server-smoke.log,server-smoke-result.json,database-checks.json,installation-receipt.json}`. The tracked installation receipt includes the key evidence hashes.
+
+## Primary sources
+
+- [FTB Quests source for 1.21.1](https://github.com/FTBTeam/FTB-Quests/tree/1.21.1/main), [FTB Maven](https://maven.ftb.dev/releases/dev/ftb/mods/), [FTB XMod events](https://github.com/FTBTeam/FTB-XMod-Compat/blob/51c6f83b55993c085ab709199a0d20e949f4233f/neoforge/src/main/java/dev/ftb/mods/ftbxmodcompat/neoforge/ftbquests/kubejs/FTBQuestsKubeJSEvents.java).
+- [RSItemEditor](https://modrinth.com/mod/rsitemeditor/version/KEpGvGgz), [Guard Villagers](https://modrinth.com/mod/guard-villagers/version/JyXugpy2), [NeoProtect](https://modrinth.com/mod/neoprotect/version/TK4G6K3x), [GriefLogger](https://modrinth.com/mod/grieflogger/version/IrRNGJIR), [GriefLogger pinned 1.21.1 source](https://github.com/DAQEM/GriefLogger/tree/e913b78806a8f7646b7e3adc0d6721d1b386f29d).
+- [Vivecraft](https://modrinth.com/mod/vivecraft/version/LjqlbRAO), [KubeJS](https://modrinth.com/mod/kubejs/version/THIGFPwf), [JEI compatibility version](https://modrinth.com/mod/jei/version/5ULZJRXC).
+- [Existing Citizens placeholder bridge](paradigm-npc-placeholders-2026-09-23.md), [Economy API requirements and crafting task contracts](yuuniverse-economy-gui-api-requirements-2026-10-12.md).
