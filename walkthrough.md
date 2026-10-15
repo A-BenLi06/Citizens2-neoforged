@@ -2415,3 +2415,30 @@ Rebuilt Economy gameplay baseline 072703c; the update/deployment documentation a
 The clean Economy build passes 79 tests without failures/errors/skips. Rehearsal upgrades a read-only online snapshot from schema 8 to 9 and restores 40 sections/88 pages while preserving all 26 original non-schema/presentation/audit table hashes. Portable upgrade/rollback restores exact original database/artifact hashes. The combined 65-JAR fixture passes startup/shutdown with exit 0, and the real Economy/Citizens/Interactions service fixture passes 36 checks. Restored the standard Citizens build and checked it excludes the service probe; its pre-existing draft and runtime artifacts were not deployed.
 
 Recorded exact package/validation hashes in docs/economy-v050-preparation-2026-10-13.json, updated the adopted goals/API-demand document and retained the initial 0.4.1 smoke evidence under version-specific filenames. The API backlog remains future adaptation work; this batch does not claim implementation of ECO/CRAFT adapters or physical-client acceptance. All requested provider artifacts and initial backup hashes were reverified.
+
+## 2026-10-15T11:56:00+08:00 (UTC+08:00) — Validate Economy's new system-shop API against the real providers
+
+Extended the isolated service audit for Economy 0.5.1-SNAPSHOT (commit c83efc8)'s first ECO-01–03
+implementation slice. The fixture uses real vanilla menus and provider APIs to
+check optional capability/version discovery, immutable catalog lookup, Unicode
+search, opaque offer/page keys, sparse page ordering, all five menu targets,
+unchanged menu/account state on rejected requests, no-charge opening, actor
+isolation, retired-provider rejection and revalidation after a shop is disabled.
+The existing named-shop dialogue and camera/monetary checks remain in the same run.
+
+Validation: the fixture passes 68 checks and exits successfully. Evidence:
+artifacts/economy051-service-audit-2026-10-15.log, SHA-256
+ec726e33aa9afaddf46e35087167b32ac075a1ab9cb698c72a9b104f3feedb95.
+The Economy candidate passes 81 unit tests and has SHA-256
+fb1777480b79ceaf12baf84302d9cbb7330ad18e40e8f00c06d6ff82c7819240.
+Restored ordinary Citizens/Interactions packaging with build -x test (packaging
+verification only); all three release/source JARs contain no service/creation
+audit classes. That log is artifacts/system-shop-standard-packaging-2026-10-15.log,
+SHA-256 cff6c052742f7839028613cd24ce4a783e8d6b55f345caf8e90e7d66018fb8ca.
+
+Updated the API-demand document to distinguish the implemented system-shop subset
+from pending coordinate/management, permission, quote/recovery and quest/crafting
+work. Production and the prepared v0.5.0 upgrade remain unchanged. Preserved and
+excluded the pre-existing CommandTrait, Util and CreationRuntimeAudit edits and
+the unrelated untracked files; no Citizens gameplay or dialogue product changes
+are part of this batch.

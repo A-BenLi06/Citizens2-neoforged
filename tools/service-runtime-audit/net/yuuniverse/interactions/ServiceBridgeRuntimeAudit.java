@@ -41,6 +41,11 @@ import net.neoforged.neoforge.network.registration.NetworkRegistry;
 import net.neoforged.neoforge.event.tick.ServerTickEvent;
 import net.yuuniverse.economy.EconomyRuntime;
 import net.yuuniverse.economy.api.YuuniverseEconomyApi;
+import net.yuuniverse.economy.api.ShopApiException;
+import net.yuuniverse.economy.api.ShopApiException.Reason;
+import net.yuuniverse.economy.api.ShopMenuRequest;
+import net.yuuniverse.economy.api.SystemShopApi;
+import net.yuuniverse.economy.core.CommerceAction;
 import org.slf4j.LoggerFactory;
 import team.creative.cmdcam.common.packet.StartPathPacket;
 import team.creative.cmdcam.common.scene.CamScene;
@@ -191,6 +196,7 @@ public final class ServiceBridgeRuntimeAudit {
             actor.channel.checkException();
             other.channel.checkException();
             check(actor.channel.isActive() && other.channel.isActive(), "provider_packets_encode_without_disconnect");
+            auditSystemShopApi(runtime, actor, other);
             check(runtime.ledger().audit().valid(), "economy_ledger_remains_balanced");
             LoggerFactory.getLogger("interactions").info("[SERVICEAUDIT] COMPLETE {} checks", passed);
         } catch (Throwable failure) {
@@ -211,6 +217,97 @@ public final class ServiceBridgeRuntimeAudit {
 
     private static String payment() { return "remove_item: %checkitem_remove_mat:minecraft:paper,amt:1%"; }
 
+    private static void auditSystemShopApi(EconomyRuntime runtime, AuditPlayer actor, AuditPlayer other) throws Exception {
+        var shops = runtime.systemShops().orElseThrow();
+        check(runtime.apiVersion() == 2 && shops.version() == 1 && shops.isAvailable(), "system_shop_capability_and_version");
+        var menu = actor.containerMenu;
+        long balance = runtime.balance(actor.getUUID(), "audit");
+        long transactions = runtime.ledger().audit().transactionCount();
+        int accounts = runtime.ledger().playerAccounts().size();
+        var catalog = shops.catalog(actor.getUUID());
+        check(catalog.stream().noneMatch(shop -> shop.id().equals("hidden_api") || shop.id().equals("disabled_api")),
+                "catalog_filters_hidden_and_disabled_sections");
+        check(shops.shop(actor.getUUID(), "hidden_api").orElseThrow().hidden()
+                && shops.shop(actor.getUUID(), "disabled_api").isEmpty()
+                && shops.shop(actor.getUUID(), "missing_api").isEmpty(), "direct_lookup_preserves_hidden_shop_policy");
+        check(shops.pages(actor.getUUID(), "blocks").get(1).pageKey().equals("资源.items.special"),
+                "pages_preserve_opaque_keys_and_sparse_order");
+        var offers = shops.offers(actor.getUUID(), "blocks", "资源.items.special");
+        check(offers.size() == 1 && offers.getFirst().itemKey().equals("opaque-api-offer"),
+                "offer_lookup_uses_exact_page_membership");
+        boolean immutable = false;
+        try { offers.clear(); } catch (UnsupportedOperationException expected) { immutable = true; }
+        check(immutable, "catalog_offer_snapshot_is_immutable");
+        check(shops.search(actor.getUUID(), "  资源  ").stream().anyMatch(offer -> offer.itemKey().equals("opaque-api-offer")),
+                "search_matches_unicode_snapshot_text");
+        var targets = List.<ShopMenuRequest>of(new ShopMenuRequest.Browser(0), new ShopMenuRequest.Shop("商店"),
+                new ShopMenuRequest.Page("blocks", "资源.items.special"), new ShopMenuRequest.Search("资源", 0),
+                new ShopMenuRequest.Quantity("blocks", "opaque-api-offer", CommerceAction.BUY_FROM_SHOP));
+        for (var target : targets) shops.validate(actor.getUUID(), target);
+        check(actor.containerMenu == menu && accounts == runtime.ledger().playerAccounts().size()
+                && balance == runtime.balance(actor.getUUID(), "audit")
+                && transactions == runtime.ledger().audit().transactionCount(), "system_shop_queries_and_all_preflights_have_no_effects");
+        reject(shops, actor, new ShopMenuRequest.Browser(-1), Reason.INVALID_REQUEST);
+        reject(shops, actor, new ShopMenuRequest.Browser(Integer.MAX_VALUE), Reason.INVALID_REQUEST);
+        reject(shops, actor, new ShopMenuRequest.Search("资源", Integer.MAX_VALUE), Reason.INVALID_REQUEST);
+        reject(shops, actor, new ShopMenuRequest.Search("  ", 0), Reason.INVALID_REQUEST);
+        reject(shops, actor, new ShopMenuRequest.Page("blocks", "missing"), Reason.NOT_FOUND);
+        reject(shops, actor, new ShopMenuRequest.Shop("disabled_api"), Reason.NOT_FOUND);
+        reject(shops, actor, new ShopMenuRequest.Shop("no_pages"), Reason.NOT_FOUND);
+        reject(shops, actor, new ShopMenuRequest.Quantity("blocks", "disabled-api-offer", CommerceAction.BUY_FROM_SHOP), Reason.NOT_FOUND);
+        reject(shops, actor, new ShopMenuRequest.Quantity("blocks", "opaque-api-offer", CommerceAction.SELL_TO_SHOP), Reason.UNSUPPORTED_ACTION);
+        reject(shops, actor, null, Reason.INVALID_REQUEST);
+        check(rejected(() -> shops.open(UUID.randomUUID(), new ShopMenuRequest.Browser(0)), Reason.OFFLINE_PLAYER),
+                "new_shop_api_rejects_offline_actor");
+        check(CompletableFuture.supplyAsync(() -> rejected(
+                () -> shops.catalog(actor.getUUID()), Reason.WRONG_THREAD)).join(), "catalog_rejects_worker_thread_access");
+        check(actor.containerMenu == menu && accounts == runtime.ledger().playerAccounts().size(),
+                "invalid_requests_leave_menu_and_accounts_unchanged");
+        int otherMenus = other.openedMenus.size();
+        for (var target : targets) {
+            shops.open(actor.getUUID(), target);
+            check(actor.containerMenu != menu, "public_menu_opens_" + target.getClass().getSimpleName());
+            menu = actor.containerMenu;
+        }
+        actor.containerMenu.clicked(22, 0, net.minecraft.world.inventory.ClickType.PICKUP, actor);
+        check(actor.openedMenus.getLast().equals("Audit exact page"), "quantity_back_uses_page_key_not_sparse_page_index");
+        shops.open(actor.getUUID(), new ShopMenuRequest.Search("资源", 0));
+        actor.containerMenu.clicked(0, 0, net.minecraft.world.inventory.ClickType.PICKUP, actor);
+        actor.containerMenu.clicked(22, 0, net.minecraft.world.inventory.ClickType.PICKUP, actor);
+        check(actor.openedMenus.getLast().equals("Audit exact page"), "search_quantity_back_uses_authoritative_page_membership");
+        shops.open(actor.getUUID(), new ShopMenuRequest.Search("no-such-api-item", 0));
+        check(actor.containerMenu.slots.getFirst().getItem().isEmpty(), "empty_search_first_page_is_a_valid_menu");
+        check(other.openedMenus.size() == otherMenus && balance == runtime.balance(actor.getUUID(), "audit")
+                && transactions == runtime.ledger().audit().transactionCount(), "shop_opening_neither_charges_nor_targets_other_players");
+        var target = new ShopMenuRequest.Page("blocks", "资源.items.special");
+        shops.validate(actor.getUUID(), target);
+        try (var connection = DriverManager.getConnection("jdbc:sqlite:" + runtime.ledger().databasePath());
+             var sql = connection.createStatement()) {
+            sql.executeUpdate("UPDATE system_shop SET enabled=0 WHERE shop_id='blocks'");
+            try { reject(shops, actor, target, Reason.NOT_FOUND); }
+            finally { sql.executeUpdate("UPDATE system_shop SET enabled=1 WHERE shop_id='blocks'"); }
+        }
+        YuuniverseEconomyApi.clear(runtime);
+        try {
+            check(YuuniverseEconomyApi.current().isEmpty() && !shops.isAvailable()
+                    && rejected(() -> shops.catalog(actor.getUUID()), Reason.UNAVAILABLE)
+                    && rejected(() -> shops.open(actor.getUUID(), target), Reason.UNAVAILABLE),
+                    "retired_shop_facade_cannot_query_or_open_menus");
+        } finally { YuuniverseEconomyApi.publish(runtime); }
+    }
+
+    private static void reject(SystemShopApi api, AuditPlayer actor, ShopMenuRequest request, Reason reason) {
+        var before = actor.containerMenu;
+        check(rejected(() -> api.validate(actor.getUUID(), request), reason)
+                && rejected(() -> api.open(actor.getUUID(), request), reason) && actor.containerMenu == before,
+                "reject_" + (request == null ? "null" : request) + "_" + reason);
+    }
+
+    private static boolean rejected(Runnable action, Reason reason) {
+        try { action.run(); return false; }
+        catch (ShopApiException expected) { return expected.reason() == reason; }
+    }
+
     private static boolean ready(ServerLevel level) {
         return level.areEntitiesLoaded(ChunkPos.asLong(0, 0)) && level.isPositionEntityTicking(new BlockPos(1, 0, 1));
     }
@@ -226,6 +323,30 @@ public final class ServiceBridgeRuntimeAudit {
                     page.setString(1, id); page.setString(2, "Audit " + id); page.executeUpdate();
                 }
                 shop.setString(1, "no_pages"); shop.setString(2, "No pages"); shop.executeUpdate();
+            }
+            try (var sql = connection.createStatement()) {
+                sql.executeUpdate("""
+                        INSERT OR REPLACE INTO system_shop VALUES
+                        ('hidden_api','Hidden','fixture','fixture','{}',1),
+                        ('disabled_api','Disabled','fixture','fixture','{}',0)
+                        """);
+                sql.executeUpdate("""
+                        INSERT OR REPLACE INTO system_shop_section
+                        (shop_id,section_slot,hidden,title,icon_config_json)
+                        VALUES ('hidden_api',0,1,'Hidden','{}')
+                        """);
+                sql.executeUpdate("""
+                        INSERT OR REPLACE INTO system_shop_page VALUES
+                        ('blocks','资源.items.special',10,'Audit exact page',3,'{}'),
+                        ('blocks','last',20,'Audit last page',3,'{}')
+                        """);
+                sql.executeUpdate("""
+                        INSERT OR REPLACE INTO system_shop_item
+                        (shop_id,item_key,page_key,slot_key,legacy_material,item_config_json,currency_id,
+                         buy_price_minor_units,sell_price_minor_units,dynamic_pricing,enabled) VALUES
+                        ('blocks','opaque-api-offer','资源.items.special','1','STONE','{"material":"STONE","name":"资源"}','audit',10,NULL,0,1),
+                        ('blocks','disabled-api-offer','资源.items.special','2','STONE','{"material":"STONE"}','audit',10,NULL,0,0)
+                        """);
             }
         }
     }

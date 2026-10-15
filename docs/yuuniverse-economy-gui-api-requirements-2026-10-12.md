@@ -5,6 +5,17 @@ Confirmed as the selected porting target: 2026-10-13, UTC+08:00. See the [adopte
 Update: v0.5.0 has now passed its 79-test build, the combined-stack startup and 36 actual-provider service checks; its upgrade is [prepared for the next planned restart](economy-v050-preparation-2026-10-13.json). The APIs proposed below remain development requirements, not newly implemented signatures.
 Target: Minecraft 1.21.1 / NeoForge; consumer projects are Citizens, the separate Yuuniverse Interactions mod, FTB Quests and KubeJS/FTB XMod Compat.
 
+Progress 2026-10-15, UTC+08:00: Economy **0.5.1-SNAPSHOT** now implements the
+system-shop portion of ECO-01–03: optional `SystemShopApi`, version discovery,
+typed rejection, immutable queries and browser/exact-page/search/quantity menu
+requests. Its authoritative contract is the neighboring Economy project's
+`docs/system-shop-api.md`. The 81-test Economy build and 68-check actual-provider
+fixture pass. Coordinate access/management, additional permission and mod-item
+validation, quote/execution/recovery and quest/crafting integration remain open.
+This source build has not replaced the separately prepared v0.5.0 upgrade or the
+live 0.4.1 provider. The proposed contracts below remain backlog except for that
+explicitly documented subset.
+
 **Yuuniverse Economy owns the replacement for both EconomyShopGUI Premium and QuickShop:** shop browsing, quantity selection, buying/selling, coordinate shops, administration, stock, limits, tax, money and delivery. Consumers open Economy's menus or request Economy-owned transactions. They must not construct another shop GUI, keep parallel balances/stock, or manipulate the database directly.
 
 This is a task specification, not a declaration that the proposed APIs already exist. It is based on the clean Economy source at commit `072703c` (`0.5.0-SNAPSHOT`) and read-only inspection of the installed `0.4.1-SNAPSHOT` JAR. No Economy code, database or deployment is changed by this document.
