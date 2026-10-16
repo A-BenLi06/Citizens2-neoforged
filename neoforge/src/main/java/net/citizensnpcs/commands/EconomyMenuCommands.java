@@ -13,7 +13,7 @@ import net.minecraft.commands.CommandSourceStack;
 @Requirements
 public final class EconomyMenuCommands {
     @Command(aliases = { "citizens" }, modifiers = { "economyshop" },
-            usage = "economyshop <browser|shop|page|search|quantity> <target fields>",
+            usage = "economyshop <browser|shop|page|search|quantity|coordinate> <target fields>",
             desc = "citizens.commands.economyshop.description", min = 3, max = 5, strictArguments = true)
     public void open(CommandContext args, CommandSourceStack source, NPC npc) throws CommandException {
         try {

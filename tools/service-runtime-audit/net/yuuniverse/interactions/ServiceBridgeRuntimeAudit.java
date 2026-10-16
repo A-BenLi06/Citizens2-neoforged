@@ -197,6 +197,7 @@ public final class ServiceBridgeRuntimeAudit {
             other.channel.checkException();
             check(actor.channel.isActive() && other.channel.isActive(), "provider_packets_encode_without_disconnect");
             auditSystemShopApi(runtime, actor, other);
+            auditCoordinateShopApi(runtime, actor, other);
             check(runtime.ledger().audit().valid(), "economy_ledger_remains_balanced");
             LoggerFactory.getLogger("interactions").info("[SERVICEAUDIT] COMPLETE {} checks", passed);
         } catch (Throwable failure) {
@@ -219,7 +220,7 @@ public final class ServiceBridgeRuntimeAudit {
 
     private static void auditSystemShopApi(EconomyRuntime runtime, AuditPlayer actor, AuditPlayer other) throws Exception {
         var shops = runtime.systemShops().orElseThrow();
-        check(runtime.apiVersion() == 2 && shops.version() == 1 && shops.isAvailable(), "system_shop_capability_and_version");
+        check(runtime.apiVersion() == 3 && shops.version() == 1 && shops.isAvailable(), "system_shop_capability_and_version");
         var menu = actor.containerMenu;
         long balance = runtime.balance(actor.getUUID(), "audit");
         long transactions = runtime.ledger().audit().transactionCount();
@@ -384,6 +385,148 @@ public final class ServiceBridgeRuntimeAudit {
         before = actor.containerMenu;
         net.citizensnpcs.util.EconomyShopMenus.present(actor, target, false);
         check(actor.containerMenu != before, "consumer_reacquires_republished_provider");
+    }
+
+    private static void auditCoordinateShopApi(EconomyRuntime runtime, AuditPlayer actor, AuditPlayer other) throws Exception {
+        var api = runtime.coordinateShops().orElseThrow();
+        var level = actor.serverLevel();
+        var position = new BlockPos(4, 80, 4);
+        var original = level.getBlockState(position);
+        var actorPosition = actor.position();
+        var otherPosition = other.position();
+        var otherLevel = other.serverLevel();
+        var ledger = runtime.ledger();
+        net.yuuniverse.economy.core.CoordinateShop shop = null;
+        try {
+            level.setBlock(position, net.minecraft.world.level.block.Blocks.CHEST.defaultBlockState(), 3);
+            actor.setPos(3, 80, 3);
+            if (other.serverLevel() != level) other.teleportTo(level, 3, 80, 3, 0, 0);
+            other.setPos(3, 80, 3);
+            var owner = runtime.playerAccount(actor.getUUID()).orElseThrow();
+            var buyer = runtime.playerAccount(other.getUUID()).orElseThrow();
+            shop = ledger.createCoordinateShop(new net.yuuniverse.economy.core.CoordinateShopDraft(
+                    level.dimension().location().toString(), "fixture", position.getX(), position.getY(), position.getZ(),
+                    owner.id(), "SELL_TO_PLAYER", "{\"material\":\"STONE\"}", "STONE", "audit", 10, 1,
+                    false, 0L, false, 0, null), "coordinate-api-fixture");
+            var id = new net.yuuniverse.economy.api.CoordinateShopReference.Id(shop.id());
+            var at = new net.yuuniverse.economy.api.CoordinateShopReference.Position(level.dimension().location().toString(), 4, 80, 4);
+            final String shopId = shop.id();
+            var before = actor.containerMenu;
+            int accounts = ledger.playerAccounts().size();
+            long transactions = ledger.audit().transactionCount();
+            check(api.version() == 1 && api.isAvailable() && api.shop(actor.getUUID(), id).orElseThrow().id().equals(shopId)
+                    && api.shop(actor.getUUID(), at).orElseThrow().id().equals(shopId), "coordinate_exact_id_and_position_lookup");
+            api.validate(actor.getUUID(), id);
+            check(actor.containerMenu == before && accounts == ledger.playerAccounts().size()
+                    && transactions == ledger.audit().transactionCount(), "coordinate_lookup_preflight_has_no_effects");
+            check(api.shop(actor.getUUID(), new net.yuuniverse.economy.api.CoordinateShopReference.Id("absent")).isEmpty(),
+                    "coordinate_missing_id_lookup_is_empty");
+            api.open(actor.getUUID(), id);
+            check(actor.containerMenu != before, "coordinate_api_opens_economy_menu");
+            var snapshot = api.shop(actor.getUUID(), id).orElseThrow();
+            boolean immutable = false;
+            try { snapshot.staffAccountIds().add(buyer.id()); } catch (UnsupportedOperationException expected) { immutable = true; }
+            check(immutable, "coordinate_snapshot_staff_is_immutable");
+            ledger.configureCoordinateShop(shopId, buyer.id(), "SELL_TO_PLAYER", "audit", 17, 2, false, true, 0, null, 0, "fixture");
+            actor.containerMenu.clicked(45, 0, net.minecraft.world.inventory.ClickType.PICKUP, actor);
+            check(ledger.coordinateShopDetails(shopId).orElseThrow().ownerAccountId().equals(buyer.id())
+                    && ledger.coordinateShopDetails(shopId).orElseThrow().mode().equals("SELL_TO_PLAYER"),
+                    "old_owner_menu_cannot_toggle_or_restore_old_owner");
+            ledger.setCoordinateShopStaff(shopId, owner.id(), true, "fixture");
+            api.open(actor.getUUID(), id);
+            ledger.setCoordinateShopStaff(shopId, owner.id(), false, "fixture");
+            actor.containerMenu.clicked(47, 0, net.minecraft.world.inventory.ClickType.PICKUP, actor);
+            check(ledger.coordinateShopDetails(shopId).orElseThrow().displayEnabled(), "revoked_staff_menu_cannot_toggle_display");
+            api.open(other.getUUID(), id);
+            var oldMenu = other.containerMenu;
+            ledger.configureCoordinateShop(shopId, buyer.id(), "SELL_TO_PLAYER", "audit", 31, 3, false, true, 0, null, 0, "fixture");
+            other.containerMenu.clicked(45, 0, net.minecraft.world.inventory.ClickType.PICKUP, other);
+            var current = ledger.coordinateShopDetails(shopId).orElseThrow();
+            check(current.mode().equals("BUY_FROM_PLAYER") && current.priceMinorUnits() == 31 && current.itemAmount() == 3,
+                    "management_toggle_preserves_latest_price_and_amount");
+            oldMenu.clicked(49, 0, net.minecraft.world.inventory.ClickType.PICKUP, other);
+            check(ledger.coordinateShopDetails(shopId).orElseThrow().enabled(), "retired_menu_cannot_change_shop");
+            other.containerMenu.clicked(49, 0, net.minecraft.world.inventory.ClickType.PICKUP, actor);
+            check(ledger.coordinateShopDetails(shopId).orElseThrow().enabled(), "other_actor_cannot_click_owner_menu");
+            ledger.setCoordinateShopEnabled(shopId, false, "fixture");
+            rejectCoordinate(api, actor, id, Reason.ACCESS_DENIED);
+            api.open(other.getUUID(), id);
+            other.containerMenu.clicked(49, 0, net.minecraft.world.inventory.ClickType.PICKUP, other);
+            check(ledger.coordinateShopDetails(shopId).orElseThrow().enabled(), "disabled_shop_owner_can_reenable_through_menu");
+            actor.setPos(40, 80, 40);
+            rejectCoordinate(api, actor, id, Reason.OUT_OF_RANGE);
+            actor.setPos(3, 80, 3);
+            level.setBlock(position, net.minecraft.world.level.block.Blocks.AIR.defaultBlockState(), 3);
+            rejectCoordinate(api, actor, id, Reason.CONTAINER_UNAVAILABLE);
+            level.setBlock(position, net.minecraft.world.level.block.Blocks.CHEST.defaultBlockState(), 3);
+            try (var connection = DriverManager.getConnection("jdbc:sqlite:" + ledger.databasePath());
+                    var update = connection.prepareStatement("UPDATE coordinate_shop SET legacy_material=?,item_config_json=? WHERE shop_id=?")) {
+                update.setString(1, "missing:coordinate_item");
+                update.setString(2, "{\"material\":\"missing:coordinate_item\",\"display-item\":{\"material\":\"STONE\"}}");
+                update.setString(3, shopId); update.executeUpdate();
+                try { rejectCoordinate(api, actor, id, Reason.ITEM_UNAVAILABLE); }
+                finally {
+                    update.setString(1, "STONE"); update.setString(2, "{\"material\":\"STONE\"}"); update.executeUpdate();
+                }
+            }
+            check(rejected(() -> api.validate(UUID.randomUUID(), id), Reason.OFFLINE_PLAYER), "coordinate_offline_actor_rejected");
+            check(CompletableFuture.supplyAsync(() -> rejected(() -> api.validate(actor.getUUID(), id), Reason.WRONG_THREAD)).join(),
+                    "coordinate_wrong_thread_rejected");
+            rejectCoordinate(api, actor, new net.yuuniverse.economy.api.CoordinateShopReference.Id(""), Reason.INVALID_REQUEST);
+            rejectCoordinate(api, actor, new net.yuuniverse.economy.api.CoordinateShopReference.Position("missing:dimension", 4, 80, 4),
+                    Reason.DIMENSION_UNAVAILABLE);
+            actor.teleportTo(otherLevel, 3, 80, 3, 0, 0);
+            if (otherLevel != level) rejectCoordinate(api, actor, id, Reason.OUT_OF_RANGE);
+            actor.teleportTo(level, 3, 80, 3, 0, 0);
+            var actions = new Actions(new ItemLibrary(), new Economy());
+            before = actor.containerMenu;
+            check(actions.validateAll(List.of("economy_shop: coordinate;" + shopId), actor, Component.empty())
+                    && actor.containerMenu == before, "coordinate_dialogue_preflight_is_readonly");
+            check(actions.runAll(List.of("economy_shop: coordinate;" + shopId), actor, Component.empty())
+                    && actor.containerMenu != before, "coordinate_dialogue_opens_provider_menu");
+            before = actor.containerMenu;
+            serverCommand(actor, "citizens economyshop coordinate " + shopId);
+            check(actor.containerMenu != before, "coordinate_citizens_command_opens_provider_menu");
+            for (boolean packet : new boolean[] { false, true }) {
+                var npc = net.citizensnpcs.api.CitizensAPI.getNPCRegistry()
+                        .createNPC(net.minecraft.world.entity.EntityType.COW, "CoordinateMenu" + packet);
+                try {
+                    if (packet) npc.getOrAddTrait(net.citizensnpcs.trait.PacketNPC.class);
+                    npc.spawn(new net.citizensnpcs.api.util.Location(level, 2, 80, 2));
+                    var command = npc.getOrAddTrait(net.citizensnpcs.trait.CommandTrait.class);
+                    command.addCommand(new net.citizensnpcs.trait.CommandTrait.NPCCommandBuilder(
+                            "citizens economyshop coordinate " + shopId,
+                            net.citizensnpcs.trait.CommandTrait.Hand.RIGHT).player(true).cooldown(-1));
+                    before = actor.containerMenu;
+                    command.dispatch(actor, net.citizensnpcs.trait.CommandTrait.Hand.RIGHT);
+                    net.citizensnpcs.Citizens.getInstance().getScheduler().tick();
+                    check(actor.containerMenu != before, "coordinate_npc_command_opens_provider_menu_" + packet);
+                } finally { npc.destroy(); }
+            }
+            actor.setPos(40, 80, 40);
+            int paper = actor.getInventory().countItem(Items.PAPER);
+            check(!actions.runAll(List.of(payment(), "economy_shop: coordinate;" + shopId), actor, Component.empty())
+                    && actor.getInventory().countItem(Items.PAPER) == paper, "coordinate_range_failure_preserves_dialogue_payment");
+            actor.setPos(3, 80, 3);
+            YuuniverseEconomyApi.clear(runtime);
+            try { check(rejected(() -> api.validate(actor.getUUID(), id), Reason.UNAVAILABLE), "coordinate_retired_provider_rejected"); }
+            finally { YuuniverseEconomyApi.publish(runtime); }
+        } finally {
+            if (shop != null) ledger.removeCoordinateShop(shop.id(), "fixture-cleanup");
+            actor.setPos(actorPosition);
+            if (other.serverLevel() != otherLevel) other.teleportTo(otherLevel,
+                    otherPosition.x, otherPosition.y, otherPosition.z, 0, 0);
+            other.setPos(otherPosition);
+            level.setBlock(position, original, 3);
+        }
+    }
+
+    private static void rejectCoordinate(net.yuuniverse.economy.api.CoordinateShopApi api, AuditPlayer actor,
+            net.yuuniverse.economy.api.CoordinateShopReference reference, Reason reason) {
+        var before = actor.containerMenu;
+        check(rejected(() -> api.validate(actor.getUUID(), reference), reason)
+                && rejected(() -> api.open(actor.getUUID(), reference), reason) && actor.containerMenu == before,
+                "coordinate_reject_" + reason);
     }
 
     private static void serverCommand(AuditPlayer actor, String line) {

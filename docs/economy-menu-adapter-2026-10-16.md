@@ -1,5 +1,9 @@
 # Economy menus from NPCs and dialogues
 
+Follow-up: [Economy 0.5.2 coordinate targets](economy-coordinate-adapter-2026-10-16.md)
+add `coordinate;<shopId>` actions and `economyshop coordinate <shopId>` commands.
+The system-menu contract below remains unchanged.
+
 Citizens now opens Economy's existing menus with a player-source command:
 
 ```text

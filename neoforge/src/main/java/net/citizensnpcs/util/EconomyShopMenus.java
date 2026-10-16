@@ -23,7 +23,7 @@ public final class EconomyShopMenus {
         if (fields.isEmpty()) throw new IllegalArgumentException("Missing Economy menu target");
         String kind = fields.getFirst().toLowerCase(Locale.ROOT);
         int count = switch (kind) {
-            case "browser", "shop" -> 2;
+            case "browser", "shop", "coordinate" -> 2;
             case "page", "search" -> 3;
             case "quantity" -> 4;
             default -> throw new IllegalArgumentException("Unknown Economy menu target: " + kind);
@@ -52,6 +52,16 @@ public final class EconomyShopMenus {
             Object service = ((Optional<?>) Class.forName(API + "YuuniverseEconomyApi")
                     .getMethod("current").invoke(null)).orElseThrow(
                             () -> new IllegalStateException("Yuuniverse Economy is unavailable"));
+            if (target.kind().equals("coordinate")) {
+                Object coordinates = ((Optional<?>) apiType.getMethod("coordinateShops").invoke(service))
+                        .orElseThrow(() -> new IllegalStateException("The Economy coordinate-shop API is unavailable"));
+                Class<?> reference = Class.forName(API + "CoordinateShopReference");
+                Object id = Class.forName(API + "CoordinateShopReference$Id").getConstructor(String.class)
+                        .newInstance(target.fields().getFirst());
+                Class.forName(API + "CoordinateShopApi").getMethod(validate ? "validate" : "open", UUID.class, reference)
+                        .invoke(coordinates, player.getUUID(), id);
+                return;
+            }
             Object shops;
             try {
                 shops = ((Optional<?>) apiType.getMethod("systemShops").invoke(service)).orElse(null);

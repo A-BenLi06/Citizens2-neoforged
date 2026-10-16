@@ -11,6 +11,7 @@ class EconomyShopMenusTest {
         assertEquals(List.of("A shop", "资源.items.special"), target.fields());
         assertThrows(UnsupportedOperationException.class, () -> target.fields().clear());
         assertEquals(" 资源 ", EconomyShopMenus.parse(List.of("search", " 资源 ", "0")).fields().getFirst());
+        assertEquals(List.of("coordinate:opaque-id"), EconomyShopMenus.parse(List.of("coordinate", "coordinate:opaque-id")).fields());
     }
 
     @Test void rejectsMalformedFieldsBeforeProviderAccess() {

@@ -5,6 +5,11 @@ Confirmed as the selected porting target: 2026-10-13, UTC+08:00. See the [adopte
 Update: v0.5.0 has now passed its 79-test build, the combined-stack startup and 36 actual-provider service checks; its upgrade is [prepared for the next planned restart](economy-v050-preparation-2026-10-13.json). The APIs proposed below remain development requirements, not newly implemented signatures.
 Target: Minecraft 1.21.1 / NeoForge; consumer projects are Citizens, the separate Yuuniverse Interactions mod, FTB Quests and KubeJS/FTB XMod Compat.
 
+Coordinate progress 2026-10-16, UTC+08:00: the [0.5.2 follow-up](economy-coordinate-adapter-2026-10-16.md)
+adds local exact lookup/opening and current management authority to NPC/dialogue
+consumers. Commerce/quest, remote administration and full release acceptance
+remain provider work. Historical pending-coordinate notes below describe 0.5.1.
+
 Consumer progress 2026-10-16, UTC+08:00: [NPC commands and dedicated dialogue
 actions](economy-menu-adapter-2026-10-16.md) now open all five 0.5.1 system-menu
 targets, with provider reacquisition, read-only dialogue preflight and no direct

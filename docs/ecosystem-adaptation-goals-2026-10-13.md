@@ -37,6 +37,13 @@ their access policy and wider release acceptance. [Command retirement](command-r
 and [admission/payment/permission boundaries](command-admission-2026-10-16.md) are
 now implemented and validated separately.
 
+[Coordinate-shop adaptation](economy-coordinate-adapter-2026-10-16.md) extends
+Economy to 0.5.2 and the consumers to local coordinate targets, with exact ID/block
+lookup and current management authority on each click. The API's local policy
+is documented in Economy's `docs/coordinate-shop-api.md`; no remote permission
+or deployment/physical-client acceptance is implied. ADAPT-03 commerce/receipts
+and ADAPT-04/05 quest/crafting are the next integration requirements.
+
 All rows are accepted goals. An unchecked row means adaptation remains to be implemented/validated, even when its provider is installed.
 
 | Order / ID | Owner and task | Completion gate |

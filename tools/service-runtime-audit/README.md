@@ -2,7 +2,7 @@
 
 This fixture tests the actual Yuuniverse Economy API and CmdCam provider in an isolated server. It does not connect a real Minecraft client or change production.
 
-From the Citizens repository root, supply the built Economy 0.5.1 jar, CmdCam 2.2.9 for NeoForge 1.21.1, compatible CreativeCore, and the old world directory:
+From the Citizens repository root, supply the built Economy 0.5.2 jar, CmdCam 2.2.9 for NeoForge 1.21.1, compatible CreativeCore, and the old world directory:
 
 ```powershell
 ./tools/prepare-service-audit.ps1 -EconomyJar '<economy jar>' -CmdCamJar '<cmdcam jar>' -CreativeCoreJar '<creativecore jar>' -LegacyWorld '<old world directory>'
@@ -28,5 +28,9 @@ Checks cover:
   preservation, provider unpublication/republication and absent-capability
   fallback delegation. The latter uses a proxy to exercise compatibility dispatch;
   it is not an actual older-provider artifact test.
+- Coordinate-shop ID/block lookup, owner/staff revocation, current-field toggles,
+  stale menus, different actors, disabled-shop reenabling, distance/dimension,
+  container/item/thread/offline/provider rejection, native NPC commands and
+  dedicated dialogue preflight/payment preservation.
 
 The NeoForge mock connection hook supplies negotiated channels for the embedded transport. This is not a real client handshake or a visual camera acceptance test. Run the ordinary build afterward and verify release jars exclude `ServiceBridgeRuntimeAudit` and other opt-in probes.
