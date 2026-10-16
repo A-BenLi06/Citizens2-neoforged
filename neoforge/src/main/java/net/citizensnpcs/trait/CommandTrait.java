@@ -68,6 +68,7 @@ public class CommandTrait extends Trait {
     @Persist(keyType = CommandTraitError.class)
     private final Map<CommandTraitError, String> customErrorMessages = new EnumMap<>(CommandTraitError.class);
     private final Set<String> executingCommands = new HashSet<>();
+    private boolean dispatching;
     private final Map<String, Set<CommandTraitError>> executionErrors = new HashMap<>();
     @Persist
     private ExecutionMode executionMode = ExecutionMode.LINEAR;
@@ -289,6 +290,17 @@ public class CommandTrait extends Trait {
     }
 
     public void dispatch(ServerPlayer player, Hand handIn) {
+        if (dispatching)
+            return;
+        dispatching = true;
+        try {
+            dispatchCurrent(player, handIn);
+        } finally {
+            dispatching = false;
+        }
+    }
+
+    private void dispatchCurrent(ServerPlayer player, Hand handIn) {
         long revision = lifecycleRevision;
         if (!isCurrent(revision))
             return;
@@ -303,18 +315,9 @@ public class CommandTrait extends Trait {
             Messaging.send(player.createCommandSourceStack(), Messaging.tr("citizens.items.unavailable"));
             return;
         }
-        Transaction global = chargeGlobalCommandCosts(player, hand);
-        if (!global.isPossible() || !isCurrent(revision))
-            return;
-        if (!runCharge(global))
-            return;
-        if (!isCurrent(revision)) {
-            refundCharge(global);
-            return;
-        }
-
         Runnable task = new Runnable() {
             boolean failedCharge;
+            boolean globalCharged;
 
             @Override
             public void run() {
@@ -365,6 +368,8 @@ public class CommandTrait extends Trait {
                     // Payment providers can call back into dispatch before usage is committed.
                     if (!executingCommands.add(commandKey))
                         return;
+                    boolean previouslyDispatching = dispatching;
+                    dispatching = true;
                     try {
                         PlayerNPCCommand info = playerTracking.get(player.getUUID());
                         if (info == null && (executionMode == ExecutionMode.SEQUENTIAL
@@ -378,6 +383,14 @@ public class CommandTrait extends Trait {
                         }
                         if (info != null && !info.canUse(CommandTrait.this, player, command))
                             return;
+                        if (!globalCharged) {
+                            Transaction global = chargeGlobalCommandCosts(player, hand);
+                            charge = Transaction.compose(global, charge);
+                            if (!charge.isPossible()) {
+                                failedCharge = true;
+                                return;
+                            }
+                        }
                         if (!current.getAsBoolean())
                             return;
 
@@ -389,6 +402,20 @@ public class CommandTrait extends Trait {
                             refundCharge(charge);
                             return;
                         }
+                        try {
+                            ServerPlayer executor = command.npc && npc.getEntity() instanceof ServerPlayer actor
+                                    ? actor : player;
+                            if (Util.scheduleCommand(npc, executor, command.command, command.op, command.player,
+                                    current, dispatch -> withTemporaryPermissions(player, dispatch)) == null)
+                                throw new IllegalStateException("NPC command has no server dispatcher");
+                        } catch (RuntimeException failure) {
+                            refundCharge(charge);
+                            failedCharge = true;
+                            org.slf4j.LoggerFactory.getLogger(CommandTrait.class)
+                                    .error("Could not schedule NPC command", failure);
+                            return;
+                        }
+                        globalCharged = true;
                         if (info != null) {
                             playerTracking.computeIfAbsent(player.getUUID(), ignored -> new PlayerNPCCommand())
                                     .recordUse(CommandTrait.this, hand, command);
@@ -396,20 +423,8 @@ public class CommandTrait extends Trait {
                         if (executionMode == ExecutionMode.CYCLE) {
                             lastUsedId = command.id;
                         }
-                        if (!temporaryPermissions.isEmpty()) {
-                            PermissionUtil.Attachment attachment = PermissionUtil.grantTemporary(player,
-                                    temporaryPermissions);
-                            command.run(npc, player, current);
-                            if (temporaryPermissionsDuration <= 0) {
-                                attachment.remove();
-                            } else {
-                                CitizensAPI.getScheduler().runEntityTaskLater(player, attachment::remove,
-                                        temporaryPermissionsDuration);
-                            }
-                            return;
-                        }
-                        command.run(npc, player, current);
                     } finally {
+                        dispatching = previouslyDispatching;
                         executingCommands.remove(commandKey);
                     }
                 };
@@ -425,6 +440,21 @@ public class CommandTrait extends Trait {
 
     public double getCost() {
         return cost;
+    }
+
+    private void withTemporaryPermissions(ServerPlayer player, Runnable dispatch) {
+        PermissionUtil.Attachment attachment = PermissionUtil.grantTemporary(player, temporaryPermissions);
+        boolean retained = false;
+        try {
+            if (temporaryPermissionsDuration > 0) {
+                CitizensAPI.getScheduler().runEntityTaskLater(player, attachment::remove, temporaryPermissionsDuration);
+                retained = true;
+            }
+            dispatch.run();
+        } finally {
+            if (!retained)
+                attachment.remove();
+        }
     }
 
     private boolean isCurrent(long revision) {

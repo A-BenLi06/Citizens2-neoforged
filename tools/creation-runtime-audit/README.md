@@ -1,6 +1,6 @@
 # Native NPC creation runtime audit
 
-The fixture currently has 704 checks. Template coverage includes sibling definitions,
+The fixture currently has 742 checks. Template coverage includes sibling definitions,
 overwrite index consistency, and applying the updated trait value through creation.
 Behavior short-form coverage includes missing arguments/files, malformed YAML and a
 valid filename containing spaces, with target preservation on file-input failures.
@@ -59,6 +59,9 @@ Command retirement probes remove/replace commands, clear the list, retire/replac
 traits, despawn/respawn/destroy NPCs and reuse their IDs/UUIDs before delayed or
 queued execution. Unrelated edits and fresh dispatches remain usable. Payment
 callbacks that retire owners refund the completed charge without publishing usage.
+Admission checks cover empty/other-hand/use-limited global costs, event/provider
+recursion, one global cost per LINEAR batch, refunds after first per-command or
+scheduler rejection, and immediate/timed permission scopes around native execution.
 Status mapping coverage invokes the existing API through a fixture factory. It
 verifies child effects occur before success/failure substitution: three mapped
 failure iterations retain their waits, and a mapped success preserves the failing

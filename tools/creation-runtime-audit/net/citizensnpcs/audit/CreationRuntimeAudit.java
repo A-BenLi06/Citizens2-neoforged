@@ -56,6 +56,7 @@ public final class CreationRuntimeAudit {
     private static Consumer<NPCSpawnEvent> spawn;
     private static Consumer<NPCAddTraitEvent> traitAdded;
     private static Consumer<NPCRemoveEvent> removal;
+    private static Consumer<NPCCommandDispatchEvent> commandDispatch;
     private static MinecraftServer server;
     private static ServerLevel level;
     private static NPCRegistry registry, temporary;
@@ -75,6 +76,9 @@ public final class CreationRuntimeAudit {
     @SubscribeEvent public static void spawned(NPCSpawnEvent event) { spawns.merge(event.getNPC(), 1, Integer::sum); if (spawn != null) spawn.accept(event); }
     @SubscribeEvent public static void removed(NPCRemoveEvent event) { removes.merge(event.getNPC(), 1, Integer::sum); if (removal != null) removal.accept(event); }
     @SubscribeEvent public static void added(NPCAddTraitEvent event) { if (traitAdded != null) traitAdded.accept(event); }
+    @SubscribeEvent public static void dispatched(NPCCommandDispatchEvent event) {
+        if (commandDispatch != null) commandDispatch.accept(event);
+    }
 
     @SubscribeEvent(priority = EventPriority.LOWEST)
     public static void tick(ServerTickEvent.Post event) {
@@ -97,7 +101,7 @@ public final class CreationRuntimeAudit {
                 grant("citizens.npc.create", "citizens.npc.spawn", "citizens.npc.undo");
                 types = grant("citizens.npc.create.*"); limits = grant("citizens.admin.avoid-limits");
                 admin = grant("citizens.npc.admin");
-                basic(); items(); lifetimes(); vetoAndHistory(); templatesAndPermissions(); commandRegistryTargets(); behaviorSnapshotMemory(); behaviorRootLifecycle(); repeatedBehaviorTicks(); scalarBehaviorTicks(); conditionalContainerTicks(); retryBehaviorTicks(); timerBehaviorTicks(); globalCommandCooldown(); mappedBehaviorTicks(); commandPaymentUsage(); commandRetirement();
+                basic(); items(); lifetimes(); vetoAndHistory(); templatesAndPermissions(); commandRegistryTargets(); behaviorSnapshotMemory(); behaviorRootLifecycle(); repeatedBehaviorTicks(); scalarBehaviorTicks(); conditionalContainerTicks(); retryBehaviorTicks(); timerBehaviorTicks(); globalCommandCooldown(); mappedBehaviorTicks(); commandPaymentUsage(); commandRetirement(); commandAdmission();
             }
             List<Runnable> due = checks.remove(server.getTickCount() - start);
             if (due != null) due.forEach(Runnable::run);
@@ -825,6 +829,7 @@ public final class CreationRuntimeAudit {
         final Map<UUID, Double> balances = new HashMap<>();
         int withdrawals;
         boolean accepting;
+        double rejectedAmount = -1;
         Runnable beforeWithdrawal = () -> { };
         public double getBalance(ServerPlayer player) { return balances.getOrDefault(player.getUUID(), 100D); }
         public boolean deposit(ServerPlayer player, double amount) {
@@ -833,7 +838,7 @@ public final class CreationRuntimeAudit {
         public String format(double amount) { return Double.toString(amount); }
         public boolean withdraw(ServerPlayer player, double amount) {
             withdrawals++;
-            if (!accepting) return false;
+            if (!accepting || amount == rejectedAmount) return false;
             beforeWithdrawal.run();
             balances.put(player.getUUID(), getBalance(player) - amount); return true;
         }
@@ -952,6 +957,115 @@ public final class CreationRuntimeAudit {
         }
         atTick(10, () -> check(delayedPlayer.player.experienceLevel == 92, "retired_delayed_commands_do_not_charge_experience"));
         atTick(20, () -> check(delayedPlayer.player.experienceLevel == 88, "fresh_delayed_commands_charge_after_respawn"));
+    }
+
+    private static void commandAdmission() {
+        for (boolean packet : new boolean[] { false, true }) {
+            var effects = new java.util.concurrent.atomic.AtomicInteger();
+            String reward = "creation_admission_" + packet;
+            server.getCommands().getDispatcher().register(net.minecraft.commands.Commands.literal(reward)
+                    .executes(ctx -> effects.incrementAndGet()));
+            NPC target = registry.createNPC(EntityType.COW, "Admission" + packet);
+            if (packet) target.getOrAddTrait(PacketNPC.class);
+            check(target.spawn(new Location(level, 23, -58, 5)), "admission_spawn_" + packet);
+            var commands = target.getOrAddTrait(CommandTrait.class);
+            var economy = new CommandPaymentEconomy(); economy.accepting = true;
+            commands.setCost(5);
+            withEconomy(economy, () -> commands.dispatch(alice.player, CommandTrait.Hand.RIGHT));
+            check(economy.withdrawals == 0, "empty_click_has_no_global_charge_" + packet);
+            int id = commands.addCommand(new CommandTrait.NPCCommandBuilder(reward, CommandTrait.Hand.RIGHT)
+                    .cooldown(-1).cost(3).n(1));
+            withEconomy(economy, () -> commands.dispatch(alice.player, CommandTrait.Hand.LEFT));
+            check(economy.withdrawals == 0, "other_hand_has_no_global_charge_" + packet);
+            commandDispatch = event -> {
+                if (event.getNPC() == target) {
+                    commands.dispatch(alice.player, CommandTrait.Hand.RIGHT);
+                    commands.dispatch(cooldownPlayer.player, CommandTrait.Hand.RIGHT);
+                }
+            };
+            economy.beforeWithdrawal = () -> {
+                commands.dispatch(alice.player, CommandTrait.Hand.RIGHT);
+                commands.dispatch(cooldownPlayer.player, CommandTrait.Hand.RIGHT);
+            };
+            try { withEconomy(economy, () -> commands.dispatch(alice.player, CommandTrait.Hand.RIGHT)); }
+            finally { commandDispatch = null; economy.beforeWithdrawal = () -> { }; }
+            check(economy.withdrawals == 2 && economy.getBalance(alice.player) == 92
+                    && economy.getBalance(cooldownPlayer.player) == 100,
+                    "event_and_global_provider_reentry_cannot_double_charge_" + packet);
+            withEconomy(economy, () -> commands.dispatch(alice.player, CommandTrait.Hand.RIGHT));
+            check(economy.withdrawals == 2, "use_limit_has_no_global_charge_" + packet);
+            commands.removeCommandById(id);
+            commands.addCommand(new CommandTrait.NPCCommandBuilder(reward, CommandTrait.Hand.RIGHT).cooldown(-1));
+            commands.addCommand(new CommandTrait.NPCCommandBuilder(reward + " second", CommandTrait.Hand.RIGHT).cooldown(-1));
+            withEconomy(economy, () -> commands.dispatch(alice.player, CommandTrait.Hand.RIGHT));
+            check(economy.withdrawals == 3 && economy.getBalance(alice.player) == 87,
+                    "linear_commands_share_one_global_charge_" + packet);
+            atTick(3, () -> {
+                // The admitted one-time command was removed before native dispatch; the two fresh ones execute.
+                check(effects.get() == 1, "admission_keeps_command_identity_at_native_dispatch_" + packet);
+                target.destroy();
+            });
+
+            NPC failed = registry.createNPC(EntityType.COW, "AdmissionFailure" + packet);
+            if (packet) failed.getOrAddTrait(PacketNPC.class);
+            failed.spawn(new Location(level, 23, -58, 7));
+            var failedCommands = failed.getOrAddTrait(CommandTrait.class);
+            failedCommands.setCost(5);
+            failedCommands.addCommand(new CommandTrait.NPCCommandBuilder(reward, CommandTrait.Hand.RIGHT)
+                    .cost(3).cooldown(-1).n(1));
+            var rejected = new CommandPaymentEconomy(); rejected.accepting = true; rejected.rejectedAmount = 3;
+            withEconomy(rejected, () -> failedCommands.dispatch(alice.player, CommandTrait.Hand.RIGHT));
+            check(rejected.withdrawals == 2 && rejected.getBalance(alice.player) == 100
+                    && !commandState(failedCommands).keyExists("cooldowns." + alice.player.getUUID()),
+                    "per_command_failure_refunds_first_global_charge_and_preserves_usage_" + packet);
+            rejected.rejectedAmount = -1;
+            var scheduler = CitizensAPI.getScheduler();
+            var rejectingScheduler = (net.citizensnpcs.api.util.schedulers.SchedulerAdapter)
+                    java.lang.reflect.Proxy.newProxyInstance(scheduler.getClass().getClassLoader(),
+                            new Class<?>[] { net.citizensnpcs.api.util.schedulers.SchedulerAdapter.class },
+                            (proxy, method, args) -> {
+                                if (method.getName().equals("runTask"))
+                                    throw new java.util.concurrent.RejectedExecutionException("fixture command scheduling rejection");
+                                try { return method.invoke(scheduler, args); }
+                                catch (java.lang.reflect.InvocationTargetException failure) { throw failure.getCause(); }
+                            });
+            net.citizensnpcs.api.util.schedulers.Schedulers.set(rejectingScheduler);
+            try { withEconomy(rejected, () -> failedCommands.dispatch(alice.player, CommandTrait.Hand.RIGHT)); }
+            finally { net.citizensnpcs.api.util.schedulers.Schedulers.set(scheduler); }
+            check(rejected.withdrawals == 4 && rejected.getBalance(alice.player) == 100
+                    && !commandState(failedCommands).keyExists("cooldowns." + alice.player.getUUID()),
+                    "scheduler_rejection_refunds_global_and_command_charge_without_usage_" + packet);
+            failed.destroy();
+
+            for (int duration : new int[] { 0, 4 }) {
+                String permission = "citizens.audit.execution." + packet + "." + duration;
+                var calls = new java.util.concurrent.atomic.AtomicInteger();
+                String scoped = "creation_scoped_" + duration + "_" + packet;
+                server.getCommands().getDispatcher().register(net.minecraft.commands.Commands.literal(scoped)
+                        .executes(ctx -> {
+                            if (PermissionUtil.hasPermission(alice.player, permission)) calls.incrementAndGet();
+                            return 1;
+                        }));
+                NPC scopedNpc = registry.createNPC(EntityType.COW, "Scoped" + packet + duration);
+                if (packet) scopedNpc.getOrAddTrait(PacketNPC.class);
+                scopedNpc.spawn(new Location(level, 23, -58, 6));
+                var trait = scopedNpc.getOrAddTrait(CommandTrait.class);
+                trait.addCommand(new CommandTrait.NPCCommandBuilder(scoped, CommandTrait.Hand.RIGHT).cooldown(-1));
+                trait.setTemporaryPermissions(List.of(permission), duration);
+                check(!PermissionUtil.hasPermission(alice.player, permission), "scope_absent_before_admission_" + packet + duration);
+                trait.dispatch(alice.player, CommandTrait.Hand.RIGHT);
+                check(!PermissionUtil.hasPermission(alice.player, permission), "scope_absent_until_execution_" + packet + duration);
+                atTick(2, () -> {
+                    check(calls.get() == 1, "scope_present_during_dispatch_" + packet + duration);
+                    check(PermissionUtil.hasPermission(alice.player, permission) == (duration > 0),
+                            "scope_immediate_or_timed_lifetime_" + packet + duration);
+                });
+                atTick(8, () -> {
+                    check(!PermissionUtil.hasPermission(alice.player, permission), "scope_revoked_after_duration_" + packet + duration);
+                    scopedNpc.destroy();
+                });
+            }
+        }
     }
 
     private static void commandPaymentUsage() {

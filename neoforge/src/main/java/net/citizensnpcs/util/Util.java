@@ -5,6 +5,7 @@ import java.util.Locale;
 import java.util.Random;
 import java.util.UUID;
 import java.util.function.BooleanSupplier;
+import java.util.function.Consumer;
 
 import com.google.common.base.Joiner;
 import com.google.common.base.Splitter;
@@ -223,6 +224,12 @@ public class Util {
     /** Queue a command whose owner must still be valid when the native dispatcher runs it. */
     public static net.citizensnpcs.api.util.schedulers.SchedulerTask scheduleCommand(NPC npc, ServerPlayer clicker,
             String command, boolean op, boolean asPlayer, BooleanSupplier current) {
+        return scheduleCommand(npc, clicker, command, op, asPlayer, current, Runnable::run);
+    }
+
+    /** Runs an execution scope around the native dispatch, after checking queued ownership. */
+    public static net.citizensnpcs.api.util.schedulers.SchedulerTask scheduleCommand(NPC npc, ServerPlayer clicker,
+            String command, boolean op, boolean asPlayer, BooleanSupplier current, Consumer<Runnable> execution) {
         var invocation = net.citizensnpcs.api.util.NPCCommandFormat.prepareInvocation(command);
         String cmd = invocation.command();
         MinecraftServer server = clicker != null ? clicker.getServer() : ServerLifecycleHooks.getCurrentServer();
@@ -242,8 +249,12 @@ public class Util {
             try {
                 if (!current.getAsBoolean())
                     return;
-                net.citizensnpcs.api.command.NPCCommandTarget.dispatch(invocation.implicitTarget() ? npc : null,
-                        interpolated, () -> server.getCommands().performPrefixedCommand(source, interpolated));
+                execution.accept(() -> {
+                    if (current.getAsBoolean())
+                        net.citizensnpcs.api.command.NPCCommandTarget.dispatch(
+                                invocation.implicitTarget() ? npc : null, interpolated,
+                                () -> server.getCommands().performPrefixedCommand(source, interpolated));
+                });
             } catch (Throwable t) {
                 t.printStackTrace();
             }
