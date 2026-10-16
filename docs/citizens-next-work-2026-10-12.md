@@ -1,5 +1,13 @@
 # Citizens NeoForge progress, next work and plugin alternatives
 
+2026-10-16 follow-up, UTC+08:00: the delayed-command draft is committed and
+validated in [command retirement](command-retirement-2026-10-16.md), followed by
+[admission/payment/permission scopes](command-admission-2026-10-16.md).
+[Economy system-menu consumers](economy-menu-adapter-2026-10-16.md) now have native
+NPC and dedicated dialogue entry points. The state/counts below describe the
+October 12 review; remaining coordinate, quest/crafting and physical-client
+acceptance continue under the adopted backlog.
+
 Selection update, 2026-10-13 (UTC+08:00): the user has adopted Economy GUI, FTB Quests, RSItemEditor, Paradigm placeholders, Guard Villagers, NeoProtect, GriefLogger, Vivecraft, KubeJS and FTB XMod Compat. See the [adopted goals and installation record](ecosystem-adaptation-goals-2026-10-13.md) and [ordered Economy GUI API requirements](yuuniverse-economy-gui-api-requirements-2026-10-12.md). The candidate/absence observations below are historical; adoption does not establish completed adapters.
 
 Reviewed: 2026-10-12 11:05 +08:00 (UTC+08:00).

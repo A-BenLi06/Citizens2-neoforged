@@ -5,6 +5,12 @@ Confirmed as the selected porting target: 2026-10-13, UTC+08:00. See the [adopte
 Update: v0.5.0 has now passed its 79-test build, the combined-stack startup and 36 actual-provider service checks; its upgrade is [prepared for the next planned restart](economy-v050-preparation-2026-10-13.json). The APIs proposed below remain development requirements, not newly implemented signatures.
 Target: Minecraft 1.21.1 / NeoForge; consumer projects are Citizens, the separate Yuuniverse Interactions mod, FTB Quests and KubeJS/FTB XMod Compat.
 
+Consumer progress 2026-10-16, UTC+08:00: [NPC commands and dedicated dialogue
+actions](economy-menu-adapter-2026-10-16.md) now open all five 0.5.1 system-menu
+targets, with provider reacquisition, read-only dialogue preflight and no direct
+ledger/menu implementation access. Coordinate and commerce/quest contracts remain
+the next provider work.
+
 Progress 2026-10-15, UTC+08:00: Economy **0.5.1-SNAPSHOT** now implements the
 system-shop portion of ECO-01–03: optional `SystemShopApi`, version discovery,
 typed rejection, immutable queries and browser/exact-page/search/quantity menu

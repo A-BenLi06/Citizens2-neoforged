@@ -287,6 +287,7 @@ public final class ServiceBridgeRuntimeAudit {
             try { reject(shops, actor, target, Reason.NOT_FOUND); }
             finally { sql.executeUpdate("UPDATE system_shop SET enabled=1 WHERE shop_id='blocks'"); }
         }
+        auditConsumerMenus(runtime, actor, other);
         YuuniverseEconomyApi.clear(runtime);
         try {
             check(YuuniverseEconomyApi.current().isEmpty() && !shops.isAvailable()
@@ -294,6 +295,99 @@ public final class ServiceBridgeRuntimeAudit {
                     && rejected(() -> shops.open(actor.getUUID(), target), Reason.UNAVAILABLE),
                     "retired_shop_facade_cannot_query_or_open_menus");
         } finally { YuuniverseEconomyApi.publish(runtime); }
+    }
+
+    private static void auditConsumerMenus(EconomyRuntime runtime, AuditPlayer actor, AuditPlayer other) throws Exception {
+        var actions = new Actions(new ItemLibrary(), new Economy());
+        var definitions = List.of("browser;0", "shop;A shop", "page;blocks;资源.items.special", "search;资源;0",
+                "quantity;blocks;opaque-api-offer;buy");
+        long transactions = runtime.ledger().audit().transactionCount();
+        int otherMenus = other.openedMenus.size();
+        for (String definition : definitions) {
+            var before = actor.containerMenu;
+            String action = "economy_shop: " + definition;
+            check(actions.validateAll(List.of(action), actor, Component.empty()) && actor.containerMenu == before,
+                    "consumer_menu_readonly_preflight_" + definition);
+            check(actions.runAll(List.of(action), actor, Component.empty()) && actor.containerMenu != before,
+                    "consumer_dialogue_menu_opens_" + definition);
+        }
+        for (String definition : List.of("page;blocks;absent", "quantity;blocks;opaque-api-offer;sell",
+                "browser;-1", "search;资源;2147483648", "shop;")) {
+            var before = actor.containerMenu;
+            int paper = actor.getInventory().countItem(Items.PAPER);
+            check(!actions.runAll(List.of(payment(), "economy_shop: " + definition), actor, Component.empty())
+                    && actor.containerMenu == before && actor.getInventory().countItem(Items.PAPER) == paper,
+                    "invalid_consumer_target_preserves_menu_and_payment_" + definition);
+        }
+        var before = actor.containerMenu;
+        serverCommand(actor, "citizens economyshop page blocks \"资源.items.special\"");
+        check(actor.containerMenu != before && actor.openedMenus.getLast().equals("Audit exact page"),
+                "citizens_menu_command_opens_exact_provider_page");
+        before = actor.containerMenu;
+        serverCommand(actor, "citizens economyshop shop \"A shop\"");
+        check(actor.containerMenu != before && actor.openedMenus.getLast().equals("Audit A shop"),
+                "citizens_menu_command_preserves_quoted_shop_id");
+        check(other.openedMenus.size() == otherMenus && transactions == runtime.ledger().audit().transactionCount(),
+                "consumer_opening_is_actor_scoped_and_posts_no_money");
+        for (boolean packet : new boolean[] { false, true }) {
+            var npc = net.citizensnpcs.api.CitizensAPI.getNPCRegistry()
+                    .createNPC(net.minecraft.world.entity.EntityType.COW, "EconomyMenu" + packet);
+            try {
+                if (packet) npc.getOrAddTrait(net.citizensnpcs.trait.PacketNPC.class);
+                npc.spawn(new net.citizensnpcs.api.util.Location(actor.serverLevel(), 2, 80, 2));
+                var command = npc.getOrAddTrait(net.citizensnpcs.trait.CommandTrait.class);
+                command.addCommand(new net.citizensnpcs.trait.CommandTrait.NPCCommandBuilder(
+                        "citizens economyshop page blocks \"资源.items.special\"",
+                        net.citizensnpcs.trait.CommandTrait.Hand.RIGHT).player(true).cooldown(-1));
+                before = actor.containerMenu;
+                command.dispatch(actor, net.citizensnpcs.trait.CommandTrait.Hand.RIGHT);
+                net.citizensnpcs.Citizens.getInstance().getScheduler().tick();
+                check(actor.containerMenu != before && actor.openedMenus.getLast().equals("Audit exact page"),
+                        "native_npc_command_opens_economy_page_" + packet);
+            } finally { npc.destroy(); }
+        }
+        var legacyCalls = new java.util.concurrent.atomic.AtomicInteger();
+        var legacy = (net.yuuniverse.economy.api.EconomyApi) java.lang.reflect.Proxy.newProxyInstance(
+                runtime.getClass().getClassLoader(), new Class<?>[] { net.yuuniverse.economy.api.EconomyApi.class },
+                (proxy, method, arguments) -> {
+                    if (method.getName().equals("systemShops")) return java.util.Optional.empty();
+                    if (method.getName().equals("validateSystemShop") || method.getName().equals("openSystemShop")) {
+                        check(arguments[0].equals(actor.getUUID()) && arguments[1].equals("A shop"),
+                                "legacy_fallback_retains_actor_and_exact_id_" + method.getName());
+                        legacyCalls.incrementAndGet();
+                        return null;
+                    }
+                    try { return method.invoke(runtime, arguments); }
+                    catch (java.lang.reflect.InvocationTargetException failure) { throw failure.getCause(); }
+                });
+        YuuniverseEconomyApi.clear(runtime);
+        YuuniverseEconomyApi.publish(legacy);
+        try {
+            before = actor.containerMenu;
+            check(actions.runAll(List.of("economy_shop: shop;A shop"), actor, Component.empty())
+                    && legacyCalls.get() == 2, "consumer_legacy_named_shop_fallback_dispatch");
+            before = actor.containerMenu;
+            int paper = actor.getInventory().countItem(Items.PAPER);
+            check(!actions.runAll(List.of(payment(), "economy_shop: browser;0"), actor, Component.empty())
+                    && actor.containerMenu == before && actor.getInventory().countItem(Items.PAPER) == paper,
+                    "consumer_legacy_missing_capability_rejects_before_payment");
+        } finally { YuuniverseEconomyApi.clear(legacy); YuuniverseEconomyApi.publish(runtime); }
+        var target = net.citizensnpcs.util.EconomyShopMenus.parse(List.of("page", "blocks", "资源.items.special"));
+        YuuniverseEconomyApi.clear(runtime);
+        try {
+            before = actor.containerMenu;
+            int paper = actor.getInventory().countItem(Items.PAPER);
+            check(!actions.runAll(List.of(payment(), "economy_shop: page;blocks;资源.items.special"), actor, Component.empty())
+                    && actor.containerMenu == before && actor.getInventory().countItem(Items.PAPER) == paper,
+                    "consumer_unpublished_provider_rejects_before_payment");
+        } finally { YuuniverseEconomyApi.publish(runtime); }
+        before = actor.containerMenu;
+        net.citizensnpcs.util.EconomyShopMenus.present(actor, target, false);
+        check(actor.containerMenu != before, "consumer_reacquires_republished_provider");
+    }
+
+    private static void serverCommand(AuditPlayer actor, String line) {
+        actor.getServer().getCommands().performPrefixedCommand(actor.createCommandSourceStack(), line);
     }
 
     private static void reject(SystemShopApi api, AuditPlayer actor, ShopMenuRequest request, Reason reason) {

@@ -940,5 +940,7 @@
   "citizens.commands.waypoints.hpa.path": "HPA path from {0} to {1}: {2}",
   "citizens.commands.waypoints.hpa.complete": "HPA found a path of {0} blocks using {1} clusters and {2} abstraction levels in {3} ms. The complete path is in the server log.",
   "citizens.commands.waypoints.hpa.timeout": "HPA search exceeded the configured time limit and was cancelled.",
-  "citizens.notifications.npc-load-failed": "Could not load NPC {0}: {1}. Its saved definition has been retained."
+  "citizens.notifications.npc-load-failed": "Could not load NPC {0}: {1}. Its saved definition has been retained.",
+  "citizens.commands.economyshop.description": "Open an Economy shop menu.",
+  "citizens.commands.economyshop.failed": "Could not open that Economy menu. Check the provider and target fields."
 }

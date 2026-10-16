@@ -6,6 +6,13 @@ Current planning review: [October 12 progress, ordered work and plugin alternati
 
 This is the current command and acceptance checklist for Minecraft 1.21.1. The September 13 audit contains historical gaps; later follow-ups supersede those rows. See the [ecosystem scope](neoforge-ecosystem-replacements-2026-09-22.md) for provider ownership.
 
+2026-10-16, UTC+08:00: [command retirement](command-retirement-2026-10-16.md) and
+[admission/payment/permission lifetime](command-admission-2026-10-16.md) now cover
+the interrupted draft and the global-click, callback-recursion and scheduler
+rejection gaps. They supersede those pending clauses in older entries below.
+[Economy menu adaptation](economy-menu-adapter-2026-10-16.md) implements the
+system-menu consumer slice; coordinate and quest/crafting integrations remain open.
+
 - [Command payment and usage](command-payment-usage-2026-10-10.md) now records cooldowns, use counts and sequence positions after per-command payment succeeds. Rejected withdrawals preserve history, and a provider callback cannot charge the same command again while payment is in flight. Native ordinary/packet probes cover retry, rejected wrap/hand changes and rotation after highest-ID deletion; CYCLE now advances its shared position. Global click costs, delayed-command retirement, post-payment failures and physical-client/provider acceptance remain separate work.
 
 - [Behavior status mapping](behavior-status-mapping-2026-10-10.md) now executes the wrapped child before returning a supplied status. Tests cover child effects, state-dependent mappings and exception ordering; native ordinary/packet sequences verify effects under both success/failure substitutions. The existing unconditional mapping and separate single-use contracts remain intact; arbitrary provider/callback and physical-client combinations retain separate acceptance.

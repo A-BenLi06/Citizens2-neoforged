@@ -23,8 +23,6 @@ public final class Economy {
     private Method debit;
     private Method setBalance;
     private Method balance;
-    private Method validateSystemShop;
-    private Method openSystemShop;
     private Method resolveCurrency;
     private Method resolvePlayerAccount;
     private String currencyId;
@@ -33,7 +31,6 @@ public final class Economy {
     /** Looks for the economy once, at server start. */
     public void install() {
         api = null;
-        validateSystemShop = openSystemShop = null;
         resolveCurrency = resolvePlayerAccount = null;
         if (!ModList.get().isLoaded(MOD_ID)) {
             LOGGER.info("No economy mod present; dialogue \"eco\" actions will be reported rather than paid out.");
@@ -54,12 +51,6 @@ public final class Economy {
             setBalance = type.getMethod("setBalance", UUID.class, String.class, long.class, String.class, String.class);
             balance = type.getMethod("balance", UUID.class, String.class);
             try {
-                validateSystemShop = type.getMethod("validateSystemShop", UUID.class, String.class);
-                openSystemShop = type.getMethod("openSystemShop", UUID.class, String.class);
-            } catch (NoSuchMethodException olderProvider) {
-                LOGGER.info("The economy provider has no system-shop API; monetary actions remain available.");
-            }
-            try {
                 resolveCurrency = type.getMethod("resolveCurrency", String.class);
                 resolvePlayerAccount = type.getMethod("resolvePlayerAccount", String.class);
             } catch (NoSuchMethodException olderProvider) {
@@ -77,14 +68,8 @@ public final class Economy {
     }
 
     public void systemShop(String shopId, ServerPlayer player, boolean validate) {
-        if (api == null || validateSystemShop == null || openSystemShop == null)
-            throw new IllegalStateException("The Yuuniverse Economy system-shop API is unavailable");
-        try {
-            (validate ? validateSystemShop : openSystemShop).invoke(api, player.getUUID(), shopId);
-        } catch (ReflectiveOperationException failure) {
-            throw new IllegalStateException("System-shop action failed: " + shopId,
-                    failure.getCause() == null ? failure : failure.getCause());
-        }
+        net.citizensnpcs.util.EconomyShopMenus.present(player,
+                net.citizensnpcs.util.EconomyShopMenus.parse(List.of("shop", shopId)), validate);
     }
 
     /** Reads the default currency's id and scale, which is what whole-unit amounts have to be multiplied by. */

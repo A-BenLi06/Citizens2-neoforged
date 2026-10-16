@@ -29,6 +29,14 @@ Exact artifact sources, SHA-512/SHA-256 hashes and installation paths are record
 
 ## Ordered adaptation backlog
 
+Progress 2026-10-16, UTC+08:00: [system-menu consumer adaptation](economy-menu-adapter-2026-10-16.md)
+adds native NPC commands and dedicated dialogue preflight/execution for Economy's
+browser/shop/page/search/quantity menus. Provider acquisition is per request and
+retired providers cannot be reused. ADAPT-01/02 remain open for coordinate shops,
+their access policy and wider release acceptance. [Command retirement](command-retirement-2026-10-16.md)
+and [admission/payment/permission boundaries](command-admission-2026-10-16.md) are
+now implemented and validated separately.
+
 All rows are accepted goals. An unchecked row means adaptation remains to be implemented/validated, even when its provider is installed.
 
 | Order / ID | Owner and task | Completion gate |
