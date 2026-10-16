@@ -59,7 +59,7 @@ public final class CreationRuntimeAudit {
     private static MinecraftServer server;
     private static ServerLevel level;
     private static NPCRegistry registry, temporary;
-    private static Actor alice, cooldownPlayer;
+    private static Actor alice, cooldownPlayer, delayedPlayer;
     private static CommandSourceStack source;
     private static PermissionUtil.Attachment admin;
     private static PermissionUtil.Attachment types, limits;
@@ -90,13 +90,14 @@ public final class CreationRuntimeAudit {
             if (!level.isPositionEntityTicking(new BlockPos(4, -58, 4))) return;
             if (alice != null) alice.pump();
             if (cooldownPlayer != null) cooldownPlayer.pump();
+            if (delayedPlayer != null) delayedPlayer.pump();
             if (start < 0) {
                 start = server.getTickCount(); registry = CitizensAPI.getNPCRegistry(); temporary = CitizensAPI.getTemporaryNPCRegistry();
                 alice = actor("CreationAlice"); source = alice.player.createCommandSourceStack();
                 grant("citizens.npc.create", "citizens.npc.spawn", "citizens.npc.undo");
                 types = grant("citizens.npc.create.*"); limits = grant("citizens.admin.avoid-limits");
                 admin = grant("citizens.npc.admin");
-                basic(); items(); lifetimes(); vetoAndHistory(); templatesAndPermissions(); commandRegistryTargets(); behaviorSnapshotMemory(); behaviorRootLifecycle(); repeatedBehaviorTicks(); scalarBehaviorTicks(); conditionalContainerTicks(); retryBehaviorTicks(); timerBehaviorTicks(); globalCommandCooldown(); mappedBehaviorTicks(); commandPaymentUsage();
+                basic(); items(); lifetimes(); vetoAndHistory(); templatesAndPermissions(); commandRegistryTargets(); behaviorSnapshotMemory(); behaviorRootLifecycle(); repeatedBehaviorTicks(); scalarBehaviorTicks(); conditionalContainerTicks(); retryBehaviorTicks(); timerBehaviorTicks(); globalCommandCooldown(); mappedBehaviorTicks(); commandPaymentUsage(); commandRetirement();
             }
             List<Runnable> due = checks.remove(server.getTickCount() - start);
             if (due != null) due.forEach(Runnable::run);
@@ -838,6 +839,121 @@ public final class CreationRuntimeAudit {
         }
     }
 
+    private static void commandRetirement() {
+        delayedPlayer = actor("DelayedCharlie");
+        delayedPlayer.player.setExperienceLevels(100);
+        for (boolean packet : new boolean[] { false, true }) {
+            for (String operation : List.of("remove_command", "replace_command", "clear", "remove_trait",
+                    "replace_trait", "despawn", "respawn", "destroy", "replace_npc", "unchanged", "unrelated")) {
+                var executions = new java.util.concurrent.atomic.AtomicInteger();
+                String reward = "creation_retired_" + operation + "_" + packet;
+                server.getCommands().getDispatcher().register(net.minecraft.commands.Commands.literal(reward)
+                        .executes(ctx -> executions.incrementAndGet()));
+                NPC target = registry.createNPC(EntityType.COW, "Delayed" + operation + packet);
+                if (packet) target.getOrAddTrait(PacketNPC.class);
+                check(target.spawn(new Location(level, 22, -58, 7)), "delayed_command_spawn_" + operation + "_" + packet);
+                var commands = target.getOrAddTrait(CommandTrait.class);
+                int id = commands.addCommand(new CommandTrait.NPCCommandBuilder(reward, CommandTrait.Hand.RIGHT)
+                        .delay(java.time.Duration.ofMillis(300)).cooldown(-1).experienceCost(2).n(1));
+                int unrelated = commands.addCommand(new CommandTrait.NPCCommandBuilder(reward + " unused", CommandTrait.Hand.LEFT));
+                commands.dispatch(delayedPlayer.player, CommandTrait.Hand.RIGHT);
+                NPC[] replacement = { null };
+                boolean runs = operation.equals("unchanged") || operation.equals("unrelated");
+                atTick(2, () -> {
+                    switch (operation) {
+                        case "remove_command" -> commands.removeCommandById(id);
+                        case "replace_command" -> {
+                            commands.removeCommandById(id);
+                            check(commands.addCommand(new CommandTrait.NPCCommandBuilder(reward, CommandTrait.Hand.RIGHT)
+                                    .cooldown(-1)) == id, "replacement_reuses_command_id_" + packet);
+                        }
+                        case "clear" -> commands.clear();
+                        case "remove_trait" -> target.removeTrait(CommandTrait.class);
+                        case "replace_trait" -> target.addTrait(new CommandTrait());
+                        case "despawn" -> check(target.despawn(), "delayed_command_despawn_" + packet);
+                        case "respawn" -> {
+                            check(target.despawn() && target.spawn(new Location(level, 22, -58, 7)),
+                                    "delayed_command_respawn_" + packet);
+                        }
+                        case "destroy" -> target.destroy();
+                        case "replace_npc" -> {
+                            target.destroy();
+                            replacement[0] = registry.createNPC(EntityType.COW, target.getUniqueId(), target.getId(), "DelayedReplacement");
+                            if (packet) replacement[0].getOrAddTrait(PacketNPC.class);
+                            check(replacement[0].spawn(new Location(level, 22, -58, 7)), "delayed_replacement_spawn_" + packet);
+                        }
+                        case "unrelated" -> commands.removeCommandById(unrelated);
+                        default -> { }
+                    }
+                });
+                atTick(10, () -> {
+                    check(executions.get() == (runs ? 1 : 0), "delayed_command_retirement_" + operation + "_" + packet);
+                    check(commandState(commands).keyExists("cooldowns." + delayedPlayer.player.getUUID()) == runs,
+                            "delayed_command_usage_" + operation + "_" + packet);
+                    if (operation.equals("replace_command") || operation.equals("respawn")) {
+                        commands.dispatch(delayedPlayer.player, CommandTrait.Hand.RIGHT);
+                    }
+                });
+                atTick(20, () -> {
+                    if (operation.equals("replace_command") || operation.equals("respawn"))
+                        check(executions.get() == 1, "fresh_delayed_dispatch_after_retirement_" + operation + "_" + packet);
+                    if (exists(target)) target.destroy();
+                    if (replacement[0] != null) replacement[0].destroy();
+                });
+            }
+            for (String operation : List.of("remove_command", "remove_trait", "respawn", "destroy")) {
+                var executions = new java.util.concurrent.atomic.AtomicInteger();
+                String reward = "creation_queued_retired_" + operation + "_" + packet;
+                server.getCommands().getDispatcher().register(net.minecraft.commands.Commands.literal(reward)
+                        .executes(ctx -> executions.incrementAndGet()));
+                NPC target = registry.createNPC(EntityType.COW, "Queued" + operation + packet);
+                if (packet) target.getOrAddTrait(PacketNPC.class);
+                check(target.spawn(new Location(level, 22, -58, 8)), "queued_command_spawn_" + operation + "_" + packet);
+                var commands = target.getOrAddTrait(CommandTrait.class);
+                int id = commands.addCommand(new CommandTrait.NPCCommandBuilder(reward, CommandTrait.Hand.RIGHT).cooldown(-1));
+                commands.dispatch(delayedPlayer.player, CommandTrait.Hand.RIGHT);
+                switch (operation) {
+                    case "remove_command" -> commands.removeCommandById(id);
+                    case "remove_trait" -> target.removeTrait(CommandTrait.class);
+                    case "respawn" -> check(target.despawn() && target.spawn(new Location(level, 22, -58, 8)),
+                            "queued_command_respawn_" + packet);
+                    case "destroy" -> target.destroy();
+                }
+                atTick(11, () -> {
+                    check(executions.get() == 0, "queued_command_retirement_" + operation + "_" + packet);
+                    if (exists(target)) target.destroy();
+                });
+            }
+            for (boolean global : new boolean[] { false, true }) {
+                var executions = new java.util.concurrent.atomic.AtomicInteger();
+                String reward = "creation_payment_retired_" + global + "_" + packet;
+                server.getCommands().getDispatcher().register(net.minecraft.commands.Commands.literal(reward)
+                        .executes(ctx -> executions.incrementAndGet()));
+                NPC target = registry.createNPC(EntityType.COW, "PaymentRetired" + global + packet);
+                if (packet) target.getOrAddTrait(PacketNPC.class);
+                check(target.spawn(new Location(level, 22, -58, 9)), "payment_retirement_spawn_" + global + "_" + packet);
+                var commands = target.getOrAddTrait(CommandTrait.class);
+                commands.addCommand(new CommandTrait.NPCCommandBuilder(reward, CommandTrait.Hand.RIGHT)
+                        .cost(global ? -1 : 5).n(1));
+                if (global) commands.setCost(5);
+                var economy = new CommandPaymentEconomy(); economy.accepting = true;
+                economy.beforeWithdrawal = () -> target.removeTrait(CommandTrait.class);
+                withEconomy(economy, () -> commands.dispatch(delayedPlayer.player, CommandTrait.Hand.RIGHT));
+                withEconomy(economy, () -> commands.dispatch(delayedPlayer.player, CommandTrait.Hand.RIGHT));
+                check(economy.withdrawals == 1 && economy.getBalance(delayedPlayer.player) == 100,
+                        "payment_retirement_refunds_and_rejects_detached_trait_" + global + "_" + packet);
+                check(!commandState(commands).keyExists("cooldowns." + delayedPlayer.player.getUUID()),
+                        "payment_retirement_keeps_usage_unpublished_" + global + "_" + packet);
+                atTick(3, () -> {
+                    check(executions.get() == 0, "payment_retirement_cannot_execute_" + global + "_" + packet);
+                    target.destroy();
+                });
+            }
+        }
+        atTick(10, () -> check(delayedPlayer.player.experienceLevel == 92, "retired_delayed_commands_do_not_charge_experience"));
+        atTick(20, () -> check(delayedPlayer.player.experienceLevel == 88, "fresh_delayed_commands_charge_after_respawn"));
+    }
+
     private static void commandPaymentUsage() {
         for (boolean packet : new boolean[] { false, true }) {
             var rewards = new java.util.concurrent.atomic.AtomicInteger();
@@ -925,9 +1041,15 @@ public final class CreationRuntimeAudit {
                 order.dispatch(mode == CommandTrait.ExecutionMode.CYCLE ? cooldownPlayer.player : alice.player, CommandTrait.Hand.RIGHT);
                 order.dispatch(cooldownPlayer.player, CommandTrait.Hand.RIGHT);
                 if (mode == CommandTrait.ExecutionMode.CYCLE) order.dispatch(alice.player, CommandTrait.Hand.RIGHT);
-                order.removeCommandById(last);
-                order.dispatch(alice.player, CommandTrait.Hand.RIGHT);
                 atTick(3, () -> {
+                    List<String> expected = mode == CommandTrait.ExecutionMode.CYCLE
+                            ? List.of("first", "second", "first", "second")
+                            : List.of("first", "second", "first");
+                    check(executions.equals(expected), "command_order_rotates_before_deletion_" + mode + "_" + packet);
+                    order.removeCommandById(last);
+                    order.dispatch(alice.player, CommandTrait.Hand.RIGHT);
+                });
+                atTick(6, () -> {
                     List<String> expected = mode == CommandTrait.ExecutionMode.CYCLE
                             ? List.of("first", "second", "first", "second", "first")
                             : List.of("first", "second", "first", "first");
@@ -1283,7 +1405,7 @@ public final class CreationRuntimeAudit {
             for (String name : registries) if (CitizensAPI.getNamedNPCRegistry(name) != null) CitizensAPI.removeNamedNPCRegistry(name);
             blocks.forEach((pos, state) -> level.setBlock(pos, state, 3));
             grants.forEach(PermissionUtil.Attachment::remove);
-            for (Actor actor : new Actor[] { alice, cooldownPlayer }) {
+            for (Actor actor : new Actor[] { alice, cooldownPlayer, delayedPlayer }) {
                 if (actor != null) { server.getPlayerList().remove(actor.player); actor.channel.finishAndReleaseAll(); }
             }
             if (forced) level.setChunkForced(0, 0, false);

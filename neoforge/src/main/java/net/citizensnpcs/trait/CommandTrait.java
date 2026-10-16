@@ -15,6 +15,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
+import java.util.function.BooleanSupplier;
 import java.util.function.Function;
 
 import com.google.common.io.BaseEncoding;
@@ -81,6 +82,7 @@ public class CommandTrait extends Trait {
     @Persist
     private final List<ItemStack> itemRequirements = new ArrayList<>();
     private int lastUsedId = -1;
+    private long lifecycleRevision;
     @Persist(keyType = UUID.class, reify = true, value = "cooldowns")
     private final Map<UUID, PlayerNPCCommand> playerTracking = new HashMap<>();
     @Persist("persistSequence")
@@ -287,11 +289,14 @@ public class CommandTrait extends Trait {
     }
 
     public void dispatch(ServerPlayer player, Hand handIn) {
+        long revision = lifecycleRevision;
+        if (!isCurrent(revision))
+            return;
         Hand hand = player.isShiftKeyDown()
                 ? handIn == Hand.LEFT ? Hand.SHIFT_LEFT : Hand.SHIFT_RIGHT
                 : handIn;
         NPCCommandDispatchEvent event = new NPCCommandDispatchEvent(npc, player).callEvent();
-        if (event.isCanceled())
+        if (event.isCanceled() || !isCurrent(revision))
             return;
         if (commands.values().stream().anyMatch(command -> (command.hand == hand || command.hand == Hand.BOTH)
                 && StoredItemList.hasUnavailable(command.itemCost))) {
@@ -299,16 +304,22 @@ public class CommandTrait extends Trait {
             return;
         }
         Transaction global = chargeGlobalCommandCosts(player, hand);
-        if (!global.isPossible())
+        if (!global.isPossible() || !isCurrent(revision))
             return;
         if (!runCharge(global))
             return;
+        if (!isCurrent(revision)) {
+            refundCharge(global);
+            return;
+        }
 
         Runnable task = new Runnable() {
             boolean failedCharge;
 
             @Override
             public void run() {
+                if (!isCurrent(revision))
+                    return;
                 List<NPCCommand> commandList = new ArrayList<>();
                 for (NPCCommand command : commands.values()) {
                     if (command.hand == hand || command.hand == Hand.BOTH) {
@@ -346,8 +357,9 @@ public class CommandTrait extends Trait {
             }
 
             private void runCommand(ServerPlayer player, Hand hand, NPCCommand command) {
+                BooleanSupplier current = () -> isCurrent(revision) && commands.get(command.id) == command;
                 Runnable runnable = () -> {
-                    if (failedCharge)
+                    if (failedCharge || !current.getAsBoolean())
                         return;
                     String commandKey = command.getEncodedKey();
                     // Payment providers can call back into dispatch before usage is committed.
@@ -366,9 +378,15 @@ public class CommandTrait extends Trait {
                         }
                         if (info != null && !info.canUse(CommandTrait.this, player, command))
                             return;
+                        if (!current.getAsBoolean())
+                            return;
 
                         if (!runCharge(charge)) {
                             failedCharge = true;
+                            return;
+                        }
+                        if (!current.getAsBoolean()) {
+                            refundCharge(charge);
                             return;
                         }
                         if (info != null) {
@@ -381,7 +399,7 @@ public class CommandTrait extends Trait {
                         if (!temporaryPermissions.isEmpty()) {
                             PermissionUtil.Attachment attachment = PermissionUtil.grantTemporary(player,
                                     temporaryPermissions);
-                            command.run(npc, player);
+                            command.run(npc, player, current);
                             if (temporaryPermissionsDuration <= 0) {
                                 attachment.remove();
                             } else {
@@ -390,7 +408,7 @@ public class CommandTrait extends Trait {
                             }
                             return;
                         }
-                        command.run(npc, player);
+                        command.run(npc, player, current);
                     } finally {
                         executingCommands.remove(commandKey);
                     }
@@ -407,6 +425,30 @@ public class CommandTrait extends Trait {
 
     public double getCost() {
         return cost;
+    }
+
+    private boolean isCurrent(long revision) {
+        return lifecycleRevision == revision && npc != null && npc.getTraitNullable(CommandTrait.class) == this
+                && npc.getOwningRegistry() != null && npc.getOwningRegistry().getById(npc.getId()) == npc
+                && npc.getOwningRegistry().getByUniqueId(npc.getUniqueId()) == npc;
+    }
+
+    @Override
+    public void onDespawn() {
+        lifecycleRevision++;
+    }
+
+    @Override
+    public void onRemove() {
+        lifecycleRevision++;
+    }
+
+    private static void refundCharge(Transaction charge) {
+        try {
+            charge.rollback();
+        } catch (RuntimeException failure) {
+            org.slf4j.LoggerFactory.getLogger(CommandTrait.class).error("NPC command payment rollback failed", failure);
+        }
     }
 
     private static boolean runCharge(Transaction charge) {
@@ -665,10 +707,14 @@ public class CommandTrait extends Trait {
         }
 
         public void run(NPC npc, ServerPlayer clicker) {
+            run(npc, clicker, () -> true);
+        }
+
+        public void run(NPC npc, ServerPlayer clicker, BooleanSupplier current) {
             if (this.npc && npc.getEntity() instanceof ServerPlayer) {
                 clicker = (ServerPlayer) npc.getEntity();
             }
-            Util.runCommand(npc, clicker, command, op, player);
+            Util.scheduleCommand(npc, clicker, command, op, player, current);
         }
     }
 

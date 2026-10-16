@@ -2442,3 +2442,9 @@ work. Production and the prepared v0.5.0 upgrade remain unchanged. Preserved and
 excluded the pre-existing CommandTrait, Util and CreationRuntimeAudit edits and
 the unrelated untracked files; no Citizens gameplay or dialogue product changes
 are part of this batch.
+
+## 2026-10-16T10:27:49.0699213+08:00 (UTC+08:00) — Complete interrupted command retirement
+
+Recovered the pending CommandTrait/Util/creation-fixture draft. Delayed and queued commands now check exact command, trait, NPC and registry ownership; despawn/removal increments the lifecycle revision so respawn or same-ID/UUID replacement cannot revive old work. Payment callbacks that retire ownership refund completed charges before publishing usage. Restored the public NPCCommand.run(NPC, ServerPlayer) overload for extension compatibility. Updated the fixture ordering assertions and documented semantics in docs/command-retirement-2026-10-16.md.
+
+Validation: 704 native creation checks pass on both NeoForge 21.1.233 and 21.1.248. A final default-version clean test/build passes all 725 tests, with no failures/errors/skips. Separate Citizens/Interactions JARs and Citizens sources contain no audit probes; Citizens contains no Interactions classes and Interactions contains no Citizens classes. Logs, archive hashes and counts are recorded in artifacts/command-retirement-validation-2026-10-16.json. No production files changed. Global click costs and temporary-permission/scheduling boundaries remain the next correctness batch.

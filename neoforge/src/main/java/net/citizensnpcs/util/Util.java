@@ -4,6 +4,7 @@ import java.text.DecimalFormat;
 import java.util.Locale;
 import java.util.Random;
 import java.util.UUID;
+import java.util.function.BooleanSupplier;
 
 import com.google.common.base.Joiner;
 import com.google.common.base.Splitter;
@@ -216,6 +217,12 @@ public class Util {
     /** Queue the same command dispatch, returning its cancellation handle (or null without a server). */
     public static net.citizensnpcs.api.util.schedulers.SchedulerTask scheduleCommand(NPC npc, ServerPlayer clicker,
             String command, boolean op, boolean asPlayer) {
+        return scheduleCommand(npc, clicker, command, op, asPlayer, () -> true);
+    }
+
+    /** Queue a command whose owner must still be valid when the native dispatcher runs it. */
+    public static net.citizensnpcs.api.util.schedulers.SchedulerTask scheduleCommand(NPC npc, ServerPlayer clicker,
+            String command, boolean op, boolean asPlayer, BooleanSupplier current) {
         var invocation = net.citizensnpcs.api.util.NPCCommandFormat.prepareInvocation(command);
         String cmd = invocation.command();
         MinecraftServer server = clicker != null ? clicker.getServer() : ServerLifecycleHooks.getCurrentServer();
@@ -233,6 +240,8 @@ public class Util {
         CommandSourceStack source = op ? base.withPermission(4) : base;
         return CitizensAPI.getScheduler().runTask(() -> {
             try {
+                if (!current.getAsBoolean())
+                    return;
                 net.citizensnpcs.api.command.NPCCommandTarget.dispatch(invocation.implicitTarget() ? npc : null,
                         interpolated, () -> server.getCommands().performPrefixedCommand(source, interpolated));
             } catch (Throwable t) {
