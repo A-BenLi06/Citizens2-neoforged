@@ -224,11 +224,31 @@ public final class ReloadRuntimeAudit {
             throw new IllegalStateException("expected prompt cleanup failure");
         }));
         var oldShop = plugin.getShops().addNamedShop("reload-cleanup-shop");
-        var shopCloseCalls = net.citizensnpcs.trait.shop.ReloadShopProbe.failOnClose(oldShop);
+        var previousTemplates = plugin.getTemplateRegistry();
+        var previousSkin = net.citizensnpcs.npc.skin.Skin.get("");
+        boolean[] observedPublication = new boolean[4];
+        var shopCloseCalls = net.citizensnpcs.trait.shop.ReloadShopProbe.failOnClose(oldShop, () -> {
+            observedPublication[0] = plugin.getNPCRegistry() != before
+                    && plugin.getShops().getGlobalShop("reload-cleanup-shop") != oldShop;
+            observedPublication[1] = plugin.getTemplateRegistry() != previousTemplates
+                    && net.citizensnpcs.npc.skin.Skin.get("") != previousSkin
+                    && Setting.DEFAULT_NPC_LIMIT.asInt() == 83;
+            int beforeEvents = templateCalls;
+            NeoForge.EVENT_BUS.post(new TemplateProbeEvent(npc));
+            NeoForge.EVENT_BUS.post(new TemplateProbeEvent(plugin.getNPCRegistry().getById(world.getId())));
+            observedPublication[2] = templateCalls == beforeEvents + 1;
+            try { plugin.reload(); }
+            catch (IllegalStateException expected) { observedPublication[3] = true; }
+            catch (NPCLoadException unexpected) { throw new AssertionError(unexpected); }
+        });
         plugin.getShops().storeShops();
         plugin.getShops().saveToDiskImmediate();
         writeLimit(83);
         NPCLoadException failure = rejectedReload();
+        check(observedPublication[0], "shop_retirement_observes_new_shops_and_registry");
+        check(observedPublication[1], "shop_retirement_observes_new_templates_settings_and_skin");
+        check(observedPublication[2], "shop_retirement_observes_transferred_template_ownership");
+        check(observedPublication[3], "shop_retirement_rejects_reentrant_reload");
         check(Setting.DEFAULT_NPC_LIMIT.asInt() == 83, "published_cleanup_failure_keeps_new_settings");
         check(shopCloseCalls.get() == 1 && !oldShop.isActive()
                 && plugin.getShops().getGlobalShop("reload-cleanup-shop") != oldShop

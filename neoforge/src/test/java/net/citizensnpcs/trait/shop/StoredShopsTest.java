@@ -103,6 +103,58 @@ class StoredShopsTest {
     }
 
     @Test
+    void retirementCallbacksObservePublishedMapsAndCompanionState(@TempDir Path directory) {
+        YamlStorage storage = new YamlStorage(directory.resolve("shops.yml").toFile());
+        StoredShops shops = new StoredShops(storage);
+        assertTrue(shops.loadFromDisk());
+        NPCShop old = shops.addNamedShop("old");
+        boolean[] companion = {false};
+        old.trackSession(companion, state -> {
+            assertTrue(state[0]);
+            assertNull(shops.getGlobalShop("old"));
+            assertNotNull(shops.getGlobalShop("new"));
+            assertThrows(IllegalStateException.class, shops::load);
+        });
+        storage.getKey("").setRaw("global", Map.of("new", "new"));
+        var ready = shops.prepareLoad();
+        ready.publish(() -> companion[0] = true);
+        assertTrue(ready.isPublished());
+        assertFalse(old.isActive());
+    }
+
+    @Test
+    void companionFailureStillRetiresSessionsAndPreservesBothErrors(@TempDir Path directory) {
+        StoredShops shops = new StoredShops(new YamlStorage(directory.resolve("shops.yml").toFile()));
+        assertTrue(shops.loadFromDisk());
+        NPCShop old = shops.addNamedShop("old");
+        var companionFailure = new IllegalStateException("companion publication");
+        var closeFailure = new IllegalArgumentException("session closure");
+        old.trackSession(old, ignored -> { throw closeFailure; });
+        var ready = shops.prepareLoad();
+        var thrown = assertThrows(IllegalStateException.class,
+                () -> ready.publish(() -> { throw companionFailure; }));
+        assertSame(companionFailure, thrown.getCause());
+        assertSame(closeFailure, companionFailure.getSuppressed()[0]);
+        assertTrue(ready.isPublished());
+        assertFalse(old.isActive());
+        assertDoesNotThrow(() -> shops.addNamedShop("usable"));
+        assertThrows(IllegalStateException.class, ready::publish);
+    }
+
+    @Test
+    void stalePublicationNeverCallsCompanionOrRetiresCurrentSessions(@TempDir Path directory) {
+        StoredShops shops = new StoredShops(new YamlStorage(directory.resolve("shops.yml").toFile()));
+        assertTrue(shops.loadFromDisk());
+        NPCShop old = shops.addNamedShop("old");
+        var ready = shops.prepareLoad();
+        shops.storeShops();
+        assertThrows(IllegalStateException.class, () -> ready.publish(() -> fail("stale companion")));
+        assertSame(old, shops.getGlobalShop("old"));
+        assertTrue(old.isActive());
+        assertFalse(ready.isPublished());
+    }
+
+    @Test
     void tradingShopCannotBePreparedOrPublishedAway(@TempDir Path directory) {
         YamlStorage storage = new YamlStorage(directory.resolve("shops.yml").toFile());
         StoredShops shops = new StoredShops(storage);

@@ -139,6 +139,15 @@ public class StoredShops {
         public boolean isPublished() { return published; }
 
         public void publish() {
+            publish(() -> {});
+        }
+
+        /**
+         * Publish the maps and companion runtime state before invoking any old-session callbacks.
+         * A companion failure is post-publication: every previous shop is still retired and failures are retained.
+         */
+        public void publish(Runnable publishRuntime) {
+            java.util.Objects.requireNonNull(publishRuntime, "Runtime publication");
             requireOpen();
             requireSource();
             if (generation != sourceGeneration) throw new IllegalStateException("Shop source changed after preparation");
@@ -147,6 +156,12 @@ public class StoredShops {
             publishing = true;
             Throwable failure = null;
             try {
+                globalShops = candidate.globalShops;
+                npcShops = candidate.npcShops;
+                sourceGeneration++;
+                published = true;
+                try { publishRuntime.run(); }
+                catch (RuntimeException | Error ex) { failure = ex; }
                 for (NPCShop shop : previous) {
                     try { shop.retire(); }
                     catch (RuntimeException | Error ex) {
@@ -154,12 +169,9 @@ public class StoredShops {
                         else if (failure != ex) failure.addSuppressed(ex);
                     }
                 }
-                globalShops = candidate.globalShops;
-                npcShops = candidate.npcShops;
-                sourceGeneration++;
-                published = true;
             } finally { publishing = false; }
-            if (failure != null) throw new IllegalStateException("Shops restored, but previous sessions could not all close", failure);
+            if (failure != null) throw new IllegalStateException(
+                    "Shops restored, but runtime publication or previous-session cleanup failed", failure);
         }
     }
 

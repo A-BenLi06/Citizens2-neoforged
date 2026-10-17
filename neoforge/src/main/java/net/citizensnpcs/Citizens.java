@@ -613,23 +613,31 @@ public class Citizens implements CitizensPlugin {
                 // A provider may fail after constructing some NPCs. Keep those objects isolated until loading succeeds.
                 candidate.loadFromStore();
             }
+            CitizensNPCRegistry previous = candidate == null ? null : npcRegistry;
+            CitizensNPCRegistry nextRegistry = candidate;
+            TemplateRegistry nextTemplates = preparedTemplates;
+            Skin.CacheReload nextSkins = skinReload;
+            var nextSubscriptions = templateSubscriptions;
+            // No provider/session callbacks run between these assignments. Shop retirement must see
+            // the complete published state, including the registry's template-event ownership.
+            Runnable publishRuntime = () -> {
+                nextSkins.commit();
+                templateRegistry = nextTemplates;
+                if (nextRegistry != null) {
+                    npcRegistry = nextRegistry;
+                    nextSubscriptions.commit();
+                    if (eventListen != null) eventListen.clearRespawnQueue(previous);
+                }
+            };
             Throwable cleanupFailure = null;
             if (preparedShops != null) {
-                try { preparedShops.publish(); }
+                try { preparedShops.publish(publishRuntime); }
                 catch (RuntimeException | Error failure) {
                     if (!preparedShops.isPublished()) throw failure;
                     cleanupFailure = failure;
                 }
-            }
+            } else publishRuntime.run();
             publicationStarted = true;
-            skinReload.commit();
-            templateRegistry = preparedTemplates;
-            CitizensNPCRegistry previous = candidate == null ? null : npcRegistry;
-            if (candidate != null) {
-                npcRegistry = candidate;
-                templateSubscriptions.commit();
-                if (eventListen != null) eventListen.clearRespawnQueue(previous);
-            }
             for (Runnable cleanup : java.util.List.<Runnable>of(Editor::leaveAll, ChatPrompts::abandonAll)) {
                 try { cleanup.run(); }
                 catch (RuntimeException | Error failure) {

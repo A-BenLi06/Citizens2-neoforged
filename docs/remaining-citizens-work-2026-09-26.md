@@ -1,5 +1,12 @@
 # Remaining Citizens work
 
+2026-10-18, UTC+08:00: [coordinated reload publication](reload-publication-2026-10-18.md)
+now publishes all built-in runtime participants before previous-session callbacks.
+The native regression passes 61 checks on both supported NeoForge test targets.
+The [coordinate Economy adapter](economy-coordinate-adapter-2026-10-16.md) is also
+implemented; commerce, quests/crafting, migration and physical-client gates remain
+under the adopted backlog below.
+
 Adopted integration goals: [October 13 selected stack, installation and acceptance gates](ecosystem-adaptation-goals-2026-10-13.md), including [Economy GUI API demands and mod-crafting task contracts](yuuniverse-economy-gui-api-requirements-2026-10-12.md). These extend the provider adaptation plan; the core correctness work below remains open.
 
 Current planning review: [October 12 progress, ordered work and plugin alternatives](citizens-next-work-2026-10-12.md). It records the uncommitted delayed-command draft, artifact differences and refreshed provider inventory; the detailed acceptance history below remains applicable.

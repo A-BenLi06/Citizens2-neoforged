@@ -47,7 +47,11 @@ subscription copying during candidate loading, rollback on failure, publication 
 cleanup failure after publication. Default-store replacement exercises both rejection
 and successful subscription transfer as well.
 
-Expected result: `[RELOADAUDIT] COMPLETE 57 checks` and `BUILD SUCCESSFUL`.
+Shop retirement callbacks also verify that replacement shop maps, registry,
+templates, settings, skin cache and template-event ownership are all visible before
+closure, including when closure throws. Recursive reload remains rejected.
+
+Expected result: `[RELOADAUDIT] COMPLETE 61 checks` and `BUILD SUCCESSFUL`.
 The original implementation at `deb5021` fails `failed_reload_preserves_identity`.
 The fixture does not accept shutdown, full configuration/shop transactionality, or arbitrary
 external provider side effects as verified.
