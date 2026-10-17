@@ -4,7 +4,9 @@
 now publishes all built-in runtime participants before previous-session callbacks.
 The native regression passes 61 checks on both supported NeoForge test targets.
 The [coordinate Economy adapter](economy-coordinate-adapter-2026-10-16.md) is also
-implemented; commerce, quests/crafting, migration and physical-client gates remain
+implemented. [Economy commerce recovery](economy-commerce-recovery-2026-10-18.md)
+closes the recovered caught-failure duplication/quantity defects; public commerce,
+quests/crafting, migration and physical-client gates remain
 under the adopted backlog below.
 
 Adopted integration goals: [October 13 selected stack, installation and acceptance gates](ecosystem-adaptation-goals-2026-10-13.md), including [Economy GUI API demands and mod-crafting task contracts](yuuniverse-economy-gui-api-requirements-2026-10-12.md). These extend the provider adaptation plan; the core correctness work below remains open.

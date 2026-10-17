@@ -29,6 +29,13 @@ Exact artifact sources, SHA-512/SHA-256 hashes and installation paths are record
 
 ## Ordered adaptation backlog
 
+Progress 2026-10-18, UTC+08:00: [Economy commerce recovery](economy-commerce-recovery-2026-10-18.md)
+completes the interrupted 0.5.3 caught-failure fix, including exact stack counts,
+committed receipts, recovery records and full-inventory claim retries. It passes
+24 native commerce checks and 121 actual-provider consumer checks. ADAPT-03
+remains open for public quotes/execution, full reconciliation and crash durability;
+quest/crafting and the other adopted integrations remain open as well.
+
 Progress 2026-10-16, UTC+08:00: [system-menu consumer adaptation](economy-menu-adapter-2026-10-16.md)
 adds native NPC commands and dedicated dialogue preflight/execution for Economy's
 browser/shop/page/search/quantity menus. Provider acquisition is per request and
