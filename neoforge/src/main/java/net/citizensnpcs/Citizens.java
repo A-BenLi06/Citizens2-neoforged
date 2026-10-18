@@ -115,6 +115,7 @@ public class Citizens implements CitizensPlugin {
     private TemplateRegistry templateRegistry;
 
     public Citizens(IEventBus modEventBus, ModContainer modContainer) {
+        net.citizensnpcs.util.CreateMachineEvidence.register(modEventBus);
         instance = this;
         version = modContainer.getModInfo().getVersion().toString();
         dataFolder = FMLPaths.CONFIGDIR.get().resolve(MOD_ID).toFile();

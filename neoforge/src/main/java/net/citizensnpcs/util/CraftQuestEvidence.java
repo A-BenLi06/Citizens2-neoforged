@@ -100,7 +100,9 @@ public final class CraftQuestEvidence implements AutoCloseable {
         var target = FtbQuestTasks.evidenceTarget(player, taskId);
         if (!target.visible() || target.state().maximum() <= 0) throw new IllegalArgumentException("Task is unavailable");
         var recipe = CraftingRecipes.find(server, recipeId).orElseThrow(() -> new IllegalArgumentException("Recipe is unavailable"));
-        if (!recipe.tableEvidenceSupported()) throw new IllegalArgumentException("Recipe evidence is unsupported");
+        if (!recipe.tableEvidenceSupported() && (recipe.processing() == null
+                || recipe.processing().process() != CreateProcessingRecipes.Process.MILLING || recipe.output().isEmpty()))
+            throw new IllegalArgumentException("Recipe evidence is unsupported");
         Binding previous = bindings.get(target.state().taskId());
         if (previous != null) {
             if (!previous.recipeId().equals(recipeId.toString()) || !previous.recipeRevision().equals(recipe.revision())
@@ -131,11 +133,41 @@ public final class CraftQuestEvidence implements AutoCloseable {
     @SubscribeEvent(priority = EventPriority.HIGHEST)
     public void observed(CraftingResultEvent event) {
         if (closed || event.getPlayer().getServer() != server) return;
+        var observation = event.getObservation();
+        admit(event.getPlayer(), observation.id(), observation.recipe(), observation.output().getCount(),
+                CraftingEvidence.encode(observation, event.getPlayer().registryAccess()));
+    }
+
+    @SubscribeEvent(priority = EventPriority.HIGHEST)
+    public void machineObserved(net.citizensnpcs.api.event.MachineResultEvent event) {
+        if (closed || event.getBeneficiary().getServer() != server) return;
+        var observation = event.getObservation();
+        long units = 0;
+        for (var output : observation.rolledOutputs())
+            if (net.minecraft.world.item.ItemStack.isSameItemSameComponents(output, observation.recipe().output()))
+                units = Math.addExact(units, output.getCount());
+        if (units == 0) return;
+        admit(event.getBeneficiary(), observation.id(), observation.recipe(), units,
+                CreateMachineEvidence.encode(observation, event.getBeneficiary().registryAccess()));
+    }
+
+    private void admit(net.minecraft.server.level.ServerPlayer actor, UUID observationId, CraftingRecipes.Snapshot recipe,
+            long units, String evidence) {
         for (Binding binding : List.copyOf(bindings.values())) {
-            var observation = event.getObservation();
-            if (!binding.recipeId().equals(observation.recipe().id().toString()) || !binding.recipeRevision().equals(observation.recipe().revision())) continue;
+            if (!binding.recipeId().equals(recipe.id().toString()) || !binding.recipeRevision().equals(recipe.revision())) continue;
             try {
-                active(); var target = FtbQuestTasks.evidenceTarget(event.getPlayer(), binding.taskId());
+                // Observation identity survives team and native repeat-generation changes. Replaying an old
+                // provider notification must never admit the same output to the beneficiary's new scope.
+                var previous = journal.entries().stream().filter(entry -> entry.admission().observationId().equals(observationId)
+                        && entry.admission().taskId().equals(binding.taskId())).findFirst().orElse(null);
+                if (previous != null) {
+                    var admitted = previous.admission();
+                    if (!admitted.actorId().equals(actor.getUUID()) || admitted.units() != units
+                            || !admitted.recipeRevision().equals(recipe.revision()) || !admitted.evidence().equals(evidence))
+                        throw new IllegalStateException("Observation identity changed its admitted payload");
+                    continue;
+                }
+                active(); var target = FtbQuestTasks.evidenceTarget(actor, binding.taskId());
                 validate(binding, target);
                 if (!target.visible() || !target.state().available() || target.state().completed()) continue;
                 var generation = journal.generation(new QuestEvidenceJournal.Scope(binding.epoch(), target.state().teamId(), binding.questId()), target.cycle());
@@ -144,32 +176,40 @@ public final class CraftQuestEvidence implements AutoCloseable {
                 if (journal.entries().stream().anyMatch(entry -> entry.admission().generationId().equals(generation.id())
                         && entry.admission().taskId().equals(binding.taskId()) && entry.state() == QuestEvidenceJournal.State.REVIEW))
                     throw new IllegalStateException("Uncertain craft evidence must be reviewed first");
-                journal.admit(new QuestEvidenceJournal.Admission(observation.id(), generation.id(), binding.taskId(), observation.actorId(),
-                        binding.recipeId(), binding.recipeRevision(), observation.output().getCount(),
-                        CraftingEvidence.encode(observation, event.getPlayer().registryAccess())));
+                journal.admit(new QuestEvidenceJournal.Admission(observationId, generation.id(), binding.taskId(), actor.getUUID(),
+                        binding.recipeId(), binding.recipeRevision(), units, evidence));
             } catch (IOException | RuntimeException failure) {
-                LOGGER.error("Craft evidence admission failed for task {} and observation {}", binding.taskId(), observation.id(), failure);
+                LOGGER.error("Craft evidence admission failed for task {} and observation {}", binding.taskId(), observationId, failure);
             }
         }
     }
 
     @SubscribeEvent(priority = EventPriority.HIGHEST)
     public void returned(CraftingOutcomeEvent event) {
+        returned(event.getObservation().id(), QuestEvidenceJournal.Outcome.valueOf(event.getOutcome().name()));
+    }
+
+    @SubscribeEvent(priority = EventPriority.HIGHEST)
+    public void machineReturned(net.citizensnpcs.api.event.MachineOutcomeEvent event) {
+        returned(event.getObservation().id(), QuestEvidenceJournal.Outcome.valueOf(event.getOutcome().name()));
+    }
+
+    private void returned(UUID observationId, QuestEvidenceJournal.Outcome outcome) {
         if (closed) return;
         List<QuestEvidenceJournal.Entry> candidates;
         try {
             active(); candidates = journal.entries();
         } catch (RuntimeException failure) {
-            LOGGER.error("Craft evidence journal is unavailable for {}", event.getObservation().id(), failure); return;
+            LOGGER.error("Craft evidence journal is unavailable for {}", observationId, failure); return;
         }
         for (var entry : candidates) {
-            if (!entry.admission().observationId().equals(event.getObservation().id()) || entry.state() != QuestEvidenceJournal.State.PREPARED) continue;
+            if (!entry.admission().observationId().equals(observationId) || entry.state() != QuestEvidenceJournal.State.PREPARED) continue;
             try {
-                var updated = journal.outcome(entry.id(), QuestEvidenceJournal.Outcome.valueOf(event.getOutcome().name()));
+                var updated = journal.outcome(entry.id(), outcome);
                 if (updated.state() == QuestEvidenceJournal.State.CONFIRMED) project(updated.admission().generationId(), updated.admission().taskId());
             } catch (IOException | RuntimeException failure) {
                 LOGGER.error("Craft evidence outcome/projection needs review for task {} and observation {}",
-                        entry.admission().taskId(), event.getObservation().id(), failure);
+                        entry.admission().taskId(), observationId, failure);
             }
         }
     }

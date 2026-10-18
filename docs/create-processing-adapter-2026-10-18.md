@@ -44,5 +44,6 @@ Release binary/source archives remain separate and contain no runtime-audit prob
 Hashes and evidence: `artifacts/create-recipe-validation-2026-10-18.json`.
 
 This completes the implemented Create processing guidance subset of CRAFT-03.
-Attributed machine outcomes, durable task/reward application, assembly and integrated
-crash/restart acceptance remain open.
+The subsequent [millstone evidence adapter](create-millstone-evidence-2026-10-18.md)
+adds actual milling evidence and owned FTB projection. Other machine outcomes,
+durable rewards, assembly and integrated crash/restart acceptance remain open.

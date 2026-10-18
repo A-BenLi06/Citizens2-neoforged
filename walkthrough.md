@@ -2747,3 +2747,35 @@ a later player. Failed logs are retained, no provider cache is patched. Verified
 separate release binary/source JARs contain no audit probes. Evidence/hashes:
 artifacts/create-recipe-validation-2026-10-18.json. Production was untouched.
 Machine ownership/outcomes, durable rewards, assembly and full migration remain open.
+
+## 2026-10-18T21:18:47.7652810+08:00 (UTC+08:00) - Observe native Create millstone outcomes and project owned FTB tasks
+
+Added optional pinned native process call boundaries without changing matching,
+kinetics, input consumption, random rolling or output insertion. Authenticated
+citizens.admin operators assign a loaded millstone to an online beneficiary using
+an immutable UUID/timestamp attribution in a serialized NeoForge block attachment.
+Create's temporary advancement owner is unsuitable for durable attribution; no
+proximity, pickup or block-access authority is inferred. Native observations preserve
+full input/remainder/pre-output components, location, actual current recipe instance,
+revision and actual random products. Remainder callbacks are observed once, never
+re-executed. Return confirmation requires exact component-sensitive input/output/
+remainder deltas; provider output loss or insertion exceptions retain review evidence.
+
+Owned milling CustomTasks count actual items matching the recipe's primary display
+output using the existing forced journal, explicit binding/repeat epochs and absolute
+FTB projection. Observation identity is fenced across native reward reset and team
+changes. Extraction/replay never creates extra progress. Native cached recipes removed
+by reload cannot be relabeled as current. Unassigned/offline/fake automation receives
+no credit. Other processing evidence and monetary reward generations remain open.
+
+Validation: 54 actual Create checks on each NeoForge 21.1.233/21.1.248; 137 absent-
+Create FTB/Paradigm/KubeJS checks on 21.1.248; 746 ordinary tests and successful
+baseline build, zero failures/errors/skips. Actual creative motor rotation/millstone
+ticks, native reward/reset, full/partial capacity, insertion/remainder exceptions,
+assignment NBT roundtrip, journal reopen, stale recipe identity, team/repeat replay
+and offline attribution pass. Fixture reads actual slot limits because the deployed
+provider modifies inventory limits. Failed audit/compile logs remain. Standard binaries
+and source JARs are separate, with no audit/provider/cross-mod leaks. Hashes/evidence:
+artifacts/create-machine-evidence-validation-2026-10-18.json. Production untouched.
+Documented consumption/roll-to-admission process-kill gap and non-atomic world/FTB
+persistence; actual kill/rollback and full release acceptance remain required.

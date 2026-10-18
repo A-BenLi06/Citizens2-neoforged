@@ -13,12 +13,24 @@ import net.minecraft.resources.ResourceLocation;
 @Requirements
 public final class CraftEvidenceCommands {
     @Command(aliases = { "citizens" }, modifiers = { "craftevidence" },
-            usage = "craftevidence <bind <task ID> <recipe ID>|list|review|reconcile|resolve <entry ID> <accept|reject> <reason>>",
+            usage = "craftevidence <bind <task ID> <recipe ID>|assignmachine <beneficiary UUID> <x> <y> <z>|clearmachine <x> <y> <z>|list|review|reconcile|resolve <entry ID> <accept|reject> <reason>>",
             desc = "citizens.commands.craftevidence.description", min = 2, permission = "citizens.admin")
     public void evidence(CommandContext args, CommandSourceStack source, NPC npc) throws CommandException {
         try {
             var service = CraftQuestEvidence.current(source.getServer());
             switch (args.getString(1).toLowerCase(java.util.Locale.ROOT)) {
+                case "assignmachine" -> {
+                    require(args, 6);
+                    var assignment = net.citizensnpcs.util.CreateMachineEvidence.assign(source, java.util.UUID.fromString(args.getString(2)),
+                            new net.minecraft.core.BlockPos(args.getInteger(3), args.getInteger(4), args.getInteger(5)));
+                    Messaging.sendTr(source, "citizens.commands.craftevidence.machine-assigned", assignment.machineId(), assignment.beneficiaryId());
+                }
+                case "clearmachine" -> {
+                    require(args, 5);
+                    net.citizensnpcs.util.CreateMachineEvidence.clear(source,
+                            new net.minecraft.core.BlockPos(args.getInteger(2), args.getInteger(3), args.getInteger(4)));
+                    Messaging.sendTr(source, "citizens.commands.craftevidence.machine-cleared");
+                }
                 case "bind" -> {
                     require(args, 4);
                     var binding = service.bind(source, args.getString(2), ResourceLocation.parse(args.getString(3)));

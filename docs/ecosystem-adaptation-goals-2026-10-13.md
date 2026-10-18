@@ -36,6 +36,14 @@ for eleven process types, including fluids, probability, components and reload
 revisions. Table evidence capability remains distinct; machine attribution,
 assembly and durable reward/crash acceptance remain open under CRAFT-03–05.
 
+Subsequent [native millstone evidence](create-millstone-evidence-2026-10-18.md)
+adds authenticated persistent beneficiary assignment, actual recipe-instance/random
+result observations and component-sensitive input/output/remainder verification.
+Owned FTB CustomTasks receive actual primary-output units through the existing
+durable journal and absolute projection. Fifty-four native checks pass on each
+NeoForge target; other process evidence, offline credit, monetary generations and
+actual process-kill/world rollback acceptance remain open.
+
 Progress 2026-10-18, UTC+08:00: [configured Paradigm exports](paradigm-provider-exports-2026-10-18.md)
 add exact native currency balances and visibility/permission-filtered current-team
 FTB progress/maximum/completion. Worker callbacks use immutable snapshots; owned
