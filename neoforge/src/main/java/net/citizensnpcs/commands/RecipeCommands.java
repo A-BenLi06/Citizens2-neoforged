@@ -30,6 +30,18 @@ public final class RecipeCommands {
             Messaging.sendTr(source, "citizens.commands.recipe.unsupported", recipe.id(), recipe.type(), recipe.serializer());
             return;
         }
+        if (recipe.processing() != null) {
+            var processing = recipe.processing();
+            Messaging.sendTr(source, "citizens.commands.recipe.processing", recipe.id(), recipe.workstation(), recipe.inputs().size(),
+                    processing.fluidInputs().size(), processing.recipeDuration(),
+                    net.minecraft.network.chat.Component.translatable(processing.heatTranslationKey()).getString());
+            for (var result : processing.itemResults()) Messaging.sendTr(source, "citizens.commands.recipe.processing-item",
+                    result.stack().getCount(), result.stack().getHoverName().getString(), new java.math.BigDecimal(Float.toString(result.chancePerItem()))
+                            .multiply(java.math.BigDecimal.valueOf(100)).stripTrailingZeros().toPlainString());
+            for (var result : processing.fluidResults()) Messaging.sendTr(source, "citizens.commands.recipe.processing-fluid",
+                    result.getAmount(), result.getHoverName().getString());
+            return;
+        }
         var output = recipe.output();
         Messaging.sendTr(source, "citizens.commands.recipe.status", recipe.id(), output.getCount(),
                 output.getHoverName().getString(), recipe.workstation(), recipe.inputs().size());

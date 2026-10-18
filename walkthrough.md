@@ -2724,3 +2724,26 @@ standard separate binaries/sources and verified no audit/provider classes leak.
 Evidence and hashes: artifacts/provider-exports-validation-2026-10-18.json. Production
 was untouched. Durable monetary rewards, commerce tasks, machines, crash/rollback,
 remaining specialist integrations and physical clients remain active requirements.
+
+## 2026-10-18T20:57:52.0340076+08:00 (UTC+08:00) - Adapt the selected Create processing recipe provider
+
+Added an optional public-method Create 6 processing adapter against the actual
+6.0.10 performance-v6 pack JAR. Eleven native processing types expose typed item/
+fluid ingredients and alternatives, full output components, per-item probabilities,
+retained deploying tools, configured duration and heat. Complete resolved native
+snapshots participate in recipe revisions; lookup never rolls results. Secondary
+products now appear in output search. NPC and separate dialogue guidance share
+translatable output; table evidence capability remains separate from machine guidance.
+Pure-fluid recipes use native fluid availability instead of the table-only empty
+item-ingredient rule. Unknown/manual/assembly/grid contracts remain unsupported.
+
+Validation: 30 actual Create checks and 137 absent-Create FTB/Paradigm/KubeJS checks
+on NeoForge 21.1.248; 746 ordinary tests on 21.1.233, zero failures/errors/skips, and
+successful standard build. Native resource reload, components, fluid predicates,
+secondary probability, defensive snapshots and eleven recipe types pass. Repaired
+an existing hidden-task audit precondition by loading the complete native SNBT quest
+before login; creating its empty parent before adding a task cached completion for
+a later player. Failed logs are retained, no provider cache is patched. Verified
+separate release binary/source JARs contain no audit probes. Evidence/hashes:
+artifacts/create-recipe-validation-2026-10-18.json. Production was untouched.
+Machine ownership/outcomes, durable rewards, assembly and full migration remain open.

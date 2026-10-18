@@ -100,7 +100,7 @@ public final class CraftQuestEvidence implements AutoCloseable {
         var target = FtbQuestTasks.evidenceTarget(player, taskId);
         if (!target.visible() || target.state().maximum() <= 0) throw new IllegalArgumentException("Task is unavailable");
         var recipe = CraftingRecipes.find(server, recipeId).orElseThrow(() -> new IllegalArgumentException("Recipe is unavailable"));
-        if (!recipe.supported()) throw new IllegalArgumentException("Recipe evidence is unsupported");
+        if (!recipe.tableEvidenceSupported()) throw new IllegalArgumentException("Recipe evidence is unsupported");
         Binding previous = bindings.get(target.state().taskId());
         if (previous != null) {
             if (!previous.recipeId().equals(recipeId.toString()) || !previous.recipeRevision().equals(recipe.revision())

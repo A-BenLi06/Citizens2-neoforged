@@ -234,10 +234,10 @@ public final class QuestRuntimeAudit {
                 net.citizensnpcs.util.ProviderPlaceholderExports.Kind.FTB_TASK_PROGRESS,null,task.getCodeString(),"audit.unknown.permission");
         check(net.citizensnpcs.util.ProviderPlaceholderExports.snapshot(actor,List.of(denied)).isEmpty(),"provider_exports_current_permission_filters_task_values");
         var file=ServerQuestFile.getInstance().orElseThrow();
-        var hiddenQuest=new Quest(0x10601L,file.getChapter(0x10301L));
-        var hiddenConfig=new net.minecraft.nbt.CompoundTag(); hiddenConfig.putBoolean("invisible",true);
-        hiddenQuest.readData(hiddenConfig,actor.registryAccess()); hiddenQuest.onCreated();
-        var hidden=new CustomTask(0x10602L,hiddenQuest); hidden.setMaxProgress(100); hidden.onCreated();
+        // Load the complete quest/task from native SNBT before players log in. Creating an empty quest
+        // before adding its task can cache completion/visibility for players joining later in this tick.
+        var hidden=Objects.requireNonNull(file.getTask(0x10703L));
+        check(!hidden.getQuest().isVisible(team),"provider_exports_fixture_native_quest_is_hidden_for_actor");
         var hiddenExport=new net.citizensnpcs.util.ProviderPlaceholderExports.Export("hidden_task",
                 net.citizensnpcs.util.ProviderPlaceholderExports.Kind.FTB_TASK_PROGRESS,null,hidden.getCodeString(),null);
         check(net.citizensnpcs.util.ProviderPlaceholderExports.snapshot(actor,List.of(hiddenExport)).isEmpty(),

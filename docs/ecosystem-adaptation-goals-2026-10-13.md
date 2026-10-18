@@ -29,6 +29,13 @@ Exact artifact sources, SHA-512/SHA-256 hashes and installation paths are record
 
 ## Ordered adaptation backlog
 
+Progress 2026-10-18, UTC+08:00: the user selected **Create (mechanical power)**
+as the machine provider. The actual pack's Create 6.0.10 performance-v6 now has an
+[optional native processing recipe adapter](create-processing-adapter-2026-10-18.md)
+for eleven process types, including fluids, probability, components and reload
+revisions. Table evidence capability remains distinct; machine attribution,
+assembly and durable reward/crash acceptance remain open under CRAFT-03–05.
+
 Progress 2026-10-18, UTC+08:00: [configured Paradigm exports](paradigm-provider-exports-2026-10-18.md)
 add exact native currency balances and visibility/permission-filtered current-team
 FTB progress/maximum/completion. Worker callbacks use immutable snapshots; owned

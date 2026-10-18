@@ -199,7 +199,7 @@ public final class CraftingEvidence {
         var input = grid.asCraftInput();
         if (!recipe.matches(input, player.serverLevel())) return null;
         var snapshot = CraftingRecipes.find(server, holder.id()).orElseThrow();
-        if (!snapshot.supported()) return null;
+        if (!snapshot.tableEvidenceSupported()) return null;
         ItemStack output = event.getCrafting();
         if (output.isEmpty() || !ItemStack.matches(output, recipe.assemble(input, player.registryAccess()))
                 || !ItemStack.matches(output, snapshot.output())) return null;

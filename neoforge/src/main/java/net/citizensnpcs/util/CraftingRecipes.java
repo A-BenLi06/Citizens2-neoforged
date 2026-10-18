@@ -25,7 +25,7 @@ import net.minecraft.world.item.crafting.ShapelessRecipe;
 /** Registry-backed recipe discovery. Queries never craft items or advance tasks. */
 public final class CraftingRecipes {
     private CraftingRecipes() { }
-    public enum Kind { SHAPED, SHAPELESS, UNSUPPORTED }
+    public enum Kind { SHAPED, SHAPELESS, CREATE_PROCESSING, UNSUPPORTED }
 
     /** Alternatives are display candidates. The current provider's predicate remains authoritative. */
     public record Input(String definition, boolean custom, List<ItemStack> alternatives) {
@@ -34,13 +34,19 @@ public final class CraftingRecipes {
     }
 
     public record Snapshot(ResourceLocation id, ResourceLocation type, ResourceLocation serializer, Kind kind,
-            String revision, String definition, ResourceLocation workstation, int width, int height, List<Input> inputs, ItemStack output) {
+            String revision, String definition, ResourceLocation workstation, int width, int height, List<Input> inputs, ItemStack output,
+            CreateProcessingRecipes.Snapshot processing) {
+        public Snapshot(ResourceLocation id, ResourceLocation type, ResourceLocation serializer, Kind kind, String revision,
+                String definition, ResourceLocation workstation, int width, int height, List<Input> inputs, ItemStack output) {
+            this(id, type, serializer, kind, revision, definition, workstation, width, height, inputs, output, null);
+        }
         public Snapshot {
             inputs = List.copyOf(inputs);
             output = output.copy();
         }
         @Override public ItemStack output() { return output.copy(); }
         public boolean supported() { return kind != Kind.UNSUPPORTED; }
+        public boolean tableEvidenceSupported() { return kind == Kind.SHAPED || kind == Kind.SHAPELESS; }
     }
 
     public static Optional<Snapshot> find(MinecraftServer server, ResourceLocation id) {
@@ -67,8 +73,10 @@ public final class CraftingRecipes {
         List<Snapshot> found = new ArrayList<>();
         for (var holder : server.getRecipeManager().getRecipes().stream()
                 .sorted(java.util.Comparator.comparing(recipe -> recipe.id().toString())).toList()) {
-            ItemStack result = holder.value().getResultItem(server.registryAccess());
-            if (result.isEmpty() || (components ? !ItemStack.isSameItemSameComponents(output, result) : !result.is(output.getItem()))) continue;
+            var processing = CreateProcessingRecipes.snapshot(server, holder.value());
+            var results = processing.map(value -> value.itemResults().stream().map(CreateProcessingRecipes.ItemResult::stack).toList())
+                    .orElseGet(() -> List.of(holder.value().getResultItem(server.registryAccess())));
+            if (results.stream().noneMatch(result -> !result.isEmpty() && (components ? ItemStack.isSameItemSameComponents(output, result) : result.is(output.getItem())))) continue;
             found.add(snapshot(server, holder));
             if (found.size() == limit) break;
         }
@@ -92,10 +100,12 @@ public final class CraftingRecipes {
         Recipe<?> recipe = holder.value();
         var ops = server.registryAccess().createSerializationContext(JsonOps.INSTANCE);
         JsonElement definition = Recipe.CODEC.encodeStart(ops, recipe).getOrThrow();
-        Kind kind = kind(recipe);
+        var processing = CreateProcessingRecipes.snapshot(server, recipe).orElse(null);
+        Kind kind = processing == null ? kind(recipe) : Kind.CREATE_PROCESSING;
         if (kind != Kind.UNSUPPORTED && !recipe.canCraftInDimensions(3, 3)) kind = Kind.UNSUPPORTED;
         ItemStack output = recipe.getResultItem(server.registryAccess()).copy();
-        if (kind != Kind.UNSUPPORTED && (output.isEmpty() || recipe.isIncomplete()))
+        if (kind != Kind.UNSUPPORTED && (processing == null ? output.isEmpty() || recipe.isIncomplete()
+                : recipe.getIngredients().stream().anyMatch(ingredient -> ingredient.isEmpty() || ingredient.hasNoItems())))
             throw new IllegalStateException("Recipe output or ingredient provider is unavailable");
         int width = kind == Kind.SHAPED ? ((ShapedRecipe) recipe).getWidth() : 0;
         int height = kind == Kind.SHAPED ? ((ShapedRecipe) recipe).getHeight() : 0;
@@ -115,6 +125,7 @@ public final class CraftingRecipes {
         content.addProperty("id", holder.id().toString());
         content.add("recipe", definition);
         content.add("resolvedIngredients", expanded);
+        if (processing != null) content.add("createProcessing", CreateProcessingRecipes.encode(processing, server.registryAccess()));
         content.add("output", output.isEmpty() ? com.google.gson.JsonNull.INSTANCE : ItemStack.CODEC.encodeStart(ops, output).getOrThrow());
         String revision;
         try { revision = HexFormat.of().formatHex(MessageDigest.getInstance("SHA-256")
@@ -122,11 +133,11 @@ public final class CraftingRecipes {
         catch (NoSuchAlgorithmException impossible) { throw new IllegalStateException(impossible); }
         return new Snapshot(holder.id(), BuiltInRegistries.RECIPE_TYPE.getKey(recipe.getType()),
                 BuiltInRegistries.RECIPE_SERIALIZER.getKey(recipe.getSerializer()), kind, revision,
-                canonical(definition).toString(), kind == Kind.UNSUPPORTED ? null : BuiltInRegistries.BLOCK.getKey(
-                        net.minecraft.world.level.block.Blocks.CRAFTING_TABLE), width, height, inputs, output);
+                canonical(definition).toString(), kind == Kind.UNSUPPORTED ? null : processing != null ? processing.workstation() : BuiltInRegistries.BLOCK.getKey(
+                        net.minecraft.world.level.block.Blocks.CRAFTING_TABLE), width, height, inputs, output, processing);
     }
 
-    private static JsonElement canonical(JsonElement value) {
+    static JsonElement canonical(JsonElement value) {
         if (value.isJsonObject()) {
             JsonObject result = new JsonObject();
             value.getAsJsonObject().keySet().stream().sorted().forEach(key -> result.add(key, canonical(value.getAsJsonObject().get(key))));

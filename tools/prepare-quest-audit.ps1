@@ -64,6 +64,19 @@ New-Item -ItemType Directory -Force $questChapters | Out-Null
     }]
 }
 '@ | Set-Content -LiteralPath (Join-Path $questChapters '0000000000010401.snbt') -Encoding utf8
+@'
+{
+    filename: "0000000000010701"
+    id: "0000000000010701"
+    quests: [{
+        id: "0000000000010702"
+        invisible: true
+        tasks: [{ id: "0000000000010703", type: "custom", max_progress: 100L }]
+        x: 0.0d
+        y: 0.0d
+    }]
+}
+'@ | Set-Content -LiteralPath (Join-Path $questChapters '0000000000010701.snbt') -Encoding utf8
 'permissionHandler = "paradigm:internal"' | Set-Content -LiteralPath (Join-Path $fixture 'config/neoforge-server.toml') -Encoding utf8
 'permissionHandler = "paradigm:internal"' | Set-Content -LiteralPath (Join-Path $fixture 'defaultconfigs/neoforge-server.toml') -Encoding utf8
 Write-Output "Prepared $fixture"
