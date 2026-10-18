@@ -126,6 +126,13 @@ public final class QuestRuntimeAudit {
             var before = FtbQuestTasks.query(actor,id);
             check(before.teamId().equals(team.getTeamId()) && before.progress()==0 && before.maximum()==3,
                     "query_uses_current_authoritative_team");
+            check(net.citizensnpcs.api.integration.CitizensScripts.task(actor,id).equals(before),
+                    "public_script_facade_uses_native_task_without_xmod_provider");
+            var beforeAbsentMenu=actor.containerMenu;
+            try { net.citizensnpcs.api.integration.CitizensScripts.validateEconomyMenu(actor,List.of("browser","0"));
+                throw new AssertionError("Absent Economy script menu accepted"); }
+            catch(IllegalStateException expected) { check(actor.containerMenu==beforeAbsentMenu,
+                    "public_script_absent_economy_rejects_without_changing_menu"); }
             FtbQuestTasks.submit(actor,id,true);
             check(actor.getInventory().countItem(Items.STONE)==5 && team.getProgress(task)==0,
                     "preflight_consumes_no_items_or_progress");

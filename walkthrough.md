@@ -2807,3 +2807,31 @@ no audit/provider/cross-mod classes leak. Evidence/provider/release/log hashes:
 artifacts/guard-coexistence-validation-2026-10-18.json. Production untouched. Physical
 client screens/packets, full-world restart, combined modpack and migration acceptance
 remain open; this establishes coexistence and native workflows, not Sentinel parity.
+
+## 2026-10-18T22:09:08+08:00 (UTC+08:00) - Expose public script operations and verify actual FTB XMod callbacks
+
+Added CitizensScripts API version 1 without a production KubeJS dependency. Current
+recipe snapshots, visible task state/discovery, explicit native consuming delivery and
+Economy menu validation/opening share existing provider adapters. Every request checks
+the server thread and exact active player session. Known hidden task IDs cannot disclose
+state or consume items. No generic progress setter, invented craft evidence or monetary
+callback is added. Content IDs come from callers and native registries/configuration.
+
+The separate actual FTB XMod/Rhino fixture registers customTask/customReward/started/
+completed with native full hexadecimal object IDs. Native result-slot takes project
+owned craft evidence into the script-configured CustomTask; callbacks preserve native
+team progress without inventing a current player context during journal projection.
+Decoded native reward claims exercise item callback/duplicate claim/two repeat cycles;
+Economy browser opens leave balance unchanged. Repeat reset precedes reward callback,
+which observes progress zero. Item callback evidence is not a crash-safe reward design.
+
+Validation: 25 actual XMod/KubeJS/Rhino/FTB/Economy checks on NeoForge 21.1.248, 139
+absent-XMod/Economy FTB/Paradigm/KubeJS checks, and 746 ordinary baseline tests/build,
+zero failures/errors/skips. The complete 21.1.233 runtime fixture correctly refuses
+startup: selected JEI requires 21.1.238, Economy 0.5.5 requires 21.1.247. No provider
+metadata bypass. Failed logs retain typed native can_repeat fixture repair, startup
+registration count reset and KubeJS's version-specific uuid property use. Standard
+separate binaries/source JARs exclude all probes/provider/cross-mod classes and scripts.
+Exact hashes/evidence: artifacts/xmod-script-validation-2026-10-18.json. Production
+untouched. Durable monetary claims, script/quest reload, process-kill recovery and
+combined/physical migration acceptance remain open under ADAPT-04/05/11.

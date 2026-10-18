@@ -123,6 +123,14 @@ is documented in Economy's `docs/coordinate-shop-api.md`; no remote permission
 or deployment/physical-client acceptance is implied. ADAPT-03 commerce/receipts
 and ADAPT-04/05 quest/crafting are the next integration requirements.
 
+Progress 2026-10-18, UTC+08:00: [public script and FTB XMod contracts](kubejs-ftb-script-contracts-2026-10-18.md)
+expose current recipe/visible task queries, explicit native delivery and Economy
+menus without a KubeJS dependency in Citizens. The four actual Rhino callbacks
+pass 25 checks, including repeat/reset and native craft evidence, on 21.1.248.
+The selected JEI/Economy floors prevent that complete fixture on 21.1.233;
+ordinary baseline compatibility remains separate. Missing XMod/Economy regression
+passes 139 checks. Durable monetary claims and integrated release gates remain.
+
 Progress 2026-10-18, UTC+08:00: [Guard Villagers coexistence](guard-villagers-coexistence-2026-10-18.md)
 protects NPC recruitment/AI identity and skips direct assistance target assignments
 for Citizens-owned AI. Native guard recruitment, equipment, follow/patrol payloads
