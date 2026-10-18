@@ -54,3 +54,8 @@ Final validation: 93 combined native checks on NeoForge 21.1.248, 127 separate
 Economy/camera/provider-absence checks and 730 ordinary tests on the 21.1.233
 baseline, with zero unit failures/errors/skips. Build and separate-archive checks
 pass; runtime audit classes are absent from release binaries and sources.
+
+The subsequent [outcome and journal contract](quest-evidence-journal-2026-10-18.md)
+adds a return-scoped event and reusable durable evidence store. The pre-consumption
+source still requires a production admission/binding adapter; it does not install
+one automatically. Its additional validation supersedes the counts above.

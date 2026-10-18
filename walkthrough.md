@@ -2646,3 +2646,26 @@ audit probes and preserve separate Citizens/Interactions packaging. Exact provid
 log and archive hashes: artifacts/crafting-evidence-validation-2026-10-18.json.
 Production was untouched. Durable crafting/task/reward generations, commerce receipt
 application, machines, process-crash recovery and specialist/client gates remain open.
+
+## 2026-10-18T19:53:09.8043648+08:00 (UTC+08:00) - Confirm native crafting outcomes and retain durable quest evidence
+
+Completed the recovered crafting-outcome and single-writer evidence-journal work.
+ResultSlot wrappers preserve native input/remainder handling and pair pickup/shift
+observations with RETURNED, INTERRUPTED or UNCONFIRMED outcomes. RETURNED confirms
+native consumption returned, not that world/player files or later output handling
+were persisted. Listener failures cannot interrupt native processing.
+
+Journal admission preserves immutable registry-aware components, recipe revisions,
+actor and explicit binding epoch/team/quest/cycle generations. Immutable forced
+revision files support deduplicated replay, exclusive ownership, rollback fencing,
+checked totals and attributed acceptance/rejection of uncertain outcomes. Startup
+moves unfinished admissions to review. Corrupt/incomplete/gapped histories retain
+source bytes and fail explicitly. No filesystem delete/retry workaround is used.
+
+Validation: 741 ordinary tests, zero failures/errors/skips, successful baseline
+build; 102 actual-provider native checks on each of NeoForge 21.1.233 and 21.1.248;
+127 separate Economy/camera/provider-absence checks. Verified separate release
+binary/source jars exclude audit fixtures. Evidence and artifact/provider hashes:
+artifacts/quest-evidence-journal-validation-2026-10-18.json. Production task binding,
+absolute native CustomTask projection, durable rewards and actual crash/rollback
+acceptance remain requirements; this commit does not install the fixture consumer.

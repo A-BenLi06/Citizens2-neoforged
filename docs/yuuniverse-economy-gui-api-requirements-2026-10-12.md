@@ -155,3 +155,10 @@ Do not expose the proposed Java types as fake callable KubeJS examples. Pin the 
 In the neighboring `yuuniverse-economy` repository: `src/main/java/net/yuuniverse/economy/api/{EconomyApi,YuuniverseEconomyApi,LedgerEconomyApi}.java`, `EconomyMenus.java`, `EconomyRuntime.java`, `CommerceService.java`, `QuickShopCommands.java`, and `core/{CommerceRequest,CommerceQuote,CommerceReceipt,SqliteLedger}.java`. The existing `docs/economyshopgui-compatibility.md`, `docs/quickshop-compatibility.md`, and `docs/legacy-economy-api-coverage.md` describe the original source scope.
 
 Installed `EconomyApi` was independently inspected with JDK 21 `javap`: 0.4.1 exposes basic currency/account/monetary operations but lacks the source's shop-opening and newer facade methods. Upgrade/migration validation is an explicit prerequisite; this specification does not authorize assuming source features are deployed.
+
+Progress 2026-10-18, UTC+08:00: [craft outcomes and journal](quest-evidence-journal-2026-10-18.md)
+add return-scoped native evidence, durable deduplication/generation storage,
+append-only transitions and explicit review of interrupted/missing outcomes.
+Production task binding/projection, monetary claim generations, authenticated
+operator workflows and process-crash/world-rollback acceptance remain required;
+CRAFT-04/05 are incomplete.

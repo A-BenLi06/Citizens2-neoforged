@@ -141,3 +141,10 @@ An online read-only backup was used solely for rehearsal. The upgrade migrates s
 - [RSItemEditor](https://modrinth.com/mod/rsitemeditor/version/KEpGvGgz), [Guard Villagers](https://modrinth.com/mod/guard-villagers/version/JyXugpy2), [NeoProtect](https://modrinth.com/mod/neoprotect/version/TK4G6K3x), [GriefLogger](https://modrinth.com/mod/grieflogger/version/IrRNGJIR), [GriefLogger pinned 1.21.1 source](https://github.com/DAQEM/GriefLogger/tree/e913b78806a8f7646b7e3adc0d6721d1b386f29d).
 - [Vivecraft](https://modrinth.com/mod/vivecraft/version/LjqlbRAO), [KubeJS](https://modrinth.com/mod/kubejs/version/THIGFPwf), [JEI compatibility version](https://modrinth.com/mod/jei/version/5ULZJRXC).
 - [Existing Citizens placeholder bridge](paradigm-npc-placeholders-2026-09-23.md), [Economy API requirements and crafting task contracts](yuuniverse-economy-gui-api-requirements-2026-10-12.md).
+
+Progress 2026-10-18, UTC+08:00: [craft outcomes and journal](quest-evidence-journal-2026-10-18.md)
+add return-scoped native evidence, durable deduplication/generation storage,
+append-only transitions and explicit review of interrupted/missing outcomes.
+Production task binding/projection, monetary claim generations, authenticated
+operator workflows and process-crash/world-rollback acceptance remain required;
+CRAFT-04/05 are incomplete.
