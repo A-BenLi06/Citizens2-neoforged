@@ -43,6 +43,65 @@ public final class ItemLibrary {
 
     private Map<String, ItemStack> items = Map.of();
 
+    record MigrationSource(byte[] original, Map<String, ItemStack> snapshots, Map<String, String> unavailable,
+            Map<String, String> legacyNicknames) { }
+
+    /** Strict export: unsupported YAML fields must never disappear into an apparently successful conversion. */
+    static MigrationSource migrationSource(File file, RegistryAccess registries) throws java.io.IOException {
+        byte[] original = java.nio.file.Files.readAllBytes(file.toPath());
+        LoaderOptions options = new LoaderOptions();
+        options.setAllowDuplicateKeys(false);
+        options.setCodePointLimit(32 * 1024 * 1024);
+        Object parsed = new Yaml(options).load(new java.io.ByteArrayInputStream(original));
+        if (!(parsed instanceof Map<?, ?> root)) throw new IllegalArgumentException("Saved-item database must be a map");
+        Map<String, ItemStack> snapshots = new java.util.TreeMap<>();
+        Map<String, String> unavailable = new java.util.TreeMap<>();
+        Map<String, String> nicknames = new java.util.TreeMap<>();
+        ItemLibrary converter = new ItemLibrary();
+        for (var entry : root.entrySet()) {
+            if (!(entry.getKey() instanceof String id) || id.isBlank())
+                throw new IllegalArgumentException("Saved-item IDs must be nonblank strings");
+            try {
+                if (!(entry.getValue() instanceof Map<?, ?> definition)) throw new IllegalArgumentException("Definition is not a map");
+                onlyKeys(definition, java.util.Set.of("item", "nick"));
+                if (definition.containsKey("nick")) {
+                    if (!(definition.get("nick") instanceof String nickname)) throw new IllegalArgumentException("Nickname is not a string");
+                    nicknames.put(id, nickname);
+                }
+                if (!(definition.get("item") instanceof Map<?, ?> raw)) throw new IllegalArgumentException("Missing item map");
+                onlyKeys(raw, java.util.Set.of("==", "v", "type", "amount", "meta"));
+                if (raw.containsKey("meta")) {
+                    if (!(raw.get("meta") instanceof Map<?, ?> meta)) throw new IllegalArgumentException("Meta is not a map");
+                    onlyKeys(meta, java.util.Set.of("==", "meta-type", "display-name", "lore", "internal", "pages", "title", "author"));
+                    for (String field : java.util.List.of("display-name", "title", "author"))
+                        if (meta.containsKey(field) && !(meta.get(field) instanceof String))
+                            throw new IllegalArgumentException("Text field is not a string: " + field);
+                    if (meta.containsKey("lore") && !(meta.get("lore") instanceof List<?>)) throw new IllegalArgumentException("Lore is not a list");
+                    if (meta.containsKey("pages") && !(meta.get("pages") instanceof List<?>)) throw new IllegalArgumentException("Pages is not a list");
+                    for (String field : java.util.List.of("lore", "pages")) {
+                        if (meta.get(field) instanceof List<?> lines && lines.stream().anyMatch(line -> !(line instanceof String)))
+                            throw new IllegalArgumentException("Text list contains a non-string: " + field);
+                    }
+                    if (meta.get("pages") instanceof List<?> pages && pages.isEmpty())
+                        throw new IllegalArgumentException("Empty book pages require an explicit book-content conversion");
+                    if ((meta.containsKey("author") || meta.containsKey("title")) && !(meta.get("pages") instanceof List<?> pages && !pages.isEmpty()))
+                        throw new IllegalArgumentException("Book metadata requires nonempty pages");
+                }
+                @SuppressWarnings("unchecked") ItemStack snapshot = converter.build((Map<String, Object>) raw, registries, id);
+                if (snapshot == null || snapshot.isEmpty()) throw new IllegalArgumentException("Item provider or type is unavailable");
+                snapshots.put(id, snapshot);
+            } catch (RuntimeException failure) {
+                unavailable.put(id, failure.getMessage() == null ? failure.getClass().getSimpleName() : failure.getMessage());
+            }
+        }
+        return new MigrationSource(original, Map.copyOf(snapshots), Map.copyOf(unavailable), Map.copyOf(nicknames));
+    }
+
+    private static void onlyKeys(Map<?, ?> map, java.util.Set<String> supported) {
+        for (Object key : map.keySet()) if (!supported.contains(key))
+            throw new IllegalArgumentException("Unsupported saved-item field: " + key);
+    }
+
     @SuppressWarnings("unchecked")
     public void load(File file, RegistryAccess registries) {
         if (!file.isFile()) {
@@ -110,7 +169,13 @@ public final class ItemLibrary {
             LOGGER.warn("Saved item {} is a {}, which does not exist on this server; skipped.", id, type);
             return null;
         }
-        ItemStack stack = new ItemStack(resolved);
+        int amount = 1;
+        if (item.containsKey("amount")) {
+            try { amount = new java.math.BigDecimal(String.valueOf(item.get("amount"))).intValueExact(); }
+            catch (RuntimeException failure) { throw new IllegalArgumentException("Item amount must be a positive integer", failure); }
+            if (amount <= 0) throw new IllegalArgumentException("Item amount must be a positive integer");
+        }
+        ItemStack stack = new ItemStack(resolved, amount);
         Object metaRaw = item.get("meta");
         if (!(metaRaw instanceof Map))
             return stack;
@@ -120,6 +185,7 @@ public final class ItemLibrary {
                     || version.doubleValue() != version.intValue())
                 throw new IllegalArgumentException("Internal item NBT requires its integer data version");
             stack = LegacyItemData.convert(key, LegacyItemData.decode(encoded), version.intValue(), registries);
+            stack.setCount(amount);
         }
         Component name = json(meta.get("display-name"), registries);
         if (name != null) {
@@ -132,9 +198,7 @@ public final class ItemLibrary {
                 Component parsed = json(line, registries);
                 lines.add(parsed == null ? Component.literal(String.valueOf(line)) : parsed);
             }
-            if (!lines.isEmpty()) {
-                stack.set(DataComponents.LORE, new ItemLore(lines));
-            }
+            stack.set(DataComponents.LORE, new ItemLore(lines));
         }
         // the six written books in the database
         if (meta.get("pages") instanceof List<?> pages && !pages.isEmpty()) {

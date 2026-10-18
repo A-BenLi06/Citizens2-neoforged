@@ -322,6 +322,24 @@ public class InteractionsMod implements Session.Engine {
     public void onRegisterCommands(RegisterCommandsEvent event) {
         LiteralArgumentBuilder<CommandSourceStack> root = Commands.literal("interactions");
         InfluenceCommands.register(root, influence, library);
+        var migration = Commands.literal("migrateitems")
+                .requires(source -> net.citizensnpcs.api.util.PermissionUtil.hasPermission(source, "interactions.admin"));
+        var provider = Commands.literal("rsitemeditor");
+        for (String mode : java.util.List.of("preview", "apply")) {
+            provider.then(Commands.literal(mode).executes(context -> {
+                try {
+                    var report = LegacySavedItemMigration.run(context.getSource(), new File(dataFolder, "items.yml").toPath(),
+                            new File(dataFolder, "migration-reports").toPath(), mode.equals("apply"));
+                    net.citizensnpcs.api.util.Messaging.sendTr(context.getSource(), "interactions.items.migration.report", report.toString());
+                    return 1;
+                } catch (java.io.IOException | RuntimeException failure) {
+                    org.slf4j.LoggerFactory.getLogger("interactions").error("Saved-item migration failed", failure);
+                    net.citizensnpcs.api.util.Messaging.sendTr(context.getSource(), "interactions.items.migration.failed");
+                    return 0;
+                }
+            }));
+        }
+        root.then(migration.then(provider));
         root.then(Commands.literal("skipdialogue").executes(context -> {
             ServerPlayer player = context.getSource().getPlayer();
             Session session = player == null ? null : sessions.get(player.getUUID());

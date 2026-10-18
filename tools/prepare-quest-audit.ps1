@@ -1,7 +1,8 @@
 param(
     [string]$ProviderDirectory = (Join-Path (Split-Path $PSScriptRoot -Parent) 'artifacts/selected-integrations-2026-10-12'),
     [string]$ParadigmJar = (Join-Path (Split-Path $PSScriptRoot -Parent) 'artifacts/ecosystem-2026-10-13/server-smoke/mods/Paradigm-neoforge-1.21.1-2.5.0.jar'),
-    [string]$ArchitecturyJar = (Join-Path (Split-Path $PSScriptRoot -Parent) 'artifacts/ecosystem-2026-10-13/server-smoke/mods/architectury-13.0.11-neoforge.jar')
+    [string]$ArchitecturyJar = (Join-Path (Split-Path $PSScriptRoot -Parent) 'artifacts/ecosystem-2026-10-13/server-smoke/mods/architectury-13.0.11-neoforge.jar'),
+    [string]$OriginalItemFixtureDirectory
 )
 $ErrorActionPreference = 'Stop'
 $fixture = Join-Path (Split-Path $PSScriptRoot -Parent) 'artifacts/quest-audit-server'
@@ -11,6 +12,13 @@ foreach ($name in @('ftb-library-neoforge-2101.1.37.jar','ftb-quests-neoforge-21
 }
 Copy-Item -LiteralPath $ParadigmJar -Destination (Join-Path $fixture 'mods')
 Copy-Item -LiteralPath $ArchitecturyJar -Destination (Join-Path $fixture 'mods')
+if ($OriginalItemFixtureDirectory) {
+    foreach ($jar in Get-ChildItem -LiteralPath (Join-Path $OriginalItemFixtureDirectory 'mods') -Filter '*.jar') {
+        Copy-Item -LiteralPath $jar.FullName -Destination (Join-Path $fixture 'mods')
+    }
+    Copy-Item -LiteralPath (Join-Path $OriginalItemFixtureDirectory 'config/interactions/items.yml') -Destination (Join-Path $fixture 'original-items.yml')
+    Copy-Item -LiteralPath (Join-Path $OriginalItemFixtureDirectory 'config/interactions/item-aliases.yml') -Destination (Join-Path $fixture 'original-item-aliases.yml')
+}
 @('server-ip=127.0.0.1','server-port=25628','online-mode=false','level-name=quest-world',
   'level-type=minecraft:flat','generate-structures=false','spawn-protection=0',
   'view-distance=2','simulation-distance=2','sync-chunk-writes=false',

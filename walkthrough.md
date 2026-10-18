@@ -2529,3 +2529,34 @@ tests with no failures/errors/skips; archives remain separate and probe-free.
 Exact logs/hashes are in artifacts/rsitem-bridge-validation-2026-10-18.json. Legacy
 conversion, durable quest rewards/craft evidence and specialist/client gates remain
 open; production is untouched and the full goal remains active.
+
+## 2026-10-18T17:51:43.9811225+08:00 (UTC+08:00) - Source-backed ItemEdit to RSItemEditor migration
+
+Added Interactions migrateitems rsitemeditor preview/apply with admin and native
+save authority, shared-store ownership, exact source backups/SHA-256, native SNBT
+snapshots, per-item outcomes and checkpointed import intents. Imports never overwrite
+different existing definitions; identical snapshots are idempotent. Strict export
+reports unsupported/malformed fields and unavailable providers instead of discarding
+them. Saved quantities now survive conversion, including internal NBT definitions;
+legacy grants still honor their explicit requested amounts. Original nickname
+metadata is retained separately in reports without inventing native alias behavior.
+Existing dialogue references are not silently rewritten.
+
+The first recovered-content check correctly rejected item 701's previously ignored
+nick field. Added explicit report metadata preservation, then verified all 139
+resolvable original definitions through the actual provider. Package 163 remains
+unavailable because its real Eyephone dependency is absent; missing definitions
+6/15/144 cannot be invented. Reports document these content gaps and the separate
+provider/report persistence boundary; no cross-filesystem power-loss transaction
+is claimed.
+
+Validation: 38 synthetic combined native checks; 42 checks with the recovered
+source and its pinned content providers on NeoForge 21.1.248. A fresh server process
+reports UNCHANGED=139 and UNAVAILABLE=1 and verifies all native snapshots, source
+bytes and retained nicknames. Separate Economy/camera/provider-absence suite passes
+124 checks, including explicit failed migration reports with exact source retention.
+Ordinary test/build passes 730 tests with no failures/errors/skips. Binary/source
+archives contain no audit probes, and Citizens/Interactions remain separate.
+Evidence and hashes: artifacts/item-migration-validation-2026-10-18.json.
+Production was untouched. Durable quest rewards/crafting, crash reconciliation and
+specialist/client acceptance remain active porting requirements.

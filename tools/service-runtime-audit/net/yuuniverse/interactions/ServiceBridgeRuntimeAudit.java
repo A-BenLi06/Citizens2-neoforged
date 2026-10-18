@@ -139,6 +139,17 @@ public final class ServiceBridgeRuntimeAudit {
             check(!actions.runAll(List.of(payment(), "rs_item: shared;absent-provider;1"), actor, Component.empty())
                     && actor.getInventory().countItem(Items.PAPER) == optionalPaper,
                     "missing_item_provider_fails_before_dialogue_payment");
+            var migrationDirectory=java.nio.file.Files.createTempDirectory(server.getServerDirectory(),"missing-rsitems-");
+            var migrationInput=migrationDirectory.resolve("items.yml");
+            String migrationSource="'retained':\n  item: {type: PAPER, amount: 4}\n";
+            java.nio.file.Files.writeString(migrationInput,migrationSource);
+            var migrationReport=LegacySavedItemMigration.run(server.createCommandSourceStack(),migrationInput,
+                    migrationDirectory.resolve("reports"),true);
+            var failedMigration=new com.google.gson.Gson().fromJson(java.nio.file.Files.readString(migrationReport),LegacySavedItemMigration.Report.class);
+            check(failedMigration.entries().get("retained").status().equals("FAILED")
+                    && java.nio.file.Files.readString(migrationInput).equals(migrationSource)
+                    && java.nio.file.Files.readString(migrationReport.getParent().resolve("source.yml")).equals(migrationSource),
+                    "missing_item_provider_retains_migration_source_and_explicit_failure_report");
             check(!Conditions.all(List.of("%ftb_task_completed_10103% != true"), actor),
                     "missing_ftb_provider_does_not_satisfy_negative_condition");
             actor.doCloseContainer();

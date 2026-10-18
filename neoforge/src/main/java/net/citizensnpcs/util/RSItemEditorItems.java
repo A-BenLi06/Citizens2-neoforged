@@ -16,6 +16,36 @@ public final class RSItemEditorItems {
     private static final String ROOT = "org.resonaresmp.rsitemeditor.";
     private RSItemEditorItems() { }
     public enum Scope { SHARED, PERSONAL }
+    public enum ImportResult { WOULD_IMPORT, IMPORTED, UNCHANGED, CONFLICT }
+
+    /** Non-destructive, idempotent import through the provider's public shared-store API. */
+    public static ImportResult importShared(CommandSourceStack source, String id, ItemStack snapshot, boolean apply) {
+        return invoke(() -> {
+            if (source == null || !source.getServer().isSameThread())
+                throw new IllegalStateException("Saved-item import requires the server thread");
+            if (source.getPlayer() != null) active(source.getPlayer());
+            new Reference(Scope.SHARED, id);
+            if (snapshot == null || snapshot.isEmpty()) throw new IllegalArgumentException("Empty import snapshot");
+            permission(source, Scope.SHARED, "save");
+            Class<?> stores = Class.forName(ROOT + "storage.Stores");
+            Object store = stores.getMethod("server", MinecraftServer.class)
+                    .invoke(stores.getField("INSTANCE").get(null), source.getServer());
+            Class<?> type = Class.forName(ROOT + "storage.NbtItemStore");
+            var registries = source.getServer().registryAccess();
+            if ((boolean) type.getMethod("contains", String.class).invoke(store, id)) {
+                ItemStack existing = (ItemStack) type.getMethod("get", HolderLookup.Provider.class, String.class)
+                        .invoke(store, registries, id);
+                return ItemStack.matches(snapshot, existing) ? ImportResult.UNCHANGED : ImportResult.CONFLICT;
+            }
+            if (!apply) return ImportResult.WOULD_IMPORT;
+            type.getMethod("put", HolderLookup.Provider.class, String.class, ItemStack.class)
+                    .invoke(store, registries, id, snapshot.copy());
+            ItemStack written = (ItemStack) type.getMethod("get", HolderLookup.Provider.class, String.class)
+                    .invoke(store, registries, id);
+            if (!ItemStack.matches(snapshot, written)) throw new IllegalStateException("Provider import verification failed");
+            return ImportResult.IMPORTED;
+        });
+    }
     public record Reference(Scope scope, String id) {
         public Reference {
             java.util.Objects.requireNonNull(scope, "scope");

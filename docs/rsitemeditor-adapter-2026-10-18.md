@@ -35,11 +35,12 @@ reference/permissions without inserting items. Execution reacquires them. Explic
 amounts replace the snapshot count only for that grant; the stored definition
 remains unchanged.
 
-This is native library integration, not automatic translation of legacy `si give`
-commands or migration of ItemEdit YAML. Existing legacy content retains its explicit
-local library. Full source-backed conversion/reporting and missing-mod/component
-migration still require separate acceptance under ADAPT-06. Native give/drop
-semantics do not provide a cross-mod process-crash transaction.
+Existing legacy `si give` content retains its explicit local library. The
+[source-backed migration follow-up](legacy-rsitemeditor-migration-2026-10-18.md)
+adds preview/apply and retained reports for ItemEdit YAML; it does not automatically
+rewrite dialogue references. Missing original definitions/providers still require
+authoritative resolution under ADAPT-06. Native give/drop semantics do not provide
+a cross-mod process-crash transaction.
 
 Validation: 31 combined FTB/RSItemEditor native checks with the actual Paradigm
 handler selected, 123 Economy/camera/optional-absence service checks, and 730

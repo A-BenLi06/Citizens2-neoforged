@@ -122,6 +122,7 @@ public final class QuestRuntimeAudit {
                     dev.ftb.mods.ftblibrary.icon.Color4I.WHITE);
             check(FtbQuestTasks.query(actor,id).teamId().equals(party.getId()), "party_change_reacquires_team_identity");
             auditItems(actor,other);
+            auditMigration(actor);
             LoggerFactory.getLogger("interactions").info("[QUESTAUDIT] COMPLETE {} checks",passed);
         } catch(Throwable failure) { LoggerFactory.getLogger("interactions").error("[QUESTAUDIT] FAILED",failure); }
         finally {
@@ -198,6 +199,89 @@ public final class QuestRuntimeAudit {
                 com.mojang.brigadier.arguments.StringArgumentType.escapeIfRequired(permissions.serverItem("get").getNodeName()),server.createCommandSourceStack());
         try { net.citizensnpcs.util.RSItemEditorItems.snapshot(actor,sharedRef); throw new AssertionError("revoked lookup accepted"); }
         catch(IllegalStateException expected) { check(true,"rsitems_permission_revocation_takes_effect_immediately"); }
+    }
+    private static void auditMigration(AuditPlayer actor) throws Exception {
+        var server=actor.getServer();
+        var store=org.resonaresmp.rsitemeditor.storage.Stores.INSTANCE.server(server);
+        String prefix="migration-"+UUID.randomUUID();
+        var directory=java.nio.file.Files.createTempDirectory(server.getServerDirectory(),"migration-fixture-");
+        var input=directory.resolve("items.yml");
+        String yaml="""
+                %s-valid:
+                  item:
+                    type: STONE
+                    amount: 7
+                    meta:
+                      display-name: '{"text":"Preserved item"}'
+                      lore: ['{"text":"Preserved lore"}']
+                %s-conflict:
+                  item: {type: DIAMOND, amount: 2}
+                %s-unsupported:
+                  item: {type: STONE, meta: {unbreakable: true}}
+                %s-unavailable:
+                  item: {type: absent:item}
+                %s-malformed: invalid
+                %s-amount:
+                  item: {type: STONE, amount: 1.5}
+                """.formatted(prefix,prefix,prefix,prefix,prefix,prefix);
+        java.nio.file.Files.writeString(input,yaml);
+        byte[] original=java.nio.file.Files.readAllBytes(input);
+        store.put(actor.registryAccess(),prefix+"-conflict",new ItemStack(Items.GOLD_INGOT,3));
+        var preview=LegacySavedItemMigration.run(server.createCommandSourceStack(),input,directory.resolve("reports"),false);
+        var gson=new com.google.gson.Gson();
+        var planned=gson.fromJson(java.nio.file.Files.readString(preview),LegacySavedItemMigration.Report.class);
+        check(planned.entries().get(prefix+"-valid").status().equals("WOULD_IMPORT") && !store.contains(prefix+"-valid"),
+                "migration_preview_never_writes_provider");
+        check(planned.entries().get(prefix+"-conflict").status().equals("CONFLICT") &&
+                planned.entries().values().stream().filter(e->e.status().equals("UNAVAILABLE")).count()==4,
+                "migration_reports_conflicts_unsupported_missing_and_malformed_items");
+        var applied=LegacySavedItemMigration.run(server.createCommandSourceStack(),input,directory.resolve("reports"),true);
+        var report=gson.fromJson(java.nio.file.Files.readString(applied),LegacySavedItemMigration.Report.class);
+        var imported=store.get(actor.registryAccess(),prefix+"-valid");
+        check(report.entries().get(prefix+"-valid").status().equals("IMPORTED") && imported.getCount()==7
+                && imported.getHoverName().getString().equals("Preserved item")
+                && imported.get(net.minecraft.core.component.DataComponents.LORE).lines().getFirst().getString().equals("Preserved lore"),
+                "migration_preserves_count_name_and_lore_in_native_provider");
+        check(store.get(actor.registryAccess(),prefix+"-conflict").is(Items.GOLD_INGOT)
+                && store.get(actor.registryAccess(),prefix+"-conflict").getCount()==3,
+                "migration_never_overwrites_conflicting_provider_entry");
+        check(Arrays.equals(original,java.nio.file.Files.readAllBytes(input)) &&
+                Arrays.equals(original,java.nio.file.Files.readAllBytes(applied.getParent().resolve("source.yml"))) &&
+                report.sha256().equals(java.util.HexFormat.of().formatHex(java.security.MessageDigest.getInstance("SHA-256").digest(original))),
+                "migration_retains_exact_source_backup_and_hash");
+        var repeated=LegacySavedItemMigration.run(server.createCommandSourceStack(),input,directory.resolve("reports"),true);
+        check(gson.fromJson(java.nio.file.Files.readString(repeated),LegacySavedItemMigration.Report.class)
+                .entries().get(prefix+"-valid").status().equals("UNCHANGED"),"migration_replay_is_idempotent");
+        try {
+            net.citizensnpcs.util.RSItemEditorItems.importShared(actor.createCommandSourceStack(),prefix+"-denied",new ItemStack(Items.STONE),true);
+            throw new AssertionError("unprivileged import accepted");
+        } catch(IllegalStateException expected) {
+            check(!store.contains(prefix+"-denied"),"migration_requires_native_save_permission");
+        }
+        for(String suffix:List.of("valid","conflict")) store.remove(prefix+"-"+suffix);
+        var originalInput=server.getServerDirectory().resolve("original-items.yml");
+        if(java.nio.file.Files.isRegularFile(originalInput)) {
+            ItemAliases.load(server.getServerDirectory().resolve("original-item-aliases.yml").toFile());
+            var recovered=ItemLibrary.migrationSource(originalInput.toFile(),server.registryAccess());
+            LoggerFactory.getLogger("interactions").info("[QUESTAUDIT] Original snapshots={}, unavailable={}",recovered.snapshots().size(),recovered.unavailable());
+            check(recovered.snapshots().size()==139 && recovered.unavailable().size()==1
+                    && recovered.unavailable().containsKey("163"),"migration_original_content_resolves_139_and_retains_missing_eyephone");
+            var result=LegacySavedItemMigration.run(server.createCommandSourceStack(),originalInput,directory.resolve("original-reports"),true);
+            var actual=gson.fromJson(java.nio.file.Files.readString(result),LegacySavedItemMigration.Report.class);
+            var statuses=actual.entries().values().stream().collect(java.util.stream.Collectors.groupingBy(
+                    LegacySavedItemMigration.Entry::status,java.util.TreeMap::new,java.util.stream.Collectors.counting()));
+            LoggerFactory.getLogger("interactions").info("[QUESTAUDIT] Original migration results={}",statuses);
+            for(var entry:recovered.snapshots().entrySet()) {
+                var status=actual.entries().get(entry.getKey()).status();
+                if(!(status.equals("IMPORTED") || status.equals("UNCHANGED")) ||
+                        !ItemStack.matches(entry.getValue(),store.get(server.registryAccess(),entry.getKey())))
+                    throw new AssertionError("Recovered item import mismatch: "+entry.getKey()+" "+status);
+            }
+            check(actual.entries().get("163").status().equals("UNAVAILABLE"),"migration_original_139_native_snapshots_roundtrip_and_unavailable_source_retained");
+            check(Arrays.equals(recovered.original(),java.nio.file.Files.readAllBytes(originalInput)),"migration_original_database_is_unchanged");
+            check(!recovered.legacyNicknames().isEmpty() && actual.legacyNicknames().equals(recovered.legacyNicknames()),
+                    "migration_original_nicknames_retained_without_inventing_provider_aliases");
+        }
     }
     private static AuditPlayer player(ServerLevel level,String name) {
         var player = new AuditPlayer(level,name); players.add(player); player.setPos(1,-60,1);

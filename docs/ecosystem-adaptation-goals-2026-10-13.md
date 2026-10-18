@@ -33,7 +33,9 @@ Progress 2026-10-18, UTC+08:00: [RSItemEditor library references](rsitemeditor-a
 add shared/personal resolution, defensive native snapshots, explicit NPC/dialogue
 grants and live provider permission checks. The combined FTB/RSItemEditor audit
 passes 31 checks with actual Paradigm authority; the optional-absence/provider
-service audit passes 123 checks. Legacy conversion remains open. The
+service audit passes 123 checks. [Legacy conversion](legacy-rsitemeditor-migration-2026-10-18.md)
+now has preview/apply, exact source backups and non-overwriting native shared imports;
+missing legacy content still needs authoritative source/provider resolution. The
 [FTB repeatable reward boundary](ftb-reward-claim-boundary-2026-10-18.md) records
 why a simple monetary callback cannot close the durable reward requirement.
 
