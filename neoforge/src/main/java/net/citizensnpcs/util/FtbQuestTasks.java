@@ -95,6 +95,42 @@ public final class FtbQuestTasks {
         return invoke(() -> evidenceTarget(evidencePrepared(server, teamId, taskId)));
     }
 
+    /** Serialized task/quest/reward definitions fence reloads that change the meaning of retained evidence. */
+    static String evidenceRevision(net.minecraft.server.MinecraftServer server, UUID teamId, String taskId) {
+        return invoke(() -> {
+            Prepared prepared = evidencePrepared(server, teamId, taskId); evidenceTarget(prepared);
+            var questType = Class.forName(QUEST + "Quest"); var base = Class.forName(QUEST + "QuestObjectBase");
+            var objects = new java.util.ArrayList<Object>(); objects.add(prepared.quest());
+            var tasks = (java.util.Collection<?>) questType.getMethod("getTasksAsList").invoke(prepared.quest());
+            var rewards = (java.util.Collection<?>) questType.getMethod("getRewards").invoke(prepared.quest());
+            objects.addAll(tasks); objects.addAll(rewards);
+            var data = new java.util.TreeMap<String, String>();
+            for (Object object : objects) {
+                var tag = new net.minecraft.nbt.CompoundTag();
+                base.getMethod("writeData", net.minecraft.nbt.CompoundTag.class, net.minecraft.core.HolderLookup.Provider.class)
+                        .invoke(object, tag, server.registryAccess());
+                String maximum = prepared.taskType().isInstance(object) ? ":" + prepared.taskType().getMethod("getMaxProgress").invoke(object) : "";
+                data.put(code(object), object.getClass().getName() + maximum + ":" + canonicalEvidence(tag));
+            }
+            var definition = new com.google.gson.JsonObject(); var json = new com.google.gson.Gson();
+            definition.add("objects", json.toJsonTree(data));
+            var taskOrder = new java.util.ArrayList<String>(); for (Object task : tasks) taskOrder.add(code(task));
+            var rewardOrder = new java.util.ArrayList<String>(); for (Object reward : rewards) rewardOrder.add(code(reward));
+            definition.add("taskOrder", json.toJsonTree(taskOrder));
+            definition.add("rewardOrder", json.toJsonTree(rewardOrder));
+            return QuestRewardJournal.digest(definition.toString());
+        });
+    }
+    private static String canonicalEvidence(net.minecraft.nbt.Tag tag) {
+        if (tag instanceof net.minecraft.nbt.CompoundTag compound) {
+            var fields = new java.util.TreeMap<String, String>();
+            for (String key : compound.getAllKeys()) fields.put(key, canonicalEvidence(compound.get(key)));
+            return new com.google.gson.Gson().toJson(fields);
+        }
+        if (tag instanceof net.minecraft.nbt.ListTag list) return new com.google.gson.Gson().toJson(list.stream().map(FtbQuestTasks::canonicalEvidence).toList());
+        return tag.getId() + ":" + tag;
+    }
+
     static EvidenceTarget projectEvidence(net.minecraft.server.MinecraftServer server, UUID teamId, String taskId,
             String questId, int cycle, long maximum, long expectedProgress, long absoluteProgress) {
         return invoke(() -> {

@@ -1,0 +1,118 @@
+{
+  "createdAt": "2026-10-18T23:45:31.7701374+08:00",
+  "timezone": "UTC+08:00",
+  "citizensBaseline": "21.1.233",
+  "selectedRuntime": "21.1.248",
+  "java": "21.0.11+10",
+  "ordinaryTests": {
+    "tests": 767.0,
+    "failures": 0.0,
+    "errors": 0.0,
+    "skipped": 0.0
+  },
+  "commerceJournalTests": 13,
+  "nativeCommerceChecks": 27,
+  "existingXmodChecks": 44,
+  "absentEconomyXmodChecks": 141,
+  "actualJvmKillRecovery": [
+    {
+      "stage": "receipt",
+      "checks": 6,
+      "checkpointManifest": false
+    },
+    {
+      "stage": "projection",
+      "checks": 6,
+      "checkpointManifest": false
+    },
+    {
+      "stage": "applied",
+      "checks": 6,
+      "checkpointManifest": true
+    }
+  ],
+  "economy": {
+    "commit": "b7f128d",
+    "version": "0.5.6-SNAPSHOT",
+    "commerceCapability": 3,
+    "jarSha256": "179115e5301ee6629acd3bdcbb6779d2549a35f7493821ab0fca79bcc43645f5",
+    "unitTests": 91,
+    "nativeChecks": 43
+  },
+  "release": [
+    {
+      "path": "C:\\Users\\ben_l\\Documents\\Coding\\citizens2-neoforged\\neoforge\\build\\libs\\citizens-2.0.43-neoforge-SNAPSHOT-sources.jar",
+      "sha256": "0e38966c709bb732508ec05ec932e847993127537f7a78a5845812f63c86f646",
+      "size": 1076452,
+      "probeAndProviderClassesAbsent": true,
+      "separateModContents": true
+    },
+    {
+      "path": "C:\\Users\\ben_l\\Documents\\Coding\\citizens2-neoforged\\neoforge\\build\\libs\\citizens-2.0.43-neoforge-SNAPSHOT.jar",
+      "sha256": "caf45d00f7d881b9b802b034005e40703b4ca8fe0af25195f346d99f216dd1e9",
+      "size": 3956207,
+      "probeAndProviderClassesAbsent": true,
+      "separateModContents": true
+    },
+    {
+      "path": "C:\\Users\\ben_l\\Documents\\Coding\\citizens2-neoforged\\neoforge\\build\\libs\\yuuniverse-interactions-2.0.43-neoforge-SNAPSHOT.jar",
+      "sha256": "0252e57a1a97c740493c74ae186569414a553b23900fad7b03f51de86df7341a",
+      "size": 204123,
+      "probeAndProviderClassesAbsent": true,
+      "separateModContents": true
+    }
+  ],
+  "logs": [
+    {
+      "path": "neoforge/build/commerce-all-unit.log",
+      "sha256": "7787615d45f76523d75e7e70691a7d4c6a5fdd019c7ad404b0aa4a83b924ecfe"
+    },
+    {
+      "path": "neoforge/build/commerce-native-final.log",
+      "sha256": "0a54eca65ffe1ea8c13887bacd83177c8c37779afb58e7c3cf54e3c7d465be8d"
+    },
+    {
+      "path": "neoforge/build/commerce-absent.log",
+      "sha256": "2f3440e5164aa306d2564588f8a2f8db2cf79d3294d37c3d5d59230e6b8d449c"
+    },
+    {
+      "path": "neoforge/build/commerce-release.log",
+      "sha256": "6f922671de1733ba843274d6157428b0550dc0d87690b4d30d863e2282a16ccb"
+    },
+    {
+      "path": "artifacts/commerce-crash-receipt-killed.log",
+      "sha256": "154346416a6a611cbc50c8730c8b272359497fb1045ca7e4291d2cfb9a12acfa"
+    },
+    {
+      "path": "artifacts/commerce-crash-receipt-recovered.log",
+      "sha256": "7f34deebd0e533488582301af595b8ffee810551fd06ca2d994c98caf1541d93"
+    },
+    {
+      "path": "artifacts/commerce-crash-projection-killed.log",
+      "sha256": "aa7dd4e38b9b0fa849e79660dc2a6cd02dd8bbc6caedfb4d12735199960321fa"
+    },
+    {
+      "path": "artifacts/commerce-crash-projection-recovered.log",
+      "sha256": "49e675846e0fc65eb89dfe63d6004a129ce91ca0f487cb34fed58dc7a22e6ed8"
+    },
+    {
+      "path": "artifacts/commerce-crash-applied-killed.log",
+      "sha256": "727da02eaafc21f65a14adbff65539b47657d709d9d6c9f6e63dd68912727798"
+    },
+    {
+      "path": "artifacts/commerce-crash-applied-recovered.log",
+      "sha256": "2cbc7aa166594da127410830f60698d4d4e5707d5e3289f97710d5d6e78d27e6"
+    }
+  ],
+  "productionTouched": false,
+  "goalComplete": false,
+  "remaining": [
+    "Additional Create machines and assembly",
+    "Multi-member/offline/reconnect and repeat rollback matrices",
+    "Inventory mutation kill matrix",
+    "NeoProtect/GriefLogger receipt attribution and rollback",
+    "Legacy eyephone and quest provenance",
+    "Paradigm inbound evaluation",
+    "Physical Vivecraft VR/non-VR and integrated release acceptance"
+  ]
+}

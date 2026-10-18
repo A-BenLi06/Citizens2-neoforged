@@ -2879,3 +2879,55 @@ commerce task bindings, additional Create evidence, NeoProtect/GriefLogger rollb
 content reload and physical/integrated migration acceptance remain open. The overall
 goal is not complete. Preserve the whole reward journal and Economy ledger when
 rolling back world blocks/FTB; arbitrary rollback of monetary evidence is unaccepted.
+
+## 2026-10-18T23:46:26.1215451+08:00 (UTC+08:00) - Project durable native commerce receipts into FTB tasks
+
+Implemented explicit authenticated system/coordinate shop and offer bindings for
+native FTB CustomTasks. Measures use actual item quantity, recorded trade quantity
+or one configured currency's settled minor units. English messages are external
+translations; IDs and currencies remain configured. Recipe and commerce task
+ownership are mutually exclusive. The public Economy 0.5.6 capability 3 from
+provider commit b7f128d supplies stable journal identity, ordered receipts and
+native precommit observation without a production compile dependency.
+
+PREPARED freezes the actual native team and repeat cycle before inventory/payment
+mutation. Committed receipts confirm that original scope; missing start observations
+remain reviewable without borrowing today's party. WAITING retains unresolved
+inventory or delivery and recovers using the exact public provider outcome.
+CONFIRMED is forced before absolute native projection and APPLIED afterward.
+Reconciliation handles FTB's independently saved older progress even when APPLIED
+already survived a process kill, checking original receipt/outcome again before
+restoring progress. Native cycle regression and changed serialized quest/task/reward
+definitions/order are fenced. Retired actor/provider and worker-thread calls fail.
+
+The single-writer forced immutable journal validates exact schemas, contiguous
+revisions, immutable payloads, operation/sequence uniqueness and checkpoint manifests
+that prove retained processed evidence still exists. Cursor/provider UUID/global
+high-water regression is rejected. Legacy missing request/trade fields remain
+unknown; bounded totals avoid overflow. Authenticated review keeps original
+attribution, requires explanation and cannot fabricate missing trade counts.
+Failed uncommitted requests remain PREPARED with no progress.
+
+Validation: 13 new meaningful journal tests; 767 ordinary tests with zero failures,
+errors or skips; 27 actual FTB/XMod/Rhino/Economy commerce checks plus 44 existing
+script/reward checks on 21.1.248; 141 absent-Economy/XMod checks on baseline 21.1.233.
+Three real opt-in JVM kills cover post-Economy/pre-replay, native projection callback
+and post-APPLIED/pre-FTB-save. Each restart passes six original settlement/progress/
+delivery checks. The final checkpoint-manifest implementation also passes the
+APPLIED kill/restart stage. Kill runner verifies its exact fixture Java PID marker.
+Final standard test/build and JAR inspection exclude all probes/provider/cross-mod
+classes; Interactions stays independent with its unchanged binary hash.
+
+Fixture repairs: public FTB holderLookup API, native system-shop quantity of one
+per trade (fixture now buys two explicit trades), PowerShell stage interpolation,
+and removal of only the dedicated fixture's previous coordinate shop on repeat.
+An intermediate draft commerce journal was preserved under the same isolated
+fixture before adding checkpoint manifests; no production data was migrated.
+No production restart/deployment or live world/ledger/config change occurred.
+Exact artifacts/log/provider hashes and limits: artifacts/ftb-commerce-validation-
+2026-10-18.json; usage/recovery policy: docs/ftb-commerce-tasks-2026-10-18.md.
+
+Complete port remains active. Additional Create machines/assembly, multi-member/
+offline/reconnect and repeat/inventory kill matrices, NeoProtect/GriefLogger
+attribution/rollback, unresolved legacy eyephone/quest provenance, Paradigm inbound
+formatting and physical VR/non-VR/integrated migration acceptance remain open.

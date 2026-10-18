@@ -148,6 +148,16 @@ Physical clients, full-world restart and combined migration acceptance remain op
 
 All rows are accepted goals. An unchecked row means adaptation remains to be implemented/validated, even when its provider is installed.
 
+Progress 2026-10-18, UTC+08:00: [native commerce receipt tasks](ftb-commerce-tasks-2026-10-18.md)
+add exact system/coordinate buy/sell bindings, precommit team/cycle attribution,
+durable receipt replay and absolute native projection. Actual selected FTB/XMod/
+Rhino/Economy validation passes 27 commerce plus 44 existing checks; absent-Economy
+regression passes 141 checks. Three actual JVM kill stages recover the original
+settlement/task/delivery with six checks each. Ordinary baseline passes 767 tests.
+The final checkpoint manifest version also passes the APPLIED kill/restart stage.
+Commerce capability 3 is provided by Economy 0.5.6. Additional Create machines,
+multi-member/offline recovery and full migration acceptance remain open.
+
 | Order / ID | Owner and task | Completion gate |
 |---|---|---|
 | 1 / ADAPT-01 | Economy: publish the [ordered Economy API backlog](yuuniverse-economy-gui-api-requirements-2026-10-12.md), starting with ECO-01–03. | Stable shop lookup and Economy-owned browser/system/coordinate menu entry points exist in a versioned provider JAR. Old/absent providers fail without payment. NPC/dialogue paths use the same menus as Economy commands. |

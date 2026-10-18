@@ -130,6 +130,13 @@ public final class QuestRuntimeAudit {
             catch(IllegalStateException expected) { check(rewardService.bindings(actor.createCommandSourceStack().withPermission(2)).isEmpty()
                     && rewardService.claims(actor.createCommandSourceStack().withPermission(2)).size()==absentClaims,
                     "absent_economy_reward_binding_rejects_before_durable_or_native_mutation"); }
+            var commerceService=net.citizensnpcs.util.CommerceQuestTasks.current(server);
+            var absentSource=actor.createCommandSourceStack().withPermission(2);
+            try { commerceService.bind(absentSource,custom.getCodeString(),net.citizensnpcs.util.CommerceTaskJournal.Shop.SYSTEM,"absent","offer",
+                    net.citizensnpcs.util.CommerceTaskJournal.Action.BUY_FROM_SHOP,net.citizensnpcs.util.CommerceTaskJournal.Measure.ITEMS,null,true);
+                throw new AssertionError("Absent Economy commerce task bound"); }
+            catch(IllegalStateException expected) { check(commerceService.bindings(absentSource).isEmpty() && commerceService.entries(absentSource).isEmpty(),
+                    "absent_economy_commerce_binding_rejects_without_native_or_durable_mutation"); }
             actor.getInventory().setItem(0,new ItemStack(Items.STONE,5));
             var before = FtbQuestTasks.query(actor,id);
             check(before.teamId().equals(team.getTeamId()) && before.progress()==0 && before.maximum()==3,

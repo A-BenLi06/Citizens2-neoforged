@@ -42,6 +42,7 @@ public final class XModRuntimeAudit {
         var server=event.getServer(); var level=server.overworld(); level.setChunkForced(0,0,true);
         if(server.getTickCount()<20 || !level.isPositionEntityTicking(new BlockPos(1,-60,1))) return;
         if(System.getenv("CITIZENS_REWARD_AUDIT_PHASE")!=null) { ran=true; crashRewards(server,System.getenv("CITIZENS_REWARD_AUDIT_PHASE")); return; }
+        if(System.getenv("CITIZENS_COMMERCE_AUDIT_PHASE")!=null) { ran=true; CommerceTaskRuntimeAudit.crash(server,System.getenv("CITIZENS_COMMERCE_AUDIT_PHASE")); return; }
         ran=true; notes.clear(); ServerPlayer actor=null; EmbeddedChannel channel=null; CraftQuestEvidence service=null;
         try {
             var file=ServerQuestFile.getInstance().orElseThrow();
@@ -140,6 +141,8 @@ public final class XModRuntimeAudit {
             catch(IllegalStateException expected) { check(true,"public_script_api_rejects_unregistered_same_uuid_player"); }
             try { CitizensScripts.validateEconomyMenu(actor,List.of("browser","-1")); throw new AssertionError("Invalid menu accepted"); }
             catch(IllegalArgumentException expected) { check(economy.balance(actor.getUUID(),currency)==balance,"script_rejects_invalid_menu_without_payment"); }
+            CommerceTaskRuntimeAudit.run(actor, file, economy);
+            team=file.getTeamData(actor).orElseThrow();
             monetaryRewards(actor, file, team, economy);
             LoggerFactory.getLogger("citizens").info("[XMODAUDIT] COMPLETE {} checks",passed);
         } catch(Throwable failure) { LoggerFactory.getLogger("citizens").error("[XMODAUDIT] FAILED",failure); }
@@ -317,7 +320,7 @@ public final class XModRuntimeAudit {
         } finally { buffer.release(); }
     }
     private static Note last(String kind) { return notes.stream().filter(note->note.kind().equals(kind)).toList().getLast(); }
-    private static EmbeddedChannel connect(ServerPlayer player) {
+    static EmbeddedChannel connect(ServerPlayer player) {
         var connection=new Connection(PacketFlow.SERVERBOUND);
         var channel=new EmbeddedChannel(new ChannelInitializer<Channel>() {
             @Override protected void initChannel(Channel channel) {

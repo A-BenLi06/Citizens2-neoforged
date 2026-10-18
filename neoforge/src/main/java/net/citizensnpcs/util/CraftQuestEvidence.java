@@ -98,6 +98,7 @@ public final class CraftQuestEvidence implements AutoCloseable {
         var player = source.getPlayer();
         if (player == null) throw new IllegalArgumentException("Binding needs an online operator's native team context");
         var target = FtbQuestTasks.evidenceTarget(player, taskId);
+        if (CommerceQuestTasks.owns(server, target.state().taskId())) throw new IllegalStateException("Task is already owned by commerce receipts");
         if (!target.visible() || target.state().maximum() <= 0) throw new IllegalArgumentException("Task is unavailable");
         var recipe = CraftingRecipes.find(server, recipeId).orElseThrow(() -> new IllegalArgumentException("Recipe is unavailable"));
         if (!recipe.tableEvidenceSupported() && (recipe.processing() == null
