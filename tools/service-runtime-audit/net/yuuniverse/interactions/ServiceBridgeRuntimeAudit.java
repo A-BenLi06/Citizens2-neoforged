@@ -89,6 +89,15 @@ public final class ServiceBridgeRuntimeAudit {
             AuditPlayer other = player(level, players, "ServiceOther");
             var economy = new Economy();
             economy.install();
+            var balanceExport = new net.citizensnpcs.util.ProviderPlaceholderExports.Export("audit_balance",
+                    net.citizensnpcs.util.ProviderPlaceholderExports.Kind.ECONOMY_BALANCE,"reserve",null,null);
+            check(net.citizensnpcs.util.ProviderPlaceholderExports.snapshot(actor,List.of(balanceExport))
+                    .get(balanceExport.externalKey()).equals(java.math.BigDecimal.valueOf(api.balance(actor.getUUID(),"reserve"),3).toPlainString()),
+                    "provider_exports_exact_configured_economy_currency_scale");
+            var missingCurrencyExport = new net.citizensnpcs.util.ProviderPlaceholderExports.Export("missing_balance",
+                    net.citizensnpcs.util.ProviderPlaceholderExports.Kind.ECONOMY_BALANCE,"missing_currency",null,null);
+            check(net.citizensnpcs.util.ProviderPlaceholderExports.snapshot(actor,List.of(missingCurrencyExport)).isEmpty(),
+                    "provider_exports_unknown_currency_has_no_fabricated_balance");
             var actions = new Actions(new ItemLibrary(), economy);
             var craftEvidence = net.citizensnpcs.util.CraftQuestEvidence.current(server);
             check(craftEvidence.bindings(server.createCommandSourceStack()).isEmpty(),

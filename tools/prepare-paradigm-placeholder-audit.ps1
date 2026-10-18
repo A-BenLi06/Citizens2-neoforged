@@ -22,6 +22,8 @@ foreach ($withProvider in @($true, $false)) {
     Set-Content -LiteralPath (Join-Path $fixture 'eula.txt') -Encoding utf8 -Value 'eula=true'
     Set-Content -LiteralPath (Join-Path $fixture 'expect-provider.txt') -Encoding utf8 -Value $withProvider.ToString().ToLowerInvariant()
     Set-Content -LiteralPath (Join-Path $fixture 'paradigm-placeholder-audit-fixture.txt') -Encoding utf8 -Value 'Isolated Citizens placeholder audit. No production NPC/player data belongs here.'
+    New-Item -ItemType Directory -Force -Path (Join-Path $fixture 'config/citizens') | Out-Null
+    Set-Content -LiteralPath (Join-Path $fixture 'config/citizens/placeholder-exports.json') -Encoding utf8 -Value '{"schema":1,"exports":[{"key":"audit_balance","kind":"ECONOMY_BALANCE","currencyId":"audit"},{"key":"audit_task","kind":"FTB_TASK_PROGRESS","taskId":"1"}]}'
     if ($withProvider) {
         Copy-Item -LiteralPath $provider.FullName -Destination (Join-Path $fixture 'mods/paradigm.jar')
         New-Item -ItemType Directory -Force -Path (Join-Path $fixture 'config/paradigm') | Out-Null

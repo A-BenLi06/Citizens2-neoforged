@@ -2698,3 +2698,29 @@ failed logs as evidence. Separate release jars/sources exclude all audit fixture
 Exact hashes: artifacts/craft-task-projection-validation-2026-10-18.json. Production
 was untouched. Monetary rewards, commerce evidence, machine adapters, legacy task
 mapping and actual process-kill/rollback plus physical-client acceptance remain.
+
+## 2026-10-18T20:29:59.9381726+08:00 (UTC+08:00) - Export configured Economy and FTB values through Paradigm
+
+Extended owned Paradigm registrations with optional strict placeholder-exports.json
+configuration. Explicit keys reference exact currency IDs or native FTB task IDs,
+with optional current permission checks; reserved/duplicate/unknown fields fail
+without rewriting source. Balance snapshots reacquire Economy's public provider,
+require an existing account and render exact major units using native scale. Task
+values use current authoritative team state and visibility. Missing/denied/offline
+values are omitted, never fabricated as zero or borrowed from console/another user.
+
+Normal server-thread resolution reads current owners; worker callbacks read immutable
+published snapshots with up to one tick of lag and never touch live provider state.
+Configured keys use existing collision rollback, owned handles, provider replacement
+and shutdown retirement. Built-in NPC resolution avoids needless provider queries.
+No inbound Paradigm evaluator or private formatter is introduced.
+
+Validation: 746 ordinary tests, zero failures/errors/skips, successful build;
+136 combined actual FTB/Paradigm/KubeJS checks; 86 actual Paradigm 2.5.0 lifecycle
+checks including configured-key release/replacement; 8 absent-provider checks;
+131 Economy/camera/service checks including exact configured currency precision.
+All native runs target NeoForge 21.1.248; ordinary build remains 21.1.233. Restored
+standard separate binaries/sources and verified no audit/provider classes leak.
+Evidence and hashes: artifacts/provider-exports-validation-2026-10-18.json. Production
+was untouched. Durable monetary rewards, commerce tasks, machines, crash/rollback,
+remaining specialist integrations and physical clients remain active requirements.

@@ -44,7 +44,8 @@ Economy owns currency, settlement and its system/coordinate shop menus. The
 supported optional API from Economy 0.5.1+, and the
 [coordinate adapter](docs/economy-coordinate-adapter-2026-10-16.md) requires 0.5.2+.
 Consumers reacquire the provider and validate player/menu targets before opening.
-Paradigm supplies permissions/groups and owned NPC placeholder registration;
+Paradigm supplies permissions/groups, owned NPC placeholder registration and
+[configured Economy/FTB exports](docs/paradigm-provider-exports-2026-10-18.md);
 CMDCam supplies supported camera playback. [FTB task/delivery integration](docs/ftb-task-adapter-2026-10-18.md)
 shares native team state with NPC commands and dialogue. [RSItemEditor references](docs/rsitemeditor-adapter-2026-10-18.md)
 resolve shared/personal items and native permissions. [Legacy item migration](docs/legacy-rsitemeditor-migration-2026-10-18.md)

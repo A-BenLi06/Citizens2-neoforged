@@ -202,6 +202,7 @@ public final class QuestRuntimeAudit {
             FTBTeamsAPI.api().getManager().createPartyTeam(craftActor,"CraftAuditParty","fixture",
                     dev.ftb.mods.ftblibrary.icon.Color4I.WHITE);
             auditCrafting(craftActor,other,nativeCraftTask);
+            auditProviderExports(craftActor,other,nativeCraftTask);
             auditCraftProjection(craftActor,other);
             auditMigration(actor);
             LoggerFactory.getLogger("interactions").info("[QUESTAUDIT] COMPLETE {} checks",passed);
@@ -211,6 +212,36 @@ public final class QuestRuntimeAudit {
             for(var entry:realPlayers.entrySet()) { server.getPlayerList().remove(entry.getKey()); entry.getValue().finishAndReleaseAll(); }
             server.halt(false);
         }
+    }
+    private static void auditProviderExports(ServerPlayer actor, ServerPlayer other, ItemTask task) throws Exception {
+        var exports=net.citizensnpcs.util.ProviderPlaceholderExports.load(java.nio.file.Path.of("config/citizens/placeholder-exports.json"));
+        var values=net.citizensnpcs.util.ProviderPlaceholderExports.snapshot(actor,exports);
+        var team=ServerQuestFile.getInstance().orElseThrow().getTeamData(actor).orElseThrow();
+        check(values.get("citizens_audit_craft_progress").equals(Long.toString(team.getProgress(task)))
+                && !values.containsKey("citizens_audit_missing_balance"),"provider_exports_native_ftb_owner_and_absent_economy");
+        net.citizensnpcs.util.ParadigmPlaceholders.refresh();
+        var resolve=Class.forName("eu.avalanche7.paradigm.api.internal.ApiProviderRegistry")
+                .getMethod("resolveExternalPlaceholders",String.class,UUID.class);
+        String template="{citizens_audit_craft_progress}";
+        check(resolve.invoke(null,template,actor.getUUID()).equals(Long.toString(team.getProgress(task))),
+                "provider_exports_actual_paradigm_registered_task_value");
+        check(java.util.concurrent.CompletableFuture.supplyAsync(()->{
+            try { return resolve.invoke(null,template,actor.getUUID()); } catch(Exception failure) { throw new RuntimeException(failure); }
+        }).join().equals(Long.toString(team.getProgress(task))),"provider_exports_worker_reads_immutable_native_task_snapshot");
+        check(resolve.invoke(null,template,other.getUUID()).equals("0") && resolve.invoke(null,template,UUID.randomUUID()).equals(""),
+                "provider_exports_team_isolation_and_offline_privacy");
+        var denied=new net.citizensnpcs.util.ProviderPlaceholderExports.Export("denied_task",
+                net.citizensnpcs.util.ProviderPlaceholderExports.Kind.FTB_TASK_PROGRESS,null,task.getCodeString(),"audit.unknown.permission");
+        check(net.citizensnpcs.util.ProviderPlaceholderExports.snapshot(actor,List.of(denied)).isEmpty(),"provider_exports_current_permission_filters_task_values");
+        var file=ServerQuestFile.getInstance().orElseThrow();
+        var hiddenQuest=new Quest(0x10601L,file.getChapter(0x10301L));
+        var hiddenConfig=new net.minecraft.nbt.CompoundTag(); hiddenConfig.putBoolean("invisible",true);
+        hiddenQuest.readData(hiddenConfig,actor.registryAccess()); hiddenQuest.onCreated();
+        var hidden=new CustomTask(0x10602L,hiddenQuest); hidden.setMaxProgress(100); hidden.onCreated();
+        var hiddenExport=new net.citizensnpcs.util.ProviderPlaceholderExports.Export("hidden_task",
+                net.citizensnpcs.util.ProviderPlaceholderExports.Kind.FTB_TASK_PROGRESS,null,hidden.getCodeString(),null);
+        check(net.citizensnpcs.util.ProviderPlaceholderExports.snapshot(actor,List.of(hiddenExport)).isEmpty(),
+                "provider_exports_hidden_task_identity_has_no_value");
     }
     private static void auditCraftProjection(ServerPlayer actor, ServerPlayer other) throws Exception {
         var server=actor.getServer(); var manager=server.getRecipeManager();

@@ -57,8 +57,8 @@ public final class ParadigmPlaceholders {
         Key(String suffix) { external = "citizens_" + suffix; }
     }
 
-    private record Values(String name, String id, String uuid, String nearest) {
-        static final Values EMPTY = new Values(null, null, null, null);
+    private record Values(String name, String id, String uuid, String nearest, Map<String, String> providerValues) {
+        static final Values EMPTY = new Values(null, null, null, null, Map.of());
         String get(Key key) {
             return switch (key) {
                 case SELECTED_NAME -> name;
@@ -82,9 +82,14 @@ public final class ParadigmPlaceholders {
         volatile Snapshot snapshot = Snapshot.EMPTY;
         Object service;
         boolean warned;
+        final List<ProviderPlaceholderExports.Export> exports;
 
         Bridge(MinecraftServer server) throws ReflectiveOperationException {
             this.server = server;
+            try {
+                exports = ProviderPlaceholderExports.load(net.neoforged.fml.loading.FMLPaths.CONFIGDIR.get()
+                        .resolve("citizens/placeholder-exports.json"));
+            } catch (java.io.IOException invalid) { throw new IllegalArgumentException("Could not load placeholder exports", invalid); }
             Class<?> api = Class.forName("eu.avalanche7.paradigm.api.ParadigmAPI");
             available = api.getMethod("isAvailable");
             capabilities = api.getMethod("capabilities");
@@ -131,28 +136,9 @@ public final class ParadigmPlaceholders {
         private void registerAll() throws ReflectiveOperationException {
             try {
                 for (Key key : Key.values()) {
-                    Object resolver = Proxy.newProxyInstance(resolverType.getClassLoader(), new Class<?>[] { resolverType },
-                            (proxy, method, args) -> {
-                                if (method.getDeclaringClass() == Object.class) return switch (method.getName()) {
-                                    case "equals" -> proxy == args[0];
-                                    case "hashCode" -> System.identityHashCode(proxy);
-                                    case "toString" -> "Citizens placeholder " + key.external;
-                                    default -> throw new UnsupportedOperationException(method.toString());
-                                };
-                                if (!running) return null;
-                                UUID player = (UUID) ((Optional<?>) playerUuid.invoke(args[0])).orElse(null);
-                                if (server.isSameThread()) return query(player).get(key);
-                                // Paradigm message delivery runs on the server thread. Other formatter callers can
-                                // safely use the last completed tick without reading live entity/registry state.
-                                Snapshot published = snapshot;
-                                return (player == null ? published.console()
-                                        : published.players().getOrDefault(player, published.console())).get(key);
-                            });
-                    Object handle = register.invoke(service, "citizens", key.external, resolver);
-                    handles.add(handle);
-                    if (!Boolean.TRUE.equals(active.invoke(handle)) || !"REGISTERED".equals(String.valueOf(status.invoke(handle))))
-                        throw new IllegalStateException("Could not own placeholder " + key.external + ": " + status.invoke(handle));
+                    register(key.external, key);
                 }
+                for (var export : exports) register(export.externalKey(), null);
             } catch (ReflectiveOperationException | RuntimeException | LinkageError failure) {
                 // ALREADY_REGISTERED retains the old resolver and increments its reference count. Release our handle
                 // as well as this partial batch; never claim or remove somebody else's existing registration.
@@ -161,14 +147,49 @@ public final class ParadigmPlaceholders {
             }
         }
 
+        private void register(String external, Key key) throws ReflectiveOperationException {
+            Object resolver = Proxy.newProxyInstance(resolverType.getClassLoader(), new Class<?>[] { resolverType },
+                    (proxy, method, args) -> {
+                        if (method.getDeclaringClass() == Object.class) return switch (method.getName()) {
+                            case "equals" -> proxy == args[0];
+                            case "hashCode" -> System.identityHashCode(proxy);
+                            case "toString" -> "Citizens placeholder " + external;
+                            default -> throw new UnsupportedOperationException(method.toString());
+                        };
+                        if (!running) return null;
+                        UUID player = (UUID) ((Optional<?>) playerUuid.invoke(args[0])).orElse(null);
+                        if (key == null) {
+                            if (player == null) return null;
+                            if (server.isSameThread()) return ProviderPlaceholderExports.snapshot(
+                                    server.getPlayerList().getPlayer(player), exports).get(external);
+                            Values values = snapshot.players().get(player);
+                            return values == null ? null : values.providerValues().get(external);
+                        }
+                        if (server.isSameThread()) return query(player, false).get(key);
+                        // Worker callers use immutable values from the last completed server tick.
+                        Snapshot published = snapshot;
+                        return (player == null ? published.console()
+                                : published.players().getOrDefault(player, published.console())).get(key);
+                    });
+            Object handle = register.invoke(service, "citizens", external, resolver);
+            handles.add(handle);
+            if (!Boolean.TRUE.equals(active.invoke(handle)) || !"REGISTERED".equals(String.valueOf(status.invoke(handle))))
+                throw new IllegalStateException("Could not own placeholder " + external + ": " + status.invoke(handle));
+        }
+
         private Values query(UUID id) {
+            return query(id, true);
+        }
+
+        private Values query(UUID id, boolean includeProviders) {
             ServerPlayer player = id == null ? null : server.getPlayerList().getPlayer(id);
             NPC selected = CitizensAPI.getDefaultNPCSelector().getSelected(player == null
                     ? server.createCommandSourceStack() : player.createCommandSourceStack());
             return new Values(selected == null ? null : selected.getFullName(),
                     selected == null ? null : Integer.toString(selected.getId()),
                     selected == null ? null : selected.getUniqueId().toString(),
-                    player == null ? null : Placeholders.replace("<nearest_npc_id>", player));
+                    player == null ? null : Placeholders.replace("<nearest_npc_id>", player),
+                    includeProviders ? ProviderPlaceholderExports.snapshot(player, exports) : Map.of());
         }
 
         void release() {

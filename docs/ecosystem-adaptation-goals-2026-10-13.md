@@ -29,6 +29,13 @@ Exact artifact sources, SHA-512/SHA-256 hashes and installation paths are record
 
 ## Ordered adaptation backlog
 
+Progress 2026-10-18, UTC+08:00: [configured Paradigm exports](paradigm-provider-exports-2026-10-18.md)
+add exact native currency balances and visibility/permission-filtered current-team
+FTB progress/maximum/completion. Worker callbacks use immutable snapshots; owned
+registration handles include configured keys and retire on provider replacement.
+Inbound evaluation still requires a supported Paradigm contract; ADAPT-07's full
+formatting/provider reload and release acceptance remain separate.
+
 Progress 2026-10-18, UTC+08:00: [explicit FTB craft bindings](ftb-craft-evidence-projection-2026-10-18.md)
 connect confirmed exact-recipe evidence to owned CustomTasks. Bindings retain stable
 epochs, recipe revisions, creator UUIDs and native definitions; current-team

@@ -1,5 +1,11 @@
 # Citizens values through Paradigm's placeholder API
 
+2026-10-18 follow-up: [configured provider exports](paradigm-provider-exports-2026-10-18.md)
+now add exact Economy balances and visible current-team FTB values on the installed
+Paradigm 2.5.0 contract, retaining the same registration ownership and worker snapshot
+rules. This supersedes the pending outbound-provider clause below. A supported
+inbound evaluation API and broader client/reload acceptance remain open.
+
 This optional bridge follows the [retained NeoForge ecosystem guidance](neoforge-ecosystem-replacements-2026-09-22.md). Citizens owns the NPC values; Paradigm owns their use in its formatting surfaces. The installed Paradigm 2.4.2b jar supplies the actual public `PlaceholderService`, `ExternalPlaceholderResolver`, `PlaceholderContext` and `Registration` contracts. No provider implementation or Bukkit expansion runtime is bundled.
 
 ## Exported values

@@ -134,6 +134,11 @@ public final class ParadigmPlaceholderRuntimeAudit {
                     }
                     expect(alice, all(), "Alpha|" + alpha.getId() + "|" + alpha.getUniqueId() + "|" + alpha.getId());
                     expect(bob, all(), "Beta|" + beta.getId() + "|" + beta.getUniqueId() + "|" + beta.getId());
+                    for(String key:List.of("citizens_audit_balance","citizens_audit_task")) {
+                        Object duplicate=registration("citizens",key,"wrong");
+                        check(status.invoke(duplicate).toString().equals("ALREADY_REGISTERED"),"configured_provider_key_owned_"+key); close.invoke(duplicate);
+                        check(raw("{"+key+"}",alice.player.getUUID()).isEmpty(),"configured_absent_provider_value_empty_"+key);
+                    }
                 }
                 case 2 -> {
                     alpha.setName("Cost $5");
@@ -175,6 +180,11 @@ public final class ParadigmPlaceholderRuntimeAudit {
                         check(raw("{" + key + "}", null).equals("{" + key + "}"), "uninstall_removes_key_" + key);
                         Object probe = registration("citizens", key, "probe");
                         check(status.invoke(probe).toString().equals("REGISTERED"), "repeated_install_did_not_leak_reference_" + key); close.invoke(probe);
+                    }
+                    for(String key:List.of("citizens_audit_balance","citizens_audit_task")) {
+                        check(raw("{"+key+"}",alice.player.getUUID()).equals("{"+key+"}"),"configured_export_removed_on_uninstall_"+key);
+                        Object probe=registration("citizens",key,"probe");
+                        check(status.invoke(probe).toString().equals("REGISTERED"),"configured_export_no_leaked_reference_"+key); close.invoke(probe);
                     }
                     collision = registration("citizens", "citizens_selected_npc_id", "existing");
                     ParadigmPlaceholders.install(server);

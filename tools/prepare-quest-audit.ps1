@@ -40,6 +40,9 @@ ServerEvents.recipes(event => {
 'eula=true' | Set-Content -LiteralPath (Join-Path $fixture 'eula.txt') -Encoding utf8
 'citizens-quest-audit' | Set-Content -LiteralPath (Join-Path $fixture 'quest-audit-fixture.txt') -Encoding utf8
 New-Item -ItemType Directory -Force (Join-Path $fixture 'config'), (Join-Path $fixture 'defaultconfigs') | Out-Null
+New-Item -ItemType Directory -Force (Join-Path $fixture 'config/citizens') | Out-Null
+'{"schema":1,"exports":[{"key":"audit_craft_progress","kind":"FTB_TASK_PROGRESS","taskId":"10403"},{"key":"audit_craft_completed","kind":"FTB_TASK_COMPLETED","taskId":"10403"},{"key":"audit_missing_balance","kind":"ECONOMY_BALANCE","currencyId":"audit"}]}' |
+    Set-Content -LiteralPath (Join-Path $fixture 'config/citizens/placeholder-exports.json') -Encoding utf8
 $questChapters = Join-Path $fixture 'config/ftbquests/quests/chapters'
 New-Item -ItemType Directory -Force $questChapters | Out-Null
 @'
