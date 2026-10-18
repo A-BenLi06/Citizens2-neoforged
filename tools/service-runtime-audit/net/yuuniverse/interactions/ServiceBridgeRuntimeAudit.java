@@ -136,6 +136,12 @@ public final class ServiceBridgeRuntimeAudit {
             check(actions.runAll(List.of("player_command_as_op: shop list"), actor, Component.empty())
                     && actor.containerMenu == previous, "native_shop_subcommands_keep_their_dispatcher_grammar");
             int optionalPaper = actor.getInventory().countItem(Items.PAPER);
+            check(!actions.runAll(List.of(payment(), "ftb_tasks:"), actor, Component.empty())
+                    && actor.getInventory().countItem(Items.PAPER)==optionalPaper,
+                    "absent_quest_discovery_fails_before_dialogue_payment");
+            check(!actions.runAll(List.of(payment(), "ftb_task: 10307"), actor, Component.empty())
+                    && actor.getInventory().countItem(Items.PAPER)==optionalPaper,
+                    "absent_quest_details_fails_before_dialogue_payment");
             check(!actions.runAll(List.of(payment(), "recipe: citizens_audit:missing_recipe"), actor, Component.empty())
                     && actor.getInventory().countItem(Items.PAPER)==optionalPaper,
                     "missing_recipe_fails_before_dialogue_payment");

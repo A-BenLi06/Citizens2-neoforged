@@ -2589,3 +2589,27 @@ Final separate binary/source archives contain no audit probes. Evidence/hashes:
 artifacts/recipe-discovery-validation-2026-10-18.json. Production was untouched.
 Machine adapters, attributed craft evidence, durable rewards, commerce crash
 reconciliation and specialist/client acceptance remain active requirements.
+
+## 2026-10-18T18:32:17+08:00 (UTC+08:00) - Native task discovery and NPC details
+
+Added immutable current-team FTB task discovery and details with stable native-ID
+pagination, localized title JSON, task kinds, authoritative progress, prerequisites,
+sequential order, repeatable cycle observations and player/team reward claim status.
+Visibility masks hidden task/dependency identities and honors hidden-until-startable
+details. Reads require the active online actor and server thread and create no teams,
+progress, claims or payments. Discovery uses FTB's public live object collection:
+native testing exposed that its cached task collection can lag newly created tasks.
+No provider cache or private fields are modified to conceal that behavior.
+
+Added quest list/details commands and dedicated Interactions actions; preflight
+checks provider/session/visibility before other actions consume payment. Native
+cycle counts are explicitly observations, not durable monetary generations. No
+purchase/sale binding is inferred from task labels and no reward is issued.
+
+Validation: 78 combined native checks on NeoForge 21.1.248 with actual FTB, Paradigm,
+RSItemEditor and KubeJS; 127 separate Economy/camera/provider-absence checks;
+730 ordinary tests, zero failures/errors/skips, successful build. Separate release
+binary/source jars contain no runtime audit probes or cross-packaged mod classes.
+Evidence/hashes: artifacts/ftb-task-discovery-validation-2026-10-18.json.
+Production was untouched. Durable generations/rewards, commerce receipt application,
+craft evidence/machines, crash reconciliation and specialist/client gates remain open.

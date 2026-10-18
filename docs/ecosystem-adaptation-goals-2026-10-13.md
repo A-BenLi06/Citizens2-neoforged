@@ -29,6 +29,12 @@ Exact artifact sources, SHA-512/SHA-256 hashes and installation paths are record
 
 ## Ordered adaptation backlog
 
+Progress 2026-10-18, UTC+08:00: [FTB task discovery](ftb-task-discovery-2026-10-18.md)
+adds native visibility-filtered pagination, details, prerequisites, sequential order,
+repeatability observations and reward claim ownership/status to NPC commands and
+dialogue. It does not establish a durable monetary generation or apply craft/commerce
+evidence; those requirements remain open.
+
 Progress 2026-10-18, UTC+08:00: [native recipe discovery](crafting-recipe-discovery-2026-10-18.md)
 provides registry IDs, component-sensitive output lookup, native ingredient predicates,
 tag/candidate snapshots and revision checks for NPC/dialogue guidance. The selected

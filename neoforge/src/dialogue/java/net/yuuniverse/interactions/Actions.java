@@ -247,6 +247,16 @@ public final class Actions {
                 net.citizensnpcs.util.RSItemEditorItems.give(source, player, reference, Integer.parseInt(fields.get(2)), validate);
             }
             case "ftb_submit" -> net.citizensnpcs.util.FtbQuestTasks.submit(player, body.trim(), validate);
+            case "ftb_tasks" -> {
+                var page = net.citizensnpcs.util.FtbQuestTasks.discover(player, body.isBlank() ? null : body.trim(),
+                        net.citizensnpcs.commands.QuestCommands.TASKS_PER_PAGE);
+                if (!validate) net.citizensnpcs.commands.QuestCommands.presentTasks(player.createCommandSourceStack(), page);
+            }
+            case "ftb_task" -> {
+                var task = net.citizensnpcs.util.FtbQuestTasks.describe(player, body.trim())
+                        .orElseThrow(() -> new IllegalArgumentException("Task details are hidden"));
+                if (!validate) net.citizensnpcs.commands.QuestCommands.presentDetails(player.createCommandSourceStack(), task);
+            }
             case "recipe" -> {
                 var recipe = net.citizensnpcs.util.CraftingRecipes.find(player.getServer(), ResourceLocation.parse(body.trim()))
                         .orElseThrow(() -> new IllegalArgumentException("Recipe is unavailable"));

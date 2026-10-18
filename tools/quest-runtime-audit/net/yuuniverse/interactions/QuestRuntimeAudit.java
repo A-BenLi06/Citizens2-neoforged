@@ -151,6 +151,7 @@ public final class QuestRuntimeAudit {
                     dev.ftb.mods.ftblibrary.icon.Color4I.WHITE);
             check(FtbQuestTasks.query(actor,id).teamId().equals(party.getId()), "party_change_reacquires_team_identity");
             auditItems(actor,other);
+            auditDiscovery(actor,other);
             auditRecipes(actor);
             auditMigration(actor);
             LoggerFactory.getLogger("interactions").info("[QUESTAUDIT] COMPLETE {} checks",passed);
@@ -159,6 +160,95 @@ public final class QuestRuntimeAudit {
             for(var player:players) { server.getPlayerList().remove(player); player.channel.finishAndReleaseAll(); }
             server.halt(false);
         }
+    }
+    private static void auditDiscovery(AuditPlayer actor,AuditPlayer other) throws Exception {
+        var file=ServerQuestFile.getInstance().orElseThrow(); var registries=actor.registryAccess();
+        var old=file.getChapter(0x10301L); if(old!=null) old.deleteSelf();
+        var chapter=new Chapter(0x10301L,file,file.getDefaultChapterGroup()); chapter.onCreated();
+        var prerequisite=new Quest(0x10302L,chapter); prerequisite.setRawTitle("Visible prerequisite"); prerequisite.onCreated();
+        var prerequisiteTask=new CustomTask(0x10303L,prerequisite); prerequisiteTask.onCreated();
+        var hidden=new Quest(0x10304L,chapter);
+        var hiddenConfig=new net.minecraft.nbt.CompoundTag(); hiddenConfig.putBoolean("invisible",true);
+        hidden.readData(hiddenConfig,registries); hidden.setRawTitle("Hidden prerequisite"); hidden.onCreated();
+        var hiddenTask=new CustomTask(0x10305L,hidden); hiddenTask.onCreated();
+        var quest=new Quest(0x10306L,chapter);
+        var config=new net.minecraft.nbt.CompoundTag(); config.putBoolean("hide_until_deps_visible",false);
+        config.putBoolean("hide_until_deps_complete",false); config.putBoolean("hide_details_until_startable",false);
+        config.putBoolean("require_sequential_tasks",true); config.putBoolean("can_repeat",true);
+        quest.readData(config,registries); quest.setRawTitle("Discovery quest"); quest.addDependency(prerequisite); quest.addDependency(hidden); quest.onCreated();
+        var delivery=new ItemTask(0x10307L,quest).setStackAndCount(new ItemStack(Items.STONE),10);
+        delivery.setConsumeItems(Tristate.TRUE); delivery.onCreated();
+        var possession=new ItemTask(0x10308L,quest).setStackAndCount(new ItemStack(Items.DIAMOND),5);
+        possession.setConsumeItems(Tristate.FALSE); possession.onCreated();
+        var craft=new ItemTask(0x10309L,quest) {
+            @Override public boolean isOnlyFromCrafting() { return true; }
+            @Override public net.minecraft.network.chat.MutableComponent getAltTitle() { return Component.translatable("item.minecraft.stone"); }
+        };
+        craft.setStackAndCount(new ItemStack(Items.STONE),12); craft.setConsumeItems(Tristate.FALSE); craft.onCreated();
+        var custom=new CustomTask(Long.MAX_VALUE-2,quest); custom.onCreated();
+        var personalReward=new dev.ftb.mods.ftbquests.quest.reward.CustomReward(0x10310L,quest);
+        var personalConfig=new net.minecraft.nbt.CompoundTag(); personalConfig.putBoolean("team_reward",false);
+        personalReward.readData(personalConfig,registries); personalReward.onCreated();
+        var sharedReward=new dev.ftb.mods.ftbquests.quest.reward.CustomReward(0x10311L,quest);
+        var sharedConfig=new net.minecraft.nbt.CompoundTag(); sharedConfig.putBoolean("team_reward",true);
+        sharedReward.readData(sharedConfig,registries); sharedReward.onCreated();
+        var team=file.getTeamData(actor).orElseThrow(); var otherTeam=file.getTeamData(other).orElseThrow();
+        team.setProgress(delivery,4); otherTeam.setProgress(delivery,1);
+        String before=team.serializeNBT().toString(); int teamCount=file.getAllTeamData().size();
+        var view=FtbQuestTasks.describe(actor,delivery.getCodeString()).orElseThrow();
+        check(view.actorId().equals(actor.getUUID()) && view.state().teamId().equals(team.getTeamId()) && view.state().progress()==4
+                && view.questId().equals(quest.getCodeString()) && view.chapterId().equals(chapter.getCodeString()),
+                "task_discovery_uses_current_party_and_authoritative_ids_progress");
+        check(view.kind()==FtbQuestTasks.Kind.DELIVERY && FtbQuestTasks.describe(actor,possession.getCodeString()).orElseThrow().kind()==FtbQuestTasks.Kind.POSSESSION
+                && FtbQuestTasks.describe(actor,craft.getCodeString()).orElseThrow().kind()==FtbQuestTasks.Kind.CRAFT
+                && FtbQuestTasks.describe(actor,custom.getCodeString()).orElseThrow().kind()==FtbQuestTasks.Kind.CUSTOM,
+                "task_discovery_distinguishes_native_craft_possession_delivery_and_custom");
+        check(FtbQuestTasks.describe(actor,craft.getCodeString()).orElseThrow().titleJson().contains("\"translate\"")
+                && FtbQuestTasks.describe(actor,craft.getCodeString()).orElseThrow().type().equals(craft.getType().getTypeId()),
+                "task_discovery_retains_native_localizable_titles_and_type_ids");
+        check(view.prerequisites().hiddenCount()==1 && view.prerequisites().visible().size()==1
+                && view.prerequisites().visible().getFirst().id().equals(prerequisite.getCodeString())
+                && !view.prerequisites().complete(),"task_discovery_masks_hidden_dependency_identity_and_title");
+        check(FtbQuestTasks.describe(actor,hiddenTask.getCodeString()).isEmpty(),"task_discovery_never_describes_invisible_quest_tasks");
+        var sequential=FtbQuestTasks.describe(actor,possession.getCodeString()).orElseThrow();
+        check(sequential.order().sequential() && sequential.order().index()==1
+                && sequential.order().previous().orElseThrow().id().equals(delivery.getCodeString())
+                && !sequential.order().previous().orElseThrow().completed() && !sequential.state().available(),
+                "task_discovery_exposes_native_sequential_dependency");
+        check(view.cycle().repeatable() && view.cycle().completedCycles()==team.getCompletionCount(quest)
+                && view.cycle().startedAt().orElseThrow()==team.getStartedTime(quest.id).orElseThrow().getTime(),
+                "task_discovery_copies_native_cycle_observations_without_inventing_claim_generations");
+        check(view.rewards().stream().anyMatch(reward->reward.rewardId().equals(personalReward.getCodeString())
+                    && reward.scope()==FtbQuestTasks.ClaimScope.PLAYER && reward.ownerId().equals(actor.getUUID()))
+                && view.rewards().stream().anyMatch(reward->reward.rewardId().equals(sharedReward.getCodeString())
+                    && reward.scope()==FtbQuestTasks.ClaimScope.TEAM && reward.ownerId().equals(team.getTeamId())),
+                "task_discovery_preserves_player_and_team_claim_ownership");
+        var seen=new LinkedHashSet<String>(); String after=null; boolean paged=false;
+        for(int pageNumber=0;pageNumber<=file.getAllObjects().size();pageNumber++) {
+            var page=FtbQuestTasks.discover(actor,after,2);
+            for(var task:page.tasks()) if(!seen.add(task.taskId())) throw new AssertionError("duplicate discovery cursor");
+            if(page.nextAfterId()==null) { paged=true; break; }
+            after=page.nextAfterId();
+        }
+        check(paged && seen.contains(custom.getCodeString()) && !seen.contains(hiddenTask.getCodeString()),
+                "task_discovery_high_id_pagination_is_complete_and_filters_hidden_entries");
+        var page=FtbQuestTasks.discover(actor,null,2);
+        try { page.tasks().clear(); throw new AssertionError("mutable discovery page"); }
+        catch(UnsupportedOperationException expected) { check(true,"task_discovery_pages_are_immutable"); }
+        check(before.equals(team.serializeNBT().toString()) && file.getAllTeamData().size()==teamCount,
+                "task_discovery_does_not_mutate_progress_claims_or_create_teams");
+        check(FtbQuestTasks.describe(other,delivery.getCodeString()).orElseThrow().state().progress()==1,
+                "task_discovery_separate_party_progress_stays_separate");
+        var actions=new Actions(new ItemLibrary(),new Economy()); int messages=actor.messages.size();
+        check(actions.validateAll(List.of("ftb_tasks:","ftb_task: "+delivery.getCodeString()),actor,Component.empty())
+                && actor.messages.size()==messages,"task_discovery_dialogue_preflight_is_read_only");
+        check(actions.runAll(List.of("ftb_task: "+delivery.getCodeString()),actor,Component.empty())
+                && actor.messages.subList(messages,actor.messages.size()).stream().anyMatch(message->message.contains(delivery.getCodeString())),
+                "task_discovery_dialogue_displays_live_visible_task");
+        check(!actions.validateAll(List.of("ftb_task: "+hiddenTask.getCodeString()),actor,Component.empty()),
+                "task_discovery_hidden_detail_action_rejects_in_preflight");
+        check(actor.getServer().getCommands().getDispatcher().execute("citizens quest list",actor.createCommandSourceStack().withPermission(2))==1,
+                "task_discovery_list_command_dispatches_without_requiring_a_task_id");
     }
     private static void auditItems(AuditPlayer actor,AuditPlayer other) throws Exception {
         var server=actor.getServer();

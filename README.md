@@ -53,6 +53,8 @@ missing legacy content and specialist acceptance remain in the adaptation backlo
 [Native recipe discovery](docs/crafting-recipe-discovery-2026-10-18.md) supplies
 current server definitions and NPC/dialogue guidance with revision checks; machine
 processes, craft evidence and durable quest rewards remain separate acceptance.
+[Task discovery](docs/ftb-task-discovery-2026-10-18.md) adds visibility-filtered
+listing and details, prerequisites, repeatability and native reward ownership.
 
 The existing configuration, shop and text-input GUIs use vanilla container,
 merchant and anvil protocols. They do not introduce a Citizens-specific client

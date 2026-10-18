@@ -5,6 +5,11 @@ Confirmed as the selected porting target: 2026-10-13, UTC+08:00. See the [adopte
 Update: v0.5.0 has now passed its 79-test build, the combined-stack startup and 36 actual-provider service checks; its upgrade is [prepared for the next planned restart](economy-v050-preparation-2026-10-13.json). The APIs proposed below remain development requirements, not newly implemented signatures.
 Target: Minecraft 1.21.1 / NeoForge; consumer projects are Citizens, the separate Yuuniverse Interactions mod, FTB Quests and KubeJS/FTB XMod Compat.
 
+Task progress 2026-10-18, UTC+08:00: [native task discovery](ftb-task-discovery-2026-10-18.md)
+adds current-team visibility, prerequisites, native counts, task kinds and reward
+ownership/status to NPC/dialogue listing and details. Repeatable cycle observations
+are not durable monetary claim generations; that CRAFT-01 requirement remains open.
+
 Recipe progress 2026-10-18, UTC+08:00: [native discovery and guidance](crafting-recipe-discovery-2026-10-18.md)
 now queries the active recipe manager, snapshots components/tags, checks revisions
 and follows an actual KubeJS script/resource reload. CRAFT-02 lookup is implemented
