@@ -2490,3 +2490,20 @@ pass. Provider unit/native results and remaining reconciliation/quest gates are
 recorded in docs/economy-commerce-api-2026-10-18.md. Artifact hashes and logs are
 in artifacts/economy054-consumer-validation-2026-10-18.json. Production remains
 untouched; the full port goal remains active.
+
+## 2026-10-18T17:11:55.191513+08:00 (UTC+08:00) - Authoritative FTB task and NPC delivery integration
+
+Added optional public-contract FtbQuestTasks snapshots and consuming item delivery.
+Native citizens quest status/submit commands and separate dialogue ftb_submit and
+ftb_task condition tokens use current FTB team/task authority. Preflight consumes
+nothing; unsupported/custom/craft-only/screen-only tasks and missing items fail.
+Completed retries consume nothing; callback reentry cannot reuse in-flight player
+inventory. Player/team/provider references are reacquired per request.
+
+Validation: 17 native checks with pinned real FTB jars on 21.1.248 cover ordinary
+and packet NPC commands, dialogue, exact quantities, separate teams, party changes,
+reentry and craft-only rejection. Economy 605e187 / 0.5.5 passes the 121 existing
+real-provider consumer checks. Ordinary test/build passes; separate archives have
+no audit classes. Exact counts/hashes are in artifacts/ftb-task-validation-2026-10-18.json.
+This establishes query/delivery, not quest money/craft evidence or atomic persistence
+across FTB, inventories and Economy. Remaining accepted scope stays active.

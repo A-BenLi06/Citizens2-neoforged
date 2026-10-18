@@ -942,5 +942,8 @@
   "citizens.commands.waypoints.hpa.timeout": "HPA search exceeded the configured time limit and was cancelled.",
   "citizens.notifications.npc-load-failed": "Could not load NPC {0}: {1}. Its saved definition has been retained.",
   "citizens.commands.economyshop.description": "Open an Economy shop menu.",
-  "citizens.commands.economyshop.failed": "Could not open that Economy menu. Check the provider and target fields."
+  "citizens.commands.economyshop.failed": "Could not open that Economy menu. Check the provider and target fields.",
+  "citizens.commands.quest.description": "Query an FTB task or submit its required delivery items.",
+  "citizens.commands.quest.failed": "Could not access that FTB task. Check the provider, task and team requirements.",
+  "citizens.commands.quest.status": "Task {0}: {1}/{2} for team {3}."
 }

@@ -238,6 +238,7 @@ public final class Actions {
                     throw new IllegalStateException("Required items unavailable: " + body);
             }
             case "console_command" -> command(body, player, CommandActor.CONSOLE, validate);
+            case "ftb_submit" -> net.citizensnpcs.util.FtbQuestTasks.submit(player, body.trim(), validate);
             case "economy_shop" -> net.citizensnpcs.util.EconomyShopMenus.present(player,
                     net.citizensnpcs.util.EconomyShopMenus.parse(ActionArguments.fields(body, 2, 4)), validate);
             case "player_command_as_op" -> command(body, player, CommandActor.OPERATOR, validate);

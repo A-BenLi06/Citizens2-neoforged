@@ -143,6 +143,20 @@ public final class Conditions {
                 if (query == null) return null;
                 return CheckItem.holds(query, player) ? "yes" : "no";
             }
+            if (inner.startsWith("ftb_task_")) {
+                String[] fields = inner.substring("ftb_task_".length()).split("_", 2);
+                if (fields.length != 2) return null;
+                var state = net.citizensnpcs.util.FtbQuestTasks.query(player, fields[1]);
+                return switch (fields[0]) {
+                    case "progress" -> Long.toString(state.progress());
+                    case "maximum" -> Long.toString(state.maximum());
+                    case "completed" -> Boolean.toString(state.completed());
+                    case "started" -> Boolean.toString(state.started());
+                    case "available" -> Boolean.toString(state.available());
+                    case "team" -> state.teamId().toString();
+                    default -> null;
+                };
+            }
             String expanded = Text.placeholders(token, player, progress);
             return expanded.equals(token) ? null : expanded;
         } catch (IllegalArgumentException | IllegalStateException failure) {
