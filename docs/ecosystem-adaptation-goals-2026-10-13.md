@@ -29,6 +29,14 @@ Exact artifact sources, SHA-512/SHA-256 hashes and installation paths are record
 
 ## Ordered adaptation backlog
 
+Progress 2026-10-18, UTC+08:00: [RSItemEditor library references](rsitemeditor-adapter-2026-10-18.md)
+add shared/personal resolution, defensive native snapshots, explicit NPC/dialogue
+grants and live provider permission checks. The combined FTB/RSItemEditor audit
+passes 31 checks with actual Paradigm authority; the optional-absence/provider
+service audit passes 123 checks. Legacy conversion remains open. The
+[FTB repeatable reward boundary](ftb-reward-claim-boundary-2026-10-18.md) records
+why a simple monetary callback cannot close the durable reward requirement.
+
 Progress 2026-10-18, UTC+08:00: [native FTB task/delivery adapter](ftb-task-adapter-2026-10-18.md)
 adds authoritative current-team queries, consuming item delivery commands for
 ordinary/packet NPCs, and dedicated dialogue actions/conditions. It passes 17

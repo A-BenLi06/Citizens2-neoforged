@@ -238,6 +238,14 @@ public final class Actions {
                     throw new IllegalStateException("Required items unavailable: " + body);
             }
             case "console_command" -> command(body, player, CommandActor.CONSOLE, validate);
+            case "rs_item" -> {
+                var fields = ActionArguments.fields(body, 3, 3);
+                var scope = net.citizensnpcs.util.RSItemEditorItems.Scope.valueOf(fields.getFirst().toUpperCase(java.util.Locale.ROOT));
+                var reference = new net.citizensnpcs.util.RSItemEditorItems.Reference(scope, fields.get(1));
+                var source = scope == net.citizensnpcs.util.RSItemEditorItems.Scope.SHARED
+                        ? player.getServer().createCommandSourceStack() : player.createCommandSourceStack();
+                net.citizensnpcs.util.RSItemEditorItems.give(source, player, reference, Integer.parseInt(fields.get(2)), validate);
+            }
             case "ftb_submit" -> net.citizensnpcs.util.FtbQuestTasks.submit(player, body.trim(), validate);
             case "economy_shop" -> net.citizensnpcs.util.EconomyShopMenus.present(player,
                     net.citizensnpcs.util.EconomyShopMenus.parse(ActionArguments.fields(body, 2, 4)), validate);

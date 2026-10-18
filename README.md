@@ -45,8 +45,10 @@ supported optional API from Economy 0.5.1+, and the
 [coordinate adapter](docs/economy-coordinate-adapter-2026-10-16.md) requires 0.5.2+.
 Consumers reacquire the provider and validate player/menu targets before opening.
 Paradigm supplies permissions/groups and owned NPC placeholder registration;
-CMDCam supplies supported camera playback. FTB quests/crafting and specialist
-provider acceptance remain tracked separately in the adaptation backlog.
+CMDCam supplies supported camera playback. [FTB task/delivery integration](docs/ftb-task-adapter-2026-10-18.md)
+shares native team state with NPC commands and dialogue. [RSItemEditor references](docs/rsitemeditor-adapter-2026-10-18.md)
+resolve shared/personal items and native permissions. Quest rewards/crafting,
+legacy conversion and specialist acceptance remain in the adaptation backlog.
 
 The existing configuration, shop and text-input GUIs use vanilla container,
 merchant and anvil protocols. They do not introduce a Citizens-specific client

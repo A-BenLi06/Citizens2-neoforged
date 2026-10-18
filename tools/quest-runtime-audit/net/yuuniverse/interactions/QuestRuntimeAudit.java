@@ -121,12 +121,83 @@ public final class QuestRuntimeAudit {
             var party = FTBTeamsAPI.api().getManager().createPartyTeam(actor,"QuestAuditParty","fixture",
                     dev.ftb.mods.ftblibrary.icon.Color4I.WHITE);
             check(FtbQuestTasks.query(actor,id).teamId().equals(party.getId()), "party_change_reacquires_team_identity");
+            auditItems(actor,other);
             LoggerFactory.getLogger("interactions").info("[QUESTAUDIT] COMPLETE {} checks",passed);
         } catch(Throwable failure) { LoggerFactory.getLogger("interactions").error("[QUESTAUDIT] FAILED",failure); }
         finally {
             for(var player:players) { server.getPlayerList().remove(player); player.channel.finishAndReleaseAll(); }
             server.halt(false);
         }
+    }
+    private static void auditItems(AuditPlayer actor,AuditPlayer other) throws Exception {
+        var server=actor.getServer();
+        var stores=org.resonaresmp.rsitemeditor.storage.Stores.INSTANCE;
+        var shared=stores.server(server); var personal=stores.personal(actor); var otherPersonal=stores.personal(other);
+        String id="adapter-fixture";
+        var saved=new ItemStack(Items.STONE,7);
+        saved.set(net.minecraft.core.component.DataComponents.CUSTOM_NAME,Component.literal("Complete component fixture"));
+        var tag=new net.minecraft.nbt.CompoundTag(); tag.putString("scope","shared");
+        saved.set(net.minecraft.core.component.DataComponents.CUSTOM_DATA,net.minecraft.world.item.component.CustomData.of(tag));
+        shared.put(actor.registryAccess(),id,saved);
+        personal.put(actor.registryAccess(),id,new ItemStack(Items.DIAMOND,5));
+        otherPersonal.put(actor.registryAccess(),id,new ItemStack(Items.PAPER,2));
+        var sharedRef=new net.citizensnpcs.util.RSItemEditorItems.Reference(net.citizensnpcs.util.RSItemEditorItems.Scope.SHARED,id);
+        var personalRef=new net.citizensnpcs.util.RSItemEditorItems.Reference(net.citizensnpcs.util.RSItemEditorItems.Scope.PERSONAL,id);
+        var permissions=org.resonaresmp.rsitemeditor.permission.Permissions.INSTANCE;
+        check("paradigm:internal".equals(String.valueOf(net.neoforged.neoforge.server.permission.PermissionAPI.getActivePermissionHandler())),
+                "rsitems_use_actual_paradigm_permission_handler");
+        try { net.citizensnpcs.util.RSItemEditorItems.snapshot(actor,sharedRef); throw new AssertionError("missing permission rejection"); }
+        catch(IllegalStateException expected) { check(true,"rsitems_unprivileged_lookup_rejected"); }
+        for(var node:List.of(permissions.serverItem("get"),permissions.serverItem("list"),permissions.itemStorage("get")))
+            server.getCommands().getDispatcher().execute("paradigm group user perm add "+actor.getUUID()+" "+
+                    com.mojang.brigadier.arguments.StringArgumentType.escapeIfRequired(node.getNodeName()),server.createCommandSourceStack());
+        server.getCommands().getDispatcher().execute("paradigm group user perm add "+other.getUUID()+" "+
+                com.mojang.brigadier.arguments.StringArgumentType.escapeIfRequired(permissions.itemStorage("get").getNodeName()),server.createCommandSourceStack());
+        var snapshot=net.citizensnpcs.util.RSItemEditorItems.snapshot(actor,sharedRef);
+        check(ItemStack.matches(snapshot,saved),"rsitems_snapshot_preserves_components_and_saved_count");
+        snapshot.setCount(1); snapshot.remove(net.minecraft.core.component.DataComponents.CUSTOM_NAME);
+        check(ItemStack.matches(net.citizensnpcs.util.RSItemEditorItems.snapshot(actor,sharedRef),saved),"rsitems_snapshot_mutation_cannot_change_provider");
+        check(net.citizensnpcs.util.RSItemEditorItems.snapshot(actor,personalRef).is(Items.DIAMOND)
+                && net.citizensnpcs.util.RSItemEditorItems.snapshot(other,personalRef).is(Items.PAPER),"rsitems_personal_namespaces_are_owner_scoped");
+        try { net.citizensnpcs.util.RSItemEditorItems.give(server.createCommandSourceStack(),actor,personalRef,1,true);
+            throw new AssertionError("personal console access accepted"); }
+        catch(IllegalStateException expected) { check(true,"rsitems_console_cannot_substitute_personal_owner"); }
+        var ids=net.citizensnpcs.util.RSItemEditorItems.ids(actor,net.citizensnpcs.util.RSItemEditorItems.Scope.SHARED);
+        try { ids.clear(); throw new AssertionError("mutable ids"); } catch(UnsupportedOperationException expected) { check(ids.contains(id),"rsitems_ids_are_defensive"); }
+        actor.getInventory().clearContent();
+        var actions=new Actions(new ItemLibrary(),new Economy());
+        check(actions.validateAll(List.of("rs_item: shared;"+id+";130"),actor,Component.empty())
+                && actor.getInventory().countItem(Items.STONE)==0,"rsitems_dialogue_preflight_has_no_inventory_effect");
+        check(actions.runAll(List.of("rs_item: shared;"+id+";130"),actor,Component.empty())
+                && actor.getInventory().countItem(Items.STONE)==130 && shared.get(actor.registryAccess(),id).getCount()==7,
+                "rsitems_dialogue_grant_preserves_exact_requested_count");
+        for(boolean packet:new boolean[]{false,true}) {
+            actor.getInventory().clearContent();
+            var npc=net.citizensnpcs.api.CitizensAPI.getNPCRegistry()
+                    .createNPC(net.minecraft.world.entity.EntityType.COW,"SavedItem"+packet);
+            try {
+                if(packet) npc.getOrAddTrait(net.citizensnpcs.trait.PacketNPC.class);
+                npc.spawn(new net.citizensnpcs.api.util.Location(actor.serverLevel(),2,-60,2));
+                var commands=npc.getOrAddTrait(net.citizensnpcs.trait.CommandTrait.class);
+                commands.addCommand(new net.citizensnpcs.trait.CommandTrait.NPCCommandBuilder(
+                        "citizens saveditem shared "+id+" 2",net.citizensnpcs.trait.CommandTrait.Hand.RIGHT)
+                        .player(true).op(true).cooldown(-1));
+                commands.dispatch(actor,net.citizensnpcs.trait.CommandTrait.Hand.RIGHT);
+                net.citizensnpcs.Citizens.getInstance().getScheduler().tick();
+                check(actor.getInventory().countItem(Items.STONE)==2,"rsitems_native_npc_grant_"+packet);
+            } finally { npc.destroy(); }
+        }
+        shared.put(actor.registryAccess(),id,new ItemStack(Items.GOLD_INGOT,9));
+        check(net.citizensnpcs.util.RSItemEditorItems.snapshot(actor,sharedRef).is(Items.GOLD_INGOT)
+                && snapshot.is(Items.STONE),"rsitems_redefinition_changes_future_references_only");
+        shared.remove(id);
+        try { net.citizensnpcs.util.RSItemEditorItems.snapshot(actor,sharedRef); throw new AssertionError("deleted reference accepted"); }
+        catch(IllegalArgumentException expected) { check(snapshot.is(Items.STONE),"rsitems_deletion_retains_existing_snapshots"); }
+        shared.put(actor.registryAccess(),id,saved);
+        server.getCommands().getDispatcher().execute("paradigm group user perm remove "+actor.getUUID()+" "+
+                com.mojang.brigadier.arguments.StringArgumentType.escapeIfRequired(permissions.serverItem("get").getNodeName()),server.createCommandSourceStack());
+        try { net.citizensnpcs.util.RSItemEditorItems.snapshot(actor,sharedRef); throw new AssertionError("revoked lookup accepted"); }
+        catch(IllegalStateException expected) { check(true,"rsitems_permission_revocation_takes_effect_immediately"); }
     }
     private static AuditPlayer player(ServerLevel level,String name) {
         var player = new AuditPlayer(level,name); players.add(player); player.setPos(1,-60,1);

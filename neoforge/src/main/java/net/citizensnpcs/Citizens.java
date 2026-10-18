@@ -137,6 +137,7 @@ public class Citizens implements CitizensPlugin {
         commands.register(AdminCommands.class);
         commands.register(net.citizensnpcs.commands.EconomyMenuCommands.class);
         commands.register(net.citizensnpcs.commands.QuestCommands.class);
+        commands.register(net.citizensnpcs.commands.SavedItemCommands.class);
         commands.register(TemplateCommands.class);
         // ChunkTicketTrait's controller has to be registered during startup, on the mod bus rather than the game bus
         modEventBus.addListener(RegisterTicketControllersEvent.class, event -> {

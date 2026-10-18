@@ -2507,3 +2507,25 @@ real-provider consumer checks. Ordinary test/build passes; separate archives hav
 no audit classes. Exact counts/hashes are in artifacts/ftb-task-validation-2026-10-18.json.
 This establishes query/delivery, not quest money/craft evidence or atomic persistence
 across FTB, inventories and Economy. Remaining accepted scope stays active.
+
+## 2026-10-18T17:27:41.428004+08:00 (UTC+08:00) - Native RSItemEditor references and grants
+
+Added optional shared/personal provider references using public Stores/NbtItemStore,
+Permission and StorageSupport APIs. Snapshots preserve native components/counts and
+are defensive; references resolve current definitions and permission each time.
+Personal sources cannot be substituted by console/another player. Added native
+citizens saveditem commands for ordinary/packet NPCs and explicit rs_item dialogue
+actions with preflight. Existing legacy IDs are not silently redirected. Added
+provider contract documentation and recorded the FTB repeatable claim/reset boundary
+that prevents a simple callback from satisfying durable monetary reward acceptance.
+
+Validation: 31 combined native FTB/RSItemEditor checks on 21.1.248 include actual
+Paradigm grants/revocation, ownership, snapshots, deletion/redefinition, exact
+quantities and both NPC kinds. The fixture initially loaded Paradigm without
+selecting its handler; the preparation script now explicitly selects paradigm:internal
+in its isolated NeoForge config, and the audit asserts that handler. The separate
+provider-absence service suite passes 123 checks. Ordinary test/build passes 730
+tests with no failures/errors/skips; archives remain separate and probe-free.
+Exact logs/hashes are in artifacts/rsitem-bridge-validation-2026-10-18.json. Legacy
+conversion, durable quest rewards/craft evidence and specialist/client gates remain
+open; production is untouched and the full goal remains active.

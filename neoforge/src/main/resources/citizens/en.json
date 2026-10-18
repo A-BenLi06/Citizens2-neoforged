@@ -945,5 +945,7 @@
   "citizens.commands.economyshop.failed": "Could not open that Economy menu. Check the provider and target fields.",
   "citizens.commands.quest.description": "Query an FTB task or submit its required delivery items.",
   "citizens.commands.quest.failed": "Could not access that FTB task. Check the provider, task and team requirements.",
-  "citizens.commands.quest.status": "Task {0}: {1}/{2} for team {3}."
+  "citizens.commands.quest.status": "Task {0}: {1}/{2} for team {3}.",
+  "citizens.commands.saveditem.description": "Grant an explicitly referenced RSItemEditor item.",
+  "citizens.commands.saveditem.failed": "Could not grant that saved item. Check the provider, reference and permissions."
 }

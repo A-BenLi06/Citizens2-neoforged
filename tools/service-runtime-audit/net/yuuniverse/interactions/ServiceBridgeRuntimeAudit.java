@@ -135,6 +135,12 @@ public final class ServiceBridgeRuntimeAudit {
                     && api.balance(actor.getUUID(), "audit") == balance, "missing_shop_fails_before_ledger_payment");
             check(actions.runAll(List.of("player_command_as_op: shop list"), actor, Component.empty())
                     && actor.containerMenu == previous, "native_shop_subcommands_keep_their_dispatcher_grammar");
+            int optionalPaper = actor.getInventory().countItem(Items.PAPER);
+            check(!actions.runAll(List.of(payment(), "rs_item: shared;absent-provider;1"), actor, Component.empty())
+                    && actor.getInventory().countItem(Items.PAPER) == optionalPaper,
+                    "missing_item_provider_fails_before_dialogue_payment");
+            check(!Conditions.all(List.of("%ftb_task_completed_10103% != true"), actor),
+                    "missing_ftb_provider_does_not_satisfy_negative_condition");
             actor.doCloseContainer();
 
             api.ensurePlayerAccount(OFFLINE, "OfflineService");
