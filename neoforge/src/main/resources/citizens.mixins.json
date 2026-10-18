@@ -5,6 +5,7 @@
   "compatibilityLevel": "JAVA_21",
   "mixins": [
     "CreateMillstoneEvidenceMixin",
+    "GuardVillagersOwnershipMixin",
     "ResultSlotMixin",
     "EntityFluidPushMixin",
     "FallingBlockNPCMixin",

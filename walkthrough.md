@@ -2779,3 +2779,31 @@ and source JARs are separate, with no audit/provider/cross-mod leaks. Hashes/evi
 artifacts/create-machine-evidence-validation-2026-10-18.json. Production untouched.
 Documented consumption/roll-to-admission process-kill gap and non-atomic world/FTB
 persistence; actual kill/rollback and full release acceptance remain required.
+
+## 2026-10-18T21:48:08.7196534+08:00 (UTC+08:00) - Preserve Citizens ownership alongside native Guard Villagers workflows
+
+Reproduced native Guard Villagers 2.4.12 recruitment replacing a Citizens villager
+and consuming the player's weapon, plus spawn-time goals reintroduced after Citizens
+cleared AI. Added optional provider-entry ownership checks without cancelling shared
+interaction/spawn events. Native AI opt-in retains provider goals; NPC identity always
+prevents recruitment replacement. Native assistance separately assigned combat targets
+to owned iron golems despite empty goals; wrapped those provider assignments so only
+native AI owners receive them. Ordinary guard AI and Citizens targetability/protection
+remain their respective owners. Named/packet NPCs resolve by actual live association.
+
+Validation: 41 actual Guard checks on each NeoForge 21.1.233/21.1.248, 137 missing-
+Guard FTB/Paradigm/KubeJS checks on 21.1.248, 746 ordinary tests and successful standard
+build, zero failures/errors/skips. Native recruitment, shared NPC clicks, ordinary/
+opted-in assistance, scoreboard alliance, protection, projectile friendly fire,
+equipment menu and component/owner/follow/patrol NBT pass. Native decoded follow/patrol
+payload handlers and real server ticks verify movement, without replacing goals or
+private provider method calls. Failed patrol runs exposed native 200-world-tick delay,
+concurrent random strolling and retained off-arena Slimes pulling guards into combat;
+fixture cleanup now includes all loaded ordinary mobs and disables random spawning.
+No gameplay AI behavior is patched to satisfy movement checks. Failed logs retained.
+
+Restored standard independent Citizens/Interactions binaries and source JAR, verified
+no audit/provider/cross-mod classes leak. Evidence/provider/release/log hashes:
+artifacts/guard-coexistence-validation-2026-10-18.json. Production untouched. Physical
+client screens/packets, full-world restart, combined modpack and migration acceptance
+remain open; this establishes coexistence and native workflows, not Sentinel parity.

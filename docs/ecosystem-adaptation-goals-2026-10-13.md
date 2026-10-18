@@ -123,6 +123,13 @@ is documented in Economy's `docs/coordinate-shop-api.md`; no remote permission
 or deployment/physical-client acceptance is implied. ADAPT-03 commerce/receipts
 and ADAPT-04/05 quest/crafting are the next integration requirements.
 
+Progress 2026-10-18, UTC+08:00: [Guard Villagers coexistence](guard-villagers-coexistence-2026-10-18.md)
+protects NPC recruitment/AI identity and skips direct assistance target assignments
+for Citizens-owned AI. Native guard recruitment, equipment, follow/patrol payloads
+and physical goal movement, targeting, protection and friendly fire pass 41 native
+checks on each NeoForge target. Missing-provider regression passes 137 checks.
+Physical clients, full-world restart and combined migration acceptance remain open.
+
 All rows are accepted goals. An unchecked row means adaptation remains to be implemented/validated, even when its provider is installed.
 
 | Order / ID | Owner and task | Completion gate |
