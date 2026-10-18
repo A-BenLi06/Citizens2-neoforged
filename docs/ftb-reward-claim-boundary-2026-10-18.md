@@ -1,5 +1,10 @@
 # FTB repeatable reward claim boundary
 
+The [native monetary reward bridge](ftb-monetary-rewards-2026-10-18.md) now persists
+explicit pre-reset intents and native acceptance before callbacks, then replays
+Economy receipts durably. The historical inspection below explains its boundary;
+full kill-point/financial-backup acceptance remains separately documented.
+
 Inspected the pinned FTB Quests 2101.1.36 public signatures and bytecode locally on
 2026-10-18, UTC+08:00. `TeamData.claimReward(player, reward, notify, timestamp)`
 first calls `markRewardAsClaimed`, then calls `Reward.claim` if accepted.

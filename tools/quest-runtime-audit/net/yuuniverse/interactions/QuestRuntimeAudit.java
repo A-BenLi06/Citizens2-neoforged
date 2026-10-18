@@ -122,6 +122,14 @@ public final class QuestRuntimeAudit {
             // PlayerList login publishes FTB's player/team lifecycle before returning.
             var team = file.getTeamData(actor).orElseThrow();
             String id = task.getCodeString();
+            var absentReward=new dev.ftb.mods.ftbquests.quest.reward.CustomReward(0x10119L,quest); absentReward.onCreated();
+            var rewardService=net.citizensnpcs.util.FtbMonetaryRewards.current(server);
+            int absentClaims=rewardService.claims(actor.createCommandSourceStack().withPermission(2)).size();
+            try { rewardService.bind(actor.createCommandSourceStack().withPermission(2),absentReward.getCodeString(),"absent",java.math.BigDecimal.ONE);
+                throw new AssertionError("Absent Economy reward bound"); }
+            catch(IllegalStateException expected) { check(rewardService.bindings(actor.createCommandSourceStack().withPermission(2)).isEmpty()
+                    && rewardService.claims(actor.createCommandSourceStack().withPermission(2)).size()==absentClaims,
+                    "absent_economy_reward_binding_rejects_before_durable_or_native_mutation"); }
             actor.getInventory().setItem(0,new ItemStack(Items.STONE,5));
             var before = FtbQuestTasks.query(actor,id);
             check(before.teamId().equals(team.getTeamId()) && before.progress()==0 && before.maximum()==3,

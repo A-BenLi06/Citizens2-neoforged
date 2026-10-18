@@ -2835,3 +2835,47 @@ separate binaries/source JARs exclude all probes/provider/cross-mod classes and 
 Exact hashes/evidence: artifacts/xmod-script-validation-2026-10-18.json. Production
 untouched. Durable monetary claims, script/quest reload, process-kill recovery and
 combined/physical migration acceptance remain open under ADAPT-04/05/11.
+
+## 2026-10-18T22:54:01.5314586+08:00 (UTC+08:00) - Persist native FTB monetary claims and replay Economy receipts
+
+Added explicit authenticated CustomReward bindings to configured currency IDs and
+exact provider precision. The optional FTB player-claim mixin wraps only its public
+markRewardAsClaimed call. PREPARED is forced before native mutation; ACCEPTED with
+the observed native reset outcome is forced before CustomReward/XMod callbacks.
+Team/player ownership, binding epoch, native cycle and actual immutable beneficiary
+remain distinct. Native status/locking/visibility/current team/session/reward instance
+and serialized definitions with task/reward order and maximums are revalidated.
+Unbound rewards retain native behavior; unavailable ownership journals fail closed
+for CustomRewards. No private FTB mutation or production KubeJS dependency is added.
+
+Economy remains the ledger owner. Every retry reacquires its public API and credits
+the identical durable payload/key, retaining the transaction UUID. Missing providers
+or acknowledgement leave accepted intent pending; startup/operator reconciliation
+replays the original committed transaction. Callback failure cannot reissue money.
+Incomplete native outcomes become attributed operator review; corrupted/incomplete
+revision chains stop admission. Older native repeat counts and reused generations
+are fenced, including after loading an older FTB backup. Binding/review commands
+use active operator permissions and UUIDs; language strings are external English
+translations. Monetary review never redirects beneficiary or invents another key.
+
+Validation: 8 new journal tests, 754 ordinary baseline tests/build with zero failures,
+errors or skips; 44 actual selected FTB/XMod/Rhino/Economy checks on 21.1.248; 140
+absent-Economy/XMod regressions; actual forced JVM kill after real Economy commit
+with missing consumer acknowledgement, followed by 5 native restart checks. Real
+FTB loads its separately saved older pre-claim cycle; payment stays exactly once
+and another native claim is fenced. Crash runner checks its exact opt-in JVM PID
+before termination and never touches production. A transient empty fixture log
+exposed a runner null-read bug; fixed and rerun successfully. FTB dynamic fixture
+construction required public cache refresh; provider visibility checks were kept.
+Reward instances use native-generated IDs to preserve historical bindings.
+
+Final standard binary/source JAR inspection excludes all probes, provider classes
+and cross-mod contents; Interactions remains independent and its binary hash is
+unchanged. Evidence/provider/release/log hashes: artifacts/ftb-monetary-validation-
+2026-10-18.json. Complete selected runtime requires 21.1.248; JEI/Economy floors
+are preserved and Citizens ordinary baseline remains 21.1.233. Production untouched.
+Full kill-point and inconsistent financial-backup matrix, party-member/reconnect,
+commerce task bindings, additional Create evidence, NeoProtect/GriefLogger rollback,
+content reload and physical/integrated migration acceptance remain open. The overall
+goal is not complete. Preserve the whole reward journal and Economy ledger when
+rolling back world blocks/FTB; arbitrary rollback of monetary evidence is unaccepted.

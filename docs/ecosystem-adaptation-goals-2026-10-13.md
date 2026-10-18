@@ -29,6 +29,14 @@ Exact artifact sources, SHA-512/SHA-256 hashes and installation paths are record
 
 ## Ordered adaptation backlog
 
+Progress 2026-10-18, UTC+08:00: [native monetary rewards](ftb-monetary-rewards-2026-10-18.md)
+bind explicit CustomRewards to configured exact Economy amounts. Durable pre-reset
+intent, native acceptance, immutable beneficiary and public receipt replay cover
+repeat/party changes and callback failures. Actual process kill after ledger commit
+recovers one payment and fences the older unsaved FTB cycle. Commerce task bindings,
+all kill points, financial backup recovery, full reload/reconnect and integrated
+client/migration acceptance remain required; ADAPT-04/05/11 are not closed.
+
 Progress 2026-10-18, UTC+08:00: the user selected **Create (mechanical power)**
 as the machine provider. The actual pack's Create 6.0.10 performance-v6 now has an
 [optional native processing recipe adapter](create-processing-adapter-2026-10-18.md)

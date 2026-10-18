@@ -1,5 +1,11 @@
 # Yuuniverse Economy GUI: API requirements and ordered implementation tasks
 
+Reward follow-up 2026-10-18, UTC+08:00: [native FTB monetary bindings](ftb-monetary-rewards-2026-10-18.md)
+now use Economy's exact credit/idempotency contracts with durable pre-reset claim
+identity and native acceptance. Actual ledger-commit/lost-ack process kill recovery
+and older FTB cycle fencing pass. This does not complete commerce task application,
+all crash/backup domains or the full ECO-09/CRAFT-05/ADAPT-11 acceptance matrix.
+
 Craft task follow-up 2026-10-18, UTC+08:00: [explicit FTB craft bindings](ftb-craft-evidence-projection-2026-10-18.md)
 provide production recipe-revision bindings, durable team/cycle generations,
 authenticated evidence review and absolute native CustomTask projection. Monetary

@@ -60,3 +60,9 @@ The native suite passes 25 checks on the actual deployment target, NeoForge
 is 21.1.238 and Economy 0.5.5 requires 21.1.247. The rejected startup is retained
 as evidence; no dependency descriptor is rewritten. Citizens' ordinary build
 continues to target 21.1.233.
+
+Monetary follow-up 2026-10-18, UTC+08:00: the [native claim bridge](ftb-monetary-rewards-2026-10-18.md)
+now records exact beneficiary/generation and provider receipts before CustomReward
+callbacks. The extended native fixture passes 44 checks and the actual killed-JVM
+recovery passes 5 restart checks. This does not make arbitrary script item effects
+durable or complete all script/content reload and physical-client acceptance.

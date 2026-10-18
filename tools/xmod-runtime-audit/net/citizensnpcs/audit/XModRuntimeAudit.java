@@ -41,6 +41,7 @@ public final class XModRuntimeAudit {
         if(ran) return;
         var server=event.getServer(); var level=server.overworld(); level.setChunkForced(0,0,true);
         if(server.getTickCount()<20 || !level.isPositionEntityTicking(new BlockPos(1,-60,1))) return;
+        if(System.getenv("CITIZENS_REWARD_AUDIT_PHASE")!=null) { ran=true; crashRewards(server,System.getenv("CITIZENS_REWARD_AUDIT_PHASE")); return; }
         ran=true; notes.clear(); ServerPlayer actor=null; EmbeddedChannel channel=null; CraftQuestEvidence service=null;
         try {
             var file=ServerQuestFile.getInstance().orElseThrow();
@@ -56,6 +57,7 @@ public final class XModRuntimeAudit {
             hiddenQuest.readData(hiddenConfig,server.registryAccess()); hiddenQuest.onCreated();
             var hiddenTask=new ItemTask(0x20107L,hiddenQuest).setStackAndCount(new ItemStack(Items.STONE),2);
             hiddenTask.setConsumeItems(dev.ftb.mods.ftblibrary.config.Tristate.TRUE); hiddenTask.onCreated();
+            file.clearCachedData(); file.clearCachedProgress();
             check(count("customTask")==1 && task.getMaxProgress()==4 && task.autoSubmitOnPlayerTick()==1000000,
                     "actual_rhino_custom_task_registration_configures_native_checker");
             check(quest.canBeRepeated(),"native_repeatable_quest_fixture");
@@ -138,6 +140,7 @@ public final class XModRuntimeAudit {
             catch(IllegalStateException expected) { check(true,"public_script_api_rejects_unregistered_same_uuid_player"); }
             try { CitizensScripts.validateEconomyMenu(actor,List.of("browser","-1")); throw new AssertionError("Invalid menu accepted"); }
             catch(IllegalArgumentException expected) { check(economy.balance(actor.getUUID(),currency)==balance,"script_rejects_invalid_menu_without_payment"); }
+            monetaryRewards(actor, file, team, economy);
             LoggerFactory.getLogger("citizens").info("[XMODAUDIT] COMPLETE {} checks",passed);
         } catch(Throwable failure) { LoggerFactory.getLogger("citizens").error("[XMODAUDIT] FAILED",failure); }
         finally {
@@ -145,6 +148,150 @@ public final class XModRuntimeAudit {
             if(actor!=null && actor.connection!=null) server.getPlayerList().remove(actor);
             if(channel!=null) channel.finishAndReleaseAll(); server.halt(false);
         }
+    }
+    private static void crashRewards(net.minecraft.server.MinecraftServer server,String phase) {
+        ServerPlayer actor=null; EmbeddedChannel channel=null;
+        try {
+            var statePath=server.getServerDirectory().resolve("reward-crash-state.json");
+            var json=new com.google.gson.Gson(); var file=ServerQuestFile.getInstance().orElseThrow();
+            var economy=net.yuuniverse.economy.api.YuuniverseEconomyApi.current().orElseThrow();
+            var service=net.citizensnpcs.util.FtbMonetaryRewards.current(server);
+            UUID actorId;
+            com.google.gson.JsonObject state;
+            if(phase.equals("recover")) { state=com.google.gson.JsonParser.parseString(java.nio.file.Files.readString(statePath)).getAsJsonObject(); actorId=UUID.fromString(state.get("actor").getAsString()); }
+            else { state=new com.google.gson.JsonObject(); actorId=UUID.randomUUID(); }
+            actor=new ServerPlayer(server,server.overworld(),new GameProfile(actorId,"RewardCrashActor"),ClientInformation.createDefault()); actor.setPos(1,-60,1); channel=connect(actor);
+            var source=actor.createCommandSourceStack().withPermission(2); var team=file.getTeamData(actor).orElseThrow();
+            if(phase.equals("recover")) {
+                var claim=service.claims(source).stream().filter(value->value.id().equals(state.get("claim").getAsString())).findFirst().orElseThrow();
+                check(claim.state()==net.citizensnpcs.util.QuestRewardJournal.State.PAID && claim.transactionId().toString().equals(state.get("transaction").getAsString()),
+                        "actual_process_restart_replays_committed_economy_transaction_into_pending_claim");
+                check(economy.balance(actorId,state.get("currency").getAsString())==state.get("balance").getAsLong()+375,
+                        "actual_process_kill_and_restart_preserves_one_exact_monetary_credit");
+                var reward=file.getReward(Long.parseUnsignedLong(state.get("reward").getAsString(),16));
+                check(team.getTeamId().equals(claim.intent().teamId()) && team.getCompletionCount(reward.getQuest())==claim.intent().nativeCycle(),
+                        "crash_fixture_retains_older_native_ftb_save_in_separate_persistence_domain");
+                try { team.claimReward(actor,reward,false); throw new AssertionError("Rolled back native claim recredited"); }
+                catch(IllegalStateException expected) { check(economy.balance(actorId,state.get("currency").getAsString())==state.get("balance").getAsLong()+375,
+                        "actual_restart_fences_unsaved_ftb_repeat_reset_without_duplicate_payment"); }
+                check(service.reconcile(source)==0,"restart_reconciled_paid_receipt_is_stable");
+                LoggerFactory.getLogger("citizens").info("[XMODAUDIT] COMPLETE {} crash recovery checks",passed);
+            } else {
+                var id=0x20300L+Math.floorMod(actorId.hashCode(),1000000)*16L;
+                var chapter=new Chapter(id+1,file,file.getDefaultChapterGroup()); chapter.onCreated();
+                var quest=new Quest(id+2,chapter); var definition=new net.minecraft.nbt.CompoundTag(); definition.putBoolean("can_repeat",true); definition.putInt("repeat_cooldown",0);
+                quest.readData(definition,server.registryAccess()); quest.onCreated();
+                var task=new CustomTask(id+3,quest); task.onCreated(); var reward=new CustomReward(id+4,quest); reward.onCreated();
+                file.clearCachedData(); file.clearCachedProgress(); economy.ensurePlayerAccount(actorId,actor.getGameProfile().getName());
+                var currency=economy.defaultCurrency(); var binding=service.bind(source,reward.getCodeString(),currency.id(),java.math.BigDecimal.valueOf(375,currency.scale()));
+                team.setProgress(task,task.getMaxProgress());
+                // Persist authoritative native state before claiming; the following reset deliberately remains unsaved.
+                ((dev.ftb.mods.ftbteams.data.TeamManagerImpl)dev.ftb.mods.ftbteams.api.FTBTeamsAPI.api().getManager()).saveNow();
+                team.saveIfChanged(); file.saveNow(); server.saveEverything(true,true,true);
+                state.addProperty("actor",actorId.toString()); state.addProperty("reward",reward.getCodeString()); state.addProperty("currency",currency.id()); state.addProperty("balance",economy.balance(actorId,currency.id()));
+                net.yuuniverse.economy.api.YuuniverseEconomyApi.clear(economy);
+                team.claimReward(actor,reward,false);
+                var claim=service.claims(source).stream().filter(value->value.intent().binding().epoch().equals(binding.epoch())).findFirst().orElseThrow();
+                check(claim.state()==net.citizensnpcs.util.QuestRewardJournal.State.ACCEPTED,"crash_fixture_native_claim_is_durable_before_missing_payment_acknowledgement");
+                var receipt=economy.credit(actorId,currency.id(),375,claim.intent().operationKey(),claim.intent().sourceReference());
+                state.addProperty("claim",claim.id()); state.addProperty("transaction",receipt.transactionId().toString());
+                java.nio.file.Files.writeString(statePath,json.toJson(state));
+                LoggerFactory.getLogger("citizens").info("[XMODAUDIT] KILL_READY pid={} claim={}",ProcessHandle.current().pid(),claim.id());
+                // The runner kills this exact JVM after the durable record/ledger commit marker. No shutdown/save runs.
+                while(true) java.util.concurrent.locks.LockSupport.parkNanos(100_000_000L);
+            }
+        } catch(Throwable failure) { LoggerFactory.getLogger("citizens").error("[XMODAUDIT] FAILED crash recovery",failure); }
+        finally { if(actor!=null && actor.connection!=null) server.getPlayerList().remove(actor); if(channel!=null) channel.finishAndReleaseAll(); server.halt(false); }
+    }
+    private static void monetaryRewards(ServerPlayer actor, ServerQuestFile file, TeamData team,
+            net.yuuniverse.economy.api.EconomyApi economy) throws Exception {
+        var server=actor.getServer(); var source=actor.createCommandSourceStack().withPermission(2);
+        var service=net.citizensnpcs.util.FtbMonetaryRewards.current(server);
+        long baseId=file.newID();
+        var chapter=new Chapter(baseId,file,file.getDefaultChapterGroup()); chapter.onCreated();
+        var quest=new Quest(file.newID(),chapter);
+        var definition=new net.minecraft.nbt.CompoundTag(); definition.putBoolean("can_repeat",true); definition.putInt("repeat_cooldown",0);
+        quest.readData(definition,server.registryAccess()); quest.onCreated();
+        var task=new CustomTask(file.newID(),quest); task.onCreated();
+        var reward=new CustomReward(file.newID(),quest); reward.onCreated();
+        var rewardConfig=new net.minecraft.nbt.CompoundTag(); rewardConfig.putBoolean("team_reward",true); reward.readData(rewardConfig,server.registryAccess());
+        file.clearCachedData(); file.clearCachedProgress();
+        var currency=economy.defaultCurrency(); long before=economy.balance(actor.getUUID(),currency.id());
+        var amount=java.math.BigDecimal.valueOf(375,currency.scale());
+        var binding=service.bind(source,reward.getCodeString(),currency.id(),amount);
+        check(binding.amount()==375 && binding.currencyScale()==currency.scale() && binding.teamReward(),"native_monetary_binding_preserves_currency_precision_and_team_owner");
+        check(service.bind(source,reward.getCodeString(),currency.id(),amount).epoch().equals(binding.epoch()),"identical_reward_binding_reuses_immutable_epoch");
+        try { service.bind(source,reward.getCodeString(),currency.id(),amount.add(java.math.BigDecimal.ONE)); throw new AssertionError("Rebinding accepted"); }
+        catch(IllegalStateException expected) { check(true,"changed_monetary_binding_requires_explicit_migration"); }
+        int originalCount=service.claims(source).size(); claim(actor,reward,true);
+        check(service.claims(source).size()==originalCount && economy.balance(actor.getUUID(),currency.id())==before,"incomplete_native_quest_cannot_admit_payment");
+        var callbacks=new ArrayList<Boolean>();
+        dev.ftb.mods.ftbquests.events.CustomRewardEvent.EVENT.register(event->{
+            if(event.getReward()!=reward) return dev.architectury.event.EventResult.pass();
+            var latest=service.claims(source).stream().filter(value->value.intent().binding().rewardId().equals(reward.getCodeString()) && value.intent().teamId().equals(team.getTeamId())).toList().getLast();
+            callbacks.add(latest.state()==net.citizensnpcs.util.QuestRewardJournal.State.PAID && team.getProgress(task)==0);
+            return dev.architectury.event.EventResult.pass();
+        });
+        team.setProgress(task,task.getMaxProgress()); claim(actor,reward,true);
+        var first=service.claims(source).stream().filter(value->value.intent().binding().rewardId().equals(reward.getCodeString()) && value.intent().teamId().equals(team.getTeamId())).toList().getLast();
+        check(first.state()==net.citizensnpcs.util.QuestRewardJournal.State.PAID && first.intent().beneficiaryId().equals(actor.getUUID())
+                && first.intent().ownerId().equals(team.getTeamId()) && first.afterCycle()==first.intent().nativeCycle()+1
+                && economy.balance(actor.getUUID(),currency.id())==before+375,"actual_native_claim_records_pre_reset_generation_and_pays_exact_beneficiary");
+        check(callbacks.size()==1 && callbacks.getFirst(),"native_custom_reward_callback_observes_reset_and_durable_monetary_receipt");
+        claim(actor,reward,true);
+        check(service.claims(source).size()==originalCount+1 && economy.balance(actor.getUUID(),currency.id())==before+375,"duplicate_native_claim_has_no_second_intent_or_payment");
+        team.setProgress(task,task.getMaxProgress());
+        net.yuuniverse.economy.api.YuuniverseEconomyApi.clear(economy);
+        try { claim(actor,reward,false); }
+        finally { net.yuuniverse.economy.api.YuuniverseEconomyApi.publish(economy); }
+        var second=service.claims(source).stream().filter(value->value.intent().binding().rewardId().equals(reward.getCodeString()) && value.intent().teamId().equals(team.getTeamId())).toList().getLast();
+        check(second.state()==net.citizensnpcs.util.QuestRewardJournal.State.ACCEPTED && team.getProgress(task)==0
+                && second.intent().nativeCycle()==first.afterCycle() && !first.intent().operationKey().equals(second.intent().operationKey()),
+                "provider_absence_keeps_native_accepted_repeat_claim_pending_under_distinct_operation");
+        // Actual Economy commit simulates a lost consumer acknowledgement; recovery must reuse this operation.
+        var receipt=economy.credit(second.intent().beneficiaryId(),currency.id(),375,second.intent().operationKey(),second.intent().sourceReference());
+        check(service.reconcile(source)==1 && service.claims(source).stream().filter(value->value.id().equals(second.id())).findFirst().orElseThrow().transactionId().equals(receipt.transactionId())
+                && economy.balance(actor.getUUID(),currency.id())==before+750,"reconciliation_replays_actual_committed_economy_receipt_without_duplicate_credit");
+        check(service.reconcile(source)==0 && economy.balance(actor.getUUID(),currency.id())==before+750,"paid_monetary_claims_are_not_reissued_by_reconciliation");
+        var saved=team.serializeNBT();
+        var countKey=saved.getAllKeys().stream().filter(key->key.contains("completion_count")).findFirst().orElseThrow();
+        var rolled=saved.copy(); rolled.getCompound(countKey).putInt(quest.getCodeString(),first.intent().nativeCycle());
+        // Use provider-owned native deserialization to reproduce backup rollback, never production mutation.
+        var rollbackData=new dev.ftb.mods.ftblibrary.snbt.SNBTCompoundTag(); rollbackData.merge(rolled); team.deserializeNBT(rollbackData);
+        team.setProgress(task,task.getMaxProgress());
+        try { team.claimReward(actor,reward,false); throw new AssertionError("Rollback payment admitted"); }
+        catch(IllegalStateException expected) { check(economy.balance(actor.getUUID(),currency.id())==before+750,"native_repeat_counter_rollback_is_fenced_before_another_payment"); }
+        team.deserializeNBT(saved);
+        rewardConfig.putBoolean("team_reward",false); reward.readData(rewardConfig,server.registryAccess()); team.setProgress(task,task.getMaxProgress());
+        try { team.claimReward(actor,reward,false); throw new AssertionError("Changed reward ownership accepted"); }
+        catch(IllegalStateException expected) { check(economy.balance(actor.getUUID(),currency.id())==before+750,"native_reward_redefinition_cannot_reinterpret_bound_money_or_ownership"); }
+        rewardConfig.putBoolean("team_reward",true); reward.readData(rewardConfig,server.registryAccess());
+        var party=dev.ftb.mods.ftbteams.api.FTBTeamsAPI.api().getManager().createPartyTeam(actor,"RewardAuditParty"+actor.getUUID(),"fixture",dev.ftb.mods.ftblibrary.icon.Color4I.rgb(0x335577));
+        var partyTeam=file.getTeamData(actor).orElseThrow();
+        check(!partyTeam.getTeamId().equals(team.getTeamId()) && partyTeam.getTeamId().equals(party.getId()),"monetary_claim_reacquires_current_native_party_identity");
+        partyTeam.setProgress(task,task.getMaxProgress());
+        net.yuuniverse.economy.api.YuuniverseEconomyApi.clear(economy);
+        try { partyTeam.claimReward(actor,reward,false); }
+        finally { net.yuuniverse.economy.api.YuuniverseEconomyApi.publish(economy); }
+        var partyClaim=service.claims(source).stream().filter(value->value.intent().teamId().equals(partyTeam.getTeamId()) && value.intent().binding().rewardId().equals(reward.getCodeString())).findFirst().orElseThrow();
+        check(partyClaim.intent().beneficiaryId().equals(actor.getUUID()) && partyClaim.state()==net.citizensnpcs.util.QuestRewardJournal.State.ACCEPTED,
+                "new_native_party_claim_has_its_own_generation_and_immutable_beneficiary");
+        check(service.reconcile(source)==1 && economy.balance(actor.getUUID(),currency.id())==before+1125,"historical_and_current_party_claims_reconcile_without_redirecting_beneficiary");
+        var throwQuest=new Quest(file.newID(),chapter); throwQuest.onCreated(); var throwTask=new CustomTask(file.newID(),throwQuest); throwTask.onCreated();
+        var throwReward=new CustomReward(file.newID(),throwQuest); throwReward.onCreated(); file.clearCachedData(); file.clearCachedProgress();
+        service.bind(source,throwReward.getCodeString(),currency.id(),amount);
+        dev.ftb.mods.ftbquests.events.CustomRewardEvent.EVENT.register(event->{ if(event.getReward()==throwReward) throw new IllegalStateException("Fixture callback fails after payment"); return dev.architectury.event.EventResult.pass(); });
+        partyTeam.setProgress(throwTask,throwTask.getMaxProgress());
+        try { partyTeam.claimReward(actor,throwReward,false); throw new AssertionError("Throwing callback completed"); }
+        catch(IllegalStateException expected) { check(economy.balance(actor.getUUID(),currency.id())==before+1500 && service.claims(source).stream().anyMatch(value->value.intent().binding().rewardId().equals(throwReward.getCodeString()) && value.state()==net.citizensnpcs.util.QuestRewardJournal.State.PAID),
+                "throwing_native_custom_callback_preserves_previously_durable_money_and_receipt"); }
+        partyTeam.claimReward(actor,throwReward,false);
+        check(economy.balance(actor.getUUID(),currency.id())==before+1500,"retry_after_throwing_reward_callback_does_not_reissue_payment");
+        check(java.util.concurrent.CompletableFuture.supplyAsync(()->{ try { service.claims(source); return false; } catch(IllegalStateException expected) { return true; } }).join(),
+                "monetary_administration_rejects_worker_thread_access");
+        var noAuthority=actor.createCommandSourceStack().withPermission(0);
+        try { service.claims(noAuthority); throw new AssertionError("Unauthorized reward audit accepted"); }
+        catch(IllegalStateException expected) { check(true,"native_monetary_audit_requires_live_operator_authority"); }
     }
     @SuppressWarnings("unchecked") private static void craft(ServerQuestFile file,ServerPlayer player,net.minecraft.world.inventory.CraftingMenu menu,ResourceLocation recipeId) {
         var recipe=(net.minecraft.world.item.crafting.RecipeHolder<net.minecraft.world.item.crafting.CraftingRecipe>)
