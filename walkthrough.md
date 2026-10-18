@@ -2478,3 +2478,15 @@ Validation: the unchanged implementation fails shop_retirement_observes_new_shop
 Validated the ordinary Economy 0.5.3 candidate committed in the neighboring project as 4989892. Its recovered commerce fix separates pre-commit compensation from post-commit recovery and preserves matching stack counts/components. Added docs/economy-commerce-recovery-2026-10-18.md and updated the adopted backlog without treating unimplemented quote/reconciliation/quest/crafting contracts as complete. Replaced the stale Bukkit-only README with native Minecraft/Java requirements, PowerShell build commands, separate artifact/install instructions and provider/client acceptance boundaries.
 
 Validation: Economy passes 83 ordinary tests and 24 native commerce checks. Citizens/Interactions with the actual Economy/CMDCam/CreativeCore providers passes all 121 service checks on NeoForge 21.1.248. Restored ordinary Citizens/Interactions packaging with build -x test (packaging only; the source-matched 730-test pass is recorded in the preceding batch) and verified module separation and zero runtime-audit probes in binary/source JARs. Exact hashes and logs are in artifacts/economy053-consumer-validation-2026-10-18.json. Documentation links were reviewed; README line endings were normalized and the final staged diff passes whitespace validation. Production and its staged upgrade remain unchanged; full port acceptance remains unfinished under the explicitly linked backlog.
+
+## 2026-10-18T12:47:18.708139+08:00 (UTC+08:00) - Validate accepted-commerce provider compatibility
+
+Validated neighboring Economy 698fbde / 0.5.4 with existing Citizens and separate
+Interactions consumers. Updated the service fixture to assert API revision 4 and
+the additive commerce capability. All 121 real-provider checks pass on 21.1.248;
+ordinary build -x test restores probe-free separate binary/source jars. This is
+consumer compatibility/packaging validation, not a new ordinary gameplay test
+pass. Provider unit/native results and remaining reconciliation/quest gates are
+recorded in docs/economy-commerce-api-2026-10-18.md. Artifact hashes and logs are
+in artifacts/economy054-consumer-validation-2026-10-18.json. Production remains
+untouched; the full port goal remains active.

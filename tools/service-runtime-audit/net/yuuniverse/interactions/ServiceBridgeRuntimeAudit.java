@@ -220,7 +220,7 @@ public final class ServiceBridgeRuntimeAudit {
 
     private static void auditSystemShopApi(EconomyRuntime runtime, AuditPlayer actor, AuditPlayer other) throws Exception {
         var shops = runtime.systemShops().orElseThrow();
-        check(runtime.apiVersion() == 3 && shops.version() == 1 && shops.isAvailable(), "system_shop_capability_and_version");
+        check(runtime.apiVersion() == 4 && runtime.commerceApi().isPresent() && shops.version() == 1 && shops.isAvailable(), "system_shop_capability_and_version");
         var menu = actor.containerMenu;
         long balance = runtime.balance(actor.getUUID(), "audit");
         long transactions = runtime.ledger().audit().transactionCount();

@@ -29,6 +29,12 @@ Exact artifact sources, SHA-512/SHA-256 hashes and installation paths are record
 
 ## Ordered adaptation backlog
 
+Progress 2026-10-18, UTC+08:00: [accepted commerce API](economy-commerce-api-2026-10-18.md)
+adds public read-only quotes, exact accepted execution, outcome/claim access and
+retired-provider rejection in Economy 0.5.4. Validation passes 86 provider unit
+tests, 35 provider native checks and 121 actual-provider consumer checks.
+ADAPT-03 remains open for crash reconciliation and durable receipt subscriptions.
+
 Progress 2026-10-18, UTC+08:00: [Economy commerce recovery](economy-commerce-recovery-2026-10-18.md)
 completes the interrupted 0.5.3 caught-failure fix, including exact stack counts,
 committed receipts, recovery records and full-inventory claim retries. It passes
