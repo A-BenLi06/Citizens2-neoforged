@@ -5,6 +5,12 @@ Confirmed as the selected porting target: 2026-10-13, UTC+08:00. See the [adopte
 Update: v0.5.0 has now passed its 79-test build, the combined-stack startup and 36 actual-provider service checks; its upgrade is [prepared for the next planned restart](economy-v050-preparation-2026-10-13.json). The APIs proposed below remain development requirements, not newly implemented signatures.
 Target: Minecraft 1.21.1 / NeoForge; consumer projects are Citizens, the separate Yuuniverse Interactions mod, FTB Quests and KubeJS/FTB XMod Compat.
 
+Recipe progress 2026-10-18, UTC+08:00: [native discovery and guidance](crafting-recipe-discovery-2026-10-18.md)
+now queries the active recipe manager, snapshots components/tags, checks revisions
+and follows an actual KubeJS script/resource reload. CRAFT-02 lookup is implemented
+for the documented capabilities. Machine adapters, craft evidence, full task
+discovery/advancement and durable currency rewards remain required.
+
 Coordinate progress 2026-10-16, UTC+08:00: the [0.5.2 follow-up](economy-coordinate-adapter-2026-10-16.md)
 adds local exact lookup/opening and current management authority to NPC/dialogue
 consumers. Commerce/quest, remote administration and full release acceptance

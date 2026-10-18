@@ -50,6 +50,9 @@ shares native team state with NPC commands and dialogue. [RSItemEditor reference
 resolve shared/personal items and native permissions. [Legacy item migration](docs/legacy-rsitemeditor-migration-2026-10-18.md)
 provides preview, source backups and conflict-safe shared imports. Quest rewards/crafting,
 missing legacy content and specialist acceptance remain in the adaptation backlog.
+[Native recipe discovery](docs/crafting-recipe-discovery-2026-10-18.md) supplies
+current server definitions and NPC/dialogue guidance with revision checks; machine
+processes, craft evidence and durable quest rewards remain separate acceptance.
 
 The existing configuration, shop and text-input GUIs use vanilla container,
 merchant and anvil protocols. They do not introduce a Citizens-specific client

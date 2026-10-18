@@ -136,6 +136,9 @@ public final class ServiceBridgeRuntimeAudit {
             check(actions.runAll(List.of("player_command_as_op: shop list"), actor, Component.empty())
                     && actor.containerMenu == previous, "native_shop_subcommands_keep_their_dispatcher_grammar");
             int optionalPaper = actor.getInventory().countItem(Items.PAPER);
+            check(!actions.runAll(List.of(payment(), "recipe: citizens_audit:missing_recipe"), actor, Component.empty())
+                    && actor.getInventory().countItem(Items.PAPER)==optionalPaper,
+                    "missing_recipe_fails_before_dialogue_payment");
             check(!actions.runAll(List.of(payment(), "rs_item: shared;absent-provider;1"), actor, Component.empty())
                     && actor.getInventory().countItem(Items.PAPER) == optionalPaper,
                     "missing_item_provider_fails_before_dialogue_payment");

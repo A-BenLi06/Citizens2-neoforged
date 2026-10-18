@@ -2,7 +2,8 @@ param(
     [string]$ProviderDirectory = (Join-Path (Split-Path $PSScriptRoot -Parent) 'artifacts/selected-integrations-2026-10-12'),
     [string]$ParadigmJar = (Join-Path (Split-Path $PSScriptRoot -Parent) 'artifacts/ecosystem-2026-10-13/server-smoke/mods/Paradigm-neoforge-1.21.1-2.5.0.jar'),
     [string]$ArchitecturyJar = (Join-Path (Split-Path $PSScriptRoot -Parent) 'artifacts/ecosystem-2026-10-13/server-smoke/mods/architectury-13.0.11-neoforge.jar'),
-    [string]$OriginalItemFixtureDirectory
+    [string]$OriginalItemFixtureDirectory,
+    [switch]$WithKubeJS
 )
 $ErrorActionPreference = 'Stop'
 $fixture = Join-Path (Split-Path $PSScriptRoot -Parent) 'artifacts/quest-audit-server'
@@ -18,6 +19,18 @@ if ($OriginalItemFixtureDirectory) {
     }
     Copy-Item -LiteralPath (Join-Path $OriginalItemFixtureDirectory 'config/interactions/items.yml') -Destination (Join-Path $fixture 'original-items.yml')
     Copy-Item -LiteralPath (Join-Path $OriginalItemFixtureDirectory 'config/interactions/item-aliases.yml') -Destination (Join-Path $fixture 'original-item-aliases.yml')
+}
+if ($WithKubeJS) {
+    foreach ($name in @('kubejs-neoforge-2101.7.2-build.377.jar','rhino-2101.2.8-build.91.jar')) {
+        Copy-Item -LiteralPath (Join-Path $ProviderDirectory $name) -Destination (Join-Path $fixture 'mods')
+    }
+    $recipeScripts = Join-Path $fixture 'kubejs/server_scripts'
+    New-Item -ItemType Directory -Force $recipeScripts | Out-Null
+    @'
+ServerEvents.recipes(event => {
+    event.shapeless(Item.of('minecraft:paper', 3), ['minecraft:stone']).id('citizens_audit:kubejs_recipe')
+})
+'@ | Set-Content -LiteralPath (Join-Path $recipeScripts 'citizens_recipe_audit.js') -Encoding utf8
 }
 @('server-ip=127.0.0.1','server-port=25628','online-mode=false','level-name=quest-world',
   'level-type=minecraft:flat','generate-structures=false','spawn-protection=0',

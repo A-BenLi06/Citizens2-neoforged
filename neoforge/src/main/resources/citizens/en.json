@@ -949,5 +949,9 @@
   "citizens.commands.saveditem.description": "Grant an explicitly referenced RSItemEditor item.",
   "citizens.commands.saveditem.failed": "Could not grant that saved item. Check the provider, reference and permissions.",
   "interactions.items.migration.report": "Saved-item migration report: {0}. Review per-item results before using the imported references.",
-  "interactions.items.migration.failed": "Saved-item migration failed. Check the server log and retained migration reports."
+  "interactions.items.migration.failed": "Saved-item migration failed. Check the server log and retained migration reports.",
+  "citizens.commands.recipe.description": "Inspect a recipe from the active server data.",
+  "citizens.commands.recipe.status": "Recipe {0}: {1} × {2}; workstation {3}, {4} ingredient slots.",
+  "citizens.commands.recipe.unsupported": "Recipe {0} uses type {1} and serializer {2}; crafting guidance for this recipe is unavailable.",
+  "citizens.commands.recipe.failed": "Could not inspect that recipe. Check its ID, providers and current server data."
 }

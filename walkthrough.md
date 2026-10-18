@@ -2560,3 +2560,32 @@ archives contain no audit probes, and Citizens/Interactions remain separate.
 Evidence and hashes: artifacts/item-migration-validation-2026-10-18.json.
 Production was untouched. Durable quest rewards/crafting, crash reconciliation and
 specialist/client acceptance remain active porting requirements.
+
+## 2026-10-18T18:08:34.5696067+08:00 (UTC+08:00) - Native recipe discovery and NPC guidance
+
+Added current-server recipe lookup by ID, registered type and output, immutable
+native output/ingredient candidates, serialized tags/custom definitions, shaped
+grid/workstation metadata and SHA-256 revisions including resolved ingredients.
+Matching revalidates revisions and uses actual native ingredient predicates.
+No recipes/results are cached across reload. Queries require the server thread.
+NPC recipe commands and a dedicated recipe dialogue action show current guidance;
+missing/unsupported recipes fail dialogue preflight before payment and create no
+output, craft progress or reward.
+
+The actual KubeJS test exposed its own shaped/shapeless wrapper classes. Added a
+public-API adapter only for static results with empty ingredient-action lists and
+empty result-modifier keys. Dynamic callbacks, unknown subclasses, special recipes
+and machine types remain explicitly unsupported rather than approximated. Added
+fixture-owned KubeJS/Rhino preparation and an asynchronous real resource-reload
+phase that changes output from three to four and rejects the old revision.
+
+Validation: 62 combined native checks on NeoForge 21.1.248 cover the actual selected
+KubeJS script/reload, component matching, tags, output/type lookup, defensive copies,
+dynamic-wrapper rejection, shaped slots, native/packet NPC feedback, dialogue
+preflight, replacement/removal and worker-thread rejection. Separate optional-absence/
+Economy/camera suite passes 125 checks, including missing recipes before payment.
+Ordinary test/build passes 730 tests with zero failures/errors/skips.
+Final separate binary/source archives contain no audit probes. Evidence/hashes:
+artifacts/recipe-discovery-validation-2026-10-18.json. Production was untouched.
+Machine adapters, attributed craft evidence, durable rewards, commerce crash
+reconciliation and specialist/client acceptance remain active requirements.

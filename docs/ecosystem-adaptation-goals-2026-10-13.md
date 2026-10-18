@@ -29,6 +29,12 @@ Exact artifact sources, SHA-512/SHA-256 hashes and installation paths are record
 
 ## Ordered adaptation backlog
 
+Progress 2026-10-18, UTC+08:00: [native recipe discovery](crafting-recipe-discovery-2026-10-18.md)
+provides registry IDs, component-sensitive output lookup, native ingredient predicates,
+tag/candidate snapshots and revision checks for NPC/dialogue guidance. The selected
+KubeJS script and actual server resource reload are exercised natively. Machine
+adapters, attributed craft evidence and durable monetary rewards remain open.
+
 Progress 2026-10-18, UTC+08:00: [RSItemEditor library references](rsitemeditor-adapter-2026-10-18.md)
 add shared/personal resolution, defensive native snapshots, explicit NPC/dialogue
 grants and live provider permission checks. The combined FTB/RSItemEditor audit

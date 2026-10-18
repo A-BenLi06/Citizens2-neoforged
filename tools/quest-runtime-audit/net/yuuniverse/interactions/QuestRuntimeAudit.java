@@ -29,12 +29,41 @@ import org.slf4j.LoggerFactory;
 public final class QuestRuntimeAudit {
     private static boolean ran;
     private static int passed;
+    private static java.util.concurrent.CompletableFuture<Void> recipeReload;
+    private static String beforeRecipeReload;
+    private static boolean recipeReloadChecked;
     private static final List<AuditPlayer> players = new ArrayList<>();
     @SubscribeEvent public static void tick(ServerTickEvent.Post event) {
         if (ran) return;
         var server = event.getServer(); var level = server.overworld();
         level.setChunkForced(0,0,true);
         if (server.getTickCount() < 20 || !level.isPositionEntityTicking(new BlockPos(1,-60,1))) return;
+        try {
+            var script=server.getServerDirectory().resolve("kubejs/server_scripts/citizens_recipe_audit.js");
+            if(java.nio.file.Files.isRegularFile(script) && !recipeReloadChecked) {
+                var recipeId=net.minecraft.resources.ResourceLocation.parse("citizens_audit:kubejs_recipe");
+                if(recipeReload==null) {
+                    var before=net.citizensnpcs.util.CraftingRecipes.find(server,recipeId).orElseThrow();
+                    LoggerFactory.getLogger("interactions").info("[QUESTAUDIT] KubeJS recipe kind={}, output={}",before.kind(),before.output());
+                    check(before.supported() && before.output().getCount()==3,"recipes_kubejs_initial_script_loaded_before_reload");
+                    beforeRecipeReload=before.revision();
+                    String original=java.nio.file.Files.readString(script);
+                    String updated=original.replace("Item.of('minecraft:paper', 3)","Item.of('minecraft:paper', 4)");
+                    if(original.equals(updated)) throw new AssertionError("Unexpected KubeJS fixture script");
+                    java.nio.file.Files.writeString(script,updated);
+                    recipeReload=server.reloadResources(server.getPackRepository().getSelectedIds());
+                    return;
+                }
+                if(!recipeReload.isDone()) return;
+                recipeReload.join();
+                check(net.citizensnpcs.util.CraftingRecipes.find(server,recipeId).orElseThrow().output().getCount()==4
+                        && !net.citizensnpcs.util.CraftingRecipes.current(server,recipeId,beforeRecipeReload),
+                        "recipes_actual_kubejs_datapack_reload_invalidates_old_snapshot");
+                recipeReloadChecked=true;
+            }
+        } catch(Throwable failure) {
+            ran=true; LoggerFactory.getLogger("interactions").error("[QUESTAUDIT] FAILED",failure); server.halt(false); return;
+        }
         ran = true;
         try {
             var file = ServerQuestFile.getInstance().orElseThrow();
@@ -122,6 +151,7 @@ public final class QuestRuntimeAudit {
                     dev.ftb.mods.ftblibrary.icon.Color4I.WHITE);
             check(FtbQuestTasks.query(actor,id).teamId().equals(party.getId()), "party_change_reacquires_team_identity");
             auditItems(actor,other);
+            auditRecipes(actor);
             auditMigration(actor);
             LoggerFactory.getLogger("interactions").info("[QUESTAUDIT] COMPLETE {} checks",passed);
         } catch(Throwable failure) { LoggerFactory.getLogger("interactions").error("[QUESTAUDIT] FAILED",failure); }
@@ -199,6 +229,101 @@ public final class QuestRuntimeAudit {
                 com.mojang.brigadier.arguments.StringArgumentType.escapeIfRequired(permissions.serverItem("get").getNodeName()),server.createCommandSourceStack());
         try { net.citizensnpcs.util.RSItemEditorItems.snapshot(actor,sharedRef); throw new AssertionError("revoked lookup accepted"); }
         catch(IllegalStateException expected) { check(true,"rsitems_permission_revocation_takes_effect_immediately"); }
+    }
+    private static void auditRecipes(AuditPlayer actor) throws Exception {
+        var server=actor.getServer(); var manager=server.getRecipeManager();
+        var original=List.copyOf(manager.getRecipes());
+        var kubeScript=server.getServerDirectory().resolve("kubejs/server_scripts/citizens_recipe_audit.js");
+        if(java.nio.file.Files.isRegularFile(kubeScript)) {
+            var scripted=net.citizensnpcs.util.CraftingRecipes.find(server,net.minecraft.resources.ResourceLocation.parse("citizens_audit:kubejs_recipe")).orElseThrow();
+            check(scripted.supported() && scripted.output().is(Items.PAPER) && scripted.output().getCount()==4,
+                    "recipes_actual_kubejs_server_script_definition_is_discovered");
+        }
+        var id=net.minecraft.resources.ResourceLocation.fromNamespaceAndPath("citizens_audit","component_recipe");
+        var shapedId=net.minecraft.resources.ResourceLocation.fromNamespaceAndPath("citizens_audit","shaped_recipe");
+        var name=Component.literal("Component ingredient");
+        var required=new ItemStack(Items.STONE); required.set(net.minecraft.core.component.DataComponents.CUSTOM_NAME,name);
+        var ingredient=net.neoforged.neoforge.common.crafting.DataComponentIngredient.of(false,required);
+        var output=new ItemStack(Items.PAPER,3); output.set(net.minecraft.core.component.DataComponents.CUSTOM_NAME,Component.literal("Recipe result"));
+        var recipe=new net.minecraft.world.item.crafting.ShapelessRecipe("",net.minecraft.world.item.crafting.CraftingBookCategory.MISC,
+                output,net.minecraft.core.NonNullList.of(net.minecraft.world.item.crafting.Ingredient.EMPTY,ingredient));
+        var shaped=new net.minecraft.world.item.crafting.ShapedRecipe("",net.minecraft.world.item.crafting.CraftingBookCategory.MISC,
+                net.minecraft.world.item.crafting.ShapedRecipePattern.of(Map.of('A',net.minecraft.world.item.crafting.Ingredient.of(Items.COBBLESTONE)),"AA"," A"),new ItemStack(Items.STONE,2));
+        var augmented=new ArrayList<net.minecraft.world.item.crafting.RecipeHolder<?>>(original);
+        augmented.add(new net.minecraft.world.item.crafting.RecipeHolder<>(id,recipe));
+        augmented.add(new net.minecraft.world.item.crafting.RecipeHolder<>(shapedId,shaped));
+        var dynamicId=net.minecraft.resources.ResourceLocation.parse("citizens_audit:dynamic_recipe");
+        if(java.nio.file.Files.isRegularFile(kubeScript)) {
+            var dynamic=(net.minecraft.world.item.crafting.Recipe<?>)Class.forName("dev.latvian.mods.kubejs.recipe.special.ShapelessKubeJSRecipe")
+                    .getConstructor(net.minecraft.world.item.crafting.ShapelessRecipe.class,List.class,String.class)
+                    .newInstance(recipe,List.of(),"citizens_audit:result_callback");
+            augmented.add(new net.minecraft.world.item.crafting.RecipeHolder<>(dynamicId,dynamic));
+        }
+        manager.replaceRecipes(augmented);
+        try {
+            if(java.nio.file.Files.isRegularFile(kubeScript))
+                check(!net.citizensnpcs.util.CraftingRecipes.find(server,dynamicId).orElseThrow().supported(),
+                        "recipes_kubejs_dynamic_result_callback_is_explicitly_unsupported");
+            var view=net.citizensnpcs.util.CraftingRecipes.find(server,id).orElseThrow();
+            check(view.supported() && view.kind()==net.citizensnpcs.util.CraftingRecipes.Kind.SHAPELESS
+                    && view.output().getCount()==3 && view.inputs().getFirst().custom(),"recipes_native_component_output_and_custom_ingredient_discovered");
+            var candidate=view.inputs().getFirst().alternatives().getFirst(); candidate.remove(net.minecraft.core.component.DataComponents.CUSTOM_NAME);
+            var copy=view.output(); copy.setCount(1); copy.remove(net.minecraft.core.component.DataComponents.CUSTOM_NAME);
+            check(ItemStack.matches(view.output(),output) && view.inputs().getFirst().alternatives().getFirst()
+                    .has(net.minecraft.core.component.DataComponents.CUSTOM_NAME),"recipes_outputs_and_candidates_are_defensive");
+            check(net.citizensnpcs.util.CraftingRecipes.matchesInput(server,id,view.revision(),0,required)
+                    && !net.citizensnpcs.util.CraftingRecipes.matchesInput(server,id,view.revision(),0,new ItemStack(Items.STONE)),
+                    "recipes_custom_matching_uses_native_predicate_not_display_candidates");
+            var grid=net.citizensnpcs.util.CraftingRecipes.find(server,shapedId).orElseThrow();
+            check(grid.width()==2 && grid.height()==2 && grid.inputs().size()==4 && grid.inputs().get(2).alternatives().isEmpty()
+                    && grid.workstation().equals(net.minecraft.resources.ResourceLocation.parse("minecraft:crafting_table")),
+                    "recipes_shaped_grid_preserves_empty_slots_and_workstation");
+            var sticks=net.citizensnpcs.util.CraftingRecipes.find(server,net.minecraft.resources.ResourceLocation.parse("minecraft:stick")).orElseThrow();
+            check(sticks.inputs().stream().anyMatch(input->input.definition().contains("\"tag\"") && input.alternatives().size()>1),
+                    "recipes_native_tag_identity_and_resolved_alternatives_are_preserved");
+            var cooking=original.stream().filter(holder->holder.value().getType()==net.minecraft.world.item.crafting.RecipeType.SMELTING).findFirst().orElseThrow();
+            check(!net.citizensnpcs.util.CraftingRecipes.find(server,cooking.id()).orElseThrow().supported(),
+                    "recipes_unsupported_machine_type_is_not_fabricated_as_table_crafting");
+            check(net.citizensnpcs.util.CraftingRecipes.byOutput(server,output,true,100).stream().anyMatch(found->found.id().equals(id))
+                    && net.citizensnpcs.util.CraftingRecipes.byOutput(server,new ItemStack(Items.PAPER),true,100).stream().noneMatch(found->found.id().equals(id)),
+                    "recipes_output_lookup_preserves_component_filter");
+            check(net.citizensnpcs.util.CraftingRecipes.byType(server,view.type(),100).stream().anyMatch(found->found.id().equals(id)),
+                    "recipes_type_lookup_uses_registered_type_and_current_manager");
+            var actions=new Actions(new ItemLibrary(),new Economy());
+            int messagesBeforeGuidance=actor.messages.size();
+            check(actions.validateAll(List.of("recipe: "+id),actor,Component.empty()) && actor.messages.size()==messagesBeforeGuidance,
+                    "recipes_dialogue_preflight_has_no_feedback_or_item_effect");
+            check(actions.runAll(List.of("recipe: "+id),actor,Component.empty()) && actor.messages.size()>messagesBeforeGuidance
+                    && actor.getInventory().countItem(Items.PAPER)==0,"recipes_dialogue_guidance_does_not_create_crafted_output");
+            for(boolean packet:new boolean[]{false,true}) {
+                var npc=net.citizensnpcs.api.CitizensAPI.getNPCRegistry().createNPC(net.minecraft.world.entity.EntityType.COW,"Recipe"+packet);
+                try {
+                    if(packet) npc.getOrAddTrait(net.citizensnpcs.trait.PacketNPC.class);
+                    npc.spawn(new net.citizensnpcs.api.util.Location(actor.serverLevel(),2,-60,2));
+                    var commands=npc.getOrAddTrait(net.citizensnpcs.trait.CommandTrait.class);
+                    commands.addCommand(new net.citizensnpcs.trait.CommandTrait.NPCCommandBuilder("citizens recipe "+id,
+                            net.citizensnpcs.trait.CommandTrait.Hand.RIGHT).player(true).op(true).cooldown(-1));
+                    int messagesBefore=actor.messages.size();
+                    commands.dispatch(actor,net.citizensnpcs.trait.CommandTrait.Hand.RIGHT);
+                    net.citizensnpcs.Citizens.getInstance().getScheduler().tick();
+                    check(actor.messages.size()>messagesBefore && actor.messages.getLast().contains(id.toString())
+                            && actor.getInventory().countItem(Items.PAPER)==0,"recipes_npc_guidance_creates_no_output_"+packet);
+                } finally { npc.destroy(); }
+            }
+            var replacement=new net.minecraft.world.item.crafting.ShapelessRecipe("",net.minecraft.world.item.crafting.CraftingBookCategory.MISC,
+                    new ItemStack(Items.PAPER,4),net.minecraft.core.NonNullList.of(net.minecraft.world.item.crafting.Ingredient.EMPTY,ingredient));
+            augmented.removeIf(holder->holder.id().equals(id)); augmented.add(new net.minecraft.world.item.crafting.RecipeHolder<>(id,replacement));
+            manager.replaceRecipes(augmented);
+            check(!net.citizensnpcs.util.CraftingRecipes.current(server,id,view.revision()) &&
+                    net.citizensnpcs.util.CraftingRecipes.find(server,id).orElseThrow().output().getCount()==4,"recipes_live_replacement_invalidates_previous_revision");
+            try { net.citizensnpcs.util.CraftingRecipes.matchesInput(server,id,view.revision(),0,required); throw new AssertionError("Stale recipe accepted"); }
+            catch(IllegalStateException expected) { check(true,"recipes_stale_revision_cannot_validate_ingredients"); }
+            check(java.util.concurrent.CompletableFuture.supplyAsync(()->{
+                try { net.citizensnpcs.util.CraftingRecipes.find(server,id); return false; }
+                catch(IllegalStateException expected) { return true; }
+            }).get(),"recipes_worker_thread_access_is_rejected");
+        } finally { manager.replaceRecipes(original); }
+        check(net.citizensnpcs.util.CraftingRecipes.find(server,id).isEmpty(),"recipes_removed_definition_stays_unavailable");
     }
     private static void auditMigration(AuditPlayer actor) throws Exception {
         var server=actor.getServer();
@@ -301,8 +426,9 @@ public final class QuestRuntimeAudit {
     }
     private static final class AuditPlayer extends ServerPlayer {
         EmbeddedChannel channel;
+        final List<String> messages=new ArrayList<>();
         AuditPlayer(ServerLevel level,String name) { super(level.getServer(),level,new GameProfile(UUID.randomUUID(),name),ClientInformation.createDefault()); }
-        @Override public void sendSystemMessage(Component message) { }
+        @Override public void sendSystemMessage(Component message) { messages.add(message.getString()); }
     }
     private static void check(boolean condition,String name) {
         if(!condition) throw new AssertionError(name);

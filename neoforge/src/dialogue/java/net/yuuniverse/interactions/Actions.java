@@ -247,6 +247,12 @@ public final class Actions {
                 net.citizensnpcs.util.RSItemEditorItems.give(source, player, reference, Integer.parseInt(fields.get(2)), validate);
             }
             case "ftb_submit" -> net.citizensnpcs.util.FtbQuestTasks.submit(player, body.trim(), validate);
+            case "recipe" -> {
+                var recipe = net.citizensnpcs.util.CraftingRecipes.find(player.getServer(), ResourceLocation.parse(body.trim()))
+                        .orElseThrow(() -> new IllegalArgumentException("Recipe is unavailable"));
+                if (!recipe.supported()) throw new IllegalArgumentException("Recipe guidance is unsupported");
+                if (!validate) net.citizensnpcs.commands.RecipeCommands.present(player.createCommandSourceStack(), recipe);
+            }
             case "economy_shop" -> net.citizensnpcs.util.EconomyShopMenus.present(player,
                     net.citizensnpcs.util.EconomyShopMenus.parse(ActionArguments.fields(body, 2, 4)), validate);
             case "player_command_as_op" -> command(body, player, CommandActor.OPERATOR, validate);
