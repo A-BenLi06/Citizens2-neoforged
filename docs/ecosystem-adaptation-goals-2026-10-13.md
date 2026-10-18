@@ -29,6 +29,12 @@ Exact artifact sources, SHA-512/SHA-256 hashes and installation paths are record
 
 ## Ordered adaptation backlog
 
+Progress 2026-10-18, UTC+08:00: [crafting result observations](crafting-evidence-2026-10-18.md)
+add a native event source with actual selected recipe ID/revision, actor, immutable
+input/output components and per-batch observation identity. It runs before native
+input consumption; durable generation admission, journaling/reconciliation and
+recipe-specific task application remain required under CRAFT-04/05.
+
 Progress 2026-10-18, UTC+08:00: [FTB task discovery](ftb-task-discovery-2026-10-18.md)
 adds native visibility-filtered pagination, details, prerequisites, sequential order,
 repeatability observations and reward claim ownership/status to NPC commands and

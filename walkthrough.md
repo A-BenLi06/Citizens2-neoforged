@@ -2613,3 +2613,36 @@ binary/source jars contain no runtime audit probes or cross-packaged mod classes
 Evidence/hashes: artifacts/ftb-task-discovery-validation-2026-10-18.json.
 Production was untouched. Durable generations/rewards, commerce receipt application,
 craft evidence/machines, crash reconciliation and specialist/client gates remain open.
+
+## 2026-10-18T18:55:31+08:00 (UTC+08:00) - Recipe-attributed native crafting observations
+
+Added a public non-cancellable CraftingResultEvent with immutable per-take UUID,
+actor, dimension/menu/tick, current recipe ID/revision/definition, full component
+output and defensive pre-consumption grid snapshots. Attribution reads the actual
+public result-container recipe holder, verifies current manager identity, native
+matching and assembled output, and accepts only supported static native/KubeJS
+recipes in the standard crafting table/player grid. It never guesses recipe
+identity from equal output. Repeated entry for the same native event is suppressed
+before callbacks; subscriber failures are contained so output transfer cannot abort
+the remaining native ingredient-consumption path.
+
+Native evidence established that the hook precedes ingredient consumption and
+that partial-inventory shift crafting reports the full batch, including subsequently
+dropped output. A fully blocked shift creates no craft or progress. The adapter
+does not grant items, persist observations, infer task generations or independently
+advance quests. Durable task admission/journaling/reconciliation remain required.
+
+Extended the owned fixture with a real FTB quest SNBT loaded at startup and an
+actual ServerPlayer, since Architectury treats subclasses as fake. This exercises
+FTB's native crafting detector without cache mutation or direct progress injection.
+Tests use actual pickup/shift/player-grid result clicks, component-sensitive inputs,
+the reloaded KubeJS recipe, current-party counts, partial drops, full inventory,
+callback reentry during the take and a deliberately failing event consumer.
+
+Validation: 93 combined native checks on NeoForge 21.1.248; 127 separate actual
+Economy/camera/provider-absence checks; 730 ordinary tests on the 21.1.233 baseline,
+zero failures/errors/skips and successful build. Final binaries/sources contain no
+audit probes and preserve separate Citizens/Interactions packaging. Exact provider,
+log and archive hashes: artifacts/crafting-evidence-validation-2026-10-18.json.
+Production was untouched. Durable crafting/task/reward generations, commerce receipt
+application, machines, process-crash recovery and specialist/client gates remain open.

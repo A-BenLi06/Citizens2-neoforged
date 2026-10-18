@@ -33,6 +33,22 @@ public final class QuestRuntimeAudit {
     private static String beforeRecipeReload;
     private static boolean recipeReloadChecked;
     private static final List<AuditPlayer> players = new ArrayList<>();
+    private static final Map<ServerPlayer,EmbeddedChannel> realPlayers = new LinkedHashMap<>();
+    private static final List<net.citizensnpcs.util.CraftingEvidence.Observation> crafts = new ArrayList<>();
+    private static net.neoforged.neoforge.event.entity.player.PlayerEvent.ItemCraftedEvent lastCraft;
+    private static boolean recordingCrafts;
+    private static boolean failCraftConsumer;
+    private static boolean reenterCraftBridge;
+    @SubscribeEvent public static void craftResult(net.citizensnpcs.api.event.CraftingResultEvent event) {
+        if (!recordingCrafts) return;
+        crafts.add(event.getObservation());
+        if (reenterCraftBridge) { reenterCraftBridge=false; net.citizensnpcs.util.CraftingEvidence.onCrafted(lastCraft); }
+        if (failCraftConsumer) throw new IllegalStateException("Expected fixture consumer failure");
+    }
+    @SubscribeEvent(priority=net.neoforged.bus.api.EventPriority.HIGHEST)
+    public static void nativeCraft(net.neoforged.neoforge.event.entity.player.PlayerEvent.ItemCraftedEvent event) {
+        if (recordingCrafts) lastCraft=event;
+    }
     @SubscribeEvent public static void tick(ServerTickEvent.Post event) {
         if (ran) return;
         var server = event.getServer(); var level = server.overworld();
@@ -73,6 +89,7 @@ public final class QuestRuntimeAudit {
             var task = new ItemTask(0x10103L,quest).setStackAndCount(new ItemStack(Items.STONE),3);
             task.setConsumeItems(Tristate.TRUE); task.onCreated();
             var custom = new CustomTask(0x10104L,quest); custom.onCreated();
+            var nativeCraftTask = (ItemTask) Objects.requireNonNull(file.getTask(0x10403L),"Missing prepared native crafting task");
             var actor = player(level,"QuestActor"); var other = player(level,"QuestOther");
             // PlayerList login publishes FTB's player/team lifecycle before returning.
             var team = file.getTeamData(actor).orElseThrow();
@@ -153,12 +170,130 @@ public final class QuestRuntimeAudit {
             auditItems(actor,other);
             auditDiscovery(actor,other);
             auditRecipes(actor);
+            var craftActor=realPlayer(level,"CraftActor");
+            FTBTeamsAPI.api().getManager().createPartyTeam(craftActor,"CraftAuditParty","fixture",
+                    dev.ftb.mods.ftblibrary.icon.Color4I.WHITE);
+            auditCrafting(craftActor,other,nativeCraftTask);
             auditMigration(actor);
             LoggerFactory.getLogger("interactions").info("[QUESTAUDIT] COMPLETE {} checks",passed);
         } catch(Throwable failure) { LoggerFactory.getLogger("interactions").error("[QUESTAUDIT] FAILED",failure); }
         finally {
             for(var player:players) { server.getPlayerList().remove(player); player.channel.finishAndReleaseAll(); }
+            for(var entry:realPlayers.entrySet()) { server.getPlayerList().remove(entry.getKey()); entry.getValue().finishAndReleaseAll(); }
             server.halt(false);
+        }
+    }
+    private static void auditCrafting(ServerPlayer actor,AuditPlayer other,ItemTask task) throws Exception {
+        var server=actor.getServer(); var manager=server.getRecipeManager();
+        var original=new ArrayList<net.minecraft.world.item.crafting.RecipeHolder<?>>(manager.getRecipes());
+        var id=net.minecraft.resources.ResourceLocation.parse("citizens_audit:craft_evidence");
+        var required=new ItemStack(Items.STONE);
+        required.set(net.minecraft.core.component.DataComponents.CUSTOM_NAME,Component.literal("Craft evidence input"));
+        var output=new ItemStack(Items.PAPER,3);
+        output.set(net.minecraft.core.component.DataComponents.CUSTOM_NAME,Component.literal("Craft evidence output"));
+        var recipe=new net.minecraft.world.item.crafting.ShapelessRecipe("",net.minecraft.world.item.crafting.CraftingBookCategory.MISC,
+                output,net.minecraft.core.NonNullList.of(net.minecraft.world.item.crafting.Ingredient.EMPTY,
+                        net.neoforged.neoforge.common.crafting.DataComponentIngredient.of(false,required),
+                        net.minecraft.world.item.crafting.Ingredient.of(Items.NETHER_STAR)));
+        var augmented=new ArrayList<net.minecraft.world.item.crafting.RecipeHolder<?>>(original);
+        augmented.add(new net.minecraft.world.item.crafting.RecipeHolder<>(id,recipe)); manager.replaceRecipes(augmented);
+        var previousMenu=actor.containerMenu;
+        var station=actor.blockPosition().offset(1,0,0); var stationBefore=actor.serverLevel().getBlockState(station);
+        actor.serverLevel().setBlockAndUpdate(station,net.minecraft.world.level.block.Blocks.CRAFTING_TABLE.defaultBlockState());
+        var menu=new net.minecraft.world.inventory.CraftingMenu(91,actor.getInventory(),
+                net.minecraft.world.inventory.ContainerLevelAccess.create(actor.serverLevel(),station));
+        actor.containerMenu=menu; actor.getInventory().clearContent(); crafts.clear(); recordingCrafts=true;
+        var team=ServerQuestFile.getInstance().orElseThrow().getTeamData(actor).orElseThrow();
+        long before=team.getProgress(task);
+        try {
+            check(!dev.architectury.hooks.level.entity.PlayerHooks.isFake(actor) && task.isOnlyFromCrafting()
+                    && ServerQuestFile.getInstance().orElseThrow().getCraftingTasks().contains(task),
+                    "craft_evidence_fixture_uses_native_actor_and_registered_crafting_task");
+            menu.getSlot(1).set(required.copyWithCount(3));
+            menu.getSlot(2).set(new ItemStack(Items.NETHER_STAR,3));
+            check(ItemStack.matches(menu.getSlot(0).getItem(),output),"craft_evidence_native_menu_resolves_actual_recipe_output");
+            reenterCraftBridge=true; menu.clicked(0,0,net.minecraft.world.inventory.ClickType.PICKUP,actor);
+            check(crafts.size()==1 && !reenterCraftBridge && ItemStack.matches(menu.getCarried(),output) && menu.getSlot(1).getItem().getCount()==2,
+                    "craft_evidence_pickup_with_callback_reentry_records_one_full_batch_and_native_consumption");
+            var first=crafts.getFirst();
+            check(first.actorId().equals(actor.getUUID()) && first.recipe().id().equals(id)
+                    && first.recipe().revision().equals(net.citizensnpcs.util.CraftingRecipes.find(server,id).orElseThrow().revision())
+                    && first.source()==net.citizensnpcs.util.CraftingEvidence.Source.CRAFTING_TABLE
+                    && first.width()==3 && first.height()==3 && first.inputs().getFirst().getCount()==3
+                    && ItemStack.matches(first.output(),output),"craft_evidence_attributes_recipe_revision_actor_and_preconsumption_grid");
+            check(team.getProgress(task)==before+3,"craft_evidence_native_ftb_hook_counts_actual_output_batch");
+            menu.setCarried(ItemStack.EMPTY);
+            menu.clicked(0,0,net.minecraft.world.inventory.ClickType.QUICK_MOVE,actor);
+            check(crafts.size()==3 && menu.getSlot(1).getItem().isEmpty() && actor.getInventory().countItem(Items.PAPER)==6
+                    && crafts.stream().mapToInt(craft->craft.output().getCount()).sum()==9
+                    && crafts.stream().map(craft->craft.id()).distinct().count()==3,
+                    "craft_evidence_shift_crafting_counts_each_completed_batch_once");
+            check(team.getProgress(task)==before+9
+                    && ServerQuestFile.getInstance().orElseThrow().getTeamData(other).orElseThrow().getProgress(task)==0,
+                    "craft_evidence_native_ftb_progress_uses_current_party_only");
+            var nativeEvent=lastCraft; int count=crafts.size();
+            // Re-enter this bridge only: replaying the provider event itself would also replay FTB's own handler.
+            net.citizensnpcs.util.CraftingEvidence.onCrafted(nativeEvent);
+            check(crafts.size()==count,"craft_evidence_same_native_event_cannot_publish_twice");
+            var outputCopy=first.output(); outputCopy.setCount(1);
+            var inputCopy=first.inputs().getFirst(); inputCopy.setCount(1);
+            check(first.output().getCount()==3 && first.inputs().getFirst().getCount()==3,
+                    "craft_evidence_snapshots_are_defensive");
+            actor.getInventory().setItem(0,output.copyWithCount(12));
+            check(crafts.size()==count && team.getProgress(task)==before+9,
+                    "craft_evidence_inventory_assignment_is_not_crafting");
+            for(int slot=0;slot<actor.getInventory().items.size();slot++) actor.getInventory().setItem(slot,new ItemStack(Items.DIAMOND,64));
+            actor.getInventory().setItem(0,output.copyWithCount(63));
+            var dropArea=actor.getBoundingBox().inflate(4);
+            var existingDrops=actor.serverLevel().getEntitiesOfClass(net.minecraft.world.entity.item.ItemEntity.class,dropArea)
+                    .stream().map(entity->entity.getUUID()).collect(java.util.stream.Collectors.toSet());
+            menu.getSlot(1).set(required.copy()); menu.getSlot(2).set(new ItemStack(Items.NETHER_STAR));
+            menu.clicked(0,0,net.minecraft.world.inventory.ClickType.QUICK_MOVE,actor);
+            var newDrops=actor.serverLevel().getEntitiesOfClass(net.minecraft.world.entity.item.ItemEntity.class,dropArea)
+                    .stream().filter(entity->!existingDrops.contains(entity.getUUID())).toList();
+            check(crafts.size()==count+1 && crafts.getLast().output().getCount()==3
+                    && actor.getInventory().countItem(Items.PAPER)==64 && menu.getSlot(1).getItem().isEmpty()
+                    && newDrops.stream().filter(entity->ItemStack.isSameItemSameComponents(entity.getItem(),output))
+                        .mapToInt(entity->entity.getItem().getCount()).sum()==2 && team.getProgress(task)==before+12,
+                    "craft_evidence_partial_space_counts_full_batch_including_native_dropped_output");
+            for(var entity:newDrops) entity.discard(); count=crafts.size();
+            menu.getSlot(1).set(required.copy()); menu.getSlot(2).set(new ItemStack(Items.NETHER_STAR));
+            menu.clicked(0,0,net.minecraft.world.inventory.ClickType.QUICK_MOVE,actor);
+            check(crafts.size()==count && menu.getSlot(1).getItem().getCount()==1 && team.getProgress(task)==before+12,
+                    "craft_evidence_full_inventory_failed_shift_emits_no_observation_or_progress");
+            actor.containerMenu=actor.inventoryMenu;
+            actor.inventoryMenu.getCraftSlots().setItem(0,required.copy());
+            actor.inventoryMenu.getCraftSlots().setItem(1,new ItemStack(Items.NETHER_STAR));
+            actor.inventoryMenu.clicked(0,0,net.minecraft.world.inventory.ClickType.PICKUP,actor);
+            check(crafts.size()==count+1 && crafts.getLast().source()==net.citizensnpcs.util.CraftingEvidence.Source.PLAYER_GRID
+                    && crafts.getLast().width()==2 && crafts.getLast().height()==2,
+                    "craft_evidence_player_grid_uses_native_recipe_holder");
+            actor.inventoryMenu.setCarried(ItemStack.EMPTY); actor.containerMenu=menu;
+            var kubeId=net.minecraft.resources.ResourceLocation.parse("citizens_audit:kubejs_recipe");
+            if(manager.byKey(kubeId).isPresent()) {
+                @SuppressWarnings("unchecked")
+                var kubeRecipe=(net.minecraft.world.item.crafting.RecipeHolder<net.minecraft.world.item.crafting.CraftingRecipe>)
+                        (net.minecraft.world.item.crafting.RecipeHolder<?>)manager.byKey(kubeId).orElseThrow();
+                int beforeKube=crafts.size();
+                // The recipe-book placement path selects this valid recipe when another recipe accepts the same input.
+                menu.beginPlacingRecipe(); menu.clearCraftingContent(); menu.getSlot(1).set(new ItemStack(Items.STONE));
+                menu.finishPlacingRecipe(kubeRecipe);
+                menu.clicked(0,0,net.minecraft.world.inventory.ClickType.PICKUP,actor);
+                check(crafts.size()==beforeKube+1 && crafts.getLast().recipe().id().equals(kubeId)
+                        && crafts.getLast().output().getCount()==4 && menu.getCarried().getCount()==4
+                        && menu.getSlot(1).getItem().isEmpty(),"craft_evidence_actual_kubejs_reloaded_recipe_is_attributed_and_consumed");
+                menu.setCarried(ItemStack.EMPTY);
+            }
+            menu.getSlot(1).set(required.copy()); menu.getSlot(2).set(new ItemStack(Items.NETHER_STAR)); failCraftConsumer=true;
+            menu.clicked(0,0,net.minecraft.world.inventory.ClickType.PICKUP,actor);
+            check(menu.getSlot(1).getItem().isEmpty() && ItemStack.matches(menu.getCarried(),output),
+                    "craft_evidence_consumer_failure_does_not_abort_native_consumption");
+        } finally {
+            recordingCrafts=false; failCraftConsumer=false; reenterCraftBridge=false;
+            menu.setCarried(ItemStack.EMPTY); menu.clearCraftingContent();
+            actor.inventoryMenu.clearCraftingContent(); actor.containerMenu=previousMenu;
+            actor.serverLevel().setBlockAndUpdate(station,stationBefore);
+            manager.replaceRecipes(original);
         }
     }
     private static void auditDiscovery(AuditPlayer actor,AuditPlayer other) throws Exception {
@@ -500,8 +635,15 @@ public final class QuestRuntimeAudit {
     }
     private static AuditPlayer player(ServerLevel level,String name) {
         var player = new AuditPlayer(level,name); players.add(player); player.setPos(1,-60,1);
+        player.channel=connect(player); return player;
+    }
+    private static ServerPlayer realPlayer(ServerLevel level,String name) {
+        var player=new ServerPlayer(level.getServer(),level,new GameProfile(UUID.randomUUID(),name),ClientInformation.createDefault());
+        player.setPos(1,-60,1); realPlayers.put(player,connect(player)); return player;
+    }
+    private static EmbeddedChannel connect(ServerPlayer player) {
         var connection = new Connection(PacketFlow.SERVERBOUND);
-        player.channel = new EmbeddedChannel(new ChannelInitializer<Channel>() {
+        var channel = new EmbeddedChannel(new ChannelInitializer<Channel>() {
             @Override protected void initChannel(Channel channel) {
                 Connection.configureInMemoryPipeline(channel.pipeline(),PacketFlow.SERVERBOUND);
                 connection.configurePacketHandler(channel.pipeline());
@@ -510,9 +652,9 @@ public final class QuestRuntimeAudit {
         NetworkRegistry.configureMockConnection(connection);
         var cookie = new CommonListenerCookie(player.getGameProfile(),0,ClientInformation.createDefault(),false,ConnectionType.NEOFORGE);
         connection.setupOutboundProtocol(GameProtocols.CLIENTBOUND_TEMPLATE.bind(
-                RegistryFriendlyByteBuf.decorator(level.registryAccess(),cookie.connectionType())));
-        level.getServer().getPlayerList().placeNewPlayer(connection,player,cookie);
-        return player;
+                RegistryFriendlyByteBuf.decorator(player.registryAccess(),cookie.connectionType())));
+        player.getServer().getPlayerList().placeNewPlayer(connection,player,cookie);
+        return channel;
     }
     private static final class AuditPlayer extends ServerPlayer {
         EmbeddedChannel channel;

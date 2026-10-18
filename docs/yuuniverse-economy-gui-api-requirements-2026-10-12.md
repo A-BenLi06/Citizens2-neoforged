@@ -10,6 +10,12 @@ adds current-team visibility, prerequisites, native counts, task kinds and rewar
 ownership/status to NPC/dialogue listing and details. Repeatable cycle observations
 are not durable monetary claim generations; that CRAFT-01 requirement remains open.
 
+Craft evidence progress 2026-10-18, UTC+08:00: [native result observations](crafting-evidence-2026-10-18.md)
+attribute actual table/player-grid takes to recipe ID/revision, actor, components and
+complete batch quantity, including shift crafting and partial-inventory drops. The
+hook precedes input consumption. Durable task-generation admission, replay/recovery
+and recipe-specific advancement remain open under CRAFT-04/05.
+
 Recipe progress 2026-10-18, UTC+08:00: [native discovery and guidance](crafting-recipe-discovery-2026-10-18.md)
 now queries the active recipe manager, snapshots components/tags, checks revisions
 and follows an actual KubeJS script/resource reload. CRAFT-02 lookup is implemented

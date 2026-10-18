@@ -55,6 +55,9 @@ current server definitions and NPC/dialogue guidance with revision checks; machi
 processes, craft evidence and durable quest rewards remain separate acceptance.
 [Task discovery](docs/ftb-task-discovery-2026-10-18.md) adds visibility-filtered
 listing and details, prerequisites, repeatability and native reward ownership.
+[Crafting observations](docs/crafting-evidence-2026-10-18.md) attribute supported
+native result takes to the actual recipe holder, actor and complete output batch;
+durable task admission and recovery remain required.
 
 The existing configuration, shop and text-input GUIs use vanilla container,
 merchant and anvil protocols. They do not introduce a Citizens-specific client

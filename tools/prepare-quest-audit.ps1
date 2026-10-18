@@ -40,6 +40,27 @@ ServerEvents.recipes(event => {
 'eula=true' | Set-Content -LiteralPath (Join-Path $fixture 'eula.txt') -Encoding utf8
 'citizens-quest-audit' | Set-Content -LiteralPath (Join-Path $fixture 'quest-audit-fixture.txt') -Encoding utf8
 New-Item -ItemType Directory -Force (Join-Path $fixture 'config'), (Join-Path $fixture 'defaultconfigs') | Out-Null
+$questChapters = Join-Path $fixture 'config/ftbquests/quests/chapters'
+New-Item -ItemType Directory -Force $questChapters | Out-Null
+@'
+{
+    filename: "0000000000010401"
+    id: "0000000000010401"
+    quests: [{
+        id: "0000000000010402"
+        tasks: [{
+            id: "0000000000010403"
+            type: "item"
+            item: { count: 1, id: "minecraft:paper" }
+            count: 100L
+            consume_items: false
+            only_from_crafting: true
+        }]
+        x: 0.0d
+        y: 0.0d
+    }]
+}
+'@ | Set-Content -LiteralPath (Join-Path $questChapters '0000000000010401.snbt') -Encoding utf8
 'permissionHandler = "paradigm:internal"' | Set-Content -LiteralPath (Join-Path $fixture 'config/neoforge-server.toml') -Encoding utf8
 'permissionHandler = "paradigm:internal"' | Set-Content -LiteralPath (Join-Path $fixture 'defaultconfigs/neoforge-server.toml') -Encoding utf8
 Write-Output "Prepared $fixture"
