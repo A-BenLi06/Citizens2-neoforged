@@ -1,5 +1,11 @@
 # Crafting outcomes and quest evidence journal
 
+Follow-up: [explicit craft task projection](ftb-craft-evidence-projection-2026-10-18.md)
+now supplies production recipe bindings, durable team/quest/cycle generations,
+absolute CustomTask projection and authenticated review commands. It supersedes
+the pending production-consumer clauses below; monetary rewards and actual
+process-kill/world-rollback acceptance remain open.
+
 `CraftingOutcomeEvent` pairs the immutable observation UUID from
 `CraftingResultEvent` with the native result slot's return outcome. The required
 ResultSlot mixin wraps the original methods; native matching, ingredient removal,

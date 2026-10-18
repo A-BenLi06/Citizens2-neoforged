@@ -57,7 +57,10 @@ processes, craft evidence and durable quest rewards remain separate acceptance.
 listing and details, prerequisites, repeatability and native reward ownership.
 [Crafting observations](docs/crafting-evidence-2026-10-18.md) attribute supported
 native result takes to the actual recipe holder, actor and complete output batch;
-[Crafting outcomes and evidence journal](docs/quest-evidence-journal-2026-10-18.md) add native return status and immutable durable revisions; production task binding, projection and recovery acceptance remain required.
+[Crafting outcomes and evidence journal](docs/quest-evidence-journal-2026-10-18.md) add native return status and immutable durable revisions.
+[Explicit FTB craft bindings](docs/ftb-craft-evidence-projection-2026-10-18.md) apply
+confirmed recipe evidence to owned CustomTasks with stable generations and
+authenticated review. Monetary rewards and crash/rollback acceptance remain required.
 
 The existing configuration, shop and text-input GUIs use vanilla container,
 merchant and anvil protocols. They do not introduce a Citizens-specific client

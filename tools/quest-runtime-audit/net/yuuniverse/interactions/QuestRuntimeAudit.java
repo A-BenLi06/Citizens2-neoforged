@@ -202,6 +202,7 @@ public final class QuestRuntimeAudit {
             FTBTeamsAPI.api().getManager().createPartyTeam(craftActor,"CraftAuditParty","fixture",
                     dev.ftb.mods.ftblibrary.icon.Color4I.WHITE);
             auditCrafting(craftActor,other,nativeCraftTask);
+            auditCraftProjection(craftActor,other);
             auditMigration(actor);
             LoggerFactory.getLogger("interactions").info("[QUESTAUDIT] COMPLETE {} checks",passed);
         } catch(Throwable failure) { LoggerFactory.getLogger("interactions").error("[QUESTAUDIT] FAILED",failure); }
@@ -209,6 +210,169 @@ public final class QuestRuntimeAudit {
             for(var player:players) { server.getPlayerList().remove(player); player.channel.finishAndReleaseAll(); }
             for(var entry:realPlayers.entrySet()) { server.getPlayerList().remove(entry.getKey()); entry.getValue().finishAndReleaseAll(); }
             server.halt(false);
+        }
+    }
+    private static void auditCraftProjection(ServerPlayer actor, ServerPlayer other) throws Exception {
+        var server=actor.getServer(); var manager=server.getRecipeManager();
+        var original=new ArrayList<net.minecraft.world.item.crafting.RecipeHolder<?>>(manager.getRecipes());
+        var recipeId=net.minecraft.resources.ResourceLocation.parse("citizens_audit:bound_craft");
+        var failureId=net.minecraft.resources.ResourceLocation.parse("citizens_audit:bound_failure");
+        var output=new ItemStack(Items.PAPER,3);
+        output.set(net.minecraft.core.component.DataComponents.CUSTOM_NAME,Component.literal("Bound craft output"));
+        var required=new ItemStack(Items.STONE);
+        required.set(net.minecraft.core.component.DataComponents.CUSTOM_NAME,Component.literal("Bound craft ingredient"));
+        var recipe=new net.minecraft.world.item.crafting.ShapelessRecipe("",net.minecraft.world.item.crafting.CraftingBookCategory.MISC,
+                output,net.minecraft.core.NonNullList.of(net.minecraft.world.item.crafting.Ingredient.EMPTY,
+                        net.neoforged.neoforge.common.crafting.DataComponentIngredient.of(false,required),
+                        net.minecraft.world.item.crafting.Ingredient.of(Items.NETHER_STAR)));
+        var failureRecipe=new net.minecraft.world.item.crafting.ShapelessRecipe("",net.minecraft.world.item.crafting.CraftingBookCategory.MISC,
+                output,net.minecraft.core.NonNullList.of(net.minecraft.world.item.crafting.Ingredient.EMPTY,
+                        net.minecraft.world.item.crafting.Ingredient.of(CraftFailureIngredient.item),
+                        net.minecraft.world.item.crafting.Ingredient.of(Items.NETHER_STAR)));
+        var recipes=new ArrayList<net.minecraft.world.item.crafting.RecipeHolder<?>>(original);
+        recipes.add(new net.minecraft.world.item.crafting.RecipeHolder<>(recipeId,recipe));
+        recipes.add(new net.minecraft.world.item.crafting.RecipeHolder<>(failureId,failureRecipe)); manager.replaceRecipes(recipes);
+        var file=ServerQuestFile.getInstance().orElseThrow();
+        var old=file.getChapter(0x10501L); if(old!=null) old.deleteSelf();
+        var chapter=new Chapter(0x10501L,file,file.getDefaultChapterGroup()); chapter.onCreated();
+        var quest=new Quest(0x10502L,chapter); quest.onCreated();
+        var task=new CustomTask(0x10503L,quest); task.setMaxProgress(6); task.onCreated();
+        var blocker=new CustomTask(0x10504L,quest); blocker.setMaxProgress(1); blocker.onCreated();
+        var failureTask=new CustomTask(0x10505L,quest); failureTask.setMaxProgress(12); failureTask.onCreated();
+        var commandTask=new CustomTask(0x10506L,quest); commandTask.setMaxProgress(30); commandTask.onCreated();
+        var team=file.getTeamData(actor).orElseThrow();
+        var previousMenu=actor.containerMenu;
+        var station=actor.blockPosition().offset(1,0,0); var oldStation=actor.serverLevel().getBlockState(station);
+        actor.serverLevel().setBlockAndUpdate(station,net.minecraft.world.level.block.Blocks.CRAFTING_TABLE.defaultBlockState());
+        var menu=new net.minecraft.world.inventory.CraftingMenu(93,actor.getInventory(),
+                net.minecraft.world.inventory.ContainerLevelAccess.create(actor.serverLevel(),station)); actor.containerMenu=menu;
+        var directory=java.nio.file.Files.createTempDirectory(server.getServerDirectory(),"craft-projection-");
+        var service=net.citizensnpcs.util.CraftQuestEvidence.open(server,directory);
+        var source=actor.createCommandSourceStack();
+        try {
+            try { service.bind(source,task.getCodeString(),recipeId); throw new AssertionError("Unprivileged binding accepted"); }
+            catch(IllegalStateException expected) { check(service.bindings(server.createCommandSourceStack()).isEmpty(),"craft_projection_unprivileged_binding_retains_empty_config"); }
+            server.getCommands().getDispatcher().execute("paradigm group user perm add "+actor.getUUID()+" citizens.admin",server.createCommandSourceStack());
+            var binding=service.bind(source,task.getCodeString(),recipeId);
+            check(binding.operatorId().equals(actor.getUUID()) && binding.maximum()==6 && service.bind(source,task.getCodeString(),recipeId).epoch().equals(binding.epoch()),
+                    "craft_projection_binding_persists_operator_recipe_revision_and_stable_epoch");
+            service.bind(source,failureTask.getCodeString(),failureId);
+            try { service.bind(source,task.getCodeString(),failureId); throw new AssertionError("Silent rebind accepted"); }
+            catch(IllegalStateException expected) { check(service.bindings(source).getFirst().equals(binding),"craft_projection_rebind_preserves_original_definition"); }
+            check(server.getCommands().getDispatcher().execute("citizens craftevidence bind "+commandTask.getCodeString()+" "+recipeId,source)==1,
+                    "craft_projection_native_operator_binding_command");
+            check(server.getCommands().getDispatcher().execute("citizens craftevidence list",source)==1,"craft_projection_native_binding_listing_command");
+            actor.getInventory().clearContent(); actor.getInventory().setItem(0,output.copyWithCount(6));
+            check(team.getProgress(task)==0 && service.entries(source).isEmpty(),"craft_projection_inventory_possession_does_not_count");
+            actor.getInventory().clearContent(); menu.setCarried(ItemStack.EMPTY); menu.getSlot(1).set(required.copyWithCount(2)); menu.getSlot(2).set(new ItemStack(Items.NETHER_STAR,2));
+            menu.clicked(0,0,net.minecraft.world.inventory.ClickType.PICKUP,actor);
+            check(team.getProgress(task)==3 && service.entries(source).getFirst().state()==QuestEvidenceJournal.State.APPLIED
+                    && menu.getSlot(1).getItem().getCount()==1,"craft_projection_actual_native_take_sets_absolute_custom_progress");
+            var firstEntry=service.entries(source).getFirst();
+            var bindingBytes=java.nio.file.Files.readAllBytes(directory.resolve("bindings").resolve(binding.taskId()+".json"));
+            service.close(); service=net.citizensnpcs.util.CraftQuestEvidence.open(server,directory);
+            check(team.getProgress(task)==3 && service.bindings(source).getFirst().epoch().equals(binding.epoch())
+                    && Arrays.equals(bindingBytes,java.nio.file.Files.readAllBytes(directory.resolve("bindings").resolve(binding.taskId()+".json"))),
+                    "craft_projection_reopen_preserves_binding_epoch_and_does_not_increment_native_progress");
+            check(service.reconcile(source)==0 && team.getProgress(task)==3,"craft_projection_reconcile_applied_evidence_has_no_increment");
+            menu.setCarried(ItemStack.EMPTY); menu.clicked(0,0,net.minecraft.world.inventory.ClickType.QUICK_MOVE,actor);
+            check(team.getProgress(task)==6 && team.isCompleted(task) && service.entries(source).size()==2,
+                    "craft_projection_shift_batch_completes_matching_custom_task_once");
+            menu.getSlot(1).set(required.copy()); menu.getSlot(2).set(new ItemStack(Items.NETHER_STAR)); menu.clicked(0,0,net.minecraft.world.inventory.ClickType.PICKUP,actor);
+            check(service.entries(source).size()==2 && team.getProgress(task)==6,"craft_projection_completed_task_stops_admitting_output");
+            check(file.getTeamData(other).orElseThrow().getProgress(task)==0,"craft_projection_other_team_receives_no_progress");
+            menu.clearCraftingContent(); menu.setCarried(ItemStack.EMPTY); menu.getSlot(1).set(new ItemStack(CraftFailureIngredient.item)); menu.getSlot(2).set(new ItemStack(Items.NETHER_STAR));
+            CraftFailureIngredient.fail=true;
+            try { menu.clicked(0,0,net.minecraft.world.inventory.ClickType.PICKUP,actor); throw new AssertionError("Native failure did not escape"); }
+            catch(RuntimeException expected) { if(!expected.toString().contains("Expected native remainder failure")
+                    && (expected.getCause()==null || !expected.getCause().toString().contains("Expected native remainder failure"))) throw expected; }
+            finally { CraftFailureIngredient.fail=false; }
+            var review=service.entries(source).stream().filter(entry->entry.state()==QuestEvidenceJournal.State.REVIEW).findFirst().orElseThrow();
+            check(team.getProgress(failureTask)==0 && review.outcome()==QuestEvidenceJournal.Outcome.INTERRUPTED,"craft_projection_native_failure_retains_review_without_advancement");
+            menu.setCarried(ItemStack.EMPTY); menu.clicked(0,0,net.minecraft.world.inventory.ClickType.PICKUP,actor);
+            check(team.getProgress(failureTask)==0 && service.entries(source).size()==3,"craft_projection_unresolved_review_fences_subsequent_admission");
+            service.resolve(source,review.id(),false,"Native failure left the original input unconsumed");
+            check(service.entries(source).stream().anyMatch(entry->entry.id().equals(review.id())
+                    && entry.state()==QuestEvidenceJournal.State.REJECTED && entry.resolution().operatorId().equals(actor.getUUID())),
+                    "craft_projection_rejection_retains_authenticated_operator_and_reason");
+            menu.setCarried(ItemStack.EMPTY); menu.getSlot(1).set(new ItemStack(CraftFailureIngredient.item)); menu.getSlot(2).set(new ItemStack(Items.NETHER_STAR));
+            menu.clicked(0,0,net.minecraft.world.inventory.ClickType.PICKUP,actor);
+            check(team.getProgress(failureTask)==3,"craft_projection_success_after_review_uses_only_confirmed_total");
+            // Restore an earlier independent FTB state: APPLIED evidence must not silently repair rollback.
+            team.resetProgress(failureTask); menu.setCarried(ItemStack.EMPTY);
+            menu.getSlot(1).set(new ItemStack(CraftFailureIngredient.item)); menu.getSlot(2).set(new ItemStack(Items.NETHER_STAR));
+            int beforeFence=service.entries(source).size(); menu.clicked(0,0,net.minecraft.world.inventory.ClickType.PICKUP,actor);
+            check(team.getProgress(failureTask)==0 && service.entries(source).size()==beforeFence,
+                    "craft_projection_native_rollback_fences_new_admission_without_inventing_generation");
+            // Recovery of a confirmed admission whose native progress was already persisted before APPLIED.
+            service.close();
+            try(var journal=QuestEvidenceJournal.open(directory.resolve("journal"))) {
+                var generation=journal.generations().stream().filter(value->value.id().equals(review.admission().generationId())).findFirst().orElseThrow();
+                var entry=journal.admit(new QuestEvidenceJournal.Admission(UUID.randomUUID(),generation.id(),failureTask.getCodeString(),actor.getUUID(),
+                        failureId.toString(),review.admission().recipeRevision(),3,review.admission().evidence()));
+                journal.outcome(entry.id(),QuestEvidenceJournal.Outcome.RETURNED);
+                team.setProgress(failureTask,6);
+            }
+            service=net.citizensnpcs.util.CraftQuestEvidence.open(server,directory);
+            check(service.reconcile(source)==1 && team.getProgress(failureTask)==6
+                    && service.entries(source).stream().noneMatch(entry->entry.state()==QuestEvidenceJournal.State.CONFIRMED),
+                    "craft_projection_exact_already_saved_total_replays_without_increment");
+            check(service.reconcile(source)==0 && team.getProgress(failureTask)==6,"craft_projection_duplicate_recovery_creates_no_extra_progress");
+            // FTB increments repeatable cycles on the actual native reward claim/reset boundary.
+            var repeatQuest=new Quest(0x10507L,chapter);
+            var repeatConfig=new net.minecraft.nbt.CompoundTag(); repeatConfig.putBoolean("can_repeat",true);
+            repeatQuest.readData(repeatConfig,actor.registryAccess()); repeatQuest.onCreated();
+            var repeatTask=new CustomTask(0x10508L,repeatQuest); repeatTask.setMaxProgress(3); repeatTask.onCreated();
+            var reward=new dev.ftb.mods.ftbquests.quest.reward.CustomReward(0x10509L,repeatQuest); reward.onCreated();
+            service.bind(source,repeatTask.getCodeString(),recipeId);
+            menu.clearCraftingContent(); menu.setCarried(ItemStack.EMPTY); menu.getSlot(1).set(required.copy()); menu.getSlot(2).set(new ItemStack(Items.NETHER_STAR));
+            menu.clicked(0,0,net.minecraft.world.inventory.ClickType.PICKUP,actor);
+            check(team.isCompleted(repeatQuest) && team.getCompletionCount(repeatQuest)==0 && team.getProgress(repeatTask)==3,
+                    "craft_projection_repeatable_task_finishes_native_cycle_before_claim");
+            team.claimReward(actor,reward,false);
+            check(team.getCompletionCount(repeatQuest)==1 && team.getProgress(repeatTask)==0,
+                    "craft_projection_native_reward_claim_advances_repeat_cycle");
+            menu.setCarried(ItemStack.EMPTY); menu.getSlot(1).set(required.copy()); menu.getSlot(2).set(new ItemStack(Items.NETHER_STAR));
+            menu.clicked(0,0,net.minecraft.world.inventory.ClickType.PICKUP,actor);
+            check(team.getProgress(repeatTask)==3 && service.entries(source).stream().filter(entry->entry.admission().taskId().equals(repeatTask.getCodeString()))
+                    .map(entry->entry.admission().generationId()).distinct().count()==2,
+                    "craft_projection_repeat_cycle_uses_distinct_durable_generation");
+            var finishedQuest=new Quest(0x10510L,chapter); finishedQuest.onCreated();
+            var finishedTask=new CustomTask(0x10511L,finishedQuest); finishedTask.setMaxProgress(3); finishedTask.onCreated();
+            service.bind(source,finishedTask.getCodeString(),recipeId);
+            menu.setCarried(ItemStack.EMPTY); menu.getSlot(1).set(required.copy()); menu.getSlot(2).set(new ItemStack(Items.NETHER_STAR));
+            menu.clicked(0,0,net.minecraft.world.inventory.ClickType.PICKUP,actor);
+            check(team.isCompleted(finishedQuest) && team.getCompletionCount(finishedQuest)==1
+                    && service.entries(source).stream().filter(entry->entry.admission().taskId().equals(finishedTask.getCodeString()))
+                        .allMatch(entry->entry.state()==QuestEvidenceJournal.State.APPLIED),
+                    "craft_projection_nonrepeatable_completion_count_does_not_rebind_generation");
+            // Equal output under a different recipe identity must not satisfy an explicitly bound task.
+            var identityQuest=new Quest(0x10512L,chapter); identityQuest.onCreated();
+            var identityTask=new CustomTask(0x10513L,identityQuest); identityTask.setMaxProgress(30); identityTask.onCreated();
+            service.bind(source,identityTask.getCodeString(),recipeId);
+            menu.setCarried(ItemStack.EMPTY); menu.getSlot(1).set(new ItemStack(CraftFailureIngredient.item)); menu.getSlot(2).set(new ItemStack(Items.NETHER_STAR));
+            menu.clicked(0,0,net.minecraft.world.inventory.ClickType.PICKUP,actor);
+            check(team.getProgress(identityTask)==0,"craft_projection_equal_output_from_another_recipe_is_not_admitted");
+            var changed=new net.minecraft.world.item.crafting.ShapelessRecipe("",net.minecraft.world.item.crafting.CraftingBookCategory.MISC,
+                    output.copyWithCount(4),recipe.getIngredients());
+            var changedRecipes=recipes.stream().filter(holder->!holder.id().equals(recipeId)).collect(java.util.stream.Collectors.toCollection(ArrayList::new));
+            changedRecipes.add(new net.minecraft.world.item.crafting.RecipeHolder<>(recipeId,changed)); manager.replaceRecipes(changedRecipes);
+            menu.setCarried(ItemStack.EMPTY); menu.getSlot(1).set(required.copy()); menu.getSlot(2).set(new ItemStack(Items.NETHER_STAR));
+            menu.clicked(0,0,net.minecraft.world.inventory.ClickType.PICKUP,actor);
+            check(menu.getCarried().getCount()==4 && team.getProgress(identityTask)==0,
+                    "craft_projection_recipe_redefinition_requires_explicit_binding_migration");
+            manager.replaceRecipes(recipes);
+            long beforeRevocation=team.getProgress(failureTask);
+            server.getCommands().getDispatcher().execute("paradigm group user perm remove "+actor.getUUID()+" citizens.admin",server.createCommandSourceStack());
+            try { service.resolve(source,review.id(),true,"Unauthorised retry"); throw new AssertionError("Revoked operator accepted"); }
+            catch(IllegalStateException expected) { check(team.getProgress(failureTask)==beforeRevocation,"craft_projection_provider_permission_revocation_is_rechecked"); }
+            check(firstEntry.admission().actorId().equals(actor.getUUID()) && firstEntry.admission().recipeId().equals(recipeId.toString()),
+                    "craft_projection_admission_retains_original_actor_and_recipe");
+            try { service.resolve(server.createCommandSourceStack(),review.id(),true,"Console has no actor UUID"); throw new AssertionError("Unattributed decision accepted"); }
+            catch(IllegalArgumentException expected) { check(true,"craft_projection_console_cannot_invent_review_operator"); }
+        } finally {
+            service.close(); CraftFailureIngredient.fail=false; menu.setCarried(ItemStack.EMPTY); menu.clearCraftingContent();
+            actor.containerMenu=previousMenu; actor.serverLevel().setBlockAndUpdate(station,oldStation); manager.replaceRecipes(original);
         }
     }
     private static void auditCrafting(ServerPlayer actor,AuditPlayer other,ItemTask task) throws Exception {

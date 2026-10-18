@@ -1,5 +1,11 @@
 # Yuuniverse Economy GUI: API requirements and ordered implementation tasks
 
+Craft task follow-up 2026-10-18, UTC+08:00: [explicit FTB craft bindings](ftb-craft-evidence-projection-2026-10-18.md)
+provide production recipe-revision bindings, durable team/cycle generations,
+authenticated evidence review and absolute native CustomTask projection. Monetary
+reward operations, commerce bindings, machine adapters and process-kill/rollback
+acceptance remain required under CRAFT-04/05 and ECO-09.
+
 Decision recorded: 2026-10-12, UTC+08:00.
 Confirmed as the selected porting target: 2026-10-13, UTC+08:00. See the [adopted integration backlog and installation record](ecosystem-adaptation-goals-2026-10-13.md).
 Update: v0.5.0 has now passed its 79-test build, the combined-stack startup and 36 actual-provider service checks; its upgrade is [prepared for the next planned restart](economy-v050-preparation-2026-10-13.json). The APIs proposed below remain development requirements, not newly implemented signatures.
@@ -159,6 +165,7 @@ Installed `EconomyApi` was independently inspected with JDK 21 `javap`: 0.4.1 ex
 Progress 2026-10-18, UTC+08:00: [craft outcomes and journal](quest-evidence-journal-2026-10-18.md)
 add return-scoped native evidence, durable deduplication/generation storage,
 append-only transitions and explicit review of interrupted/missing outcomes.
-Production task binding/projection, monetary claim generations, authenticated
-operator workflows and process-crash/world-rollback acceptance remain required;
+Production binding/projection and authenticated review are now implemented by the
+[explicit craft binding adapter](ftb-craft-evidence-projection-2026-10-18.md).
+Monetary claims and process-crash/world-rollback acceptance remain required;
 CRAFT-04/05 are incomplete.

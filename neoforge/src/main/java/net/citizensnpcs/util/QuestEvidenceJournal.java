@@ -164,6 +164,14 @@ public final class QuestEvidenceJournal implements AutoCloseable {
         return total;
     }
 
+    public long appliedTotal(UUID generation, String taskId) {
+        active(); String task = objectId(taskId); long total = 0;
+        for (Entry entry : entries.values()) if (entry.admission().generationId().equals(generation)
+                && entry.admission().taskId().equals(task) && entry.state() == State.APPLIED)
+            total = Math.addExact(total, entry.admission().units());
+        return total;
+    }
+
     public List<Entry> entries() { active(); return entries.values().stream().sorted(java.util.Comparator.comparingLong(Entry::createdAt).thenComparing(Entry::id)).toList(); }
     public List<Generation> generations() { active(); return generations.values().stream().sorted(java.util.Comparator.comparingLong(Generation::createdAt).thenComparing(Generation::id)).toList(); }
 

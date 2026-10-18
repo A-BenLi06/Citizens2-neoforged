@@ -29,6 +29,14 @@ Exact artifact sources, SHA-512/SHA-256 hashes and installation paths are record
 
 ## Ordered adaptation backlog
 
+Progress 2026-10-18, UTC+08:00: [explicit FTB craft bindings](ftb-craft-evidence-projection-2026-10-18.md)
+connect confirmed exact-recipe evidence to owned CustomTasks. Bindings retain stable
+epochs, recipe revisions, creator UUIDs and native definitions; current-team
+admission and absolute projection retain distinct repeat generations. Failure
+review, rollback fencing and authenticated reconciliation are implemented. Monetary
+rewards, commerce tasks, machines, actual process-kill/rollback and specialist/client
+acceptance remain open under ADAPT-04/05/11.
+
 Progress 2026-10-18, UTC+08:00: [crafting result observations](crafting-evidence-2026-10-18.md)
 add a native event source with actual selected recipe ID/revision, actor, immutable
 input/output components and per-batch observation identity. It runs before native
@@ -145,6 +153,7 @@ An online read-only backup was used solely for rehearsal. The upgrade migrates s
 Progress 2026-10-18, UTC+08:00: [craft outcomes and journal](quest-evidence-journal-2026-10-18.md)
 add return-scoped native evidence, durable deduplication/generation storage,
 append-only transitions and explicit review of interrupted/missing outcomes.
-Production task binding/projection, monetary claim generations, authenticated
-operator workflows and process-crash/world-rollback acceptance remain required;
+Production binding/projection and authenticated review are now implemented by the
+[explicit craft binding adapter](ftb-craft-evidence-projection-2026-10-18.md).
+Monetary claims and process-crash/world-rollback acceptance remain required;
 CRAFT-04/05 are incomplete.

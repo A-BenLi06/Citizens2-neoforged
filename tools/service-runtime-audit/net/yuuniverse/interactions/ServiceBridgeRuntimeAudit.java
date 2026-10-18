@@ -90,6 +90,18 @@ public final class ServiceBridgeRuntimeAudit {
             var economy = new Economy();
             economy.install();
             var actions = new Actions(new ItemLibrary(), economy);
+            var craftEvidence = net.citizensnpcs.util.CraftQuestEvidence.current(server);
+            check(craftEvidence.bindings(server.createCommandSourceStack()).isEmpty(),
+                    "craft_evidence_lifecycle_loads_without_optional_ftb_provider");
+            try {
+                craftEvidence.bind(actor.createCommandSourceStack().withPermission(2), "10103",
+                        net.minecraft.resources.ResourceLocation.parse("minecraft:paper"));
+                throw new AssertionError("Missing FTB binding accepted");
+            } catch (IllegalStateException expected) {
+                check(craftEvidence.bindings(server.createCommandSourceStack()).isEmpty()
+                        && craftEvidence.entries(server.createCommandSourceStack()).isEmpty(),
+                        "missing_ftb_craft_binding_creates_no_journal_admission");
+            }
             CommandAliases.load(Path.of("config/interactions/command-aliases.yml").toFile());
             check(CommandAliases.rewrite("shop 商店", actor.getGameProfile().getName()).equals("shop 商店")
                     && CommandAliases.rewrite("cam-server start test ServiceActor", "ServiceActor")

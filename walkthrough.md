@@ -2669,3 +2669,32 @@ binary/source jars exclude audit fixtures. Evidence and artifact/provider hashes
 artifacts/quest-evidence-journal-validation-2026-10-18.json. Production task binding,
 absolute native CustomTask projection, durable rewards and actual crash/rollback
 acceptance remain requirements; this commit does not install the fixture consumer.
+
+## 2026-10-18T20:17:16.1653143+08:00 (UTC+08:00) - Apply explicit recipe evidence to owned FTB custom tasks
+
+Added a production world-scoped craft-evidence service, immutable recipe-revision
+bindings and authenticated craftevidence admin commands. Bindings retain native
+IDs, maximum/repeat policy, operator UUID and stable epoch. The public FTB adapter
+validates current online team admission, visibility/prerequisites, exact recipe
+revision and supported static output; purchases/possession and another recipe's
+identical output cannot substitute. Projection reacquires the admitted team UUID
+and sets the absolute confirmed total through FTB TeamData.setProgress before
+marking evidence APPLIED. No private FTB state or custom checker is replaced.
+
+Native interrupted/missing evidence stays in review; unresolved review fences later
+admission. Explicit operator acceptance/rejection retains UUID and explanation.
+Reconciliation accepts the last APPLIED or exact desired native total; other values
+and historical-cycle/definition changes fail for review. APPLIED history never
+silently repairs FTB/world rollback. Actual FTB repeat reward reset yields a new
+generation, while non-repeatable completion remains cycle zero. Startup validates
+records without touching progress and works without FTB; retirement closes handles.
+
+Validation: 130 combined actual-provider checks on each NeoForge target 21.1.233
+and 21.1.248, including actual remainder failure, shift craft, native repeat claim,
+recipe redefinition, permission revocation, immutable reopen and absolute replay;
+129 separate Economy/camera/provider-absence checks; 741 ordinary tests with zero
+failures/errors/skips and successful build. Test-only assertion corrections retain
+failed logs as evidence. Separate release jars/sources exclude all audit fixtures.
+Exact hashes: artifacts/craft-task-projection-validation-2026-10-18.json. Production
+was untouched. Monetary rewards, commerce evidence, machine adapters, legacy task
+mapping and actual process-kill/rollback plus physical-client acceptance remain.

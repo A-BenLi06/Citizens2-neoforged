@@ -83,6 +83,63 @@ public final class FtbQuestTasks {
         return invoke(() -> snapshot(prepare(player, parseId(taskId))));
     }
 
+    /** Public native CustomTask ownership; reads never create teams or install a custom checker. */
+    public record EvidenceTarget(State state, String questId, int cycle, boolean repeatable, boolean visible) { }
+
+    public static EvidenceTarget evidenceTarget(ServerPlayer player, String taskId) {
+        return invoke(() -> evidenceTarget(prepare(player, parseId(taskId))));
+    }
+
+    /** Reacquires the admitted team by UUID, even when the crafting player has since changed parties. */
+    public static EvidenceTarget evidenceTarget(net.minecraft.server.MinecraftServer server, UUID teamId, String taskId) {
+        return invoke(() -> evidenceTarget(evidencePrepared(server, teamId, taskId)));
+    }
+
+    static EvidenceTarget projectEvidence(net.minecraft.server.MinecraftServer server, UUID teamId, String taskId,
+            String questId, int cycle, long maximum, long expectedProgress, long absoluteProgress) {
+        return invoke(() -> {
+            Prepared prepared = evidencePrepared(server, teamId, taskId);
+            EvidenceTarget before = evidenceTarget(prepared);
+            if (!before.questId().equals(questId) || before.cycle() != cycle || before.state().maximum() != maximum
+                    || before.state().progress() != expectedProgress || absoluteProgress < expectedProgress
+                    || absoluteProgress > maximum || (!before.state().available() && !before.state().completed()))
+                throw new IllegalStateException("Native task changed; evidence reconciliation is required");
+            if (before.state().progress() != absoluteProgress)
+                prepared.teamType().getMethod("setProgress", prepared.taskType(), long.class)
+                        .invoke(prepared.team(), prepared.task(), absoluteProgress);
+            EvidenceTarget after = evidenceTarget(prepared);
+            if (after.cycle() != cycle || after.state().progress() != absoluteProgress
+                    || (absoluteProgress == maximum && !after.state().completed()))
+                throw new IllegalStateException("Native task did not retain the projected total; review is required");
+            return after;
+        });
+    }
+
+    private static Prepared evidencePrepared(net.minecraft.server.MinecraftServer server, UUID teamId, String taskId)
+            throws ReflectiveOperationException {
+        if (server == null || !server.isSameThread()) throw new IllegalStateException("Evidence requires the server thread");
+        Class<?> base = Class.forName(QUEST + "BaseQuestFile");
+        Object file = ((Optional<?>) Class.forName(QUEST + "ServerQuestFile").getMethod("getInstance").invoke(null))
+                .orElseThrow(() -> new IllegalStateException("FTB Quests is unavailable"));
+        Object team = base.getMethod("getNullableTeamData", UUID.class).invoke(file, teamId);
+        if (team == null) throw new IllegalStateException("Admitted team no longer exists");
+        Object task = base.getMethod("getTask", long.class).invoke(file, parseId(taskId));
+        if (task == null || !(boolean) Class.forName(QUEST + "QuestObjectBase").getMethod("isValid").invoke(task))
+            throw new IllegalArgumentException("Admitted task no longer exists");
+        return task(new Context(file, team, Class.forName(QUEST + "task.Task"), Class.forName(QUEST + "TeamData"),
+                Class.forName(QUEST + "QuestObject")), task);
+    }
+
+    private static EvidenceTarget evidenceTarget(Prepared value) throws ReflectiveOperationException {
+        if (!Class.forName(QUEST + "task.CustomTask").isInstance(value.task()))
+            throw new IllegalArgumentException("Craft evidence requires an explicitly owned CustomTask");
+        Class<?> questType = Class.forName(QUEST + "Quest");
+        boolean repeatable = (boolean) questType.getMethod("canBeRepeated").invoke(value.quest());
+        // A non-repeatable completion flips FTB's count to one, but is still the same admitted run.
+        int cycle = repeatable ? (int) value.teamType().getMethod("getCompletionCount", questType).invoke(value.team(), value.quest()) : 0;
+        return new EvidenceTarget(snapshot(value), code(value.quest()), cycle, repeatable, visible(value.task(), value));
+    }
+
     /** Preflight and execution resolve the current file/team independently. FTB owns item matching and consumption. */
     public static State submit(ServerPlayer player, String taskId, boolean validate) {
         return invoke(() -> {

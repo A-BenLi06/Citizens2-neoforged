@@ -137,6 +137,7 @@ public class Citizens implements CitizensPlugin {
         commands.register(AdminCommands.class);
         commands.register(net.citizensnpcs.commands.EconomyMenuCommands.class);
         commands.register(net.citizensnpcs.commands.QuestCommands.class);
+        commands.register(net.citizensnpcs.commands.CraftEvidenceCommands.class);
         commands.register(net.citizensnpcs.commands.SavedItemCommands.class);
         commands.register(net.citizensnpcs.commands.RecipeCommands.class);
         commands.register(TemplateCommands.class);
