@@ -29,6 +29,15 @@ Exact artifact sources, SHA-512/SHA-256 hashes and installation paths are record
 
 ## Ordered adaptation backlog
 
+Progress 2026-10-19, UTC+08:00: [native sequenced assembly](create-assembly-evidence-2026-10-19.md)
+adds separate weighted/ordered recipe discovery and actual final parent advancement
+through native pressing, deploying, filling and cutting storage. Forty-one assembly
+checks on both targets cover world/depot/belt output, a four-machine sequence,
+incidental matching step output exclusion, tool/fluid/input mutations, parent
+revision/identity replacement, native remainders and exceptions, duplicates and
+journal reopen. Earlier-step owner history, machine-specific hard-kill/rollback,
+other required unsupported machines and wider recovery/client gates remain open.
+
 Progress 2026-10-19, UTC+08:00: [native fan evidence](create-fan-evidence-2026-10-19.md)
 confirms actual SPLASHING/HAUNTING world/depot/belt output after complete storage.
 All simultaneous callback outcomes wait for the native holder return; exact input,

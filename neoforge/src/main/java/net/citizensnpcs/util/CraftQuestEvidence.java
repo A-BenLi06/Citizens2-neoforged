@@ -101,7 +101,7 @@ public final class CraftQuestEvidence implements AutoCloseable {
         if (CommerceQuestTasks.owns(server, target.state().taskId())) throw new IllegalStateException("Task is already owned by commerce receipts");
         if (!target.visible() || target.state().maximum() <= 0) throw new IllegalArgumentException("Task is unavailable");
         var recipe = CraftingRecipes.find(server, recipeId).orElseThrow(() -> new IllegalArgumentException("Recipe is unavailable"));
-        if (!recipe.tableEvidenceSupported() && (recipe.processing() == null
+        if (!recipe.tableEvidenceSupported() && !(recipe.assembly() != null && recipe.assembly().evidenceSupported()) && (recipe.processing() == null
                 || !CreateMachineEvidence.supports(recipe.processing().process())
                 || (recipe.output().isEmpty() && recipe.processing().fluidResults().isEmpty())))
             throw new IllegalArgumentException("Recipe evidence is unsupported");
@@ -145,7 +145,7 @@ public final class CraftQuestEvidence implements AutoCloseable {
         if (closed || event.getBeneficiary().getServer() != server) return;
         var observation = event.getObservation();
         long units = 0;
-        for (var output : observation.rolledOutputs())
+        for (var output : observation.assembly() == null ? observation.rolledOutputs() : observation.assembly().finalOutputs())
             if (net.minecraft.world.item.ItemStack.isSameItemSameComponents(output, observation.recipe().output()))
                 units = Math.addExact(units, output.getCount());
         if (observation.recipe().output().isEmpty() && (observation.basin() != null || observation.fluid() != null)

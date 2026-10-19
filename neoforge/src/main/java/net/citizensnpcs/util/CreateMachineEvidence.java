@@ -78,7 +78,14 @@ public final class CreateMachineEvidence {
     }
     public record Observation(UUID id, Attribution attribution, ResourceLocation dimension, BlockPos position, long serverTick,
             Source source, CraftingRecipes.Snapshot recipe, ItemStack consumedInput, ItemStack remainingInput, ItemStack nativeRemainder,
-            List<ItemStack> beforeOutput, List<ItemStack> rolledOutputs, List<ItemStack> additionalRemainders, UUID inputEntityId, BasinData basin, FluidData fluid, ToolData tool) {
+            List<ItemStack> beforeOutput, List<ItemStack> rolledOutputs, List<ItemStack> additionalRemainders, UUID inputEntityId, BasinData basin, FluidData fluid, ToolData tool,
+            AssemblyData assembly) {
+        public Observation(UUID id, Attribution attribution, ResourceLocation dimension, BlockPos position, long serverTick,
+                Source source, CraftingRecipes.Snapshot recipe, ItemStack consumedInput, ItemStack remainingInput, ItemStack nativeRemainder,
+                List<ItemStack> beforeOutput, List<ItemStack> rolledOutputs, List<ItemStack> additionalRemainders, UUID inputEntityId, BasinData basin, FluidData fluid, ToolData tool) {
+            this(id, attribution, dimension, position, serverTick, source, recipe, consumedInput, remainingInput, nativeRemainder,
+                    beforeOutput, rolledOutputs, additionalRemainders, inputEntityId, basin, fluid, tool, null);
+        }
         public Observation(UUID id, Attribution attribution, ResourceLocation dimension, BlockPos position, long serverTick,
                 Source source, CraftingRecipes.Snapshot recipe, ItemStack consumedInput, ItemStack remainingInput, ItemStack nativeRemainder,
                 List<ItemStack> beforeOutput, List<ItemStack> rolledOutputs, List<ItemStack> additionalRemainders, UUID inputEntityId, BasinData basin, FluidData fluid) {
@@ -118,6 +125,15 @@ public final class CreateMachineEvidence {
         @Override public List<ItemStack> beforeOutput() { return copies(beforeOutput); }
         @Override public List<ItemStack> rolledOutputs() { return copies(rolledOutputs); }
         @Override public List<ItemStack> additionalRemainders() { return copies(additionalRemainders); }
+    }
+
+    /** Exact final native advancement, distinct from incidental step/secondary outputs. */
+    public record AssemblyData(int step, int totalSteps, CreateProcessingRecipes.Process process, List<ItemStack> finalOutputs) {
+        public AssemblyData {
+            if (step < 0 || step != totalSteps - 1) throw new IllegalArgumentException("Assembly is not at its final step");
+            finalOutputs = copies(finalOutputs);
+        }
+        @Override public List<ItemStack> finalOutputs() { return copies(finalOutputs); }
     }
 
     /** Pre-storage native deployer hand/inventory and the selected recipe's retention policy. */
@@ -211,11 +227,68 @@ public final class CreateMachineEvidence {
                 try { verifyTool(scope); }
                 catch (RuntimeException | LinkageError failure) { scope.verified = false; LOGGER.error("Deployer tool verification failed", failure); }
             }
+            if (scope.observation.assembly() != null && returned) {
+                try {
+                    var server = ((ServerLevel) scope.machine.getLevel()).getServer();
+                    var holder = server.getRecipeManager().byKey(scope.observation.recipe().id()).orElse(null);
+                    scope.verified &= holder != null && holder.value() == scope.assemblyRecipe
+                            && server.getRecipeManager().getRecipes().stream().filter(value -> value.value() == scope.assemblyRecipe).count() == 1
+                            && CraftingRecipes.current(server, scope.observation.recipe().id(), scope.observation.recipe().revision()) && !scope.invalidBatch;
+                } catch (RuntimeException | LinkageError failure) { scope.verified = false; LOGGER.error("Assembly revision verification failed", failure); }
+            }
             var outcome = !returned ? MachineOutcomeEvent.Outcome.INTERRUPTED
                     : scope.verified ? MachineOutcomeEvent.Outcome.RETURNED : MachineOutcomeEvent.Outcome.UNCONFIRMED;
             try { NeoForge.EVENT_BUS.post(new MachineOutcomeEvent(scope.observation, outcome)); }
             catch (RuntimeException | LinkageError failure) { LOGGER.error("Machine outcome listener failed for {}", scope.observation.id(), failure); }
         }
+    }
+
+    /** Capture the actual native final result only while a supported live machine owns this roll. */
+    public static ItemStack duringAssemblyAdvance(Object recipe, ResourceLocation id, ItemStack input,
+            java.util.function.Supplier<ItemStack> original) {
+        var scope = SCOPES.get().peek(); CraftingRecipes.Snapshot snapshot = null; Object stepRecipe = null; int step = -1;
+        try {
+            if (scope != null && live(scope.machine) && scope.input != null && ItemStack.isSameItemSameComponents(input, scope.input)) {
+                var server = ((ServerLevel) scope.machine.getLevel()).getServer();
+                var holder = server.getRecipeManager().byKey(id).orElse(null);
+                if (holder != null && holder.value() == recipe && server.getRecipeManager().getRecipes().stream().filter(h -> h.value() == recipe).count() == 1) {
+                    snapshot = CraftingRecipes.find(server, id).orElseThrow();
+                    var component = (net.minecraft.core.component.DataComponentType<?>) Class.forName("com.simibubi.create.AllDataComponents").getField("SEQUENCED_ASSEMBLY").get(null);
+                    var data = input.get(component); step = data == null ? 0 : (int) data.getClass().getMethod("step").invoke(data);
+                    if (data == null && !((net.minecraft.world.item.crafting.Ingredient) recipe.getClass().getMethod("getIngredient").invoke(recipe)).test(input)) snapshot = null;
+                    if (data != null && (!id.equals(data.getClass().getMethod("id").invoke(data))
+                            || !input.is(snapshot.assembly().transitionalItem().getItem()))) snapshot = null;
+                    if (snapshot != null && snapshot.assembly() != null && snapshot.assembly().evidenceSupported()) {
+                        int total = Math.multiplyExact(snapshot.assembly().loops(), snapshot.assembly().steps().size());
+                        if (step != total - 1) snapshot = null;
+                        else {
+                            var entry = ((List<?>) recipe.getClass().getMethod("getSequence").invoke(recipe)).get(step % snapshot.assembly().steps().size());
+                            stepRecipe = entry.getClass().getMethod("getRecipe").invoke(entry);
+                            if (scope.batchRecipe != null && scope.batchRecipe != stepRecipe
+                                    || !source(scope.machine).supports(snapshot.assembly().steps().get(step % snapshot.assembly().steps().size()).processing().process())) snapshot = null;
+                        }
+                    } else snapshot = null;
+                }
+            }
+        } catch (ReflectiveOperationException | RuntimeException | LinkageError failure) {
+            snapshot = null; if (scope != null) scope.invalidBatch = true; LOGGER.error("Assembly advance observation failed", failure);
+        }
+        var output = original.get();
+        if (snapshot != null) {
+            try {
+                if (scope.assemblyRecipe != null && (scope.assemblyRecipe != recipe || scope.assemblyStepRecipe != stepRecipe
+                        || scope.assemblyStep != step || !scope.assemblySnapshot.revision().equals(snapshot.revision()))) scope.invalidBatch = true;
+                scope.assemblyRecipe = recipe; scope.assemblyStepRecipe = stepRecipe; scope.assemblySnapshot = snapshot; scope.assemblyStep = step;
+                scope.assemblyOutputs.add(output.copy());
+            } catch (RuntimeException | LinkageError failure) { scope.invalidBatch = true; LOGGER.error("Assembly result observation failed", failure); }
+        }
+        return output;
+    }
+    private static AssemblyData assemblyData(Scope scope) {
+        if (scope.assemblySnapshot == null) return null;
+        var assembly = scope.assemblySnapshot.assembly();
+        return new AssemblyData(scope.assemblyStep, Math.multiplyExact(assembly.loops(), assembly.steps().size()),
+                assembly.steps().get(scope.assemblyStep % assembly.steps().size()).processing().process(), scope.assemblyOutputs);
     }
 
     /** Native AirCurrent caller only; utility processing without a live fan source stays unobserved. */
@@ -457,7 +530,7 @@ public final class CreateMachineEvidence {
                 scope.fluidBefore, scope.fluidConsumed, outputs);
         scope.observation = new Observation(UUID.randomUUID(), assignment, level.dimension().location(), scope.machine.getBlockPos(),
                 level.getServer().getTickCount(), source(scope.machine), selected, scope.input, scope.remainingInput, ItemStack.EMPTY,
-                scope.transportInitial == null ? List.of(scope.worldBefore) : scope.transportInitial, scope.batchOutputs, List.of(), null, null, data);
+                scope.transportInitial == null ? List.of(scope.worldBefore) : scope.transportInitial, scope.batchOutputs, List.of(), null, null, data, null, assemblyData(scope));
         NeoForge.EVENT_BUS.post(new MachineResultEvent(actor, scope.observation));
         scope.invalidBatch |= !equalFluids(scope.fluidBefore, tankSnapshot(scope.machine));
         if (source(scope.machine) == Source.CREATE_SPOUT) scope.invalidBatch |= !ItemStack.matches(transportedStack(scope.transportInput), scope.worldBefore);
@@ -732,9 +805,11 @@ public final class CreateMachineEvidence {
                     scope.transportInitial == null ? List.of() : scope.transportInitial, scope.batchOutputs,
                     scope.batchRemainders.size() < 2 ? List.of() : scope.batchRemainders.subList(1, scope.batchRemainders.size()),
                     scope.worldInput == null ? null : scope.worldInput.getUUID(), null, null,
-                    scope.toolBefore == null ? null : new ToolData(scope.toolBefore, scope.toolInventoryBefore, selected.processing().retainedItemSlots().contains(1)));
+                    scope.toolBefore == null ? null : new ToolData(scope.toolBefore, scope.toolInventoryBefore,
+                            selected.assembly() == null ? selected.processing().retainedItemSlots().contains(1)
+                            : selected.assembly().steps().get(scope.assemblyStep % selected.assembly().steps().size()).processing().retainedItemSlots().contains(1)), assemblyData(scope));
             NeoForge.EVENT_BUS.post(new MachineResultEvent(actor, scope.observation));
-            if (source(scope.machine) == Source.CREATE_FAN) {
+            if (source(scope.machine) == Source.CREATE_FAN || scope.assemblySnapshot != null) {
                 scope.invalidBatch |= scope.worldInput != null ? !scope.worldInput.isAlive() || !ItemStack.matches(scope.worldInput.getItem(), scope.worldBefore)
                         : !ItemStack.matches(transportedStack(scope.transportInput), scope.worldBefore);
             }
@@ -807,7 +882,7 @@ public final class CreateMachineEvidence {
             scope.observation = new Observation(UUID.randomUUID(), assignment, level.dimension().location(), scope.machine.getBlockPos(),
                     level.getServer().getTickCount(), source(scope.machine), selected, scope.input, ItemStack.EMPTY,
                     remainders.isEmpty() ? ItemStack.EMPTY : remainders.getFirst(), scope.beforeOutput, scope.batchOutputs,
-                    remainders.size() < 2 ? List.of() : remainders.subList(1, remainders.size()));
+                    remainders.size() < 2 ? List.of() : remainders.subList(1, remainders.size()), null, null, null, null, assemblyData(scope));
             NeoForge.EVENT_BUS.post(new MachineResultEvent(actor, scope.observation));
         } catch (RuntimeException | LinkageError failure) { LOGGER.error("Batch result observation failed", failure); }
     }
@@ -914,7 +989,15 @@ public final class CreateMachineEvidence {
             root.add("basin", value);
         }
         root.add("recipeDefinition", com.google.gson.JsonParser.parseString(observation.recipe().definition()));
-        root.add("processing", CreateProcessingRecipes.encode(observation.recipe().processing(), registries));
+        if (observation.recipe().processing() != null) root.add("processing", CreateProcessingRecipes.encode(observation.recipe().processing(), registries));
+        if (observation.assembly() != null) {
+            root.add("assemblyRecipe", CreateAssemblyRecipes.encode(observation.recipe().assembly(), registries));
+            var value = new com.google.gson.JsonObject(); value.addProperty("step", observation.assembly().step());
+            value.addProperty("totalSteps", observation.assembly().totalSteps()); value.addProperty("process", observation.assembly().process().name());
+            var results = new com.google.gson.JsonArray();
+            observation.assembly().finalOutputs().forEach(stack -> results.add(ItemStack.OPTIONAL_CODEC.encodeStart(ops, stack).getOrThrow()));
+            value.add("finalOutputs", results); root.add("assembly", value);
+        }
         root.add("consumedInput", ItemStack.OPTIONAL_CODEC.encodeStart(ops, observation.consumedInput()).getOrThrow());
         root.add("remainingInput", ItemStack.OPTIONAL_CODEC.encodeStart(ops, observation.remainingInput()).getOrThrow());
         root.add("nativeRemainder", ItemStack.OPTIONAL_CODEC.encodeStart(ops, observation.nativeRemainder()).getOrThrow());
@@ -992,6 +1075,15 @@ public final class CreateMachineEvidence {
         if (!live(machine) || source(machine) == null) return null;
         var server = ((ServerLevel) machine.getLevel()).getServer();
         var holders = server.getRecipeManager().getRecipes().stream().filter(holder -> holder.value() == recipe).toList();
+        if (holders.isEmpty()) {
+            var scope = SCOPES.get().peek();
+            if (scope == null || scope.machine != machine || scope.invalidBatch || scope.assemblyStepRecipe != recipe || scope.assemblySnapshot == null
+                    || scope.assemblyOutputs.size() != scope.rolls || scope.rolls != scope.input.getCount()
+                    || subtractItems(scope.batchOutputs, scope.assemblyOutputs) == null) return null;
+            var current = server.getRecipeManager().byKey(scope.assemblySnapshot.id()).orElse(null);
+            if (current == null || current.value() != scope.assemblyRecipe || !CraftingRecipes.current(server, current.id(), scope.assemblySnapshot.revision())) return null;
+            return scope.assemblySnapshot;
+        }
         if (holders.size() != 1) return null;
         var snapshot = CraftingRecipes.find(server, holders.getFirst().id()).orElseThrow();
         return snapshot.processing() != null && source(machine).supports(snapshot.processing().process()) ? snapshot : null;
@@ -1004,6 +1096,8 @@ public final class CreateMachineEvidence {
             throw new IllegalStateException("Machine assignment requires an authenticated administrator");
     }
     private static final class Scope {
+        Object assemblyRecipe, assemblyStepRecipe; CraftingRecipes.Snapshot assemblySnapshot; int assemblyStep;
+        final List<ItemStack> assemblyOutputs = new java.util.ArrayList<>();
         boolean deferredFan; List<ItemStack> fanStoredOutputs = List.of();
         final BlockEntity machine; ItemStack input; ItemStack remainingInput; ItemStack remainder; List<ItemStack> beforeOutput; Observation observation; boolean verified;
         Object batchRecipe; int rolls; boolean invalidBatch;

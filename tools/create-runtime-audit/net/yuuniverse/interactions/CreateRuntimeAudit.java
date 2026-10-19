@@ -72,6 +72,7 @@ public final class CreateRuntimeAudit {
             FluidMachineRuntimeAudit.run(server);
             DeployerRuntimeAudit.run(server);
             FanRuntimeAudit.run(server);
+            AssemblyRuntimeAudit.run(server);
             LoggerFactory.getLogger("interactions").info("[CREATEAUDIT] COMPLETE {} checks",passed);
         } catch(Throwable failure) {
             ran=true; LoggerFactory.getLogger("interactions").error("[CREATEAUDIT] FAILED",failure);
@@ -269,7 +270,7 @@ public final class CreateRuntimeAudit {
                     "native_type_"+process.name().toLowerCase(Locale.ROOT));
         }
         var sequence=CraftingRecipes.byType(server,ResourceLocation.parse("create:sequenced_assembly"),1).getFirst();
-        check(!sequence.supported() && sequence.processing()==null,"assembly_is_explicitly_unsupported");
+        check(sequence.supported() && sequence.processing()==null && sequence.assembly()!=null,"assembly_has_separate_weighted_sequence_contract");
         var mechanical=CraftingRecipes.byType(server,ResourceLocation.parse("create:mechanical_crafting"),1).getFirst();
         check(!mechanical.supported(),"mechanical_grid_is_not_a_vanilla_table");
         var manager=server.getRecipeManager(); var original=List.copyOf(manager.getRecipes());

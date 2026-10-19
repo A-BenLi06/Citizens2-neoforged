@@ -99,6 +99,14 @@ The pinned Gradle 8.14.3 build passes but emits Gradle-9 deprecation warnings. T
 
 ## Next acceptance batches
 
+Follow-up 2026-10-19, UTC+08:00: [sequenced assembly evidence](create-assembly-evidence-2026-10-19.md)
+adds separate weighted/ordered discovery and exact native final parent results.
+Forty-one additional checks pass on both targets, including powered world/depot/belt
+pressing, press → deployer → spout → saw, tool/fluid mutations, incidental matching
+step output exclusion, parent identity/revision replacement, native remainder/storage
+failures and journal reopen. Final-machine beneficiary attribution is explicit;
+durable earlier-step owner history and machine-specific hard-kill/rollback remain open.
+
 Follow-up 2026-10-19, UTC+08:00: [fan evidence](create-fan-evidence-2026-10-19.md)
 adds native SPLASHING/HAUNTING world/depot/belt confirmation, exact accepted overflow
 and complete simultaneous callback storage. Thirty-one additional checks cover
@@ -130,7 +138,7 @@ now observes the complete native callback through exact storage verification and
 passes 21 additional native checks on both NeoForge targets. Remaining machine,
 transport crash/recovery and integrated release gates below stay open.
 
-1. Extend actual evidence to Create sequenced assembly and other required unsupported machine types, preserving provider-native outputs and recipe revisions.
+1. Complete machine-specific hard-kill/inventory rollback coverage including assembly, and extend actual evidence to other required unsupported machine types while preserving provider-native outputs and recipe revisions.
 2. Complete concrete party/offline/reconnect, repeat-generation, inventory-mutation kill and financial/world-backup recovery cases for the adopted quest/commerce/reward workflow.
 3. Resolve original quest IDs, group/account/shop identities and missing legacy items with source provenance; keep unsupported content recoverable.
 4. Add the required logging retention/failure/load coverage and a supported Paradigm inbound contract where the pack requires one.

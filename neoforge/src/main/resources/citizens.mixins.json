@@ -21,6 +21,7 @@
     "CreateDeployerEvidenceMixin",
     "CreateFanEvidenceMixin",
     "CreateFanProcessingEvidenceMixin",
+    "CreateAssemblyEvidenceMixin",
     "CreateDepotEvidenceMixin",
     "CreateBeltInventoryEvidenceMixin",
     "CreateTransportOverflowMixin",

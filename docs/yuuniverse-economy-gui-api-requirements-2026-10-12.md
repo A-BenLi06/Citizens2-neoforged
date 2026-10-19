@@ -1,5 +1,13 @@
 # Yuuniverse Economy GUI: API requirements and ordered implementation tasks
 
+Assembly follow-up 2026-10-19, UTC+08:00: [native Create sequenced assembly](create-assembly-evidence-2026-10-19.md)
+adds typed weighted/ordered recipe discovery and final-machine evidence through
+native pressing, deploying, filling and cutting. Forty-one checks on both targets
+verify actual final output, complete storage, native remainders, tool/fluid mutations
+and parent revision/identity changes. Incidental matching step output does not count.
+CRAFT-03–05 remain open for other required unsupported machines, machine-specific
+hard-kill/rollback, wider party/repeat/reconnect and integrated release acceptance.
+
 Reward follow-up 2026-10-18, UTC+08:00: [native FTB monetary bindings](ftb-monetary-rewards-2026-10-18.md)
 now use Economy's exact credit/idempotency contracts with durable pre-reset claim
 identity and native acceptance. Actual ledger-commit/lost-ack process kill recovery

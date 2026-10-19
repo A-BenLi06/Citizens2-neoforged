@@ -25,7 +25,7 @@ import net.minecraft.world.item.crafting.ShapelessRecipe;
 /** Registry-backed recipe discovery. Queries never craft items or advance tasks. */
 public final class CraftingRecipes {
     private CraftingRecipes() { }
-    public enum Kind { SHAPED, SHAPELESS, CREATE_PROCESSING, UNSUPPORTED }
+    public enum Kind { SHAPED, SHAPELESS, CREATE_PROCESSING, CREATE_ASSEMBLY, UNSUPPORTED }
 
     /** Alternatives are display candidates. The current provider's predicate remains authoritative. */
     public record Input(String definition, boolean custom, List<ItemStack> alternatives) {
@@ -35,7 +35,12 @@ public final class CraftingRecipes {
 
     public record Snapshot(ResourceLocation id, ResourceLocation type, ResourceLocation serializer, Kind kind,
             String revision, String definition, ResourceLocation workstation, int width, int height, List<Input> inputs, ItemStack output,
-            CreateProcessingRecipes.Snapshot processing) {
+            CreateProcessingRecipes.Snapshot processing, CreateAssemblyRecipes.Snapshot assembly) {
+        public Snapshot(ResourceLocation id, ResourceLocation type, ResourceLocation serializer, Kind kind, String revision,
+                String definition, ResourceLocation workstation, int width, int height, List<Input> inputs, ItemStack output,
+                CreateProcessingRecipes.Snapshot processing) {
+            this(id, type, serializer, kind, revision, definition, workstation, width, height, inputs, output, processing, null);
+        }
         public Snapshot(ResourceLocation id, ResourceLocation type, ResourceLocation serializer, Kind kind, String revision,
                 String definition, ResourceLocation workstation, int width, int height, List<Input> inputs, ItemStack output) {
             this(id, type, serializer, kind, revision, definition, workstation, width, height, inputs, output, null);
@@ -74,8 +79,10 @@ public final class CraftingRecipes {
         for (var holder : server.getRecipeManager().getRecipes().stream()
                 .sorted(java.util.Comparator.comparing(recipe -> recipe.id().toString())).toList()) {
             var processing = CreateProcessingRecipes.snapshot(server, holder.value());
-            var results = processing.map(value -> value.itemResults().stream().map(CreateProcessingRecipes.ItemResult::stack).toList())
-                    .orElseGet(() -> List.of(holder.value().getResultItem(server.registryAccess())));
+            var assembly = CreateAssemblyRecipes.snapshot(server, holder.value());
+            var results = assembly.map(value -> value.results().stream().map(CreateAssemblyRecipes.WeightedResult::stack).toList())
+                    .orElseGet(() -> processing.map(value -> value.itemResults().stream().map(CreateProcessingRecipes.ItemResult::stack).toList())
+                    .orElseGet(() -> List.of(holder.value().getResultItem(server.registryAccess()))));
             if (results.stream().noneMatch(result -> !result.isEmpty() && (components ? ItemStack.isSameItemSameComponents(output, result) : result.is(output.getItem())))) continue;
             found.add(snapshot(server, holder));
             if (found.size() == limit) break;
@@ -92,6 +99,11 @@ public final class CraftingRecipes {
         Snapshot current = find(server, id).orElseThrow(() -> new IllegalArgumentException("Recipe is unavailable"));
         if (!current.supported() || !current.revision().equals(revision)) throw new IllegalStateException("Recipe changed or is unsupported");
         var recipe = server.getRecipeManager().byKey(id).orElseThrow().value();
+        if (current.assembly() != null) {
+            if (slot != 0) throw new IllegalArgumentException("Assembly ingredient slot is out of range");
+            try { return ((Ingredient) recipe.getClass().getMethod("getIngredient").invoke(recipe)).test(java.util.Objects.requireNonNull(stack)); }
+            catch (ReflectiveOperationException failure) { throw new IllegalStateException("Assembly ingredient API unavailable", failure); }
+        }
         if (slot < 0 || slot >= recipe.getIngredients().size()) throw new IllegalArgumentException("Recipe slot is out of range");
         return recipe.getIngredients().get(slot).test(java.util.Objects.requireNonNull(stack, "stack"));
     }
@@ -101,16 +113,18 @@ public final class CraftingRecipes {
         var ops = server.registryAccess().createSerializationContext(JsonOps.INSTANCE);
         JsonElement definition = Recipe.CODEC.encodeStart(ops, recipe).getOrThrow();
         var processing = CreateProcessingRecipes.snapshot(server, recipe).orElse(null);
-        Kind kind = processing == null ? kind(recipe) : Kind.CREATE_PROCESSING;
-        if (kind != Kind.UNSUPPORTED && !recipe.canCraftInDimensions(3, 3)) kind = Kind.UNSUPPORTED;
+        var assembly = CreateAssemblyRecipes.snapshot(server, recipe).orElse(null);
+        Kind kind = assembly != null ? Kind.CREATE_ASSEMBLY : processing == null ? kind(recipe) : Kind.CREATE_PROCESSING;
+        if (kind != Kind.UNSUPPORTED && assembly == null && !recipe.canCraftInDimensions(3, 3)) kind = Kind.UNSUPPORTED;
         ItemStack output = recipe.getResultItem(server.registryAccess()).copy();
-        if (kind != Kind.UNSUPPORTED && (processing == null ? output.isEmpty() || recipe.isIncomplete()
+        if (kind != Kind.UNSUPPORTED && assembly == null && (processing == null ? output.isEmpty() || recipe.isIncomplete()
                 : recipe.getIngredients().stream().anyMatch(ingredient -> ingredient.isEmpty() || ingredient.hasNoItems())))
             throw new IllegalStateException("Recipe output or ingredient provider is unavailable");
         int width = kind == Kind.SHAPED ? ((ShapedRecipe) recipe).getWidth() : 0;
         int height = kind == Kind.SHAPED ? ((ShapedRecipe) recipe).getHeight() : 0;
         List<Input> inputs = new ArrayList<>();
         JsonArray expanded = new JsonArray();
+        if (assembly != null) inputs.add(assembly.ingredient());
         if (kind != Kind.UNSUPPORTED) {
             for (Ingredient ingredient : recipe.getIngredients()) {
                 JsonElement nativeDefinition = Ingredient.CODEC.encodeStart(ops, ingredient).getOrThrow();
@@ -126,6 +140,7 @@ public final class CraftingRecipes {
         content.add("recipe", definition);
         content.add("resolvedIngredients", expanded);
         if (processing != null) content.add("createProcessing", CreateProcessingRecipes.encode(processing, server.registryAccess()));
+        if (assembly != null) content.add("createAssembly", CreateAssemblyRecipes.encode(assembly, server.registryAccess()));
         content.add("output", output.isEmpty() ? com.google.gson.JsonNull.INSTANCE : ItemStack.CODEC.encodeStart(ops, output).getOrThrow());
         String revision;
         try { revision = HexFormat.of().formatHex(MessageDigest.getInstance("SHA-256")
@@ -133,8 +148,8 @@ public final class CraftingRecipes {
         catch (NoSuchAlgorithmException impossible) { throw new IllegalStateException(impossible); }
         return new Snapshot(holder.id(), BuiltInRegistries.RECIPE_TYPE.getKey(recipe.getType()),
                 BuiltInRegistries.RECIPE_SERIALIZER.getKey(recipe.getSerializer()), kind, revision,
-                canonical(definition).toString(), kind == Kind.UNSUPPORTED ? null : processing != null ? processing.workstation() : BuiltInRegistries.BLOCK.getKey(
-                        net.minecraft.world.level.block.Blocks.CRAFTING_TABLE), width, height, inputs, output, processing);
+                canonical(definition).toString(), kind == Kind.UNSUPPORTED || assembly != null ? null : processing != null ? processing.workstation() : BuiltInRegistries.BLOCK.getKey(
+                        net.minecraft.world.level.block.Blocks.CRAFTING_TABLE), width, height, inputs, output, processing, assembly);
     }
 
     static JsonElement canonical(JsonElement value) {

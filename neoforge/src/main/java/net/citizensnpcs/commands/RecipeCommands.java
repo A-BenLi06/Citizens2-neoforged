@@ -30,6 +30,20 @@ public final class RecipeCommands {
             Messaging.sendTr(source, "citizens.commands.recipe.unsupported", recipe.id(), recipe.type(), recipe.serializer());
             return;
         }
+        if (recipe.assembly() != null) {
+            var assembly = recipe.assembly();
+            Messaging.sendTr(source, "citizens.commands.recipe.assembly", recipe.id(), assembly.loops(), assembly.steps().size(),
+                    assembly.transitionalItem().getHoverName().getString());
+            double total = assembly.results().stream().mapToDouble(result -> result.weight()).sum();
+            for (var result : assembly.results()) Messaging.sendTr(source, "citizens.commands.recipe.assembly-result",
+                    result.stack().getCount(), result.stack().getHoverName().getString(),
+                    java.math.BigDecimal.valueOf(result.weight() / total * 100).setScale(4, java.math.RoundingMode.HALF_UP).stripTrailingZeros().toPlainString());
+            int index = 0;
+            for (var step : assembly.steps()) Messaging.sendTr(source, "citizens.commands.recipe.assembly-step", ++index,
+                    step.processing() == null ? net.minecraft.network.chat.Component.translatable("citizens.commands.recipe.unsupported-step").getString() : step.processing().workstation(), step.inputs().size(),
+                    step.processing() == null ? 0 : step.processing().fluidInputs().size());
+            return;
+        }
         if (recipe.processing() != null) {
             var processing = recipe.processing();
             Messaging.sendTr(source, "citizens.commands.recipe.processing", recipe.id(), recipe.workstation(), recipe.inputs().size(),
