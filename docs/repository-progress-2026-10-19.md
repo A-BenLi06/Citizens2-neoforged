@@ -99,6 +99,13 @@ The pinned Gradle 8.14.3 build passes but emits Gradle-9 deprecation warnings. T
 
 ## Next acceptance batches
 
+Follow-up 2026-10-19, UTC+08:00: [basin mixing/compacting](create-basin-evidence-2026-10-19.md)
+now has scoped native multi-item/fluid evidence, exact storage confirmation and
+primary millibucket progression for fluid-only recipes. The reproduced empty
+dummy input is repaired for real basin remainders. Twenty-three additional native
+checks cover direct/spout, heated, pure-fluid and attribution/mutation paths.
+Other machine, crash/recovery and integrated acceptance below remain open.
+
 Follow-up 2026-10-19, UTC+08:00: [depot/belt pressing evidence](create-transport-press-evidence-2026-10-19.md)
 now observes the complete native callback through exact storage verification and
 passes 21 additional native checks on both NeoForge targets. Remaining machine,

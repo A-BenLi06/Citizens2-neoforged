@@ -102,7 +102,8 @@ public final class CraftQuestEvidence implements AutoCloseable {
         if (!target.visible() || target.state().maximum() <= 0) throw new IllegalArgumentException("Task is unavailable");
         var recipe = CraftingRecipes.find(server, recipeId).orElseThrow(() -> new IllegalArgumentException("Recipe is unavailable"));
         if (!recipe.tableEvidenceSupported() && (recipe.processing() == null
-                || !CreateMachineEvidence.supports(recipe.processing().process()) || recipe.output().isEmpty()))
+                || !CreateMachineEvidence.supports(recipe.processing().process())
+                || (recipe.output().isEmpty() && recipe.processing().fluidResults().isEmpty())))
             throw new IllegalArgumentException("Recipe evidence is unsupported");
         Binding previous = bindings.get(target.state().taskId());
         if (previous != null) {
@@ -147,6 +148,13 @@ public final class CraftQuestEvidence implements AutoCloseable {
         for (var output : observation.rolledOutputs())
             if (net.minecraft.world.item.ItemStack.isSameItemSameComponents(output, observation.recipe().output()))
                 units = Math.addExact(units, output.getCount());
+        if (observation.recipe().output().isEmpty() && observation.basin() != null
+                && !observation.recipe().processing().fluidResults().isEmpty()) {
+            var primary = observation.recipe().processing().fluidResults().getFirst();
+            for (var output : observation.basin().fluidOutputs())
+                if (net.neoforged.neoforge.fluids.FluidStack.isSameFluidSameComponents(output, primary))
+                    units = Math.addExact(units, output.getAmount());
+        }
         if (units == 0) return;
         admit(event.getBeneficiary(), observation.id(), observation.recipe(), units,
                 CreateMachineEvidence.encode(observation, event.getBeneficiary().registryAccess()));

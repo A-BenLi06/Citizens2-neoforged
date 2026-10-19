@@ -18,6 +18,7 @@ import net.neoforged.bus.api.IEventBus;
 import net.neoforged.neoforge.attachment.AttachmentType;
 import net.neoforged.neoforge.common.NeoForge;
 import net.neoforged.neoforge.items.IItemHandler;
+import net.neoforged.neoforge.fluids.FluidStack;
 import net.neoforged.neoforge.registries.DeferredRegister;
 import net.neoforged.neoforge.registries.NeoForgeRegistries;
 
@@ -49,6 +50,7 @@ public final class CreateMachineEvidence {
         CREATE_MILLSTONE("com.simibubi.create.content.kinetics.millstone.MillstoneBlockEntity"),
         CREATE_SAW("com.simibubi.create.content.kinetics.saw.SawBlockEntity"),
         CREATE_PRESS("com.simibubi.create.content.kinetics.press.MechanicalPressBlockEntity"),
+        CREATE_MIXER("com.simibubi.create.content.kinetics.mixer.MechanicalMixerBlockEntity"),
         CREATE_CRUSHING_WHEELS("com.simibubi.create.content.kinetics.crusher.CrushingWheelControllerBlockEntity");
         private final String implementation;
         Source(String implementation) { this.implementation = implementation; }
@@ -56,7 +58,8 @@ public final class CreateMachineEvidence {
             return switch (this) {
                 case CREATE_MILLSTONE -> process == CreateProcessingRecipes.Process.MILLING;
                 case CREATE_SAW -> process == CreateProcessingRecipes.Process.CUTTING;
-                case CREATE_PRESS -> process == CreateProcessingRecipes.Process.PRESSING;
+                case CREATE_PRESS -> process == CreateProcessingRecipes.Process.PRESSING || process == CreateProcessingRecipes.Process.COMPACTING;
+                case CREATE_MIXER -> process == CreateProcessingRecipes.Process.MIXING;
                 case CREATE_CRUSHING_WHEELS -> process == CreateProcessingRecipes.Process.CRUSHING || process == CreateProcessingRecipes.Process.MILLING;
             };
         }
@@ -66,7 +69,13 @@ public final class CreateMachineEvidence {
     }
     public record Observation(UUID id, Attribution attribution, ResourceLocation dimension, BlockPos position, long serverTick,
             Source source, CraftingRecipes.Snapshot recipe, ItemStack consumedInput, ItemStack remainingInput, ItemStack nativeRemainder,
-            List<ItemStack> beforeOutput, List<ItemStack> rolledOutputs, List<ItemStack> additionalRemainders, UUID inputEntityId) {
+            List<ItemStack> beforeOutput, List<ItemStack> rolledOutputs, List<ItemStack> additionalRemainders, UUID inputEntityId, BasinData basin) {
+        public Observation(UUID id, Attribution attribution, ResourceLocation dimension, BlockPos position, long serverTick,
+                Source source, CraftingRecipes.Snapshot recipe, ItemStack consumedInput, ItemStack remainingInput, ItemStack nativeRemainder,
+                List<ItemStack> beforeOutput, List<ItemStack> rolledOutputs, List<ItemStack> additionalRemainders, UUID inputEntityId) {
+            this(id, attribution, dimension, position, serverTick, source, recipe, consumedInput, remainingInput, nativeRemainder,
+                    beforeOutput, rolledOutputs, additionalRemainders, inputEntityId, null);
+        }
         public Observation(UUID id, Attribution attribution, ResourceLocation dimension, BlockPos position, long serverTick,
                 Source source, CraftingRecipes.Snapshot recipe, ItemStack consumedInput, ItemStack remainingInput, ItemStack nativeRemainder,
                 List<ItemStack> beforeOutput, List<ItemStack> rolledOutputs, List<ItemStack> additionalRemainders) {
@@ -88,6 +97,19 @@ public final class CreateMachineEvidence {
         @Override public List<ItemStack> beforeOutput() { return copies(beforeOutput); }
         @Override public List<ItemStack> rolledOutputs() { return copies(rolledOutputs); }
         @Override public List<ItemStack> additionalRemainders() { return copies(additionalRemainders); }
+    }
+
+    /** Complete multi-input item/fluid plan and actual outputs for native basin operations. */
+    public record BasinData(BlockPos holder, List<ItemStack> consumedItems, List<FluidStack> consumedFluids,
+            List<FluidStack> beforeFluids, List<FluidStack> fluidOutputs) {
+        public BasinData {
+            holder = holder.immutable(); consumedItems = copies(consumedItems); consumedFluids = fluidCopies(consumedFluids);
+            beforeFluids = fluidCopies(beforeFluids); fluidOutputs = fluidCopies(fluidOutputs);
+        }
+        @Override public List<ItemStack> consumedItems() { return copies(consumedItems); }
+        @Override public List<FluidStack> consumedFluids() { return fluidCopies(consumedFluids); }
+        @Override public List<FluidStack> beforeFluids() { return fluidCopies(beforeFluids); }
+        @Override public List<FluidStack> fluidOutputs() { return fluidCopies(fluidOutputs); }
     }
 
     /** Authenticated administrators assign an existing supported machine; replacement requires an explicit clear. */
@@ -127,6 +149,10 @@ public final class CreateMachineEvidence {
             var scopes = SCOPES.get(); if (scopes.pop() != scope) throw new IllegalStateException("Machine observation scope changed");
             if (scopes.isEmpty()) SCOPES.remove();
             if (scope.observation != null) {
+                if (scope.basin != null && returned) {
+                    try { verifyBasin(scope); }
+                    catch (RuntimeException | LinkageError failure) { LOGGER.error("Basin output verification failed", failure); }
+                }
                 if (scope.worldInput != null && returned) verifyWorld(scope);
                 if (scope.transportInput != null && returned) {
                     try { verifyTransport(scope); }
@@ -138,6 +164,86 @@ public final class CreateMachineEvidence {
                 catch (RuntimeException | LinkageError failure) { LOGGER.error("Machine outcome listener failed for {}", scope.observation.id(), failure); }
             }
         }
+    }
+
+    public static void beforeBasinRecipe(BlockEntity basin, Object recipe, boolean simulate) {
+        var scope = SCOPES.get().peek();
+        if (scope == null || simulate || scope.basin != null || !live(basin) || basin.getLevel() != scope.machine.getLevel()
+                || source(scope.machine) == null || !basin.getBlockPos().equals(scope.machine.getBlockPos().below(2))) return;
+        var selected = currentRecipe(scope.machine, recipe);
+        if (selected == null || (selected.processing().process() != CreateProcessingRecipes.Process.MIXING
+                && selected.processing().process() != CreateProcessingRecipes.Process.COMPACTING)) return;
+        scope.basin = basin; scope.batchRecipe = recipe; scope.basinProcessing = true;
+        try { scope.basinBefore = ((CreateBasinStorage) basin).citizens$basinSnapshot(); }
+        catch (RuntimeException | LinkageError failure) { scope.invalidBatch = true; LOGGER.error("Basin input storage observation failed", failure); }
+    }
+    public static void afterBasinRecipe(BlockEntity basin, boolean simulate, boolean accepted) {
+        var scope = SCOPES.get().peek();
+        if (scope == null || simulate || scope.basin != basin || !scope.basinProcessing) return;
+        scope.basinReturned = accepted; scope.basinProcessing = false;
+    }
+    public static void basinRolled(Object recipe, List<ItemStack> outputs) {
+        var scope = SCOPES.get().peek();
+        if (scope == null || !scope.basinProcessing || scope.batchRecipe != recipe) return;
+        if (++scope.rolls != 1) scope.invalidBatch = true;
+        scope.batchOutputs.addAll(copies(outputs));
+    }
+    public static void basinRemainders(List<ItemStack> outputs) {
+        var scope = SCOPES.get().peek();
+        if (scope != null && scope.basinProcessing) scope.batchRemainders.addAll(copies(outputs.stream().filter(s -> !s.isEmpty()).toList()));
+    }
+    public static void basinFluidPlan(FluidStack fluid, int amount) {
+        var scope = SCOPES.get().peek();
+        if (scope != null && scope.basinProcessing && scope.observation == null) scope.basinPlannedFluids.add(fluid.copyWithAmount(amount));
+    }
+    public static void basinItemConsumed(ItemStack item) {
+        var scope = SCOPES.get().peek();
+        if (scope != null && scope.basinProcessing) scope.basinConsumedItems.add(item.copy());
+    }
+    public static void basinFluidConsumed(FluidStack fluid, int amount) {
+        var scope = SCOPES.get().peek();
+        if (scope != null && scope.basinProcessing) scope.basinConsumedFluids.add(fluid.copyWithAmount(amount));
+    }
+    public static void basinAccepted(BlockEntity basin, List<ItemStack> items, List<FluidStack> fluids, boolean simulate,
+            boolean accepted, int[] itemCounts) {
+        var scope = SCOPES.get().peek();
+        if (scope == null || scope.basin != basin || !scope.basinProcessing || !accepted) return;
+        if (!simulate) { scope.basinStored = true; return; }
+        if (scope.observation != null || scope.invalidBatch || scope.rolls != 1) return;
+        try {
+            var expected = new java.util.ArrayList<>(scope.batchOutputs); expected.addAll(scope.batchRemainders);
+            if (!equalMultiset(expected, items) || !equalMultiset(scope.basinBefore.items(), ((CreateBasinStorage) basin).citizens$basinSnapshot().items())
+                    || !equalFluids(scope.basinBefore.fluids(), ((CreateBasinStorage) basin).citizens$basinSnapshot().fluids())) return;
+            var handler = basin.getLevel().getCapability(net.neoforged.neoforge.capabilities.Capabilities.ItemHandler.BLOCK, basin.getBlockPos(), null);
+            if (handler == null || handler.getSlots() != itemCounts.length) return;
+            var consumed = new java.util.ArrayList<ItemStack>();
+            for (int slot = 0; slot < itemCounts.length; slot++) if (itemCounts[slot] > 0) {
+                var stored = handler.getStackInSlot(slot); if (stored.getCount() < itemCounts[slot]) return;
+                consumed.add(stored.copyWithCount(itemCounts[slot]));
+            }
+            var selected = currentRecipe(scope.machine, scope.batchRecipe); if (selected == null) return;
+            var assignment = attribution(scope.machine); var actor = beneficiary(scope.machine, assignment); if (actor == null) return;
+            var level = (ServerLevel) basin.getLevel();
+            var data = new BasinData(basin.getBlockPos(), consumed, scope.basinPlannedFluids, scope.basinBefore.fluids(), fluids);
+            scope.observation = new Observation(UUID.randomUUID(), assignment, level.dimension().location(), scope.machine.getBlockPos(),
+                    level.getServer().getTickCount(), source(scope.machine), selected, consumed.isEmpty() ? ItemStack.EMPTY : consumed.getFirst(),
+                    ItemStack.EMPTY, scope.batchRemainders.isEmpty() ? ItemStack.EMPTY : scope.batchRemainders.getFirst(), scope.basinBefore.items(),
+                    scope.batchOutputs, scope.batchRemainders.size() < 2 ? List.of() : scope.batchRemainders.subList(1, scope.batchRemainders.size()), null, data);
+            NeoForge.EVENT_BUS.post(new MachineResultEvent(actor, scope.observation));
+            scope.invalidBatch |= !equalMultiset(scope.basinBefore.items(), ((CreateBasinStorage) basin).citizens$basinSnapshot().items())
+                    || !equalFluids(scope.basinBefore.fluids(), ((CreateBasinStorage) basin).citizens$basinSnapshot().fluids());
+        } catch (RuntimeException | LinkageError failure) { scope.invalidBatch = true; LOGGER.error("Basin preparation observation failed", failure); }
+    }
+    private static void verifyBasin(Scope scope) {
+        if (scope.invalidBatch || !scope.basinStored || !scope.basinReturned || !live(scope.machine) || !live(scope.basin)) return;
+        var data = scope.observation.basin();
+        if (!equalMultiset(data.consumedItems(), scope.basinConsumedItems) || !equalFluids(data.consumedFluids(), scope.basinConsumedFluids)) return;
+        var items = subtractItems(scope.basinBefore.items(), data.consumedItems());
+        var fluids = subtractFluids(scope.basinBefore.fluids(), data.consumedFluids());
+        if (items == null || fluids == null) return;
+        items.addAll(scope.batchOutputs); items.addAll(scope.batchRemainders); fluids.addAll(data.fluidOutputs());
+        var after = ((CreateBasinStorage) scope.basin).citizens$basinSnapshot();
+        scope.verified = equalMultiset(items, after.items()) && equalFluids(fluids, after.fluids());
     }
 
     /** Keep the press scope open until the caller's native transport storage has returned. */
@@ -458,9 +564,22 @@ public final class CreateMachineEvidence {
         root.addProperty("y", observation.position().getY()); root.addProperty("z", observation.position().getZ()); root.addProperty("serverTick", observation.serverTick());
         root.addProperty("recipeId", observation.recipe().id().toString()); root.addProperty("recipeRevision", observation.recipe().revision());
         if (observation.inputEntityId() != null) root.addProperty("inputEntityId", observation.inputEntityId().toString());
+        if (observation.basin() != null) {
+            var data = observation.basin(); var value = new com.google.gson.JsonObject();
+            value.addProperty("x", data.holder().getX()); value.addProperty("y", data.holder().getY()); value.addProperty("z", data.holder().getZ());
+            var items = new com.google.gson.JsonArray();
+            for (var stack : data.consumedItems()) items.add(ItemStack.CODEC.encodeStart(ops, stack).getOrThrow());
+            value.add("consumedItems", items);
+            for (var entry : java.util.Map.of("consumedFluids", data.consumedFluids(), "beforeFluids", data.beforeFluids(), "fluidOutputs", data.fluidOutputs()).entrySet()) {
+                var encoded = new com.google.gson.JsonArray();
+                for (var stack : entry.getValue()) encoded.add(FluidStack.OPTIONAL_CODEC.encodeStart(ops, stack).getOrThrow());
+                value.add(entry.getKey(), encoded);
+            }
+            root.add("basin", value);
+        }
         root.add("recipeDefinition", com.google.gson.JsonParser.parseString(observation.recipe().definition()));
         root.add("processing", CreateProcessingRecipes.encode(observation.recipe().processing(), registries));
-        root.add("consumedInput", ItemStack.CODEC.encodeStart(ops, observation.consumedInput()).getOrThrow());
+        root.add("consumedInput", ItemStack.OPTIONAL_CODEC.encodeStart(ops, observation.consumedInput()).getOrThrow());
         root.add("remainingInput", ItemStack.OPTIONAL_CODEC.encodeStart(ops, observation.remainingInput()).getOrThrow());
         root.add("nativeRemainder", ItemStack.OPTIONAL_CODEC.encodeStart(ops, observation.nativeRemainder()).getOrThrow());
         var remainders = new com.google.gson.JsonArray();
@@ -494,6 +613,33 @@ public final class CreateMachineEvidence {
         }
         return remaining.stream().allMatch(ItemStack::isEmpty);
     }
+    private static java.util.ArrayList<ItemStack> subtractItems(List<ItemStack> stored, List<ItemStack> consumed) {
+        var remaining = new java.util.ArrayList<>(copies(stored));
+        for (var item : consumed) {
+            int needed = item.getCount();
+            for (var stack : remaining) if (ItemStack.isSameItemSameComponents(item, stack)) {
+                int take = Math.min(needed, stack.getCount()); stack.shrink(take); needed -= take;
+            }
+            if (needed != 0) return null;
+        }
+        return remaining;
+    }
+    private static java.util.ArrayList<FluidStack> subtractFluids(List<FluidStack> stored, List<FluidStack> consumed) {
+        var remaining = new java.util.ArrayList<>(fluidCopies(stored));
+        for (var fluid : consumed) {
+            int needed = fluid.getAmount();
+            for (var stack : remaining) if (FluidStack.isSameFluidSameComponents(fluid, stack)) {
+                int take = Math.min(needed, stack.getAmount()); stack.shrink(take); needed -= take;
+            }
+            if (needed != 0) return null;
+        }
+        return remaining;
+    }
+    private static boolean equalFluids(List<FluidStack> expected, List<FluidStack> actual) {
+        var remaining = subtractFluids(actual, expected);
+        return remaining != null && remaining.stream().allMatch(FluidStack::isEmpty);
+    }
+    private static List<FluidStack> fluidCopies(List<FluidStack> stacks) { return stacks.stream().map(FluidStack::copy).toList(); }
     private static Source source(BlockEntity machine) {
         return java.util.Arrays.stream(Source.values()).filter(value -> value.implementation.equals(machine.getClass().getName())).findFirst().orElse(null);
     }
@@ -507,7 +653,7 @@ public final class CreateMachineEvidence {
         return actor == null || actor.hasDisconnected() || actor instanceof net.neoforged.neoforge.common.util.FakePlayer ? null : actor;
     }
     private static CraftingRecipes.Snapshot currentRecipe(BlockEntity machine, Object recipe) {
-        if (!live(machine)) return null;
+        if (!live(machine) || source(machine) == null) return null;
         var server = ((ServerLevel) machine.getLevel()).getServer();
         var holders = server.getRecipeManager().getRecipes().stream().filter(holder -> holder.value() == recipe).toList();
         if (holders.size() != 1) return null;
@@ -528,6 +674,9 @@ public final class CreateMachineEvidence {
         net.minecraft.world.entity.item.ItemEntity worldInput; ItemStack worldBefore;
         Object transportInput; BlockEntity transportHolder, transportExpectedHolder, transportStorageOwner; List<ItemStack> transportInitial, transportBefore, transportAfter;
         boolean transportMatched, storageReturned, storageActive;
+        BlockEntity basin; CreateBasinStorage.Snapshot basinBefore; boolean basinProcessing, basinReturned, basinStored;
+        final List<ItemStack> basinConsumedItems = new java.util.ArrayList<>();
+        final List<FluidStack> basinPlannedFluids = new java.util.ArrayList<>(), basinConsumedFluids = new java.util.ArrayList<>();
         final List<net.minecraft.world.entity.item.ItemEntity> worldOutputs = new java.util.ArrayList<>();
         Scope(BlockEntity machine) { this.machine = machine; }
     }

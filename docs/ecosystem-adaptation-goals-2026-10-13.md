@@ -29,6 +29,14 @@ Exact artifact sources, SHA-512/SHA-256 hashes and installation paths are record
 
 ## Ordered adaptation backlog
 
+Progress 2026-10-19, UTC+08:00: [native basin evidence](create-basin-evidence-2026-10-19.md)
+adds actual mixing/compacting item/fluid consumption, native output/remainder and
+pending spout storage verification. Fluid-only tasks count actual primary
+millibuckets. A reproduced empty dummy crafting-input defect is repaired so
+native basin remainder callbacks receive selected items. Twenty-three additional
+native checks cover heated/direct/spout/pure-fluid paths and review after mutations.
+Fan/deployer/fluid-transfer/assembly evidence and broader recovery/client gates stay open.
+
 Progress 2026-10-19, UTC+08:00: [native depot/belt pressing](create-transport-press-evidence-2026-10-19.md)
 keeps evidence open through Create's actual transport storage. Exact input/holder,
 depot buffers and accepted overflow, read-only belt pending queues and retained

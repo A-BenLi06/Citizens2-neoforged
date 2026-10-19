@@ -68,6 +68,7 @@ public final class CreateRuntimeAudit {
             BatchMachineRuntimeAudit.run(server);
             PressMachineRuntimeAudit.run(server);
             TransportPressRuntimeAudit.run(server);
+            BasinMachineRuntimeAudit.run(server);
             LoggerFactory.getLogger("interactions").info("[CREATEAUDIT] COMPLETE {} checks",passed);
         } catch(Throwable failure) {
             ran=true; LoggerFactory.getLogger("interactions").error("[CREATEAUDIT] FAILED",failure);

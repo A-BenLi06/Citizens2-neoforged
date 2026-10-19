@@ -1,0 +1,178 @@
+{
+  "createdAt": "2026-10-19T20:58:45+08:00",
+  "timezone": "UTC+08:00",
+  "provider": {
+    "path": "artifacts/create-provider-pinned.jar",
+    "sha256": "5602a16796957cb5c7fb829c10c6b54bf9d228931c7680636710b6a60d92822e",
+    "bytes": 19138095
+  },
+  "providerVersion": "6.0.10-mc1.21.1-performance-v6",
+  "native": {
+    "21.1.233": {
+      "worldPress": 16,
+      "batch": 23,
+      "create": 54,
+      "transportPress": 21,
+      "basin": 23
+    },
+    "21.1.248": {
+      "worldPress": 16,
+      "batch": 23,
+      "create": 54,
+      "transportPress": 21,
+      "basin": 23
+    },
+    "absentCreate233": 141
+  },
+  "ordinaryTests": {
+    "21.1.233": {
+      "tests": 767,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    "21.1.248": {
+      "tests": 767,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    }
+  },
+  "packages": [
+    {
+      "path": "artifacts/create-basin-release-233-jars-2026-10-19/citizens-2.0.43-neoforge-SNAPSHOT-sources.jar",
+      "sha256": "b67a68b58676325e31def42c5e056352a90d2156d81a5ed86fb9cb606ae8ce00",
+      "bytes": 1093939,
+      "neoForge": "21.1.233",
+      "probeAndForeignProviderClassesAbsent": true,
+      "independentModContents": true
+    },
+    {
+      "path": "artifacts/create-basin-release-233-jars-2026-10-19/citizens-2.0.43-neoforge-SNAPSHOT.jar",
+      "sha256": "aa3a24d4315eb9a3b564a64439ada75a7b62c66b9fab9135c7216500e4aa0615",
+      "bytes": 3992817,
+      "neoForge": "21.1.233",
+      "probeAndForeignProviderClassesAbsent": true,
+      "independentModContents": true
+    },
+    {
+      "path": "artifacts/create-basin-release-233-jars-2026-10-19/yuuniverse-interactions-2.0.43-neoforge-SNAPSHOT.jar",
+      "sha256": "ee37886b4cd234a5ed79090916bd216cc1d12c03efe3dceb31ad9ac3d81505b7",
+      "bytes": 204123,
+      "neoForge": "21.1.233",
+      "probeAndForeignProviderClassesAbsent": true,
+      "independentModContents": true
+    },
+    {
+      "path": "artifacts/create-basin-release-248-jars-2026-10-19/citizens-2.0.43-neoforge-SNAPSHOT-sources.jar",
+      "sha256": "937b06e40057b6909fba5c21a55ab510a650bbb947d89abc9a921320290ea6e8",
+      "bytes": 1093939,
+      "neoForge": "21.1.248",
+      "probeAndForeignProviderClassesAbsent": true,
+      "independentModContents": true
+    },
+    {
+      "path": "artifacts/create-basin-release-248-jars-2026-10-19/citizens-2.0.43-neoforge-SNAPSHOT.jar",
+      "sha256": "e77983a8bc59d6a17db983ec5e483339162ab0747521a058142e2f66ab52304a",
+      "bytes": 3992817,
+      "neoForge": "21.1.248",
+      "probeAndForeignProviderClassesAbsent": true,
+      "independentModContents": true
+    },
+    {
+      "path": "artifacts/create-basin-release-248-jars-2026-10-19/yuuniverse-interactions-2.0.43-neoforge-SNAPSHOT.jar",
+      "sha256": "e934d7bbd0cd45016580f10892d6bfa369e8e1a04f17f241a4851e35db3729db",
+      "bytes": 204123,
+      "neoForge": "21.1.248",
+      "probeAndForeignProviderClassesAbsent": true,
+      "independentModContents": true
+    }
+  ],
+  "logs": [
+    {
+      "path": "artifacts/create-basin-final-native-233-2026-10-19.log",
+      "sha256": "b020d33fa6e45257cf691465c9d64d5d25a2a289822b86e9d885d2baae2cb856",
+      "bytes": 37773
+    },
+    {
+      "path": "artifacts/create-basin-final-native-248-2026-10-19.log",
+      "sha256": "4bf3bee4641d6219bd3780d51df0d1e8a2bc28a0cc2ef0ed523dc9a7413f8060",
+      "bytes": 40109
+    },
+    {
+      "path": "artifacts/create-basin-absent-2026-10-19.log",
+      "sha256": "a33adece1c1e720f0941e9c5224ee8afd8e732e50dd76b66e4fafde81ed64fcb",
+      "bytes": 88010
+    },
+    {
+      "path": "artifacts/create-basin-release-233-2026-10-19.log",
+      "sha256": "80967985003a6e59366873f3df7269887cfaf58314f4d69cbea5cff6cfc34d03",
+      "bytes": 69044
+    },
+    {
+      "path": "artifacts/create-basin-release-248-2026-10-19.log",
+      "sha256": "368108a56b47a16cef543b80cef3e4b2a1ec71fd8e5752917d00ac33d7a68234",
+      "bytes": 69044
+    }
+  ],
+  "sources": [
+    {
+      "path": "neoforge/src/main/java/net/citizensnpcs/util/CreateMachineEvidence.java",
+      "sha256": "40c09ca0c432a85748b4f630053fb8a8025ece2a7461bee86eb7a276fe0529d6",
+      "bytes": 50322
+    },
+    {
+      "path": "neoforge/src/main/java/net/citizensnpcs/util/CraftQuestEvidence.java",
+      "sha256": "368a1121f41606e2dfb39ac6d699c42498ecae1dd997ddcc8a0c9ee4e9fc540e",
+      "bytes": 19962
+    },
+    {
+      "path": "neoforge/src/main/java/net/citizensnpcs/util/CreateBasinStorage.java",
+      "sha256": "d1c653a0ce4eae65dbb91db3005702252ca6806e188f3e3d51fe048ed37bb44f",
+      "bytes": 769
+    },
+    {
+      "path": "neoforge/src/main/java/net/citizensnpcs/mixin/CreateBasinOperatorEvidenceMixin.java",
+      "sha256": "237aaee54c957e053f73391c68ff1b8469ff2c1617d90486772f68e1d125ca29",
+      "bytes": 752
+    },
+    {
+      "path": "neoforge/src/main/java/net/citizensnpcs/mixin/CreateBasinRecipeEvidenceMixin.java",
+      "sha256": "b587b1530a02de76d9cc0daadb32820abfae10055e4934113de22925a212424d",
+      "bytes": 4404
+    },
+    {
+      "path": "neoforge/src/main/java/net/citizensnpcs/mixin/CreateBasinStorageMixin.java",
+      "sha256": "208cec4d7453e5c8715f18ce1c6eef8a949a9e973928470ace8b2da5ab4ed5ac",
+      "bytes": 1611
+    },
+    {
+      "path": "neoforge/src/main/java/net/citizensnpcs/mixin/CreateDummyCraftingInputMixin.java",
+      "sha256": "d2f0b9532c9184bc7634512af518c6adb1e9496bd71f3a1975fb330883a0c2a0",
+      "bytes": 693
+    },
+    {
+      "path": "neoforge/src/main/resources/citizens.mixins.json",
+      "sha256": "4eaf1bdc59b2af61c4134d1d2ecfd0b419f911121cd55fae198fe327e3ff7514",
+      "bytes": 1594
+    },
+    {
+      "path": "tools/create-runtime-audit/net/yuuniverse/interactions/BasinMachineRuntimeAudit.java",
+      "sha256": "bb40ac00ef1e84bf141ad3eb8b10432d4d9f202042fef1d3537ae5141cfb41c6",
+      "bytes": 23532
+    },
+    {
+      "path": "tools/create-runtime-audit/net/yuuniverse/interactions/CreateRuntimeAudit.java",
+      "sha256": "13b58061e224dbbe8e6d6d2bf54a52979183f1782a29a12b93865f9ed6c35a35",
+      "bytes": 27578
+    }
+  ],
+  "productionActivated": false,
+  "remaining": [
+    "Fan/deployer/fluid processing and sequenced assembly",
+    "Basin/transport-specific actual hard-kill and inventory rollback recovery",
+    "Wider party/repeat/offline/reconnect and financial backup matrix",
+    "Logging operations, legacy provenance and Paradigm inbound formatting",
+    "Physical VR/non-VR and integrated migration acceptance"
+  ]
+}
