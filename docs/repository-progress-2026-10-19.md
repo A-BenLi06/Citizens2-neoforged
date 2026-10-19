@@ -99,6 +99,11 @@ The pinned Gradle 8.14.3 build passes but emits Gradle-9 deprecation warnings. T
 
 ## Next acceptance batches
 
+Follow-up 2026-10-19, UTC+08:00: [depot/belt pressing evidence](create-transport-press-evidence-2026-10-19.md)
+now observes the complete native callback through exact storage verification and
+passes 21 additional native checks on both NeoForge targets. Remaining machine,
+transport crash/recovery and integrated release gates below stay open.
+
 1. Extend actual evidence to the remaining required Create processes and assembly, preserving provider-native outputs and recipe revisions.
 2. Complete concrete party/offline/reconnect, repeat-generation, inventory-mutation kill and financial/world-backup recovery cases for the adopted quest/commerce/reward workflow.
 3. Resolve original quest IDs, group/account/shop identities and missing legacy items with source provenance; keep unsupported content recoverable.

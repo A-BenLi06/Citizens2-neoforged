@@ -29,6 +29,14 @@ Exact artifact sources, SHA-512/SHA-256 hashes and installation paths are record
 
 ## Ordered adaptation backlog
 
+Progress 2026-10-19, UTC+08:00: [native depot/belt pressing](create-transport-press-evidence-2026-10-19.md)
+keeps evidence open through Create's actual transport storage. Exact input/holder,
+depot buffers and accepted overflow, read-only belt pending queues and retained
+components/counts gate confirmation. Twenty-one native checks on both NeoForge
+targets cover bulk/single cycles, queue merge, unchanged-result skipping, callback
+mutations and review without duplicate progress. Basin/fan/deployer/fluid/assembly,
+transport hard-kill and wider recovery/client acceptance remain open.
+
 Progress 2026-10-19, UTC+08:00: [native world pressing](create-press-evidence-2026-10-19.md)
 extends attributed FTB evidence to mechanical presses processing world items.
 Native bulk/single quantities, actual random/component outputs, input entity

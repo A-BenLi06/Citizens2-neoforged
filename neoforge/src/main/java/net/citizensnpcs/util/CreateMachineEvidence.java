@@ -128,12 +128,138 @@ public final class CreateMachineEvidence {
             if (scopes.isEmpty()) SCOPES.remove();
             if (scope.observation != null) {
                 if (scope.worldInput != null && returned) verifyWorld(scope);
+                if (scope.transportInput != null && returned) {
+                    try { verifyTransport(scope); }
+                    catch (ReflectiveOperationException | RuntimeException | LinkageError failure) { LOGGER.error("Transport output verification failed", failure); }
+                }
                 var outcome = !returned ? MachineOutcomeEvent.Outcome.INTERRUPTED
                         : scope.verified ? MachineOutcomeEvent.Outcome.RETURNED : MachineOutcomeEvent.Outcome.UNCONFIRMED;
                 try { NeoForge.EVENT_BUS.post(new MachineOutcomeEvent(scope.observation, outcome)); }
                 catch (RuntimeException | LinkageError failure) { LOGGER.error("Machine outcome listener failed for {}", scope.observation.id(), failure); }
             }
         }
+    }
+
+    /** Keep the press scope open until the caller's native transport storage has returned. */
+    public static <T> T duringTransportPress(Object input, Object handler, Object behaviour, java.util.function.Supplier<T> original) {
+        BlockEntity machine;
+        try { machine = (BlockEntity) behaviour.getClass().getField("blockEntity").get(behaviour); }
+        catch (ReflectiveOperationException | RuntimeException failure) { return original.get(); }
+        if (!live(machine) || source(machine) != Source.CREATE_PRESS) return original.get();
+        var result = new java.util.concurrent.atomic.AtomicReference<T>();
+        duringProcess(machine, () -> {
+            var scope = SCOPES.get().peek(); scope.transportInput = input;
+            scope.transportExpectedHolder = transportBlockEntity(handler);
+            scope.worldBefore = transportedStack(input).copy(); result.set(original.get());
+        });
+        return result.get();
+    }
+
+    /** Called by the exact native holder; snapshots never flush Create's pending queues. */
+    public static void duringTransportStorage(BlockEntity holder, java.util.function.Supplier<List<ItemStack>> snapshot,
+            Runnable original) {
+        var scope = SCOPES.get().peek();
+        if (scope == null || scope.transportInput == null || scope.observation == null) { original.run(); return; }
+        if (holder != (scope.transportStorageOwner == null ? scope.transportExpectedHolder : scope.transportStorageOwner)) {
+            scope.invalidBatch = true; original.run(); return;
+        }
+        if (scope.transportHolder != null) { scope.invalidBatch = true; original.run(); return; }
+        scope.transportHolder = holder;
+        try { scope.transportBefore = copies(snapshot.get()); }
+        catch (RuntimeException | LinkageError failure) {
+            scope.invalidBatch = true; LOGGER.error("Transport input storage observation failed", failure); original.run(); return;
+        }
+        scope.storageActive = true;
+        try {
+            original.run(); scope.storageReturned = true;
+            try { scope.transportAfter = copies(snapshot.get()); }
+            catch (RuntimeException | LinkageError failure) { scope.invalidBatch = true; LOGGER.error("Transport output storage observation failed", failure); }
+        }
+        finally { scope.storageActive = false; }
+    }
+
+    public static void duringBeltStorage(Object inventory, java.util.function.Supplier<List<ItemStack>> snapshot, Runnable original) {
+        var scope = SCOPES.get().peek();
+        if (scope == null || scope.transportExpectedHolder == null) { original.run(); return; }
+        try {
+            var holder = scope.transportExpectedHolder;
+            if (!holder.getClass().getName().equals("com.simibubi.create.content.kinetics.belt.BeltBlockEntity")) { original.run(); return; }
+            var controller = (BlockEntity) holder.getClass().getMethod("getControllerBE").invoke(holder);
+            if (controller == null || controller.getClass().getMethod("getInventory").invoke(controller) != inventory) { original.run(); return; }
+            scope.transportStorageOwner = controller;
+            duringTransportStorage(controller, snapshot, original);
+        } catch (ReflectiveOperationException failure) { throw new IllegalStateException("Unsupported Create belt inventory", failure); }
+    }
+
+    public static void transportEntityAdded(net.minecraft.world.entity.Entity entity, boolean accepted) {
+        var scope = SCOPES.get().peek();
+        if (scope != null && scope.transportInput != null && scope.storageActive) worldEntityAdded(entity, accepted);
+    }
+
+    public static void transportMatched(Object input, ItemStack before, Object result) {
+        var scope = SCOPES.get().peek();
+        if (scope == null || scope.transportInput != input || scope.transportHolder == null || result == null) return;
+        if (!ItemStack.matches(before, scope.worldBefore)) { scope.invalidBatch = true; return; }
+        try {
+            // The native holders intentionally skip unchanged results. Such a return did not store a craft.
+            scope.transportMatched = !(boolean) result.getClass().getMethod("didntChangeFrom", ItemStack.class).invoke(result, before);
+        } catch (ReflectiveOperationException | RuntimeException failure) {
+            scope.invalidBatch = true; LOGGER.error("Transport result acceptance observation failed", failure);
+        }
+    }
+
+    /** Public pinned TransportedItemStack.stack; no provider class is linked when Create is absent. */
+    public static ItemStack transportedStack(Object input) {
+        try { return (ItemStack) input.getClass().getField("stack").get(input); }
+        catch (ReflectiveOperationException failure) { throw new IllegalStateException("Unsupported Create transported stack", failure); }
+    }
+
+    public static BlockEntity transportBlockEntity(Object behaviour) {
+        try { return (BlockEntity) behaviour.getClass().getField("blockEntity").get(behaviour); }
+        catch (ReflectiveOperationException failure) { throw new IllegalStateException("Unsupported Create transport holder", failure); }
+    }
+
+    public static List<ItemStack> depotInventory(Object depot) {
+        try { return inventory(transportBlockEntity(depot), (IItemHandler) depot.getClass().getField("itemHandler").get(depot)); }
+        catch (ReflectiveOperationException failure) { throw new IllegalStateException("Unsupported Create depot inventory", failure); }
+    }
+
+    private static List<ItemStack> transportSnapshot(BlockEntity holder) throws ReflectiveOperationException {
+        if (holder.getClass().getName().equals("com.simibubi.create.content.logistics.depot.DepotBlockEntity")) {
+            var loader = holder.getClass().getClassLoader();
+            var depotClass = Class.forName("com.simibubi.create.content.logistics.depot.DepotBehaviour", false, loader);
+            var typeClass = Class.forName("com.simibubi.create.foundation.blockEntity.behaviour.BehaviourType", false, loader);
+            return depotInventory(holder.getClass().getMethod("getBehaviour", typeClass).invoke(holder, depotClass.getField("TYPE").get(null)));
+        }
+        if (holder.getClass().getName().equals("com.simibubi.create.content.kinetics.belt.BeltBlockEntity")) {
+            var controller = holder.getClass().getMethod("getControllerBE").invoke(holder);
+            var inventory = controller.getClass().getMethod("getInventory").invoke(controller);
+            return ((CreateTransportInventory) inventory).citizens$transportSnapshot();
+        }
+        throw new IllegalStateException("Unsupported Create transport storage");
+    }
+
+    private static void verifyTransport(Scope scope) throws ReflectiveOperationException {
+        if (!scope.storageReturned || !scope.transportMatched || scope.invalidBatch || !live(scope.machine)
+                || !live(scope.transportHolder) || !live(scope.transportExpectedHolder)
+                || scope.transportHolder.getLevel() != scope.machine.getLevel()) return;
+        if (!equalMultiset(scope.transportInitial, scope.transportBefore)) return;
+        if (!equalMultiset(scope.transportAfter, transportSnapshot(scope.transportExpectedHolder))) return;
+        var expected = new java.util.ArrayList<>(scope.transportBefore);
+        // Remove this operation's exact original quantity; retain every unrelated stored stack.
+        int needed = scope.worldBefore.getCount();
+        for (var stack : expected) if (ItemStack.isSameItemSameComponents(stack, scope.worldBefore)) {
+            int take = Math.min(needed, stack.getCount()); stack.shrink(take); needed -= take;
+        }
+        if (needed != 0) return;
+        expected.add(scope.remainingInput); expected.addAll(scope.batchOutputs); expected.addAll(scope.batchRemainders);
+        var actual = new java.util.ArrayList<>(scope.transportAfter);
+        var level = (ServerLevel) scope.machine.getLevel();
+        for (var output : scope.worldOutputs) {
+            if (!output.isAlive() || output.level() != level || level.getEntity(output.getUUID()) != output) return;
+            actual.add(output.getItem().copy());
+        }
+        scope.verified = equalMultiset(expected, actual);
     }
 
     /** The press owns the operation; RecipeApplier also serves unrelated automation, which remains unobserved. */
@@ -155,7 +281,14 @@ public final class CreateMachineEvidence {
     /** Observe the native input to RecipeApplier before its results or callbacks can mutate it. */
     public static void beforeWorldRecipe(ItemStack input, Object recipe) {
         Scope scope = SCOPES.get().peek();
-        if (scope == null || scope.worldInput == null || scope.input != null || input.isEmpty()) return;
+        if (scope == null || (scope.worldInput == null && scope.transportInput == null) || scope.input != null || input.isEmpty()) return;
+        if (scope.transportInput != null) {
+            // Snapshot only an actual selected recipe invocation, not every held-item animation tick.
+            try { scope.transportInitial = transportSnapshot(scope.transportExpectedHolder); }
+            catch (ReflectiveOperationException | RuntimeException | LinkageError failure) {
+                scope.invalidBatch = true; LOGGER.error("Transport operation input observation failed", failure);
+            }
+        }
         scope.input = input.copy(); scope.batchRecipe = recipe;
         if (!ItemStack.isSameItemSameComponents(input, scope.worldBefore) || input.getCount() > scope.worldBefore.getCount()) {
             scope.invalidBatch = true; return;
@@ -167,7 +300,7 @@ public final class CreateMachineEvidence {
     /** RecipeApplier has completed all actual rolls and remainder callbacks, before native world storage. */
     public static void worldRecipeResults(List<ItemStack> results) {
         Scope scope = SCOPES.get().peek();
-        if (scope == null || scope.worldInput == null || scope.input == null || scope.invalidBatch
+        if (scope == null || (scope.worldInput == null && scope.transportInput == null) || scope.input == null || scope.invalidBatch
                 || scope.observation != null || scope.rolls != scope.input.getCount()) return;
         try {
             var expected = new java.util.ArrayList<>(scope.batchOutputs); expected.addAll(scope.batchRemainders);
@@ -177,8 +310,10 @@ public final class CreateMachineEvidence {
             var level = (ServerLevel) scope.machine.getLevel();
             scope.observation = new Observation(UUID.randomUUID(), assignment, level.dimension().location(), scope.machine.getBlockPos(),
                     level.getServer().getTickCount(), Source.CREATE_PRESS, selected, scope.input, scope.remainingInput,
-                    scope.batchRemainders.isEmpty() ? ItemStack.EMPTY : scope.batchRemainders.getFirst(), List.of(), scope.batchOutputs,
-                    scope.batchRemainders.size() < 2 ? List.of() : scope.batchRemainders.subList(1, scope.batchRemainders.size()), scope.worldInput.getUUID());
+                    scope.batchRemainders.isEmpty() ? ItemStack.EMPTY : scope.batchRemainders.getFirst(),
+                    scope.transportInitial == null ? List.of() : scope.transportInitial, scope.batchOutputs,
+                    scope.batchRemainders.size() < 2 ? List.of() : scope.batchRemainders.subList(1, scope.batchRemainders.size()),
+                    scope.worldInput == null ? null : scope.worldInput.getUUID());
             NeoForge.EVENT_BUS.post(new MachineResultEvent(actor, scope.observation));
         } catch (RuntimeException | LinkageError failure) { LOGGER.error("World press result observation failed", failure); }
     }
@@ -186,7 +321,7 @@ public final class CreateMachineEvidence {
     /** Capture only the actual native output entities and insertion results, without searching nearby items. */
     public static void worldEntityAdded(net.minecraft.world.entity.Entity entity, boolean accepted) {
         Scope scope = SCOPES.get().peek();
-        if (scope == null || scope.worldInput == null || scope.observation == null) return;
+        if (scope == null || (scope.worldInput == null && scope.transportInput == null) || scope.observation == null) return;
         if (!accepted || !(entity instanceof net.minecraft.world.entity.item.ItemEntity item)) { scope.invalidBatch = true; return; }
         scope.worldOutputs.add(item);
     }
@@ -341,7 +476,10 @@ public final class CreateMachineEvidence {
     }
 
     private static List<ItemStack> inventory(BlockEntity machine, String field) throws ReflectiveOperationException {
-        var handler = (IItemHandler) machine.getClass().getField(field).get(machine); var items = new java.util.ArrayList<ItemStack>();
+        return inventory(machine, (IItemHandler) machine.getClass().getField(field).get(machine));
+    }
+    private static List<ItemStack> inventory(BlockEntity machine, IItemHandler handler) {
+        var items = new java.util.ArrayList<ItemStack>();
         for (int i = 0; i < handler.getSlots(); i++) items.add(handler.getStackInSlot(i).copy()); return items;
     }
     private static boolean equalMultiset(List<ItemStack> expected, List<ItemStack> actual) {
@@ -388,6 +526,8 @@ public final class CreateMachineEvidence {
         Object batchRecipe; int rolls; boolean invalidBatch;
         final List<ItemStack> batchOutputs = new java.util.ArrayList<>(), batchRemainders = new java.util.ArrayList<>();
         net.minecraft.world.entity.item.ItemEntity worldInput; ItemStack worldBefore;
+        Object transportInput; BlockEntity transportHolder, transportExpectedHolder, transportStorageOwner; List<ItemStack> transportInitial, transportBefore, transportAfter;
+        boolean transportMatched, storageReturned, storageActive;
         final List<net.minecraft.world.entity.item.ItemEntity> worldOutputs = new java.util.ArrayList<>();
         Scope(BlockEntity machine) { this.machine = machine; }
     }

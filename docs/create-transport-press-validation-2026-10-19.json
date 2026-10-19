@@ -1,0 +1,172 @@
+{
+  "createdAt": "2026-10-19T20:14:41+08:00",
+  "timezone": "UTC+08:00",
+  "provider": {
+    "path": "artifacts/create-provider-pinned.jar",
+    "sha256": "5602a16796957cb5c7fb829c10c6b54bf9d228931c7680636710b6a60d92822e",
+    "bytes": 19138095
+  },
+  "providerVersion": "6.0.10-mc1.21.1-performance-v6",
+  "native": {
+    "21.1.233": {
+      "transportPress": 21,
+      "create": 54,
+      "batch": 23,
+      "worldPress": 16
+    },
+    "21.1.248": {
+      "transportPress": 21,
+      "create": 54,
+      "batch": 23,
+      "worldPress": 16
+    },
+    "absentCreate233": 141
+  },
+  "ordinaryTests": {
+    "21.1.233": {
+      "tests": 767,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    "21.1.248": {
+      "tests": 767,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    }
+  },
+  "packages": [
+    {
+      "path": "artifacts/create-transport-release-233-jars-2026-10-19/citizens-2.0.43-neoforge-SNAPSHOT-sources.jar",
+      "sha256": "d78bc7791cdba84d018e4d8120f268eb161725de0487e9ecf331fe67978320d7",
+      "bytes": 1088283,
+      "neoForge": "21.1.233",
+      "probeAndForeignProviderClassesAbsent": true,
+      "independentModContents": true
+    },
+    {
+      "path": "artifacts/create-transport-release-233-jars-2026-10-19/citizens-2.0.43-neoforge-SNAPSHOT.jar",
+      "sha256": "c1b71aeecf649b2878fe8e3207cbf257d79da6eb3e41b14f8b2bac4d964dd457",
+      "bytes": 3978924,
+      "neoForge": "21.1.233",
+      "probeAndForeignProviderClassesAbsent": true,
+      "independentModContents": true
+    },
+    {
+      "path": "artifacts/create-transport-release-233-jars-2026-10-19/yuuniverse-interactions-2.0.43-neoforge-SNAPSHOT.jar",
+      "sha256": "33591604d3c73c777bda2bf0c79f51dc486f076f118e73be7ca9c7e1f2243da3",
+      "bytes": 204123,
+      "neoForge": "21.1.233",
+      "probeAndForeignProviderClassesAbsent": true,
+      "independentModContents": true
+    },
+    {
+      "path": "artifacts/create-transport-release-248-jars-2026-10-19/citizens-2.0.43-neoforge-SNAPSHOT-sources.jar",
+      "sha256": "fb5990b060882c152c3e533b8ee57bdef4ce6ff8745db1b193479dadde6f5e69",
+      "bytes": 1088283,
+      "neoForge": "21.1.248",
+      "probeAndForeignProviderClassesAbsent": true,
+      "independentModContents": true
+    },
+    {
+      "path": "artifacts/create-transport-release-248-jars-2026-10-19/citizens-2.0.43-neoforge-SNAPSHOT.jar",
+      "sha256": "2c22461053e8c005ec792a7b007c0a3b3980532b7c0c85bc9f137bbd9bcbccce",
+      "bytes": 3978924,
+      "neoForge": "21.1.248",
+      "probeAndForeignProviderClassesAbsent": true,
+      "independentModContents": true
+    },
+    {
+      "path": "artifacts/create-transport-release-248-jars-2026-10-19/yuuniverse-interactions-2.0.43-neoforge-SNAPSHOT.jar",
+      "sha256": "82252e2efd66a632e94e8551e685b013141ef4842941add00741adc0510d5d07",
+      "bytes": 204123,
+      "neoForge": "21.1.248",
+      "probeAndForeignProviderClassesAbsent": true,
+      "independentModContents": true
+    }
+  ],
+  "logs": [
+    {
+      "path": "artifacts/create-transport-native-233-2026-10-19.log",
+      "sha256": "059aed3402a41fc89e3c91f6cd70b837dc8df7982c9d95e5f0f76962abe291a5",
+      "bytes": 33790
+    },
+    {
+      "path": "artifacts/create-transport-native-248-2026-10-19.log",
+      "sha256": "071d905a7e228b36086732e34330b242b490cb1d191b0b865500f8af2007561b",
+      "bytes": 36130
+    },
+    {
+      "path": "artifacts/create-transport-absent-2026-10-19.log",
+      "sha256": "e388fffebb3b87bf5a2e1fb2142d0fcb583d9c7b1a62b74c4dc889798eaf6c21",
+      "bytes": 89107
+    },
+    {
+      "path": "artifacts/create-transport-release-233-2026-10-19.log",
+      "sha256": "12a53acecd053114ae647cac20c7a3a70cdc9d9697fb50f8cb03aed4f6036c30",
+      "bytes": 69044
+    },
+    {
+      "path": "artifacts/create-transport-release-248-2026-10-19.log",
+      "sha256": "059cf93c3de8b9b7894ff01b5709d90ba1dfc11c03d583dc81c4fb9b1dfa81f2",
+      "bytes": 69044
+    }
+  ],
+  "sources": [
+    {
+      "path": "neoforge/src/main/java/net/citizensnpcs/util/CreateMachineEvidence.java",
+      "sha256": "3e1eaf708431be66ecf56f0ede66e71247b9a3a35d60b935e86b653d30b23631",
+      "bytes": 38844
+    },
+    {
+      "path": "neoforge/src/main/java/net/citizensnpcs/util/CreateTransportInventory.java",
+      "sha256": "830b7a300d330a15b3ec88aef777404433231f6ff84b89778498cbeee40b86f5",
+      "bytes": 267
+    },
+    {
+      "path": "neoforge/src/main/java/net/citizensnpcs/mixin/CreateBeltPressEvidenceMixin.java",
+      "sha256": "fbbbb3a3a66516b47d2cf03068c72e353cec763b9326567a20dd905c9d011bc1",
+      "bytes": 876
+    },
+    {
+      "path": "neoforge/src/main/java/net/citizensnpcs/mixin/CreateDepotEvidenceMixin.java",
+      "sha256": "5a9b3bd421b032e866c816e06ef4597ce7fd58da5501a704889eae0bd0ba53f9",
+      "bytes": 1464
+    },
+    {
+      "path": "neoforge/src/main/java/net/citizensnpcs/mixin/CreateBeltInventoryEvidenceMixin.java",
+      "sha256": "a2bb0b202aadc3ef285c5aede7024bdafe00ecb29aeafcd0426850470d85d38f",
+      "bytes": 2139
+    },
+    {
+      "path": "neoforge/src/main/java/net/citizensnpcs/mixin/CreateTransportOverflowMixin.java",
+      "sha256": "8ad229cce2fd7c8b177448be84686bb1ac9ad70b8de9a9304a8564853e209930",
+      "bytes": 945
+    },
+    {
+      "path": "neoforge/src/main/resources/citizens.mixins.json",
+      "sha256": "a1d001d41662fbd0bd98c73dbb155a4198506b1dc1b6c5cba8989aad3d2b2722",
+      "bytes": 1444
+    },
+    {
+      "path": "tools/create-runtime-audit/net/yuuniverse/interactions/TransportPressRuntimeAudit.java",
+      "sha256": "0a63571713e66a9098694c7a8be6e16f4aeb82d45fa2e2cb83da857591857ee2",
+      "bytes": 20496
+    },
+    {
+      "path": "tools/create-runtime-audit/net/yuuniverse/interactions/CreateRuntimeAudit.java",
+      "sha256": "1c5fe9d5d79b7b47fb091c261694c92192cc4d8207f79ff73ab78646d4edb7fd",
+      "bytes": 27528
+    }
+  ],
+  "productionActivated": false,
+  "remaining": [
+    "Basin mixing/compacting",
+    "Fan/deployer/fluid processing and sequenced assembly",
+    "Transport-specific actual hard-kill and inventory rollback recovery",
+    "Wider party/repeat/offline/reconnect and financial backup matrix",
+    "Logging operations, legacy provenance and Paradigm inbound formatting",
+    "Physical VR/non-VR and integrated migration acceptance"
+  ]
+}
