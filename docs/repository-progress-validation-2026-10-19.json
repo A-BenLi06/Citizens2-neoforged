@@ -1,0 +1,153 @@
+{
+  "reviewedAt": "2026-10-19T14:15:06.3346945+08:00",
+  "timezone": "UTC+08:00",
+  "gameplayCommit": "55396e644450a4f10ae2a3938c669c13fa25fbff",
+  "branch": "neoforge-port",
+  "baseline": "21.1.233",
+  "selected": "21.1.248",
+  "freshChecks": {
+    "baseline": {
+      "Target": "21.1.233",
+      "BuildDirectory": "artifacts/progress-audit-final-build",
+      "Suites": 112,
+      "Tests": 767.0,
+      "Failures": 0.0,
+      "Errors": 0.0,
+      "Skipped": 0.0,
+      "LastTimestamp": "2026-10-19T06:00:03.535Z",
+      "MixinSha256": "3B93014B72882728C906B8812E3BDB6D016A57360DF77A4727D5F65AF4AD0D86"
+    },
+    "selected": {
+      "Target": "21.1.248",
+      "BuildDirectory": "artifacts/progress-audit-final-build",
+      "Suites": 112,
+      "Tests": 767.0,
+      "Failures": 0.0,
+      "Errors": 0.0,
+      "Skipped": 0.0,
+      "LastTimestamp": "2026-10-19T06:03:27.074Z",
+      "SourceHead": "55396e644450a4f10ae2a3938c669c13fa25fbff"
+    },
+    "dialogue": {
+      "Suites": 9,
+      "Tests": 100.0,
+      "Failures": 0.0,
+      "Errors": 0.0,
+      "Skipped": 0.0,
+      "LastTimestamp": "2026-10-19T05:53:27.47Z"
+    }
+  },
+  "commandInventory": {
+    "scope": "checked-in command declarations; static evidence only",
+    "upstream": 192,
+    "native": 201,
+    "missing": [
+      "npc chicken",
+      "npc coppergolem",
+      "npc cow",
+      "npc mannequin",
+      "npc pig",
+      "npc sulfurcube"
+    ],
+    "added": [
+      "citizens commercetask",
+      "citizens craftevidence",
+      "citizens economyshop",
+      "citizens quest",
+      "citizens questreward",
+      "citizens recipe",
+      "citizens saveditem",
+      "npc interaction",
+      "npc prof",
+      "npc profession",
+      "npc protect",
+      "npc protected",
+      "npc saddle",
+      "npc size",
+      "npc sneak"
+    ],
+    "registeredTraitClasses": 96
+  },
+  "packages": [
+    {
+      "path": "C:\\Users\\ben_l\\Documents\\Coding\\citizens2-neoforged\\artifacts\\progress-audit-final-build\\libs\\citizens-2.0.43-neoforge-SNAPSHOT-sources.jar",
+      "bytes": 1080544,
+      "sha256": "5d4b31121b457bd202867b0320a9f50578b4ffdb8596a23862876631080e1c89",
+      "probeEntries": 0,
+      "foreignProviderEntries": 0,
+      "mixedModEntries": 0
+    },
+    {
+      "path": "C:\\Users\\ben_l\\Documents\\Coding\\citizens2-neoforged\\artifacts\\progress-audit-final-build\\libs\\citizens-2.0.43-neoforge-SNAPSHOT.jar",
+      "bytes": 3964037,
+      "sha256": "ebd6d66aefdbc889ed5f99b65ce91cdaf7474ebdfa4718f25d9d8b5a0bcc15f0",
+      "probeEntries": 0,
+      "foreignProviderEntries": 0,
+      "mixedModEntries": 0
+    },
+    {
+      "path": "C:\\Users\\ben_l\\Documents\\Coding\\citizens2-neoforged\\artifacts\\progress-audit-final-build\\libs\\yuuniverse-interactions-2.0.43-neoforge-SNAPSHOT.jar",
+      "bytes": 204123,
+      "sha256": "3e4d834120908f607e8acdbe9d60b73b41c938c09532bc81acc72aa4844df4c3",
+      "probeEntries": 0,
+      "foreignProviderEntries": 0,
+      "mixedModEntries": 0
+    }
+  ],
+  "deployedPackages": [
+    {
+      "path": "E:\\yunniverse-server\\mods\\[S][自研]citizens-2.0.43-neoforge-SNAPSHOT.jar",
+      "bytes": 2527097,
+      "sha256": "73e82636cc6da1cdf534a6666b43d8553ee7458eb38b18bd685c45e3dd8a6673"
+    },
+    {
+      "path": "E:\\yunniverse-server\\mods\\[S][自研]yuuniverse-economy-0.4.1-SNAPSHOT.jar",
+      "bytes": 14357004,
+      "sha256": "f6f6fea0c4b6e1f7efa7ac25dbf8fa2ecf9e3a9cc29682cd7dff53132e283d2f"
+    },
+    {
+      "path": "E:\\yunniverse-server\\mods\\[S][自研]yuuniverse-interactions.jar",
+      "bytes": 60101,
+      "sha256": "3bc4bdff01f94473395e6e52d3dd5ca3c31e3d06a55c38623187d8712a12e113"
+    }
+  ],
+  "evidence": [
+    {
+      "path": "artifacts/progress-audit-final-baseline-2026-10-19.log",
+      "bytes": 67698,
+      "sha256": "a2c7c24250c0b9208fa6af5223b4d9dee870c7246096f95c62951b40ed35d14b"
+    },
+    {
+      "path": "artifacts/progress-audit-final-selected-2026-10-19.log",
+      "bytes": 69348,
+      "sha256": "21987509d1bb05cd64f0fca9fea514311836676d995c725e1bba56c8e066d23d"
+    },
+    {
+      "path": "artifacts/progress-audit-dialogue-retry-2026-10-19.log",
+      "bytes": 11695,
+      "sha256": "0aaa22b8414f51281083254c0d9c17977ceabc844edcf4ed54390acb66d8b2c6"
+    },
+    {
+      "path": "artifacts/progress-audit-command-inventory-2026-10-19.json",
+      "bytes": 659,
+      "sha256": "3e512bef1d2fa86e8e9b683e220ab2eea836d9e4c92b17ef8f81a1d62312fc5e"
+    },
+    {
+      "path": "artifacts/create-batch-validation-2026-10-19.json",
+      "bytes": 3813,
+      "sha256": "78c48c580fd4125325917427eb5425c8f0f52b3bf178c38b8a9572df4d9a8cf4"
+    },
+    {
+      "path": "artifacts/ftb-commerce-validation-2026-10-18.json",
+      "bytes": 4125,
+      "sha256": "f6f04bf95928a292e0a6dd04f499e90da3faecf24c37366bfea83518d50581e4"
+    },
+    {
+      "path": "docs/logging-attribution-validation-2026-10-19.json",
+      "bytes": 6388,
+      "sha256": "5cd2ef4650ea39843faf49ca4e9dd8b56d15f56373470b922dc916a7d35053f4"
+    }
+  ],
+  "noProductionChanges": true,
+  "portComplete": false
+}
