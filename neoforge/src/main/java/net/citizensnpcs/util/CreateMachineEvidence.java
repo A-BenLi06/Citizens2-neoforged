@@ -30,6 +30,7 @@ public final class CreateMachineEvidence {
             "machine_evidence_attribution", () -> AttachmentType.builder(() -> java.util.Optional.<Attribution>empty())
                     .serialize(Attribution.CODEC.optionalFieldOf("assignment").codec()).build());
     private static final ThreadLocal<java.util.Deque<Scope>> SCOPES = ThreadLocal.withInitial(java.util.ArrayDeque::new);
+    private static final ThreadLocal<FanStorage> FAN_STORAGE = new ThreadLocal<>();
     private CreateMachineEvidence() { }
     public static void register(IEventBus bus) { ATTACHMENTS.register(bus); }
 
@@ -54,6 +55,7 @@ public final class CreateMachineEvidence {
         CREATE_SPOUT("com.simibubi.create.content.fluids.spout.SpoutBlockEntity"),
         CREATE_ITEM_DRAIN("com.simibubi.create.content.fluids.drain.ItemDrainBlockEntity"),
         CREATE_DEPLOYER("com.simibubi.create.content.kinetics.deployer.DeployerBlockEntity"),
+        CREATE_FAN("com.simibubi.create.content.kinetics.fan.EncasedFanBlockEntity"),
         CREATE_CRUSHING_WHEELS("com.simibubi.create.content.kinetics.crusher.CrushingWheelControllerBlockEntity");
         private final String implementation;
         Source(String implementation) { this.implementation = implementation; }
@@ -66,6 +68,7 @@ public final class CreateMachineEvidence {
                 case CREATE_SPOUT -> process == CreateProcessingRecipes.Process.FILLING;
                 case CREATE_ITEM_DRAIN -> process == CreateProcessingRecipes.Process.EMPTYING;
                 case CREATE_DEPLOYER -> process == CreateProcessingRecipes.Process.DEPLOYING;
+                case CREATE_FAN -> process == CreateProcessingRecipes.Process.SPLASHING || process == CreateProcessingRecipes.Process.HAUNTING;
                 case CREATE_CRUSHING_WHEELS -> process == CreateProcessingRecipes.Process.CRUSHING || process == CreateProcessingRecipes.Process.MILLING;
             };
         }
@@ -184,32 +187,121 @@ public final class CreateMachineEvidence {
         finally {
             var scopes = SCOPES.get(); if (scopes.pop() != scope) throw new IllegalStateException("Machine observation scope changed");
             if (scopes.isEmpty()) SCOPES.remove();
-            if (scope.observation != null) {
-                if (scope.basin != null && returned) {
-                    try { verifyBasin(scope); }
-                    catch (RuntimeException | LinkageError failure) { LOGGER.error("Basin output verification failed", failure); }
-                }
-                if (scope.worldInput != null && returned) verifyWorld(scope);
-                if (scope.transportInput != null && returned) {
-                    try { verifyTransport(scope); }
-                    catch (ReflectiveOperationException | RuntimeException | LinkageError failure) { LOGGER.error("Transport output verification failed", failure); }
-                }
-                if (scope.observation.fluid() != null && returned) {
-                    try { verifyFluid(scope); }
-                    catch (ReflectiveOperationException | RuntimeException | LinkageError failure) {
-                        scope.verified = false; LOGGER.error("Fluid machine output verification failed", failure);
-                    }
-                }
-                if (scope.observation.tool() != null && returned) {
-                    try { verifyTool(scope); }
-                    catch (RuntimeException | LinkageError failure) { scope.verified = false; LOGGER.error("Deployer tool verification failed", failure); }
-                }
-                var outcome = !returned ? MachineOutcomeEvent.Outcome.INTERRUPTED
-                        : scope.verified ? MachineOutcomeEvent.Outcome.RETURNED : MachineOutcomeEvent.Outcome.UNCONFIRMED;
-                try { NeoForge.EVENT_BUS.post(new MachineOutcomeEvent(scope.observation, outcome)); }
-                catch (RuntimeException | LinkageError failure) { LOGGER.error("Machine outcome listener failed for {}", scope.observation.id(), failure); }
-            }
+            if (!scope.deferredFan) finish(scope, returned);
         }
+    }
+    private static void finish(Scope scope, boolean returned) {
+        if (scope.observation != null) {
+            if (scope.basin != null && returned) {
+                try { verifyBasin(scope); }
+                catch (RuntimeException | LinkageError failure) { LOGGER.error("Basin output verification failed", failure); }
+            }
+            if (scope.worldInput != null && returned) verifyWorld(scope);
+            if (scope.transportInput != null && returned && !scope.deferredFan) {
+                try { verifyTransport(scope); }
+                catch (ReflectiveOperationException | RuntimeException | LinkageError failure) { LOGGER.error("Transport output verification failed", failure); }
+            }
+            if (scope.observation.fluid() != null && returned) {
+                try { verifyFluid(scope); }
+                catch (ReflectiveOperationException | RuntimeException | LinkageError failure) {
+                    scope.verified = false; LOGGER.error("Fluid machine output verification failed", failure);
+                }
+            }
+            if (scope.observation.tool() != null && returned) {
+                try { verifyTool(scope); }
+                catch (RuntimeException | LinkageError failure) { scope.verified = false; LOGGER.error("Deployer tool verification failed", failure); }
+            }
+            var outcome = !returned ? MachineOutcomeEvent.Outcome.INTERRUPTED
+                    : scope.verified ? MachineOutcomeEvent.Outcome.RETURNED : MachineOutcomeEvent.Outcome.UNCONFIRMED;
+            try { NeoForge.EVENT_BUS.post(new MachineOutcomeEvent(scope.observation, outcome)); }
+            catch (RuntimeException | LinkageError failure) { LOGGER.error("Machine outcome listener failed for {}", scope.observation.id(), failure); }
+        }
+    }
+
+    /** Native AirCurrent caller only; utility processing without a live fan source stays unobserved. */
+    public static boolean duringFanWorld(Object air, net.minecraft.world.entity.item.ItemEntity input, java.util.function.BooleanSupplier original) {
+        var machine = fanMachine(air); if (machine == null) return original.getAsBoolean();
+        final boolean[] result = { false };
+        duringProcess(machine, () -> {
+            var scope = SCOPES.get().peek();
+            if (input.isAlive() && input.level() == machine.getLevel() && ((ServerLevel) input.level()).getEntity(input.getUUID()) == input) {
+                scope.worldInput = input; scope.worldBefore = input.getItem().copy();
+            }
+            result[0] = original.getAsBoolean();
+        });
+        return result[0];
+    }
+    private static BlockEntity fanMachine(Object air) {
+        try {
+            var source = air.getClass().getField("source").get(air);
+            return source instanceof BlockEntity machine && source(machine) == Source.CREATE_FAN && live(machine) ? machine : null;
+        } catch (ReflectiveOperationException | RuntimeException | LinkageError failure) { return null; }
+    }
+    /** Every native callback retains its own observation; confirmation waits for the holder's complete write. */
+    public static void duringFanStorage(Object air, Object handler, java.util.function.Function<Object, Object> callback,
+            java.util.function.Consumer<java.util.function.Function<Object, Object>> original) {
+        var machine = fanMachine(air); if (machine == null || FAN_STORAGE.get() != null) { original.accept(callback); return; }
+        BlockEntity holder; FanStorage storage;
+        try { holder = transportBlockEntity(handler); storage = new FanStorage(transportSnapshot(holder)); }
+        catch (ReflectiveOperationException | RuntimeException | LinkageError failure) { original.accept(callback); return; }
+        FAN_STORAGE.set(storage); boolean returned = false;
+        try {
+            original.accept(input -> {
+                var result = new java.util.concurrent.atomic.AtomicReference<Object>();
+                duringProcess(machine, () -> {
+                    var scope = SCOPES.get().peek(); scope.deferredFan = true; storage.scopes.add(scope);
+                    scope.transportInput = input; scope.transportExpectedHolder = holder;
+                    try { scope.worldBefore = transportedStack(input).copy(); }
+                    catch (RuntimeException | LinkageError failure) { scope.transportInput = null; scope.invalidBatch = true; storage.invalid = true; }
+                    result.set(callback.apply(input));
+                    try {
+                        scope.transportMatched = result.get() != null && !nativeResultUnchanged(result.get(), scope.worldBefore);
+                        if (scope.transportMatched) scope.fanStoredOutputs = nativeTransportOutputs(result.get());
+                    } catch (ReflectiveOperationException | RuntimeException | LinkageError failure) {
+                        storage.invalid = true; LOGGER.error("Fan result observation failed", failure);
+                    }
+                });
+                return result.get();
+            }); returned = true;
+        } finally {
+            FAN_STORAGE.remove();
+            if (returned) {
+                try {
+                    boolean valid = live(machine) && live(holder) && holder.getLevel() == machine.getLevel() && !storage.invalid;
+                    var consumed = new java.util.ArrayList<ItemStack>(); var produced = new java.util.ArrayList<ItemStack>();
+                    for (var scope : storage.scopes) {
+                        valid &= !scope.invalidBatch;
+                        if (!scope.transportMatched) continue;
+                        // Include unassigned/unsupported native changes in the holder's complete delta.
+                        consumed.add(scope.worldBefore); produced.addAll(scope.fanStoredOutputs);
+                        if (scope.observation != null) {
+                            var rolled = new java.util.ArrayList<>(scope.batchOutputs); rolled.addAll(scope.batchRemainders);
+                            valid &= ItemStack.matches(scope.input, scope.worldBefore) && equalMultiset(rolled, scope.fanStoredOutputs);
+                        }
+                    }
+                    var expected = subtractItems(storage.before, consumed);
+                    if (expected != null) expected.addAll(produced);
+                    var actual = new java.util.ArrayList<>(transportSnapshot(holder));
+                    for (var drop : storage.drops) {
+                        valid &= drop.isAlive() && drop.level() == machine.getLevel() && ((ServerLevel) machine.getLevel()).getEntity(drop.getUUID()) == drop;
+                        actual.add(drop.getItem().copy());
+                    }
+                    valid &= expected != null && equalMultiset(expected, actual);
+                    for (var scope : storage.scopes) scope.verified = valid && scope.transportMatched;
+                } catch (ReflectiveOperationException | RuntimeException | LinkageError failure) { LOGGER.error("Fan transport verification failed", failure); }
+            }
+            for (var scope : storage.scopes) finish(scope, returned);
+        }
+    }
+    private static boolean nativeResultUnchanged(Object result, ItemStack before) throws ReflectiveOperationException {
+        return (boolean) result.getClass().getMethod("didntChangeFrom", ItemStack.class).invoke(result, before);
+    }
+    private static List<ItemStack> nativeTransportOutputs(Object result) throws ReflectiveOperationException {
+        var outputs = new java.util.ArrayList<ItemStack>();
+        for (var output : (List<?>) result.getClass().getMethod("getOutputs").invoke(result)) outputs.add(transportedStack(output).copy());
+        if ((boolean) result.getClass().getMethod("hasHeldOutput").invoke(result))
+            outputs.add(transportedStack(result.getClass().getMethod("getHeldOutput").invoke(result)).copy());
+        return outputs;
     }
 
     public static void beforeBasinRecipe(BlockEntity basin, Object recipe, boolean simulate) {
@@ -507,6 +599,11 @@ public final class CreateMachineEvidence {
     }
 
     public static void transportEntityAdded(net.minecraft.world.entity.Entity entity, boolean accepted) {
+        var storage = FAN_STORAGE.get();
+        if (storage != null) {
+            if (accepted && entity instanceof net.minecraft.world.entity.item.ItemEntity item) storage.drops.add(item);
+            else storage.invalid = true;
+        }
         var scope = SCOPES.get().peek();
         if (scope != null && scope.transportInput != null && scope.storageActive) worldEntityAdded(entity, accepted);
     }
@@ -637,6 +734,10 @@ public final class CreateMachineEvidence {
                     scope.worldInput == null ? null : scope.worldInput.getUUID(), null, null,
                     scope.toolBefore == null ? null : new ToolData(scope.toolBefore, scope.toolInventoryBefore, selected.processing().retainedItemSlots().contains(1)));
             NeoForge.EVENT_BUS.post(new MachineResultEvent(actor, scope.observation));
+            if (source(scope.machine) == Source.CREATE_FAN) {
+                scope.invalidBatch |= scope.worldInput != null ? !scope.worldInput.isAlive() || !ItemStack.matches(scope.worldInput.getItem(), scope.worldBefore)
+                        : !ItemStack.matches(transportedStack(scope.transportInput), scope.worldBefore);
+            }
             if (scope.toolBefore != null) scope.invalidBatch |= !ItemStack.matches(scope.toolBefore, scope.toolPlayer.getMainHandItem())
                     || !equalMultiset(scope.toolInventoryBefore, playerInventory(scope.toolPlayer));
         } catch (RuntimeException | LinkageError failure) { LOGGER.error("World press result observation failed", failure); }
@@ -903,6 +1004,7 @@ public final class CreateMachineEvidence {
             throw new IllegalStateException("Machine assignment requires an authenticated administrator");
     }
     private static final class Scope {
+        boolean deferredFan; List<ItemStack> fanStoredOutputs = List.of();
         final BlockEntity machine; ItemStack input; ItemStack remainingInput; ItemStack remainder; List<ItemStack> beforeOutput; Observation observation; boolean verified;
         Object batchRecipe; int rolls; boolean invalidBatch;
         final List<ItemStack> batchOutputs = new java.util.ArrayList<>(), batchRemainders = new java.util.ArrayList<>();
@@ -917,5 +1019,11 @@ public final class CreateMachineEvidence {
         final List<FluidStack> basinPlannedFluids = new java.util.ArrayList<>(), basinConsumedFluids = new java.util.ArrayList<>();
         final List<net.minecraft.world.entity.item.ItemEntity> worldOutputs = new java.util.ArrayList<>();
         Scope(BlockEntity machine) { this.machine = machine; }
+    }
+    private static final class FanStorage {
+        final List<ItemStack> before; boolean invalid;
+        final List<Scope> scopes = new java.util.ArrayList<>();
+        final List<net.minecraft.world.entity.item.ItemEntity> drops = new java.util.ArrayList<>();
+        FanStorage(List<ItemStack> before) { this.before = copies(before); }
     }
 }

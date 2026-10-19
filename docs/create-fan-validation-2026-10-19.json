@@ -1,0 +1,164 @@
+{
+  "createdAt": "2026-10-19T23:06:41+08:00",
+  "timezone": "UTC+08:00",
+  "provider": {
+    "path": "artifacts/create-provider-pinned.jar",
+    "sha256": "5602a16796957cb5c7fb829c10c6b54bf9d228931c7680636710b6a60d92822e",
+    "bytes": 19138095
+  },
+  "providerVersion": "6.0.10-mc1.21.1-performance-v6",
+  "native": {
+    "21.1.233": {
+      "basin": 23,
+      "create": 54,
+      "fluid": 28,
+      "transportPress": 21,
+      "worldPress": 16,
+      "fan": 31,
+      "deployer": 26,
+      "batch": 23
+    },
+    "21.1.248": {
+      "basin": 23,
+      "create": 54,
+      "fluid": 28,
+      "transportPress": 21,
+      "worldPress": 16,
+      "fan": 31,
+      "deployer": 26,
+      "batch": 23
+    },
+    "absentCreate233": 141
+  },
+  "ordinaryTests": {
+    "21.1.233": {
+      "tests": 767,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    "21.1.248": {
+      "tests": 767,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    }
+  },
+  "packages": [
+    {
+      "path": "artifacts/create-fan-release-233-jars-2026-10-19/citizens-2.0.43-neoforge-SNAPSHOT-sources.jar",
+      "sha256": "e076ad7b09e25e84169d8b26a6640ced0dc09463ef75ab4841b276e7a65b9dcb",
+      "bytes": 1102745,
+      "neoForge": "21.1.233",
+      "probeAndForeignProviderClassesAbsent": true,
+      "independentModContents": true
+    },
+    {
+      "path": "artifacts/create-fan-release-233-jars-2026-10-19/citizens-2.0.43-neoforge-SNAPSHOT.jar",
+      "sha256": "a4ebb4cc4a02c6705cb0bf69be5729ac9148d7d120ec01e68b9d444244664683",
+      "bytes": 4014105,
+      "neoForge": "21.1.233",
+      "probeAndForeignProviderClassesAbsent": true,
+      "independentModContents": true
+    },
+    {
+      "path": "artifacts/create-fan-release-233-jars-2026-10-19/yuuniverse-interactions-2.0.43-neoforge-SNAPSHOT.jar",
+      "sha256": "a3d1038807e075f5a69956405734334805ca18cd239bb47e696d57fa1b20eceb",
+      "bytes": 204123,
+      "neoForge": "21.1.233",
+      "probeAndForeignProviderClassesAbsent": true,
+      "independentModContents": true
+    },
+    {
+      "path": "artifacts/create-fan-release-248-jars-2026-10-19/citizens-2.0.43-neoforge-SNAPSHOT-sources.jar",
+      "sha256": "ab9d0b78d64ec81a0b0fe4c6bd1c176b3b13992937269188e0cd3e2fd6b0b360",
+      "bytes": 1102745,
+      "neoForge": "21.1.248",
+      "probeAndForeignProviderClassesAbsent": true,
+      "independentModContents": true
+    },
+    {
+      "path": "artifacts/create-fan-release-248-jars-2026-10-19/citizens-2.0.43-neoforge-SNAPSHOT.jar",
+      "sha256": "2a1602073ea2033348327d85b57789f01a038c77e55b7c3fafc0fb432538fea5",
+      "bytes": 4014105,
+      "neoForge": "21.1.248",
+      "probeAndForeignProviderClassesAbsent": true,
+      "independentModContents": true
+    },
+    {
+      "path": "artifacts/create-fan-release-248-jars-2026-10-19/yuuniverse-interactions-2.0.43-neoforge-SNAPSHOT.jar",
+      "sha256": "39e8837d2d1fd6812f0bfc53eed0b76c787e2bdc94865a3130aee38da790d152",
+      "bytes": 204123,
+      "neoForge": "21.1.248",
+      "probeAndForeignProviderClassesAbsent": true,
+      "independentModContents": true
+    }
+  ],
+  "logs": [
+    {
+      "path": "artifacts/create-fan-final-native-233-2026-10-19.log",
+      "sha256": "ca6c1786534041568023e25ad1d635ee867acc5e008293e76086f36e07b572ec",
+      "bytes": 61013
+    },
+    {
+      "path": "artifacts/create-fan-final-native-248-2026-10-19.log",
+      "sha256": "4b0560fa792c5ab65c3cd7592261e73dccca6448db57df7ba450e74a26c69ebd",
+      "bytes": 56461
+    },
+    {
+      "path": "artifacts/create-fan-absent-2026-10-19.log",
+      "sha256": "1ee3830c860caf9d6c5302bf07fcafc4fc955976d256512cd46f63b9a8f3a714",
+      "bytes": 89359
+    },
+    {
+      "path": "artifacts/create-fan-release-233-2026-10-19.log",
+      "sha256": "76b7abe0841d56fa54f894ed06f4687c623bfe014c7a91a38e1da8d7f0761904",
+      "bytes": 69044
+    },
+    {
+      "path": "artifacts/create-fan-release-248-2026-10-19.log",
+      "sha256": "cfe559dbd9929d6df8e8a532eaf1b7126bd3cc5acdffc80056a929a05cfd35c4",
+      "bytes": 69044
+    }
+  ],
+  "sources": [
+    {
+      "path": "neoforge/src/main/java/net/citizensnpcs/util/CreateMachineEvidence.java",
+      "sha256": "9535fdce30a79334b03534539d928114fa2bb7172497c7965aadf942ec115e32",
+      "bytes": 76105
+    },
+    {
+      "path": "neoforge/src/main/java/net/citizensnpcs/mixin/CreateFanEvidenceMixin.java",
+      "sha256": "b5e4795ac606b62d83ee801d9f29132043d72fef82388aa70412b38c339d80ef",
+      "bytes": 1453
+    },
+    {
+      "path": "neoforge/src/main/resources/citizens.mixins.json",
+      "sha256": "b10abad94034744fadd9d34358819f24db1cb89eb48cc3a82dc25c3e810d3350",
+      "bytes": 1843
+    },
+    {
+      "path": "tools/create-runtime-audit/net/yuuniverse/interactions/FanRuntimeAudit.java",
+      "sha256": "8f5aab69cf080b7ffac9bc6f1dc795695977495c9a44356bbd698bfd8af0379e",
+      "bytes": 26873
+    },
+    {
+      "path": "neoforge/src/main/java/net/citizensnpcs/mixin/CreateFanProcessingEvidenceMixin.java",
+      "sha256": "df558161c1455d45b3eb2938c183f31e92696ab7457f73e4000e44f3a508ea16",
+      "bytes": 1025
+    },
+    {
+      "path": "tools/create-runtime-audit/net/yuuniverse/interactions/CreateRuntimeAudit.java",
+      "sha256": "75f5b67add320f15aa904c7251bb9c229451f62c74959e8c42124fcff0f3893c",
+      "bytes": 27715
+    }
+  ],
+  "productionActivated": false,
+  "remaining": [
+    "Sequenced assembly and other required unsupported machine types",
+    "Machine-specific actual hard-kill and inventory rollback recovery including fans",
+    "Wider party/repeat/offline/reconnect and financial backup matrix",
+    "Logging operations, legacy provenance and Paradigm inbound formatting",
+    "Physical VR/non-VR and integrated migration acceptance"
+  ]
+}

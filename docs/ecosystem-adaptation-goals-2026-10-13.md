@@ -29,6 +29,14 @@ Exact artifact sources, SHA-512/SHA-256 hashes and installation paths are record
 
 ## Ordered adaptation backlog
 
+Progress 2026-10-19, UTC+08:00: [native fan evidence](create-fan-evidence-2026-10-19.md)
+confirms actual SPLASHING/HAUNTING world/depot/belt output after complete storage.
+All simultaneous callback outcomes wait for the native holder return; exact input,
+actual rolls/remainders, native overflow and unsupported concurrent storage deltas
+gate confirmation. Thirty-one checks on both targets cover mutations, interruptions,
+offline attribution, current recipe revisions, duplicates and reopen. Sequenced
+assembly, other required unsupported machines and wider recovery/client gates remain open.
+
 Progress 2026-10-19, UTC+08:00: [native deployer evidence](create-deployer-evidence-2026-10-19.md)
 confirms actual depot/belt recipe output only after native retained/damaged/consumed
 tool handling. Complete inventory and exact accepted remainder drops gate completion;

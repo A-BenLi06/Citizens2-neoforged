@@ -99,6 +99,12 @@ The pinned Gradle 8.14.3 build passes but emits Gradle-9 deprecation warnings. T
 
 ## Next acceptance batches
 
+Follow-up 2026-10-19, UTC+08:00: [fan evidence](create-fan-evidence-2026-10-19.md)
+adds native SPLASHING/HAUNTING world/depot/belt confirmation, exact accepted overflow
+and complete simultaneous callback storage. Thirty-one additional checks cover
+actual rolls/remainders, mutations, interruptions, unidentified concurrent recipes,
+current revisions and reopened progress. Assembly and recovery/client gates stay open.
+
 Follow-up 2026-10-19, UTC+08:00: [deployer evidence](create-deployer-evidence-2026-10-19.md)
 extends native recipe confirmation through complete depot/belt storage and actual
 tool retention/damage/consumption/remainder handling. Twenty-six checks cover native
@@ -124,7 +130,7 @@ now observes the complete native callback through exact storage verification and
 passes 21 additional native checks on both NeoForge targets. Remaining machine,
 transport crash/recovery and integrated release gates below stay open.
 
-1. Extend actual evidence to Create fan processes and sequenced assembly, preserving provider-native outputs and recipe revisions.
+1. Extend actual evidence to Create sequenced assembly and other required unsupported machine types, preserving provider-native outputs and recipe revisions.
 2. Complete concrete party/offline/reconnect, repeat-generation, inventory-mutation kill and financial/world-backup recovery cases for the adopted quest/commerce/reward workflow.
 3. Resolve original quest IDs, group/account/shop identities and missing legacy items with source provenance; keep unsupported content recoverable.
 4. Add the required logging retention/failure/load coverage and a supported Paradigm inbound contract where the pack requires one.
