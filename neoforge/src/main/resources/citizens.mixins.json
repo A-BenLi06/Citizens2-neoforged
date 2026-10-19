@@ -8,6 +8,8 @@
     "CreateMillstoneEvidenceMixin",
     "CreateSawEvidenceMixin",
     "CreateCrushingEvidenceMixin",
+    "CreatePressEvidenceMixin",
+    "CreateRecipeApplierEvidenceMixin",
     "NeoProtectMultiPlaceMixin",
     "GuardVillagersOwnershipMixin",
     "ResultSlotMixin",

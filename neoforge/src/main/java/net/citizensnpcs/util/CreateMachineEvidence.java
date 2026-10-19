@@ -48,6 +48,7 @@ public final class CreateMachineEvidence {
     public enum Source {
         CREATE_MILLSTONE("com.simibubi.create.content.kinetics.millstone.MillstoneBlockEntity"),
         CREATE_SAW("com.simibubi.create.content.kinetics.saw.SawBlockEntity"),
+        CREATE_PRESS("com.simibubi.create.content.kinetics.press.MechanicalPressBlockEntity"),
         CREATE_CRUSHING_WHEELS("com.simibubi.create.content.kinetics.crusher.CrushingWheelControllerBlockEntity");
         private final String implementation;
         Source(String implementation) { this.implementation = implementation; }
@@ -55,6 +56,7 @@ public final class CreateMachineEvidence {
             return switch (this) {
                 case CREATE_MILLSTONE -> process == CreateProcessingRecipes.Process.MILLING;
                 case CREATE_SAW -> process == CreateProcessingRecipes.Process.CUTTING;
+                case CREATE_PRESS -> process == CreateProcessingRecipes.Process.PRESSING;
                 case CREATE_CRUSHING_WHEELS -> process == CreateProcessingRecipes.Process.CRUSHING || process == CreateProcessingRecipes.Process.MILLING;
             };
         }
@@ -64,11 +66,17 @@ public final class CreateMachineEvidence {
     }
     public record Observation(UUID id, Attribution attribution, ResourceLocation dimension, BlockPos position, long serverTick,
             Source source, CraftingRecipes.Snapshot recipe, ItemStack consumedInput, ItemStack remainingInput, ItemStack nativeRemainder,
-            List<ItemStack> beforeOutput, List<ItemStack> rolledOutputs, List<ItemStack> additionalRemainders) {
+            List<ItemStack> beforeOutput, List<ItemStack> rolledOutputs, List<ItemStack> additionalRemainders, UUID inputEntityId) {
+        public Observation(UUID id, Attribution attribution, ResourceLocation dimension, BlockPos position, long serverTick,
+                Source source, CraftingRecipes.Snapshot recipe, ItemStack consumedInput, ItemStack remainingInput, ItemStack nativeRemainder,
+                List<ItemStack> beforeOutput, List<ItemStack> rolledOutputs, List<ItemStack> additionalRemainders) {
+            this(id, attribution, dimension, position, serverTick, source, recipe, consumedInput, remainingInput, nativeRemainder,
+                    beforeOutput, rolledOutputs, additionalRemainders, null);
+        }
         public Observation(UUID id, Attribution attribution, ResourceLocation dimension, BlockPos position, long serverTick,
                 Source source, CraftingRecipes.Snapshot recipe, ItemStack consumedInput, ItemStack remainingInput, ItemStack nativeRemainder,
                 List<ItemStack> beforeOutput, List<ItemStack> rolledOutputs) {
-            this(id, attribution, dimension, position, serverTick, source, recipe, consumedInput, remainingInput, nativeRemainder, beforeOutput, rolledOutputs, List.of());
+            this(id, attribution, dimension, position, serverTick, source, recipe, consumedInput, remainingInput, nativeRemainder, beforeOutput, rolledOutputs, List.of(), null);
         }
         public Observation {
             position = position.immutable(); consumedInput = consumedInput.copy(); remainingInput = remainingInput.copy();
@@ -119,12 +127,83 @@ public final class CreateMachineEvidence {
             var scopes = SCOPES.get(); if (scopes.pop() != scope) throw new IllegalStateException("Machine observation scope changed");
             if (scopes.isEmpty()) SCOPES.remove();
             if (scope.observation != null) {
+                if (scope.worldInput != null && returned) verifyWorld(scope);
                 var outcome = !returned ? MachineOutcomeEvent.Outcome.INTERRUPTED
                         : scope.verified ? MachineOutcomeEvent.Outcome.RETURNED : MachineOutcomeEvent.Outcome.UNCONFIRMED;
                 try { NeoForge.EVENT_BUS.post(new MachineOutcomeEvent(scope.observation, outcome)); }
                 catch (RuntimeException | LinkageError failure) { LOGGER.error("Machine outcome listener failed for {}", scope.observation.id(), failure); }
             }
         }
+    }
+
+    /** The press owns the operation; RecipeApplier also serves unrelated automation, which remains unobserved. */
+    public static boolean duringWorldPress(BlockEntity machine, net.minecraft.world.entity.item.ItemEntity input,
+            boolean simulate, java.util.function.BooleanSupplier original) {
+        if (simulate || !live(machine) || source(machine) != Source.CREATE_PRESS) return original.getAsBoolean();
+        final boolean[] result = { false };
+        duringProcess(machine, () -> {
+            Scope scope = SCOPES.get().peek();
+            if (input.level() == machine.getLevel() && input.isAlive()
+                    && ((ServerLevel) input.level()).getEntity(input.getUUID()) == input) {
+                scope.worldInput = input; scope.worldBefore = input.getItem().copy();
+            }
+            result[0] = original.getAsBoolean();
+        });
+        return result[0];
+    }
+
+    /** Observe the native input to RecipeApplier before its results or callbacks can mutate it. */
+    public static void beforeWorldRecipe(ItemStack input, Object recipe) {
+        Scope scope = SCOPES.get().peek();
+        if (scope == null || scope.worldInput == null || scope.input != null || input.isEmpty()) return;
+        scope.input = input.copy(); scope.batchRecipe = recipe;
+        if (!ItemStack.isSameItemSameComponents(input, scope.worldBefore) || input.getCount() > scope.worldBefore.getCount()) {
+            scope.invalidBatch = true; return;
+        }
+        scope.remainingInput = scope.worldBefore.copyWithCount(scope.worldBefore.getCount() - input.getCount());
+        scope.beforeOutput = List.of();
+    }
+
+    /** RecipeApplier has completed all actual rolls and remainder callbacks, before native world storage. */
+    public static void worldRecipeResults(List<ItemStack> results) {
+        Scope scope = SCOPES.get().peek();
+        if (scope == null || scope.worldInput == null || scope.input == null || scope.invalidBatch
+                || scope.observation != null || scope.rolls != scope.input.getCount()) return;
+        try {
+            var expected = new java.util.ArrayList<>(scope.batchOutputs); expected.addAll(scope.batchRemainders);
+            if (!equalMultiset(expected, results)) return;
+            var selected = currentRecipe(scope.machine, scope.batchRecipe); if (selected == null) return;
+            var assignment = attribution(scope.machine); var actor = beneficiary(scope.machine, assignment); if (actor == null) return;
+            var level = (ServerLevel) scope.machine.getLevel();
+            scope.observation = new Observation(UUID.randomUUID(), assignment, level.dimension().location(), scope.machine.getBlockPos(),
+                    level.getServer().getTickCount(), Source.CREATE_PRESS, selected, scope.input, scope.remainingInput,
+                    scope.batchRemainders.isEmpty() ? ItemStack.EMPTY : scope.batchRemainders.getFirst(), List.of(), scope.batchOutputs,
+                    scope.batchRemainders.size() < 2 ? List.of() : scope.batchRemainders.subList(1, scope.batchRemainders.size()), scope.worldInput.getUUID());
+            NeoForge.EVENT_BUS.post(new MachineResultEvent(actor, scope.observation));
+        } catch (RuntimeException | LinkageError failure) { LOGGER.error("World press result observation failed", failure); }
+    }
+
+    /** Capture only the actual native output entities and insertion results, without searching nearby items. */
+    public static void worldEntityAdded(net.minecraft.world.entity.Entity entity, boolean accepted) {
+        Scope scope = SCOPES.get().peek();
+        if (scope == null || scope.worldInput == null || scope.observation == null) return;
+        if (!accepted || !(entity instanceof net.minecraft.world.entity.item.ItemEntity item)) { scope.invalidBatch = true; return; }
+        scope.worldOutputs.add(item);
+    }
+
+    private static void verifyWorld(Scope scope) {
+        try {
+            var expected = new java.util.ArrayList<>(scope.observation.rolledOutputs()); expected.add(scope.observation.nativeRemainder());
+            expected.addAll(scope.observation.additionalRemainders()); expected.add(scope.remainingInput);
+            var level = (ServerLevel) scope.machine.getLevel(); var actual = new java.util.ArrayList<ItemStack>();
+            if (scope.worldInput.isAlive() && level.getEntity(scope.worldInput.getUUID()) == scope.worldInput) actual.add(scope.worldInput.getItem().copy());
+            else if (!scope.remainingInput.isEmpty()) return;
+            for (var output : scope.worldOutputs) {
+                if (!output.isAlive() || output.level() != level || level.getEntity(output.getUUID()) != output) return;
+                actual.add(output.getItem().copy());
+            }
+            scope.verified = live(scope.machine) && !scope.invalidBatch && equalMultiset(expected, actual);
+        } catch (RuntimeException | LinkageError failure) { LOGGER.error("World press output verification failed", failure); }
     }
 
     /** Save the whole native batch before ProcessingInventory.clear; no alternative recipe is selected. */
@@ -243,6 +322,7 @@ public final class CreateMachineEvidence {
         root.addProperty("dimension", observation.dimension().toString()); root.addProperty("x", observation.position().getX());
         root.addProperty("y", observation.position().getY()); root.addProperty("z", observation.position().getZ()); root.addProperty("serverTick", observation.serverTick());
         root.addProperty("recipeId", observation.recipe().id().toString()); root.addProperty("recipeRevision", observation.recipe().revision());
+        if (observation.inputEntityId() != null) root.addProperty("inputEntityId", observation.inputEntityId().toString());
         root.add("recipeDefinition", com.google.gson.JsonParser.parseString(observation.recipe().definition()));
         root.add("processing", CreateProcessingRecipes.encode(observation.recipe().processing(), registries));
         root.add("consumedInput", ItemStack.CODEC.encodeStart(ops, observation.consumedInput()).getOrThrow());
@@ -307,6 +387,8 @@ public final class CreateMachineEvidence {
         final BlockEntity machine; ItemStack input; ItemStack remainingInput; ItemStack remainder; List<ItemStack> beforeOutput; Observation observation; boolean verified;
         Object batchRecipe; int rolls; boolean invalidBatch;
         final List<ItemStack> batchOutputs = new java.util.ArrayList<>(), batchRemainders = new java.util.ArrayList<>();
+        net.minecraft.world.entity.item.ItemEntity worldInput; ItemStack worldBefore;
+        final List<net.minecraft.world.entity.item.ItemEntity> worldOutputs = new java.util.ArrayList<>();
         Scope(BlockEntity machine) { this.machine = machine; }
     }
 }

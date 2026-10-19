@@ -66,6 +66,9 @@ authenticated review. Monetary rewards and crash/rollback acceptance remain requ
 machine completion to saw cutting and crushing-wheel crushing/milling, preserving
 actual random outputs and remainders. Real JVM termination/restart exercises
 durable phases and independently saved world/FTB rollback fences.
+[World pressing evidence](docs/create-press-evidence-2026-10-19.md) observes native
+mechanical press bulk/single processing with exact entity outputs and remainders.
+Belt/basin/assembly and remaining machine acceptance stay in the adopted backlog.
 
 [NeoProtect/GriefLogger attribution](docs/logging-attribution-2026-10-19.md)
 retains independent native histories, corrects duplicate multi-block placement

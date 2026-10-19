@@ -29,6 +29,13 @@ Exact artifact sources, SHA-512/SHA-256 hashes and installation paths are record
 
 ## Ordered adaptation backlog
 
+Progress 2026-10-19, UTC+08:00: [native world pressing](create-press-evidence-2026-10-19.md)
+extends attributed FTB evidence to mechanical presses processing world items.
+Native bulk/single quantities, actual random/component outputs, input entity
+identity, remainder callbacks and exact accepted entity storage are observed.
+Sixteen press checks supplement existing machine acceptance; belt/basin/assembly,
+other machines and the broader crash/client matrix remain open under CRAFT-03–05.
+
 Progress 2026-10-19, UTC+08:00: [NeoProtect/GriefLogger attribution](logging-attribution-2026-10-19.md)
 fixes the reproduced duplicate multi-place log write while retaining shared events
 and native fire attribution. Native blocks, components, entity protection, operator
