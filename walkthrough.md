@@ -2931,3 +2931,55 @@ Complete port remains active. Additional Create machines/assembly, multi-member/
 offline/reconnect and repeat/inventory kill matrices, NeoProtect/GriefLogger
 attribution/rollback, unresolved legacy eyephone/quest provenance, Paradigm inbound
 formatting and physical VR/non-VR/integrated migration acceptance remain open.
+
+## 2026-10-19T10:44:02.6687756+08:00 (UTC+08:00) - Extend native Create batch evidence and verify actual machine process kills
+
+Recovered the interrupted saw/crushing draft and completed its native acceptance.
+The optional pinned applyRecipe wrappers preserve the complete input batch before
+native clear, copy every actual random roll before provider merging, and retain
+native remainder callbacks without invoking them again. The saw calls once per
+input; crushing calls once per batch. Additional component-sensitive remainders
+are encoded separately while preserving retained single-remainder payloads.
+Create native cutting, crushing and crushing's milling fallback now support the
+existing explicitly owned FTB CustomTask bindings. Current actual recipe-object
+identity and full output components remain authoritative; no alternate recipe,
+random roll, machine speed or storage behavior is substituted.
+
+Confirmation checks empty input, no displaced preexisting outputs and exact
+component-sensitive multiset equality for every output and remainder. Native
+slot truncation, output loss and storage exceptions retain durable review without
+credit. Unassigned/offline automation, extraction and duplicate notification do
+not add progress. Existing binding/repeat/team generations stay authoritative.
+Saw stonecutting/woodcutting/package unpacking and intermediate assembly are
+outside this cutting contract; the other processing types remain guidance only.
+
+Added opt-in actual JVM termination at PREPARED before storage, CONFIRMED during
+native FTB completion, and APPLIED before world/FTB save. Each restart passes six
+checks with original assignment, actor, recipe, batch and separately saved input.
+Missing outcome becomes REVIEW/MISSING with zero credit and operator rejection.
+Confirmed evidence reconciles an absolute total once. Applied evidence never
+silently repairs old world/FTB data; reprocessing restored input is fenced by
+retained applied totals. These are actual process kills, not simulated exceptions.
+The runner validates the fresh fixture PID and opt-in Java arguments before kill.
+
+Validation: 54 existing plus 23 new actual Create checks on each NeoForge
+21.1.233 and 21.1.248; 141 absent-Create FTB/Paradigm/KubeJS checks on baseline;
+18 actual restart recovery checks; 767 ordinary tests with zero failures/errors/
+skips and successful standard build. Citizens binary/source and independent
+Interactions JAR exclude all audit/provider/cross-mod classes; Interactions hash
+remains unchanged. Exact hashes and logs: artifacts/create-batch-validation-
+2026-10-19.json. Contract: docs/create-batch-evidence-2026-10-19.md.
+
+Fixture repairs retained failed logs: native wheat includes random flour beyond
+its primary guaranteed result; Create recipe list cache uses its public resource
+reload listener; native stonecutting initially selected andesite ladder instead
+of the intended cutting recipe. The final crash fixture selects shaft using
+Create's public output filter, recreates only its dedicated machine positions,
+and resets its synthetic inventory before saving. No provider matching or private
+cache is patched. Production files/processes/world/ledger were untouched.
+
+Full port remains active: other Create processes/assembly, pre-admission and
+broader process kill points, financial backup/rollback matrices, NeoProtect/
+GriefLogger attribution, missing legacy content/quest provenance and integrated
+physical VR/non-VR acceptance remain required. No atomic transaction between
+world, FTB and evidence files or unrestricted rollback acceptance is claimed.

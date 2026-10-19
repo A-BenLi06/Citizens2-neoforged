@@ -6,6 +6,8 @@
   "mixins": [
     "FtbRewardClaimMixin",
     "CreateMillstoneEvidenceMixin",
+    "CreateSawEvidenceMixin",
+    "CreateCrushingEvidenceMixin",
     "GuardVillagersOwnershipMixin",
     "ResultSlotMixin",
     "EntityFluidPushMixin",

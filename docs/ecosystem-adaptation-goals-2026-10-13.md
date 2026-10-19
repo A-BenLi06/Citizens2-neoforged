@@ -29,6 +29,14 @@ Exact artifact sources, SHA-512/SHA-256 hashes and installation paths are record
 
 ## Ordered adaptation backlog
 
+Progress 2026-10-19, UTC+08:00: [native saw/crushing evidence](create-batch-evidence-2026-10-19.md)
+extends attributed FTB completion to actual batch cutting, crushing and the native
+milling fallback. Complete random outputs and native remainder callback semantics
+are retained; truncated/lost outputs and storage failures require review. Actual
+JVM termination covers PREPARED, CONFIRMED and APPLIED with separately saved old
+world/FTB data. Other machines/assembly, all kill points, arbitrary backup rollback
+and integrated physical clients remain required under CRAFT-03–05 and ADAPT-11.
+
 Progress 2026-10-18, UTC+08:00: [native monetary rewards](ftb-monetary-rewards-2026-10-18.md)
 bind explicit CustomRewards to configured exact Economy amounts. Durable pre-reset
 intent, native acceptance, immutable beneficiary and public receipt replay cover

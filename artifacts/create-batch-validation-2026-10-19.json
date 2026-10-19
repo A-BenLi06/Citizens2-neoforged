@@ -1,0 +1,115 @@
+{
+  "createdAt": "2026-10-19T10:43:01.5184299+08:00",
+  "timezone": "UTC+08:00",
+  "baseline": "21.1.233",
+  "selected": "21.1.248",
+  "provider": {
+    "version": "6.0.10-mc1.21.1-performance-v6",
+    "sha256": "5602a16796957cb5c7fb829c10c6b54bf9d228931c7680636710b6a60d92822e"
+  },
+  "ordinaryTests": {
+    "tests": 767.0,
+    "failures": 0.0,
+    "errors": 0.0,
+    "skipped": 0.0
+  },
+  "native": {
+    "create233": 54,
+    "batch233": 23,
+    "create248": 54,
+    "batch248": 23,
+    "absentCreate233": 141
+  },
+  "actualJvmTermination": [
+    {
+      "stage": "prepared",
+      "checks": 6,
+      "result": "REVIEW/MISSING; operator rejection; zero progress"
+    },
+    {
+      "stage": "confirmed",
+      "checks": 6,
+      "result": "Explicit absolute reconciliation once; independent old world input retained"
+    },
+    {
+      "stage": "applied",
+      "checks": 6,
+      "result": "Old world/FTB data retained; no silent repair; reprocessing admission fenced"
+    }
+  ],
+  "packages": [
+    {
+      "name": "citizens-2.0.43-neoforge-SNAPSHOT-sources.jar",
+      "sha256": "f240a20599eda4ff1890e7216fe149d826f3f9a69284dd4be92c98f6d1d6acc5",
+      "bytes": 1079567,
+      "probesAndProviderClassesAbsent": true,
+      "independentModContents": true
+    },
+    {
+      "name": "citizens-2.0.43-neoforge-SNAPSHOT.jar",
+      "sha256": "ff473df25b69583ae5769c591f6372773ba1ac1cde63b7b357a7f52bdbed6b4a",
+      "bytes": 3962714,
+      "probesAndProviderClassesAbsent": true,
+      "independentModContents": true
+    },
+    {
+      "name": "yuuniverse-interactions-2.0.43-neoforge-SNAPSHOT.jar",
+      "sha256": "0252e57a1a97c740493c74ae186569414a553b23900fad7b03f51de86df7341a",
+      "bytes": 204123,
+      "probesAndProviderClassesAbsent": true,
+      "independentModContents": true
+    }
+  ],
+  "logs": [
+    {
+      "name": "create-batch-baseline-2026-10-19.log",
+      "sha256": "726704b73af71385489619a2176d90a5fabf28e38a951160a3b0896baa58544b"
+    },
+    {
+      "name": "create-batch-selected-2026-10-19.log",
+      "sha256": "14dd6587804f3dce61aa2ae8b440bc053444ef39ebe3ee790c97b855bd3c41d5"
+    },
+    {
+      "name": "create-batch-absent-2026-10-19.log",
+      "sha256": "c7b10bb7643fa6d4921d04ffbd9efd090a09a7bd60721d1069979adbcae07913"
+    },
+    {
+      "name": "create-batch-release-2026-10-19.log",
+      "sha256": "de8a40586059b93188a707fe86855e27c33fc5ff5ee115a42328ad739a331be4"
+    },
+    {
+      "name": "machine-crash-prepared-killed.log",
+      "sha256": "e42d8dbc03b0714770a2a23dab49a3561917d9ce36df1a5b39eb15f3acc0e646"
+    },
+    {
+      "name": "machine-crash-prepared-recovered.log",
+      "sha256": "2bedd646b11cc0c6c229c9802f7ee989656d30e8b0ff42b580843507c2045577"
+    },
+    {
+      "name": "machine-crash-confirmed-killed.log",
+      "sha256": "ed998eed68cd42cdb931ad69491a0475e984dd853f6a8051e1c98a02540011ae"
+    },
+    {
+      "name": "machine-crash-confirmed-recovered.log",
+      "sha256": "9846aa84d1c39a48e6a880a4ad6e1c805b5b0ebab90eab610ca6de5590c1abfa"
+    },
+    {
+      "name": "machine-crash-applied-killed.log",
+      "sha256": "b188cae809a0211ee97cd9d21df8930bf3069d7c3c1377e31a5269c6576bfe14"
+    },
+    {
+      "name": "machine-crash-applied-recovered.log",
+      "sha256": "063c5d6c7d734a5415486af9fee3148e5314db213b34923aea66bdccfe4ef856"
+    }
+  ],
+  "productionTouched": false,
+  "goalComplete": false,
+  "remaining": [
+    "Other Create processes and assembly",
+    "Pre-admission and other machine process kill points",
+    "Financial backup and combined rollback matrices",
+    "NeoProtect/GriefLogger attribution and rollback",
+    "Legacy content and quest provenance",
+    "Physical VR/non-VR and combined migration acceptance"
+  ]
+}

@@ -102,7 +102,7 @@ public final class CraftQuestEvidence implements AutoCloseable {
         if (!target.visible() || target.state().maximum() <= 0) throw new IllegalArgumentException("Task is unavailable");
         var recipe = CraftingRecipes.find(server, recipeId).orElseThrow(() -> new IllegalArgumentException("Recipe is unavailable"));
         if (!recipe.tableEvidenceSupported() && (recipe.processing() == null
-                || recipe.processing().process() != CreateProcessingRecipes.Process.MILLING || recipe.output().isEmpty()))
+                || !CreateMachineEvidence.supports(recipe.processing().process()) || recipe.output().isEmpty()))
             throw new IllegalArgumentException("Recipe evidence is unsupported");
         Binding previous = bindings.get(target.state().taskId());
         if (previous != null) {

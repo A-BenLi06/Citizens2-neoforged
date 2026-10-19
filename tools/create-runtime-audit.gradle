@@ -16,6 +16,7 @@ allprojects {
             }
         }
         p.tasks.named('runServer') {
+            if (p.hasProperty('machineAuditPhase')) environment 'CITIZENS_MACHINE_AUDIT_PHASE', p.property('machineAuditPhase')
             timeout = java.time.Duration.ofMinutes(3)
             doLast {
                 def log = new File(fixture, 'logs/latest.log').getText('UTF-8')

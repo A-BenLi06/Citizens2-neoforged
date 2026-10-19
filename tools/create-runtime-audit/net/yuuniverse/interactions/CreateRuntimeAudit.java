@@ -40,6 +40,12 @@ public final class CreateRuntimeAudit {
         var server=event.getServer(); var level=server.overworld();
         level.setChunkForced(0,0,true);
         if(server.getTickCount()<20 || !level.isPositionEntityTicking(new BlockPos(1,-60,1))) return;
+        var crashPhase = System.getenv("CITIZENS_MACHINE_AUDIT_PHASE");
+        if (crashPhase != null) {
+            ran = true;
+            MachineCrashRuntimeAudit.run(server, crashPhase);
+            return;
+        }
         try {
             var id=ResourceLocation.parse("citizens_audit:create_milling");
             if(reload==null) {
@@ -59,6 +65,7 @@ public final class CreateRuntimeAudit {
                     "actual_resource_reload_invalidates_create_revision");
             recipes(server);
             machines(server);
+            BatchMachineRuntimeAudit.run(server);
             LoggerFactory.getLogger("interactions").info("[CREATEAUDIT] COMPLETE {} checks",passed);
         } catch(Throwable failure) {
             ran=true; LoggerFactory.getLogger("interactions").error("[CREATEAUDIT] FAILED",failure);
@@ -219,7 +226,7 @@ public final class CreateRuntimeAudit {
     private static void clearOutput(com.simibubi.create.content.kinetics.millstone.MillstoneBlockEntity mill) {
         for(int i=0;i<mill.outputInv.getSlots();i++) mill.outputInv.extractItem(i,Integer.MAX_VALUE,false);
     }
-    private static io.netty.channel.embedded.EmbeddedChannel connect(net.minecraft.server.level.ServerPlayer player) {
+    static io.netty.channel.embedded.EmbeddedChannel connect(net.minecraft.server.level.ServerPlayer player) {
         var connection=new net.minecraft.network.Connection(net.minecraft.network.protocol.PacketFlow.SERVERBOUND);
         var channel=new io.netty.channel.embedded.EmbeddedChannel(new io.netty.channel.ChannelInitializer<io.netty.channel.Channel>() {
             @Override protected void initChannel(io.netty.channel.Channel channel) {

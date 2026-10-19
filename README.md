@@ -62,6 +62,10 @@ native result takes to the actual recipe holder, actor and complete output batch
 [Explicit FTB craft bindings](docs/ftb-craft-evidence-projection-2026-10-18.md) apply
 confirmed recipe evidence to owned CustomTasks with stable generations and
 authenticated review. Monetary rewards and crash/rollback acceptance remain required.
+[Create batch evidence](docs/create-batch-evidence-2026-10-19.md) extends native
+machine completion to saw cutting and crushing-wheel crushing/milling, preserving
+actual random outputs and remainders. Real JVM termination/restart exercises
+durable phases and independently saved world/FTB rollback fences.
 
 The existing configuration, shop and text-input GUIs use vanilla container,
 merchant and anvil protocols. They do not introduce a Citizens-specific client

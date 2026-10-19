@@ -21,7 +21,7 @@ import net.neoforged.neoforge.items.IItemHandler;
 import net.neoforged.neoforge.registries.DeferredRegister;
 import net.neoforged.neoforge.registries.NeoForgeRegistries;
 
-/** Create millstone completion observations with explicitly assigned online beneficiaries. */
+/** Pinned native Create machine completion observations with explicitly assigned online beneficiaries. */
 public final class CreateMachineEvidence {
     private static final org.slf4j.Logger LOGGER = org.slf4j.LoggerFactory.getLogger(CreateMachineEvidence.class);
     private static final DeferredRegister<AttachmentType<?>> ATTACHMENTS = DeferredRegister.create(NeoForgeRegistries.ATTACHMENT_TYPES, "citizens");
@@ -45,27 +45,49 @@ public final class CreateMachineEvidence {
         }
     }
 
-    public enum Source { CREATE_MILLSTONE }
+    public enum Source {
+        CREATE_MILLSTONE("com.simibubi.create.content.kinetics.millstone.MillstoneBlockEntity"),
+        CREATE_SAW("com.simibubi.create.content.kinetics.saw.SawBlockEntity"),
+        CREATE_CRUSHING_WHEELS("com.simibubi.create.content.kinetics.crusher.CrushingWheelControllerBlockEntity");
+        private final String implementation;
+        Source(String implementation) { this.implementation = implementation; }
+        public boolean supports(CreateProcessingRecipes.Process process) {
+            return switch (this) {
+                case CREATE_MILLSTONE -> process == CreateProcessingRecipes.Process.MILLING;
+                case CREATE_SAW -> process == CreateProcessingRecipes.Process.CUTTING;
+                case CREATE_CRUSHING_WHEELS -> process == CreateProcessingRecipes.Process.CRUSHING || process == CreateProcessingRecipes.Process.MILLING;
+            };
+        }
+    }
+    public static boolean supports(CreateProcessingRecipes.Process process) {
+        return java.util.Arrays.stream(Source.values()).anyMatch(source -> source.supports(process));
+    }
     public record Observation(UUID id, Attribution attribution, ResourceLocation dimension, BlockPos position, long serverTick,
             Source source, CraftingRecipes.Snapshot recipe, ItemStack consumedInput, ItemStack remainingInput, ItemStack nativeRemainder,
-            List<ItemStack> beforeOutput, List<ItemStack> rolledOutputs) {
+            List<ItemStack> beforeOutput, List<ItemStack> rolledOutputs, List<ItemStack> additionalRemainders) {
+        public Observation(UUID id, Attribution attribution, ResourceLocation dimension, BlockPos position, long serverTick,
+                Source source, CraftingRecipes.Snapshot recipe, ItemStack consumedInput, ItemStack remainingInput, ItemStack nativeRemainder,
+                List<ItemStack> beforeOutput, List<ItemStack> rolledOutputs) {
+            this(id, attribution, dimension, position, serverTick, source, recipe, consumedInput, remainingInput, nativeRemainder, beforeOutput, rolledOutputs, List.of());
+        }
         public Observation {
             position = position.immutable(); consumedInput = consumedInput.copy(); remainingInput = remainingInput.copy();
-            nativeRemainder = nativeRemainder.copy(); beforeOutput = copies(beforeOutput); rolledOutputs = copies(rolledOutputs);
+            nativeRemainder = nativeRemainder.copy(); beforeOutput = copies(beforeOutput); rolledOutputs = copies(rolledOutputs); additionalRemainders = copies(additionalRemainders);
         }
         @Override public ItemStack consumedInput() { return consumedInput.copy(); }
         @Override public ItemStack remainingInput() { return remainingInput.copy(); }
         @Override public ItemStack nativeRemainder() { return nativeRemainder.copy(); }
         @Override public List<ItemStack> beforeOutput() { return copies(beforeOutput); }
         @Override public List<ItemStack> rolledOutputs() { return copies(rolledOutputs); }
+        @Override public List<ItemStack> additionalRemainders() { return copies(additionalRemainders); }
     }
 
-    /** Authenticated administrators assign an existing loaded millstone; existing assignments require an explicit clear. */
+    /** Authenticated administrators assign an existing supported machine; replacement requires an explicit clear. */
     public static Attribution assign(CommandSourceStack source, UUID beneficiaryId, BlockPos position) {
         authorize(source); var level = source.getLevel();
         if (!level.hasChunkAt(position)) throw new IllegalArgumentException("Machine chunk is not loaded");
         var machine = level.getBlockEntity(position);
-        if (machine == null || !millstone(machine)) throw new IllegalArgumentException("Supported machine is unavailable");
+        if (machine == null || source(machine) == null) throw new IllegalArgumentException("Supported machine is unavailable");
         if (attribution(machine) != null) throw new IllegalStateException("Machine already has an assignment");
         var beneficiary = source.getServer().getPlayerList().getPlayer(beneficiaryId);
         if (beneficiary == null || beneficiary.hasDisconnected() || beneficiary instanceof net.neoforged.neoforge.common.util.FakePlayer)
@@ -78,7 +100,7 @@ public final class CreateMachineEvidence {
         authorize(source);
         if (!source.getLevel().hasChunkAt(position)) throw new IllegalArgumentException("Machine chunk is not loaded");
         var machine = source.getLevel().getBlockEntity(position);
-        if (machine == null || !millstone(machine)) throw new IllegalArgumentException("Supported machine is unavailable");
+        if (machine == null || source(machine) == null) throw new IllegalArgumentException("Supported machine is unavailable");
         machine.removeData(ATTRIBUTION); machine.setChanged();
     }
 
@@ -88,7 +110,7 @@ public final class CreateMachineEvidence {
         return machine.getExistingData(ATTRIBUTION).flatMap(value -> value).orElse(null);
     }
 
-    /** Called only by the pinned millstone process wrapper; native matching/consumption/RNG are unchanged. */
+    /** Called only by pinned process wrappers; native matching/consumption/RNG are unchanged. */
     public static void duringProcess(BlockEntity machine, Runnable original) {
         Scope scope = new Scope(machine);
         SCOPES.get().push(scope); boolean returned = false;
@@ -103,6 +125,63 @@ public final class CreateMachineEvidence {
                 catch (RuntimeException | LinkageError failure) { LOGGER.error("Machine outcome listener failed for {}", scope.observation.id(), failure); }
             }
         }
+    }
+
+    /** Save the whole native batch before ProcessingInventory.clear; no alternative recipe is selected. */
+    public static void beforeBatchClear() {
+        Scope scope = SCOPES.get().peek();
+        if (scope == null || scope.input != null || source(scope.machine) == Source.CREATE_MILLSTONE) return;
+        try {
+            var before = inventory(scope.machine, "inventory");
+            if (before.isEmpty() || before.getFirst().isEmpty()) return;
+            scope.input = before.getFirst().copy(); scope.remainingInput = ItemStack.EMPTY;
+            scope.beforeOutput = copies(before.subList(1, before.size())); scope.remainder = ItemStack.EMPTY;
+        } catch (ReflectiveOperationException | RuntimeException failure) { LOGGER.error("Batch input observation failed", failure); }
+    }
+
+    /** Retain every actual roll before the provider merges or mutates its result stacks. */
+    public static void batchRolled(Object recipe, List<ItemStack> outputs) {
+        Scope scope = SCOPES.get().peek(); if (scope == null || scope.input == null) return;
+        if (scope.batchRecipe != null && scope.batchRecipe != recipe) { scope.invalidBatch = true; return; }
+        try {
+            scope.batchRecipe = recipe; scope.rolls++; scope.batchOutputs.addAll(copies(outputs));
+        } catch (RuntimeException | LinkageError failure) {
+            scope.invalidBatch = true; LOGGER.error("Batch roll observation failed", failure);
+        }
+    }
+    public static void batchRemainder(ItemStack remainder) {
+        Scope scope = SCOPES.get().peek(); if (scope == null) return;
+        try { if (!remainder.isEmpty()) scope.batchRemainders.add(remainder.copy()); }
+        catch (RuntimeException | LinkageError failure) {
+            scope.invalidBatch = true; LOGGER.error("Batch remainder observation failed", failure);
+        }
+    }
+    /** All native rolls/remainders are complete at the first output-slot write. Persist evidence before storage. */
+    public static void beforeBatchStorage() {
+        Scope scope = SCOPES.get().peek();
+        if (scope == null || scope.input == null || scope.observation != null || scope.batchRecipe == null || scope.invalidBatch
+                || scope.rolls != scope.input.getCount() || !(scope.machine.getLevel() instanceof ServerLevel level)) return;
+        try {
+            var selected = currentRecipe(scope.machine, scope.batchRecipe); if (selected == null) return;
+            var assignment = attribution(scope.machine); ServerPlayer actor = beneficiary(scope.machine, assignment); if (actor == null) return;
+            var remainders = scope.batchRemainders;
+            scope.observation = new Observation(UUID.randomUUID(), assignment, level.dimension().location(), scope.machine.getBlockPos(),
+                    level.getServer().getTickCount(), source(scope.machine), selected, scope.input, ItemStack.EMPTY,
+                    remainders.isEmpty() ? ItemStack.EMPTY : remainders.getFirst(), scope.beforeOutput, scope.batchOutputs,
+                    remainders.size() < 2 ? List.of() : remainders.subList(1, remainders.size()));
+            NeoForge.EVENT_BUS.post(new MachineResultEvent(actor, scope.observation));
+        } catch (RuntimeException | LinkageError failure) { LOGGER.error("Batch result observation failed", failure); }
+    }
+    public static void afterBatchStorage() {
+        Scope scope = SCOPES.get().peek(); if (scope == null || scope.observation == null) return;
+        try {
+            var expected = new java.util.ArrayList<>(scope.observation.rolledOutputs());
+            if (!scope.observation.nativeRemainder().isEmpty()) expected.add(scope.observation.nativeRemainder());
+            expected.addAll(scope.observation.additionalRemainders());
+            var stored = inventory(scope.machine, "inventory");
+            scope.verified = live(scope.machine) && scope.beforeOutput.stream().allMatch(ItemStack::isEmpty)
+                    && stored.getFirst().isEmpty() && equalMultiset(expected, stored);
+        } catch (ReflectiveOperationException | RuntimeException | LinkageError failure) { LOGGER.error("Batch inventory verification failed", failure); }
     }
 
     /** Saves the exact pre-consumption input, without re-running matching or selecting a recipe. */
@@ -130,10 +209,7 @@ public final class CreateMachineEvidence {
             ServerPlayer beneficiary = server.getPlayerList().getPlayer(attribution.beneficiaryId());
             if (beneficiary == null || beneficiary.hasDisconnected() || beneficiary instanceof net.neoforged.neoforge.common.util.FakePlayer) return;
             // Identity must be the actual current holder. Create can retain a recipe across resource reload.
-            var holders = server.getRecipeManager().getRecipes().stream().filter(holder -> holder.value() == recipe).toList();
-            if (holders.size() != 1) return;
-            var snapshot = CraftingRecipes.find(server, holders.getFirst().id()).orElseThrow();
-            if (snapshot.processing() == null || snapshot.processing().process() != CreateProcessingRecipes.Process.MILLING) return;
+            var snapshot = currentRecipe(scope.machine, recipe); if (snapshot == null) return;
             scope.beforeOutput = inventory(scope.machine, "outputInv");
             scope.observation = new Observation(UUID.randomUUID(), attribution, level.dimension().location(), scope.machine.getBlockPos(),
                     server.getTickCount(), Source.CREATE_MILLSTONE, snapshot, scope.input, scope.remainingInput, scope.remainder, scope.beforeOutput, outputs);
@@ -172,6 +248,10 @@ public final class CreateMachineEvidence {
         root.add("consumedInput", ItemStack.CODEC.encodeStart(ops, observation.consumedInput()).getOrThrow());
         root.add("remainingInput", ItemStack.OPTIONAL_CODEC.encodeStart(ops, observation.remainingInput()).getOrThrow());
         root.add("nativeRemainder", ItemStack.OPTIONAL_CODEC.encodeStart(ops, observation.nativeRemainder()).getOrThrow());
+        var remainders = new com.google.gson.JsonArray();
+        for (var stack : observation.additionalRemainders()) remainders.add(ItemStack.CODEC.encodeStart(ops, stack).getOrThrow());
+        // Keep the original single-remainder encoding stable for retained observations.
+        if (!remainders.isEmpty()) root.add("additionalRemainders", remainders);
         var before = new com.google.gson.JsonArray();
         for (var stack : observation.beforeOutput()) before.add(ItemStack.OPTIONAL_CODEC.encodeStart(ops, stack).getOrThrow());
         root.add("beforeOutput", before);
@@ -196,7 +276,26 @@ public final class CreateMachineEvidence {
         }
         return remaining.stream().allMatch(ItemStack::isEmpty);
     }
-    private static boolean millstone(BlockEntity machine) { return machine.getClass().getName().equals("com.simibubi.create.content.kinetics.millstone.MillstoneBlockEntity"); }
+    private static Source source(BlockEntity machine) {
+        return java.util.Arrays.stream(Source.values()).filter(value -> value.implementation.equals(machine.getClass().getName())).findFirst().orElse(null);
+    }
+    private static boolean live(BlockEntity machine) {
+        return machine.getLevel() instanceof ServerLevel level && level.getServer().isSameThread() && !machine.isRemoved()
+                && level.getBlockEntity(machine.getBlockPos()) == machine;
+    }
+    private static ServerPlayer beneficiary(BlockEntity machine, Attribution assignment) {
+        if (!live(machine) || assignment == null) return null;
+        var actor = ((ServerLevel) machine.getLevel()).getServer().getPlayerList().getPlayer(assignment.beneficiaryId());
+        return actor == null || actor.hasDisconnected() || actor instanceof net.neoforged.neoforge.common.util.FakePlayer ? null : actor;
+    }
+    private static CraftingRecipes.Snapshot currentRecipe(BlockEntity machine, Object recipe) {
+        if (!live(machine)) return null;
+        var server = ((ServerLevel) machine.getLevel()).getServer();
+        var holders = server.getRecipeManager().getRecipes().stream().filter(holder -> holder.value() == recipe).toList();
+        if (holders.size() != 1) return null;
+        var snapshot = CraftingRecipes.find(server, holders.getFirst().id()).orElseThrow();
+        return snapshot.processing() != null && source(machine).supports(snapshot.processing().process()) ? snapshot : null;
+    }
     private static List<ItemStack> copies(List<ItemStack> stacks) { return stacks.stream().map(ItemStack::copy).toList(); }
     private static void authorize(CommandSourceStack source) {
         if (source == null || !source.getServer().isSameThread() || !PermissionUtil.hasPermission(source, "citizens.admin")
@@ -206,6 +305,8 @@ public final class CreateMachineEvidence {
     }
     private static final class Scope {
         final BlockEntity machine; ItemStack input; ItemStack remainingInput; ItemStack remainder; List<ItemStack> beforeOutput; Observation observation; boolean verified;
+        Object batchRecipe; int rolls; boolean invalidBatch;
+        final List<ItemStack> batchOutputs = new java.util.ArrayList<>(), batchRemainders = new java.util.ArrayList<>();
         Scope(BlockEntity machine) { this.machine = machine; }
     }
 }

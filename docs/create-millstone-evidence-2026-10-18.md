@@ -6,6 +6,11 @@ eleven processing types available for recipe guidance. Crushing, mixing, pressin
 cutting, fan processing, deploying, filling, emptying, mechanical grids and assembly
 do not yet provide attributed task evidence through this adapter.
 
+The [October 19 batch adapter](create-batch-evidence-2026-10-19.md) adds mechanical
+saw cutting and crushing-wheel crushing/milling evidence plus actual JVM
+termination/restart validation. Its supported processes supersede the exclusions
+above; other machine and assembly evidence remains open.
+
 The pack rule is explicit assignment to an online beneficiary. Create's advancement
 owner is temporary and can clear once advancements are awarded; it is not used as a
 durable machine owner. An authenticated operator with `citizens.admin` assigns an
