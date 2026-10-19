@@ -67,6 +67,11 @@ machine completion to saw cutting and crushing-wheel crushing/milling, preservin
 actual random outputs and remainders. Real JVM termination/restart exercises
 durable phases and independently saved world/FTB rollback fences.
 
+[NeoProtect/GriefLogger attribution](docs/logging-attribution-2026-10-19.md)
+retains independent native histories, corrects duplicate multi-block placement
+records and verifies world rollback against committed Economy receipts. Retention,
+hard-kill/load and integrated client acceptance remain in the backlog.
+
 The existing configuration, shop and text-input GUIs use vanilla container,
 merchant and anvil protocols. They do not introduce a Citizens-specific client
 screen. Actual clients and other content/camera/quest mods have separate

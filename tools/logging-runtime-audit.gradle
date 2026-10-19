@@ -1,0 +1,34 @@
+allprojects {
+    afterEvaluate { p ->
+        if (p.extensions.findByName('neoForge') == null) return
+        def fixture = p.file('../artifacts/logging-audit-server')
+        def phase = p.findProperty('loggingAuditPhase') ?: 'native'
+        if (!(phase in ['native', 'recover'])) throw new GradleException('Unknown logging audit phase')
+        p.sourceSets.dialogue.java.srcDir(p.file('../tools/logging-runtime-audit'))
+        p.sourceSets.dialogue.compileClasspath += p.files(p.fileTree(new File(fixture, 'mods')) { include '*.jar' },
+                p.fileTree(new File(fixture, 'compile-libs')) { include '*.jar' })
+        p.neoForge.runs.named('server') { gameDirectory = fixture }
+        p.tasks.named('prepareServerRun') {
+            doLast {
+                def marker = new File(fixture, 'logging-audit-fixture.txt')
+                if (!marker.isFile() || marker.getText('UTF-8').trim() != 'citizens-logging-audit')
+                    throw new GradleException('Missing or incorrect logging fixture marker')
+                if (phase == 'recover' && !new File(fixture, 'logging-restart-state.json').isFile())
+                    throw new GradleException('Run the native logging phase before recovery')
+                def properties = new Properties()
+                new File(fixture, 'server.properties').withInputStream { properties.load(it) }
+                for (entry in ['server-ip':'127.0.0.1', 'server-port':'25632', 'level-name':'logging-world'])
+                    if (properties.getProperty(entry.key) != entry.value) throw new GradleException('Unexpected logging fixture properties')
+            }
+        }
+        p.tasks.named('runServer') {
+            environment 'CITIZENS_LOGGING_AUDIT_PHASE', phase
+            timeout = java.time.Duration.ofMinutes(3)
+            doLast {
+                def log = new File(fixture, 'logs/latest.log').getText('UTF-8')
+                if (log.contains('[LOGGINGAUDIT] FAILED') || !log.contains('[LOGGINGAUDIT] COMPLETE'))
+                    throw new GradleException('Logging audit failed or incomplete')
+            }
+        }
+    }
+}

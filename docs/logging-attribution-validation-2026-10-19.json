@@ -1,0 +1,172 @@
+{
+  "createdAt": "2026-10-19T14:02:34+08:00",
+  "timezone": "UTC+08:00",
+  "baseline": "21.1.233",
+  "selected": "21.1.248",
+  "scope": "ADAPT-09 native attribution and world/commerce rollback follow-up",
+  "native": {
+    "loggingSelected": 37,
+    "cleanRestartSelected": 8,
+    "absentProvidersBaseline": 141
+  },
+  "ordinaryTests": {
+    "baseline": {
+      "tests": 767,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    "selected": {
+      "tests": 767,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    }
+  },
+  "providers": [
+    {
+      "path": "artifacts/logging-audit-server/mods/architectury-13.0.11-neoforge.jar",
+      "sha256": "9cc92f2c09533fc5482c60f993bd891c655a0e32b637037cdcb7c2b23adedeeb",
+      "bytes": 584734
+    },
+    {
+      "path": "artifacts/logging-audit-server/mods/create.jar",
+      "sha256": "5602a16796957cb5c7fb829c10c6b54bf9d228931c7680636710b6a60d92822e",
+      "bytes": 19138095
+    },
+    {
+      "path": "artifacts/logging-audit-server/mods/economy.jar",
+      "sha256": "179115e5301ee6629acd3bdcbb6779d2549a35f7493821ab0fca79bcc43645f5",
+      "bytes": 14431850
+    },
+    {
+      "path": "artifacts/logging-audit-server/mods/grieflogger-1.2.10-1.21.1-yuuniverse.1-neoforge.jar",
+      "sha256": "a897f22fca7705144b26749f7baa097b4e1cc0d16eed1ddeed3a9fed270806e0",
+      "bytes": 18915537
+    },
+    {
+      "path": "artifacts/logging-audit-server/mods/neoprotect-1.0.4-mc1.21.1-neoforge.jar",
+      "sha256": "2cbcec7aeef26ef3f5b54dae90fc16da353a1534462353b9f516d7d2e0a138ce",
+      "bytes": 2614693
+    },
+    {
+      "path": "artifacts/logging-audit-server/mods/supermartijn642configlib-1.1.8-neoforge-mc1.21.jar",
+      "sha256": "d2ba7b839a2268e4e223457e813d11aa2476c3bf708a7bba691d8fc851778a4b",
+      "bytes": 207514
+    }
+  ],
+  "packages": [
+    {
+      "path": "artifacts/logging-release-baseline-jars-2026-10-19/citizens-2.0.43-neoforge-SNAPSHOT-sources.jar",
+      "sha256": "e1775c9d3a77ec26111595bf06435483e2e99318a3f837e91cb9ea53e4d3e2e6",
+      "bytes": 1080544,
+      "neoForge": "21.1.233",
+      "probesAndProviderClassesAbsent": true,
+      "independentModContents": true
+    },
+    {
+      "path": "artifacts/logging-release-baseline-jars-2026-10-19/citizens-2.0.43-neoforge-SNAPSHOT.jar",
+      "sha256": "abb29aa354cb5ac3cb1ae8f007de6423540bd470fd1b2b62f70c61e5280522b4",
+      "bytes": 3964037,
+      "neoForge": "21.1.233",
+      "probesAndProviderClassesAbsent": true,
+      "independentModContents": true
+    },
+    {
+      "path": "artifacts/logging-release-baseline-jars-2026-10-19/yuuniverse-interactions-2.0.43-neoforge-SNAPSHOT.jar",
+      "sha256": "6ee527ebb042a4188bba861431352af1fff59e73d51a66015281535b91bd144d",
+      "bytes": 204123,
+      "neoForge": "21.1.233",
+      "probesAndProviderClassesAbsent": true,
+      "independentModContents": true
+    },
+    {
+      "path": "artifacts/logging-isolated-build/libs/citizens-2.0.43-neoforge-SNAPSHOT-sources.jar",
+      "sha256": "9c41c32e129d24a47b159c352f9634fcc5cafb5e43e4b7840862b0775b5bb6e8",
+      "bytes": 1080544,
+      "neoForge": "21.1.248",
+      "probesAndProviderClassesAbsent": true,
+      "independentModContents": true
+    },
+    {
+      "path": "artifacts/logging-isolated-build/libs/citizens-2.0.43-neoforge-SNAPSHOT.jar",
+      "sha256": "9517d2b7f454bffbc173662c36ca6976d109b75d5d5a6a60ee3f6c0888703efa",
+      "bytes": 3964037,
+      "neoForge": "21.1.248",
+      "probesAndProviderClassesAbsent": true,
+      "independentModContents": true
+    },
+    {
+      "path": "artifacts/logging-isolated-build/libs/yuuniverse-interactions-2.0.43-neoforge-SNAPSHOT.jar",
+      "sha256": "75df54edfd8ff665662cc863ff48521613f69c86b141399f348153b935458748",
+      "bytes": 204123,
+      "neoForge": "21.1.248",
+      "probesAndProviderClassesAbsent": true,
+      "independentModContents": true
+    }
+  ],
+  "logs": [
+    {
+      "path": "artifacts/logging-final-native-248-2026-10-19.log",
+      "sha256": "c9b1f4fac30467642ad92aa060801f579d42380e477e004c7788d9c7d8bbd01d",
+      "bytes": 17822
+    },
+    {
+      "path": "artifacts/logging-final-restart-248-2026-10-19.log",
+      "sha256": "8582e8029381f9ef1fa6499012caa9d2fc868f222cbf5d41b14e87cce25080e2",
+      "bytes": 13228
+    },
+    {
+      "path": "artifacts/logging-absent-baseline-2026-10-19.log",
+      "sha256": "00b516f065e31ea434e25048d106b18324e73f07d71e1b90ba76a0ac4d6df00c",
+      "bytes": 86122
+    },
+    {
+      "path": "artifacts/logging-release-baseline-2026-10-19.log",
+      "sha256": "632f4c5fb1cb6441e0e8325cfd28dc5c85579c833323068a3630d026fb9e55d3",
+      "bytes": 67701
+    },
+    {
+      "path": "artifacts/logging-release-selected-2026-10-19.log",
+      "sha256": "ac920b6c6580384a518009cfb5e6aa8cc85be793014bf56d27316212bb835fac",
+      "bytes": 67754
+    }
+  ],
+  "productionActivated": false,
+  "baselineCombinedLoggingFixtureSupported": false,
+  "baselineCombinedLoggingFixtureReason": "Economy 0.5.6 requires NeoForge 21.1.247+",
+  "sourceFiles": [
+    {
+      "path": "neoforge/src/main/java/net/citizensnpcs/mixin/NeoProtectMultiPlaceMixin.java",
+      "sha256": "3b93014b72882728c906b8812e3bdb6d016a57360df77a4727d5f65af4ad0d86",
+      "bytes": 2026
+    },
+    {
+      "path": "neoforge/src/main/resources/citizens.mixins.json",
+      "sha256": "fcfdabbd6f7a56aa2b54bbe4f2b640fec3a0982f84579745631f795cf654a670",
+      "bytes": 1222
+    },
+    {
+      "path": "tools/logging-runtime-audit.gradle",
+      "sha256": "583284dbeaefafeb4403d27652d158bc4ede0a1a03fdbd6d36badc2979a2d01c",
+      "bytes": 2115
+    },
+    {
+      "path": "tools/logging-runtime-audit/net/yuuniverse/interactions/LoggingRuntimeAudit.java",
+      "sha256": "17b08f8438c80304b4de5584a34879e2377bb1ecb0af386a567420ac89129d49",
+      "bytes": 25798
+    },
+    {
+      "path": "tools/prepare-logging-audit.ps1",
+      "sha256": "ced55ff7e988e8f3fe37ef866c2006e090a2f5bfb9c71f30396d8bd83ada5606",
+      "bytes": 3320
+    }
+  ],
+  "remainingAcceptance": [
+    "Timed retention tooling",
+    "Queue overflow and storage failure",
+    "Hard process termination",
+    "Wider modded inventory/entity and fire/explosion attribution",
+    "Production load and physical VR/non-VR acceptance"
+  ]
+}

@@ -29,6 +29,14 @@ Exact artifact sources, SHA-512/SHA-256 hashes and installation paths are record
 
 ## Ordered adaptation backlog
 
+Progress 2026-10-19, UTC+08:00: [NeoProtect/GriefLogger attribution](logging-attribution-2026-10-19.md)
+fixes the reproduced duplicate multi-place log write while retaining shared events
+and native fire attribution. Native blocks, components, entity protection, operator
+permissions, bounded burst retention, finite Economy trade/receipt correlation and
+world rollback pass 37 checks; eight clean-restart checks retain original money,
+delivery and independent histories. Retention tooling, hard-kill/overflow/load and
+broader client/modded acceptance remain open under ADAPT-09/11.
+
 Progress 2026-10-19, UTC+08:00: [native saw/crushing evidence](create-batch-evidence-2026-10-19.md)
 extends attributed FTB completion to actual batch cutting, crushing and the native
 milling fallback. Complete random outputs and native remainder callback semantics
