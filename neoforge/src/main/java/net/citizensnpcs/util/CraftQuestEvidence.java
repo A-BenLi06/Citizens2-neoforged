@@ -148,10 +148,10 @@ public final class CraftQuestEvidence implements AutoCloseable {
         for (var output : observation.rolledOutputs())
             if (net.minecraft.world.item.ItemStack.isSameItemSameComponents(output, observation.recipe().output()))
                 units = Math.addExact(units, output.getCount());
-        if (observation.recipe().output().isEmpty() && observation.basin() != null
+        if (observation.recipe().output().isEmpty() && (observation.basin() != null || observation.fluid() != null)
                 && !observation.recipe().processing().fluidResults().isEmpty()) {
             var primary = observation.recipe().processing().fluidResults().getFirst();
-            for (var output : observation.basin().fluidOutputs())
+            for (var output : observation.basin() != null ? observation.basin().fluidOutputs() : observation.fluid().fluidOutputs())
                 if (net.neoforged.neoforge.fluids.FluidStack.isSameFluidSameComponents(output, primary))
                     units = Math.addExact(units, output.getAmount());
         }

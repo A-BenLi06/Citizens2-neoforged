@@ -1,0 +1,175 @@
+{
+  "createdAt": "2026-10-19T21:49:21+08:00",
+  "timezone": "UTC+08:00",
+  "provider": {
+    "path": "artifacts/create-provider-pinned.jar",
+    "sha256": "5602a16796957cb5c7fb829c10c6b54bf9d228931c7680636710b6a60d92822e",
+    "bytes": 19138095
+  },
+  "providerVersion": "6.0.10-mc1.21.1-performance-v6",
+  "native": {
+    "21.1.233": {
+      "create": 54,
+      "worldPress": 16,
+      "transportPress": 21,
+      "batch": 23,
+      "basin": 23,
+      "fluid": 28
+    },
+    "21.1.248": {
+      "create": 54,
+      "worldPress": 16,
+      "transportPress": 21,
+      "batch": 23,
+      "basin": 23,
+      "fluid": 28
+    },
+    "absentCreate233": 141
+  },
+  "ordinaryTests": {
+    "21.1.233": {
+      "tests": 767,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    "21.1.248": {
+      "tests": 767,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    }
+  },
+  "packages": [
+    {
+      "path": "artifacts/create-fluid-release-233-jars-2026-10-19/citizens-2.0.43-neoforge-SNAPSHOT-sources.jar",
+      "sha256": "10e1e7b030edc5d26a788bb6aa43b29d3b6d66badab3cbc52be184470db13c1b",
+      "bytes": 1098027,
+      "neoForge": "21.1.233",
+      "probeAndForeignProviderClassesAbsent": true,
+      "independentModContents": true
+    },
+    {
+      "path": "artifacts/create-fluid-release-233-jars-2026-10-19/citizens-2.0.43-neoforge-SNAPSHOT.jar",
+      "sha256": "268b519a49914e93e4ddabcb465db5b290973858b197938f312bdf49013f1e23",
+      "bytes": 4002263,
+      "neoForge": "21.1.233",
+      "probeAndForeignProviderClassesAbsent": true,
+      "independentModContents": true
+    },
+    {
+      "path": "artifacts/create-fluid-release-233-jars-2026-10-19/yuuniverse-interactions-2.0.43-neoforge-SNAPSHOT.jar",
+      "sha256": "e569bf57db3d4205ae5c3877ff7c790193aaa6bf8fe8e0496848834e56a6ef3a",
+      "bytes": 204123,
+      "neoForge": "21.1.233",
+      "probeAndForeignProviderClassesAbsent": true,
+      "independentModContents": true
+    },
+    {
+      "path": "artifacts/create-fluid-release-248-jars-2026-10-19/citizens-2.0.43-neoforge-SNAPSHOT-sources.jar",
+      "sha256": "19c963a30c0263cbc41335729387d4cfbc69ba0bbcf2630f370d9d5442abe43a",
+      "bytes": 1098027,
+      "neoForge": "21.1.248",
+      "probeAndForeignProviderClassesAbsent": true,
+      "independentModContents": true
+    },
+    {
+      "path": "artifacts/create-fluid-release-248-jars-2026-10-19/citizens-2.0.43-neoforge-SNAPSHOT.jar",
+      "sha256": "c5ac998fc04e886300f22ae0cff6360475cb9d4eabe59e8059962e120837f313",
+      "bytes": 4002263,
+      "neoForge": "21.1.248",
+      "probeAndForeignProviderClassesAbsent": true,
+      "independentModContents": true
+    },
+    {
+      "path": "artifacts/create-fluid-release-248-jars-2026-10-19/yuuniverse-interactions-2.0.43-neoforge-SNAPSHOT.jar",
+      "sha256": "81ace22b30363e6772a8ea183df6433c0cca78d88a33838e16887eebd38a90ca",
+      "bytes": 204123,
+      "neoForge": "21.1.248",
+      "probeAndForeignProviderClassesAbsent": true,
+      "independentModContents": true
+    }
+  ],
+  "logs": [
+    {
+      "path": "artifacts/create-fluid-final-native-233-2026-10-19.log",
+      "sha256": "cab718815b77c8995c19ed23378c60883b60636232d0a4f36f4316fbc55572d2",
+      "bytes": 41414
+    },
+    {
+      "path": "artifacts/create-fluid-final-native-248-2026-10-19.log",
+      "sha256": "b25cbb446ff543070fd7fcfe62f9be40579c68c8369aa3c035bbfb829704cc2b",
+      "bytes": 45956
+    },
+    {
+      "path": "artifacts/create-fluid-absent-2026-10-19.log",
+      "sha256": "1d0c059579c30705d5359ac3769a834fc1180a27861f223dcbf9d20c0de995ba",
+      "bytes": 90927
+    },
+    {
+      "path": "artifacts/create-fluid-release-233-2026-10-19.log",
+      "sha256": "5cca0abd35208c96d42062ef3861ba6b9fa8312cadd1f165e2cea40dbb5d1227",
+      "bytes": 69044
+    },
+    {
+      "path": "artifacts/create-fluid-release-248-2026-10-19.log",
+      "sha256": "d0216cb7d5f091a40687f765a3039d7d6ad4a6986d17aca600ba0326c1a006a7",
+      "bytes": 69044
+    }
+  ],
+  "sources": [
+    {
+      "path": "neoforge/src/main/java/net/citizensnpcs/util/CreateMachineEvidence.java",
+      "sha256": "9f8a6129b7e836689246f89a3f26899b5c28eb38226642ba1e0bc932762d43a7",
+      "bytes": 61238
+    },
+    {
+      "path": "neoforge/src/main/java/net/citizensnpcs/util/CraftQuestEvidence.java",
+      "sha256": "19bbb9e777990aadc91b3afe49eb1d651c598dcd46208b7ad40283a68f55c795",
+      "bytes": 20062
+    },
+    {
+      "path": "neoforge/src/main/java/net/citizensnpcs/mixin/CreateSpoutEvidenceMixin.java",
+      "sha256": "4a497fb95e128cb9032beb0530733a9c0f50703c473ff72f6598f60e8f06d2f3",
+      "bytes": 826
+    },
+    {
+      "path": "neoforge/src/main/java/net/citizensnpcs/mixin/CreateFillingEvidenceMixin.java",
+      "sha256": "ef6ba5bc9e0fb169b9e96649a32dbc9f88318f69c1bcfd99d3af48e90f9579ef",
+      "bytes": 1401
+    },
+    {
+      "path": "neoforge/src/main/java/net/citizensnpcs/mixin/CreateItemDrainEvidenceMixin.java",
+      "sha256": "c7465c5d78d9b7e5c7d4cdfb344d521eeb3f43e3bf7a129f013ac268308a2af7",
+      "bytes": 710
+    },
+    {
+      "path": "neoforge/src/main/java/net/citizensnpcs/mixin/CreateEmptyingEvidenceMixin.java",
+      "sha256": "406b078f1dae16a16988d9130dc6f07ac0a3837de593311ed12452c99d19eb54",
+      "bytes": 1437
+    },
+    {
+      "path": "neoforge/src/main/resources/citizens.mixins.json",
+      "sha256": "f1f46bc62283486655fbf72acbddaf4911237d33f80e169c25335e03058f8ee1",
+      "bytes": 1735
+    },
+    {
+      "path": "tools/create-runtime-audit/net/yuuniverse/interactions/FluidMachineRuntimeAudit.java",
+      "sha256": "b2c255d6eb896c4c308a658dbca808d76655ed379e10de8d562f8c7b489d1f9a",
+      "bytes": 22729
+    },
+    {
+      "path": "tools/create-runtime-audit/net/yuuniverse/interactions/CreateRuntimeAudit.java",
+      "sha256": "1213cbf64644bd32e7f4a4baa06cd7ba0c13dba9eeb6223931b2fd0261106f04",
+      "bytes": 27628
+    }
+  ],
+  "productionActivated": false,
+  "remaining": [
+    "Fan/deployer processing and sequenced assembly",
+    "Basin/transport/spout/drain-specific actual hard-kill and inventory rollback recovery",
+    "Wider party/repeat/offline/reconnect and financial backup matrix",
+    "Logging operations, legacy provenance and Paradigm inbound formatting",
+    "Physical VR/non-VR and integrated migration acceptance"
+  ]
+}

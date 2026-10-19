@@ -29,6 +29,13 @@ Exact artifact sources, SHA-512/SHA-256 hashes and installation paths are record
 
 ## Ordered adaptation backlog
 
+Progress 2026-10-19, UTC+08:00: [native filling/emptying evidence](create-fluid-machine-evidence-2026-10-19.md)
+adds scoped spout depot/belt storage and item-drain item/fluid confirmation. Actual
+execution rolls exclude drain simulation; exact final tank deltas fence failed
+capacity and changed inputs. Twenty-eight native checks cover quantities,
+components, generic exclusions, offline attribution, recipe replacement and journal
+reopen. Fan/deployer/assembly and wider recovery/client gates remain open.
+
 Progress 2026-10-19, UTC+08:00: [native basin evidence](create-basin-evidence-2026-10-19.md)
 adds actual mixing/compacting item/fluid consumption, native output/remainder and
 pending spout storage verification. Fluid-only tasks count actual primary
