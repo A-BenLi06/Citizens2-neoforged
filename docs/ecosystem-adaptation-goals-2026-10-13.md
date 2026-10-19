@@ -29,6 +29,13 @@ Exact artifact sources, SHA-512/SHA-256 hashes and installation paths are record
 
 ## Ordered adaptation backlog
 
+Progress 2026-10-19, UTC+08:00: [native deployer evidence](create-deployer-evidence-2026-10-19.md)
+confirms actual depot/belt recipe output only after native retained/damaged/consumed
+tool handling. Complete inventory and exact accepted remainder drops gate completion;
+native exceptions after output storage stay interrupted. Twenty-six native checks
+cover power, quantities/components, tool policies, mutations, offline attribution,
+duplicates and reopen. Fan/assembly and wider recovery/client gates remain open.
+
 Progress 2026-10-19, UTC+08:00: [native filling/emptying evidence](create-fluid-machine-evidence-2026-10-19.md)
 adds scoped spout depot/belt storage and item-drain item/fluid confirmation. Actual
 execution rolls exclude drain simulation; exact final tank deltas fence failed

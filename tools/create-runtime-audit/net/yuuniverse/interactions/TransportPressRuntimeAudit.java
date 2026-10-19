@@ -74,6 +74,7 @@ public final class TransportPressRuntimeAudit {
         var beltStart=new BlockPos(8,-60,5);var beltEnd=new BlockPos(8,-60,10);var beltMotorPos=beltStart.west();
         var oldBulk=AllConfigs.server().recipes.bulkPressing.get();recording=true;
         try {
+            clearEntities(level,depotPos);
             level.setBlockAndUpdate(pos,AllBlocks.MECHANICAL_PRESS.getDefaultState().setValue(BlockStateProperties.HORIZONTAL_FACING,Direction.EAST));
             var press=(MechanicalPressBlockEntity)level.getBlockEntity(pos);press.initialize();
             var motor=motor(level,motorPos);

@@ -18,6 +18,7 @@
     "CreateFillingEvidenceMixin",
     "CreateItemDrainEvidenceMixin",
     "CreateEmptyingEvidenceMixin",
+    "CreateDeployerEvidenceMixin",
     "CreateDepotEvidenceMixin",
     "CreateBeltInventoryEvidenceMixin",
     "CreateTransportOverflowMixin",

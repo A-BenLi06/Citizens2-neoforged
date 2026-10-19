@@ -53,6 +53,7 @@ public final class CreateMachineEvidence {
         CREATE_MIXER("com.simibubi.create.content.kinetics.mixer.MechanicalMixerBlockEntity"),
         CREATE_SPOUT("com.simibubi.create.content.fluids.spout.SpoutBlockEntity"),
         CREATE_ITEM_DRAIN("com.simibubi.create.content.fluids.drain.ItemDrainBlockEntity"),
+        CREATE_DEPLOYER("com.simibubi.create.content.kinetics.deployer.DeployerBlockEntity"),
         CREATE_CRUSHING_WHEELS("com.simibubi.create.content.kinetics.crusher.CrushingWheelControllerBlockEntity");
         private final String implementation;
         Source(String implementation) { this.implementation = implementation; }
@@ -64,6 +65,7 @@ public final class CreateMachineEvidence {
                 case CREATE_MIXER -> process == CreateProcessingRecipes.Process.MIXING;
                 case CREATE_SPOUT -> process == CreateProcessingRecipes.Process.FILLING;
                 case CREATE_ITEM_DRAIN -> process == CreateProcessingRecipes.Process.EMPTYING;
+                case CREATE_DEPLOYER -> process == CreateProcessingRecipes.Process.DEPLOYING;
                 case CREATE_CRUSHING_WHEELS -> process == CreateProcessingRecipes.Process.CRUSHING || process == CreateProcessingRecipes.Process.MILLING;
             };
         }
@@ -73,7 +75,13 @@ public final class CreateMachineEvidence {
     }
     public record Observation(UUID id, Attribution attribution, ResourceLocation dimension, BlockPos position, long serverTick,
             Source source, CraftingRecipes.Snapshot recipe, ItemStack consumedInput, ItemStack remainingInput, ItemStack nativeRemainder,
-            List<ItemStack> beforeOutput, List<ItemStack> rolledOutputs, List<ItemStack> additionalRemainders, UUID inputEntityId, BasinData basin, FluidData fluid) {
+            List<ItemStack> beforeOutput, List<ItemStack> rolledOutputs, List<ItemStack> additionalRemainders, UUID inputEntityId, BasinData basin, FluidData fluid, ToolData tool) {
+        public Observation(UUID id, Attribution attribution, ResourceLocation dimension, BlockPos position, long serverTick,
+                Source source, CraftingRecipes.Snapshot recipe, ItemStack consumedInput, ItemStack remainingInput, ItemStack nativeRemainder,
+                List<ItemStack> beforeOutput, List<ItemStack> rolledOutputs, List<ItemStack> additionalRemainders, UUID inputEntityId, BasinData basin, FluidData fluid) {
+            this(id, attribution, dimension, position, serverTick, source, recipe, consumedInput, remainingInput, nativeRemainder,
+                    beforeOutput, rolledOutputs, additionalRemainders, inputEntityId, basin, fluid, null);
+        }
         public Observation(UUID id, Attribution attribution, ResourceLocation dimension, BlockPos position, long serverTick,
                 Source source, CraftingRecipes.Snapshot recipe, ItemStack consumedInput, ItemStack remainingInput, ItemStack nativeRemainder,
                 List<ItemStack> beforeOutput, List<ItemStack> rolledOutputs, List<ItemStack> additionalRemainders, UUID inputEntityId, BasinData basin) {
@@ -107,6 +115,13 @@ public final class CreateMachineEvidence {
         @Override public List<ItemStack> beforeOutput() { return copies(beforeOutput); }
         @Override public List<ItemStack> rolledOutputs() { return copies(rolledOutputs); }
         @Override public List<ItemStack> additionalRemainders() { return copies(additionalRemainders); }
+    }
+
+    /** Pre-storage native deployer hand/inventory and the selected recipe's retention policy. */
+    public record ToolData(ItemStack held, List<ItemStack> inventory, boolean retained) {
+        public ToolData { held = held.copy(); inventory = copies(inventory); }
+        @Override public ItemStack held() { return held.copy(); }
+        @Override public List<ItemStack> inventory() { return copies(inventory); }
     }
 
     /** Native tank plan for spout filling and item-drain emptying; quantities use millibuckets. */
@@ -184,6 +199,10 @@ public final class CreateMachineEvidence {
                     catch (ReflectiveOperationException | RuntimeException | LinkageError failure) {
                         scope.verified = false; LOGGER.error("Fluid machine output verification failed", failure);
                     }
+                }
+                if (scope.observation.tool() != null && returned) {
+                    try { verifyTool(scope); }
+                    catch (RuntimeException | LinkageError failure) { scope.verified = false; LOGGER.error("Deployer tool verification failed", failure); }
                 }
                 var outcome = !returned ? MachineOutcomeEvent.Outcome.INTERRUPTED
                         : scope.verified ? MachineOutcomeEvent.Outcome.RETURNED : MachineOutcomeEvent.Outcome.UNCONFIRMED;
@@ -390,6 +409,67 @@ public final class CreateMachineEvidence {
         return result.get();
     }
 
+    /** Only the native held-item callback admits deployer operations; direct activate calls are unobserved. */
+    public static <T> T duringTransportDeployer(BlockEntity machine, Object input, Object handler, java.util.function.Supplier<T> original) {
+        if (!live(machine) || source(machine) != Source.CREATE_DEPLOYER) return original.get();
+        var result = new java.util.concurrent.atomic.AtomicReference<T>();
+        duringProcess(machine, () -> {
+            var scope = SCOPES.get().peek(); scope.transportInput = input;
+            scope.transportExpectedHolder = transportBlockEntity(handler); scope.worldBefore = transportedStack(input).copy();
+            scope.toolPlayer = deployerPlayer(machine); result.set(original.get());
+        });
+        return result.get();
+    }
+    private static net.minecraft.world.entity.player.Player deployerPlayer(BlockEntity machine) {
+        try { return (net.minecraft.world.entity.player.Player) machine.getClass().getMethod("getPlayer").invoke(machine); }
+        catch (ReflectiveOperationException failure) { throw new IllegalStateException("Unsupported Create deployer player", failure); }
+    }
+    private static List<ItemStack> playerInventory(net.minecraft.world.entity.player.Player player) {
+        var inventory = player.getInventory(); var stacks = new java.util.ArrayList<ItemStack>();
+        for (int slot = 0; slot < inventory.getContainerSize(); slot++) stacks.add(inventory.getItem(slot).copy());
+        return stacks;
+    }
+    public static void toolRemainder(ItemStack held, ItemStack remainder) {
+        var scope = SCOPES.get().peek(); if (scope == null || scope.toolBefore == null || scope.observation == null) return;
+        scope.invalidBatch |= held != scope.toolPlayer.getMainHandItem() || !ItemStack.matches(held, scope.toolBefore);
+        scope.toolRemainder = remainder.copy();
+    }
+    public static void duringToolDamage(ItemStack held, Runnable original) {
+        var scope = SCOPES.get().peek();
+        if (scope == null || scope.toolBefore == null || scope.observation == null) { original.run(); return; }
+        scope.invalidBatch |= held != scope.toolPlayer.getMainHandItem() || !ItemStack.matches(held, scope.toolBefore);
+        original.run(); scope.toolDamaged = scope.toolPlayer.getMainHandItem().copy();
+    }
+    public static void toolDropped(ItemStack attempted, net.minecraft.world.entity.item.ItemEntity entity) {
+        var scope = SCOPES.get().peek();
+        if (scope == null || scope.toolBefore == null || scope.observation == null || attempted.isEmpty()) return;
+        if (entity == null) scope.invalidBatch = true; else scope.toolDrops.add(entity);
+    }
+    private static void verifyTool(Scope scope) {
+        boolean storageVerified = scope.verified; scope.verified = false;
+        if (!storageVerified || scope.invalidBatch || deployerPlayer(scope.machine) != scope.toolPlayer) return;
+        var data = scope.observation.tool(); java.util.ArrayList<ItemStack> expected; ItemStack expectedHand;
+        if (data.retained()) { expected = new java.util.ArrayList<>(data.inventory()); expectedHand = data.held(); }
+        else if (data.held().getMaxDamage() > 0) {
+            if (scope.toolDamaged == null) return;
+            expected = subtractItems(data.inventory(), List.of(data.held())); if (expected == null) return;
+            expected.add(scope.toolDamaged);
+            expectedHand = scope.toolDamaged;
+        } else {
+            if (scope.toolRemainder == null) return;
+            expected = subtractItems(data.inventory(), List.of(data.held().copyWithCount(1))); if (expected == null) return;
+            expected.add(scope.toolRemainder);
+            expectedHand = data.held().getCount() == 1 ? scope.toolRemainder : data.held().copyWithCount(data.held().getCount() - 1);
+        }
+        if (!ItemStack.matches(expectedHand, scope.toolPlayer.getMainHandItem())) return;
+        var actual = new java.util.ArrayList<>(playerInventory(scope.toolPlayer)); var level = (ServerLevel) scope.machine.getLevel();
+        for (var drop : scope.toolDrops) {
+            if (!drop.isAlive() || drop.level() != level || level.getEntity(drop.getUUID()) != drop) return;
+            actual.add(drop.getItem().copy());
+        }
+        scope.verified = equalMultiset(expected, actual);
+    }
+
     /** Called by the exact native holder; snapshots never flush Create's pending queues. */
     public static void duringTransportStorage(BlockEntity holder, java.util.function.Supplier<List<ItemStack>> snapshot,
             Runnable original) {
@@ -528,6 +608,9 @@ public final class CreateMachineEvidence {
             }
         }
         scope.input = input.copy(); scope.batchRecipe = recipe;
+        if (source(scope.machine) == Source.CREATE_DEPLOYER && scope.toolPlayer != null) {
+            scope.toolBefore = scope.toolPlayer.getMainHandItem().copy(); scope.toolInventoryBefore = playerInventory(scope.toolPlayer);
+        }
         if (!ItemStack.isSameItemSameComponents(input, scope.worldBefore) || input.getCount() > scope.worldBefore.getCount()) {
             scope.invalidBatch = true; return;
         }
@@ -547,12 +630,15 @@ public final class CreateMachineEvidence {
             var assignment = attribution(scope.machine); var actor = beneficiary(scope.machine, assignment); if (actor == null) return;
             var level = (ServerLevel) scope.machine.getLevel();
             scope.observation = new Observation(UUID.randomUUID(), assignment, level.dimension().location(), scope.machine.getBlockPos(),
-                    level.getServer().getTickCount(), Source.CREATE_PRESS, selected, scope.input, scope.remainingInput,
+                    level.getServer().getTickCount(), source(scope.machine), selected, scope.input, scope.remainingInput,
                     scope.batchRemainders.isEmpty() ? ItemStack.EMPTY : scope.batchRemainders.getFirst(),
                     scope.transportInitial == null ? List.of() : scope.transportInitial, scope.batchOutputs,
                     scope.batchRemainders.size() < 2 ? List.of() : scope.batchRemainders.subList(1, scope.batchRemainders.size()),
-                    scope.worldInput == null ? null : scope.worldInput.getUUID());
+                    scope.worldInput == null ? null : scope.worldInput.getUUID(), null, null,
+                    scope.toolBefore == null ? null : new ToolData(scope.toolBefore, scope.toolInventoryBefore, selected.processing().retainedItemSlots().contains(1)));
             NeoForge.EVENT_BUS.post(new MachineResultEvent(actor, scope.observation));
+            if (scope.toolBefore != null) scope.invalidBatch |= !ItemStack.matches(scope.toolBefore, scope.toolPlayer.getMainHandItem())
+                    || !equalMultiset(scope.toolInventoryBefore, playerInventory(scope.toolPlayer));
         } catch (RuntimeException | LinkageError failure) { LOGGER.error("World press result observation failed", failure); }
     }
 
@@ -696,6 +782,13 @@ public final class CreateMachineEvidence {
         root.addProperty("y", observation.position().getY()); root.addProperty("z", observation.position().getZ()); root.addProperty("serverTick", observation.serverTick());
         root.addProperty("recipeId", observation.recipe().id().toString()); root.addProperty("recipeRevision", observation.recipe().revision());
         if (observation.inputEntityId() != null) root.addProperty("inputEntityId", observation.inputEntityId().toString());
+        if (observation.tool() != null) {
+            var data = observation.tool(); var value = new com.google.gson.JsonObject();
+            value.add("held", ItemStack.CODEC.encodeStart(ops, data.held()).getOrThrow()); value.addProperty("retained", data.retained());
+            var inventory = new com.google.gson.JsonArray();
+            for (var stack : data.inventory()) inventory.add(ItemStack.OPTIONAL_CODEC.encodeStart(ops, stack).getOrThrow());
+            value.add("inventory", inventory); root.add("tool", value);
+        }
         if (observation.fluid() != null) {
             var data = observation.fluid(); var value = new com.google.gson.JsonObject();
             value.addProperty("x", data.holder().getX()); value.addProperty("y", data.holder().getY()); value.addProperty("z", data.holder().getZ());
@@ -818,6 +911,8 @@ public final class CreateMachineEvidence {
         boolean transportMatched, storageReturned, storageActive;
         BlockEntity basin; CreateBasinStorage.Snapshot basinBefore; boolean basinProcessing, basinReturned, basinStored;
         ItemStack drainInput; boolean fluidCall, fluidSimulate; List<FluidStack> fluidBefore, fluidConsumed;
+        net.minecraft.world.entity.player.Player toolPlayer; ItemStack toolBefore, toolRemainder, toolDamaged; List<ItemStack> toolInventoryBefore;
+        final List<net.minecraft.world.entity.item.ItemEntity> toolDrops = new java.util.ArrayList<>();
         final List<ItemStack> basinConsumedItems = new java.util.ArrayList<>();
         final List<FluidStack> basinPlannedFluids = new java.util.ArrayList<>(), basinConsumedFluids = new java.util.ArrayList<>();
         final List<net.minecraft.world.entity.item.ItemEntity> worldOutputs = new java.util.ArrayList<>();

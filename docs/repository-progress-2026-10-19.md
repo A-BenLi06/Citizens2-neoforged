@@ -35,7 +35,7 @@ The fresh declaration scan finds 192 upstream alias/modifier pairs and 201 nativ
 | ADAPT-03: commerce | Economy's accepted public API, exact quotes/execution, receipts, delivery outcomes and recovery are consumed through native adapters. Economy 0.5.6 supplies commerce capability 3. | Wider inventory-mutation crash points, financial-backup reconciliation and combined repeat/party/reconnect cases. |
 | ADAPT-04: FTB tasks/rewards | Authoritative team-task query/discovery, consuming NPC/dialogue delivery, explicit craft/commerce CustomTask bindings, durable monetary CustomReward claims and original Economy receipt replay. | Legacy quest-ID/content provenance; multi-member/offline/reconnect behavior and the full reward/backup matrix. |
 | ADAPT-05: scripts/crafting | Public Citizens script facade; actual KubeJS/Rhino `customTask`, `customReward`, `started`, `completed` callbacks. Native table/player-grid observations and durable recipe/team/cycle evidence. | Other required machine/assembly outcomes and the complete task/reward recovery matrix. |
-| Create | Guidance for 11 processing types, including native ingredients/components/fluids/probability and reload revisions. Attributed completion evidence for millstones, saw cutting, crushing/milling, world/depot/belt pressing, basin mixing/compacting and spout/drain filling/emptying, with native item/fluid storage checks. | Fan processes, deploying and assembly evidence; additional machine-specific kill points and world/financial-backup combinations. |
+| Create | Guidance for 11 processing types, including native ingredients/components/fluids/probability and reload revisions. Attributed completion evidence for millstones, saw cutting, crushing/milling, world/depot/belt pressing, basin mixing/compacting, spout/drain filling/emptying and depot/belt deploying, with native item/fluid/tool storage checks. | Fan processes and assembly evidence; additional machine-specific kill points and world/financial-backup combinations. |
 | ADAPT-06: RSItemEditor | Shared/personal references, defensive native snapshots, explicit grants and permission checks. Source-backed preview/import preserves backups and conflicts. The fixture imports and reads back 139 of 140 original definitions; restart reports 139 unchanged and one unavailable. | `eyemod:eyephone` for package 163, missing source definitions 6/15/144, and other unresolved production content. No substitute definitions were invented. |
 | ADAPT-07: Paradigm | Permissions/groups, owned NPC placeholders and configured exact Economy/FTB exports; immutable snapshots and registration retirement. | A supported inbound formatting/evaluation contract and wider reload/client acceptance. Installed 2.5.0's registration API is not an inbound evaluator. |
 | ADAPT-08: guards | Native Guard Villagers ownership/coexistence and recruitment/equipment/follow/patrol/target/protection/friendly-fire workflows. 41 native checks on each NeoForge target. | Physical clients and full-world migration/restart. Sentinel's native melee subset does not establish complete ranged/admin Sentinel parity. |
@@ -99,6 +99,12 @@ The pinned Gradle 8.14.3 build passes but emits Gradle-9 deprecation warnings. T
 
 ## Next acceptance batches
 
+Follow-up 2026-10-19, UTC+08:00: [deployer evidence](create-deployer-evidence-2026-10-19.md)
+extends native recipe confirmation through complete depot/belt storage and actual
+tool retention/damage/consumption/remainder handling. Twenty-six checks cover native
+power, outputs, drops, mutations, exceptions, offline attribution and journal replay.
+Fan/assembly and wider recovery/client gates remain open.
+
 Follow-up 2026-10-19, UTC+08:00: [filling/emptying evidence](create-fluid-machine-evidence-2026-10-19.md)
 verifies native spout depot/belt outputs and item-drain held-item/tank deltas.
 Twenty-eight additional checks on both targets cover actual rolls, simulation
@@ -118,7 +124,7 @@ now observes the complete native callback through exact storage verification and
 passes 21 additional native checks on both NeoForge targets. Remaining machine,
 transport crash/recovery and integrated release gates below stay open.
 
-1. Extend actual evidence to Create fan/deployer processes and sequenced assembly, preserving provider-native outputs and recipe revisions.
+1. Extend actual evidence to Create fan processes and sequenced assembly, preserving provider-native outputs and recipe revisions.
 2. Complete concrete party/offline/reconnect, repeat-generation, inventory-mutation kill and financial/world-backup recovery cases for the adopted quest/commerce/reward workflow.
 3. Resolve original quest IDs, group/account/shop identities and missing legacy items with source provenance; keep unsupported content recoverable.
 4. Add the required logging retention/failure/load coverage and a supported Paradigm inbound contract where the pack requires one.
