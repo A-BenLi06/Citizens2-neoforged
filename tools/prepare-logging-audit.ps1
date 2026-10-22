@@ -1,17 +1,24 @@
 param(
     [string]$SupportDirectory = (Join-Path (Split-Path $PSScriptRoot -Parent) 'artifacts/ecosystem-2026-10-13/server-smoke/mods'),
     [string]$CreateJar = (Join-Path (Split-Path $PSScriptRoot -Parent) 'artifacts/create-provider-pinned.jar'),
-    [string]$EconomyJar = (Join-Path (Split-Path (Split-Path $PSScriptRoot -Parent) -Parent) 'yuuniverse-economy/build/libs/yuuniverse-economy-0.5.6-SNAPSHOT.jar')
+    [string]$EconomyJar = (Join-Path (Split-Path (Split-Path $PSScriptRoot -Parent) -Parent) 'yuuniverse-economy/build/libs/yuuniverse-economy-0.5.6-SNAPSHOT.jar'),
+    [string]$FixtureDirectory = (Join-Path (Split-Path $PSScriptRoot -Parent) 'artifacts/logging-audit-server'),
+    [ValidateRange(1024,65535)][int]$ServerPort = 25632,
+    [ValidatePattern('^[a-zA-Z0-9_-]+$')][string]$WorldName = 'logging-world'
 )
 $ErrorActionPreference = 'Stop'
-$fixture = Join-Path (Split-Path $PSScriptRoot -Parent) 'artifacts/logging-audit-server'
+$fixture = [IO.Path]::GetFullPath($FixtureDirectory)
 $fixtureMarker = Join-Path $fixture 'logging-audit-fixture.txt'
 if (Test-Path -LiteralPath $fixture) {
     if (!(Test-Path -LiteralPath $fixtureMarker) -or
             (Get-Content -LiteralPath $fixtureMarker -Raw).Trim() -ne 'citizens-logging-audit') {
         throw 'Refusing to prepare an existing directory without the logging fixture marker.'
     }
-    $sessionFile = Join-Path $fixture 'logging-world/session.lock'
+    $existingWorld = @(Select-String -LiteralPath (Join-Path $fixture 'server.properties') -Pattern '^level-name=(.*)$')
+    if ($existingWorld.Count -ne 1 -or $existingWorld[0].Matches[0].Groups[1].Value.Trim() -ne $WorldName) {
+        throw 'Existing logging fixture world differs from the requested world; use a separate fixture directory.'
+    }
+    $sessionFile = Join-Path $fixture "$WorldName/session.lock"
     if (Test-Path -LiteralPath $sessionFile) {
         $sessionGuard = [System.IO.File]::Open($sessionFile, [System.IO.FileMode]::Open,
             [System.IO.FileAccess]::Read, [System.IO.FileShare]::None)
@@ -38,7 +45,7 @@ foreach ($provider in @($CreateJar,$EconomyJar)) {
         }
     } finally { $archive.Dispose() }
 }
-@('server-ip=127.0.0.1','server-port=25632','online-mode=false','level-name=logging-world',
+@('server-ip=127.0.0.1',"server-port=$ServerPort",'online-mode=false',"level-name=$WorldName",
   'level-type=minecraft:flat','generate-structures=false','spawn-protection=0','view-distance=2','simulation-distance=2',
   'generator-settings={"layers":[{"block":"minecraft:bedrock","height":1},{"block":"minecraft:dirt","height":2},{"block":"minecraft:grass_block","height":1}],"biome":"minecraft:plains"}') |
     Set-Content -LiteralPath (Join-Path $fixture 'server.properties') -Encoding utf8

@@ -29,6 +29,14 @@ Exact artifact sources, SHA-512/SHA-256 hashes and installation paths are record
 
 ## Ordered adaptation backlog
 
+Progress 2026-10-22, UTC+08:00: [native fire logging](native-fire-logging-2026-10-22.md)
+repairs an actual vanilla fire mutation/event gap and the provider's null-entity
+state interpretation. Native burning retains original/result snapshots and the
+provider-owned igniter/unknown policy; fire tracking configuration and optional
+absence remain effective. Actual owned/unowned TNT and restart evidence extend
+the environmental logging boundary. Queue/storage/retention/load and integrated
+client acceptance remain separate gates.
+
 Progress 2026-10-22, UTC+08:00: [logging process-kill recovery](logging-crash-recovery-2026-10-22.md)
 retains both complete logger histories, container components and the original
 Economy settlement through a forced JVM termination after flush and explicit

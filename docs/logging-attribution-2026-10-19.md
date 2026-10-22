@@ -74,7 +74,11 @@ now verifies a forced JVM termination after observed flush and explicit saved
 player/world state, with all 37 native and eight restart checks passing. It also
 records read-only integrity checks for the two SQLite databases.
 
+The [native fire follow-up](native-fire-logging-2026-10-22.md) repairs vanilla
+burn/spread observations and verifies bounded native fire and owned/unowned TNT
+attribution, configured tracking, optional absence and restart.
+
 Queue overflow, database failures, termination during writes, retention tooling,
-wider modded inventories/entities, explosion/fire attribution, production load,
+wider modded inventories/entities and environmental cause paths, production load,
 and integrated physical clients remain open. The combined provider fixture needs
 Economy's 21.1.247 floor; the Citizens 21.1.233 baseline is validated separately.

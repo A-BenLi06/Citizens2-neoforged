@@ -1,0 +1,33 @@
+allprojects {
+    layout.buildDirectory.set(file('../artifacts/environment-logging-build'))
+    afterEvaluate { p ->
+        if (p.extensions.findByName('neoForge') == null) return
+        def absent = p.findProperty('environmentAuditPhase') == 'absent'
+        def fixture = p.file(absent ? '../artifacts/environment-logging-absent-server' : '../artifacts/environment-logging-audit-server')
+        def providers = p.file('../artifacts/environment-logging-audit-server')
+        p.sourceSets.dialogue.java.srcDir(p.file('../tools/environment-logging-runtime-audit'))
+        p.sourceSets.dialogue.compileClasspath += p.files(p.fileTree(new File(providers, 'mods')) { include '*.jar' },
+                p.fileTree(new File(providers, 'compile-libs')) { include '*.jar' })
+        p.neoForge.runs.named('server') { gameDirectory = fixture }
+        p.tasks.named('prepareServerRun') {
+            doLast {
+                def marker = new File(fixture, 'logging-audit-fixture.txt')
+                if (!marker.isFile() || marker.getText('UTF-8').trim() != 'citizens-logging-audit')
+                    throw new GradleException('Missing environmental logging fixture marker')
+                def properties = new Properties()
+                new File(fixture, 'server.properties').withInputStream { properties.load(it) }
+                for (entry in ['server-ip':'127.0.0.1','server-port':absent?'25643':'25642','level-name':absent?'environment-absent-world':'environment-world'])
+                    if (properties.getProperty(entry.key) != entry.value) throw new GradleException('Unexpected environmental logging fixture properties')
+            }
+        }
+        p.tasks.named('runServer') {
+            if (p.hasProperty('environmentAuditPhase')) environment 'CITIZENS_ENVIRONMENT_AUDIT_PHASE', p.property('environmentAuditPhase')
+            timeout = java.time.Duration.ofMinutes(3)
+            doLast {
+                def log = new File(fixture, 'logs/latest.log').getText('UTF-8')
+                if (log.contains('[ENVIRONMENTAUDIT] FAILED') || !log.contains('[ENVIRONMENTAUDIT] COMPLETE'))
+                    throw new GradleException('Environmental logging audit failed or incomplete')
+            }
+        }
+    }
+}

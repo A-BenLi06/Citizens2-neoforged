@@ -1,0 +1,310 @@
+{
+  "createdAt": "2026-10-22T14:15:01.564333+08:00",
+  "timezone": "UTC+08:00",
+  "neoForge": "21.1.248",
+  "nativeChecks": 30,
+  "restartChecks": 24,
+  "absentProviderChecks": 6,
+  "processKills": 1,
+  "loggingChecksBeforeKill": 37,
+  "loggingRestartChecks": 8,
+  "ordinaryBuilds": [
+    {
+      "neoForge": "21.1.248",
+      "results": {
+        "tests": 775.0,
+        "failures": 0.0,
+        "errors": 0.0,
+        "skipped": 0.0,
+        "suites": 113
+      },
+      "summary": {
+        "path": "artifacts/environment-ordinary-248-tests-2026-10-22.json",
+        "bytes": 99,
+        "sha256": "8e247ea7e5af54901ce1871ce41ad9eaa1bcdcf4fbb342bafddf4111a7296849"
+      },
+      "log": {
+        "path": "artifacts/environment-ordinary-248-2026-10-22.log",
+        "bytes": 68556,
+        "sha256": "8ebeaa1d09c948535c128c709963516dfc6e38be6dfbaf6c888c1567da7a87c0"
+      }
+    },
+    {
+      "neoForge": "21.1.233",
+      "results": {
+        "tests": 775.0,
+        "failures": 0.0,
+        "errors": 0.0,
+        "skipped": 0.0,
+        "suites": 113
+      },
+      "summary": {
+        "path": "artifacts/environment-ordinary-233-tests-2026-10-22.json",
+        "bytes": 99,
+        "sha256": "8e247ea7e5af54901ce1871ce41ad9eaa1bcdcf4fbb342bafddf4111a7296849"
+      },
+      "log": {
+        "path": "artifacts/environment-ordinary-233-2026-10-22.log",
+        "bytes": 68698,
+        "sha256": "e3c013a5cf4a65c06826836d7457e4bbf27d4bb5107d324e96aa6457fea05c61"
+      }
+    }
+  ],
+  "interactions": {
+    "tests": 100,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0,
+    "suites": 9
+  },
+  "sourceTrees": [
+    {
+      "path": "neoforge/src/main",
+      "files": 610,
+      "sha256": "6be4e69d635beea5e6145d0e2c3df203410fc3f5a5ff7b38cc436893fe0fc53d",
+      "algorithm": "SHA-256 of compact sorted-key JSON array of path/bytes/sha256 records ordered by path"
+    },
+    {
+      "path": "neoforge/src/dialogue",
+      "files": 48,
+      "sha256": "a08fe8e655014f5b26ec981cef4590278f7bffef8a8feabe9c9d5ab6d4aa5ddd",
+      "algorithm": "SHA-256 of compact sorted-key JSON array of path/bytes/sha256 records ordered by path"
+    }
+  ],
+  "sources": [
+    {
+      "path": "neoforge/src/main/java/net/citizensnpcs/mixin/FireBlockLoggingMixin.java",
+      "bytes": 2725,
+      "sha256": "9275cc8715baf34c25c7ef11e772e6767d7ad959c4e122c2bcb3af758bfa7f22"
+    },
+    {
+      "path": "neoforge/src/main/java/net/citizensnpcs/mixin/NeoProtectFireStateMixin.java",
+      "bytes": 1119,
+      "sha256": "9588a874e540595596c87dcfa369cee5b40986ea317f8d744f6cefc4c4f8be80"
+    },
+    {
+      "path": "neoforge/src/main/java/net/citizensnpcs/util/NeoProtectFireObservations.java",
+      "bytes": 3058,
+      "sha256": "ee7691d368c5468348aaaeb35f23950164b794a68d73c0d2ebb44d4a2af52ae4"
+    },
+    {
+      "path": "neoforge/src/main/resources/citizens.mixins.json",
+      "bytes": 1942,
+      "sha256": "6796298eb7134d81d718980a9ebcf97c84b4c7898d16ef54395aded41ec279e9"
+    },
+    {
+      "path": "tools/environment-logging-runtime-audit.gradle",
+      "bytes": 2233,
+      "sha256": "ddafb63ce3444832266c7ed96c8b441b75f3787e755761d682de4eaaebf7490a"
+    },
+    {
+      "path": "tools/environment-logging-runtime-audit/net/yuuniverse/interactions/EnvironmentalLoggingRuntimeAudit.java",
+      "bytes": 15797,
+      "sha256": "3e34498c5a27bdf3866bc15ca6009b3b177a9b9e9d45fb5cc03dd067034de9ef"
+    },
+    {
+      "path": "tools/prepare-logging-audit.ps1",
+      "bytes": 3884,
+      "sha256": "6863b62daca2b61dee2fa3815d8510e57378f4744bdd97eceb7bdf27e6c53447"
+    },
+    {
+      "path": "tools/logging-runtime-audit.gradle",
+      "bytes": 2407,
+      "sha256": "5052006c982f89a1a466d7f0b089121d557a6f1b6ac1d8721685f540b3baaa4e"
+    },
+    {
+      "path": "tools/logging-runtime-audit/net/yuuniverse/interactions/LoggingRuntimeAudit.java",
+      "bytes": 27091,
+      "sha256": "e3209d4712594e590379a08721f4033d9584046f1e1a437195b99f9d0f2506a8"
+    },
+    {
+      "path": "tools/run-logging-crash-audit.ps1",
+      "bytes": 5114,
+      "sha256": "08d3a2138b4036e5b809af6a71c4877c017f1511da2bc613e4d6ce24b181d4ab"
+    },
+    {
+      "path": "tools/audit-tests.gradle",
+      "bytes": 737,
+      "sha256": "20c7b9400adf7dff57f8d0bef20561ba4e45c511237ce626610a138544eac830"
+    },
+    {
+      "path": "neoforge/build.gradle",
+      "bytes": 6251,
+      "sha256": "1868e4bdef668af415d43ddbee5177778514abae177d35415c83b19c1831dedc"
+    }
+  ],
+  "packages": [
+    {
+      "path": "artifacts/environment-release-248-jars-2026-10-22/citizens-2.0.43-neoforge-SNAPSHOT-sources.jar",
+      "bytes": 1118982,
+      "sha256": "abeb2bcc8d8c3dad796fb8608c62f4fe7698c7efe9a5c81bce7b1e644299f784",
+      "entries": 661,
+      "auditAndProviderClassesExcluded": true,
+      "separateOwnership": true
+    },
+    {
+      "path": "artifacts/environment-release-248-jars-2026-10-22/citizens-2.0.43-neoforge-SNAPSHOT.jar",
+      "bytes": 4062633,
+      "sha256": "4c5235cb6e1a0e30baed788451647412dc92468d19369c674b351137b7c3fcfe",
+      "entries": 1089,
+      "auditAndProviderClassesExcluded": true,
+      "separateOwnership": true
+    },
+    {
+      "path": "artifacts/environment-release-248-jars-2026-10-22/yuuniverse-interactions-2.0.43-neoforge-SNAPSHOT.jar",
+      "bytes": 204146,
+      "sha256": "5f2b57c388ba3932252736d44387084db38ae8b111fe07ba2d469ac9c9b54c8d",
+      "entries": 82,
+      "auditAndProviderClassesExcluded": true,
+      "separateOwnership": true
+    },
+    {
+      "path": "artifacts/environment-release-233-jars-2026-10-22/citizens-2.0.43-neoforge-SNAPSHOT-sources.jar",
+      "bytes": 1118982,
+      "sha256": "9902baabe853dc9236eaab2dc59ce804db717ffef85774e6717cbe0c31efe9d7",
+      "entries": 661,
+      "auditAndProviderClassesExcluded": true,
+      "separateOwnership": true
+    },
+    {
+      "path": "artifacts/environment-release-233-jars-2026-10-22/citizens-2.0.43-neoforge-SNAPSHOT.jar",
+      "bytes": 4062633,
+      "sha256": "099294255f33d659f1d9acd10c20135b13a3e038705b7ee7ea91b97643cdd6cf",
+      "entries": 1089,
+      "auditAndProviderClassesExcluded": true,
+      "separateOwnership": true
+    },
+    {
+      "path": "artifacts/environment-release-233-jars-2026-10-22/yuuniverse-interactions-2.0.43-neoforge-SNAPSHOT.jar",
+      "bytes": 204146,
+      "sha256": "5eac0e0e91fac4144c443c3678128fc864ab6c43295d70a2ab90c55801381abb",
+      "entries": 82,
+      "auditAndProviderClassesExcluded": true,
+      "separateOwnership": true
+    }
+  ],
+  "providers": [
+    {
+      "path": "artifacts/environment-logging-audit-server/mods/architectury-13.0.11-neoforge.jar",
+      "bytes": 584734,
+      "sha256": "9cc92f2c09533fc5482c60f993bd891c655a0e32b637037cdcb7c2b23adedeeb"
+    },
+    {
+      "path": "artifacts/environment-logging-audit-server/mods/create.jar",
+      "bytes": 19138095,
+      "sha256": "5602a16796957cb5c7fb829c10c6b54bf9d228931c7680636710b6a60d92822e"
+    },
+    {
+      "path": "artifacts/environment-logging-audit-server/mods/economy.jar",
+      "bytes": 14431850,
+      "sha256": "179115e5301ee6629acd3bdcbb6779d2549a35f7493821ab0fca79bcc43645f5"
+    },
+    {
+      "path": "artifacts/environment-logging-audit-server/mods/grieflogger-1.2.10-1.21.1-yuuniverse.1-neoforge.jar",
+      "bytes": 18915537,
+      "sha256": "a897f22fca7705144b26749f7baa097b4e1cc0d16eed1ddeed3a9fed270806e0"
+    },
+    {
+      "path": "artifacts/environment-logging-audit-server/mods/neoprotect-1.0.4-mc1.21.1-neoforge.jar",
+      "bytes": 2614693,
+      "sha256": "2cbcec7aeef26ef3f5b54dae90fc16da353a1534462353b9f516d7d2e0a138ce"
+    },
+    {
+      "path": "artifacts/environment-logging-audit-server/mods/supermartijn642configlib-1.1.8-neoforge-mc1.21.jar",
+      "bytes": 207514,
+      "sha256": "d2ba7b839a2268e4e223457e813d11aa2476c3bf708a7bba691d8fc851778a4b"
+    }
+  ],
+  "beforeFixReproduction": {
+    "path": "artifacts/environment-logging-before-2026-10-22.log",
+    "bytes": 19431,
+    "sha256": "e3fd2aa38e625ae59f1a356d089f2bd3526f159e5d0391a13b6564aa14500528"
+  },
+  "files": [
+    {
+      "path": "artifacts/environment-logging-final-native-2026-10-22.log",
+      "bytes": 18618,
+      "sha256": "d8ec1bd58a29ab877fe8f5fddb5c9444a44d70c7793f8d86ed7ae40d510bef23"
+    },
+    {
+      "path": "artifacts/environment-logging-final-recover-2026-10-22.log",
+      "bytes": 17291,
+      "sha256": "8eba0025f933285b3d215b38d84559ded9ac84f1ebbb44fb0816eff5066cca65"
+    },
+    {
+      "path": "artifacts/environment-logging-final-absent-2026-10-22.log",
+      "bytes": 14058,
+      "sha256": "d123c75fa14360346e157e3d027628e4a8e3beb1c6a907e57180e021af70f667"
+    },
+    {
+      "path": "artifacts/environment-logging-final-crash-2026-10-22-killed.log",
+      "bytes": 17087,
+      "sha256": "76d3b736239182b183fa9bb4ada57d8c8552614d372f79098987d7f7cbd64f66"
+    },
+    {
+      "path": "artifacts/environment-logging-final-crash-2026-10-22-killed-stderr.log",
+      "bytes": 520,
+      "sha256": "b4c111e87f59cb62255837cbd922fd746a3f600cff200ab99769e0d3fba4082c"
+    },
+    {
+      "path": "artifacts/environment-logging-final-crash-2026-10-22-recovered.log",
+      "bytes": 13293,
+      "sha256": "899cc4130743d9c00b56a6ed502fe1a9555239dc4b75f9bfbaa00811fbb836ca"
+    },
+    {
+      "path": "artifacts/environment-logging-final-crash-2026-10-22-state.json",
+      "bytes": 314,
+      "sha256": "70f5150cac29d4e971a29024723989b17ad4246c750fbfc91329aa9b1f5fd63e"
+    },
+    {
+      "path": "artifacts/environment-logging-final-crash-2026-10-22-termination.json",
+      "bytes": 515,
+      "sha256": "1b5f48f4a51aaa6fa3c2586754e258d1808025aa4cea64d81fef1070e3024ecb"
+    },
+    {
+      "path": "artifacts/environment-logging-final-crash-runner-2026-10-22.log",
+      "bytes": 188,
+      "sha256": "bb0db3c095419b6bf2db9b3767fe995b089c718fcd01b87a14960644f335bd90"
+    },
+    {
+      "path": "artifacts/environment-interactions-2026-10-22.log",
+      "bytes": 9742,
+      "sha256": "39346079cc968e3d857c15ed71141e9628b5a4ee4d92ad4e09970cab9d89bca4"
+    }
+  ],
+  "environmentalSavedState": {
+    "path": "artifacts/environment-logging-audit-server/environment-state.json",
+    "bytes": 430,
+    "sha256": "f72ca935f6a8c5e6f46819cd3313c6554c5f7c67b2727daadfbbe4b6152582e6"
+  },
+  "sqliteIntegrity": {
+    "path": "artifacts/environment-logging-integrity-2026-10-22.json",
+    "bytes": 303,
+    "sha256": "f90293dd912fa4f3df974f1af90bb8b1097004d48900cdffa32873ba2ef99b07"
+  },
+  "sqliteResults": [
+    {
+      "path": "artifacts/logging-audit-server/database.db",
+      "readOnly": true,
+      "quickCheck": [
+        "ok"
+      ]
+    },
+    {
+      "path": "artifacts/logging-audit-server/logging-world/yuuniverse_economy/economy.db",
+      "readOnly": true,
+      "quickCheck": [
+        "ok"
+      ]
+    }
+  ],
+  "acceptedBoundary": "Completed vanilla FireBlock writes; provider-owned cause inheritance and storage; existing logging kill is after observed flush and native save.",
+  "limitations": [
+    "Lava and mod-specific fire ignition",
+    "Arbitrary causal chains",
+    "Other fire-observer coexistence",
+    "Write-interior crash and failed provider write replay",
+    "Queue overflow, timed retention, storage failures and production load",
+    "Physical clients and legacy migration"
+  ]
+}
