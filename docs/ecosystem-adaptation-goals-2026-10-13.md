@@ -8,6 +8,15 @@ Citizens retains NPC behavior and its existing native extension contracts. Yuuni
 
 ## Selected artifacts and sides
 
+Progress 2026-10-22, UTC+08:00: [offline retained-receipt reconciliation](commerce-offline-reconciliation-2026-10-22.md)
+adds direct administrator recovery of original team/task/cycle projections with
+no connected contributor, including delivery settlement after disconnect. Replay
+by a party member with no historical contribution also validates and recovers
+current shared scopes. Actual older native FTB files and lower/equal/higher/
+matching financial backups supply acceptance; exact counts/hashes are in the
+linked validation manifest. Offline discovery of PREPARED requests, native reward
+admission, monetary PAID validation, throughput and migration/client gates remain.
+
 Progress 2026-10-22, UTC+08:00: [shared commerce backup recovery](commerce-shared-backup-recovery-2026-10-22.md)
 adds contributor-wide checks within a bound task/team/cycle, using Economy 0.5.7
 Commerce capability 4's supported read-only offline inspection. The native fixture

@@ -10,6 +10,15 @@ This review covers repository structure, native implementation boundaries, upstr
 
 ## Repository and implementation boundaries
 
+Update 2026-10-22, UTC+08:00: [offline commerce reconciliation](commerce-offline-reconciliation-2026-10-22.md)
+recovers retained absolute task progress through console administration with every
+contributor offline, including settled WAITING deliveries. Current native team
+scopes also participate in replay by noncontributing party members. The actual
+stopped-task-file/financial-backup cases supplement the earlier contributor
+validation; they do not establish offline discovery of unretained operations or
+native/monetary reward backup correctness. Fresh ordinary builds pass 775 tests
+per target, Interactions passes 100 and selected native regression passes 90.
+
 Update 2026-10-22, UTC+08:00: [shared/offline commerce recovery](commerce-shared-backup-recovery-2026-10-22.md)
 extends current-actor validation to all retained contributors in the relevant
 task/team/cycle. Economy 0.5.7 capability 4 supplies the public offline inspection

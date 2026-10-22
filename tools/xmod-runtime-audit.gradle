@@ -3,7 +3,9 @@ allprojects {
     if (auditBuild != null) layout.buildDirectory.set(file(auditBuild))
     afterEvaluate { p ->
         if (p.extensions.findByName('neoForge') == null) return
-        def fixture = p.file('../artifacts/xmod-audit-server')
+        def fixture = p.file(p.findProperty('xmodAuditFixture') ?: '../artifacts/xmod-audit-server')
+        if (!fixture.toPath().toAbsolutePath().normalize().startsWith(p.file('../artifacts').toPath().toAbsolutePath().normalize()))
+            throw new GradleException('XMod fixture must be inside task artifacts')
         p.sourceSets.main.java.srcDir(p.file('../tools/xmod-runtime-audit'))
         p.sourceSets.main.compileClasspath += p.files(p.fileTree(new File(fixture, 'mods')) { include '*.jar' })
         p.neoForge.runs.named('server') { gameDirectory = fixture }

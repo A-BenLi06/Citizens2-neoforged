@@ -73,6 +73,13 @@ supplies owner-scoped read-only inspection without an online contributor session
 Capability 3 remains usable when all required contributors are online; offline
 inspection requires capability 4. Native reward admission is a separate open gate.
 
+[Offline administrator reconciliation](commerce-offline-reconciliation-2026-10-22.md)
+now validates and projects retained receipts even with no connected players,
+including WAITING deliveries that have actually settled. Regular replay also
+validates/projects the actor's current team scopes, so a noncontributing party
+member can recover valid shared progress. Offline discovery of a PREPARED request
+without its operation UUID still requires a supported provider history contract.
+
 FTB saves independently. A process kill can leave retained APPLIED while FTB still
 has an older progress total. Reconciliation rechecks the original public settlements
 and restores the exact absolute total; it does not execute another trade. Lower

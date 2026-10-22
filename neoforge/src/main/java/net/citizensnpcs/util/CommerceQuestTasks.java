@@ -26,7 +26,7 @@ public final class CommerceQuestTasks implements AutoCloseable {
     private final CommerceTaskJournal journal;
     private final List<Consumer<Event>> listeners = new ArrayList<>();
     private final Set<UUID> processing = new HashSet<>();
-    private boolean closed;
+    private boolean closed, reconciling;
     private int playerCursor;
 
     public static CommerceQuestTasks current(MinecraftServer server) {
@@ -126,7 +126,7 @@ public final class CommerceQuestTasks implements AutoCloseable {
         active(); online(actor); if (!processing.add(actor.getUUID())) throw new IllegalStateException("Commerce replay is already active for this actor");
         try {
             Object provider = provider(actor); Position position = position(provider, actor); int count = 0;
-            validateRetained(provider, actor, position);
+            var eligibleScopes = validateRetained(provider, actor, position);
             for (Binding binding : journal.bindings()) {
                 long cursor = journal.cursor(binding, actor.getUUID(), position.id(), position.sequence());
                 List<?> page = reflected(() -> (List<?>) Class.forName(API + "CommerceApi").getMethod("history", UUID.class, long.class, int.class).invoke(provider, actor.getUUID(), cursor, 100));
@@ -149,16 +149,7 @@ public final class CommerceQuestTasks implements AutoCloseable {
                 journal.checkpoint(binding, actor.getUUID(), position.id(), position.sequence(), last);
             }
             // Checkpoint only after retaining each matching receipt. Delivery can settle after its page was checkpointed.
-            var scopes = new LinkedHashSet<Projection>();
-            for (Entry entry : journal.entries()) if (entry.request().actorId().equals(actor.getUUID())) {
-                if (entry.state() == State.WAITING) {
-                    Object outcome = outcome(provider, actor, entry.receipt().operationId());
-                    validateOutcome(entry.receipt(), outcome);
-                    if (settled(entry.binding(), outcome)) entry = journal.ready(entry.id());
-                }
-                if (entry.state() == State.CONFIRMED || entry.state() == State.APPLIED)
-                    scopes.add(new Projection(entry.binding(), entry.attribution().teamId(), entry.attribution().cycle()));
-            }
+            var scopes = ready(provider, journal.entries().stream().filter(entry -> retained(entry) && eligibleScopes.contains(projection(entry))).toList());
             for (Projection scope : scopes) try { project(scope.binding(), scope.team(), scope.cycle()); }
             catch (IOException | RuntimeException failure) { LOGGER.warn("Commerce projection remains pending for task {}, team {}, cycle {}: {}",
                     scope.binding().taskId(), scope.team(), scope.cycle(), failure.getMessage()); }
@@ -167,6 +158,21 @@ public final class CommerceQuestTasks implements AutoCloseable {
     }
     private static Object receiptFromOutcome(Object outcome) { return property(outcome, "receipt"); }
     private record Projection(Binding binding, UUID team, int cycle) { }
+    private static Projection projection(Entry entry) {
+        return new Projection(entry.binding(), entry.attribution().teamId(), entry.attribution().cycle());
+    }
+    private Set<Projection> ready(Object provider, List<Entry> entries) throws IOException {
+        var scopes = new LinkedHashSet<Projection>();
+        for (Entry entry : entries) {
+            if (entry.state() == State.WAITING) {
+                Object outcome = inspect(provider, new Operation(entry.request().actorId(), entry.receipt().operationId())).outcome();
+                validateOutcome(entry.receipt(), outcome);
+                if (settled(entry.binding(), outcome)) entry = journal.ready(entry.id());
+            }
+            if (entry.state() == State.CONFIRMED || entry.state() == State.APPLIED) scopes.add(projection(entry));
+        }
+        return scopes;
+    }
     private static Object outcome(Object provider, ServerPlayer actor, UUID operation) {
         return reflected(() -> ((Optional<?>) Class.forName(API + "CommerceApi").getMethod("findOperation", UUID.class, UUID.class)
                 .invoke(provider, actor.getUUID(), operation)).orElseThrow(() -> new IllegalStateException("Committed operation disappeared")));
@@ -184,13 +190,18 @@ public final class CommerceQuestTasks implements AutoCloseable {
         return state.equals("COMMITTED") || !binding.requireDelivery() && state.equals("DELIVERY_PENDING");
     }
     /** A restored ledger can catch up its sequence with unrelated trades while losing admitted settlements. */
-    private void validateRetained(Object provider, ServerPlayer actor, Position position) {
+    private Set<Projection> validateRetained(Object provider, ServerPlayer actor, Position position) {
         for (Binding binding : journal.bindings()) journal.cursor(binding, actor.getUUID(), position.id(), position.sequence());
         var entries = journal.entries(); var scopes = new HashSet<Projection>();
+        for (Binding binding : journal.bindings()) {
+            var target = FtbQuestTasks.evidenceTarget(actor, binding.taskId());
+            scopes.add(new Projection(binding, target.state().teamId(), target.cycle()));
+        }
         for (Entry entry : entries) if (retained(entry) && entry.request().actorId().equals(actor.getUUID()))
-            scopes.add(new Projection(entry.binding(), entry.attribution().teamId(), entry.attribution().cycle()));
+            scopes.add(projection(entry));
         validateEntries(provider, entries.stream().filter(entry -> retained(entry)
-                && scopes.contains(new Projection(entry.binding(), entry.attribution().teamId(), entry.attribution().cycle()))).toList());
+                && scopes.contains(projection(entry))).toList());
+        return scopes;
     }
     private static boolean retained(Entry entry) {
         return entry.state() == State.WAITING || entry.state() == State.CONFIRMED || entry.state() == State.APPLIED;
@@ -266,7 +277,22 @@ public final class CommerceQuestTasks implements AutoCloseable {
         if (accept) project(binding, teamId, cycle); return journal.entry(resolved.id());
     }
     public int reconcile(CommandSourceStack source) throws IOException {
-        authorize(source, false); int count = 0; for (ServerPlayer player : List.copyOf(server.getPlayerList().getPlayers())) count += replay(player); return count;
+        authorize(source, false);
+        if (reconciling || !processing.isEmpty()) throw new IllegalStateException("Commerce reconciliation is already active");
+        reconciling = true;
+        try {
+            // Validate all retained settlements before any history retention or native projection.
+            var entries = journal.entries().stream().filter(CommerceQuestTasks::retained).toList();
+            if (!entries.isEmpty()) validateEntries(provider(), entries);
+            int count = 0;
+            for (ServerPlayer player : List.copyOf(server.getPlayerList().getPlayers())) count += replay(player);
+            entries = journal.entries().stream().filter(CommerceQuestTasks::retained).toList();
+            if (!entries.isEmpty()) {
+                Object provider = provider(); validateEntries(provider, entries);
+                for (Projection scope : ready(provider, entries)) project(scope.binding(), scope.team(), scope.cycle());
+            }
+            return count;
+        } finally { reconciling = false; }
     }
     public List<Binding> bindings(CommandSourceStack source) { authorize(source, false); return journal.bindings(); }
     public List<Entry> entries(CommandSourceStack source) { authorize(source, false); return journal.entries(); }

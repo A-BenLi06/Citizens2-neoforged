@@ -1,6 +1,6 @@
 param(
     [Parameter(Mandatory)][string]$JavaHome,
-    [ValidateSet('actor','shared')][string]$Scope = 'actor',
+    [ValidateSet('actor','shared','offline','newmember')][string]$Scope = 'actor',
     [string]$EconomyJar,
     [ValidatePattern('^[a-zA-Z0-9_-]+$')][string]$LogPrefix = 'financial-backup-2026-10-22'
 )
@@ -57,6 +57,12 @@ try {
     $playerPath = Join-Path $fixture "financial-world/playerdata/$($state.actor).dat"
     $playerSnapshot = Join-Path $fixture 'financial-player.dat'
     Copy-Item -LiteralPath $playerPath -Destination $playerSnapshot
+    if ($Scope -eq 'newmember') {
+        $newActorId = [Guid]::Parse($state.newActor).ToString()
+        $newPlayerPath = Join-Path $fixture "financial-world/playerdata/$newActorId.dat"
+        $newPlayerSnapshot = Join-Path $fixture 'financial-new-player.dat'
+        Copy-Item -LiteralPath $newPlayerPath -Destination $newPlayerSnapshot
+    }
     $database = Join-Path $fixture 'financial-world/yuuniverse_economy/economy.db'
     foreach ($phase in @('regressed','caughtup','higher','consistent')) {
         Assert-StoppedFixture
@@ -66,6 +72,11 @@ try {
         $backupName = if ($phase -eq 'consistent') { 'financial-after.db' } else { 'financial-before.db' }
         Copy-Item -LiteralPath (Join-Path $fixture $backupName) -Destination $database -Force
         Copy-Item -LiteralPath $playerSnapshot -Destination $playerPath -Force
+        if ($Scope -eq 'newmember') { Copy-Item -LiteralPath $newPlayerSnapshot -Destination $newPlayerPath -Force }
+        if ($Scope -in @('offline','newmember')) {
+            $teamId = [Guid]::Parse($state.team).ToString()
+            Copy-Item -LiteralPath (Join-Path $fixture 'financial-progress-before.snbt') -Destination (Join-Path $fixture "financial-world/ftbquests/$teamId.snbt") -Force
+        }
         Invoke-Phase $phase
     }
 } finally {

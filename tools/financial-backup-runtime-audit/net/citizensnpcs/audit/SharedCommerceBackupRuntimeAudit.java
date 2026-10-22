@@ -24,7 +24,9 @@ public final class SharedCommerceBackupRuntimeAudit {
     private static boolean ran;
     private static int passed;
     @SubscribeEvent public static void tick(ServerTickEvent.Post event) {
-        if(!"shared".equals(System.getenv("CITIZENS_FINANCIAL_AUDIT_SCOPE")) || ran || event.getServer().getTickCount()<20)return;
+        String scope=System.getenv("CITIZENS_FINANCIAL_AUDIT_SCOPE");
+        boolean offline="offline".equals(scope)||"newmember".equals(scope);
+        if(!("shared".equals(scope)||offline&&"seed".equals(System.getenv("CITIZENS_FINANCIAL_AUDIT_PHASE"))) || ran || event.getServer().getTickCount()<20)return;
         ran=true;
         var server=event.getServer();ServerPlayer actor=null,member=null;
         io.netty.channel.embedded.EmbeddedChannel actorChannel=null,memberChannel=null;
@@ -56,6 +58,11 @@ public final class SharedCommerceBackupRuntimeAudit {
                     economy.credit(player.getUUID(),currency.id(),1000,"shared-seed:"+player.getUUID(),"fixture");
                     player.getInventory().clearContent();
                 }
+                UUID newActorId=UUID.randomUUID();
+                if("newmember".equals(scope)) {
+                    economy.ensurePlayerAccount(newActorId,"RecoveryMember");
+                    economy.credit(newActorId,currency.id(),1000,"new-member-seed:"+newActorId,"fixture");
+                }
                 String shop="shared-bound-"+actorId,unrelated="shared-unbound-"+actorId;
                 seed(runtime.ledger().databasePath(),shop,currency.id());seed(runtime.ledger().databasePath(),unrelated,currency.id());
                 var chapter=new Chapter(file.newID(),file,file.getDefaultChapterGroup());chapter.onCreated();
@@ -64,6 +71,12 @@ public final class SharedCommerceBackupRuntimeAudit {
                 service.bind(source,task.getCodeString(),Shop.SYSTEM,shop,"paper",Action.BUY_FROM_SHOP,Measure.ITEMS,null,true);
                 var onlineTrade=trade(api,actor,shop,"online-first");
                 check(team.getProgress(task)==1 && service.entries(source).size()==1,"online_member_has_a_valid_applied_settlement_before_the_selected_backup");
+                if(offline) {
+                    team.saveIfChanged();
+                    var progress=server.getWorldPath(net.minecraft.world.level.storage.LevelResource.ROOT).resolve("ftbquests").resolve(team.getTeamId()+".snbt");
+                    Files.copy(progress,server.getServerDirectory().resolve("financial-progress-before.snbt"));
+                    check(Files.size(progress)>0,"native_older_task_file_is_saved_before_the_second_admitted_contribution");
+                }
                 snapshot(runtime.ledger().databasePath(),server.getServerDirectory().resolve("financial-before.db"));
                 var offlineTrade=trade(api,member,shop,"offline-second");
                 check(team.getProgress(task)==2 && service.entries(source).stream().allMatch(e->e.state()==State.APPLIED),"two_native_trades_share_exact_progress_and_distinct_applied_receipts");
@@ -71,6 +84,16 @@ public final class SharedCommerceBackupRuntimeAudit {
                 server.getPlayerList().remove(member);memberChannel.finishAndReleaseAll();memberChannel=null;member=null;
                 check(server.getPlayerList().getPlayer(memberId)==null && api.inspectOperation(memberId,offlineTrade.receipt().operationId()).outcome().orElseThrow().state()==CommerceOutcome.State.COMMITTED,
                         "public_inspection_can_verify_the_actually_offline_members_original_settlement");
+                if("newmember".equals(scope)) {
+                    var newcomer=new ServerPlayer(server,server.overworld(),new GameProfile(newActorId,"RecoveryMember"),ClientInformation.createDefault());
+                    newcomer.setPos(1,-60,1);var newcomerChannel=connect(newcomer);
+                    try {
+                        party.invite(actor,List.of(newcomer.getGameProfile()));party.join(newcomer);
+                        check(file.getTeamData(newcomer).orElseThrow()==team && service.entries(source).stream().noneMatch(e->e.request().actorId().equals(newActorId)),
+                                "a_newly_joined_native_party_member_has_no_historical_contribution_to_replay");
+                    } finally {server.getPlayerList().remove(newcomer);newcomerChannel.finishAndReleaseAll();}
+                    state.addProperty("newActor",newActorId.toString());
+                }
                 state.addProperty("run",System.getenv("CITIZENS_FINANCIAL_AUDIT_RUN"));state.addProperty("actor",actorId.toString());state.addProperty("offlineActor",memberId.toString());
                 state.addProperty("task",task.getCodeString());state.addProperty("team",team.getTeamId().toString());state.addProperty("boundShop",shop);state.addProperty("unrelatedShop",unrelated);
                 state.addProperty("onlineOperation",onlineTrade.receipt().operationId().toString());state.addProperty("operation",offlineTrade.receipt().operationId().toString());

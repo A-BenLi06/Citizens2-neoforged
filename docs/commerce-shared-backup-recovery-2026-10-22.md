@@ -72,3 +72,8 @@ remain open; the user will test the pinned ordinary-client fixture later.
 Reconciliation with every contributor offline, and replay by a newly joined
 member with no retained contribution, still need explicit acceptance and any
 necessary recovery implementation.
+
+The subsequent [offline reconciliation extension](commerce-offline-reconciliation-2026-10-22.md)
+implements recovery of retained receipts without contributor sessions and includes
+native stopped-task-file/new-member validation. Its remaining offline discovery
+boundary for PREPARED requests is recorded separately.

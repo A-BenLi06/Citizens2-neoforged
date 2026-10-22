@@ -23,7 +23,8 @@ public final class FinancialBackupRuntimeAudit {
     private static boolean ran;
     private static int passed;
     @SubscribeEvent public static void tick(ServerTickEvent.Post event) {
-        if ("shared".equals(System.getenv("CITIZENS_FINANCIAL_AUDIT_SCOPE"))) return;
+        String scope=System.getenv("CITIZENS_FINANCIAL_AUDIT_SCOPE");
+        if (scope!=null && !"actor".equals(scope)) return;
         if(ran || event.getServer().getTickCount()<20)return;
         ran=true;
         var server=event.getServer(); ServerPlayer actor=null; io.netty.channel.embedded.EmbeddedChannel channel=null;
