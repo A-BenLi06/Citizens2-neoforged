@@ -10,6 +10,14 @@ This review covers repository structure, native implementation boundaries, upstr
 
 ## Repository and implementation boundaries
 
+Update 2026-10-22, UTC+08:00: [direct commerce reward admission](commerce-direct-reward-admission-2026-10-22.md)
+checks same-quest commerce backing before FTB marks item, command or monetary
+claims or resets repeat progress. Financial inspection includes offline party
+contributors; confirmed projection can still trigger native automatic rewards.
+Unrelated and already-claimed native paths preserve provider-outage behavior.
+Admission through other-quest prerequisites, monetary PAID inspection and the
+remaining migration/client/recovery gates are still open.
+
 Update 2026-10-22, UTC+08:00: [dependent commerce recovery](commerce-dependent-recovery-2026-10-22.md)
 recovers retained projections loaded before their native quest prerequisites or
 sequential tasks. Batches retry only after a successful scope, keep native gates

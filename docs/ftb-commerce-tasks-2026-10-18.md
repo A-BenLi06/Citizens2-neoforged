@@ -73,6 +73,12 @@ supplies owner-scoped read-only inspection without an online contributor session
 Capability 3 remains usable when all required contributors are online; offline
 inspection requires capability 4. Native reward admission is a separate open gate.
 
+[Direct native reward admission](commerce-direct-reward-admission-2026-10-22.md)
+now validates those retained settlements, native definitions/cycles and absolute
+progress before item, command or monetary rewards in the bound task's own quest
+can be marked claimed. Other-quest prerequisite paths and monetary PAID journal
+inspection remain separate open gates.
+
 [Offline administrator reconciliation](commerce-offline-reconciliation-2026-10-22.md)
 now validates and projects retained receipts even with no connected players,
 including WAITING deliveries that have actually settled. Regular replay also

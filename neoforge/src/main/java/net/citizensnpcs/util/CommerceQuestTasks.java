@@ -231,6 +231,43 @@ public final class CommerceQuestTasks implements AutoCloseable {
         validateEntries(provider(), journal.entries().stream().filter(entry -> retained(entry) && entry.binding().equals(binding)
                 && entry.attribution().teamId().equals(team) && entry.attribution().cycle() == cycle).toList());
     }
+    /** Read-only admission before FTB marks a reward or resets its quest's repeat cycle. */
+    public static boolean validateNativeReward(Object nativeTeam, Object nativeReward, ServerPlayer actor) {
+        var service = current(actor.getServer());
+        return service.validateReward(nativeTeam, nativeReward, actor);
+    }
+    private boolean validateReward(Object nativeTeam, Object nativeReward, ServerPlayer actor) {
+        return reflected(() -> {
+            String questId = (String) property(property(nativeReward, "getQuest"), "getCodeString");
+            var bindings = journal.bindings().stream().filter(binding -> binding.questId().equals(questId)).toList();
+            if (bindings.isEmpty()) return true;
+            online(actor);
+            String ftb = "dev.ftb.mods.ftbquests.quest.";
+            Class<?> teamType = Class.forName(ftb + "TeamData"), rewardType = Class.forName(ftb + "reward.Reward");
+            // Native no-op claims do not need a provider or another financial admission.
+            if ((boolean) teamType.getMethod("isLocked").invoke(nativeTeam)
+                    || (boolean) teamType.getMethod("isRewardBlocked", rewardType).invoke(nativeTeam, nativeReward)
+                    || (boolean) teamType.getMethod("isRewardClaimed", UUID.class, rewardType).invoke(nativeTeam, actor.getUUID(), nativeReward)) return true;
+            Object file = ((Optional<?>) Class.forName(ftb + "ServerQuestFile").getMethod("getInstance").invoke(null)).orElseThrow();
+            Object team = ((Optional<?>) Class.forName(ftb + "BaseQuestFile").getMethod("getTeamData", net.minecraft.world.entity.player.Player.class)
+                    .invoke(file, actor)).orElseThrow();
+            if (team != nativeTeam) throw new IllegalStateException("Commerce-backed reward does not belong to the actor's current native team");
+            Enum<?> status = (Enum<?>) teamType.getMethod("getClaimType", UUID.class, rewardType).invoke(team, actor.getUUID(), nativeReward);
+            if (!status.name().equals("CAN_CLAIM")) return false;
+            UUID teamId = (UUID) teamType.getMethod("getTeamId").invoke(team);
+            var entries = journal.entries().stream().filter(entry -> retained(entry) && bindings.contains(entry.binding())
+                    && entry.attribution().teamId().equals(teamId)).toList();
+            if (!entries.isEmpty()) validateEntries(provider(), entries);
+            for (Binding binding : bindings) {
+                var target = FtbQuestTasks.evidenceTarget(server, teamId, binding.taskId()); validate(binding, target);
+                journal.validateCycle(binding, teamId, target.cycle());
+                // CONFIRMED progress can trigger native automatic rewards before project() acknowledges APPLIED.
+                if (target.state().progress() != journal.total(binding, teamId, target.cycle(), false))
+                    throw new IllegalStateException("Commerce-backed reward task has unowned or unreconciled progress: " + binding.taskId());
+            }
+            return true;
+        });
+    }
     private record Operation(UUID actor, UUID operation) { }
     private record Observation(Position position, Object metadata, Object outcome) { }
     private void validateEntries(Object provider, List<Entry> entries) {
@@ -377,7 +414,8 @@ public final class CommerceQuestTasks implements AutoCloseable {
         if (closed) return; closed = true; for (var listener : listeners) NeoForge.EVENT_BUS.unregister(listener); journal.close();
     }
     @EventBusSubscriber(modid = "citizens") public static final class Lifecycle {
-        @SubscribeEvent(priority = EventPriority.LOWEST) public static void start(ServerStartedEvent event) {
+        // Open before FTB loads teams and can attempt native automatic claims during startup.
+        @SubscribeEvent(priority = EventPriority.LOWEST) public static void start(ServerAboutToStartEvent event) {
             try { current = new CommerceQuestTasks(event.getServer(), event.getServer().getWorldPath(LevelResource.ROOT).resolve("citizens/commerce-tasks")); }
             catch (IOException | RuntimeException failure) { current = null; LOGGER.error("Commerce task journal unavailable; retained records need review", failure); }
         }

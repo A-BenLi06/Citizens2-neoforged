@@ -1,6 +1,6 @@
 param(
     [Parameter(Mandatory)][string]$JavaHome,
-    [ValidateSet('actor','shared','offline','newmember','dependency','sequential')][string]$Scope = 'actor',
+    [ValidateSet('actor','shared','offline','newmember','dependency','sequential','reward','rewardshared')][string]$Scope = 'actor',
     [string]$EconomyJar,
     [ValidatePattern('^[a-zA-Z0-9_-]+$')][string]$LogPrefix = 'financial-backup-2026-10-22'
 )

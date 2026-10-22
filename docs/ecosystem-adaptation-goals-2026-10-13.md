@@ -8,6 +8,13 @@ Citizens retains NPC behavior and its existing native extension contracts. Yuuni
 
 ## Selected artifacts and sides
 
+Progress 2026-10-22, UTC+08:00: [direct commerce reward admission](commerce-direct-reward-admission-2026-10-22.md)
+revalidates same-quest retained settlements and native progress before FTB's
+claim marker, repeat reset or item/command/monetary outcome. The native matrices
+include an offline party contributor and unrelated/automatic/repeat controls.
+Other-quest dependency admission and monetary PAID backup validation remain open,
+alongside unretained offline requests, storage/load and content/client acceptance.
+
 Progress 2026-10-22, UTC+08:00: [dependent commerce recovery](commerce-dependent-recovery-2026-10-22.md)
 retries retained projections after other native scopes succeed, covering quest
 prerequisites and sequential tasks without overriding FTB gates. Missing financial
