@@ -54,6 +54,11 @@ and the separate Interactions suite provide regression coverage.
 
 ## Remaining boundary
 
+The subsequent [shared/offline extension](commerce-shared-backup-recovery-2026-10-22.md)
+adds a supported provider inspection contract and contributor-wide checks within
+the relevant task/team/cycle. The following actor-only limitation describes this
+earlier acceptance boundary; the linked extension records its additional coverage.
+
 Validation is actor-scoped. Commerce capability 3 requires an online actor even
 for read-only operation lookup and journal position. Shared task admission may
 depend on another, offline member's previously admitted settlements. A supported

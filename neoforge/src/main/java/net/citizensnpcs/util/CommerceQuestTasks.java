@@ -106,6 +106,7 @@ public final class CommerceQuestTasks implements AutoCloseable {
                     journal.cursor(binding, actor.getUUID(), position.id(), position.sequence());
                     var target = FtbQuestTasks.evidenceTarget(actor, binding.taskId()); validate(binding, target);
                     if (!target.visible() || !target.state().available() || target.state().completed()) continue;
+                    validateScope(binding, target.state().teamId(), target.cycle());
                     long applied = journal.total(binding, target.state().teamId(), target.cycle(), true);
                     if (target.state().progress() != applied) throw new IllegalStateException("Task has unowned or unacknowledged progress");
                     journal.prepare(binding, request, new Attribution(target.state().teamId(), target.cycle(), position.sequence(), System.currentTimeMillis()));
@@ -185,17 +186,55 @@ public final class CommerceQuestTasks implements AutoCloseable {
     /** A restored ledger can catch up its sequence with unrelated trades while losing admitted settlements. */
     private void validateRetained(Object provider, ServerPlayer actor, Position position) {
         for (Binding binding : journal.bindings()) journal.cursor(binding, actor.getUUID(), position.id(), position.sequence());
-        for (Entry entry : journal.entries()) if (entry.request().actorId().equals(actor.getUUID())
-                && (entry.state() == State.WAITING || entry.state() == State.CONFIRMED || entry.state() == State.APPLIED)) {
-            Object outcome = outcome(provider, actor, entry.receipt().operationId());
-            validateOutcome(entry.receipt(), outcome);
-            if (entry.state() != State.WAITING && !settled(entry.binding(), outcome))
+        var entries = journal.entries(); var scopes = new HashSet<Projection>();
+        for (Entry entry : entries) if (retained(entry) && entry.request().actorId().equals(actor.getUUID()))
+            scopes.add(new Projection(entry.binding(), entry.attribution().teamId(), entry.attribution().cycle()));
+        validateEntries(provider, entries.stream().filter(entry -> retained(entry)
+                && scopes.contains(new Projection(entry.binding(), entry.attribution().teamId(), entry.attribution().cycle()))).toList());
+    }
+    private static boolean retained(Entry entry) {
+        return entry.state() == State.WAITING || entry.state() == State.CONFIRMED || entry.state() == State.APPLIED;
+    }
+    private void validateScope(Binding binding, UUID team, int cycle) {
+        validateEntries(provider(), journal.entries().stream().filter(entry -> retained(entry) && entry.binding().equals(binding)
+                && entry.attribution().teamId().equals(team) && entry.attribution().cycle() == cycle).toList());
+    }
+    private record Operation(UUID actor, UUID operation) { }
+    private record Observation(Position position, Object metadata, Object outcome) { }
+    private void validateEntries(Object provider, List<Entry> entries) {
+        // Cache only within this synchronous validation, never across admissions or native callbacks.
+        var observations = new HashMap<Operation, Observation>();
+        for (Entry entry : entries) {
+            var key = new Operation(entry.request().actorId(), entry.receipt().operationId());
+            var observation = observations.computeIfAbsent(key, ignored -> inspect(provider, key));
+            var position = observation.position();
+            journal.cursor(entry.binding(), key.actor(), position.id(), position.sequence());
+            if (observation.metadata() != null && (!request(observation.metadata(), key.actor()).equals(entry.request())
+                    || !receipt(property(observation.metadata(), "receipt"), observation.metadata()).equals(entry.receipt())))
+                throw new IllegalStateException("Provider receipt changed its immutable request or history payload");
+            validateOutcome(entry.receipt(), observation.outcome());
+            if (entry.state() != State.WAITING && !settled(entry.binding(), observation.outcome()))
                 throw new IllegalStateException("Retained receipt inventory outcome is unresolved");
         }
+    }
+    private Observation inspect(Object provider, Operation operation) {
+        if (version(provider) >= 4) {
+            Object inspection = reflected(() -> Class.forName(API + "CommerceApi").getMethod("inspectOperation", UUID.class, UUID.class)
+                    .invoke(provider, operation.actor(), operation.operation()));
+            Object position = property(inspection, "position");
+            Object metadata = ((Optional<?>) property(inspection, "entry")).orElseThrow(() -> new IllegalStateException("Committed operation disappeared"));
+            Object outcome = ((Optional<?>) property(inspection, "outcome")).orElseThrow(() -> new IllegalStateException("Committed operation disappeared"));
+            return new Observation(new Position((UUID) property(position, "journalId"), ((Number) property(position, "sequence")).longValue()), metadata, outcome);
+        }
+        var actor = server.getPlayerList().getPlayer(operation.actor());
+        if (actor == null) throw new IllegalStateException("Commerce capability revision 4 is required to inspect an offline contributor");
+        online(actor);
+        return new Observation(position(provider, actor), null, outcome(provider, actor, operation.operation()));
     }
     private void project(Binding binding, UUID team, int cycle) throws IOException {
         var target = FtbQuestTasks.evidenceTarget(server, team, binding.taskId()); validate(binding, target);
         journal.validateCycle(binding, team, target.cycle());
+        validateScope(binding, team, cycle);
         // Fully acknowledged earlier cycles need no mutation after a normal native repeat reset.
         if (target.cycle() > cycle && journal.entries().stream().noneMatch(entry -> entry.binding().equals(binding)
                 && entry.attribution() != null && entry.attribution().teamId().equals(team) && entry.attribution().cycle() == cycle
@@ -204,16 +243,6 @@ public final class CommerceQuestTasks implements AutoCloseable {
         long total = journal.total(binding, team, cycle, false), applied = journal.total(binding, team, cycle, true);
         if (target.state().progress() == total && applied == total) return;
         if (target.state().progress() > applied && target.state().progress() != total) throw new IllegalStateException("Native progress conflicts with admitted receipts");
-        // A crash can persist APPLIED before FTB's own save. Verify the retained settlements again before restoring.
-        for (Entry entry : journal.entries()) if (entry.binding().equals(binding)
-                && entry.attribution() != null && entry.attribution().teamId().equals(team) && entry.attribution().cycle() == cycle
-                && (entry.state() == State.CONFIRMED || target.state().progress() < applied && entry.state() == State.APPLIED)) {
-            var actor = server.getPlayerList().getPlayer(entry.request().actorId()); online(actor);
-            Object provider = provider(actor); Position position = position(provider, actor);
-            journal.cursor(binding, actor.getUUID(), position.id(), position.sequence());
-            Object outcome = outcome(provider, actor, entry.receipt().operationId()); validateOutcome(entry.receipt(), outcome);
-            if (!settled(binding, outcome)) throw new IllegalStateException("Retained receipt inventory outcome is unresolved");
-        }
         FtbQuestTasks.projectEvidence(server, team, binding.taskId(), binding.questId(), cycle, binding.maximum(), target.state().progress(), total);
         for (Entry entry : journal.entries()) if (entry.binding().equals(binding) && entry.attribution() != null
                 && entry.attribution().teamId().equals(team) && entry.attribution().cycle() == cycle && entry.state() == State.CONFIRMED) journal.applied(entry.id());
@@ -223,6 +252,7 @@ public final class CommerceQuestTasks implements AutoCloseable {
         var actor = server.getPlayerList().getPlayer(entry.request().actorId()); online(actor);
         Object provider = provider(actor); Position position = position(provider, actor); journal.cursor(binding, actor.getUUID(), position.id(), position.sequence());
         validateRetained(provider, actor, position);
+        validateScope(binding, teamId, cycle);
         Object outcome = outcome(provider, actor, entry.receipt().operationId()); validateOutcome(entry.receipt(), outcome);
         if (accept && !settled(binding, outcome)) throw new IllegalStateException("Provider inventory outcome is still unresolved");
         Attribution attribution = entry.attribution();
@@ -243,22 +273,29 @@ public final class CommerceQuestTasks implements AutoCloseable {
     private record Position(UUID id, long sequence) { }
     private static Object economy() { return reflected(() -> ((Optional<?>) Class.forName(API + "YuuniverseEconomyApi").getMethod("current").invoke(null)).orElseThrow(() -> new IllegalStateException("Economy is unavailable"))); }
     private Object provider(ServerPlayer actor) {
-        online(actor); Object provider = reflected(() -> ((Optional<?>) Class.forName(API + "EconomyApi").getMethod("commerceApi").invoke(economy())).orElseThrow());
-        int version = reflected(() -> (int) Class.forName(API + "CommerceApi").getMethod("version").invoke(provider));
-        if (version < 3) throw new IllegalStateException("Commerce capability revision 3 is required"); return provider;
+        online(actor); return provider();
     }
+    private Object provider() {
+        active(); Object provider = reflected(() -> ((Optional<?>) Class.forName(API + "EconomyApi").getMethod("commerceApi").invoke(economy())).orElseThrow());
+        if (version(provider) < 3) throw new IllegalStateException("Commerce capability revision 3 is required"); return provider;
+    }
+    private static int version(Object provider) { return reflected(() -> (int) Class.forName(API + "CommerceApi").getMethod("version").invoke(provider)); }
     private static Position position(Object provider, ServerPlayer actor) {
         Object nativePosition = reflected(() -> Class.forName(API + "CommerceApi").getMethod("journalPosition", UUID.class).invoke(provider, actor.getUUID()));
         return new Position((UUID) property(nativePosition, "journalId"), ((Number) property(nativePosition, "sequence")).longValue());
     }
-    private static String account(ServerPlayer actor) { return reflected(() -> (String) Class.forName(CORE + "AccountIds").getMethod("player", UUID.class).invoke(null, actor.getUUID())); }
+    private static String account(ServerPlayer actor) { return account(actor.getUUID()); }
+    private static String account(UUID actor) { return reflected(() -> (String) Class.forName(CORE + "AccountIds").getMethod("player", UUID.class).invoke(null, actor)); }
     private static Request request(Object value, ServerPlayer actor) {
+        return request(value, actor.getUUID());
+    }
+    private static Request request(Object value, UUID actor) {
         boolean history = value.getClass().getName().equals(CORE + "CommerceJournalEntry");
         if (!Objects.equals(property(value, "playerAccountId"), account(actor))) throw new IllegalStateException("Commerce account does not belong to actor");
         Number trades = (Number) property(value, history ? "tradeQuantity" : "quantity");
         String requestKey = (String) property(value, history ? "requestKey" : "idempotencyKey");
         return new Request(Shop.valueOf(property(value, "shopType").toString()), (String) property(value, "shopId"), (String) property(value, "itemKey"),
-                Action.valueOf(property(value, "action").toString()), actor.getUUID(), trades == null ? null : trades.intValue(), requestKey, (String) property(value, "origin"),
+                Action.valueOf(property(value, "action").toString()), actor, trades == null ? null : trades.intValue(), requestKey, (String) property(value, "origin"),
                 requestKey == null && history ? (UUID) property(property(value, "receipt"), "operationId") : null);
     }
     private static Receipt receipt(Object value, Object metadata) {

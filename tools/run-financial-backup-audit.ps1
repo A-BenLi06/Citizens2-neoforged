@@ -1,5 +1,7 @@
 param(
     [Parameter(Mandatory)][string]$JavaHome,
+    [ValidateSet('actor','shared')][string]$Scope = 'actor',
+    [string]$EconomyJar,
     [ValidatePattern('^[a-zA-Z0-9_-]+$')][string]$LogPrefix = 'financial-backup-2026-10-22'
 )
 $ErrorActionPreference = 'Stop'
@@ -18,7 +20,8 @@ foreach ($name in @('ftb-library-neoforge-2101.1.37.jar','ftb-quests-neoforge-21
     Copy-Item -LiteralPath (Join-Path $taskRoot "artifacts/selected-integrations-2026-10-12/$name") -Destination $mods
 }
 Copy-Item -LiteralPath (Join-Path $taskRoot 'artifacts/ecosystem-2026-10-13/server-smoke/mods/architectury-13.0.11-neoforge.jar') -Destination $mods
-Copy-Item -LiteralPath (Join-Path $taskRoot '../yuuniverse-economy/build/libs/yuuniverse-economy-0.5.6-SNAPSHOT.jar') -Destination (Join-Path $mods 'economy.jar')
+if (!$EconomyJar) { $EconomyJar = Join-Path $taskRoot '../yuuniverse-economy/build/libs/yuuniverse-economy-0.5.7-SNAPSHOT.jar' }
+Copy-Item -LiteralPath $EconomyJar -Destination (Join-Path $mods 'economy.jar')
 @('server-ip=127.0.0.1','server-port=25646','online-mode=false','level-name=financial-world',
   'level-type=minecraft:flat','generate-structures=false','spawn-protection=0','view-distance=2','simulation-distance=2',
   'generator-settings={"layers":[{"block":"minecraft:bedrock","height":1},{"block":"minecraft:dirt","height":2},{"block":"minecraft:grass_block","height":1}],"biome":"minecraft:plains"}') |
@@ -26,7 +29,7 @@ Copy-Item -LiteralPath (Join-Path $taskRoot '../yuuniverse-economy/build/libs/yu
 'eula=true' | Set-Content -LiteralPath (Join-Path $fixture 'eula.txt') -Encoding ascii
 $runId | Set-Content -LiteralPath (Join-Path $fixture 'financial-audit-fixture.txt') -Encoding ascii
 $gradleArguments = @('--project-cache-dir','../artifacts/financial-backup-cache','-I','../tools/financial-backup-runtime-audit.gradle',
-    '-Pneo_version=21.1.248',"-PfinancialAuditFixture=../$relativeFixture","-PfinancialAuditRun=$runId")
+    '-Pneo_version=21.1.248',"-PfinancialAuditFixture=../$relativeFixture","-PfinancialAuditRun=$runId","-PfinancialAuditScope=$Scope")
 $stages = [Collections.Generic.List[object]]::new()
 function Assert-StoppedFixture {
     if ((Get-Content -LiteralPath (Join-Path $fixture 'financial-audit-fixture.txt') -Raw).Trim() -ne $runId) { throw 'Financial fixture identity changed' }
@@ -66,6 +69,6 @@ try {
         Invoke-Phase $phase
     }
 } finally {
-    [ordered]@{run=$runId;fixture=$relativeFixture;neoForge='21.1.248';createdAt=[DateTimeOffset]::Now.ToString('o');stages=$stages.ToArray()} |
+    [ordered]@{run=$runId;fixture=$relativeFixture;scope=$Scope;neoForge='21.1.248';createdAt=[DateTimeOffset]::Now.ToString('o');stages=$stages.ToArray()} |
         ConvertTo-Json -Depth 5 | Set-Content -LiteralPath (Join-Path $taskRoot "artifacts/$LogPrefix-result.json") -Encoding utf8NoBOM
 }

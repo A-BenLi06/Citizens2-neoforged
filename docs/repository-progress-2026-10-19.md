@@ -10,6 +10,15 @@ This review covers repository structure, native implementation boundaries, upstr
 
 ## Repository and implementation boundaries
 
+Update 2026-10-22, UTC+08:00: [shared/offline commerce recovery](commerce-shared-backup-recovery-2026-10-22.md)
+extends current-actor validation to all retained contributors in the relevant
+task/team/cycle. Economy 0.5.7 capability 4 supplies the public offline inspection
+contract (provider commit `1507c3d`, 91 ordinary tests and 54 native checks). The
+actual two-member party fixture passes 40 stopped-backup checks. Both ordinary
+Citizens targets pass 775 tests; 100 Interactions and 90 selected native checks pass.
+Monetary/native reward admission, reconciliation with all contributors offline,
+new noncontributing party members, throughput and physical/migration gates remain.
+
 Update 2026-10-22, UTC+08:00: [financial backup recovery](commerce-financial-backup-recovery-2026-10-22.md)
 closes the current-actor commerce replay gap where unrelated trades could hide a
 missing settlement behind an equal/higher ledger sequence. Native stopped-restore

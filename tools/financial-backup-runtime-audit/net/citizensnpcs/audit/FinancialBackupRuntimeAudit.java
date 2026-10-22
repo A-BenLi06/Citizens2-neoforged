@@ -23,6 +23,7 @@ public final class FinancialBackupRuntimeAudit {
     private static boolean ran;
     private static int passed;
     @SubscribeEvent public static void tick(ServerTickEvent.Post event) {
+        if ("shared".equals(System.getenv("CITIZENS_FINANCIAL_AUDIT_SCOPE"))) return;
         if(ran || event.getServer().getTickCount()<20)return;
         ran=true;
         var server=event.getServer(); ServerPlayer actor=null; io.netty.channel.embedded.EmbeddedChannel channel=null;
@@ -114,16 +115,16 @@ public final class FinancialBackupRuntimeAudit {
         }catch(Throwable failure){LOG.error("[FINANCIALAUDIT] FAILED {}",phase,failure);}
         finally {if(actor!=null&&actor.connection!=null)server.getPlayerList().remove(actor);if(channel!=null)channel.finishAndReleaseAll();server.halt(false);}
     }
-    private static CommerceOutcome trade(CommerceApi api,ServerPlayer actor,String shop,String suffix) {
+    static CommerceOutcome trade(CommerceApi api,ServerPlayer actor,String shop,String suffix) {
         var request=new CommerceRequest(CommerceShopType.SYSTEM,shop,"paper",CommerceAction.BUY_FROM_SHOP,AccountIds.player(actor.getUUID()),1,"financial:"+UUID.randomUUID(),"audit:"+suffix);
         return api.execute(actor.getUUID(),api.quote(actor.getUUID(),request));
     }
-    private static void snapshot(Path database,Path target)throws Exception {
+    static void snapshot(Path database,Path target)throws Exception {
         try(var connection=DriverManager.getConnection("jdbc:sqlite:"+database);var statement=connection.prepareStatement("VACUUM INTO ?")) {
             statement.setString(1,target.toAbsolutePath().toString());statement.execute();
         }
     }
-    private static void seed(Path database,String shop,String currency)throws Exception {
+    static void seed(Path database,String shop,String currency)throws Exception {
         try(var c=DriverManager.getConnection("jdbc:sqlite:"+database);
             var s=c.prepareStatement("INSERT INTO system_shop VALUES (?,?,'fixture','fixture','{}',1)");
             var p=c.prepareStatement("INSERT INTO system_shop_page VALUES (?,'page1',0,'Financial fixture',3,'{}')");
@@ -131,7 +132,7 @@ public final class FinancialBackupRuntimeAudit {
             s.setString(1,shop);s.setString(2,shop);s.executeUpdate();p.setString(1,shop);p.executeUpdate();o.setString(1,shop);o.setString(2,currency);o.executeUpdate();
         }
     }
-    private static io.netty.channel.embedded.EmbeddedChannel connect(ServerPlayer player) {
+    static io.netty.channel.embedded.EmbeddedChannel connect(ServerPlayer player) {
         var connection=new net.minecraft.network.Connection(net.minecraft.network.protocol.PacketFlow.SERVERBOUND);
         var channel=new io.netty.channel.embedded.EmbeddedChannel(new io.netty.channel.ChannelInitializer<io.netty.channel.Channel>() {
             @Override protected void initChannel(io.netty.channel.Channel channel) {net.minecraft.network.Connection.configureInMemoryPipeline(channel.pipeline(),net.minecraft.network.protocol.PacketFlow.SERVERBOUND);connection.configurePacketHandler(channel.pipeline());}

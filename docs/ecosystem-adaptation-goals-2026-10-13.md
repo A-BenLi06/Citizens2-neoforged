@@ -8,6 +8,14 @@ Citizens retains NPC behavior and its existing native extension contracts. Yuuni
 
 ## Selected artifacts and sides
 
+Progress 2026-10-22, UTC+08:00: [shared commerce backup recovery](commerce-shared-backup-recovery-2026-10-22.md)
+adds contributor-wide checks within a bound task/team/cycle, using Economy 0.5.7
+Commerce capability 4's supported read-only offline inspection. The native fixture
+passes 40 checks with only the unaffected party member online: missing offline
+settlements are rejected at lower/equal/higher sequence, while a matching backup
+allows exact new shared progress. Monetary/native reward admission, fully offline
+reconciliation, new noncontributing members and throughput remain open gates.
+
 Progress 2026-10-22, UTC+08:00: [commerce financial backup validation](commerce-financial-backup-recovery-2026-10-22.md)
 now rechecks the online actor's retained settlements before replay, new attribution
 or review resolution. Thirty-nine native stopped-restore checks cover lower/equal/

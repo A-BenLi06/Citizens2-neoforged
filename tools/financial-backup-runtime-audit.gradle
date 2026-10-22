@@ -4,10 +4,13 @@ allprojects {
         if (p.extensions.findByName('neoForge') == null) return
         def phase = p.findProperty('financialAuditPhase') ?: 'seed'
         if (!(phase in ['seed','regressed','caughtup','higher','consistent'])) throw new GradleException('Unknown financial backup phase')
+        def scope = p.findProperty('financialAuditScope') ?: 'actor'
+        if (!(scope in ['actor','shared'])) throw new GradleException('Unknown financial backup scope')
         def fixture = p.file(p.property('financialAuditFixture'))
         def artifacts = p.file('../artifacts').toPath().toAbsolutePath().normalize()
         if (!fixture.toPath().toAbsolutePath().normalize().startsWith(artifacts)) throw new GradleException('Financial fixture must be inside artifacts')
         p.sourceSets.main.java.srcDir(p.file('../tools/financial-backup-runtime-audit'))
+        if (scope == 'actor') p.sourceSets.main.java.exclude('**/SharedCommerceBackupRuntimeAudit.java')
         p.sourceSets.main.compileClasspath += p.files(p.fileTree(new File(fixture, 'mods')) { include '*.jar' })
         p.neoForge.runs.named('server') { gameDirectory = fixture }
         p.tasks.named('prepareServerRun') {
@@ -23,6 +26,7 @@ allprojects {
         p.tasks.named('runServer') {
             environment 'CITIZENS_FINANCIAL_AUDIT_PHASE', phase
             environment 'CITIZENS_FINANCIAL_AUDIT_RUN', p.property('financialAuditRun')
+            environment 'CITIZENS_FINANCIAL_AUDIT_SCOPE', scope
             timeout = java.time.Duration.ofMinutes(3)
             doLast {
                 def log = new File(fixture, 'logs/latest.log').getText('UTF-8')

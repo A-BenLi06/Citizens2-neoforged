@@ -66,6 +66,13 @@ native money/items/progress and does not cancel Economy trades. See the
 [financial backup recovery boundary](commerce-financial-backup-recovery-2026-10-22.md)
 for stopped-restore evidence and the separate shared/offline/reward gates.
 
+The [shared/offline extension](commerce-shared-backup-recovery-2026-10-22.md)
+validates every retained contributor in the relevant task/team/cycle, including
+before an already-matching projection returns. Economy 0.5.7 Commerce capability 4
+supplies owner-scoped read-only inspection without an online contributor session.
+Capability 3 remains usable when all required contributors are online; offline
+inspection requires capability 4. Native reward admission is a separate open gate.
+
 FTB saves independently. A process kill can leave retained APPLIED while FTB still
 has an older progress total. Reconciliation rechecks the original public settlements
 and restores the exact absolute total; it does not execute another trade. Lower
