@@ -10,6 +10,13 @@ This review covers repository structure, native implementation boundaries, upstr
 
 ## Repository and implementation boundaries
 
+Update 2026-10-22, UTC+08:00: [delivery checkpoint history](delivery-checkpoint-history-2026-10-22.md)
+rejects saved checkpoints whose native outcome disappeared from a valid older
+journal prefix, including absent-actor and latest-RESOLVED prefixes. Consistent
+backups restore the original predecessor; no historical delivery is invented.
+Fresh validation passes 285 native checks, 775 ordinary tests per target and 100
+Interactions tests. Retention/load, other recovery and migration/client gates remain.
+
 Update 2026-10-22, UTC+08:00: [delivery callback recovery](delivery-callback-recovery-2026-10-22.md)
 prevents confirmation through held ItemTask/TeamData or retired actor objects
 after native callbacks. Actual party deletion/replacement/disconnect cases retain

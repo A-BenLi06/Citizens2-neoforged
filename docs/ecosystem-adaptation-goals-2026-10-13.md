@@ -8,6 +8,12 @@ Citizens retains NPC behavior and its existing native extension contracts. Yuuni
 
 ## Selected artifacts and sides
 
+Progress 2026-10-22, UTC+08:00: [retained delivery checkpoint backing](delivery-checkpoint-history-2026-10-22.md)
+fences consumption when a saved player's checkpoint has no owned native outcome
+in the restored journal. Actual absent/latest-RESOLVED prefixes reject; matching
+backups resume the original chain. No guessed historical intent or resolution is
+created. Storage/load, remaining recovery and migration/client gates stay open.
+
 Progress 2026-10-22, UTC+08:00: [delivery callback recovery](delivery-callback-recovery-2026-10-22.md)
 validates original native target identity/definition and the active inventory
 owner after consumption. Disappearing/replaced targets and retired sessions stay

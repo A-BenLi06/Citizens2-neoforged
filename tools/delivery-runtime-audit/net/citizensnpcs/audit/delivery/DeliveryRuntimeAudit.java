@@ -39,6 +39,8 @@ public final class DeliveryRuntimeAudit {
     private static String phase, killBoundary;
     @SubscribeEvent public static void tick(ServerTickEvent.Post event) {
         if (ran) return; ran = true;
+        String history = System.getenv("CITIZENS_DELIVERY_AUDIT_HISTORY");
+        if (history != null) { DeliveryHistoryRuntimeAudit.run(event.getServer(), history); return; }
         String mutation = System.getenv("CITIZENS_DELIVERY_AUDIT_MUTATION");
         if (mutation != null) { DeliveryMutationRuntimeAudit.run(event.getServer(), mutation); return; }
         MinecraftServer server = event.getServer(); EmbeddedChannel channel = null;
@@ -70,6 +72,7 @@ public final class DeliveryRuntimeAudit {
         }
     }
     public static void boundary(String point, ServerPlayer player) {
+        DeliveryHistoryRuntimeAudit.boundary(point, player);
         if (actor == null || player != null && player != actor) return;
         if (reenter && point.equals("before")) {
             reenter = false;

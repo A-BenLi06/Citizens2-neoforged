@@ -79,6 +79,16 @@ Other unresolved entries can still fence the next attempt.
 
 ## Acceptance and limits
 
+Follow-up 2026-10-22, UTC+08:00: [saved checkpoint history](delivery-checkpoint-history-2026-10-22.md)
+also validates every present player checkpoint against its retained owned native
+outcome before admission. A valid older journal prefix can otherwise appear fresh
+or end with RESOLVED while losing a newer confirmed player outcome. Those cases
+require a consistent backup; an absent historical row cannot be resolved through
+the ordinary review command. The fresh history/native regression passes 285
+checks, ordinary775 per target and Interactions100. Removal/rollback of both
+checkpoint and journal together and general retention/load remain outside that
+positive-evidence check.
+
 Ordinary clean builds pass 775 tests on each of NeoForge 21.1.233 and 21.1.248;
 the separate Interactions suite passes 100. The journal adds eight unit tests.
 The native normal run passes 17 checks. Six actual JVM kills pass three boundary

@@ -40,6 +40,7 @@ public final class QuestDeliveryRecovery implements AutoCloseable {
             if (QuestDeliveryJournal.pending(entry) && (actorOwns || taskOwns))
                 throw new IllegalStateException("Delivery " + entry.id() + " requires its native outcome or operator review");
         }
+        verifyCheckpoint(actor);
         var latestActor = journal.latest(actor.getUUID()).orElse(null);
         if (latestActor != null && latestActor.state() == QuestDeliveryJournal.State.CONFIRMED) {
             if (!actor.getPersistentData().getString(CHECKPOINT).equals(latestActor.id().toString()))
@@ -50,6 +51,17 @@ public final class QuestDeliveryRecovery implements AutoCloseable {
         var latestTask = journal.entries().stream().filter(entry -> entry.before().teamId().equals(target.teamId())
                 && entry.before().taskId().equals(target.taskId())).max(java.util.Comparator.comparingLong(QuestDeliveryJournal.Entry::sequence)).orElse(null);
         if (latestTask != null && latestTask.state() == QuestDeliveryJournal.State.CONFIRMED) verify(latestTask, recordMismatch);
+    }
+    private void verifyCheckpoint(ServerPlayer actor) {
+        if (!actor.getPersistentData().contains(CHECKPOINT)) return;
+        String saved = actor.getPersistentData().getString(CHECKPOINT);
+        try {
+            var entry = journal.get(UUID.fromString(saved));
+            if (!entry.id().toString().equals(saved) || !entry.actorId().equals(actor.getUUID()) || entry.after() == null)
+                throw new IllegalArgumentException("Checkpoint does not identify this actor's retained native outcome");
+        } catch (IllegalArgumentException unavailable) {
+            throw new IllegalStateException("Saved player delivery checkpoint has no matching retained native outcome; restore a consistent delivery backup before retrying", unavailable);
+        }
     }
     private void verify(QuestDeliveryJournal.Entry entry, boolean recordMismatch) {
         QuestDeliveryJournal.Target live;
