@@ -1,7 +1,7 @@
 param(
     [string]$ProviderDirectory = (Join-Path (Split-Path $PSScriptRoot -Parent) 'artifacts/selected-integrations-2026-10-12'),
     [string]$SupportDirectory = (Join-Path (Split-Path $PSScriptRoot -Parent) 'artifacts/ecosystem-2026-10-13/server-smoke/mods'),
-    [string]$EconomyJar = (Join-Path (Split-Path (Split-Path $PSScriptRoot -Parent) -Parent) 'yuuniverse-economy/build/libs/yuuniverse-economy-0.5.6-SNAPSHOT.jar')
+    [string]$EconomyJar = (Join-Path (Split-Path (Split-Path $PSScriptRoot -Parent) -Parent) 'yuuniverse-economy/build/libs/yuuniverse-economy-0.5.8-SNAPSHOT.jar')
 )
 $ErrorActionPreference = 'Stop'
 $fixture = Join-Path (Split-Path $PSScriptRoot -Parent) 'artifacts/xmod-audit-server'

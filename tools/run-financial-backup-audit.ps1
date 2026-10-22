@@ -1,6 +1,6 @@
 param(
     [Parameter(Mandatory)][string]$JavaHome,
-    [ValidateSet('actor','shared','offline','newmember','dependency','sequential','reward','rewardshared','rewardgraph')][string]$Scope = 'actor',
+    [ValidateSet('actor','shared','offline','newmember','dependency','sequential','reward','rewardshared','rewardgraph','paid')][string]$Scope = 'actor',
     [string]$EconomyJar,
     [ValidatePattern('^[a-zA-Z0-9_-]+$')][string]$LogPrefix = 'financial-backup-2026-10-22'
 )
@@ -20,7 +20,7 @@ foreach ($name in @('ftb-library-neoforge-2101.1.37.jar','ftb-quests-neoforge-21
     Copy-Item -LiteralPath (Join-Path $taskRoot "artifacts/selected-integrations-2026-10-12/$name") -Destination $mods
 }
 Copy-Item -LiteralPath (Join-Path $taskRoot 'artifacts/ecosystem-2026-10-13/server-smoke/mods/architectury-13.0.11-neoforge.jar') -Destination $mods
-if (!$EconomyJar) { $EconomyJar = Join-Path $taskRoot '../yuuniverse-economy/build/libs/yuuniverse-economy-0.5.7-SNAPSHOT.jar' }
+if (!$EconomyJar) { $EconomyJar = Join-Path $taskRoot '../yuuniverse-economy/build/libs/yuuniverse-economy-0.5.8-SNAPSHOT.jar' }
 Copy-Item -LiteralPath $EconomyJar -Destination (Join-Path $mods 'economy.jar')
 @('server-ip=127.0.0.1','server-port=25646','online-mode=false','level-name=financial-world',
   'level-type=minecraft:flat','generate-structures=false','spawn-protection=0','view-distance=2','simulation-distance=2',

@@ -1,5 +1,11 @@
 # Native FTB monetary rewards and durable recovery
 
+Update 2026-10-22, UTC+08:00: [PAID financial-restore validation](monetary-paid-backup-recovery-2026-10-22.md)
+checks the original public provider credit and acknowledged transaction UUID before
+startup/reconciliation settles pending claims and before new claims in the same
+native team quest. Economy 0.5.8/API revision 5 supplies read-only inspection.
+Historical PAID records are never automatically recredited to hide missing history.
+
 Implemented 2026-10-18, UTC+08:00. Minecraft 1.21.1, FTB Quests 2101.1.36,
 Economy 0.5.5 (`605e187`), deployed NeoForge target 21.1.248. The optional
 Citizens mixin observes the selected provider's **public player claim method**

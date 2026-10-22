@@ -86,6 +86,8 @@ public final class FtbMonetaryRewards implements AutoCloseable {
             Enum<?> status = (Enum<?>) teamType.getMethod("getClaimType", UUID.class, rewardType).invoke(nativeTeam, player.getUUID(), nativeReward);
             if (!status.name().equals("CAN_CLAIM") || !visible(nativeReward, nativeTeam)) return false;
             UUID teamId = (UUID) teamType.getMethod("getTeamId").invoke(nativeTeam);
+            validatePaid(journal.claims().stream().filter(claim -> claim.intent().teamId().equals(teamId)
+                    && claim.intent().binding().questId().equals(binding.questId())).toList());
             String admissionScope = teamId + ":" + binding.questId();
             if (!admitting.add(admissionScope)) throw new IllegalStateException("A native reward claim is already in progress for this team quest");
             QuestRewardJournal.Claim prepared = null;
@@ -113,11 +115,14 @@ public final class FtbMonetaryRewards implements AutoCloseable {
     }
     public int reconcile(CommandSourceStack source) throws IOException {
         authorize(source, false); int count = 0;
+        validatePaid(journal.claims());
         for (var claim : journal.claims()) if (claim.state() == QuestRewardJournal.State.ACCEPTED) { settle(claim.id()); count++; }
         return count;
     }
     public QuestRewardJournal.Claim resolve(CommandSourceStack source, String id, boolean accept, String reason) throws IOException {
-        authorize(source, true); var claim = journal.resolve(id, source.getPlayer().getUUID(), reason, accept);
+        authorize(source, true);
+        if (accept) validatePaid(journal.claims());
+        var claim = journal.resolve(id, source.getPlayer().getUUID(), reason, accept);
         if (accept) settle(id); return journal.get(id);
     }
     public List<QuestRewardJournal.Binding> bindings(CommandSourceStack source) { authorize(source, false); return journal.bindings(); }
@@ -125,7 +130,7 @@ public final class FtbMonetaryRewards implements AutoCloseable {
 
     private void settle(String id) throws IOException {
         active(); var claim = journal.get(id);
-        if (claim.state() == QuestRewardJournal.State.PAID) return;
+        if (claim.state() == QuestRewardJournal.State.PAID) { validatePaid(List.of(claim)); return; }
         if (claim.state() != QuestRewardJournal.State.ACCEPTED) throw new IllegalStateException("Reward intent is not confirmed");
         reflected(() -> {
             var intent = claim.intent(); Object api = economy(); var apiType = Class.forName(ECONOMY + "EconomyApi");
@@ -137,6 +142,31 @@ public final class FtbMonetaryRewards implements AutoCloseable {
                     .invoke(api, intent.beneficiaryId(), intent.binding().currencyId(), intent.binding().amount(), intent.operationKey(), intent.sourceReference());
             UUID transaction = (UUID) receipt.getClass().getMethod("transactionId").invoke(receipt);
             journal.paid(id, transaction); return null;
+        });
+    }
+    /** PAID proves an acknowledged original posting; validation must never issue a replacement credit. */
+    private void validatePaid(List<QuestRewardJournal.Claim> claims) {
+        active();
+        var paid = claims.stream().filter(claim -> claim.state() == QuestRewardJournal.State.PAID).toList();
+        if (paid.isEmpty()) return;
+        reflected(() -> {
+            Object api = economy(); var type = Class.forName(ECONOMY + "EconomyApi");
+            if ((int) type.getMethod("apiVersion").invoke(api) < 5)
+                throw new IllegalStateException("Economy API revision 5 is required to inspect retained PAID monetary rewards");
+            var inspect = type.getMethod("inspectCredit", UUID.class, String.class, long.class, String.class, String.class);
+            for (var claim : paid) {
+                try {
+                    var intent = claim.intent();
+                    Object receipt = ((Optional<?>) inspect.invoke(api, intent.beneficiaryId(), intent.binding().currencyId(),
+                            intent.binding().amount(), intent.operationKey(), intent.sourceReference()))
+                            .orElseThrow(() -> new IllegalStateException("Original credited transaction is missing"));
+                    if (!claim.transactionId().equals(receipt.getClass().getMethod("transactionId").invoke(receipt)))
+                        throw new IllegalStateException("Original credited transaction identity differs");
+                } catch (ReflectiveOperationException | RuntimeException failure) {
+                    throw new IllegalStateException("PAID monetary reward requires financial reconciliation: " + claim.id(), failure);
+                }
+            }
+            return null;
         });
     }
     private record Currency(String id, int scale) { }
@@ -238,6 +268,8 @@ public final class FtbMonetaryRewards implements AutoCloseable {
         }
         @SubscribeEvent(priority = EventPriority.LOWEST) public static void recover(ServerStartedEvent event) {
             if (current == null) return;
+            try { current.validatePaid(current.journal.claims()); }
+            catch (RuntimeException failure) { LOGGER.error("Retained PAID monetary evidence is inconsistent; pending settlement is held", failure); return; }
             for (var claim : current.journal.claims()) if (claim.state() == QuestRewardJournal.State.ACCEPTED) try { current.settle(claim.id()); }
             catch (IOException | RuntimeException failure) { LOGGER.error("Monetary reward {} remains pending reconciliation", claim.id(), failure); }
         }

@@ -246,12 +246,25 @@ public final class XModRuntimeAudit {
         check(service.claims(source).size()==originalCount+1 && economy.balance(actor.getUUID(),currency.id())==before+375,"duplicate_native_claim_has_no_second_intent_or_payment");
         team.setProgress(task,task.getMaxProgress());
         net.yuuniverse.economy.api.YuuniverseEconomyApi.clear(economy);
-        try { claim(actor,reward,false); }
+        try {
+            try { claim(actor,reward,false); throw new AssertionError("Unverified PAID history admitted another claim"); }
+            catch (IllegalStateException expected) {
+                check(service.claims(source).size()==originalCount+1 && team.getProgress(task)==task.getMaxProgress()
+                        && economy.balance(actor.getUUID(),currency.id())==before+375,
+                        "provider_absence_holds_repeat_admission_before_native_or_monetary_mutation");
+            }
+        }
         finally { net.yuuniverse.economy.api.YuuniverseEconomyApi.publish(economy); }
+        // Historical inspection remains valid while the actual provider holds new credits on a frozen account.
+        var ledger=((net.yuuniverse.economy.EconomyRuntime)economy).ledger();
+        var account=economy.playerAccount(actor.getUUID()).orElseThrow();
+        ledger.setAccountFrozen(account.id(),true,"audit","isolated-test");
+        try { claim(actor,reward,false); }
+        finally { ledger.setAccountFrozen(account.id(),false,"audit","isolated-test"); }
         var second=service.claims(source).stream().filter(value->value.intent().binding().rewardId().equals(reward.getCodeString()) && value.intent().teamId().equals(team.getTeamId())).toList().getLast();
         check(second.state()==net.citizensnpcs.util.QuestRewardJournal.State.ACCEPTED && team.getProgress(task)==0
                 && second.intent().nativeCycle()==first.afterCycle() && !first.intent().operationKey().equals(second.intent().operationKey()),
-                "provider_absence_keeps_native_accepted_repeat_claim_pending_under_distinct_operation");
+                "credit_failure_keeps_native_accepted_repeat_claim_pending_under_distinct_operation");
         // Actual Economy commit simulates a lost consumer acknowledgement; recovery must reuse this operation.
         var receipt=economy.credit(second.intent().beneficiaryId(),currency.id(),375,second.intent().operationKey(),second.intent().sourceReference());
         check(service.reconcile(source)==1 && service.claims(source).stream().filter(value->value.id().equals(second.id())).findFirst().orElseThrow().transactionId().equals(receipt.transactionId())

@@ -8,6 +8,14 @@ Citizens retains NPC behavior and its existing native extension contracts. Yuuni
 
 ## Selected artifacts and sides
 
+Progress 2026-10-22, UTC+08:00: [monetary PAID restore validation](monetary-paid-backup-recovery-2026-10-22.md)
+uses supported Economy 0.5.8/API revision 5 inspection to verify original credit
+payload/postings and acknowledged transaction UUID. Startup/reconciliation hold
+pending settlement before any mutation if retained PAID evidence is inconsistent;
+new claims check prior payments in their team quest before native admission.
+Offline unretained discovery, migration/client and remaining recovery/load gates
+remain open.
+
 Progress 2026-10-22, UTC+08:00: [commerce prerequisite reward admission](commerce-reward-graph-admission-2026-10-22.md)
 checks retained backing through native quest/task/chapter/sequential and started
 paths before item, command or monetary claims. Native alternatives, minimums,

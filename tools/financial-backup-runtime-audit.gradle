@@ -5,12 +5,12 @@ allprojects {
         def phase = p.findProperty('financialAuditPhase') ?: 'seed'
         if (!(phase in ['seed','regressed','caughtup','higher','consistent'])) throw new GradleException('Unknown financial backup phase')
         def scope = p.findProperty('financialAuditScope') ?: 'actor'
-        if (!(scope in ['actor','shared','offline','newmember','dependency','sequential','reward','rewardshared','rewardgraph'])) throw new GradleException('Unknown financial backup scope')
+        if (!(scope in ['actor','shared','offline','newmember','dependency','sequential','reward','rewardshared','rewardgraph','paid'])) throw new GradleException('Unknown financial backup scope')
         def fixture = p.file(p.property('financialAuditFixture'))
         def artifacts = p.file('../artifacts').toPath().toAbsolutePath().normalize()
         if (!fixture.toPath().toAbsolutePath().normalize().startsWith(artifacts)) throw new GradleException('Financial fixture must be inside artifacts')
         p.sourceSets.main.java.srcDir(p.file('../tools/financial-backup-runtime-audit'))
-        if (scope == 'actor') p.sourceSets.main.java.exclude('**/SharedCommerceBackupRuntimeAudit.java','**/OfflineCommerceBackupRuntimeAudit.java','**/DependentCommerceRuntimeAudit.java','**/CommerceReward*.java')
+        if (scope == 'actor') p.sourceSets.main.java.exclude('**/SharedCommerceBackupRuntimeAudit.java','**/OfflineCommerceBackupRuntimeAudit.java','**/DependentCommerceRuntimeAudit.java','**/CommerceReward*.java','**/MonetaryPaid*.java')
         p.sourceSets.main.compileClasspath += p.files(p.fileTree(new File(fixture, 'mods')) { include '*.jar' })
         p.neoForge.runs.named('server') { gameDirectory = fixture }
         p.tasks.named('prepareServerRun') {

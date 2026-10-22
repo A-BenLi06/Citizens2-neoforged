@@ -10,6 +10,13 @@ This review covers repository structure, native implementation boundaries, upstr
 
 ## Repository and implementation boundaries
 
+Update 2026-10-22, UTC+08:00: [PAID monetary restore validation](monetary-paid-backup-recovery-2026-10-22.md)
+verifies original public credit metadata/postings and the retained transaction UUID
+before pending settlement or new claims in the same native team quest. Economy
+0.5.8/API revision 5 provides supported read-only offline inspection (provider
+`80bca9f`, ordinary95/native62). The remaining migration/client, unretained offline
+discovery, removed-team/callback and load/retention gates stay open.
+
 Update 2026-10-22, UTC+08:00: [commerce reward prerequisite admission](commerce-reward-graph-admission-2026-10-22.md)
 extends validation through native quest, task, sequential, chapter and started
 dependencies. FTB retains its alternative/minimum, optional-child and flexible

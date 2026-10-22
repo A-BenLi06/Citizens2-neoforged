@@ -1,6 +1,6 @@
 # Actual FTB XMod / Rhino fixture
 
-Prepare the pinned providers, including Economy 0.5.6 from its source build:
+Prepare the pinned providers, including Economy 0.5.8 from its source build:
 
 ```powershell
 ./tools/prepare-xmod-audit.ps1 -EconomyJar <absolute-provider-jar>
@@ -21,7 +21,10 @@ compatibility. Provider metadata is not rewritten to bypass those requirements.
 The two-member reward fixture also checks native party joins/leaves, shared and
 individual ownership, offline settlement, new/retired sessions and repeat cycles.
 See `docs/ftb-party-reward-acceptance-2026-10-22.md`. Its 19 checks run alongside
-the existing 44 XMod and 27 commerce checks. Both buildDirectory and project cache
+the 45 XMod and 27 commerce checks. The monetary controls verify that unavailable
+inspection holds repeat admission, while a real frozen account permits historical
+inspection and leaves the new native ACCEPTED credit pending for idempotent recovery.
+Both buildDirectory and project cache
 must be isolated when using a separate audit build; changing only the output path
 can let Gradle's stale-output cleanup delete another build's classes.
 

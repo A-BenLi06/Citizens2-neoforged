@@ -1,0 +1,1049 @@
+{
+  "createdAt": "2026-10-22T19:02:37.002362+08:00",
+  "timezone": "UTC+08:00",
+  "paid": {
+    "run": {
+      "run": "abf8ef870db34ea49f1eb0a1edb7edfc",
+      "fixture": "artifacts/financial-backup-abf8ef870db34ea49f1eb0a1edb7edfc-server",
+      "scope": "paid",
+      "neoForge": "21.1.248",
+      "createdAt": "2026-10-22T17:51:48.1974141+08:00",
+      "stages": [
+        {
+          "phase": "seed",
+          "checks": 3,
+          "log": "artifacts/paid-final-2026-10-22-seed.log"
+        },
+        {
+          "phase": "regressed",
+          "checks": 11,
+          "log": "artifacts/paid-final-2026-10-22-regressed.log"
+        },
+        {
+          "phase": "caughtup",
+          "checks": 11,
+          "log": "artifacts/paid-final-2026-10-22-caughtup.log"
+        },
+        {
+          "phase": "higher",
+          "checks": 11,
+          "log": "artifacts/paid-final-2026-10-22-higher.log"
+        },
+        {
+          "phase": "consistent",
+          "checks": 10,
+          "log": "artifacts/paid-final-2026-10-22-consistent.log"
+        }
+      ]
+    },
+    "originalIdentity": {
+      "run": "abf8ef870db34ea49f1eb0a1edb7edfc",
+      "actor": "14529bd0-b94f-4026-84b2-3ac3356585a8",
+      "team": "14529bd0-b94f-4026-84b2-3ac3356585a8",
+      "scope": "paid",
+      "quest": "3ADD1A97B1DD20A9",
+      "money": "7BA369BA3466FD68",
+      "claim": "7489ad3102f1d45b7144650c97c995499cb53126638a17c940f2a62e9f8d3ea3",
+      "transaction": "615aef55-3b3b-4a6c-9c98-6a4352a6c25b",
+      "operationKey": "citizens:ftb-reward:v1:7489ad3102f1d45b7144650c97c995499cb53126638a17c940f2a62e9f8d3ea3:14529bd0-b94f-4026-84b2-3ac3356585a8",
+      "currency": "8d6810f0-d3f7-4bfc-8598-68f54b96f834",
+      "transactionCount": 2,
+      "pendingClaim": "5da1d707134c0dd45a63067ceccd63c72bc8647f57fb10bd50c7e54b54204571",
+      "pendingReward": "63BD85676050A5CF",
+      "laterReward": "568CC66B5AE16920",
+      "provider": "3a4dca41-3715-4783-9a7a-857d5638a1fc"
+    },
+    "checks": 46,
+    "logs": [
+      {
+        "path": "artifacts/paid-final-2026-10-22-seed.log",
+        "bytes": 20495,
+        "sha256": "f470f74baed45b32107951d5b3837e3aa372fef3a1d7bf50cc3e1d76152112a6"
+      },
+      {
+        "path": "artifacts/paid-final-2026-10-22-regressed.log",
+        "bytes": 19959,
+        "sha256": "c8eedcfed513ac9f73fe39e1954fdb2daae87b8900800fcbab3e964affdf9ce5"
+      },
+      {
+        "path": "artifacts/paid-final-2026-10-22-caughtup.log",
+        "bytes": 19959,
+        "sha256": "95806793cb7fdaed273083e5018acb01cea987952b1c4ed348f951d143b6c2df"
+      },
+      {
+        "path": "artifacts/paid-final-2026-10-22-higher.log",
+        "bytes": 19954,
+        "sha256": "c2b78459b828676addde8015cc8748cbc704115e21852d9cdc7f08f4c44c6ce8"
+      },
+      {
+        "path": "artifacts/paid-final-2026-10-22-consistent.log",
+        "bytes": 17373,
+        "sha256": "1aa86a702b6535be666bd57a14b498c0f8ad6ba6a0f614a452e5f66ca8c47990"
+      }
+    ],
+    "databaseIntegrity": [
+      {
+        "path": "artifacts/financial-backup-abf8ef870db34ea49f1eb0a1edb7edfc-server/financial-before.db",
+        "bytes": 368640,
+        "sha256": "334753c2fdf189f4e974214a540605070c58f20cb875408bc94cd57dd5a0a1c7",
+        "quickCheck": "ok",
+        "originalRows": []
+      },
+      {
+        "path": "artifacts/financial-backup-abf8ef870db34ea49f1eb0a1edb7edfc-server/financial-after.db",
+        "bytes": 368640,
+        "sha256": "8c6257e092aaf26e1c4ccc9b396f005b7f326542b8950d3c4ed84dba7ffac4ed",
+        "quickCheck": "ok",
+        "originalRows": [
+          [
+            "615aef55-3b3b-4a6c-9c98-6a4352a6c25b"
+          ]
+        ]
+      },
+      {
+        "path": "artifacts/financial-backup-abf8ef870db34ea49f1eb0a1edb7edfc-server/financial-world/yuuniverse_economy/economy.db",
+        "bytes": 368640,
+        "sha256": "70b8378f8f2ee01627621bc28a4f326815806c370507c7f4d1e189720beb7f4d",
+        "quickCheck": "ok",
+        "originalRows": [
+          [
+            "615aef55-3b3b-4a6c-9c98-6a4352a6c25b"
+          ]
+        ]
+      }
+    ],
+    "replacements": [
+      {
+        "identity": {
+          "run": "abf8ef870db34ea49f1eb0a1edb7edfc",
+          "phase": "regressed",
+          "originalTransaction": "615aef55-3b3b-4a6c-9c98-6a4352a6c25b",
+          "replacementTransaction": "70dbeee1-4cca-4e5d-b160-7715c631dec9",
+          "operationKey": "citizens:ftb-reward:v1:7489ad3102f1d45b7144650c97c995499cb53126638a17c940f2a62e9f8d3ea3:14529bd0-b94f-4026-84b2-3ac3356585a8"
+        },
+        "identityFile": {
+          "path": "artifacts/financial-backup-abf8ef870db34ea49f1eb0a1edb7edfc-server/financial-replacement-regressed.json",
+          "bytes": 329,
+          "sha256": "4799af8b8ca0903d60032a357328865fb5e32d782fcb030e77f03184e2c46cf4"
+        },
+        "database": {
+          "path": "artifacts/financial-backup-abf8ef870db34ea49f1eb0a1edb7edfc-server/financial-replacement-regressed.db",
+          "bytes": 368640,
+          "sha256": "5b9e0867a6739cb7b5fac77351fa682aa24602492bf4b195a39c915b0002d94a"
+        },
+        "quickCheck": "ok",
+        "originalAbsent": true,
+        "pendingNotPaid": true,
+        "postings": [
+          [
+            "8d6810f0-d3f7-4bfc-8598-68f54b96f834",
+            "system:integration:adjustment",
+            -50
+          ],
+          [
+            "8d6810f0-d3f7-4bfc-8598-68f54b96f834",
+            "player:14529bd0-b94f-4026-84b2-3ac3356585a8",
+            50
+          ]
+        ]
+      },
+      {
+        "identity": {
+          "run": "abf8ef870db34ea49f1eb0a1edb7edfc",
+          "phase": "caughtup",
+          "originalTransaction": "615aef55-3b3b-4a6c-9c98-6a4352a6c25b",
+          "replacementTransaction": "6996a6f2-242f-4319-9ebd-4871ba94505d",
+          "operationKey": "citizens:ftb-reward:v1:7489ad3102f1d45b7144650c97c995499cb53126638a17c940f2a62e9f8d3ea3:14529bd0-b94f-4026-84b2-3ac3356585a8"
+        },
+        "identityFile": {
+          "path": "artifacts/financial-backup-abf8ef870db34ea49f1eb0a1edb7edfc-server/financial-replacement-caughtup.json",
+          "bytes": 328,
+          "sha256": "d40e39a732384a95193c2746ebd6a7caa059aa4476e8cd6e2fa32a91a50be370"
+        },
+        "database": {
+          "path": "artifacts/financial-backup-abf8ef870db34ea49f1eb0a1edb7edfc-server/financial-replacement-caughtup.db",
+          "bytes": 368640,
+          "sha256": "35e7dbc148cf9c29830b1caf4ab4b20483f258042d9d8ce334b03d27b5dd3e1d"
+        },
+        "quickCheck": "ok",
+        "originalAbsent": true,
+        "pendingNotPaid": true,
+        "postings": [
+          [
+            "8d6810f0-d3f7-4bfc-8598-68f54b96f834",
+            "system:integration:adjustment",
+            -50
+          ],
+          [
+            "8d6810f0-d3f7-4bfc-8598-68f54b96f834",
+            "player:14529bd0-b94f-4026-84b2-3ac3356585a8",
+            50
+          ]
+        ]
+      },
+      {
+        "identity": {
+          "run": "abf8ef870db34ea49f1eb0a1edb7edfc",
+          "phase": "higher",
+          "originalTransaction": "615aef55-3b3b-4a6c-9c98-6a4352a6c25b",
+          "replacementTransaction": "2d443838-7bf6-4c16-886b-cf847ac87293",
+          "operationKey": "citizens:ftb-reward:v1:7489ad3102f1d45b7144650c97c995499cb53126638a17c940f2a62e9f8d3ea3:14529bd0-b94f-4026-84b2-3ac3356585a8"
+        },
+        "identityFile": {
+          "path": "artifacts/financial-backup-abf8ef870db34ea49f1eb0a1edb7edfc-server/financial-replacement-higher.json",
+          "bytes": 326,
+          "sha256": "f4fb17bc0e78bc9645550060213e490d628834b152725cfa9ea929853bceaf2a"
+        },
+        "database": {
+          "path": "artifacts/financial-backup-abf8ef870db34ea49f1eb0a1edb7edfc-server/financial-replacement-higher.db",
+          "bytes": 368640,
+          "sha256": "b04409685baacc39403957686192a3e70435f6abd6b7d4dac200880ac0c0fc3c"
+        },
+        "quickCheck": "ok",
+        "originalAbsent": true,
+        "pendingNotPaid": true,
+        "postings": [
+          [
+            "8d6810f0-d3f7-4bfc-8598-68f54b96f834",
+            "system:integration:adjustment",
+            -50
+          ],
+          [
+            "8d6810f0-d3f7-4bfc-8598-68f54b96f834",
+            "player:14529bd0-b94f-4026-84b2-3ac3356585a8",
+            50
+          ]
+        ]
+      }
+    ],
+    "stoppedEvidence": [
+      {
+        "path": "artifacts/paid-final-2026-10-22-result.json",
+        "bytes": 873,
+        "sha256": "d07cfc4624cdc041b7853717b2fa2f9d389e3282d68f87ff83c9766ad920da84"
+      },
+      {
+        "path": "artifacts/financial-backup-abf8ef870db34ea49f1eb0a1edb7edfc-server/financial-state.json",
+        "bytes": 745,
+        "sha256": "2d6295e40cf291fc66b5570a62aaf0565311695907bc41c8bd63796838241885"
+      },
+      {
+        "path": "artifacts/financial-backup-abf8ef870db34ea49f1eb0a1edb7edfc-server/financial-player.dat",
+        "bytes": 745,
+        "sha256": "999a3c2142d2a3d33fc203501bf2cd3c5fb01ff36c09a64c8c59fc11123f5d68"
+      },
+      {
+        "path": "artifacts/financial-backup-abf8ef870db34ea49f1eb0a1edb7edfc-server/financial-audit-fixture.txt",
+        "bytes": 34,
+        "sha256": "8bc3e10724abb77c07475fc358e52ff0acdc0088d3e2017783a048397c6ac3eb"
+      },
+      {
+        "path": "artifacts/financial-backup-abf8ef870db34ea49f1eb0a1edb7edfc-server/server.properties",
+        "bytes": 1628,
+        "sha256": "8e805ce2b0e0aba167f23ae6541ec9329516aee603a9802936b279b41759f7ce"
+      }
+    ],
+    "provider": {
+      "path": "artifacts/financial-backup-abf8ef870db34ea49f1eb0a1edb7edfc-server/mods/economy.jar",
+      "bytes": 14435434,
+      "sha256": "2cd553a34ba6d2cdf559595477cf1ee2d4c5c710b2a6aade54e7fc12c63eca29"
+    },
+    "nativeTeamFile": {
+      "path": "artifacts/financial-backup-abf8ef870db34ea49f1eb0a1edb7edfc-server/financial-world/ftbquests/14529bd0-b94f-4026-84b2-3ac3356585a8.snbt",
+      "bytes": 1004,
+      "sha256": "8f500f3eb83143b04e417f1f46d2ee76c861e19b8a1e76be1e21bee3acccc466"
+    },
+    "journals": [
+      {
+        "path": "artifacts/financial-backup-abf8ef870db34ea49f1eb0a1edb7edfc-server/financial-world/citizens/quest-rewards/binding-568CC66B5AE16920.json",
+        "bytes": 434,
+        "sha256": "3c514e022d462f315bd571fc0ec44e4307092ae80ae44f2cb28248ad28e48919"
+      },
+      {
+        "path": "artifacts/financial-backup-abf8ef870db34ea49f1eb0a1edb7edfc-server/financial-world/citizens/quest-rewards/binding-63BD85676050A5CF.json",
+        "bytes": 433,
+        "sha256": "abfc474eb0fda09a4b38b35f981deb531da4b7542df342249a59da922ac3d4a5"
+      },
+      {
+        "path": "artifacts/financial-backup-abf8ef870db34ea49f1eb0a1edb7edfc-server/financial-world/citizens/quest-rewards/binding-7BA369BA3466FD68.json",
+        "bytes": 434,
+        "sha256": "7559728949db5a9608913023308a5710839418617e0bcb20b2cb08acf1a61eca"
+      },
+      {
+        "path": "artifacts/financial-backup-abf8ef870db34ea49f1eb0a1edb7edfc-server/financial-world/citizens/quest-rewards/claim-5da1d707134c0dd45a63067ceccd63c72bc8647f57fb10bd50c7e54b54204571-0.json",
+        "bytes": 835,
+        "sha256": "f5fd34d8253015c0b88f49ba5f6899faef5622b3d79f3d5e1efaddb9568fc2ea"
+      },
+      {
+        "path": "artifacts/financial-backup-abf8ef870db34ea49f1eb0a1edb7edfc-server/financial-world/citizens/quest-rewards/claim-5da1d707134c0dd45a63067ceccd63c72bc8647f57fb10bd50c7e54b54204571-1.json",
+        "bytes": 832,
+        "sha256": "ec8ea7788ca1e9576416312df5660146c4ae70ebff78c1cf29e702ff84db0254"
+      },
+      {
+        "path": "artifacts/financial-backup-abf8ef870db34ea49f1eb0a1edb7edfc-server/financial-world/citizens/quest-rewards/claim-5da1d707134c0dd45a63067ceccd63c72bc8647f57fb10bd50c7e54b54204571-2.json",
+        "bytes": 862,
+        "sha256": "fb31a0e7223879ea3b0fa1077b162c9a5972a6be156f4cad56e340d8ad68c3f2"
+      },
+      {
+        "path": "artifacts/financial-backup-abf8ef870db34ea49f1eb0a1edb7edfc-server/financial-world/citizens/quest-rewards/claim-7489ad3102f1d45b7144650c97c995499cb53126638a17c940f2a62e9f8d3ea3-0.json",
+        "bytes": 836,
+        "sha256": "4a71e9c7ab87194365336fbaac9e0d21866e719564c015b19e892decb6b88c1f"
+      },
+      {
+        "path": "artifacts/financial-backup-abf8ef870db34ea49f1eb0a1edb7edfc-server/financial-world/citizens/quest-rewards/claim-7489ad3102f1d45b7144650c97c995499cb53126638a17c940f2a62e9f8d3ea3-1.json",
+        "bytes": 833,
+        "sha256": "96972c2a2545d581cdc4f32e4c644dcce8187ec799a52cc14fe8de8210a65a50"
+      },
+      {
+        "path": "artifacts/financial-backup-abf8ef870db34ea49f1eb0a1edb7edfc-server/financial-world/citizens/quest-rewards/claim-7489ad3102f1d45b7144650c97c995499cb53126638a17c940f2a62e9f8d3ea3-2.json",
+        "bytes": 863,
+        "sha256": "50a1d63ffd065fdaf0285b64bb37cf893e739f88672a644afa77653a8c17cf9b"
+      },
+      {
+        "path": "artifacts/financial-backup-abf8ef870db34ea49f1eb0a1edb7edfc-server/financial-world/citizens/quest-rewards/claim-fc2f3df11e4ad0344cfe7baba9a6652737907b3948ef75f95a01363ed37a3a62-0.json",
+        "bytes": 836,
+        "sha256": "79d58abef394e9bc6ae200144e49472fe332195d3063bca8a7f5146b2857f581"
+      },
+      {
+        "path": "artifacts/financial-backup-abf8ef870db34ea49f1eb0a1edb7edfc-server/financial-world/citizens/quest-rewards/claim-fc2f3df11e4ad0344cfe7baba9a6652737907b3948ef75f95a01363ed37a3a62-1.json",
+        "bytes": 833,
+        "sha256": "a80c5a6dbad0d1b9136a0917aef55f8ec390b0a5a87b0e9c45a08cada4a2a644"
+      },
+      {
+        "path": "artifacts/financial-backup-abf8ef870db34ea49f1eb0a1edb7edfc-server/financial-world/citizens/quest-rewards/claim-fc2f3df11e4ad0344cfe7baba9a6652737907b3948ef75f95a01363ed37a3a62-2.json",
+        "bytes": 863,
+        "sha256": "26cc921ff8adf5948141483b4ab9f7f1a50f64b39ee6eb0a1db9f01a6101f3d4"
+      }
+    ]
+  },
+  "graphRegression": {
+    "run": {
+      "run": "e46654eabf2041dab9c8263bad49a276",
+      "fixture": "artifacts/financial-backup-e46654eabf2041dab9c8263bad49a276-server",
+      "scope": "rewardgraph",
+      "neoForge": "21.1.248",
+      "createdAt": "2026-10-22T17:56:05.3135413+08:00",
+      "stages": [
+        {
+          "phase": "seed",
+          "checks": 23,
+          "log": "artifacts/paid-graph-final-2026-10-22-seed.log"
+        },
+        {
+          "phase": "regressed",
+          "checks": 61,
+          "log": "artifacts/paid-graph-final-2026-10-22-regressed.log"
+        },
+        {
+          "phase": "caughtup",
+          "checks": 61,
+          "log": "artifacts/paid-graph-final-2026-10-22-caughtup.log"
+        },
+        {
+          "phase": "higher",
+          "checks": 61,
+          "log": "artifacts/paid-graph-final-2026-10-22-higher.log"
+        },
+        {
+          "phase": "consistent",
+          "checks": 71,
+          "log": "artifacts/paid-graph-final-2026-10-22-consistent.log"
+        }
+      ]
+    },
+    "originalIdentity": {
+      "roots": [
+        {
+          "quest": "0A1D3966541951B9",
+          "reward": "285143DD79639087",
+          "label": "required",
+          "alternative": false
+        },
+        {
+          "quest": "6770405CB95F4C04",
+          "reward": "5BB61F40D14E3D77",
+          "label": "transitive",
+          "alternative": false
+        },
+        {
+          "quest": "03A3DB80FA54986C",
+          "reward": "054C5EC1412411A7",
+          "label": "task",
+          "alternative": false
+        },
+        {
+          "quest": "49D43E897ECC8CAF",
+          "reward": "0E526A9E243E3220",
+          "label": "chapter",
+          "alternative": false
+        },
+        {
+          "quest": "706C5A17480CE4F8",
+          "reward": "2DA2BF9EB416223C",
+          "label": "started_quest",
+          "alternative": false
+        },
+        {
+          "quest": "2FA172C23703CF76",
+          "reward": "5E87DE29A03D370B",
+          "label": "started_task",
+          "alternative": false
+        },
+        {
+          "quest": "584A53B7A644F8F4",
+          "reward": "2B185F0B24C4B8FE",
+          "label": "sequential_task",
+          "alternative": false
+        },
+        {
+          "quest": "5040B45EA76075AC",
+          "reward": "02460F226EF1969C",
+          "label": "any_complete",
+          "alternative": true
+        },
+        {
+          "quest": "50EFDC4D377C53DC",
+          "reward": "4F38E051C83F31C0",
+          "label": "minimum_one",
+          "alternative": true
+        },
+        {
+          "quest": "09CAD81C6966095B",
+          "reward": "2B1B98BABF919A30",
+          "label": "minimum_two",
+          "alternative": false
+        },
+        {
+          "quest": "02BA8786786AECDF",
+          "reward": "1EB96A3BC3CE059A",
+          "label": "any_started",
+          "alternative": true
+        },
+        {
+          "quest": "2E14C759F15F8DBA",
+          "reward": "35C2F1662627A01D",
+          "label": "minimum_started_two",
+          "alternative": false
+        },
+        {
+          "quest": "7B1CA5DDD79022B3",
+          "reward": "7C28316064CF5C18",
+          "label": "optional_chapter",
+          "alternative": true
+        },
+        {
+          "quest": "4D1079D4F724EE32",
+          "reward": "7DF0BE0F8DCD173B",
+          "label": "started_chapter",
+          "alternative": false
+        },
+        {
+          "quest": "2E35E41BC77D7401",
+          "reward": "27EF4C38967D6B5D",
+          "label": "optional_started_chapter",
+          "alternative": true
+        },
+        {
+          "quest": "5B5BE09CDD4FC121",
+          "reward": "1D4BBC1C9E50372C",
+          "label": "mixed_started_quest",
+          "alternative": true
+        },
+        {
+          "quest": "70483B86F2001D9A",
+          "reward": "0279E1C3FF45542F",
+          "label": "independent_sibling_task",
+          "alternative": true
+        },
+        {
+          "quest": "3C9F819B6406EDBA",
+          "reward": "6524A7899D58A745",
+          "label": "optional_task_dependency",
+          "alternative": true
+        },
+        {
+          "quest": "5D7A202879CF0BC8",
+          "reward": "619A6B069D49FEE2",
+          "label": "optional_task_direct",
+          "alternative": true
+        },
+        {
+          "quest": "286E931A0371B55F",
+          "reward": "2AA14FED5B011CDA",
+          "label": "flexible_complete",
+          "alternative": true
+        },
+        {
+          "quest": "70F9C2C9B0E4C05B",
+          "reward": "703E1CD508CE72EE",
+          "label": "flexible_started",
+          "alternative": true
+        }
+      ],
+      "run": "e46654eabf2041dab9c8263bad49a276",
+      "actor": "7fccf6c8-6306-4f4f-96f1-523afdacb3f2",
+      "team": "7fccf6c8-6306-4f4f-96f1-523afdacb3f2",
+      "scope": "rewardgraph",
+      "partialTask": "50A478CF57E78795",
+      "command": "0F5540E50EBA2C30",
+      "money": "494A83FA2E8BA529",
+      "operation": "1ef014e5-93c1-41b6-ad6b-a7f3a17c7dda",
+      "transaction": "ded40f3d-a88c-49a6-a4e4-a0f2667d0cfb",
+      "currency": "8d6810f0-d3f7-4bfc-8598-68f54b96f834",
+      "unrelatedShop": "graph-unrelated-7fccf6c8-6306-4f4f-96f1-523afdacb3f2",
+      "provider": "1504e1b8-6a86-4772-9c10-0b2cc6366027",
+      "sequence": 1
+    },
+    "checks": 277,
+    "logs": [
+      {
+        "path": "artifacts/paid-graph-final-2026-10-22-seed.log",
+        "bytes": 22542,
+        "sha256": "a14cac344f41a901249e75416f8dcf9d0c941d89633ccfbcbc7e4abc13fcd8e9"
+      },
+      {
+        "path": "artifacts/paid-graph-final-2026-10-22-regressed.log",
+        "bytes": 23666,
+        "sha256": "bd687784be052558e0f9982ae37ec1c4fa63b8a13bdd75e934a26bc932fedb16"
+      },
+      {
+        "path": "artifacts/paid-graph-final-2026-10-22-caughtup.log",
+        "bytes": 31248,
+        "sha256": "a839c8f42156070bd07ac83c6cc15e6ed9d18dffe1bfe3f029b4292adeb09b5f"
+      },
+      {
+        "path": "artifacts/paid-graph-final-2026-10-22-higher.log",
+        "bytes": 39557,
+        "sha256": "44801bd5ea7d666ce99a7b109b581da4d882b2f97deddb5b5644bdee0e1a78cc"
+      },
+      {
+        "path": "artifacts/paid-graph-final-2026-10-22-consistent.log",
+        "bytes": 28414,
+        "sha256": "e1aafd12fbc1ab8512687052ad572710682657082337cd2db628ca8567c912dd"
+      }
+    ],
+    "databaseIntegrity": [
+      {
+        "path": "artifacts/financial-backup-e46654eabf2041dab9c8263bad49a276-server/financial-before.db",
+        "bytes": 368640,
+        "sha256": "4daa3c28348664637e6a4c5770915e6c5a6c7885fd7406055dc0d6b1f1eb5584",
+        "quickCheck": "ok",
+        "originalRows": []
+      },
+      {
+        "path": "artifacts/financial-backup-e46654eabf2041dab9c8263bad49a276-server/financial-after.db",
+        "bytes": 368640,
+        "sha256": "890132fa894aa15ef4b06cf5087e31d0c8184fc88a4ce24b504fe4dd167bd453",
+        "quickCheck": "ok",
+        "originalRows": [
+          [
+            "ded40f3d-a88c-49a6-a4e4-a0f2667d0cfb",
+            "player:7fccf6c8-6306-4f4f-96f1-523afdacb3f2"
+          ]
+        ]
+      },
+      {
+        "path": "artifacts/financial-backup-e46654eabf2041dab9c8263bad49a276-server/financial-world/yuuniverse_economy/economy.db",
+        "bytes": 368640,
+        "sha256": "98d97721b1c31bfbd673c86d363ca841e69839b869039a4d08a4cc14919fe9ac",
+        "quickCheck": "ok",
+        "originalRows": [
+          [
+            "ded40f3d-a88c-49a6-a4e4-a0f2667d0cfb",
+            "player:7fccf6c8-6306-4f4f-96f1-523afdacb3f2"
+          ]
+        ]
+      }
+    ],
+    "replacements": [],
+    "stoppedEvidence": [
+      {
+        "path": "artifacts/paid-graph-final-2026-10-22-result.json",
+        "bytes": 911,
+        "sha256": "8c7dedde92dd382400c3bfbf3c71f3e1889be88c898fe545360399bd6aebb65d"
+      },
+      {
+        "path": "artifacts/financial-backup-e46654eabf2041dab9c8263bad49a276-server/financial-state.json",
+        "bytes": 2689,
+        "sha256": "d2d749e6b8196ef6b95cdd9ab391a11b63f3e7bc9c359d9ac3e04485f285c6f4"
+      },
+      {
+        "path": "artifacts/financial-backup-e46654eabf2041dab9c8263bad49a276-server/financial-player.dat",
+        "bytes": 859,
+        "sha256": "976c295858bdd586e576444864a34dd85923ef91d368000e2c10632b2446a689"
+      },
+      {
+        "path": "artifacts/financial-backup-e46654eabf2041dab9c8263bad49a276-server/financial-audit-fixture.txt",
+        "bytes": 34,
+        "sha256": "79aa48be4ee107d684bf241d7b3e9fdcb75d7d1b779b853ea0e48d87c566582a"
+      },
+      {
+        "path": "artifacts/financial-backup-e46654eabf2041dab9c8263bad49a276-server/server.properties",
+        "bytes": 1628,
+        "sha256": "114c2f889f5aa5263249c78963d0f1e23f40734f20bf6a9e9a52d0b044d54382"
+      }
+    ],
+    "provider": {
+      "path": "artifacts/financial-backup-e46654eabf2041dab9c8263bad49a276-server/mods/economy.jar",
+      "bytes": 14435434,
+      "sha256": "2cd553a34ba6d2cdf559595477cf1ee2d4c5c710b2a6aade54e7fc12c63eca29"
+    },
+    "nativeTeamFile": {
+      "path": "artifacts/financial-backup-e46654eabf2041dab9c8263bad49a276-server/financial-world/ftbquests/7fccf6c8-6306-4f4f-96f1-523afdacb3f2.snbt",
+      "bytes": 7189,
+      "sha256": "b71055a401bfaccb7f9c537d77e9dcacc4fcaea16f4a6c16644b55a8a85e4ae5"
+    },
+    "journals": [
+      {
+        "path": "artifacts/financial-backup-e46654eabf2041dab9c8263bad49a276-server/financial-world/citizens/commerce-tasks/binding-14BA0735EF514F0C.json",
+        "bytes": 597,
+        "sha256": "bb02199661c91cf47db33ad8a6d8139277cef52bc3f5d1ffac5ca6dedac588ea"
+      },
+      {
+        "path": "artifacts/financial-backup-e46654eabf2041dab9c8263bad49a276-server/financial-world/citizens/commerce-tasks/binding-34898D6EB4DB74AC.json",
+        "bytes": 597,
+        "sha256": "5ac7d84a308a0b493445b9fa5f384b71982ded1f554c40e5e5dc9fa9d5706b88"
+      },
+      {
+        "path": "artifacts/financial-backup-e46654eabf2041dab9c8263bad49a276-server/financial-world/citizens/commerce-tasks/binding-50A478CF57E78795.json",
+        "bytes": 597,
+        "sha256": "01a7eb81371f9e78e7757deea3eeaf01c81262fa59ed08b2604a3eda0883ec62"
+      },
+      {
+        "path": "artifacts/financial-backup-e46654eabf2041dab9c8263bad49a276-server/financial-world/citizens/commerce-tasks/binding-687F88DCAE883492.json",
+        "bytes": 597,
+        "sha256": "3ce764ec6bb1ea03022a3ca3d4c24ec612a84f795f5378261beb0917c28884ab"
+      },
+      {
+        "path": "artifacts/financial-backup-e46654eabf2041dab9c8263bad49a276-server/financial-world/citizens/commerce-tasks/binding-7337EEEBF34C1E18.json",
+        "bytes": 597,
+        "sha256": "97b72bcfabdfdcd929cd983cedc6fe2952522464ecd3f809e395346c4069b870"
+      },
+      {
+        "path": "artifacts/financial-backup-e46654eabf2041dab9c8263bad49a276-server/financial-world/citizens/commerce-tasks/binding-7C4B066C4AFD3F72.json",
+        "bytes": 597,
+        "sha256": "134f9d3c21bba40778d387ee2159df44b4207160566711196415cc7c7e311e4b"
+      },
+      {
+        "path": "artifacts/financial-backup-e46654eabf2041dab9c8263bad49a276-server/financial-world/citizens/commerce-tasks/cursor-214891bcf9287c96d48707580d96e86f9a2f3d124ab7c781dec74a5317474ee5-0.json",
+        "bytes": 311,
+        "sha256": "070c6a07f5e238d00bb87bae5eb7681569fc2ead8ceeffd6e09e39b3d17212a4"
+      },
+      {
+        "path": "artifacts/financial-backup-e46654eabf2041dab9c8263bad49a276-server/financial-world/citizens/commerce-tasks/cursor-2576dcb7f8bc533e7cc2d952c48484195cae884f35bbdd5657683138af2540ab-0.json",
+        "bytes": 311,
+        "sha256": "690a37d05d124d8e1adf489476c5ab73bfd14c89c51e2ee7136827c433ee3778"
+      },
+      {
+        "path": "artifacts/financial-backup-e46654eabf2041dab9c8263bad49a276-server/financial-world/citizens/commerce-tasks/cursor-3e84fc0b8bd32b73675c044a6a6f4f1b96c6f8b6ef60bb0ecf7cc7d738d3e9bd-0.json",
+        "bytes": 311,
+        "sha256": "d36f18721af42555ff8b6309116331c920374de456edbe2674a6d392966419f6"
+      },
+      {
+        "path": "artifacts/financial-backup-e46654eabf2041dab9c8263bad49a276-server/financial-world/citizens/commerce-tasks/cursor-436fe5bf7dfaaa6d41c83752faab8c80e6f3e11da83c8a8464202bbb235ccc35-0.json",
+        "bytes": 311,
+        "sha256": "fbff3cb03b1f39bcda1d066f1f9b52e2a3d10d898409c8a11d49cea501fb82f2"
+      },
+      {
+        "path": "artifacts/financial-backup-e46654eabf2041dab9c8263bad49a276-server/financial-world/citizens/commerce-tasks/cursor-7933979ef4598f431e1bcbdb924f7c9066e494bc37363e6889cee369c1e1c59b-0.json",
+        "bytes": 311,
+        "sha256": "fc410dfd639b2293a279375bbd1d1ea651ff70ed026666b650f71849b36165e4"
+      },
+      {
+        "path": "artifacts/financial-backup-e46654eabf2041dab9c8263bad49a276-server/financial-world/citizens/commerce-tasks/cursor-d8bc03e03490e43c69e2f6881fc233f33c8f47567b6f3c4daf9b3b687f4b51d5-0.json",
+        "bytes": 311,
+        "sha256": "ca2d6bbc802727f6920b1576b8e65b400ba2d7cbb2586b1b7127109a857c8335"
+      },
+      {
+        "path": "artifacts/financial-backup-e46654eabf2041dab9c8263bad49a276-server/financial-world/citizens/commerce-tasks/entry-02e73bd4cb1b0005f63e4a8541b48a4cebca2e603df00d97b4b80ca7c4a64be6-0.json",
+        "bytes": 1230,
+        "sha256": "951787bd4046220b91d870e00983f3c75823812e27f68dae90ccc55db125aac7"
+      },
+      {
+        "path": "artifacts/financial-backup-e46654eabf2041dab9c8263bad49a276-server/financial-world/citizens/commerce-tasks/entry-02e73bd4cb1b0005f63e4a8541b48a4cebca2e603df00d97b4b80ca7c4a64be6-1.json",
+        "bytes": 1588,
+        "sha256": "f7d2eddf9a31a998e50bb9bcbe465a87460bed76c0517591e5ecd9b9def41e45"
+      },
+      {
+        "path": "artifacts/financial-backup-e46654eabf2041dab9c8263bad49a276-server/financial-world/citizens/commerce-tasks/entry-02e73bd4cb1b0005f63e4a8541b48a4cebca2e603df00d97b4b80ca7c4a64be6-2.json",
+        "bytes": 1586,
+        "sha256": "6fc4f072dea8956cb50b7592cf80ca338d796490d6f2ca326488abb3c278b3d2"
+      },
+      {
+        "path": "artifacts/financial-backup-e46654eabf2041dab9c8263bad49a276-server/financial-world/citizens/commerce-tasks/entry-1fdf3d29712eb6a2c80ed953b10754b6400b6f358c5b3ab6ca5b39245ea4132f-0.json",
+        "bytes": 1230,
+        "sha256": "760bfdd7be309aab01089cd524c39558e97a029caa47c600c862b60e6fcf17cf"
+      },
+      {
+        "path": "artifacts/financial-backup-e46654eabf2041dab9c8263bad49a276-server/financial-world/citizens/commerce-tasks/entry-1fdf3d29712eb6a2c80ed953b10754b6400b6f358c5b3ab6ca5b39245ea4132f-1.json",
+        "bytes": 1588,
+        "sha256": "5daffd7b303ad5d2c9484e3f105101b69611f8c6c6f331127d5a3f566f03702b"
+      },
+      {
+        "path": "artifacts/financial-backup-e46654eabf2041dab9c8263bad49a276-server/financial-world/citizens/commerce-tasks/entry-1fdf3d29712eb6a2c80ed953b10754b6400b6f358c5b3ab6ca5b39245ea4132f-2.json",
+        "bytes": 1586,
+        "sha256": "567977cfe7114f78d6ae70b82afca90636eae800a65784dc173ae6a90c860451"
+      },
+      {
+        "path": "artifacts/financial-backup-e46654eabf2041dab9c8263bad49a276-server/financial-world/citizens/commerce-tasks/entry-3944e6a71086e4294a0108cdb610dc2cc9ec1754781ecd827a03e393588fc616-0.json",
+        "bytes": 1230,
+        "sha256": "a065b14521a08c32b8df5ed3b79c5c2a26a9165409a0664ec296fd8fb20a172f"
+      },
+      {
+        "path": "artifacts/financial-backup-e46654eabf2041dab9c8263bad49a276-server/financial-world/citizens/commerce-tasks/entry-3944e6a71086e4294a0108cdb610dc2cc9ec1754781ecd827a03e393588fc616-1.json",
+        "bytes": 1588,
+        "sha256": "5ff7a421cb19267248099927ed0ff2cdb35cf22ded7eea31d835508c4933002b"
+      },
+      {
+        "path": "artifacts/financial-backup-e46654eabf2041dab9c8263bad49a276-server/financial-world/citizens/commerce-tasks/entry-3944e6a71086e4294a0108cdb610dc2cc9ec1754781ecd827a03e393588fc616-2.json",
+        "bytes": 1586,
+        "sha256": "aae4bd155424e168ad0c4e5a58b9644752bf30bb5c55f672e840fa8a5b212a30"
+      },
+      {
+        "path": "artifacts/financial-backup-e46654eabf2041dab9c8263bad49a276-server/financial-world/citizens/commerce-tasks/entry-7f9ea27cc34b1b271db8ee18f46e5df700699e7db9e140525a4ec06836ff6d3c-0.json",
+        "bytes": 1230,
+        "sha256": "9c381b15bc11cc05b914f90c195c92dfb0cf14968e7b1b95ced82816c682c2d5"
+      },
+      {
+        "path": "artifacts/financial-backup-e46654eabf2041dab9c8263bad49a276-server/financial-world/citizens/commerce-tasks/entry-7f9ea27cc34b1b271db8ee18f46e5df700699e7db9e140525a4ec06836ff6d3c-1.json",
+        "bytes": 1588,
+        "sha256": "bee6c58c59ec13914e6073659bce8ef179b16f97eb7eac47159bc3def0a0ef81"
+      },
+      {
+        "path": "artifacts/financial-backup-e46654eabf2041dab9c8263bad49a276-server/financial-world/citizens/commerce-tasks/entry-7f9ea27cc34b1b271db8ee18f46e5df700699e7db9e140525a4ec06836ff6d3c-2.json",
+        "bytes": 1586,
+        "sha256": "ebe2262b535fea594a98f9da39e538d76594075b0c93e38cb06e3a69de8f5f51"
+      },
+      {
+        "path": "artifacts/financial-backup-e46654eabf2041dab9c8263bad49a276-server/financial-world/citizens/commerce-tasks/entry-bb3656d1fa6b0b3bd42d2ed325add9b65e08625be6a2514f6168320185ce778d-0.json",
+        "bytes": 1230,
+        "sha256": "dac6de0e19f270c8671375e492562d8af142676ea5d840bbd3284b9405e5ce9c"
+      },
+      {
+        "path": "artifacts/financial-backup-e46654eabf2041dab9c8263bad49a276-server/financial-world/citizens/commerce-tasks/entry-bb3656d1fa6b0b3bd42d2ed325add9b65e08625be6a2514f6168320185ce778d-1.json",
+        "bytes": 1588,
+        "sha256": "ca5b44ad5b311f21031f0cdc0f26836da20a13b5b5ad6a2a9cc81d7bb5450ef2"
+      },
+      {
+        "path": "artifacts/financial-backup-e46654eabf2041dab9c8263bad49a276-server/financial-world/citizens/commerce-tasks/entry-bb3656d1fa6b0b3bd42d2ed325add9b65e08625be6a2514f6168320185ce778d-2.json",
+        "bytes": 1586,
+        "sha256": "f2dbd105782f2cede7d9ff964eeed8290d09b364b843ff5c22f156865da33ea3"
+      },
+      {
+        "path": "artifacts/financial-backup-e46654eabf2041dab9c8263bad49a276-server/financial-world/citizens/commerce-tasks/entry-ed1d55b3d888383efded48ec09fc423b2ad8968c12b0a8adf80f0809ad689fdb-0.json",
+        "bytes": 1230,
+        "sha256": "c1918b22c2eeef3d2676df35b49a7c843b9d0f44e4c3e5172bf74d3a73407bb8"
+      },
+      {
+        "path": "artifacts/financial-backup-e46654eabf2041dab9c8263bad49a276-server/financial-world/citizens/commerce-tasks/entry-ed1d55b3d888383efded48ec09fc423b2ad8968c12b0a8adf80f0809ad689fdb-1.json",
+        "bytes": 1588,
+        "sha256": "0205725194f6c485429f936009cacc0dd926d4dd526dd495f32352b1268e35d6"
+      },
+      {
+        "path": "artifacts/financial-backup-e46654eabf2041dab9c8263bad49a276-server/financial-world/citizens/commerce-tasks/entry-ed1d55b3d888383efded48ec09fc423b2ad8968c12b0a8adf80f0809ad689fdb-2.json",
+        "bytes": 1586,
+        "sha256": "775ff26f8b5755dc5629f64e8491125e3b3178ca1e546d55b4a8051c64a66f6c"
+      },
+      {
+        "path": "artifacts/financial-backup-e46654eabf2041dab9c8263bad49a276-server/financial-world/citizens/quest-rewards/binding-494A83FA2E8BA529.json",
+        "bytes": 434,
+        "sha256": "3aab6422d816968d39af64be0b1b5200c8e858abcfcbd1047dacf474b587c329"
+      },
+      {
+        "path": "artifacts/financial-backup-e46654eabf2041dab9c8263bad49a276-server/financial-world/citizens/quest-rewards/claim-53400fb33247a21f39130a1ec4cd35bc0de21e2440f6c0fd9b77c52feacbff22-0.json",
+        "bytes": 836,
+        "sha256": "f55fc1b5772bfd33825a83f0e9682cdfc2bc129187f722b4ee241c3932ae3faa"
+      },
+      {
+        "path": "artifacts/financial-backup-e46654eabf2041dab9c8263bad49a276-server/financial-world/citizens/quest-rewards/claim-53400fb33247a21f39130a1ec4cd35bc0de21e2440f6c0fd9b77c52feacbff22-1.json",
+        "bytes": 833,
+        "sha256": "0f844528e5871955428ff357ae54c6004cb59cdfa98089c3129a41b61ada56a4"
+      },
+      {
+        "path": "artifacts/financial-backup-e46654eabf2041dab9c8263bad49a276-server/financial-world/citizens/quest-rewards/claim-53400fb33247a21f39130a1ec4cd35bc0de21e2440f6c0fd9b77c52feacbff22-2.json",
+        "bytes": 863,
+        "sha256": "a0f7db08ceaca5ff7639e43072b97554e650dd2b607a4a57b83792f92c426f7d"
+      }
+    ]
+  },
+  "productionTree": {
+    "files": 612,
+    "algorithm": "SHA256 of sorted relative path + NUL + SHA256 lines joined by LF",
+    "sha256": "1b94ba3fdc962a34b35c30340e445b34f7d1df7b29a30cb095f2e1eb3316d284"
+  },
+  "sources": [
+    {
+      "path": "neoforge/src/main/java/net/citizensnpcs/util/FtbMonetaryRewards.java",
+      "bytes": 21671,
+      "sha256": "9174e097cb7af09110ac4045f9121f219538c5c950f3e9f3368f8420827dbc65"
+    },
+    {
+      "path": "neoforge/src/main/java/net/citizensnpcs/util/FtbCommerceRewardGraph.java",
+      "bytes": 8648,
+      "sha256": "05b94187db6560cec08e3a71e787c335b0c488ef3563967b988827d967f43e58"
+    },
+    {
+      "path": "neoforge/src/main/java/net/citizensnpcs/mixin/FtbRewardClaimMixin.java",
+      "bytes": 2407,
+      "sha256": "7186c5f935a67647c968a76085bf727a4a14f206302c17ac5644785433f2e49b"
+    },
+    {
+      "path": "tools/financial-backup-runtime-audit.gradle",
+      "bytes": 2815,
+      "sha256": "7db85a02c4e8b47e47292af73f6b4028a7dd505468a74b5d799a9564dc5f19c8"
+    },
+    {
+      "path": "tools/run-financial-backup-audit.ps1",
+      "bytes": 6409,
+      "sha256": "ff1f4ba3dad00855918188ef78190793073aae5abbe320ce16cc183459392135"
+    },
+    {
+      "path": "tools/financial-backup-runtime-audit/net/citizensnpcs/audit/MonetaryPaidRuntimeAudit.java",
+      "bytes": 14143,
+      "sha256": "4d789759552651e10cfa354e12417ba0ee9861b1419089c625aaa5673e39e3fc"
+    },
+    {
+      "path": "tools/xmod-runtime-audit/net/citizensnpcs/audit/XModRuntimeAudit.java",
+      "bytes": 33254,
+      "sha256": "940d7145818090b296becb0da8948d80ff911b007c5e31d8bb719c42aa36fc53"
+    }
+  ],
+  "providerContract": {
+    "revision": "80bca9f",
+    "apiVersion": 5,
+    "artifact": {
+      "path": "../yuuniverse-economy/build/libs/yuuniverse-economy-0.5.8-SNAPSHOT.jar",
+      "bytes": 14435434,
+      "sha256": "2cd553a34ba6d2cdf559595477cf1ee2d4c5c710b2a6aade54e7fc12c63eca29"
+    },
+    "manifest": {
+      "path": "../yuuniverse-economy/docs/credit-inspection-validation-2026-10-22.json",
+      "bytes": 3284,
+      "sha256": "28d5cb791e185ef4098add1eef4ee49644f966160b6a8fd08afae9c5a2be4a13"
+    }
+  },
+  "ordinaryBuilds": [
+    {
+      "neoForge": "21.1.248",
+      "results": {
+        "tests": 775,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0,
+        "suites": 113
+      },
+      "summary": {
+        "path": "artifacts/paid-final-ordinary-248-tests-2026-10-22.json",
+        "bytes": 91,
+        "sha256": "1898909b4688b9b14fc3252d95d12d0967b6dcbcf6bff4561e6944ed6dc70a78"
+      },
+      "log": {
+        "path": "artifacts/paid-final-ordinary-248-2026-10-22.log",
+        "bytes": 68719,
+        "sha256": "4e6b80404def0169f2834c56aed6e7834205def8d64cac1970288e12aba1c0f1"
+      }
+    },
+    {
+      "neoForge": "21.1.233",
+      "results": {
+        "tests": 775,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0,
+        "suites": 113
+      },
+      "summary": {
+        "path": "artifacts/paid-final-ordinary-233-tests-2026-10-22.json",
+        "bytes": 91,
+        "sha256": "1898909b4688b9b14fc3252d95d12d0967b6dcbcf6bff4561e6944ed6dc70a78"
+      },
+      "log": {
+        "path": "artifacts/paid-final-ordinary-233-2026-10-22.log",
+        "bytes": 68694,
+        "sha256": "d4fb057fa948edd38c2dc655e7c362685b592f31933354b5d06a32a3f91ec28c"
+      }
+    }
+  ],
+  "packages": [
+    {
+      "path": "artifacts/paid-final-release-248-jars-2026-10-22/citizens-2.0.43-neoforge-SNAPSHOT-sources.jar",
+      "bytes": 1124925,
+      "sha256": "6d613d00fa7225efe38f7a70eb64257467f98245013d37ac4530f04d62a9feaa",
+      "auditAndProviderClassesExcluded": true,
+      "separateOwnership": true
+    },
+    {
+      "path": "artifacts/paid-final-release-248-jars-2026-10-22/citizens-2.0.43-neoforge-SNAPSHOT.jar",
+      "bytes": 4080110,
+      "sha256": "c7d7e0d0cd7bc3895877c285927e4b93cd0dcd7fae2065c1aea3928fa71e7f8f",
+      "auditAndProviderClassesExcluded": true,
+      "separateOwnership": true
+    },
+    {
+      "path": "artifacts/paid-final-release-248-jars-2026-10-22/yuuniverse-interactions-2.0.43-neoforge-SNAPSHOT.jar",
+      "bytes": 204146,
+      "sha256": "d13cc4f3488fba99900707e22ffb367656788f6c049f1cc2b486b48128777267",
+      "auditAndProviderClassesExcluded": true,
+      "separateOwnership": true
+    },
+    {
+      "path": "artifacts/paid-final-release-233-jars-2026-10-22/citizens-2.0.43-neoforge-SNAPSHOT-sources.jar",
+      "bytes": 1124925,
+      "sha256": "009f736f98f13bd06a3ddf25e22794ef8e608152af87ed20b1c2fb976dcf2012",
+      "auditAndProviderClassesExcluded": true,
+      "separateOwnership": true
+    },
+    {
+      "path": "artifacts/paid-final-release-233-jars-2026-10-22/citizens-2.0.43-neoforge-SNAPSHOT.jar",
+      "bytes": 4080110,
+      "sha256": "d1c60148f8f783919c6decc5bb414dec2b551ee8b9d19b04e2d26931024533cf",
+      "auditAndProviderClassesExcluded": true,
+      "separateOwnership": true
+    },
+    {
+      "path": "artifacts/paid-final-release-233-jars-2026-10-22/yuuniverse-interactions-2.0.43-neoforge-SNAPSHOT.jar",
+      "bytes": 204146,
+      "sha256": "60b1ea77b8e62e4fdea1678f72a16411d2a8904ccaaa70064516bdb0aaf03b17",
+      "auditAndProviderClassesExcluded": true,
+      "separateOwnership": true
+    }
+  ],
+  "interactions": {
+    "results": {
+      "tests": 100,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    "log": {
+      "path": "artifacts/paid-final-interactions-2026-10-22.log",
+      "bytes": 11659,
+      "sha256": "03832e8c169bb86da8388bbe6c555120c1247859c49095e3aefc684c5f5a386a"
+    }
+  },
+  "selectedRegression": {
+    "xmod": 45,
+    "commerce": 27,
+    "partyRewards": 19,
+    "log": {
+      "path": "artifacts/paid-accepted-xmod-2026-10-22.log",
+      "bytes": 77371,
+      "sha256": "97ee77bd86c4934c2a264c20ee815ccc7da7a774617d91b983052355d5b85188"
+    },
+    "providers": [
+      {
+        "path": "artifacts/paid-accepted-xmod-audit-server/mods/architectury-13.0.11-neoforge.jar",
+        "bytes": 584734,
+        "sha256": "9cc92f2c09533fc5482c60f993bd891c655a0e32b637037cdcb7c2b23adedeeb"
+      },
+      {
+        "path": "artifacts/paid-accepted-xmod-audit-server/mods/economy.jar",
+        "bytes": 14435434,
+        "sha256": "2cd553a34ba6d2cdf559595477cf1ee2d4c5c710b2a6aade54e7fc12c63eca29"
+      },
+      {
+        "path": "artifacts/paid-accepted-xmod-audit-server/mods/ftb-library-neoforge-2101.1.37.jar",
+        "bytes": 1439881,
+        "sha256": "624c2d2d1cbadb946d967e17757bd5b2d129d4d3ed71f2da0c70607d04476ac2"
+      },
+      {
+        "path": "artifacts/paid-accepted-xmod-audit-server/mods/ftb-quests-neoforge-2101.1.36.jar",
+        "bytes": 1609984,
+        "sha256": "6a39982c4b3afc00b1e788041a4f0d394e1659e3b3a6e5d078cd790bc36d0018"
+      },
+      {
+        "path": "artifacts/paid-accepted-xmod-audit-server/mods/ftb-teams-neoforge-2101.1.11.jar",
+        "bytes": 308236,
+        "sha256": "e6bcd670493624e6906df872a9c6af4a33fe6405cac57a32c59cd4cd5838c655"
+      },
+      {
+        "path": "artifacts/paid-accepted-xmod-audit-server/mods/ftb-xmod-compat-neoforge-21.1.12.jar",
+        "bytes": 148575,
+        "sha256": "f587e13131101bac33d4cc7a04d13d06c00f8f88a892be90d6ffc8ad96119ae8"
+      },
+      {
+        "path": "artifacts/paid-accepted-xmod-audit-server/mods/jei-1.21.1-neoforge-19.53.0.425.jar",
+        "bytes": 1847925,
+        "sha256": "3683c743c1b6192913abc2a969486344eee98aa2924e8deb5087109645c3abc6"
+      },
+      {
+        "path": "artifacts/paid-accepted-xmod-audit-server/mods/kubejs-neoforge-2101.7.2-build.377.jar",
+        "bytes": 2294111,
+        "sha256": "df9a8458b1f83fed06ba54684977911795a5153a462b81a610895f5b1f2f0cbf"
+      },
+      {
+        "path": "artifacts/paid-accepted-xmod-audit-server/mods/rhino-2101.2.8-build.91.jar",
+        "bytes": 980936,
+        "sha256": "1d53d962aa4dac54bcbb4f998c1845980cf194318f1d6b1580ea6ac15cce5ef3"
+      }
+    ]
+  },
+  "beforeFix": {
+    "consumerRevision": "7d11f3a",
+    "run": {
+      "run": "82db10dc04ab4ac7b28a19201fc286d4",
+      "fixture": "artifacts/financial-backup-82db10dc04ab4ac7b28a19201fc286d4-server",
+      "scope": "paid",
+      "neoForge": "21.1.248",
+      "createdAt": "2026-10-22T17:32:29.3030534+08:00",
+      "stages": [
+        {
+          "phase": "seed",
+          "checks": 2,
+          "log": "artifacts/paid-before-2026-10-22-seed.log"
+        }
+      ]
+    },
+    "originalIdentity": {
+      "run": "82db10dc04ab4ac7b28a19201fc286d4",
+      "actor": "78508c13-433d-4738-9974-ae1d2514dc6b",
+      "team": "78508c13-433d-4738-9974-ae1d2514dc6b",
+      "scope": "paid",
+      "quest": "546A65BC4D15CAB5",
+      "money": "7665B075E6B9F95F",
+      "claim": "9c5dcb46965656a4f51c2c0b0fb3b6c6c48ad38b8ef37569de015b414ee32fcb",
+      "transaction": "404c5e76-9b5e-4d6a-9521-6bf09fbe416d",
+      "operationKey": "citizens:ftb-reward:v1:9c5dcb46965656a4f51c2c0b0fb3b6c6c48ad38b8ef37569de015b414ee32fcb:78508c13-433d-4738-9974-ae1d2514dc6b",
+      "currency": "8d6810f0-d3f7-4bfc-8598-68f54b96f834",
+      "transactionCount": 2,
+      "provider": "bf678f1c-759a-4ce9-88d4-b6fe3fb36b94"
+    },
+    "evidence": [
+      {
+        "path": "artifacts/paid-before-2026-10-22-regressed.log",
+        "bytes": 18206,
+        "sha256": "596d3bd1c1d141ebafe9f8d97fc009c7c0727e174d93f331a06f6daa6bb0ec38"
+      },
+      {
+        "path": "artifacts/paid-before-audit-source-2026-10-22.java",
+        "bytes": 7711,
+        "sha256": "7ebe8adf77049c31f8ddce89c15d0fa96ce26a40f8f9aad077942bfc5d3fd652"
+      }
+    ]
+  },
+  "draftDiagnostics": {
+    "auditExpandedDuringDraftRunCausedMissingSeedField": true,
+    "providerUnavailableExpectationUpdated": true,
+    "proxyInspectorRejectedInactiveProvider": true,
+    "logs": [
+      {
+        "path": "artifacts/paid-final-xmod-2026-10-22.log",
+        "bytes": 61751,
+        "sha256": "00b51edae05fb7b973dcf1fbe1d253c14b8d286d8bee4d928669c62c0c7eeff9"
+      },
+      {
+        "path": "artifacts/paid-verified-xmod-2026-10-22.log",
+        "bytes": 60676,
+        "sha256": "d81b704b7febb41c2161657ecee25b9f5453ba70291738877c36194c1400f404"
+      }
+    ]
+  },
+  "newProcessKillClaim": false,
+  "productionDeploymentChanged": false,
+  "limits": [
+    "Unretained offline PREPARED discovery",
+    "Removed native teams and arbitrary callbacks",
+    "Retention/storage/load/large-history throughput",
+    "Original migration IDs/items and physical ordinary/VR/proxy acceptance"
+  ]
+}
