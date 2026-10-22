@@ -1,16 +1,28 @@
 param(
     [Parameter(Mandatory)][string]$JavaHome,
     [ValidateSet('before','progress','inventory','confirmed','player_rollback','task_rollback')][string]$Boundary = 'inventory',
-    [ValidatePattern('^[a-zA-Z0-9_-]+$')][string]$LogPrefix = 'delivery-crash-248'
+    [ValidatePattern('^[a-zA-Z0-9_-]+$')][string]$LogPrefix = 'delivery-crash-248',
+    [string]$FixtureDirectory = 'artifacts/delivery-audit-server',
+    [string]$BuildDirectory = 'artifacts/delivery-native-build',
+    [string]$ProjectCache = 'artifacts/delivery-native-gradle-cache'
 )
 $ErrorActionPreference = 'Stop'
 $taskRoot = Split-Path $PSScriptRoot -Parent
 $env:JAVA_HOME = $JavaHome
 $runId = [Guid]::NewGuid().ToString('N')
-$fixture = Join-Path $taskRoot 'artifacts/delivery-audit-server'
-$argumentFile = Join-Path $taskRoot 'artifacts/delivery-native-build/moddev/serverRunProgramArgs.txt'
-$gradleArguments = @('--project-cache-dir','../artifacts/delivery-native-gradle-cache','-I','../tools/delivery-runtime-audit.gradle',
-    '-Pneo_version=21.1.248',"-PdeliveryAuditRun=$runId","-PdeliveryAuditBoundary=$Boundary")
+$artifactRoot = [IO.Path]::GetFullPath((Join-Path $taskRoot 'artifacts')) + [IO.Path]::DirectorySeparatorChar
+function Resolve-AuditPath([string]$path) {
+    $resolved = [IO.Path]::GetFullPath((Join-Path $taskRoot $path))
+    if (!$resolved.StartsWith($artifactRoot, [StringComparison]::OrdinalIgnoreCase)) { throw 'Delivery audit paths must be inside task artifacts' }
+    return $resolved
+}
+$fixture = Resolve-AuditPath $FixtureDirectory
+$buildOutput = Resolve-AuditPath $BuildDirectory
+$cache = Resolve-AuditPath $ProjectCache
+if ((Get-Content -LiteralPath (Join-Path $fixture 'delivery-audit-fixture.txt') -Raw).Trim() -ne 'citizens-delivery-audit') { throw 'Missing delivery fixture identity' }
+$argumentFile = Join-Path $buildOutput 'moddev/serverRunProgramArgs.txt'
+$gradleArguments = @('--project-cache-dir',$cache,'-I','../tools/delivery-runtime-audit.gradle',
+    "-PdeliveryAuditFixture=$fixture","-PdeliveryAuditBuildDir=$buildOutput",'-Pneo_version=21.1.248',"-PdeliveryAuditRun=$runId","-PdeliveryAuditBoundary=$Boundary")
 $commitArguments = $gradleArguments + @('-PdeliveryAuditPhase=crash','runServer','--console=plain')
 $escapedArguments = $commitArguments | ForEach-Object { "'" + $_.Replace("'","''") + "'" }
 $info = [Diagnostics.ProcessStartInfo]::new()
@@ -50,7 +62,7 @@ try {
                 Copy-Item -LiteralPath $statePath -Destination (Join-Path $taskRoot "artifacts/$LogPrefix-state.json")
                 [ordered]@{run=$runId;boundary=$Boundary;pid=$fixtureProcessId;actor=$state.actor;entry=$state.entry;
                     processCreatedAt=$fixtureProcess.CreationDate.ToString('o');killedAt=[DateTimeOffset]::Now.ToString('o');
-                    verifiedArgumentFile=$argumentFile;forcedTermination=$true} |
+                    verifiedArgumentFile=$argumentFile;fixture=$fixture;buildOutput=$buildOutput;forcedTermination=$true} |
                     ConvertTo-Json | Set-Content -LiteralPath (Join-Path $taskRoot "artifacts/$LogPrefix-termination.json") -Encoding utf8NoBOM
                 Write-Output "Killed isolated delivery JVM $fixtureProcessId at $Boundary."
                 $killed = $true; break

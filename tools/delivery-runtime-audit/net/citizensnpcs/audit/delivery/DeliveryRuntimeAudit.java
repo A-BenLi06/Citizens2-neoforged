@@ -39,6 +39,8 @@ public final class DeliveryRuntimeAudit {
     private static String phase, killBoundary;
     @SubscribeEvent public static void tick(ServerTickEvent.Post event) {
         if (ran) return; ran = true;
+        String mutation = System.getenv("CITIZENS_DELIVERY_AUDIT_MUTATION");
+        if (mutation != null) { DeliveryMutationRuntimeAudit.run(event.getServer(), mutation); return; }
         MinecraftServer server = event.getServer(); EmbeddedChannel channel = null;
         try {
             phase = Objects.requireNonNullElse(System.getenv("CITIZENS_DELIVERY_AUDIT_PHASE"), "normal");
@@ -155,13 +157,13 @@ public final class DeliveryRuntimeAudit {
     }
     private static QuestDeliveryJournal.Entry latest() { return QuestDeliveryRecovery.current(actor.getServer()).entries(actor.createCommandSourceStack().withPermission(4)).stream().filter(entry -> entry.actorId().equals(actor.getUUID())).max(Comparator.comparingLong(QuestDeliveryJournal.Entry::sequence)).orElseThrow(); }
     private static ItemTask task(String id) { return (ItemTask)ServerQuestFile.getInstance().orElseThrow().getTask(FtbQuestTasks.parseId(id)); }
-    private static ItemStack parcel(int count) {
+    static ItemStack parcel(int count) {
         var stack = new ItemStack(Items.PAPER, count); stack.set(DataComponents.CUSTOM_NAME, net.minecraft.network.chat.Component.literal("Delivery parcel"));
         var data = new CompoundTag(); data.putString("route", "native-delivery"); stack.set(DataComponents.CUSTOM_DATA, CustomData.of(data)); return stack;
     }
     private static void rejected(Runnable action, String name) { try { action.run(); throw new AssertionError(name); } catch (IllegalStateException expected) { check(true, name); } }
     private static void check(boolean condition, String name) { if (!condition) throw new AssertionError(name); passed++; LOG.info("[DELIVERYAUDIT] PASS {}", name); }
-    private static EmbeddedChannel connect(ServerPlayer player) {
+    static EmbeddedChannel connect(ServerPlayer player) {
         var connection = new Connection(PacketFlow.SERVERBOUND);
         var channel = new EmbeddedChannel(new ChannelInitializer<Channel>() {
             @Override protected void initChannel(Channel channel) { Connection.configureInMemoryPipeline(channel.pipeline(), PacketFlow.SERVERBOUND); connection.configurePacketHandler(channel.pipeline()); }

@@ -1,0 +1,1322 @@
+{
+  "createdAt": "2026-10-22T20:37:56.197980+08:00",
+  "timezone": "UTC+08:00",
+  "baseRevision": "0c0c46d",
+  "productionTree": {
+    "files": 612,
+    "algorithm": "SHA256 of sorted relative path + NUL + SHA256 lines joined by LF",
+    "sha256": "b028936e2e0183ddd5ab604330604bb7661160af2c763549b3b9aa7bc3113053"
+  },
+  "mutation": [
+    {
+      "beforeFix": true,
+      "states": [
+        {
+          "mode": "removed",
+          "actor": "669fe7d0-3e7a-4011-872d-b2dc86948298",
+          "team": "52782ae7-fea9-4422-8bc8-9629d2483f76",
+          "task": "7F082DC11777275E",
+          "quest": "6140E429BC61C961",
+          "entry": "2604af53-3e71-46d9-8b84-6106c79d68e1",
+          "reported": false,
+          "error": null,
+          "state": "CONFIRMED",
+          "callbacks": 1,
+          "paper": 0,
+          "nativeTeamPresent": false,
+          "actorCurrent": true
+        },
+        {
+          "mode": "replacement",
+          "actor": "da7326a4-7e40-487e-893c-f8d95996b0db",
+          "team": "983563c7-3bdb-4609-8bdc-9b0156651b85",
+          "task": "1B998721C8680EAE",
+          "quest": "7E9BF5AACAA52D99",
+          "entry": "cd7c326c-95e5-49e4-b09f-de06ae5c3e40",
+          "reported": false,
+          "error": null,
+          "state": "CONFIRMED",
+          "callbacks": 1,
+          "paper": 0,
+          "nativeTeamPresent": true,
+          "actorCurrent": true
+        },
+        {
+          "mode": "retired",
+          "actor": "66fcb26e-f241-4698-8461-d9445ea8ffbc",
+          "team": "78ab25d5-be57-4da6-90cb-b165cfc78f14",
+          "task": "395B9D076D98E4AE",
+          "quest": "462EEE90FFD7C692",
+          "entry": "c4d15e35-556f-4dd0-beaa-eefe2beddedf",
+          "reported": false,
+          "error": null,
+          "state": "CONFIRMED",
+          "callbacks": 1,
+          "paper": 0,
+          "nativeTeamPresent": true,
+          "actorCurrent": false
+        },
+        {
+          "mode": "definition",
+          "actor": "e659a204-305c-4ae0-b9ab-579a13fca97e",
+          "team": "b155fb37-62c8-4c28-a675-d4015aa4af76",
+          "task": "32A32504CE655B0B",
+          "quest": "07E3CE032C7882B7",
+          "entry": "a62f0bb2-ccf1-48bb-a54a-83666846be57",
+          "reported": true,
+          "error": "java.lang.IllegalArgumentException: Delivery changed definition, regressed or did not advance",
+          "state": "REVIEW",
+          "callbacks": 1,
+          "paper": 0,
+          "nativeTeamPresent": true,
+          "actorCurrent": true
+        },
+        {
+          "mode": "deleted",
+          "actor": "085599d8-89e2-4d26-b4eb-c9ca88180120",
+          "team": "4a111d22-113f-41a6-89bc-40089348d2de",
+          "task": "3A499AA928D8EEBD",
+          "quest": "705CD94AF1FD6EC3",
+          "entry": "8e0e50b3-61f0-4762-8da6-9f71766457c2",
+          "reported": true,
+          "error": "java.lang.IllegalArgumentException: Delivery changed definition, regressed or did not advance",
+          "state": "REVIEW",
+          "callbacks": 1,
+          "paper": 0,
+          "nativeTeamPresent": true,
+          "actorCurrent": true
+        },
+        {
+          "mode": "moved",
+          "actor": "e1d01a1b-2bb8-428b-8530-7cf38d8e2c6b",
+          "team": "ec8e1869-bebf-4dec-9af6-90866397e621",
+          "task": "04B204D532A5D8DA",
+          "quest": "0E4BFDEBA076DAA5",
+          "entry": "a7b392a8-914d-428c-b7b1-65981577d98b",
+          "reported": true,
+          "error": "java.lang.IllegalStateException: com.mojang.brigadier.exceptions.CommandSyntaxException: You must transfer ownership of the team before you can leave!",
+          "state": "REVIEW",
+          "callbacks": 1,
+          "paper": 5,
+          "nativeTeamPresent": true,
+          "actorCurrent": true
+        },
+        {
+          "mode": "repeat",
+          "actor": "8a9d96a2-5308-4b8d-9e67-08f78311d748",
+          "team": "62d8229e-a428-4c1d-827a-6050674a6778",
+          "task": "52AF1769D5BDED03",
+          "quest": "25B7ED1E4529D1ED",
+          "entry": "2ed0fda3-a724-412e-b6f7-086be347bdaa",
+          "reported": false,
+          "error": null,
+          "state": "CONFIRMED",
+          "callbacks": 1,
+          "paper": 0,
+          "nativeTeamPresent": true,
+          "actorCurrent": true
+        },
+        {
+          "mode": "normal",
+          "actor": "8769b5ca-da80-4fa9-95c4-9cc8981b1ca5",
+          "team": "9b06c951-26c2-46ca-a5b3-5e2c9eb5200e",
+          "task": "6D3B08486400A1A3",
+          "quest": "248375FA97114C4D",
+          "entry": "76e37157-c3df-4b5d-a0ee-8acb46a327af",
+          "reported": false,
+          "error": null,
+          "state": "CONFIRMED",
+          "callbacks": 1,
+          "paper": 0,
+          "nativeTeamPresent": true,
+          "actorCurrent": true
+        }
+      ],
+      "state": {
+        "path": "artifacts/delivery-mutation-before-server/delivery-mutation-state.json",
+        "bytes": 2972,
+        "sha256": "6cefdab6bb03372333fd2168df8d4acbbc2723a10ed105c5964efd8dfe84430e"
+      },
+      "log": {
+        "path": "artifacts/delivery-mutation-before-2026-10-22.log",
+        "bytes": 42382,
+        "sha256": "456e5d147a22262d16c8d627dd0520c48ab0dd2acaf57709d86f705a72ca7380"
+      },
+      "journals": [
+        {
+          "path": "artifacts/delivery-mutation-before-server/delivery-world/citizens/quest-deliveries/delivery-1-2604af53-3e71-46d9-8b84-6106c79d68e1-0.json",
+          "bytes": 820,
+          "sha256": "a267bc0ecab890a8ccc1f1c9ec7e2d276a830d25539696c1b07ee708e8ad0192"
+        },
+        {
+          "path": "artifacts/delivery-mutation-before-server/delivery-world/citizens/quest-deliveries/delivery-1-2604af53-3e71-46d9-8b84-6106c79d68e1-1.json",
+          "bytes": 1177,
+          "sha256": "e8aee3a89d065834d93d5bf8fdfebe17075cd707d6b8b785c7caecf0ecd22d7e"
+        },
+        {
+          "path": "artifacts/delivery-mutation-before-server/delivery-world/citizens/quest-deliveries/delivery-2-cd7c326c-95e5-49e4-b09f-de06ae5c3e40-0.json",
+          "bytes": 820,
+          "sha256": "8bfcbb7e27cb8a6e32f7c9d3ab34ba7a8cf3e75b60f7b654f9fd82b572ae33d5"
+        },
+        {
+          "path": "artifacts/delivery-mutation-before-server/delivery-world/citizens/quest-deliveries/delivery-2-cd7c326c-95e5-49e4-b09f-de06ae5c3e40-1.json",
+          "bytes": 1177,
+          "sha256": "df4d83840270e8da58161c6b2b106c487d51b70431e6c8400ea6a6d3c07be7e6"
+        },
+        {
+          "path": "artifacts/delivery-mutation-before-server/delivery-world/citizens/quest-deliveries/delivery-3-c4d15e35-556f-4dd0-beaa-eefe2beddedf-0.json",
+          "bytes": 820,
+          "sha256": "b14f1303d35bab701d9453bbbb9ed519af3de6a00b891d7b20b13409ba21776c"
+        },
+        {
+          "path": "artifacts/delivery-mutation-before-server/delivery-world/citizens/quest-deliveries/delivery-3-c4d15e35-556f-4dd0-beaa-eefe2beddedf-1.json",
+          "bytes": 1177,
+          "sha256": "6d664fb75f715d34ce2c6361928d8ce5a7754bb1bcbc915033280126b8e0b5a6"
+        },
+        {
+          "path": "artifacts/delivery-mutation-before-server/delivery-world/citizens/quest-deliveries/delivery-4-a62f0bb2-ccf1-48bb-a54a-83666846be57-0.json",
+          "bytes": 820,
+          "sha256": "fecddea8c63eb0deaeb6ed2f9e01e3e87bd2109ded226295417e03fc46928717"
+        },
+        {
+          "path": "artifacts/delivery-mutation-before-server/delivery-world/citizens/quest-deliveries/delivery-4-a62f0bb2-ccf1-48bb-a54a-83666846be57-1.json",
+          "bytes": 909,
+          "sha256": "3197221f0802d8b4f89e4428e37da1f387a62d3001c6466a0d183952203e49e5"
+        },
+        {
+          "path": "artifacts/delivery-mutation-before-server/delivery-world/citizens/quest-deliveries/delivery-5-8e0e50b3-61f0-4762-8da6-9f71766457c2-0.json",
+          "bytes": 820,
+          "sha256": "53fc8ced4bc1d023034ca0d1f803d2b64ceca88ccfe645bd683a107d9d4fd856"
+        },
+        {
+          "path": "artifacts/delivery-mutation-before-server/delivery-world/citizens/quest-deliveries/delivery-5-8e0e50b3-61f0-4762-8da6-9f71766457c2-1.json",
+          "bytes": 909,
+          "sha256": "0b6bd4d514fb5c39062af8dd23b599c8c5d08e40d441cf4e132c97e30f45f505"
+        },
+        {
+          "path": "artifacts/delivery-mutation-before-server/delivery-world/citizens/quest-deliveries/delivery-6-a7b392a8-914d-428c-b7b1-65981577d98b-0.json",
+          "bytes": 820,
+          "sha256": "1d43ca2c2e110586503e6d820fec8da47431cd3704b6785d606d9fb248a4c216"
+        },
+        {
+          "path": "artifacts/delivery-mutation-before-server/delivery-world/citizens/quest-deliveries/delivery-6-a7b392a8-914d-428c-b7b1-65981577d98b-1.json",
+          "bytes": 865,
+          "sha256": "73c742a07b289eff778ac460f87f327c2c02cba54d652e91623524c8676b0d8d"
+        },
+        {
+          "path": "artifacts/delivery-mutation-before-server/delivery-world/citizens/quest-deliveries/delivery-7-2ed0fda3-a724-412e-b6f7-086be347bdaa-0.json",
+          "bytes": 820,
+          "sha256": "d31b30668150c4aa1887b637f0e032572d3e90dc2f4900138dc097a0e056edfa"
+        },
+        {
+          "path": "artifacts/delivery-mutation-before-server/delivery-world/citizens/quest-deliveries/delivery-7-2ed0fda3-a724-412e-b6f7-086be347bdaa-1.json",
+          "bytes": 1218,
+          "sha256": "b22caa9e15446daa9036b46dd960effbc92f34d680376682224e2a447b3beccc"
+        },
+        {
+          "path": "artifacts/delivery-mutation-before-server/delivery-world/citizens/quest-deliveries/delivery-8-76e37157-c3df-4b5d-a0ee-8acb46a327af-0.json",
+          "bytes": 820,
+          "sha256": "bf754a1750ef220a8654664a88a0a2c1e5c775e5ee200d72803d1c7307b2c7c6"
+        },
+        {
+          "path": "artifacts/delivery-mutation-before-server/delivery-world/citizens/quest-deliveries/delivery-8-76e37157-c3df-4b5d-a0ee-8acb46a327af-1.json",
+          "bytes": 1177,
+          "sha256": "87f23089e5f68818f7909a1220fa9e1a07fca61376a71f7ae24762683a970bee"
+        }
+      ],
+      "players": [
+        {
+          "path": "artifacts/delivery-mutation-before-server/delivery-world/playerdata/669fe7d0-3e7a-4011-872d-b2dc86948298.dat",
+          "bytes": 830,
+          "sha256": "3869ba981d204e2380e18ab362777e20c207023ed7e60c50cd689c10db1862e0"
+        },
+        {
+          "path": "artifacts/delivery-mutation-before-server/delivery-world/playerdata/da7326a4-7e40-487e-893c-f8d95996b0db.dat",
+          "bytes": 826,
+          "sha256": "a01ecbf8b821e19fcc432252a15d96e33de175c47059a804e35b41a35ef856de"
+        },
+        {
+          "path": "artifacts/delivery-mutation-before-server/delivery-world/playerdata/66fcb26e-f241-4698-8461-d9445ea8ffbc.dat",
+          "bytes": 829,
+          "sha256": "824d52ca38836939d06632061548b2b53a9f33dced90d993044e0b897f6e11d5"
+        },
+        {
+          "path": "artifacts/delivery-mutation-before-server/delivery-world/playerdata/e659a204-305c-4ae0-b9ab-579a13fca97e.dat",
+          "bytes": 835,
+          "sha256": "81c18422ee5554efd4efea1af8abf2cdefe923f9cd3802d838db35fe2dd4f985"
+        },
+        {
+          "path": "artifacts/delivery-mutation-before-server/delivery-world/playerdata/085599d8-89e2-4d26-b4eb-c9ca88180120.dat",
+          "bytes": 830,
+          "sha256": "7d4feef96acf6a6c0b889488f7494c8d5464cbef2d165f1bf9a05c70b71bf897"
+        },
+        {
+          "path": "artifacts/delivery-mutation-before-server/delivery-world/playerdata/e1d01a1b-2bb8-428b-8530-7cf38d8e2c6b.dat",
+          "bytes": 832,
+          "sha256": "f6c081b3a9b55b86c8ac33da07a42f7d241dd4e7e1fa623f22154bbafcd549b9"
+        },
+        {
+          "path": "artifacts/delivery-mutation-before-server/delivery-world/playerdata/8a9d96a2-5308-4b8d-9e67-08f78311d748.dat",
+          "bytes": 971,
+          "sha256": "a5c9c8949b1d57708ea48814b44f29fdc9f5d426a8524f1abd8e846013ae10cf"
+        },
+        {
+          "path": "artifacts/delivery-mutation-before-server/delivery-world/playerdata/8769b5ca-da80-4fa9-95c4-9cc8981b1ca5.dat",
+          "bytes": 830,
+          "sha256": "eeaa80b7d8552c45cd4445e15bd5998f46e948b7e8210b140b42f76b7d274706"
+        }
+      ],
+      "nativeTeams": [
+        {
+          "path": "artifacts/delivery-mutation-before-server/delivery-world/ftbquests/52782ae7-fea9-4422-8bc8-9629d2483f76.snbt",
+          "bytes": 590,
+          "sha256": "d4d46f0452ff575f5fbe4f8afd6b6351bd4c07ad94b517e7c5251e07fd9399d8"
+        },
+        {
+          "path": "artifacts/delivery-mutation-before-server/delivery-world/ftbquests/983563c7-3bdb-4609-8bdc-9b0156651b85.snbt",
+          "bytes": 564,
+          "sha256": "d949a48222f96963e40c2fb1c2ca7228db1ce537ec07c7e9ba7a95225122e2ff"
+        },
+        {
+          "path": "artifacts/delivery-mutation-before-server/delivery-world/ftbquests/78ab25d5-be57-4da6-90cb-b165cfc78f14.snbt",
+          "bytes": 590,
+          "sha256": "45ff1f0c9fdea4fb68cfb064524f8a60eff4c706971d22a4281b6f4c06f5695c"
+        },
+        {
+          "path": "artifacts/delivery-mutation-before-server/delivery-world/ftbquests/b155fb37-62c8-4c28-a675-d4015aa4af76.snbt",
+          "bytes": 590,
+          "sha256": "e2f491a0c09118a08102487f617dae5d40f9d7e84c5792b2bd08efd4068c62f0"
+        },
+        {
+          "path": "artifacts/delivery-mutation-before-server/delivery-world/ftbquests/4a111d22-113f-41a6-89bc-40089348d2de.snbt",
+          "bytes": 564,
+          "sha256": "06da986508c28c07c74f7f437dc625a2edf8a1c64ad00d83fe78d5b82f49b229"
+        },
+        {
+          "path": "artifacts/delivery-mutation-before-server/delivery-world/ftbquests/ec8e1869-bebf-4dec-9af6-90866397e621.snbt",
+          "bytes": 590,
+          "sha256": "893f0ae80ed19b13f76ac896f4749f1db4e484791a44e336af3021149418cf68"
+        },
+        {
+          "path": "artifacts/delivery-mutation-before-server/delivery-world/ftbquests/62d8229e-a428-4c1d-827a-6050674a6778.snbt",
+          "bytes": 481,
+          "sha256": "090911ca66f9174357a9b6ee3f9ffe504188bce79a22239cd9cee122f4da231b"
+        },
+        {
+          "path": "artifacts/delivery-mutation-before-server/delivery-world/ftbquests/9b06c951-26c2-46ca-a5b3-5e2c9eb5200e.snbt",
+          "bytes": 662,
+          "sha256": "4d783a5e53ca97c11a8de3b4e7adaa01c9cc7a1350675463c18a97bd82055e50"
+        }
+      ]
+    },
+    {
+      "beforeFix": false,
+      "states": [
+        {
+          "mode": "removed",
+          "actor": "aed8d9e6-08ec-4c58-b49b-c8210a5dbd82",
+          "team": "db22f6be-4cb3-47c7-ad7a-d4228211063d",
+          "task": "57B37F2AEC7468FB",
+          "quest": "237922A02816A32B",
+          "entry": "b7eb0ca5-d719-4460-be73-e8c1791646c6",
+          "reported": true,
+          "error": "java.lang.IllegalStateException: Admitted team no longer exists",
+          "state": "REVIEW",
+          "callbacks": 1,
+          "paper": 0,
+          "nativeTeamPresent": false,
+          "actorCurrent": true
+        },
+        {
+          "mode": "replacement",
+          "actor": "3ef0ea75-0889-4930-bd72-96f2395790fc",
+          "team": "bfda96c0-e40f-4070-92fc-f5715051cc53",
+          "task": "66B1CFF084295BFB",
+          "quest": "545E9D16D9ABD185",
+          "entry": "92c44a31-26fe-4767-ac60-cdabe2096314",
+          "reported": true,
+          "error": "java.lang.IllegalStateException: Native delivery target changed during submission; review is required",
+          "state": "REVIEW",
+          "callbacks": 1,
+          "paper": 0,
+          "nativeTeamPresent": true,
+          "actorCurrent": true
+        },
+        {
+          "mode": "retired",
+          "actor": "7fb8a10b-9d83-4115-8d27-c4f07594a0ee",
+          "team": "7c0583a9-3130-4757-8180-b05f3568d873",
+          "task": "44A215848A678E10",
+          "quest": "64FF0E5C2DA4BE91",
+          "entry": "197d64f5-0726-4d7f-bec5-a96fffbdcb75",
+          "reported": true,
+          "error": "java.lang.IllegalStateException: Delivery actor session retired during native consumption; review is required",
+          "state": "REVIEW",
+          "callbacks": 1,
+          "paper": 0,
+          "nativeTeamPresent": true,
+          "actorCurrent": false,
+          "savedPaperOnReconnect": 5
+        },
+        {
+          "mode": "definition",
+          "actor": "64aeb5c2-1d14-4543-b186-b8b598ed98e3",
+          "team": "aa2dc472-0a72-41c6-a14f-552402760383",
+          "task": "075F902D046D2B16",
+          "quest": "506A6CC467E5AA10",
+          "entry": "5d1333ac-ac66-493a-ae33-b4bbb47b5413",
+          "reported": true,
+          "error": "java.lang.IllegalStateException: Native delivery target changed during submission; review is required",
+          "state": "REVIEW",
+          "callbacks": 1,
+          "paper": 0,
+          "nativeTeamPresent": true,
+          "actorCurrent": true
+        },
+        {
+          "mode": "deleted",
+          "actor": "b2303431-adc2-4a55-a0c3-ce9b2a52638f",
+          "team": "12b8fbfe-6416-4144-a00d-06665b344b54",
+          "task": "2AD20C275CD0C54B",
+          "quest": "3FCE206773603665",
+          "entry": "82e7aa36-4fa7-41d8-959f-aabc2f2753e6",
+          "reported": true,
+          "error": "java.lang.IllegalArgumentException: Admitted task no longer exists",
+          "state": "REVIEW",
+          "callbacks": 1,
+          "paper": 0,
+          "nativeTeamPresent": true,
+          "actorCurrent": true
+        },
+        {
+          "mode": "moved",
+          "actor": "cfaabdb5-7be0-448e-8889-bbe8a3a7b3dd",
+          "team": "4e3459ab-03ae-4e45-a8b2-df958b89fae7",
+          "task": "55D6904B0EEA973F",
+          "quest": "311425497B23C8B6",
+          "entry": "e54e23fe-39c0-4f9a-ac3a-1d05f2eba4f3",
+          "reported": false,
+          "error": null,
+          "state": "CONFIRMED",
+          "callbacks": 1,
+          "paper": 0,
+          "nativeTeamPresent": true,
+          "actorCurrent": true
+        },
+        {
+          "mode": "repeat",
+          "actor": "ed6a58d2-c438-48ea-8f69-7cdb24c94980",
+          "team": "d966ccd5-b162-4a5d-905a-68e409f67ab6",
+          "task": "1511D676B22F791E",
+          "quest": "62498DBF6B818532",
+          "entry": "4bcb0aed-6c06-4beb-9390-2e1ead2bd528",
+          "reported": false,
+          "error": null,
+          "state": "CONFIRMED",
+          "callbacks": 1,
+          "paper": 0,
+          "nativeTeamPresent": true,
+          "actorCurrent": true
+        },
+        {
+          "mode": "normal",
+          "actor": "382308b8-7bb1-416a-9826-bce2fde5aa52",
+          "team": "e2a758f3-dafe-42eb-9766-08826fac96fb",
+          "task": "2D1AA7F3B7D7D3DF",
+          "quest": "6616DDD20E5EFFF0",
+          "entry": "7bb8fb11-ca91-4475-ba0c-e75ba6b555c5",
+          "reported": false,
+          "error": null,
+          "state": "CONFIRMED",
+          "callbacks": 1,
+          "paper": 0,
+          "nativeTeamPresent": true,
+          "actorCurrent": true
+        }
+      ],
+      "state": {
+        "path": "artifacts/delivery-mutation-final-server/delivery-mutation-state.json",
+        "bytes": 3090,
+        "sha256": "7fe851ee9f5dc4a708dad738dc82a800f4a95edf0676da1d88b2e51ae2570d86"
+      },
+      "log": {
+        "path": "artifacts/delivery-mutation-final-2026-10-22.log",
+        "bytes": 25204,
+        "sha256": "4ebb9ac8764527cf930a72712c57fa4adb3d0323243c1331ebb4b592d281b155"
+      },
+      "journals": [
+        {
+          "path": "artifacts/delivery-mutation-final-server/delivery-world/citizens/quest-deliveries/delivery-1-b7eb0ca5-d719-4460-be73-e8c1791646c6-0.json",
+          "bytes": 820,
+          "sha256": "12b305af15c710b3e1ebc5982a932fb76b92851786e92395c6c3f4b33dfb52a3"
+        },
+        {
+          "path": "artifacts/delivery-mutation-final-server/delivery-world/citizens/quest-deliveries/delivery-1-b7eb0ca5-d719-4460-be73-e8c1791646c6-1.json",
+          "bytes": 879,
+          "sha256": "e0f19ecd78b7a9b6b64bf6385eb094075f03f1e30287f557c1d0fe2183c46660"
+        },
+        {
+          "path": "artifacts/delivery-mutation-final-server/delivery-world/citizens/quest-deliveries/delivery-2-92c44a31-26fe-4767-ac60-cdabe2096314-0.json",
+          "bytes": 820,
+          "sha256": "488430d3a74ec0fca942ed434cb24b82cc52c9ced5aa7161865ee48ec4f87a5c"
+        },
+        {
+          "path": "artifacts/delivery-mutation-final-server/delivery-world/citizens/quest-deliveries/delivery-2-92c44a31-26fe-4767-ac60-cdabe2096314-1.json",
+          "bytes": 917,
+          "sha256": "88ac489a604eee8e99ba93410e5a2f9bdc461c45229efb3d9a670058b3071f39"
+        },
+        {
+          "path": "artifacts/delivery-mutation-final-server/delivery-world/citizens/quest-deliveries/delivery-3-197d64f5-0726-4d7f-bec5-a96fffbdcb75-0.json",
+          "bytes": 820,
+          "sha256": "989df6aa124208840b75c52eec9ab9514ff3597d2657f9acb006c6a19b9ac210"
+        },
+        {
+          "path": "artifacts/delivery-mutation-final-server/delivery-world/citizens/quest-deliveries/delivery-3-197d64f5-0726-4d7f-bec5-a96fffbdcb75-1.json",
+          "bytes": 925,
+          "sha256": "1e51a29a19375940e0fa5d98ee8813e245b1afae77a46307755d1293493647f7"
+        },
+        {
+          "path": "artifacts/delivery-mutation-final-server/delivery-world/citizens/quest-deliveries/delivery-4-5d1333ac-ac66-493a-ae33-b4bbb47b5413-0.json",
+          "bytes": 820,
+          "sha256": "c386e3d4cf779db00d7f114cf13ca2228dad8e40d3b75368d9ee75220eb96750"
+        },
+        {
+          "path": "artifacts/delivery-mutation-final-server/delivery-world/citizens/quest-deliveries/delivery-4-5d1333ac-ac66-493a-ae33-b4bbb47b5413-1.json",
+          "bytes": 917,
+          "sha256": "0cff1ad24cfa52be6edbc5bdd5da34ddc308e063f6c973de19bb00b939820aad"
+        },
+        {
+          "path": "artifacts/delivery-mutation-final-server/delivery-world/citizens/quest-deliveries/delivery-5-82e7aa36-4fa7-41d8-959f-aabc2f2753e6-0.json",
+          "bytes": 820,
+          "sha256": "264380138d3109c345bc629622c555308fa63e3ef9e199e4938ec75bd33bd1bf"
+        },
+        {
+          "path": "artifacts/delivery-mutation-final-server/delivery-world/citizens/quest-deliveries/delivery-5-82e7aa36-4fa7-41d8-959f-aabc2f2753e6-1.json",
+          "bytes": 882,
+          "sha256": "f0b668a15cc756890774747c2ad99f106a68e1317e6a02742e610e9281ae4e64"
+        },
+        {
+          "path": "artifacts/delivery-mutation-final-server/delivery-world/citizens/quest-deliveries/delivery-6-e54e23fe-39c0-4f9a-ac3a-1d05f2eba4f3-0.json",
+          "bytes": 820,
+          "sha256": "e4820609221e7cf314c7f59f6a780c093b398699c18b1d851728335a84d55caa"
+        },
+        {
+          "path": "artifacts/delivery-mutation-final-server/delivery-world/citizens/quest-deliveries/delivery-6-e54e23fe-39c0-4f9a-ac3a-1d05f2eba4f3-1.json",
+          "bytes": 1177,
+          "sha256": "4f8275a6cb2c8d44c48e775009da40007b4bf2cf86cf9df23295635af37a2a38"
+        },
+        {
+          "path": "artifacts/delivery-mutation-final-server/delivery-world/citizens/quest-deliveries/delivery-7-4bcb0aed-6c06-4beb-9390-2e1ead2bd528-0.json",
+          "bytes": 820,
+          "sha256": "7fac6473ff1a8487ea413314321647ae1e021f232a4d923f10bbd9b8e652d432"
+        },
+        {
+          "path": "artifacts/delivery-mutation-final-server/delivery-world/citizens/quest-deliveries/delivery-7-4bcb0aed-6c06-4beb-9390-2e1ead2bd528-1.json",
+          "bytes": 1218,
+          "sha256": "1a5669a92ef195f6671fc0714d7dc5d685da2bd4b5fc867ec041e59bee421326"
+        },
+        {
+          "path": "artifacts/delivery-mutation-final-server/delivery-world/citizens/quest-deliveries/delivery-8-7bb8fb11-ca91-4475-ba0c-e75ba6b555c5-0.json",
+          "bytes": 820,
+          "sha256": "774a4054e8c8bb524c311a7c44828053d3bf7dbab4e9627e969441b733dfac75"
+        },
+        {
+          "path": "artifacts/delivery-mutation-final-server/delivery-world/citizens/quest-deliveries/delivery-8-7bb8fb11-ca91-4475-ba0c-e75ba6b555c5-1.json",
+          "bytes": 1177,
+          "sha256": "074ff8d302edf3c9c778414b1c18d66e5d81f2416fb9d2fd24d503f0ccf35e40"
+        }
+      ],
+      "players": [
+        {
+          "path": "artifacts/delivery-mutation-final-server/delivery-world/playerdata/aed8d9e6-08ec-4c58-b49b-c8210a5dbd82.dat",
+          "bytes": 832,
+          "sha256": "78d1b6db7b61e890491966d9a2fe6955502fa11426f1c8bda0bd89a3a14d555d"
+        },
+        {
+          "path": "artifacts/delivery-mutation-final-server/delivery-world/playerdata/3ef0ea75-0889-4930-bd72-96f2395790fc.dat",
+          "bytes": 828,
+          "sha256": "29e0ab2fd380fba77777340d65be1f7c225bea783ffd42f4b0b250357f95ca7e"
+        },
+        {
+          "path": "artifacts/delivery-mutation-final-server/delivery-world/playerdata/7fb8a10b-9d83-4115-8d27-c4f07594a0ee.dat",
+          "bytes": 897,
+          "sha256": "5dcee7d5823b75b129bfffec29317c30d4f742d35b6ef4ac35cfee888405da33"
+        },
+        {
+          "path": "artifacts/delivery-mutation-final-server/delivery-world/playerdata/64aeb5c2-1d14-4543-b186-b8b598ed98e3.dat",
+          "bytes": 830,
+          "sha256": "abd36a3dd861243f9bcab0a4a890b9a5b28dbe51ac98e438ddcb61eaf59a254b"
+        },
+        {
+          "path": "artifacts/delivery-mutation-final-server/delivery-world/playerdata/b2303431-adc2-4a55-a0c3-ce9b2a52638f.dat",
+          "bytes": 831,
+          "sha256": "95bb446a401eadc2cf00b54b60633f1288af9de8f63edaae8ecd5d8c2941586e"
+        },
+        {
+          "path": "artifacts/delivery-mutation-final-server/delivery-world/playerdata/cfaabdb5-7be0-448e-8889-bbe8a3a7b3dd.dat",
+          "bytes": 831,
+          "sha256": "33bc1fa5ae2966fe1cca17bb16dfda3083f9afdddc231c39e69c29bb1a2488fe"
+        },
+        {
+          "path": "artifacts/delivery-mutation-final-server/delivery-world/playerdata/ed6a58d2-c438-48ea-8f69-7cdb24c94980.dat",
+          "bytes": 972,
+          "sha256": "9e7f7b49793d3b238adcfb49896ee964e51f5f49e8457022456a3c540e09f317"
+        },
+        {
+          "path": "artifacts/delivery-mutation-final-server/delivery-world/playerdata/382308b8-7bb1-416a-9826-bce2fde5aa52.dat",
+          "bytes": 825,
+          "sha256": "a97530a6a65d0501ec0b115699433cf237cfa411a175dbcffcae3bd5c7668bb7"
+        }
+      ],
+      "nativeTeams": [
+        {
+          "path": "artifacts/delivery-mutation-final-server/delivery-world/ftbquests/db22f6be-4cb3-47c7-ad7a-d4228211063d.snbt",
+          "bytes": 590,
+          "sha256": "ea8a7c6efd078ca117e0bf0444354a5b640b8596a101d44c71a16aae50dfdebf"
+        },
+        {
+          "path": "artifacts/delivery-mutation-final-server/delivery-world/ftbquests/bfda96c0-e40f-4070-92fc-f5715051cc53.snbt",
+          "bytes": 564,
+          "sha256": "d0db5765d9e4ff36ba47f0857be28ed33c2cc2b6cea81e444e41178941ede3bc"
+        },
+        {
+          "path": "artifacts/delivery-mutation-final-server/delivery-world/ftbquests/7c0583a9-3130-4757-8180-b05f3568d873.snbt",
+          "bytes": 590,
+          "sha256": "c2ab0c5cd3a714045c4ee199bd18cb2fe829fc863fdff2912233daf62850f8e9"
+        },
+        {
+          "path": "artifacts/delivery-mutation-final-server/delivery-world/ftbquests/aa2dc472-0a72-41c6-a14f-552402760383.snbt",
+          "bytes": 590,
+          "sha256": "0d38678849d3e23fbd977bb8b7b1d9639a835dd833e33f4ca95479f106186147"
+        },
+        {
+          "path": "artifacts/delivery-mutation-final-server/delivery-world/ftbquests/12b8fbfe-6416-4144-a00d-06665b344b54.snbt",
+          "bytes": 564,
+          "sha256": "3d3322725c5524d36ed4e79c0b846db538e2fbd5b4a73e6935c99a2efc7820f7"
+        },
+        {
+          "path": "artifacts/delivery-mutation-final-server/delivery-world/ftbquests/4e3459ab-03ae-4e45-a8b2-df958b89fae7.snbt",
+          "bytes": 662,
+          "sha256": "f7290c8d4a2db4757b6499388a8518e0cd01ba195bb3a232e4b1056413a70d1c"
+        },
+        {
+          "path": "artifacts/delivery-mutation-final-server/delivery-world/ftbquests/d966ccd5-b162-4a5d-905a-68e409f67ab6.snbt",
+          "bytes": 481,
+          "sha256": "636a7a6610212e1f05e14d263e608d8ad73f71ef16d2da161563475e77c2d974"
+        },
+        {
+          "path": "artifacts/delivery-mutation-final-server/delivery-world/ftbquests/e2a758f3-dafe-42eb-9766-08826fac96fb.snbt",
+          "bytes": 662,
+          "sha256": "e5bd0e1992dc6317beaac178b6aacc4fff5d4a89ff0c044d678fc0b8fafb864c"
+        }
+      ]
+    }
+  ],
+  "mutationChecks": 61,
+  "normal": {
+    "checks": 17,
+    "log": {
+      "path": "artifacts/delivery-callback-normal-2026-10-22.log",
+      "bytes": 16982,
+      "sha256": "e3ca8732c53728cf00a5dee335e97db6557bd80dae315e88a9569e27c8fade28"
+    }
+  },
+  "selected": {
+    "checks": 104,
+    "log": {
+      "path": "artifacts/delivery-callback-xmod-2026-10-22.log",
+      "bytes": 89952,
+      "sha256": "5757aa7f8a9ff05b4da5bbf167c74efb65a65bd04813dfcf1453304b2a27fa86"
+    },
+    "database": {
+      "path": "artifacts/delivery-callback-xmod-server/xmod-world/yuuniverse_economy/economy.db",
+      "bytes": 405504,
+      "sha256": "e8abd74f13f0a670caad3b8995098987a2bb352fe22d2ab1ec8efd5bc0e76054",
+      "quickCheck": "ok",
+      "balanced": true,
+      "originalRows": [
+        [
+          "464fc9bb-3a01-46e9-b51e-a90351e05790",
+          "8682929c-cd13-49d4-8927-3616f3c2a2b5",
+          "player:ed492b47-81b6-45c1-be45-bb93e0686a96"
+        ]
+      ]
+    }
+  },
+  "forcedKills": [
+    {
+      "boundary": "before",
+      "identity": {
+        "actor": "d3c48367-66c5-4a14-8206-ebd1766f9560",
+        "team": "d3c48367-66c5-4a14-8206-ebd1766f9560",
+        "boundary": "before",
+        "run": "d30868ebd4304fdb9a7424d3f30b4f88",
+        "entry": "33df673c-db51-47e9-9352-7e809bec3ee8",
+        "savedInventory": 3,
+        "savedProgress": 0
+      },
+      "termination": {
+        "run": "d30868ebd4304fdb9a7424d3f30b4f88",
+        "boundary": "before",
+        "pid": 57656,
+        "actor": "d3c48367-66c5-4a14-8206-ebd1766f9560",
+        "entry": "33df673c-db51-47e9-9352-7e809bec3ee8",
+        "processCreatedAt": "2026-10-22T20:24:03.8810590+08:00",
+        "killedAt": "2026-10-22T20:25:06.6530789+08:00",
+        "verifiedArgumentFile": "C:\\Users\\ben_l\\Documents\\Coding\\citizens2-neoforged\\artifacts\\delivery-mutation-build\\moddev\\serverRunProgramArgs.txt",
+        "fixture": "C:\\Users\\ben_l\\Documents\\Coding\\citizens2-neoforged\\artifacts\\delivery-callback-crash-server",
+        "buildOutput": "C:\\Users\\ben_l\\Documents\\Coding\\citizens2-neoforged\\artifacts\\delivery-mutation-build",
+        "forcedTermination": true
+      },
+      "boundaryChecks": 3,
+      "recoveryChecks": 7,
+      "state": {
+        "path": "artifacts/delivery-callback-before-2026-10-22-state.json",
+        "bytes": 239,
+        "sha256": "46810c5a16eac57e8570a7501b7d0e477c6ce78640851c813fae9b79d50ececb"
+      },
+      "terminationRecord": {
+        "path": "artifacts/delivery-callback-before-2026-10-22-termination.json",
+        "bytes": 727,
+        "sha256": "d5688157191e5b0653b5269f3f8bcddafd3416b5ae44ff5a8e1e20bef0b02b50"
+      },
+      "killed": {
+        "path": "artifacts/delivery-callback-before-2026-10-22-killed.log",
+        "bytes": 14754,
+        "sha256": "4975f309ef55f5c065f13b29d7db7932ab866790e84892d0eb55b664bb05e975"
+      },
+      "recovered": {
+        "path": "artifacts/delivery-callback-before-2026-10-22-recovered.log",
+        "bytes": 15918,
+        "sha256": "d5ddeee45ab0f232603592174681cf1f4408f56aa6d209db6f72b5a9955e8840"
+      },
+      "journals": [
+        {
+          "path": "artifacts/delivery-callback-crash-server/delivery-world/citizens/quest-deliveries/delivery-1-33df673c-db51-47e9-9352-7e809bec3ee8-0.json",
+          "bytes": 820,
+          "sha256": "a827d3a5a6ce9c6fbc62542b57601bd3b7edf651638a8c300c303658568477d3"
+        },
+        {
+          "path": "artifacts/delivery-callback-crash-server/delivery-world/citizens/quest-deliveries/delivery-1-33df673c-db51-47e9-9352-7e809bec3ee8-1.json",
+          "bytes": 864,
+          "sha256": "6fc5633f77101d2e4e2450abaad06e758280811a1df83aab0edf50b9e7674d2a"
+        },
+        {
+          "path": "artifacts/delivery-callback-crash-server/delivery-world/citizens/quest-deliveries/delivery-1-33df673c-db51-47e9-9352-7e809bec3ee8-2.json",
+          "bytes": 1063,
+          "sha256": "e8277966337a503a5bd8e00652c46035e24fd75112af0b71ed01ef3bf80f2ac4"
+        }
+      ],
+      "player": {
+        "path": "artifacts/delivery-callback-crash-server/delivery-world/playerdata/d3c48367-66c5-4a14-8206-ebd1766f9560.dat",
+        "bytes": 899,
+        "sha256": "c7678adf3b6dab13df5d82694345f3002e9a956257b33c5b9e1ea56a929b2953"
+      },
+      "nativeTeam": {
+        "path": "artifacts/delivery-callback-crash-server/delivery-world/ftbquests/d3c48367-66c5-4a14-8206-ebd1766f9560.snbt",
+        "bytes": 271,
+        "sha256": "d8dde872dc4e542724a8812cc0bfc38a41fca7d2dfad83127fbfb71ff7361f02"
+      }
+    },
+    {
+      "boundary": "progress",
+      "identity": {
+        "actor": "464f85cc-bcd4-4cbe-be34-ef996596fad3",
+        "team": "464f85cc-bcd4-4cbe-be34-ef996596fad3",
+        "boundary": "progress",
+        "run": "3b82a43ce93c4ceda40151e20f0f9a68",
+        "entry": "6f88c0bf-db4b-4019-a64c-d4f7c607b2ad",
+        "savedInventory": 3,
+        "savedProgress": 3
+      },
+      "termination": {
+        "run": "3b82a43ce93c4ceda40151e20f0f9a68",
+        "boundary": "progress",
+        "pid": 46596,
+        "actor": "464f85cc-bcd4-4cbe-be34-ef996596fad3",
+        "entry": "6f88c0bf-db4b-4019-a64c-d4f7c607b2ad",
+        "processCreatedAt": "2026-10-22T20:26:00.0718450+08:00",
+        "killedAt": "2026-10-22T20:26:44.7467688+08:00",
+        "verifiedArgumentFile": "C:\\Users\\ben_l\\Documents\\Coding\\citizens2-neoforged\\artifacts\\delivery-mutation-build\\moddev\\serverRunProgramArgs.txt",
+        "fixture": "C:\\Users\\ben_l\\Documents\\Coding\\citizens2-neoforged\\artifacts\\delivery-callback-crash-server",
+        "buildOutput": "C:\\Users\\ben_l\\Documents\\Coding\\citizens2-neoforged\\artifacts\\delivery-mutation-build",
+        "forcedTermination": true
+      },
+      "boundaryChecks": 3,
+      "recoveryChecks": 7,
+      "state": {
+        "path": "artifacts/delivery-callback-progress-2026-10-22-state.json",
+        "bytes": 241,
+        "sha256": "755949b5c956ce86c692cea58d6cb1063def045a6337ed4836ef59a2e620a34b"
+      },
+      "terminationRecord": {
+        "path": "artifacts/delivery-callback-progress-2026-10-22-termination.json",
+        "bytes": 729,
+        "sha256": "3c2d1c9ae07447bb42f0bee24e52668b76fa878e289e7cd27f69134fd2efbcba"
+      },
+      "killed": {
+        "path": "artifacts/delivery-callback-progress-2026-10-22-killed.log",
+        "bytes": 14767,
+        "sha256": "bb2e56215964f97ae622533a9e0ba1cc750d365bdd4eeb00f80770596b1589ce"
+      },
+      "recovered": {
+        "path": "artifacts/delivery-callback-progress-2026-10-22-recovered.log",
+        "bytes": 15821,
+        "sha256": "f9c94c895507194b1fd1abfe084bba1073bb1a80a57f64fcf5e1279e0e64a3a2"
+      },
+      "journals": [
+        {
+          "path": "artifacts/delivery-callback-crash-server/delivery-world/citizens/quest-deliveries/delivery-2-6f88c0bf-db4b-4019-a64c-d4f7c607b2ad-0.json",
+          "bytes": 820,
+          "sha256": "674fd5fa9558ffdbd798b849df5ad3c650fea7894b847d91c8227ce4df70cf7d"
+        },
+        {
+          "path": "artifacts/delivery-callback-crash-server/delivery-world/citizens/quest-deliveries/delivery-2-6f88c0bf-db4b-4019-a64c-d4f7c607b2ad-1.json",
+          "bytes": 864,
+          "sha256": "c4893f3dd5a7f3e61f677dcc7f10d7ab8da05f1722452b0339146139f74d7592"
+        },
+        {
+          "path": "artifacts/delivery-callback-crash-server/delivery-world/citizens/quest-deliveries/delivery-2-6f88c0bf-db4b-4019-a64c-d4f7c607b2ad-2.json",
+          "bytes": 1063,
+          "sha256": "e993b1f2e2f1e187148be281f28e8b417375d575b28e3bca7d04bf28d003de25"
+        }
+      ],
+      "player": {
+        "path": "artifacts/delivery-callback-crash-server/delivery-world/playerdata/464f85cc-bcd4-4cbe-be34-ef996596fad3.dat",
+        "bytes": 898,
+        "sha256": "879a821ba6872311f3fe389a4fb49484eb3572bff43d29d94acf316f3cb33936"
+      },
+      "nativeTeam": {
+        "path": "artifacts/delivery-callback-crash-server/delivery-world/ftbquests/464f85cc-bcd4-4cbe-be34-ef996596fad3.snbt",
+        "bytes": 443,
+        "sha256": "7eb12575a8fdb52cecbc6cef127ac9ddb2d5fefb3e4d7fa89ae815c3f78dc43d"
+      }
+    },
+    {
+      "boundary": "inventory",
+      "identity": {
+        "actor": "2e59c886-9561-44ab-8118-7993bc90f83e",
+        "team": "2e59c886-9561-44ab-8118-7993bc90f83e",
+        "boundary": "inventory",
+        "run": "4711ab1d43f24e62a913499553dd5353",
+        "entry": "caef39c9-a47a-4239-b8c8-940078a98cf4",
+        "savedInventory": 0,
+        "savedProgress": 0
+      },
+      "termination": {
+        "run": "4711ab1d43f24e62a913499553dd5353",
+        "boundary": "inventory",
+        "pid": 50700,
+        "actor": "2e59c886-9561-44ab-8118-7993bc90f83e",
+        "entry": "caef39c9-a47a-4239-b8c8-940078a98cf4",
+        "processCreatedAt": "2026-10-22T20:27:37.0432070+08:00",
+        "killedAt": "2026-10-22T20:28:25.8636671+08:00",
+        "verifiedArgumentFile": "C:\\Users\\ben_l\\Documents\\Coding\\citizens2-neoforged\\artifacts\\delivery-mutation-build\\moddev\\serverRunProgramArgs.txt",
+        "fixture": "C:\\Users\\ben_l\\Documents\\Coding\\citizens2-neoforged\\artifacts\\delivery-callback-crash-server",
+        "buildOutput": "C:\\Users\\ben_l\\Documents\\Coding\\citizens2-neoforged\\artifacts\\delivery-mutation-build",
+        "forcedTermination": true
+      },
+      "boundaryChecks": 3,
+      "recoveryChecks": 7,
+      "state": {
+        "path": "artifacts/delivery-callback-inventory-2026-10-22-state.json",
+        "bytes": 242,
+        "sha256": "7e0ee22c966e63a0b937d6b02f39b5d6b8520cf230fb4e5eb57dcdd89948cabb"
+      },
+      "terminationRecord": {
+        "path": "artifacts/delivery-callback-inventory-2026-10-22-termination.json",
+        "bytes": 730,
+        "sha256": "3b538988417109c082257325d2ce54e1ee3f8a7b3044b6e0aec836232c91dd50"
+      },
+      "killed": {
+        "path": "artifacts/delivery-callback-inventory-2026-10-22-killed.log",
+        "bytes": 14767,
+        "sha256": "c49fa8a50444811dda9820bfe61993a949878db9cf13841aebc2a7667f93dc08"
+      },
+      "recovered": {
+        "path": "artifacts/delivery-callback-inventory-2026-10-22-recovered.log",
+        "bytes": 15822,
+        "sha256": "a8410d4bd929b459d8a52da88099d0e647f26af2d4c7e4c25e1a94db0c919c0e"
+      },
+      "journals": [
+        {
+          "path": "artifacts/delivery-callback-crash-server/delivery-world/citizens/quest-deliveries/delivery-3-caef39c9-a47a-4239-b8c8-940078a98cf4-0.json",
+          "bytes": 820,
+          "sha256": "80326591c5c9487ccbb18d5f65717718d0dadc0411a771670e9504edb261e0c8"
+        },
+        {
+          "path": "artifacts/delivery-callback-crash-server/delivery-world/citizens/quest-deliveries/delivery-3-caef39c9-a47a-4239-b8c8-940078a98cf4-1.json",
+          "bytes": 864,
+          "sha256": "9fdac907d36581b15301dec8c3f90cb25d3f4c309196a263a98a632d824e441c"
+        },
+        {
+          "path": "artifacts/delivery-callback-crash-server/delivery-world/citizens/quest-deliveries/delivery-3-caef39c9-a47a-4239-b8c8-940078a98cf4-2.json",
+          "bytes": 1063,
+          "sha256": "0cc6d67bce7350d42572f33a084624e8bd2b145477fb11a021478ce692f93688"
+        }
+      ],
+      "player": {
+        "path": "artifacts/delivery-callback-crash-server/delivery-world/playerdata/2e59c886-9561-44ab-8118-7993bc90f83e.dat",
+        "bytes": 793,
+        "sha256": "931c02da090f521a0a6bc48ff41ed87d87ee1fc58f6b1754d17e1e1e046e4282"
+      },
+      "nativeTeam": {
+        "path": "artifacts/delivery-callback-crash-server/delivery-world/ftbquests/2e59c886-9561-44ab-8118-7993bc90f83e.snbt",
+        "bytes": 271,
+        "sha256": "a9ebd29db5db94bd1ee304b0ad7bcb2fc098ab1dd2a372397d8295cddb938408"
+      }
+    },
+    {
+      "boundary": "confirmed",
+      "identity": {
+        "actor": "12e4a06c-f4e4-4ea0-a68f-2bb4252881e2",
+        "team": "12e4a06c-f4e4-4ea0-a68f-2bb4252881e2",
+        "boundary": "confirmed",
+        "run": "a2b22c6b29224cacb846ef88e52608e1",
+        "entry": "7ba348b8-6cc6-4bdc-8b97-efd3b97dd031",
+        "savedInventory": 0,
+        "savedProgress": 3
+      },
+      "termination": {
+        "run": "a2b22c6b29224cacb846ef88e52608e1",
+        "boundary": "confirmed",
+        "pid": 27076,
+        "actor": "12e4a06c-f4e4-4ea0-a68f-2bb4252881e2",
+        "entry": "7ba348b8-6cc6-4bdc-8b97-efd3b97dd031",
+        "processCreatedAt": "2026-10-22T20:29:16.3631140+08:00",
+        "killedAt": "2026-10-22T20:30:00.2945847+08:00",
+        "verifiedArgumentFile": "C:\\Users\\ben_l\\Documents\\Coding\\citizens2-neoforged\\artifacts\\delivery-mutation-build\\moddev\\serverRunProgramArgs.txt",
+        "fixture": "C:\\Users\\ben_l\\Documents\\Coding\\citizens2-neoforged\\artifacts\\delivery-callback-crash-server",
+        "buildOutput": "C:\\Users\\ben_l\\Documents\\Coding\\citizens2-neoforged\\artifacts\\delivery-mutation-build",
+        "forcedTermination": true
+      },
+      "boundaryChecks": 3,
+      "recoveryChecks": 5,
+      "state": {
+        "path": "artifacts/delivery-callback-confirmed-2026-10-22-state.json",
+        "bytes": 242,
+        "sha256": "8623e488736f56a80cc1039baf7820d4a9413e8c79848c05d302470d4bf5a86b"
+      },
+      "terminationRecord": {
+        "path": "artifacts/delivery-callback-confirmed-2026-10-22-termination.json",
+        "bytes": 730,
+        "sha256": "d33a72684a9af1a304a5a8e4bae2fd0f0450be3d244d1f47a873a16d995f22e0"
+      },
+      "killed": {
+        "path": "artifacts/delivery-callback-confirmed-2026-10-22-killed.log",
+        "bytes": 14768,
+        "sha256": "d9c70f92a43ebfc069ee4da43f30ad5cca61d43c32b32ee2f12411a680aef67d"
+      },
+      "recovered": {
+        "path": "artifacts/delivery-callback-confirmed-2026-10-22-recovered.log",
+        "bytes": 15581,
+        "sha256": "63cc83431a286900d72be2c6b3e49edf6708462f0ead66501f27ca2ca842ffba"
+      },
+      "journals": [
+        {
+          "path": "artifacts/delivery-callback-crash-server/delivery-world/citizens/quest-deliveries/delivery-4-7ba348b8-6cc6-4bdc-8b97-efd3b97dd031-0.json",
+          "bytes": 820,
+          "sha256": "18095adaa13e0e471a8ee2aea8222e7f9790c37cfbde843309129e26bb62553b"
+        },
+        {
+          "path": "artifacts/delivery-callback-crash-server/delivery-world/citizens/quest-deliveries/delivery-4-7ba348b8-6cc6-4bdc-8b97-efd3b97dd031-1.json",
+          "bytes": 1178,
+          "sha256": "26c5dd84bd3decb792560e8e4c40a4c223b1de55388278ae7900fcaed8aab90d"
+        }
+      ],
+      "player": {
+        "path": "artifacts/delivery-callback-crash-server/delivery-world/playerdata/12e4a06c-f4e4-4ea0-a68f-2bb4252881e2.dat",
+        "bytes": 880,
+        "sha256": "3fe14d56c8b2d6d2a6feff570489bba2d8e654fbb6834ed01e9a8c0a2c9a58ef"
+      },
+      "nativeTeam": {
+        "path": "artifacts/delivery-callback-crash-server/delivery-world/ftbquests/12e4a06c-f4e4-4ea0-a68f-2bb4252881e2.snbt",
+        "bytes": 517,
+        "sha256": "6bba0eb7bcd4c353e1ba07afb69fa000ddf9748dcce5be9772f08a19b7deed12"
+      }
+    },
+    {
+      "boundary": "player_rollback",
+      "identity": {
+        "actor": "940a2339-e345-4636-b453-e9f737567cbd",
+        "team": "940a2339-e345-4636-b453-e9f737567cbd",
+        "boundary": "player_rollback",
+        "run": "98665aab2846420b9e4ecf2895d4065d",
+        "entry": "6425dea9-e660-47e3-aa29-1d32bf522c51",
+        "savedInventory": 3,
+        "savedProgress": 3
+      },
+      "termination": {
+        "run": "98665aab2846420b9e4ecf2895d4065d",
+        "boundary": "player_rollback",
+        "pid": 42672,
+        "actor": "940a2339-e345-4636-b453-e9f737567cbd",
+        "entry": "6425dea9-e660-47e3-aa29-1d32bf522c51",
+        "processCreatedAt": "2026-10-22T20:30:50.5916660+08:00",
+        "killedAt": "2026-10-22T20:32:01.7634285+08:00",
+        "verifiedArgumentFile": "C:\\Users\\ben_l\\Documents\\Coding\\citizens2-neoforged\\artifacts\\delivery-mutation-build\\moddev\\serverRunProgramArgs.txt",
+        "fixture": "C:\\Users\\ben_l\\Documents\\Coding\\citizens2-neoforged\\artifacts\\delivery-callback-crash-server",
+        "buildOutput": "C:\\Users\\ben_l\\Documents\\Coding\\citizens2-neoforged\\artifacts\\delivery-mutation-build",
+        "forcedTermination": true
+      },
+      "boundaryChecks": 3,
+      "recoveryChecks": 7,
+      "state": {
+        "path": "artifacts/delivery-callback-player_rollback-2026-10-22-state.json",
+        "bytes": 248,
+        "sha256": "25dfed0d3e2bf46de88a6e21018a17c60c49edb6f0c6cc2b5d396d01ec05c5cc"
+      },
+      "terminationRecord": {
+        "path": "artifacts/delivery-callback-player_rollback-2026-10-22-termination.json",
+        "bytes": 736,
+        "sha256": "d6ec8a2797d2b6957fc6012cc0da098659ae6a4983204d78ff81034f127266c6"
+      },
+      "killed": {
+        "path": "artifacts/delivery-callback-player_rollback-2026-10-22-killed.log",
+        "bytes": 14773,
+        "sha256": "7a3dd29e4d55bde69f6bc454727b3b87ea050e5366afb50a9ff2134222068d7b"
+      },
+      "recovered": {
+        "path": "artifacts/delivery-callback-player_rollback-2026-10-22-recovered.log",
+        "bytes": 15824,
+        "sha256": "4d25505722b20e9187b26e854c76638604b42103f8b840d06803b7915c8c55c4"
+      },
+      "journals": [
+        {
+          "path": "artifacts/delivery-callback-crash-server/delivery-world/citizens/quest-deliveries/delivery-6-6425dea9-e660-47e3-aa29-1d32bf522c51-0.json",
+          "bytes": 820,
+          "sha256": "01e86ce0f8cbe726c96f47f919974a4aa17c11b01a49c2d8a1d86627082dc7ea"
+        },
+        {
+          "path": "artifacts/delivery-callback-crash-server/delivery-world/citizens/quest-deliveries/delivery-6-6425dea9-e660-47e3-aa29-1d32bf522c51-1.json",
+          "bytes": 1178,
+          "sha256": "e2fd171f69789c6f0247084a11845de9fbf563807f16d51afd24fb435f6d7a44"
+        },
+        {
+          "path": "artifacts/delivery-callback-crash-server/delivery-world/citizens/quest-deliveries/delivery-6-6425dea9-e660-47e3-aa29-1d32bf522c51-2.json",
+          "bytes": 1241,
+          "sha256": "82d5e534e3f97a91e3b0493c4e368e028f99bca761f3f580fa7fcd20feef8a78"
+        },
+        {
+          "path": "artifacts/delivery-callback-crash-server/delivery-world/citizens/quest-deliveries/delivery-6-6425dea9-e660-47e3-aa29-1d32bf522c51-3.json",
+          "bytes": 1440,
+          "sha256": "75e70d6c4842a63daf27a0376213de7490fa91c46007bf4e1e1de6b698ce1e11"
+        }
+      ],
+      "player": {
+        "path": "artifacts/delivery-callback-crash-server/delivery-world/playerdata/940a2339-e345-4636-b453-e9f737567cbd.dat",
+        "bytes": 910,
+        "sha256": "0170ca2361c38a0b3b87f5b217f7b78e3db2c933db043ff0807a36fee01ba206"
+      },
+      "nativeTeam": {
+        "path": "artifacts/delivery-callback-crash-server/delivery-world/ftbquests/940a2339-e345-4636-b453-e9f737567cbd.snbt",
+        "bytes": 443,
+        "sha256": "09ecf287b45e94b6c91e0325e46ba23251ee87428835e110465914fc341802cd"
+      }
+    },
+    {
+      "boundary": "task_rollback",
+      "identity": {
+        "actor": "23b8fb52-e931-4e53-b88d-98603f974004",
+        "team": "23b8fb52-e931-4e53-b88d-98603f974004",
+        "boundary": "task_rollback",
+        "run": "7351412efcaf441885a0ff566da11718",
+        "entry": "e0a8cbd1-841e-4fd6-bbab-0883297d44ee",
+        "savedInventory": 0,
+        "savedProgress": 0
+      },
+      "termination": {
+        "run": "7351412efcaf441885a0ff566da11718",
+        "boundary": "task_rollback",
+        "pid": 50812,
+        "actor": "23b8fb52-e931-4e53-b88d-98603f974004",
+        "entry": "e0a8cbd1-841e-4fd6-bbab-0883297d44ee",
+        "processCreatedAt": "2026-10-22T20:33:50.5011850+08:00",
+        "killedAt": "2026-10-22T20:35:10.3130784+08:00",
+        "verifiedArgumentFile": "C:\\Users\\ben_l\\Documents\\Coding\\citizens2-neoforged\\artifacts\\delivery-mutation-build\\moddev\\serverRunProgramArgs.txt",
+        "fixture": "C:\\Users\\ben_l\\Documents\\Coding\\citizens2-neoforged\\artifacts\\delivery-callback-crash-server",
+        "buildOutput": "C:\\Users\\ben_l\\Documents\\Coding\\citizens2-neoforged\\artifacts\\delivery-mutation-build",
+        "forcedTermination": true
+      },
+      "boundaryChecks": 3,
+      "recoveryChecks": 7,
+      "state": {
+        "path": "artifacts/delivery-callback-task_rollback-2026-10-22-state.json",
+        "bytes": 246,
+        "sha256": "77c4f9dfa7e802849732e2ab015a6ad8d915ce4ac4e64843583216707a60f399"
+      },
+      "terminationRecord": {
+        "path": "artifacts/delivery-callback-task_rollback-2026-10-22-termination.json",
+        "bytes": 734,
+        "sha256": "37a5122c1dd4911f860b1df2ef7aa65766f839b2b4f85d549ccbb09c15696b19"
+      },
+      "killed": {
+        "path": "artifacts/delivery-callback-task_rollback-2026-10-22-killed.log",
+        "bytes": 14867,
+        "sha256": "7f3ef1f0a0c908490f6cdb5b19eda1b4ca2b2c79f625a36843554b29c34b6ab4"
+      },
+      "recovered": {
+        "path": "artifacts/delivery-callback-task_rollback-2026-10-22-recovered.log",
+        "bytes": 15822,
+        "sha256": "a626e6cea6be925dc7eb3f95abaef587d48231846dd089553df46745aeeff02f"
+      },
+      "journals": [
+        {
+          "path": "artifacts/delivery-callback-crash-server/delivery-world/citizens/quest-deliveries/delivery-7-e0a8cbd1-841e-4fd6-bbab-0883297d44ee-0.json",
+          "bytes": 820,
+          "sha256": "a913b147622d402f85526616a73b0d24141c6f7ae3dfba47674088fa275a3d47"
+        },
+        {
+          "path": "artifacts/delivery-callback-crash-server/delivery-world/citizens/quest-deliveries/delivery-7-e0a8cbd1-841e-4fd6-bbab-0883297d44ee-1.json",
+          "bytes": 1178,
+          "sha256": "41de293f10ec3ff11d3f276d830d1eff421fddc5e34cd696907ba1f0062c8c5d"
+        },
+        {
+          "path": "artifacts/delivery-callback-crash-server/delivery-world/citizens/quest-deliveries/delivery-7-e0a8cbd1-841e-4fd6-bbab-0883297d44ee-2.json",
+          "bytes": 1248,
+          "sha256": "c04cc068cf57ef3df6f9f26b89b6ec1671024f189cad64d70afe4e3a89d496fb"
+        },
+        {
+          "path": "artifacts/delivery-callback-crash-server/delivery-world/citizens/quest-deliveries/delivery-7-e0a8cbd1-841e-4fd6-bbab-0883297d44ee-3.json",
+          "bytes": 1447,
+          "sha256": "e7faa6929a0fe1975e25a779abcadc5739b649086f8a0a6fec69d75e2a90077c"
+        }
+      ],
+      "player": {
+        "path": "artifacts/delivery-callback-crash-server/delivery-world/playerdata/23b8fb52-e931-4e53-b88d-98603f974004.dat",
+        "bytes": 874,
+        "sha256": "b25f6f670475a6ae5248122f0dfcb204227e43b26e20a35b779ac5e7be6c28b8"
+      },
+      "nativeTeam": {
+        "path": "artifacts/delivery-callback-crash-server/delivery-world/ftbquests/23b8fb52-e931-4e53-b88d-98603f974004.snbt",
+        "bytes": 271,
+        "sha256": "a2701ca19447b977ada936019c0617e22030a82fa3eb16cfee848592a4eed386"
+      }
+    }
+  ],
+  "nativeChecks": 240,
+  "ordinary": [
+    {
+      "target": "21.1.248",
+      "results": {
+        "tests": 775,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "summary": {
+        "path": "artifacts/delivery-callback-ordinary-248-tests-2026-10-22.json",
+        "bytes": 73,
+        "sha256": "ac98a3b8eb796941b40462e1a3e17cc316124bf72e85bf82264fe3d7ad2aaa44"
+      },
+      "log": {
+        "path": "artifacts/delivery-callback-ordinary-248-2026-10-22.log",
+        "bytes": 68888,
+        "sha256": "857a2c3bab60d274687c665ff7a03f8f661375301d68c40716cf43dc3876a76d"
+      }
+    },
+    {
+      "target": "21.1.233",
+      "results": {
+        "tests": 775,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "summary": {
+        "path": "artifacts/delivery-callback-ordinary-233-tests-2026-10-22.json",
+        "bytes": 73,
+        "sha256": "ac98a3b8eb796941b40462e1a3e17cc316124bf72e85bf82264fe3d7ad2aaa44"
+      },
+      "log": {
+        "path": "artifacts/delivery-callback-ordinary-233-2026-10-22.log",
+        "bytes": 68887,
+        "sha256": "68a67fcb4c774b8cbe107e942b175015e9b2c11c111d066b9a830c51cecd3013"
+      }
+    }
+  ],
+  "packages": [
+    {
+      "path": "artifacts/delivery-callback-ordinary-21.1.248-build/libs/citizens-2.0.43-neoforge-SNAPSHOT-sources.jar",
+      "bytes": 1126056,
+      "sha256": "e3f1924889978d877e8b5456010e33e5d9ad51d13cca4fbd410413e733b1122e",
+      "auditAndForeignClassesExcluded": true,
+      "auditMixinExcluded": true,
+      "separateOwnership": true
+    },
+    {
+      "path": "artifacts/delivery-callback-ordinary-21.1.248-build/libs/citizens-2.0.43-neoforge-SNAPSHOT.jar",
+      "bytes": 4082992,
+      "sha256": "9ad76d5c314233a0ca6b47bfbd026130a077f1764ef865913b0dd1d96246407c",
+      "auditAndForeignClassesExcluded": true,
+      "auditMixinExcluded": true,
+      "separateOwnership": true
+    },
+    {
+      "path": "artifacts/delivery-callback-ordinary-21.1.248-build/libs/yuuniverse-interactions-2.0.43-neoforge-SNAPSHOT.jar",
+      "bytes": 204146,
+      "sha256": "55e5fdfee234b54747f4b05cdf088cb0a66aff0bf3015b934a0b8d4b7509f397",
+      "auditAndForeignClassesExcluded": true,
+      "auditMixinExcluded": true,
+      "separateOwnership": true
+    },
+    {
+      "path": "artifacts/delivery-callback-ordinary-21.1.233-build/libs/citizens-2.0.43-neoforge-SNAPSHOT-sources.jar",
+      "bytes": 1126056,
+      "sha256": "4cb54a872c5465e778372af23f979e84c6c8f44bb540a4f95c843177689b1e15",
+      "auditAndForeignClassesExcluded": true,
+      "auditMixinExcluded": true,
+      "separateOwnership": true
+    },
+    {
+      "path": "artifacts/delivery-callback-ordinary-21.1.233-build/libs/citizens-2.0.43-neoforge-SNAPSHOT.jar",
+      "bytes": 4082992,
+      "sha256": "b10d9d239ba2a4d2d9a7e5121698639c772e8013b4ac355d627f4c3471d64b01",
+      "auditAndForeignClassesExcluded": true,
+      "auditMixinExcluded": true,
+      "separateOwnership": true
+    },
+    {
+      "path": "artifacts/delivery-callback-ordinary-21.1.233-build/libs/yuuniverse-interactions-2.0.43-neoforge-SNAPSHOT.jar",
+      "bytes": 204146,
+      "sha256": "3c36daf075334c4354331e482e69ac568a8cacf6813e242c4b7cb733dbe6b501",
+      "auditAndForeignClassesExcluded": true,
+      "auditMixinExcluded": true,
+      "separateOwnership": true
+    }
+  ],
+  "interactions": {
+    "results": {
+      "tests": 100,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    "log": {
+      "path": "artifacts/delivery-callback-interactions-2026-10-22.log",
+      "bytes": 11764,
+      "sha256": "a8edf967b3e765ec9f75eb54a7314e234b3a59ff3bbd93651cfac06e9ee1ffc6"
+    }
+  },
+  "sources": [
+    {
+      "path": "neoforge/src/main/java/net/citizensnpcs/util/FtbQuestTasks.java",
+      "bytes": 29504,
+      "sha256": "2321946dc3ed7f6b5712e3842b2efc8a37e3b15e21f396e09716642d2f1bbc39"
+    },
+    {
+      "path": "tools/delivery-runtime-audit.gradle",
+      "bytes": 2430,
+      "sha256": "353bce4642832bef9a53004d6fdcb3552c4f4b10809d870708b4f55208aeea0f"
+    },
+    {
+      "path": "tools/run-delivery-crash-audit.ps1",
+      "bytes": 5897,
+      "sha256": "e5f1c1e414b8a7503d34f82a0397f835ec95c8de0d077604038684f481bca1bc"
+    },
+    {
+      "path": "tools/delivery-runtime-audit/net/citizensnpcs/audit/delivery/DeliveryRuntimeAudit.java",
+      "bytes": 15669,
+      "sha256": "437b92a964de5a09984ec033d3aa5760acd4a6ec6e8afb7aae20e27add37d83b"
+    },
+    {
+      "path": "tools/delivery-runtime-audit/net/citizensnpcs/audit/delivery/DeliveryMutationRuntimeAudit.java",
+      "bytes": 11506,
+      "sha256": "7fb398148210bc7a4fcfbf2a5c96e74f94bb6da41677955c8ef091a220f43cbe"
+    },
+    {
+      "path": "artifacts/delivery-mutation-before-ftb-source-2026-10-22.java",
+      "bytes": 28588,
+      "sha256": "f55248aa4b079e811c0b358ec05f54501f9cada7716b773fd11f64e3734d221b"
+    },
+    {
+      "path": "artifacts/delivery-mutation-before-audit-source-2026-10-22.java",
+      "bytes": 11407,
+      "sha256": "e72c03a7bd42e40574345e17975d8658bc6672093636ddf26f004f2438528172"
+    }
+  ],
+  "providers": [
+    {
+      "path": "artifacts/delivery-mutation-final-server/mods/architectury-13.0.11-neoforge.jar",
+      "bytes": 584734,
+      "sha256": "9cc92f2c09533fc5482c60f993bd891c655a0e32b637037cdcb7c2b23adedeeb"
+    },
+    {
+      "path": "artifacts/delivery-mutation-final-server/mods/ftb-library-neoforge-2101.1.37.jar",
+      "bytes": 1439881,
+      "sha256": "624c2d2d1cbadb946d967e17757bd5b2d129d4d3ed71f2da0c70607d04476ac2"
+    },
+    {
+      "path": "artifacts/delivery-mutation-final-server/mods/ftb-quests-neoforge-2101.1.36.jar",
+      "bytes": 1609984,
+      "sha256": "6a39982c4b3afc00b1e788041a4f0d394e1659e3b3a6e5d078cd790bc36d0018"
+    },
+    {
+      "path": "artifacts/delivery-mutation-final-server/mods/ftb-teams-neoforge-2101.1.11.jar",
+      "bytes": 308236,
+      "sha256": "e6bcd670493624e6906df872a9c6af4a33fe6405cac57a32c59cd4cd5838c655"
+    },
+    {
+      "path": "artifacts/delivery-callback-xmod-server/mods/architectury-13.0.11-neoforge.jar",
+      "bytes": 584734,
+      "sha256": "9cc92f2c09533fc5482c60f993bd891c655a0e32b637037cdcb7c2b23adedeeb"
+    },
+    {
+      "path": "artifacts/delivery-callback-xmod-server/mods/ftb-library-neoforge-2101.1.37.jar",
+      "bytes": 1439881,
+      "sha256": "624c2d2d1cbadb946d967e17757bd5b2d129d4d3ed71f2da0c70607d04476ac2"
+    },
+    {
+      "path": "artifacts/delivery-callback-xmod-server/mods/ftb-quests-neoforge-2101.1.36.jar",
+      "bytes": 1609984,
+      "sha256": "6a39982c4b3afc00b1e788041a4f0d394e1659e3b3a6e5d078cd790bc36d0018"
+    },
+    {
+      "path": "artifacts/delivery-callback-xmod-server/mods/ftb-teams-neoforge-2101.1.11.jar",
+      "bytes": 308236,
+      "sha256": "e6bcd670493624e6906df872a9c6af4a33fe6405cac57a32c59cd4cd5838c655"
+    },
+    {
+      "path": "artifacts/delivery-callback-xmod-server/mods/ftb-xmod-compat-neoforge-21.1.12.jar",
+      "bytes": 148575,
+      "sha256": "f587e13131101bac33d4cc7a04d13d06c00f8f88a892be90d6ffc8ad96119ae8"
+    },
+    {
+      "path": "artifacts/delivery-callback-xmod-server/mods/jei-1.21.1-neoforge-19.53.0.425.jar",
+      "bytes": 1847925,
+      "sha256": "3683c743c1b6192913abc2a969486344eee98aa2924e8deb5087109645c3abc6"
+    },
+    {
+      "path": "artifacts/delivery-callback-xmod-server/mods/kubejs-neoforge-2101.7.2-build.377.jar",
+      "bytes": 2294111,
+      "sha256": "df9a8458b1f83fed06ba54684977911795a5153a462b81a610895f5b1f2f0cbf"
+    },
+    {
+      "path": "artifacts/delivery-callback-xmod-server/mods/rhino-2101.2.8-build.91.jar",
+      "bytes": 980936,
+      "sha256": "1d53d962aa4dac54bcbb4f998c1845980cf194318f1d6b1580ea6ac15cce5ef3"
+    },
+    {
+      "path": "artifacts/delivery-callback-xmod-server/mods/yuuniverse-economy-0.5.9-SNAPSHOT.jar",
+      "bytes": 14436199,
+      "sha256": "fc24deb2eefab0cb3eb87a3bb70a59897b9ad1a3b13f851ebb6f73994fdd75b7"
+    }
+  ],
+  "runnerPathControl": {
+    "path": "artifacts/delivery-callback-runner-path-control-2026-10-22.json",
+    "bytes": 202,
+    "sha256": "ff0a3627f29e7046a486499df851b9731ec7c9fe8753562fb02d841b769ff69c"
+  },
+  "stopped": {
+    "path": "artifacts/delivery-callback-stopped-2026-10-22.json",
+    "bytes": 427,
+    "sha256": "14c6b409573c7447cf1e0cf4ba28b15aff34030bbf4d8a63390fb88fc1f54329"
+  },
+  "draftDiagnostic": "Party-leave control required native ownership transfer before a non-disbanding leave",
+  "productionDeploymentChanged": false,
+  "limits": [
+    "Definitions changed and restored entirely within callbacks",
+    "Storage/retention/load/large-history throughput and broader recovery boundaries",
+    "Original migration provenance and physical ordinary/VR/proxy acceptance"
+  ]
+}

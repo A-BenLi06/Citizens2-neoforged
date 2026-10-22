@@ -10,6 +10,12 @@ This review covers repository structure, native implementation boundaries, upstr
 
 ## Repository and implementation boundaries
 
+Update 2026-10-22, UTC+08:00: [delivery callback recovery](delivery-callback-recovery-2026-10-22.md)
+prevents confirmation through held ItemTask/TeamData or retired actor objects
+after native callbacks. Actual party deletion/replacement/disconnect cases retain
+REVIEW, while original-party attribution and repeat reward resets remain native.
+Storage/load, broader recovery, migration and client acceptance remain open.
+
 Update 2026-10-22, UTC+08:00: [native evidence target mutation](evidence-target-mutation-2026-10-22.md)
 fences retained TeamData for deleted native parties and checks live file/team/task/
 quest identity and serialized definitions after completion callbacks. Uncertain

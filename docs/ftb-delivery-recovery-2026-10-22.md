@@ -2,6 +2,12 @@
 
 Date: 2026-10-22, UTC+08:00. Advances ADAPT-04/11.
 
+Update: [native completion callback validation](delivery-callback-recovery-2026-10-22.md)
+reacquires original native targets and verifies the active actor session before
+confirmation. Removed parties, task replacement and retired sessions retain the
+existing REVIEW fence. Valid party changes and actual repeat reward resets keep
+their original ownership and cycle semantics.
+
 Citizens now retains a durable intent before calling the native consuming ItemTask
 and its exact outcome after the provider returns. This covers `/citizens quest
 submit`, Interactions `ftb_submit` and public script calls through

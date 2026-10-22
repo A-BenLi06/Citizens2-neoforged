@@ -217,8 +217,17 @@ public final class FtbQuestTasks {
                 delivery = recovery.prepare(player, admitted);
                 prepared.taskType().getMethod("submitTask", prepared.teamType(), ServerPlayer.class)
                         .invoke(prepared.task(), prepared.team(), player);
-                State after = snapshot(prepared);
-                var outcome = deliveryTarget(player.getServer(), prepared);
+                var server = player.getServer();
+                if (player.hasDisconnected() || server.getPlayerList().getPlayer(player.getUUID()) != player)
+                    throw new IllegalStateException("Delivery actor session retired during native consumption; review is required");
+                // Keep the admitted party even if the actor moved; never confirm snapshots of retired native objects.
+                Prepared current = evidencePrepared(server, admitted.teamId(), admitted.taskId());
+                if (current.file() != prepared.file() || current.team() != prepared.team()
+                        || current.task() != prepared.task() || current.quest() != prepared.quest()
+                        || !admitted.definition().equals(definitionRevision(server, current)))
+                    throw new IllegalStateException("Native delivery target changed during submission; review is required");
+                State after = snapshot(current);
+                var outcome = deliveryTarget(server, current);
                 if (after.progress() <= before.progress() && !after.completed() && outcome.cycle() <= admitted.cycle())
                     throw new IllegalStateException("FTB did not accept the delivery");
                 recovery.confirm(delivery, player, outcome);

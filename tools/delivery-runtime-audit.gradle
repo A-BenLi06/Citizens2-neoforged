@@ -1,8 +1,10 @@
 allprojects {
-    layout.buildDirectory.set(file('../artifacts/delivery-native-build'))
+    layout.buildDirectory.set(file(gradle.startParameter.projectProperties.get('deliveryAuditBuildDir') ?: '../artifacts/delivery-native-build'))
     afterEvaluate { p ->
         if (p.extensions.findByName('neoForge') == null) return
-        def fixture = p.file('../artifacts/delivery-audit-server')
+        def fixture = p.file(p.findProperty('deliveryAuditFixture') ?: '../artifacts/delivery-audit-server')
+        if (!fixture.toPath().toAbsolutePath().normalize().startsWith(p.file('../artifacts').toPath().toAbsolutePath().normalize()))
+            throw new GradleException('Delivery fixture must be inside task artifacts')
         p.sourceSets.main.java.srcDir(p.file('../tools/delivery-runtime-audit'))
         p.sourceSets.main.compileClasspath += p.files(p.fileTree(new File(fixture, 'mods')) { include '*.jar' })
         p.tasks.named('processResources') {
@@ -22,7 +24,7 @@ allprojects {
             }
         }
         p.tasks.named('runServer') {
-            for (name in ['Phase','Boundary','Run']) if (p.hasProperty('deliveryAudit' + name))
+            for (name in ['Phase','Boundary','Run','Mutation']) if (p.hasProperty('deliveryAudit' + name))
                 environment 'CITIZENS_DELIVERY_AUDIT_' + name.toUpperCase(), p.property('deliveryAudit' + name)
             timeout = java.time.Duration.ofMinutes(3)
             doLast {

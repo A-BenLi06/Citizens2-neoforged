@@ -8,6 +8,12 @@ Citizens retains NPC behavior and its existing native extension contracts. Yuuni
 
 ## Selected artifacts and sides
 
+Progress 2026-10-22, UTC+08:00: [delivery callback recovery](delivery-callback-recovery-2026-10-22.md)
+validates original native target identity/definition and the active inventory
+owner after consumption. Disappearing/replaced targets and retired sessions stay
+reviewable; valid original-party delivery and native repeat resets remain valid.
+Storage/load, remaining recovery, migration and physical-client gates stay open.
+
 Progress 2026-10-22, UTC+08:00: [native evidence target mutation](evidence-target-mutation-2026-10-22.md)
 checks that admitted FTB teams still exist and reacquires authoritative objects
 after projection callbacks. Deleted parties, replaced tasks and changed serialized
