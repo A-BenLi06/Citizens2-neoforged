@@ -240,19 +240,15 @@ public final class CommerceTaskJournal implements AutoCloseable {
         try (var paths = Files.list(directory)) { for (Path path : paths.sorted().toList()) {
             String name = path.getFileName().toString(); if (name.contains(".json.tmp-")) throw new IOException("Incomplete commerce evidence requires review"); if (!name.endsWith(".json")) continue;
             try {
-                var document = JsonParser.parseString(Files.readString(path)).getAsJsonObject();
-                if (!document.keySet().equals(Set.of("schema", "kind", "payload")) || document.get("schema").getAsInt() != 1) throw new IllegalArgumentException("Unknown commerce evidence schema");
+                var document = JournalJson.parse(Files.readString(path));
+                if (!document.keySet().equals(Set.of("schema", "kind", "payload")) || JournalJson.integer(document.get("schema")) != 1) throw new IllegalArgumentException("Unknown commerce evidence schema");
                 JsonObject payload = document.getAsJsonObject("payload");
-                switch (document.get("kind").getAsString()) {
-                    case "binding" -> { fields(payload, Binding.class); var binding = JSON.fromJson(payload, Binding.class);
+                switch (JournalJson.string(document.get("kind"))) {
+                    case "binding" -> { var binding = JournalJson.decode(JSON, payload, Binding.class);
                         if (!name.equals("binding-" + binding.taskId() + ".json") || bindings.putIfAbsent(binding.taskId(), binding) != null) throw new IllegalArgumentException("Binding identity mismatch"); }
-                    case "entry" -> { fields(payload, Entry.class); fields(payload.getAsJsonObject("binding"), Binding.class); fields(payload.getAsJsonObject("request"), Request.class);
-                        if (!payload.get("attribution").isJsonNull()) fields(payload.getAsJsonObject("attribution"), Attribution.class);
-                        if (!payload.get("receipt").isJsonNull()) fields(payload.getAsJsonObject("receipt"), Receipt.class);
-                        if (!payload.get("resolution").isJsonNull()) fields(payload.getAsJsonObject("resolution"), Resolution.class);
-                        var entry = JSON.fromJson(payload, Entry.class);
+                    case "entry" -> { var entry = JournalJson.decode(JSON, payload, Entry.class);
                         if (!name.equals("entry-" + entry.id() + "-" + entry.revision() + ".json") || histories.computeIfAbsent(entry.id(), ignored -> new TreeMap<>()).putIfAbsent(entry.revision(), entry) != null) throw new IllegalArgumentException("Entry identity mismatch"); }
-                    case "cursor" -> { fields(payload, Cursor.class); var cursor = JSON.fromJson(payload, Cursor.class); String key = cursorKey(cursor.epoch(), cursor.actorId());
+                    case "cursor" -> { var cursor = JournalJson.decode(JSON, payload, Cursor.class); String key = cursorKey(cursor.epoch(), cursor.actorId());
                         if (!name.equals("cursor-" + key + "-" + cursor.revision() + ".json") || checkpoints.computeIfAbsent(key, ignored -> new TreeMap<>()).putIfAbsent(cursor.revision(), cursor) != null) throw new IllegalArgumentException("Checkpoint identity mismatch"); }
                     default -> throw new IllegalArgumentException("Unknown commerce evidence record");
                 }
@@ -284,7 +280,7 @@ public final class CommerceTaskJournal implements AutoCloseable {
             cursors.put(cursorKey(previous.epoch(), previous.actorId()), previous);
         }
     }
-    private static void fields(JsonObject payload, Class<?> type) { var expected = Arrays.stream(type.getRecordComponents()).map(java.lang.reflect.RecordComponent::getName).collect(java.util.stream.Collectors.toSet()); if (!payload.keySet().equals(expected)) throw new IllegalArgumentException("Invalid commerce evidence fields"); }
+
     private static void follows(Entry previous, Entry next) {
         if (previous == null) { if (next.revision() != 0 || next.state() != State.PREPARED && next.state() != State.REVIEW) throw new IllegalArgumentException("Commerce evidence must start with admission or review"); return; }
         if (next.revision() != previous.revision() + 1 || !next.binding().equals(previous.binding()) || !next.request().equals(previous.request())

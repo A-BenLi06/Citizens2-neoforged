@@ -2,6 +2,11 @@
 
 Date: 2026-10-22, UTC+08:00. Advances ADAPT-04/11.
 
+Update: [exact journal record decoding](journal-record-decoding-2026-10-22.md)
+rejects coerced schema/quantity/boolean types and duplicate members before
+publishing history or appending restart recovery. Original damaged bytes remain
+available for review; exact original backups reopen normally.
+
 Update: [native completion callback validation](delivery-callback-recovery-2026-10-22.md)
 reacquires original native targets and verifies the active actor session before
 confirmation. Removed parties, task replacement and retired sessions retain the

@@ -1,5 +1,10 @@
 # Native FTB monetary rewards and durable recovery
 
+Update 2026-10-22, UTC+08:00: [exact journal decoding](journal-record-decoding-2026-10-22.md)
+rejects fractional/overflowed amounts, coerced field types, unsupported enum names
+and duplicate members before loading retained bindings or claims. Valid original
+histories reopen unchanged; this does not create a replacement payment or repair.
+
 Update 2026-10-22, UTC+08:00: [PAID financial-restore validation](monetary-paid-backup-recovery-2026-10-22.md)
 checks the original public provider credit and acknowledged transaction UUID before
 startup/reconciliation settles pending claims and before new claims in the same

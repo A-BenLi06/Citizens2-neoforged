@@ -220,22 +220,17 @@ public final class QuestEvidenceJournal implements AutoCloseable {
                 if (name.contains(".json.tmp-")) throw new IOException("Incomplete evidence write requires review: " + name);
                 if (!name.endsWith(".json")) continue;
                 try {
-                    JsonObject document = JsonParser.parseString(Files.readString(path, StandardCharsets.UTF_8)).getAsJsonObject();
-                    if (!document.keySet().equals(Set.of("schema", "kind", "payload")) || document.get("schema").getAsInt() != 1)
+                    JsonObject document = JournalJson.parse(Files.readString(path, StandardCharsets.UTF_8));
+                    if (!document.keySet().equals(Set.of("schema", "kind", "payload")) || JournalJson.integer(document.get("schema")) != 1)
                         throw new IllegalArgumentException("Unsupported evidence schema");
-                    String kind = document.get("kind").getAsString();
+                    String kind = JournalJson.string(document.get("kind"));
                     JsonObject payload = document.getAsJsonObject("payload");
                     if (kind.equals("generation")) {
-                        fields(payload, Generation.class);
-                        fields(payload.getAsJsonObject("scope"), Scope.class);
-                        Generation generation = JSON.fromJson(payload, Generation.class);
+                        Generation generation = JournalJson.decode(JSON, payload, Generation.class);
                         if (!name.equals("generation-" + generation.id() + ".json") || generations.putIfAbsent(generation.id(), generation) != null)
                             throw new IllegalArgumentException("Generation identity mismatch");
                     } else if (kind.equals("entry")) {
-                        fields(payload, Entry.class);
-                        fields(payload.getAsJsonObject("admission"), Admission.class);
-                        if (!payload.get("resolution").isJsonNull()) fields(payload.getAsJsonObject("resolution"), Resolution.class);
-                        Entry entry = JSON.fromJson(payload, Entry.class);
+                        Entry entry = JournalJson.decode(JSON, payload, Entry.class);
                         if (!name.equals("entry-" + entry.id() + "-" + entry.revision() + ".json")
                                 || history.computeIfAbsent(entry.id(),ignored->new java.util.TreeMap<>()).putIfAbsent(entry.revision(),entry) != null)
                             throw new IllegalArgumentException("Entry identity mismatch");
@@ -275,11 +270,7 @@ public final class QuestEvidenceJournal implements AutoCloseable {
         };
         if (!valid) throw new IllegalArgumentException("Evidence state transition is not allowed");
     }
-    private static void fields(JsonObject payload, Class<?> record) {
-        Set<String> expected = java.util.Arrays.stream(record.getRecordComponents()).map(java.lang.reflect.RecordComponent::getName)
-                .collect(java.util.stream.Collectors.toSet());
-        if (!payload.keySet().equals(expected)) throw new IllegalArgumentException("Evidence fields differ from the schema");
-    }
+
     private static String objectId(String value) {
         if (value == null || !value.matches("[0-9a-fA-F]{1,16}") || Long.parseUnsignedLong(value, 16) == 0) throw new IllegalArgumentException("Invalid native quest object ID");
         return String.format(java.util.Locale.ROOT, "%016X", Long.parseUnsignedLong(value, 16));

@@ -1,5 +1,10 @@
 # Explicit FTB craft bindings and retained progress
 
+Update 2026-10-22, UTC+08:00: [exact journal decoding](journal-record-decoding-2026-10-22.md)
+rejects altered numeric/type/duplicate-member evidence and unsupported outcome
+names before startup recovery. An invalid optional outcome cannot silently become
+a missing native return. Valid historical Create evidence remains unchanged.
+
 Citizens now has a production consumer for supported native crafting observations.
 An online administrator binds a **CustomTask** to the currently loaded recipe ID
 and revision. This uses a custom task because FTB's ordinary crafting item task

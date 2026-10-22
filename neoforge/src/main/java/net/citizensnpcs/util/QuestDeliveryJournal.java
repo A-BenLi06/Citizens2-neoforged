@@ -183,14 +183,11 @@ public final class QuestDeliveryJournal implements AutoCloseable {
                 if (name.contains(".json.tmp-")) throw new IOException("Incomplete delivery write requires review: " + name);
                 if (!name.endsWith(".json")) continue;
                 try {
-                    var document = JsonParser.parseString(Files.readString(path)).getAsJsonObject();
-                    if (!document.keySet().equals(Set.of("schema", "entry")) || document.get("schema").getAsInt() != 1)
+                    var document = JournalJson.parse(Files.readString(path));
+                    if (!document.keySet().equals(Set.of("schema", "entry")) || JournalJson.integer(document.get("schema")) != 1)
                         throw new IllegalArgumentException("Unknown delivery schema");
-                    JsonObject payload = document.getAsJsonObject("entry"); fields(payload, Entry.class);
-                    fields(payload.getAsJsonObject("before"), Target.class);
-                    if (!payload.get("after").isJsonNull()) fields(payload.getAsJsonObject("after"), Target.class);
-                    if (!payload.get("resolution").isJsonNull()) fields(payload.getAsJsonObject("resolution"), Resolution.class);
-                    Entry entry = JSON.fromJson(payload, Entry.class);
+                    JsonObject payload = document.getAsJsonObject("entry");
+                    Entry entry = JournalJson.decode(JSON, payload, Entry.class);
                     if (!name.equals(filename(entry)) || histories.computeIfAbsent(entry.id(), ignored -> new TreeMap<>())
                             .putIfAbsent(entry.revision(), entry) != null) throw new IllegalArgumentException("Delivery identity mismatch");
                 } catch (RuntimeException invalid) { throw new IOException("Invalid delivery record: " + name, invalid); }
@@ -233,10 +230,7 @@ public final class QuestDeliveryJournal implements AutoCloseable {
                 || previous.state() == State.REVIEW && !next.uncertainty().equals(previous.uncertainty()))
             throw new IllegalArgumentException("Invalid delivery transition");
     }
-    private static void fields(JsonObject object, Class<?> type) {
-        var names = new HashSet<String>(); for (var field : type.getRecordComponents()) names.add(field.getName());
-        if (!object.keySet().equals(names)) throw new IllegalArgumentException("Unknown or missing delivery fields");
-    }
+
     private static String id(String value) { return String.format(Locale.ROOT, "%016X", FtbQuestTasks.parseId(value)); }
     private static void inventory(String value) {
         if (value == null || !JsonParser.parseString(value).isJsonArray()) throw new IllegalArgumentException("Expected a retained inventory array");

@@ -1,5 +1,10 @@
 # Native commerce receipt tasks
 
+Update 2026-10-22, UTC+08:00: [exact journal decoding](journal-record-decoding-2026-10-22.md)
+validates retained bindings, requests, receipts, resolutions and cursor lists by
+their record types. Damaged values reject without rewriting evidence; copied
+native histories retain their original settlement data and cursor positions.
+
 Citizens owns explicitly bound FTB CustomTasks and projects committed Economy
 receipts into absolute native progress. Economy 0.5.6 exposes Commerce capability
 3: a stable ledger journal UUID, ordered receipt history, operation lookup and a

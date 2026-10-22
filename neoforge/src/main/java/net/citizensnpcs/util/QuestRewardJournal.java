@@ -156,17 +156,14 @@ public final class QuestRewardJournal implements AutoCloseable {
                 if (name.contains(".json.tmp-")) throw new IOException("Incomplete reward write requires review: " + name);
                 if (!name.endsWith(".json")) continue;
                 try {
-                    JsonObject document = JsonParser.parseString(Files.readString(path)).getAsJsonObject();
-                    if (!document.keySet().equals(Set.of("schema", "kind", "payload")) || document.get("schema").getAsInt() != 1) throw new IllegalArgumentException("Unknown reward schema");
+                    JsonObject document = JournalJson.parse(Files.readString(path));
+                    if (!document.keySet().equals(Set.of("schema", "kind", "payload")) || JournalJson.integer(document.get("schema")) != 1) throw new IllegalArgumentException("Unknown reward schema");
                     JsonObject payload = document.getAsJsonObject("payload");
-                    if (document.get("kind").getAsString().equals("binding")) {
-                        fields(payload, Binding.class); Binding binding = JSON.fromJson(payload, Binding.class);
+                    if (JournalJson.string(document.get("kind")).equals("binding")) {
+                        Binding binding = JournalJson.decode(JSON, payload, Binding.class);
                         if (!name.equals("binding-" + binding.rewardId() + ".json") || bindings.putIfAbsent(binding.rewardId(), binding) != null) throw new IllegalArgumentException("Binding identity mismatch");
-                    } else if (document.get("kind").getAsString().equals("claim")) {
-                        fields(payload, Claim.class); fields(payload.getAsJsonObject("intent"), Intent.class);
-                        fields(payload.getAsJsonObject("intent").getAsJsonObject("binding"), Binding.class);
-                        if (!payload.get("resolution").isJsonNull()) fields(payload.getAsJsonObject("resolution"), Resolution.class);
-                        Claim claim = JSON.fromJson(payload, Claim.class);
+                    } else if (JournalJson.string(document.get("kind")).equals("claim")) {
+                        Claim claim = JournalJson.decode(JSON, payload, Claim.class);
                         if (!name.equals("claim-" + claim.id() + "-" + claim.revision() + ".json")
                                 || histories.computeIfAbsent(claim.id(), ignored -> new TreeMap<>()).putIfAbsent(claim.revision(), claim) != null) throw new IllegalArgumentException("Claim identity mismatch");
                     } else throw new IllegalArgumentException("Unknown reward record kind");
@@ -196,10 +193,7 @@ public final class QuestRewardJournal implements AutoCloseable {
         if (!valid || (previous.state() == State.PREPARED && next.resolution() != null)
                 || (previous.state() == State.REVIEW && (next.resolution() == null || !Objects.equals(previous.afterCycle(), next.afterCycle())))) throw new IllegalArgumentException("Invalid reward transition");
     }
-    private static void fields(JsonObject payload, Class<?> record) {
-        var expected = Arrays.stream(record.getRecordComponents()).map(java.lang.reflect.RecordComponent::getName).collect(java.util.stream.Collectors.toSet());
-        if (!payload.keySet().equals(expected)) throw new IllegalArgumentException("Reward fields differ from the schema");
-    }
+
     static String objectId(String value) {
         if (value == null || !value.matches("[0-9a-fA-F]{1,16}") || Long.parseUnsignedLong(value, 16) == 0) throw new IllegalArgumentException("Invalid FTB object ID");
         return String.format(Locale.ROOT, "%016X", Long.parseUnsignedLong(value, 16));

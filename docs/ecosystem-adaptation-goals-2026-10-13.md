@@ -8,6 +8,13 @@ Citizens retains NPC behavior and its existing native extension contracts. Yuuni
 
 ## Selected artifacts and sides
 
+Progress 2026-10-22, UTC+08:00: [journal record types](journal-record-decoding-2026-10-22.md)
+remain exact during delivery, craft, reward and commerce restart decoding.
+Damaged numeric/type/duplicate-member evidence rejects without repair; valid
+historical copies and cursor positions remain compatible. Acceptance passes
+823 ordinary tests per target, 100 Interactions tests and 302 native checks.
+Broader recovery/retention, migration and physical-client gates remain open.
+
 Progress 2026-10-22, UTC+08:00: [delivery ownership indexes](delivery-admission-indexes-2026-10-22.md)
 keep latest actor/task and all unresolved owners available without full-history
 admission scans. Historical reviews retain their earliest original fence across

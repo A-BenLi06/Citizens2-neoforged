@@ -1,0 +1,18 @@
+// Opt-in reload of copied historical evidence. No sources enter production archives.
+allprojects {
+    layout.buildDirectory.set(file(providers.gradleProperty('journalReloadBuildDir').get()))
+    afterEvaluate { p ->
+        p.sourceSets.create('journalReloadAudit') {
+            java.srcDir(p.file('../tools/journal-reload-audit'))
+            compileClasspath += p.sourceSets.main.output + p.sourceSets.main.compileClasspath
+            runtimeClasspath += output + compileClasspath + p.sourceSets.main.runtimeClasspath
+        }
+        p.tasks.register('runJournalReloadAudit', JavaExec) {
+            dependsOn p.tasks.named('journalReloadAuditClasses')
+            classpath = p.sourceSets.journalReloadAudit.runtimeClasspath
+            mainClass = 'net.citizensnpcs.audit.JournalReloadAudit'
+            javaLauncher = p.javaToolchains.launcherFor { languageVersion = JavaLanguageVersion.of(21) }
+            args p.file('../artifacts').absolutePath, p.file(p.property('journalReloadPlan')).absolutePath
+        }
+    }
+}

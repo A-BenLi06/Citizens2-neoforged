@@ -10,6 +10,14 @@ This review covers repository structure, native implementation boundaries, upstr
 
 ## Repository and implementation boundaries
 
+Update 2026-10-22, UTC+08:00: [journal record decoding](journal-record-decoding-2026-10-22.md)
+prevents all four retained journals from truncating/wrapping numeric evidence,
+coercing field types or silently accepting duplicate members. All 36 reproduced
+damages now reject without rewriting records. Valid historical Create, reward,
+commerce and delivery copies reopen unchanged. Fresh acceptance passes 823
+ordinary tests per target, 100 Interactions tests and 302 native checks.
+Full recovery/retention, migration and deferred physical-client gates remain open.
+
 Update 2026-10-22, UTC+08:00: [indexed delivery admission](delivery-admission-indexes-2026-10-22.md)
 removes full-history scans/copies from actor/task admission and preparation while
 preserving every historical review fence. Startup derives indexes from the same
