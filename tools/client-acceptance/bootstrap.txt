@@ -1,0 +1,18 @@
+gamerule doDaylightCycle false
+time set day
+gamerule doWeatherCycle false
+weather clear
+setworldspawn 0 -60 0
+npc create ClientGuide --type player --at 3,-60,0,minecraft:overworld
+npc lookclose
+npc create PacketGuide -p --type player --at -3,-60,0,minecraft:overworld
+npc lookclose
+npc create MarketGuide --type villager --at 0,-60,4,minecraft:overworld
+npc command add citizens economyshop browser 0 -p -r
+npc create ClientMount --type horse --at 0,-60,-4,minecraft:overworld
+npc controllable --enabled true
+npc create DeliveryGuide --type villager --at 6,-60,4,minecraft:overworld
+npc command add citizens quest submit 4c1303 -p -r
+citizens save
+npc list
+interactions status

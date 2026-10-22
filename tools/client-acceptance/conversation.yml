@@ -1,0 +1,33 @@
+name: Client guide
+starts_with:
+  - NPC named ClientGuide
+  - NPC named PacketGuide
+block_movement: true
+end_conversation_radius: 8
+conversation:
+  conversation1:
+    dialogue:
+      dialogue1:
+        text: 'Hello %player%. Choose an option below.'
+        time: 1
+    options:
+      option1:
+        text: 'Receive one paper'
+        actions:
+          - 'player_command_as_op: give @s minecraft:paper 1'
+        start_conversation: conversation2
+      option2:
+        text: 'Open the market'
+        actions:
+          - 'economy_shop: browser 0'
+        start_conversation: conversation2
+      option3:
+        text: 'Deliver paper'
+        actions:
+          - 'ftb_submit: 4c1303'
+        start_conversation: conversation2
+  conversation2:
+    dialogue:
+      dialogue1:
+        text: 'Goodbye, %player%.'
+        time: 1

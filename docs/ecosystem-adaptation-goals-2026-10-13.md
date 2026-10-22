@@ -241,6 +241,14 @@ Physical clients, full-world restart and combined migration acceptance remain op
 
 All rows are accepted goals. An unchecked row means adaptation remains to be implemented/validated, even when its provider is installed.
 
+Progress 2026-10-22, UTC+08:00: the user confirmed an ordinary Minecraft client
+is available. The [ordinary-client acceptance fixture](ordinary-client-acceptance-2026-10-22.md)
+provides a separate loopback server, pinned release/provider artifacts, a synthetic
+paper-delivery quest, ordinary/packet dialogue NPCs, menus and a mount. Packaged
+startup, command setup and persistence checks are recorded separately from pending
+physical input/rendering. This does not resolve missing original quest mappings,
+ItemEdit definitions 6/15/144, VR input or production migration/deployment.
+
 Progress 2026-10-18, UTC+08:00: [native commerce receipt tasks](ftb-commerce-tasks-2026-10-18.md)
 add exact system/coordinate buy/sell bindings, precommit team/cycle attribution,
 durable receipt replay and absolute native projection. Actual selected FTB/XMod/

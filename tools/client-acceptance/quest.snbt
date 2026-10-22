@@ -1,0 +1,24 @@
+{
+    filename: "client_acceptance"
+    id: "00000000004C1301"
+    title: "Client acceptance"
+    quests: [{
+        id: "00000000004C1302"
+        title: "Paper delivery"
+        tasks: [{
+            id: "00000000004C1303"
+            type: "item"
+            item: { count: 1, id: "minecraft:paper" }
+            count: 3L
+            consume_items: true
+            only_from_crafting: false
+        }]
+        rewards: [{
+            id: "00000000004C1304"
+            type: "item"
+            item: { count: 1, id: "minecraft:diamond" }
+        }]
+        x: 0.0d
+        y: 0.0d
+    }]
+}

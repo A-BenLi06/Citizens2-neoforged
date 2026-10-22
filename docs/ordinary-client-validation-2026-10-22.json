@@ -1,0 +1,338 @@
+{
+  "schema": 1,
+  "recordedAt": "2026-10-22T13:03:07.3859131+08:00",
+  "sourceCommit": "f2c633887a36a6216ad75149a791db8edd65e6cd",
+  "address": "127.0.0.1:25640",
+  "player": "BenLi06",
+  "minecraft": "1.21.1",
+  "neoForge": "21.1.248",
+  "java": "Eclipse Temurin 21.0.11+10",
+  "packagedServerJars": [
+    {
+      "name": "[定制]kaminari-motor-work-2.6.2-neoforge-1.21.1.jar",
+      "sha256": "16511A560D35A72A00B223C51AE6BCAF0A1AA3C3E4036E6A1D711B3826CE74CA"
+    },
+    {
+      "name": "[自修改]create-6.0.10-mc1.21.1-performance-v6.jar",
+      "sha256": "5602A16796957CB5C7FB829C10C6B54BF9D228931C7680636710B6A60D92822E"
+    },
+    {
+      "name": "[自修改]Immersive Vehicles-1.21.1-25.0.0.jar",
+      "sha256": "4D5461DFFF5108E1C4FFFABEE92A6CFA66CB24A4616AA19D4B966F7EC4672DC2"
+    },
+    {
+      "name": "[自修改]MTR-4.1.0-beta.2-mc1.21.1-performance-v6.jar",
+      "sha256": "8BD419BD798C2AB2FA03E08850409387804FDEB2E4F2987C66B9984236263585"
+    },
+    {
+      "name": "[自研]MTR-Station-Decoration-Addon-neoforge-1.4.5-yuuniverse.1.jar",
+      "sha256": "F38B00B15A36F4E2FE7F8C3AA90C5B6E61D70B979B86D25BC292B562DD92099D"
+    },
+    {
+      "name": "[自研]prosperous-2026.2.1-neoforge-1.21.1.jar",
+      "sha256": "31164410E50B110B8114F8F7B99EB35402C7F5ABC89AB8075583C8021C23F7F7"
+    },
+    {
+      "name": "[自研]Shirahane-Yorozuya-neoforge-1.21.1-1.2.1-r2.jar",
+      "sha256": "A343B0783E2BAC3B22B67D042326A6A822307A0B659017979A1A3DB9F7E72DE6"
+    },
+    {
+      "name": "[自研]udays-museum-7.241130-neoforge-1.21.1.jar",
+      "sha256": "D9AB8BF6B9D47DA2ABFB4D737F5D83AE67A907AA888B6CB36EEE77FEE4FB532F"
+    },
+    {
+      "name": "architectury-13.0.11-neoforge.jar",
+      "sha256": "9CC92F2C09533FC5482C60F993BD891C655A0E32B637037CDCB7C2B23ADEDEEB"
+    },
+    {
+      "name": "Axiom-6.1.3-for-MC1.21.1.jar",
+      "sha256": "6121B645EEEC340DD851F5DBE3B9CB9F018028388C00870174DA60DAEE309602"
+    },
+    {
+      "name": "citizens-2.0.43-neoforge-SNAPSHOT.jar",
+      "sha256": "B7A1EE4312E3057D1D8C5FA5BB71147B87003FD3AB63F3FDAC2758B909920DE1"
+    },
+    {
+      "name": "CMDCam_NEOFORGE_v2.2.9_mc1.21.1.jar",
+      "sha256": "2ACF1CCD2D320F7DA6D4D5EDFABBEBAC06B4EA15CCBC1B989B3DC8A53C976D7D"
+    },
+    {
+      "name": "connector-2.0.0-beta.17+1.21.1-full.jar",
+      "sha256": "CA70B57DF3A7A4E8D211FEA7FF3AE77E768482AF374F26BF953FF5FD755564F0"
+    },
+    {
+      "name": "copycats-3.0.4+mc.1.21.1-neoforge.jar",
+      "sha256": "8480E2A62EAA625F75776831C1D8A9EF3D77D2D816FA2E67566C6EC25BA745D1"
+    },
+    {
+      "name": "copyfoxies-2.0.0.jar",
+      "sha256": "165A536BCAC24B0FE773A0C48FB94E31EF7139FA7E47E97C9AD22F8C9AAB32E7"
+    },
+    {
+      "name": "createrailwaysnavigator-neoforge-1.21.1-beta-0.10.0-C6.jar",
+      "sha256": "1CE27FBCD80834F82F37429878901CA00496AC0E9C1A477A7B3DD4E12B4E41D4"
+    },
+    {
+      "name": "createunlimited-0.7.1.jar",
+      "sha256": "DD785E26646943BDB90A935057B851FEE637C180EB4ECC5346D1C4769BA141E4"
+    },
+    {
+      "name": "CreativeCore_NEOFORGE_v2.13.50_mc1.21.1.jar",
+      "sha256": "D07F802239AB6B9B7FB1C7CC0CE607540D34EFB4584BC27EEBB9D6BD153522D6"
+    },
+    {
+      "name": "CRTools-MTR-Map-Overlay-1.5.1.jar",
+      "sha256": "1B2792A1CC2F0B5BE0D220CD447CD0273BBABC7B6A87B682713FC59C1BCBAE56"
+    },
+    {
+      "name": "dragonlib-neoforge-1.21.1-beta-3.0.28.jar",
+      "sha256": "BA127947220504D1410716E422EF6A9A387D818A922AD5FDB3BE044F9F7556F7"
+    },
+    {
+      "name": "ferritecore-7.0.2-neoforge.jar",
+      "sha256": "235E2081DFE050D7642B0D432A786668F079168505BA5D6BF0EC70C962A36539"
+    },
+    {
+      "name": "forgified-fabric-api-0.116.15+2.3.5+1.21.1.jar",
+      "sha256": "96F8B489F401C64E87343DAF57A030CCD1B58BE40FC0AAD701278BA58A0FADAF"
+    },
+    {
+      "name": "framework-neoforge-1.21.1-0.13.11.jar",
+      "sha256": "429EA90A162D7C25C1463EE60979E4D7B1DDB525D9384A3A2A2F45D70BDA03F5"
+    },
+    {
+      "name": "ftb-library-neoforge-2101.1.37.jar",
+      "sha256": "624C2D2D1CBADB946D967E17757BD5B2D129D4D3ED71F2DA0C70607D04476AC2"
+    },
+    {
+      "name": "ftb-quests-neoforge-2101.1.36.jar",
+      "sha256": "6A39982C4B3AFC00B1E788041A4F0D394E1659E3B3A6E5D078CD790BC36D0018"
+    },
+    {
+      "name": "ftb-teams-neoforge-2101.1.11.jar",
+      "sha256": "E6BCD670493624E6906DF872A9C6AF4A33FE6405CAC57A32C59CD4CD5838C655"
+    },
+    {
+      "name": "ftb-xmod-compat-neoforge-21.1.12.jar",
+      "sha256": "F587E13131101BAC33D4CC7A04D13D06C00F8F88A892BE90D6FFC8AD96119AE8"
+    },
+    {
+      "name": "grieflogger-1.2.10-1.21.1-yuuniverse.1-neoforge.jar",
+      "sha256": "A897F22FCA7705144B26749F7BAA097B4E1CC0D16EED1DDEED3A9FED270806E0"
+    },
+    {
+      "name": "guardvillagers-2.4.12-1.21.1.jar",
+      "sha256": "AAB03D59216BD931A05434B2527E0D5B7641793BD0178A9958100579C4F11407"
+    },
+    {
+      "name": "iav-pack-8.2507-neoforge-1.21.1.jar",
+      "sha256": "AD07191670397011D43C176222E995361D7C84E41C72D851A0795D642D59EA5E"
+    },
+    {
+      "name": "ImmersiveEngineering-1.21.1-12.4.2-194.jar",
+      "sha256": "45942985A4A4AEBF265B8E22A0C54A96208637471F36F2532FF5D4911322DEBC"
+    },
+    {
+      "name": "interiors-1.21.1-neoforge-0.6.1.jar",
+      "sha256": "0D1326FB8B67623AE1C69A63B788DCDCECAF8DF400C7D8E5E55ACE79A5166FE5"
+    },
+    {
+      "name": "jei-1.21.1-neoforge-19.53.0.425.jar",
+      "sha256": "3683C743C1B6192913ABC2A969486344EEE98AA2924E8DEB5087109645C3ABC6"
+    },
+    {
+      "name": "kaleidoscope_world_liquor-1.1.9-neoforge+1.21.1-fix.jar",
+      "sha256": "3C3779945687BE248D91EA919B1F72B40A66AEED40249A6049F55B0158B149AE"
+    },
+    {
+      "name": "kaleidoscopecookery-1.5.1-neoforge+mc1.21.1.jar",
+      "sha256": "FF86A0651CAD2061B2580AE978D18AD2900D5373C75D0318E00AC6DAC98B6465"
+    },
+    {
+      "name": "kaleidoscopedoll-1.4.1-neoforge+mc1.21.1.jar",
+      "sha256": "AD63142CAE3B561D9BADCE1D8348268D85B8D4BC68084307810E22A48C7554EB"
+    },
+    {
+      "name": "kaleidoscopetavern-1.2.0-neoforge+mc1.21.1.jar",
+      "sha256": "03F35E1E614953B22CD1F5E34345613F3A6A283BF1B1C99659B57D58970EDEFF"
+    },
+    {
+      "name": "kotlinforforge-5.12.0-all.jar",
+      "sha256": "2785A4DD6DE5C6C56065FD8EB789C82771BD2EE773C30794C23160A3B2C39139"
+    },
+    {
+      "name": "kubejs-neoforge-2101.7.2-build.377.jar",
+      "sha256": "DF9A8458B1F83FED06BA54684977911795A5153A462B81A610895F5B1F2F0CBF"
+    },
+    {
+      "name": "lithium-neoforge-0.15.4+mc1.21.1.jar",
+      "sha256": "488F33216030C1CB0BAA33E59DE3D657D08D5795A6C2080C8C8BBBC133FC8757"
+    },
+    {
+      "name": "LittleTiles_BETA_v1.6.0-pre231_mc1.21.1.jar",
+      "sha256": "99366BBADC2E75E6B78751553CFB6DA2B4E44F06CC98C58EC767EB16ADF277D3"
+    },
+    {
+      "name": "modernfix-neoforge-5.27.20+mc1.21.1.jar",
+      "sha256": "6F367EA4002C39E3CFE27E0A0BE1008880A4B35A8482A78A437CFB9D8EE38273"
+    },
+    {
+      "name": "neoprotect-1.0.4-mc1.21.1-neoforge.jar",
+      "sha256": "2CBCEC7AEEF26EF3F5B54DAE90FC16DA353A1534462353B9F516D7D2E0A138CE"
+    },
+    {
+      "name": "netmusic-1.5.2-neoforge+mc1.21.1.jar",
+      "sha256": "731FBA4B4D47256D5F44F8392B093B53C7D1C650B66111EDA75B820F7F89A14B"
+    },
+    {
+      "name": "Paradigm-neoforge-1.21.1-2.5.0.jar",
+      "sha256": "4748C11F64D0CF6C172714353EF1E7A4D137BF6C4B6E0D3964A49D59971C766D"
+    },
+    {
+      "name": "railways-0.3.0-beta.2+neoforge-mc1.21.1.jar",
+      "sha256": "34F7D98B93967601313CBA314051422E1CA9A6F07CC955D5D9DB22AFA090D0F4"
+    },
+    {
+      "name": "refurbished_furniture-neoforge-1.21.1-1.0.22.jar",
+      "sha256": "953A7840261EB79959769A97CAA60CBA2EE141700A4CBE208825268327136BDF"
+    },
+    {
+      "name": "rhino-2101.2.8-build.91.jar",
+      "sha256": "1D53D962AA4DAC54BCBB4F998C1845980CF194318F1D6B1580EA6AC15CCE5EF3"
+    },
+    {
+      "name": "rsitemeditor-1.0.1.jar",
+      "sha256": "C2194C5F97A06B1472A5C7BC39C6FD2F3866E237C1CCF9C70787A09FC3109472"
+    },
+    {
+      "name": "skinrestorer-2.10.0+1.21-neoforge.jar",
+      "sha256": "CE01EAF0AEA3FB7A758BEBA08F111F0ABB2F43F17C622501AD547C3F4B6C974F"
+    },
+    {
+      "name": "SkinStatues-neoforge-1.21.1-1.5.0.jar",
+      "sha256": "A17B4C5765E7933E433D5423724F160D4E47D0D894ACEAB250724C786C63DF10"
+    },
+    {
+      "name": "slideshow_pro-neoforge-1.21.1-1.1.0.jar",
+      "sha256": "A445CC68987408E8ED5270DE0E0D7DE4040EA1A97BB2B36E2858E39F571B766C"
+    },
+    {
+      "name": "spark-1.10.124-neoforge.jar",
+      "sha256": "647E8A81AFBE414DBA1DF4BA15FD06C5D32D4CB544E68828405E8E074C2E16DB"
+    },
+    {
+      "name": "supermartijn642configlib-1.1.8-neoforge-mc1.21.jar",
+      "sha256": "D2BA7B839A2268E4E223457E813D11AA2476C3BF708A7BBA691D8FC851778A4B"
+    },
+    {
+      "name": "tacz-neoforge-1.21.1-1.1.8-hotfix-r6.jar",
+      "sha256": "58F6AB47C59218BDB10BB9EEE1905B6CD27F3BC98D4AF13982A6002A99B1D3E7"
+    },
+    {
+      "name": "touhoulittlemaid-1.5.3-neoforge+mc1.21.1.jar",
+      "sha256": "F6DB04195820C8508704277EA76D63723804FF236A7B780369BA59EBE5CD9C27"
+    },
+    {
+      "name": "unu-parts-pack-6.7.1-neoforge-1.21.1.jar",
+      "sha256": "E2706219F6F6394F0C463B04C5197CEAD00B2408E6558D21D86F553261F1A402"
+    },
+    {
+      "name": "vivecraft-1.21.1-1.3.15-neoforge.jar",
+      "sha256": "0712A6167421BF337477AB1766293887441514F5186EC94B13E081C0779A6474"
+    },
+    {
+      "name": "worldedit-mod-7.3.8.jar",
+      "sha256": "5E7752C97876D87411E3760BCC573CC431F43C453722E6959FA7FE54DB1B01CA"
+    },
+    {
+      "name": "ysm-2.6.5-neoforge+mc1.21.1-release.jar",
+      "sha256": "B285C73D4EC010D9A9BE3C53C1BEE890CF269645BE5F1BCF1C27A2E8E82807CB"
+    },
+    {
+      "name": "yuuniverse-economy-0.5.6-SNAPSHOT.jar",
+      "sha256": "179115E5301EE6629ACD3BDCBB6779D2549A35F7493821AB0FCA79BCC43645F5"
+    },
+    {
+      "name": "yuuniverse-interactions-2.0.43-neoforge-SNAPSHOT.jar",
+      "sha256": "1CA6A271EF45B6F4228810F5031261682D53A27BCD44A4B1A67EA292B5066305"
+    },
+    {
+      "name": "yuushya_modelling-1.21.1-2.4.1.jar",
+      "sha256": "EEDE4BD24A1B20AEB007C03761903AED8061B9B826DC68349A8CA146C9944AE5"
+    },
+    {
+      "name": "yuushya-1.21.0-neoforge-2.3.0.jar",
+      "sha256": "C410C51E1ECDD9D3FF55EB34B84D71DA761A8990EC0993A766C9BA40E8C360E8"
+    }
+  ],
+  "clientOverrides": [
+    "rhino-2101.2.8-build.91.jar",
+    "ftb-library-neoforge-2101.1.37.jar",
+    "ftb-quests-neoforge-2101.1.36.jar",
+    "ftb-teams-neoforge-2101.1.11.jar",
+    "ftb-xmod-compat-neoforge-21.1.12.jar",
+    "kubejs-neoforge-2101.7.2-build.377.jar",
+    "jei-1.21.1-neoforge-19.53.0.425.jar",
+    "architectury-13.0.11-neoforge.jar",
+    "guardvillagers-2.4.12-1.21.1.jar",
+    "vivecraft-1.21.1-1.3.15-neoforge.jar",
+    "CMDCam_NEOFORGE_v2.2.9_mc1.21.1.jar",
+    "CreativeCore_NEOFORGE_v2.13.50_mc1.21.1.jar",
+    "[自修改]create-6.0.10-mc1.21.1-performance-v6.jar"
+  ],
+  "libraryArgumentSha256": "EB15063CD3551F588C6DD211826DA06B7F2D5A26F1EB5321EE6D40AB8D4B0AC3",
+  "fixtureManifestSha256": "16C35ED77E4C5F1AE6204FE50CA5614D341E7B5FF6C599FA2F858089A17EF0BD",
+  "fixtureSaveSha256": "9EE3BED95F7F0FB1E20BFE429EAD3D4BC5587E52285C170871662100961A13A2",
+  "checks": [
+    "PowerShell parser checks passed",
+    "Existing fixture preparation rejected without overwrite",
+    "64 packaged JARs start without audit source injection",
+    "Five bootstrap NPCs created and saved",
+    "Synthetic FTB quest and two name-bound conversation triggers load",
+    "save-all flush and stop exit code 0",
+    "Restart loads all five NPCs with their original IDs",
+    "Post-restart console commands respond"
+  ],
+  "logs": [
+    {
+      "path": "artifacts/ordinary-client-packaged-startup-2026-10-22.log",
+      "sha256": "793A59318154A41580F77FB3CA5D8884848892E2A25204294DB8BEFD9BB19F9A"
+    },
+    {
+      "path": "artifacts/ordinary-client-packaged-restart-2026-10-22.log",
+      "sha256": "FC211E75761FCC089039F866E2D102D60A39F996A074E1B7A90E79A7C5B4E01A"
+    }
+  ],
+  "sources": [
+    {
+      "path": "tools/prepare-client-acceptance.ps1",
+      "sha256": "720A6CA0A98E95A5BA3D08347D3A687E3CCFD6F2D51785AED8F2C80197FB5748"
+    },
+    {
+      "path": "tools/start-client-acceptance.ps1",
+      "sha256": "796D7269DCAC378598336959003C7A4AB852C7591740E7DAEF5E8864F6B7D6BB"
+    },
+    {
+      "path": "tools/client-acceptance/bootstrap.txt",
+      "sha256": "A93F3F36FC05CA9658F9A299503971E32C47D8754BB7E6FE0D64EF1DBA4FBCDE"
+    },
+    {
+      "path": "tools/client-acceptance/conversation.yml",
+      "sha256": "22B865FBE1058AADC3492F7B136F1A8E7049BCA9301962CCD451709C318C2B2A"
+    },
+    {
+      "path": "tools/client-acceptance/quest.snbt",
+      "sha256": "6A8A894786B9DD1F73EC29601047EEB22299C5E3E14DCC57AB22FA8219D5B33A"
+    }
+  ],
+  "physicalClientAcceptance": "PENDING",
+  "productionChanged": false,
+  "limitations": [
+    "Offline loopback login only",
+    "Client override folder is not a complete modpack",
+    "Fresh Economy has no shop offers; item/money trades need a seeded shop",
+    "Existing provider startup warnings and slow WorldEdit/CopyFoxies enumeration remain",
+    "Name-bound conversations load correctly; status reports only numeric NPC bindings",
+    "VR, original legacy source definitions, proxy and broader recovery/release gates remain open"
+  ]
+}
