@@ -1,0 +1,123 @@
+{
+  "createdAt": "2026-10-22T12:46:38+08:00",
+  "timezone": "UTC+08:00",
+  "neoForge": "21.1.248",
+  "nativeChecks": 37,
+  "restartChecks": 8,
+  "actualProcessKills": 1,
+  "boundary": "Observed native histories after flush; player/world explicitly saved before forced process termination",
+  "files": [
+    {
+      "path": "artifacts/logging-crash-248-2026-10-22-termination.json",
+      "bytes": 515,
+      "sha256": "894b20ffcd3a0212418c674e49d558e708c3f55d088cc3f79d65e617df2df032"
+    },
+    {
+      "path": "artifacts/logging-crash-248-2026-10-22-state.json",
+      "bytes": 314,
+      "sha256": "c0dbeb124f070870d9edce8e3b1f506c6601093984c0de4bc8747bc48356aee4"
+    },
+    {
+      "path": "artifacts/logging-crash-248-2026-10-22-killed.log",
+      "bytes": 19088,
+      "sha256": "6421a8cce6dde82c7b47f8a2cfcbeb636c490eb19b545705c7a993cd605522e9"
+    },
+    {
+      "path": "artifacts/logging-crash-248-2026-10-22-killed-stderr.log",
+      "bytes": 1633,
+      "sha256": "d2c14bb5cd02c78e4a4bf3cc7ed24e7b5bac24aef656e49c59b29942d80586ec"
+    },
+    {
+      "path": "artifacts/logging-crash-248-2026-10-22-recovered.log",
+      "bytes": 13291,
+      "sha256": "c5639592682f023c8f6b3647ca2865a04ce90a6b8aa593331b116b84ed972e0c"
+    },
+    {
+      "path": "artifacts/logging-crash-248-2026-10-22-runner.log",
+      "bytes": 188,
+      "sha256": "813e5b49a9cf9670b83a0ac58b0ff2fdfed14054fc434fde47559e2d671f81d7"
+    }
+  ],
+  "sources": [
+    {
+      "path": "tools/logging-runtime-audit.gradle",
+      "bytes": 2407,
+      "sha256": "5052006c982f89a1a466d7f0b089121d557a6f1b6ac1d8721685f540b3baaa4e"
+    },
+    {
+      "path": "tools/logging-runtime-audit/net/yuuniverse/interactions/LoggingRuntimeAudit.java",
+      "bytes": 27091,
+      "sha256": "e3209d4712594e590379a08721f4033d9584046f1e1a437195b99f9d0f2506a8"
+    },
+    {
+      "path": "tools/run-logging-crash-audit.ps1",
+      "bytes": 5114,
+      "sha256": "08d3a2138b4036e5b809af6a71c4877c017f1511da2bc613e4d6ce24b181d4ab"
+    },
+    {
+      "path": "tools/prepare-logging-audit.ps1",
+      "bytes": 3320,
+      "sha256": "ced55ff7e988e8f3fe37ef866c2006e090a2f5bfb9c71f30396d8bd83ada5606"
+    }
+  ],
+  "providers": [
+    {
+      "path": "artifacts/logging-audit-server/mods/architectury-13.0.11-neoforge.jar",
+      "bytes": 584734,
+      "sha256": "9cc92f2c09533fc5482c60f993bd891c655a0e32b637037cdcb7c2b23adedeeb"
+    },
+    {
+      "path": "artifacts/logging-audit-server/mods/create.jar",
+      "bytes": 19138095,
+      "sha256": "5602a16796957cb5c7fb829c10c6b54bf9d228931c7680636710b6a60d92822e"
+    },
+    {
+      "path": "artifacts/logging-audit-server/mods/economy.jar",
+      "bytes": 14431850,
+      "sha256": "179115e5301ee6629acd3bdcbb6779d2549a35f7493821ab0fca79bcc43645f5"
+    },
+    {
+      "path": "artifacts/logging-audit-server/mods/grieflogger-1.2.10-1.21.1-yuuniverse.1-neoforge.jar",
+      "bytes": 18915537,
+      "sha256": "a897f22fca7705144b26749f7baa097b4e1cc0d16eed1ddeed3a9fed270806e0"
+    },
+    {
+      "path": "artifacts/logging-audit-server/mods/neoprotect-1.0.4-mc1.21.1-neoforge.jar",
+      "bytes": 2614693,
+      "sha256": "2cbcec7aeef26ef3f5b54dae90fc16da353a1534462353b9f516d7d2e0a138ce"
+    },
+    {
+      "path": "artifacts/logging-audit-server/mods/supermartijn642configlib-1.1.8-neoforge-mc1.21.jar",
+      "bytes": 207514,
+      "sha256": "d2ba7b839a2268e4e223457e813d11aa2476c3bf708a7bba691d8fc851778a4b"
+    }
+  ],
+  "sqliteIntegrity": {
+    "path": "artifacts/logging-crash-integrity-2026-10-22.json",
+    "bytes": 301,
+    "sha256": "9431955abd1f13a41e1f94fad19503939fd4c5b838ca7b242e21756d0c8c95c9"
+  },
+  "sqliteResults": [
+    {
+      "path": "artifacts/logging-audit-server/database.db",
+      "quickCheck": [
+        "ok"
+      ],
+      "readOnly": true
+    },
+    {
+      "path": "artifacts/logging-audit-server/logging-world/yuuniverse_economy/economy.db",
+      "quickCheck": [
+        "ok"
+      ],
+      "readOnly": true
+    }
+  ],
+  "productionBehaviorChanged": false,
+  "productionActivated": false,
+  "remaining": [
+    "Queue overflow and termination during database writes",
+    "Timed retention and production load",
+    "Broader entity/fire/explosion and physical-client acceptance"
+  ]
+}

@@ -184,12 +184,28 @@ public final class LoggingRuntimeAudit {
                 "settled_trade_replay_after_shop_block_rollback_cannot_charge_or_deliver_twice");
         var state=new com.google.gson.JsonObject();state.addProperty("actor",actor.getUUID().toString());state.addProperty("currency",currencyId);state.addProperty("balance",balanceBeforeTrade-20);
         state.addProperty("operation",receipt.operationId().toString());state.addProperty("transaction",receipt.transactionId().toString());state.addProperty("shop",shopId);
-        java.nio.file.Files.writeString(server.getServerDirectory().resolve("logging-restart-state.json"),state.toString());
+        state.addProperty("run",System.getenv("CITIZENS_LOGGING_AUDIT_RUN"));
+        var statePath=server.getServerDirectory().resolve("logging-restart-state.json");
+        try(var stateFile=java.nio.channels.FileChannel.open(statePath,java.nio.file.StandardOpenOption.CREATE,
+                java.nio.file.StandardOpenOption.TRUNCATE_EXISTING,java.nio.file.StandardOpenOption.WRITE)){
+            var bytes=java.nio.charset.StandardCharsets.UTF_8.encode(state.toString());
+            while(bytes.hasRemaining())stateFile.write(bytes);stateFile.force(true);
+        }
+        server.getPlayerList().saveAll();
         server.saveEverything(true,true,true);
+        if("crash".equals(System.getenv("CITIZENS_LOGGING_AUDIT_PHASE"))){
+            var run=System.getenv("CITIZENS_LOGGING_AUDIT_RUN");
+            if(run==null||!run.matches("[0-9a-f]{32}"))throw new IllegalStateException("Missing logging crash run identity");
+            org.slf4j.LoggerFactory.getLogger("interactions").info("[LOGGINGAUDIT] KILL_READY pid={} actor={} operation={} run={} checks={}",
+                    ProcessHandle.current().pid(),actor.getUUID(),receipt.operationId(),run,passed);
+            while(true)java.util.concurrent.locks.LockSupport.parkNanos(100_000_000L);
+        }
         org.slf4j.LoggerFactory.getLogger("interactions").info("[LOGGINGAUDIT] COMPLETE {} checks",passed);finish(server);
     }
     private static void recover(net.minecraft.server.MinecraftServer server) throws Exception {
         var state=com.google.gson.JsonParser.parseString(java.nio.file.Files.readString(server.getServerDirectory().resolve("logging-restart-state.json"))).getAsJsonObject();var level=server.overworld();
+        var run=System.getenv("CITIZENS_LOGGING_AUDIT_RUN");
+        if(run!=null&&!run.equals(state.get("run").getAsString()))throw new IllegalStateException("Different logging crash fixture run");
         actor=new ServerPlayer(server,level,new com.mojang.authlib.GameProfile(UUID.fromString(state.get("actor").getAsString()),"LoggingActor"),ClientInformation.createDefault());actor.setPos(9.5,-60,5.5);channel=connect(actor);
         var economy=net.yuuniverse.economy.api.YuuniverseEconomyApi.current().orElseThrow();var api=economy.commerceApi().orElseThrow();
         check(economy.balance(actor.getUUID(),state.get("currency").getAsString())==state.get("balance").getAsLong(),"native_restart_preserves_settled_balance_after_world_rollback");

@@ -29,6 +29,13 @@ Exact artifact sources, SHA-512/SHA-256 hashes and installation paths are record
 
 ## Ordered adaptation backlog
 
+Progress 2026-10-22, UTC+08:00: [logging process-kill recovery](logging-crash-recovery-2026-10-22.md)
+retains both complete logger histories, container components and the original
+Economy settlement through a forced JVM termination after flush and explicit
+player/world saves (37 native + eight restart checks). SQLite integrity checks
+also pass. Queue overflow, write-interior failures, retention, production load
+and integrated clients remain required.
+
 Progress 2026-10-22, UTC+08:00: [two-member reward acceptance](ftb-party-reward-acceptance-2026-10-22.md)
 adds 19 native checks for shared/individual party claims, offline payment, new and
 retired sessions, distinct repeat cycles and settlement after leaving. Original

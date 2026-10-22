@@ -69,7 +69,12 @@ each stopped database separately before any future retention migration. This
 batch does not delete or age records and does not claim indefinite operational
 capacity or full ADAPT-09 completion.
 
-Queue overflow, database failures, hard process termination, retention tooling,
+The [2026-10-22 process-kill follow-up](logging-crash-recovery-2026-10-22.md)
+now verifies a forced JVM termination after observed flush and explicit saved
+player/world state, with all 37 native and eight restart checks passing. It also
+records read-only integrity checks for the two SQLite databases.
+
+Queue overflow, database failures, termination during writes, retention tooling,
 wider modded inventories/entities, explosion/fire attribution, production load,
 and integrated physical clients remain open. The combined provider fixture needs
 Economy's 21.1.247 floor; the Citizens 21.1.233 baseline is validated separately.

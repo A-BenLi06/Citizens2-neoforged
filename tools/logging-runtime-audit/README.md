@@ -24,6 +24,19 @@ The init script adds the probe only to the dialogue source set. Run a standard
 `clean test build` afterward and inspect release JARs to exclude the probe and
 provider classes. Logs and synthetic databases stay under ignored `artifacts/`.
 
-This covers bounded burst retention and clean restart, not queue overflow,
-process-kill durability, timed history expiry, unrestricted world/financial
-rollback, production performance or physical VR/non-VR clients.
+For an actual forced termination after observed native histories and saved
+player/world state:
+
+```powershell
+./tools/run-logging-crash-audit.ps1 -JavaHome $env:JAVA_HOME -LogPrefix logging-crash-248
+```
+
+The runner uses separate build/project-cache directories, a fresh run token and
+the exact fresh JVM argument-file path. It retains the termination record and
+killed/recovered logs; recovery requires the same saved run identity. See
+`docs/logging-crash-recovery-2026-10-22.md` for the accepted 37 + 8 assertions.
+
+This covers bounded burst retention and the stated flushed/saved process-kill
+boundary. Queue overflow, termination during writes, timed history expiry,
+unrestricted world/financial rollback, production performance and physical clients
+remain separate acceptance.

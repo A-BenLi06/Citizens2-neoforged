@@ -1,9 +1,11 @@
 allprojects {
+    def auditBuild = gradle.startParameter.projectProperties.get('loggingAuditBuildDir')
+    if (auditBuild != null) layout.buildDirectory.set(file(auditBuild))
     afterEvaluate { p ->
         if (p.extensions.findByName('neoForge') == null) return
         def fixture = p.file('../artifacts/logging-audit-server')
         def phase = p.findProperty('loggingAuditPhase') ?: 'native'
-        if (!(phase in ['native', 'recover'])) throw new GradleException('Unknown logging audit phase')
+        if (!(phase in ['native', 'crash', 'recover'])) throw new GradleException('Unknown logging audit phase')
         p.sourceSets.dialogue.java.srcDir(p.file('../tools/logging-runtime-audit'))
         p.sourceSets.dialogue.compileClasspath += p.files(p.fileTree(new File(fixture, 'mods')) { include '*.jar' },
                 p.fileTree(new File(fixture, 'compile-libs')) { include '*.jar' })
@@ -23,6 +25,7 @@ allprojects {
         }
         p.tasks.named('runServer') {
             environment 'CITIZENS_LOGGING_AUDIT_PHASE', phase
+            if (p.hasProperty('loggingAuditRun')) environment 'CITIZENS_LOGGING_AUDIT_RUN', p.property('loggingAuditRun')
             timeout = java.time.Duration.ofMinutes(3)
             doLast {
                 def log = new File(fixture, 'logs/latest.log').getText('UTF-8')
