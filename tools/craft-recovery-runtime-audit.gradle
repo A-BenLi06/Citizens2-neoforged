@@ -6,7 +6,7 @@ allprojects {
         if (!fixture.toPath().toAbsolutePath().normalize().startsWith(p.file('../artifacts').toPath().toAbsolutePath().normalize()))
             throw new GradleException('Craft recovery fixture must be inside artifacts')
         def phase = p.property('craftRecoveryPhase')
-        if (!(phase in ['seed', 'recover'])) throw new GradleException('Unknown craft recovery phase')
+        if (!(phase in ['seed', 'recover', 'bindings'])) throw new GradleException('Unknown craft recovery phase')
         p.sourceSets.main.java.srcDir(p.file('../tools/craft-recovery-runtime-audit'))
         p.sourceSets.main.compileClasspath += p.files(p.fileTree(new File(fixture, 'mods')) { include '*.jar' })
         p.neoForge.runs.named('server') { gameDirectory = fixture }
@@ -22,6 +22,7 @@ allprojects {
         }
         p.tasks.named('runServer') {
             environment 'CITIZENS_CRAFT_RECOVERY_PHASE', phase
+            if (phase == 'bindings') environment 'CITIZENS_CRAFT_BINDING_SOURCE', p.file(p.property('craftBindingSource')).absolutePath
             timeout = java.time.Duration.ofMinutes(4)
             doLast {
                 def log = new File(fixture, 'logs/latest.log').getText('UTF-8')

@@ -1,5 +1,11 @@
 # Crafting outcomes and quest evidence journal
 
+Update 2026-10-22, UTC+08:00: [craft binding validation](craft-binding-validation-2026-10-22.md)
+adds companion validation under exclusive journal ownership, after complete
+history loading and before PREPARED recovery writes. A rejected companion leaves
+durable history unchanged and releases ownership. Public journal opening retains
+its existing behavior; the craft service supplies its binding validator.
+
 Follow-up: [explicit craft task projection](ftb-craft-evidence-projection-2026-10-18.md)
 now supplies production recipe bindings, durable team/quest/cycle generations,
 absolute CustomTask projection and authenticated review commands. It supersedes

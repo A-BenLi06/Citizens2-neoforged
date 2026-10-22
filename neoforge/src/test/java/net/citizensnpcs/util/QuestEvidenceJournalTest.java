@@ -71,6 +71,54 @@ class QuestEvidenceJournalTest {
         }
     }
 
+    @Test void companionValidationHoldsOwnershipAndPrecedesRecoveryPublication() throws Exception {
+        String id;
+        try (var journal = QuestEvidenceJournal.open(directory)) {
+            id = journal.admit(admission(journal.generation(scope, 0), UUID.randomUUID(), 4)).id();
+        }
+        var before = recordImages();
+        var failure = assertThrows(IOException.class, () -> QuestEvidenceJournal.open(directory, () -> {
+            assertThrows(IOException.class, () -> QuestEvidenceJournal.open(directory));
+            assertEquals(before, recordImages());
+            throw new IOException("Invalid companion binding");
+        }));
+        assertEquals("Invalid companion binding", failure.getMessage());
+        assertEquals(before, recordImages());
+        try (var journal = QuestEvidenceJournal.open(directory, () -> assertEquals(before, recordImages()))) {
+            var recovered = journal.entries().getFirst();
+            assertEquals(id, recovered.id());
+            assertEquals(State.REVIEW, recovered.state());
+            assertEquals(Outcome.MISSING, recovered.outcome());
+            assertEquals(1, recovered.revision());
+        }
+    }
+
+    @Test void damagedHistoryRejectsBeforeCompanionValidationAndRecovery() throws Exception {
+        Path path;
+        try (var journal = QuestEvidenceJournal.open(directory)) {
+            var entry = journal.admit(admission(journal.generation(scope, 0), UUID.randomUUID(), 4));
+            path = directory.resolve("entry-" + entry.id() + "-0.json");
+        }
+        String original = Files.readString(path);
+        Files.writeString(path, original.replace("\"recipeRevision\"", "\"unknownRevision\""));
+        var before = recordImages();
+        assertThrows(IOException.class, () -> QuestEvidenceJournal.open(directory, () -> fail("Damaged history reached companion validation")));
+        assertEquals(before, recordImages());
+        Files.writeString(path, original);
+        try (var journal = QuestEvidenceJournal.open(directory)) {
+            assertEquals(State.REVIEW, journal.entries().getFirst().state());
+        }
+    }
+
+    private java.util.Map<String, String> recordImages() throws IOException {
+        var images = new java.util.TreeMap<String, String>();
+        try (var paths = Files.list(directory)) {
+            for (var path : paths.filter(p -> p.toString().endsWith(".json")).toList())
+                images.put(path.getFileName().toString(), Files.readString(path));
+        }
+        return images;
+    }
+
     @Test void payloadConflictsAndContradictoryOutcomesPreserveAcceptedEvidence() throws Exception {
         try (var journal=QuestEvidenceJournal.open(directory)) {
             var generation=journal.generation(scope,0); UUID observation=UUID.randomUUID();

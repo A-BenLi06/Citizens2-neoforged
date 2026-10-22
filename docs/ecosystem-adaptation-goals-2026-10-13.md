@@ -8,6 +8,12 @@ Citizens retains NPC behavior and its existing native extension contracts. Yuuni
 
 ## Selected artifacts and sides
 
+Progress 2026-10-22, UTC+08:00: [craft binding validation](craft-binding-validation-2026-10-22.md)
+preserves binding field types and rejects damaged/incomplete companions before
+restart recovery writes, while retaining exclusive journal ownership. Fresh
+acceptance passes 82 native craft checks, 263 Create checks and 825 ordinary tests
+per target. Wider recovery, migration, provider and deferred client gates remain.
+
 Progress 2026-10-22, UTC+08:00: [craft recovery isolation](craft-recovery-isolation-2026-10-22.md)
 recovers valid original scopes before reporting independent invalid targets.
 Offline native crafting/restart/repair passes36 checks across both targets;

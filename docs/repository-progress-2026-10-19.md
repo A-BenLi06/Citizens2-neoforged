@@ -10,6 +10,13 @@ This review covers repository structure, native implementation boundaries, upstr
 
 ## Repository and implementation boundaries
 
+Update 2026-10-22, UTC+08:00: [craft binding validation](craft-binding-validation-2026-10-22.md)
+rejects coerced/duplicate binding data and validates companions under exclusive
+journal ownership before recovery publication. Eleven reproduced damage cases
+now reject unchanged; exact restoration reopens. Fresh acceptance passes 82 native
+craft checks across both targets, 263 Create checks and 825 ordinary tests each.
+Wider recovery/retention, migration and deferred physical-client gates remain open.
+
 Update 2026-10-22, UTC+08:00: [craft recovery isolation](craft-recovery-isolation-2026-10-22.md)
 prevents an invalid target from starving unrelated confirmed crafts during offline
 administrator reconciliation. Both native versions pass the actual-craft/restart/

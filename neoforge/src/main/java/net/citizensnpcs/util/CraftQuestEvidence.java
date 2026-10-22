@@ -14,7 +14,6 @@ import java.util.Map;
 import java.util.UUID;
 
 import com.google.gson.Gson;
-import com.google.gson.JsonParser;
 import net.citizensnpcs.api.event.CraftingOutcomeEvent;
 import net.citizensnpcs.api.event.CraftingResultEvent;
 import net.citizensnpcs.api.util.PermissionUtil;
@@ -66,29 +65,28 @@ public final class CraftQuestEvidence implements AutoCloseable {
         if (!server.isSameThread()) throw new IllegalStateException("Craft evidence requires the server thread");
         this.server = server; this.directory = directory.toAbsolutePath().normalize();
         Files.createDirectories(this.directory.resolve("bindings"));
-        journal = QuestEvidenceJournal.open(this.directory.resolve("journal"));
+        journal = QuestEvidenceJournal.open(this.directory.resolve("journal"), this::loadBindings);
         try {
-            try (var files = Files.list(this.directory.resolve("bindings"))) {
-                for (Path path : files.sorted().toList()) {
-                    String name = path.getFileName().toString();
-                    if (name.contains(".json.tmp-")) throw new IOException("Incomplete craft binding requires review: " + name);
-                    if (!name.endsWith(".json")) continue;
-                    try {
-                        var payload = JsonParser.parseString(Files.readString(path)).getAsJsonObject();
-                        var expected = java.util.Arrays.stream(Binding.class.getRecordComponents()).map(java.lang.reflect.RecordComponent::getName)
-                                .collect(java.util.stream.Collectors.toSet());
-                        if (!payload.keySet().equals(expected)) throw new IllegalArgumentException("Unknown binding fields");
-                        Binding binding = JSON.fromJson(payload, Binding.class);
-                        if (!name.equals(binding.taskId() + ".json") || bindings.putIfAbsent(binding.taskId(), binding) != null)
-                            throw new IllegalArgumentException("Binding identity mismatch");
-                    } catch (RuntimeException invalid) { throw new IOException("Invalid craft binding: " + name, invalid); }
-                }
-            }
             // Register only after every persistent record is validated. Opening never changes native progress.
             NeoForge.EVENT_BUS.register(this);
-        } catch (IOException | RuntimeException | Error failure) {
+        } catch (RuntimeException | Error failure) {
             try { journal.close(); } catch (IOException cleanup) { failure.addSuppressed(cleanup); }
             throw failure;
+        }
+    }
+
+    private void loadBindings() throws IOException {
+        try (var files = Files.list(directory.resolve("bindings"))) {
+            for (Path path : files.sorted().toList()) {
+                String name = path.getFileName().toString();
+                if (name.contains(".json.tmp-")) throw new IOException("Incomplete craft binding requires review: " + name);
+                if (!name.endsWith(".json")) continue;
+                try {
+                    Binding binding = JournalJson.decode(JSON, JournalJson.parse(Files.readString(path)), Binding.class);
+                    if (!name.equals(binding.taskId() + ".json") || bindings.putIfAbsent(binding.taskId(), binding) != null)
+                        throw new IllegalArgumentException("Binding identity mismatch");
+                } catch (RuntimeException invalid) { throw new IOException("Invalid craft binding: " + name, invalid); }
+            }
         }
     }
 

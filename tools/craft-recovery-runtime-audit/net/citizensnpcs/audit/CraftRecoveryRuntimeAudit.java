@@ -32,7 +32,12 @@ public final class CraftRecoveryRuntimeAudit {
         if (server.getTickCount() < 20 || !level.isPositionEntityTicking(new BlockPos(1, -60, 1))) return;
         ran = true;
         try {
-            if (System.getenv("CITIZENS_CRAFT_RECOVERY_PHASE").equals("seed")) seed(server); else recover(server);
+            switch (System.getenv("CITIZENS_CRAFT_RECOVERY_PHASE")) {
+                case "seed" -> seed(server);
+                case "recover" -> recover(server);
+                case "bindings" -> checks = CraftBindingRuntimeAudit.run(server);
+                default -> throw new IllegalArgumentException("Unknown craft recovery phase");
+            }
             log("COMPLETE " + checks + " phase=" + System.getenv("CITIZENS_CRAFT_RECOVERY_PHASE"));
         } catch (Throwable failure) { org.slf4j.LoggerFactory.getLogger("citizens").error("[CRAFTRECOVERY] FAILED", failure); }
         finally { server.halt(false); }

@@ -1,5 +1,10 @@
 # Explicit FTB craft bindings and retained progress
 
+Update 2026-10-22, UTC+08:00: [craft binding validation](craft-binding-validation-2026-10-22.md)
+preserves declared JSON field types and validates all bindings under the journal
+lock before missing-outcome recovery can publish. Invalid/incomplete companions
+reject without changing durable records; exact restoration releases the gate.
+
 Update 2026-10-22, UTC+08:00: [craft recovery isolation](craft-recovery-isolation-2026-10-22.md)
 attempts valid original task/generation scopes even when another target is invalid.
 Remaining failures retain their evidence and report original task/team/cycle

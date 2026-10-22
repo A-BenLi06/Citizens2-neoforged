@@ -73,9 +73,17 @@ public final class QuestEvidenceJournal implements AutoCloseable {
         }
     }
 
-    public static QuestEvidenceJournal open(Path directory) throws IOException { return new QuestEvidenceJournal(directory); }
+    @FunctionalInterface
+    interface OpenValidation { void validate() throws IOException; }
 
-    private QuestEvidenceJournal(Path directory) throws IOException {
+    public static QuestEvidenceJournal open(Path directory) throws IOException { return open(directory, () -> { }); }
+
+    /** Validate companion records under exclusive ownership before publishing restart recovery. */
+    static QuestEvidenceJournal open(Path directory, OpenValidation validation) throws IOException {
+        return new QuestEvidenceJournal(directory, Objects.requireNonNull(validation));
+    }
+
+    private QuestEvidenceJournal(Path directory, OpenValidation validation) throws IOException {
         this.directory = directory.toAbsolutePath().normalize();
         Files.createDirectories(this.directory);
         lockChannel = FileChannel.open(this.directory.resolve(".journal.lock"), StandardOpenOption.CREATE, StandardOpenOption.WRITE);
@@ -86,6 +94,7 @@ public final class QuestEvidenceJournal implements AutoCloseable {
             if (acquired == null) throw new IOException("Evidence journal is already open");
             lock = acquired;
             load();
+            validation.validate();
             // No old process can deliver its native return after this lock is acquired.
             for (Entry entry : List.copyOf(entries.values())) if (entry.state() == State.PREPARED)
                 replace(new Entry(entry.id(), entry.revision()+1, entry.admission(), State.REVIEW, Outcome.MISSING, null, entry.createdAt(), now()));
