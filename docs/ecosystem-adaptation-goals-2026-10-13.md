@@ -8,6 +8,13 @@ Citizens retains NPC behavior and its existing native extension contracts. Yuuni
 
 ## Selected artifacts and sides
 
+Progress 2026-10-22, UTC+08:00: [delivery storage and load probe](delivery-storage-acceptance-2026-10-22.md)
+verifies failed publication preserves original records and fences live/restarted
+consumption until review. The production implementation is unchanged. Real-file
+journals through 16,384 deliveries retain every chain; measured linear lookup and
+snapshot costs remain performance work. Full-device/provider failures, retention,
+other recovery and migration/client gates remain open.
+
 Progress 2026-10-22, UTC+08:00: [retained delivery checkpoint backing](delivery-checkpoint-history-2026-10-22.md)
 fences consumption when a saved player's checkpoint has no owned native outcome
 in the restored journal. Actual absent/latest-RESOLVED prefixes reject; matching

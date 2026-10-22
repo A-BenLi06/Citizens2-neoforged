@@ -10,6 +10,13 @@ This review covers repository structure, native implementation boundaries, upstr
 
 ## Repository and implementation boundaries
 
+Update 2026-10-22, UTC+08:00: [delivery storage acceptance](delivery-storage-acceptance-2026-10-22.md)
+adds real immutable-publication failures and damaged-history restoration tests
+(13 focused tests per target), plus 17 native consumption/restart checks. Journals
+of 1,024/4,096/16,384 deliveries retain all original chains and 43,008 revisions.
+Measured warm reload and linear lookup/snapshot costs are recorded; broader
+failure/retention/load and migration/client gates remain open.
+
 Update 2026-10-22, UTC+08:00: [delivery checkpoint history](delivery-checkpoint-history-2026-10-22.md)
 rejects saved checkpoints whose native outcome disappeared from a valid older
 journal prefix, including absent-actor and latest-RESOLVED prefixes. Consistent

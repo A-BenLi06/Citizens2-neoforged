@@ -1,0 +1,301 @@
+{
+  "createdAt": "2026-10-22T21:30:05.762003+08:00",
+  "timezone": "UTC+08:00",
+  "baseRevision": "e685d3e",
+  "productionSourceUnchanged": true,
+  "productionTree": {
+    "files": 612,
+    "algorithm": "SHA256 of sorted relative path + NUL + SHA256 lines joined by LF",
+    "sha256": "d1b4db96b70c3f62e9f1255228de5833bd1ede3f6b6f97043cbc5e95189b24b5"
+  },
+  "priorFullRegression": {
+    "path": "docs/delivery-checkpoint-history-validation-2026-10-22.json",
+    "bytes": 80049,
+    "sha256": "201f6fd35564088dad6717a027e35975e078c6aff3c15b9a3a5d2a9bc6640f96"
+  },
+  "priorReleaseArchivesVerified": true,
+  "focusedTests": [
+    {
+      "target": "21.1.248",
+      "result": {
+        "tests": 13,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "log": {
+        "path": "artifacts/delivery-storage-248-2026-10-22.log",
+        "bytes": 4734,
+        "sha256": "a505786aaee047d91ff174c6262e4095d7ea2d28c5249cf539d85962fec92a32"
+      },
+      "xml": [
+        {
+          "path": "artifacts/delivery-storage-ordinary-21.1.248-build/test-results/test/TEST-net.citizensnpcs.util.QuestDeliveryJournalTest.xml",
+          "bytes": 1518,
+          "sha256": "c858a64f65b260b2c01d2e2391cc07f19c2eaf3a8636d1d2e719b5724a6ec552"
+        },
+        {
+          "path": "artifacts/delivery-storage-ordinary-21.1.248-build/test-results/test/TEST-net.citizensnpcs.util.QuestDeliveryStorageTest.xml",
+          "bytes": 1137,
+          "sha256": "a5a52feea376162655de7c97284b4ff3490fb4a95bfb29196369b676c4df002c"
+        }
+      ]
+    },
+    {
+      "target": "21.1.233",
+      "result": {
+        "tests": 13,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "log": {
+        "path": "artifacts/delivery-storage-233-2026-10-22.log",
+        "bytes": 4855,
+        "sha256": "a43234479e367e39ba6e68c6011e90e101dd2eb65ca8f6a658da4701711a4289"
+      },
+      "xml": [
+        {
+          "path": "artifacts/delivery-storage-ordinary-21.1.233-build/test-results/test/TEST-net.citizensnpcs.util.QuestDeliveryJournalTest.xml",
+          "bytes": 1517,
+          "sha256": "e3a6e52e376feb90f9beb8e2678d673a7b616e33a90484a64d8a2f3fd0a96de7"
+        },
+        {
+          "path": "artifacts/delivery-storage-ordinary-21.1.233-build/test-results/test/TEST-net.citizensnpcs.util.QuestDeliveryStorageTest.xml",
+          "bytes": 1137,
+          "sha256": "8d99f6f688220647811dc889f3dd487188f76a251590e2724e3b9ff28259b71c"
+        }
+      ]
+    }
+  ],
+  "native": {
+    "checks": 17,
+    "identity": {
+      "actor": "168537d8-015c-43cc-920d-e3e3c8630d12",
+      "team": "168537d8-015c-43cc-920d-e3e3c8630d12",
+      "run": "60c7c620378243989056219bbbfd51b2",
+      "entry": "414bd456-b46e-4b11-9cd5-d067973694c1",
+      "reported": "java.lang.IllegalStateException: Quest delivery journal is unavailable; retain its files for review"
+    },
+    "logs": [
+      {
+        "path": "artifacts/delivery-storage-native-final-2026-10-22-failure.log",
+        "bytes": 19662,
+        "sha256": "3005608de9a9e2f3c5fbcc24f171be046d4164b0dfb27c61f89516be901704c5"
+      },
+      {
+        "path": "artifacts/delivery-storage-native-final-2026-10-22-recovered.log",
+        "bytes": 16246,
+        "sha256": "d35f8d0f355012b9f1dc597f3df5128fd30a0459e97fe33c6ab2f929e5dee035"
+      }
+    ],
+    "result": {
+      "path": "artifacts/delivery-storage-native-final-2026-10-22-result.json",
+      "bytes": 494,
+      "sha256": "f4ca5baa070691abc95a183d9b6df3f402dc38bd6800ffc9284a483b4521f2ad"
+    },
+    "state": {
+      "path": "artifacts/delivery-storage-60c7c620378243989056219bbbfd51b2-server/delivery-storage-state.json",
+      "bytes": 295,
+      "sha256": "55d9e8abeae2ee8131f7b87c653ed4386bb6d73921e14e57db4a088f4961e7c8"
+    },
+    "journal": [
+      {
+        "path": "artifacts/delivery-storage-60c7c620378243989056219bbbfd51b2-server/delivery-world/citizens/quest-deliveries/delivery-1-414bd456-b46e-4b11-9cd5-d067973694c1-0.json",
+        "bytes": 820,
+        "sha256": "56d74eb0ca7811f5be8392beee5e46c9c553d76aa01d757b2c759d53654c2852"
+      },
+      {
+        "path": "artifacts/delivery-storage-60c7c620378243989056219bbbfd51b2-server/delivery-world/citizens/quest-deliveries/delivery-1-414bd456-b46e-4b11-9cd5-d067973694c1-1.json",
+        "bytes": 864,
+        "sha256": "15c67de455260276820eb941bdc66564e1e880751585ab125c64ede7d28ec944"
+      },
+      {
+        "path": "artifacts/delivery-storage-60c7c620378243989056219bbbfd51b2-server/delivery-world/citizens/quest-deliveries/delivery-1-414bd456-b46e-4b11-9cd5-d067973694c1-2.json",
+        "bytes": 1046,
+        "sha256": "89ca1eed098bc79f8227802c8348b000d07f18860f9cfd570ab92cf5ecda597d"
+      },
+      {
+        "path": "artifacts/delivery-storage-60c7c620378243989056219bbbfd51b2-server/delivery-world/citizens/quest-deliveries/delivery-2-82219932-76c3-497b-b1ac-726122603c2b-0.json",
+        "bytes": 854,
+        "sha256": "0068cabdfe2e31041d3196e69ff3e4d6cbeddffe670180d2a0698289f17d9b05"
+      },
+      {
+        "path": "artifacts/delivery-storage-60c7c620378243989056219bbbfd51b2-server/delivery-world/citizens/quest-deliveries/delivery-2-82219932-76c3-497b-b1ac-726122603c2b-1.json",
+        "bytes": 1211,
+        "sha256": "2c3956d2529f4ceb1857805e4071cf5348b1ac9edc63e3d096abcd186b1e31c3"
+      }
+    ],
+    "player": {
+      "path": "artifacts/delivery-storage-60c7c620378243989056219bbbfd51b2-server/delivery-world/playerdata/168537d8-015c-43cc-920d-e3e3c8630d12.dat",
+      "bytes": 902,
+      "sha256": "13de0d3f2d8cad5352d6d0055ace585929ab3d9d700007833caec4c95ff1da69"
+    },
+    "team": {
+      "path": "artifacts/delivery-storage-60c7c620378243989056219bbbfd51b2-server/delivery-world/ftbquests/168537d8-015c-43cc-920d-e3e3c8630d12.snbt",
+      "bytes": 516,
+      "sha256": "ffb848bd78e0026e26dfd6245c00e3cfd451e1bc8c9ff672fece4ed7ccfd5595"
+    }
+  },
+  "load": {
+    "result": {
+      "path": "artifacts/delivery-storage-load-dd9a4127-9db8-4b8d-a0d8-b3c0ab4cf46b/result.json",
+      "bytes": 2462,
+      "sha256": "000123027bc76f6e7ac568bdd9d987033aa3ad7634ffcb6475a9329f03a6fd4c"
+    },
+    "log": {
+      "path": "artifacts/delivery-storage-load-2026-10-22.log",
+      "bytes": 4039,
+      "sha256": "d37c525279cf6bdc2a53e0f22063aa8874093d848aaf1ac9210cc2caa5cc404b"
+    },
+    "environment": {
+      "createdAt": "2026-10-22T21:21:06.742420900+08:00",
+      "run": "dd9a4127-9db8-4b8d-a0d8-b3c0ab4cf46b",
+      "java": "21.0.11+10-LTS",
+      "os": "Windows 10 10.0",
+      "processors": 8,
+      "maxHeapBytes": 2147483648,
+      "scope": "Journal API on real local files; warm filesystem cache; no Minecraft tick or production latency claim",
+      "complete": true
+    },
+    "samples": [
+      {
+        "entries": 1024,
+        "actors": 128,
+        "appendAndForceMillis": 13975.8718,
+        "appendThreadAllocatedBytes": 55854808,
+        "immutableFiles": 2048,
+        "immutableBytes": 1529947,
+        "warmReopenMillis": 1520.0155,
+        "reopenThreadAllocatedBytes": 65159160,
+        "latestLookupIterations": 10000,
+        "latestLookupNanosPerCall": 43051.91,
+        "latestLookupAllocatedBytesPerCall": 320.0584,
+        "snapshotIterations": 1000,
+        "snapshotNanosPerCall": 45456.6,
+        "snapshotAllocatedBytesPerCall": 8248.368,
+        "firstAdmissionSha256": "b3b78b5434737d68bc0060d04861248ba6afaa37c3b0febf6774e5c89fc738e6",
+        "retainedChainsAndImmutableImages": true,
+        "folder": "artifacts/delivery-storage-load-dd9a4127-9db8-4b8d-a0d8-b3c0ab4cf46b/entries-1024",
+        "recordsSha256": "5e6b0396af5b6ace543c07a3ebc7057db12bc28702a46ab17a7e10f21953f726"
+      },
+      {
+        "entries": 4096,
+        "actors": 128,
+        "appendAndForceMillis": 44147.0141,
+        "appendThreadAllocatedBytes": 193368176,
+        "immutableFiles": 8192,
+        "immutableBytes": 6162523,
+        "warmReopenMillis": 4083.0617,
+        "reopenThreadAllocatedBytes": 253361856,
+        "latestLookupIterations": 10000,
+        "latestLookupNanosPerCall": 142681.0,
+        "latestLookupAllocatedBytesPerCall": 296.0168,
+        "snapshotIterations": 1000,
+        "snapshotNanosPerCall": 33151.9,
+        "snapshotAllocatedBytesPerCall": 32824.168,
+        "firstAdmissionSha256": "05cf75340b41563236b9eb218767728155387aa755707bf6307cfe130f3f4193",
+        "retainedChainsAndImmutableImages": true,
+        "folder": "artifacts/delivery-storage-load-dd9a4127-9db8-4b8d-a0d8-b3c0ab4cf46b/entries-4096",
+        "recordsSha256": "081a0e40db8c1c99554160655e2b2831430c4be0e903cbd6c9b11eaa2bdeed12"
+      },
+      {
+        "entries": 16384,
+        "actors": 128,
+        "appendAndForceMillis": 179766.1403,
+        "appendThreadAllocatedBytes": 765981136,
+        "immutableFiles": 32768,
+        "immutableBytes": 24773902,
+        "warmReopenMillis": 11122.4412,
+        "reopenThreadAllocatedBytes": 1013302688,
+        "latestLookupIterations": 10000,
+        "latestLookupNanosPerCall": 724712.57,
+        "latestLookupAllocatedBytesPerCall": 296.0168,
+        "snapshotIterations": 1000,
+        "snapshotNanosPerCall": 104167.1,
+        "snapshotAllocatedBytesPerCall": 131128.168,
+        "firstAdmissionSha256": "d3929ccccd91c61820f1a9c7c4123dbb834a5a92ff12513be32c866299ca0557",
+        "retainedChainsAndImmutableImages": true,
+        "folder": "artifacts/delivery-storage-load-dd9a4127-9db8-4b8d-a0d8-b3c0ab4cf46b/entries-16384",
+        "recordsSha256": "371452dbdae3393a335194a343b646496142fde6bb99938b46f1381d12c14803"
+      }
+    ],
+    "fileIndex": {
+      "path": "artifacts/delivery-storage-load-files-2026-10-22.json",
+      "bytes": 11565045,
+      "sha256": "4448d3ce7efe880a46a409907eca74239cc6a808617276218081eac0a999fc1c"
+    },
+    "digestAlgorithm": "SHA256 of sorted relative path + NUL + SHA256 lines joined by LF"
+  },
+  "stopped": {
+    "path": "artifacts/delivery-storage-stopped-2026-10-22.json",
+    "bytes": 675,
+    "sha256": "b578e7e54ce4123c4af099a0180ad794a777d747cec12abd6abf3d6654bf657c"
+  },
+  "sources": [
+    {
+      "path": "neoforge/src/test/java/net/citizensnpcs/util/QuestDeliveryStorageTest.java",
+      "bytes": 8742,
+      "sha256": "3f0a5728d134d9c8fbee87c299e5177c5967706fdf780ff9da4a08a9a69ac98a"
+    },
+    {
+      "path": "tools/delivery-storage-audit.gradle",
+      "bytes": 898,
+      "sha256": "03cf79e30f6b6e665d68eaee14f4ed21aefa1bd2a3a8d8c2dbf10d6c2654bff7"
+    },
+    {
+      "path": "tools/delivery-storage-audit/net/citizensnpcs/audit/DeliveryStorageAudit.java",
+      "bytes": 6643,
+      "sha256": "6d59b4d1b607a20748395463f144e7e6ee5c033af3d91f47aa61625ca5bba55b"
+    },
+    {
+      "path": "tools/delivery-runtime-audit.gradle",
+      "bytes": 2458,
+      "sha256": "e87787f77ead44d4380ade4cd21552f2feef4982a9e5afe0de01d39280d2152d"
+    },
+    {
+      "path": "tools/delivery-runtime-audit/net/citizensnpcs/audit/delivery/DeliveryRuntimeAudit.java",
+      "bytes": 16145,
+      "sha256": "12fecccb1abc497cb0a92decc8121bf225b933cf5a435c99a47334e18dd39e6a"
+    },
+    {
+      "path": "tools/delivery-runtime-audit/net/citizensnpcs/audit/delivery/DeliveryStorageRuntimeAudit.java",
+      "bytes": 8627,
+      "sha256": "6d84a59cd91ff8dfc1bf0fbd555ca9ebaa82b05a6f04911258a1266fc461123c"
+    },
+    {
+      "path": "tools/run-delivery-storage-audit.ps1",
+      "bytes": 2880,
+      "sha256": "5dfb70ef1f530bcf6e63e9282d1ed2b4d14010ca86e531a5aa09adf5971ddabb"
+    }
+  ],
+  "providers": [
+    {
+      "path": "artifacts/delivery-storage-60c7c620378243989056219bbbfd51b2-server/mods/architectury-13.0.11-neoforge.jar",
+      "bytes": 584734,
+      "sha256": "9cc92f2c09533fc5482c60f993bd891c655a0e32b637037cdcb7c2b23adedeeb"
+    },
+    {
+      "path": "artifacts/delivery-storage-60c7c620378243989056219bbbfd51b2-server/mods/ftb-library-neoforge-2101.1.37.jar",
+      "bytes": 1439881,
+      "sha256": "624c2d2d1cbadb946d967e17757bd5b2d129d4d3ed71f2da0c70607d04476ac2"
+    },
+    {
+      "path": "artifacts/delivery-storage-60c7c620378243989056219bbbfd51b2-server/mods/ftb-quests-neoforge-2101.1.36.jar",
+      "bytes": 1609984,
+      "sha256": "6a39982c4b3afc00b1e788041a4f0d394e1659e3b3a6e5d078cd790bc36d0018"
+    },
+    {
+      "path": "artifacts/delivery-storage-60c7c620378243989056219bbbfd51b2-server/mods/ftb-teams-neoforge-2101.1.11.jar",
+      "bytes": 308236,
+      "sha256": "e6bcd670493624e6906df872a9c6af4a33fe6405cac57a32c59cd4cd5838c655"
+    }
+  ],
+  "limits": [
+    "Publication collisions are real IO failures, not disk-full/fsync/device-loss or provider-wide failure acceptance",
+    "Warm local filesystem and journal API workload do not establish Minecraft tick or production latency",
+    "Linear retained-history lookup and snapshot costs remain; no pruning or retention policy added",
+    "Other journals/loggers, broader recovery, original migration provenance and deferred physical clients remain"
+  ],
+  "productionDeploymentChanged": false
+}

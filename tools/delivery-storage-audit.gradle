@@ -1,0 +1,18 @@
+allprojects {
+    layout.buildDirectory.set(file('../artifacts/delivery-storage-load-build'))
+    afterEvaluate { p ->
+        p.sourceSets.create('storageAudit') {
+            java.srcDir(p.file('../tools/delivery-storage-audit'))
+            compileClasspath += p.sourceSets.main.output + p.sourceSets.main.compileClasspath
+            runtimeClasspath += output + compileClasspath + p.sourceSets.main.runtimeClasspath
+        }
+        p.tasks.register('runDeliveryStorageAudit', JavaExec) {
+            dependsOn p.tasks.named('storageAuditClasses')
+            classpath = p.sourceSets.storageAudit.runtimeClasspath
+            mainClass = 'net.citizensnpcs.audit.DeliveryStorageAudit'
+            javaLauncher = p.javaToolchains.launcherFor { languageVersion = JavaLanguageVersion.of(21) }
+            maxHeapSize = '2G'
+            args p.file('../artifacts').absolutePath
+        }
+    }
+}

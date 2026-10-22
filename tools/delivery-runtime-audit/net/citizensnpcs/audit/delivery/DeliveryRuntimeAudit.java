@@ -39,6 +39,8 @@ public final class DeliveryRuntimeAudit {
     private static String phase, killBoundary;
     @SubscribeEvent public static void tick(ServerTickEvent.Post event) {
         if (ran) return; ran = true;
+        String storage = System.getenv("CITIZENS_DELIVERY_AUDIT_STORAGE");
+        if (storage != null) { DeliveryStorageRuntimeAudit.run(event.getServer(), storage); return; }
         String history = System.getenv("CITIZENS_DELIVERY_AUDIT_HISTORY");
         if (history != null) { DeliveryHistoryRuntimeAudit.run(event.getServer(), history); return; }
         String mutation = System.getenv("CITIZENS_DELIVERY_AUDIT_MUTATION");
@@ -72,6 +74,7 @@ public final class DeliveryRuntimeAudit {
         }
     }
     public static void boundary(String point, ServerPlayer player) {
+        DeliveryStorageRuntimeAudit.boundary(point, player);
         DeliveryHistoryRuntimeAudit.boundary(point, player);
         if (actor == null || player != null && player != actor) return;
         if (reenter && point.equals("before")) {

@@ -79,6 +79,14 @@ Other unresolved entries can still fence the next attempt.
 
 ## Acceptance and limits
 
+Follow-up 2026-10-22, UTC+08:00: [delivery storage acceptance](delivery-storage-acceptance-2026-10-22.md)
+adds 13 focused journal/storage tests per target and 17 native confirmation-write
+failure/restart assertions. Previously consumed paper and progress remain intact;
+review permits only the remaining delivery. A real-file probe preserves all chains
+through 16,384 deliveries and records warm reload, lookup and allocation costs.
+This adds bounded storage evidence, without automatic retention or production
+latency/full-device-failure claims.
+
 Follow-up 2026-10-22, UTC+08:00: [saved checkpoint history](delivery-checkpoint-history-2026-10-22.md)
 also validates every present player checkpoint against its retained owned native
 outcome before admission. A valid older journal prefix can otherwise appear fresh

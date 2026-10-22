@@ -24,7 +24,7 @@ allprojects {
             }
         }
         p.tasks.named('runServer') {
-            for (name in ['Phase','Boundary','Run','Mutation','History','Shape']) if (p.hasProperty('deliveryAudit' + name))
+            for (name in ['Phase','Boundary','Run','Mutation','History','Shape','Storage']) if (p.hasProperty('deliveryAudit' + name))
                 environment 'CITIZENS_DELIVERY_AUDIT_' + name.toUpperCase(), p.property('deliveryAudit' + name)
             timeout = java.time.Duration.ofMinutes(3)
             doLast {
