@@ -8,6 +8,15 @@ Citizens retains NPC behavior and its existing native extension contracts. Yuuni
 
 ## Selected artifacts and sides
 
+Progress 2026-10-22, UTC+08:00: [commerce financial backup validation](commerce-financial-backup-recovery-2026-10-22.md)
+now rechecks the online actor's retained settlements before replay, new attribution
+or review resolution. Thirty-nine native stopped-restore checks cover lower/equal/
+higher ledger sequences and matching restoration; 90 selected integration checks,
+775 ordinary tests on each target and 100 Interactions tests pass. Original
+evidence and native trades retain ownership. Shared/offline settlement validation,
+monetary reward admission and history throughput remain separate open gates.
+The user deferred the physical ordinary-client run; its fixture remains pinned.
+
 | Provider | Selected version | Deployment role |
 |---|---|---|
 | Yuuniverse Economy | Active 0.4.1-SNAPSHOT; validated 0.5.0-SNAPSHOT prepared from `072703c`, tooling `9d501be` | Server economy/GUI owner. The user-authorized update is staged for the next planned restart; see the preparation record below. |

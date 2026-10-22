@@ -95,11 +95,12 @@ public final class CommerceQuestTasks implements AutoCloseable {
                 position.id(), position.sequence(), shopType, shopId, itemKey, action, measure, currencyId, requireDelivery, actor.getUUID(), System.currentTimeMillis()));
     }
     private void starting(Event event) {
-        if (closed) return;
+        if (closed || journal.bindings().isEmpty()) return;
         try {
             active(); ServerPlayer actor = (ServerPlayer) property(event, "player"); online(actor);
             Object nativeRequest = property(event, "request"), nativePosition = property(event, "journalPosition");
             var request = request(nativeRequest, actor); var position = new Position((UUID) property(nativePosition, "journalId"), ((Number) property(nativePosition, "sequence")).longValue());
+            validateRetained(provider(actor), actor, position);
             for (Binding binding : journal.bindings()) if (CommerceTaskJournal.matches(binding, request)) {
                 try {
                     journal.cursor(binding, actor.getUUID(), position.id(), position.sequence());
@@ -124,6 +125,7 @@ public final class CommerceQuestTasks implements AutoCloseable {
         active(); online(actor); if (!processing.add(actor.getUUID())) throw new IllegalStateException("Commerce replay is already active for this actor");
         try {
             Object provider = provider(actor); Position position = position(provider, actor); int count = 0;
+            validateRetained(provider, actor, position);
             for (Binding binding : journal.bindings()) {
                 long cursor = journal.cursor(binding, actor.getUUID(), position.id(), position.sequence());
                 List<?> page = reflected(() -> (List<?>) Class.forName(API + "CommerceApi").getMethod("history", UUID.class, long.class, int.class).invoke(provider, actor.getUUID(), cursor, 100));
@@ -180,6 +182,17 @@ public final class CommerceQuestTasks implements AutoCloseable {
         String state = ((Enum<?>) property(outcome, "state")).name();
         return state.equals("COMMITTED") || !binding.requireDelivery() && state.equals("DELIVERY_PENDING");
     }
+    /** A restored ledger can catch up its sequence with unrelated trades while losing admitted settlements. */
+    private void validateRetained(Object provider, ServerPlayer actor, Position position) {
+        for (Binding binding : journal.bindings()) journal.cursor(binding, actor.getUUID(), position.id(), position.sequence());
+        for (Entry entry : journal.entries()) if (entry.request().actorId().equals(actor.getUUID())
+                && (entry.state() == State.WAITING || entry.state() == State.CONFIRMED || entry.state() == State.APPLIED)) {
+            Object outcome = outcome(provider, actor, entry.receipt().operationId());
+            validateOutcome(entry.receipt(), outcome);
+            if (entry.state() != State.WAITING && !settled(entry.binding(), outcome))
+                throw new IllegalStateException("Retained receipt inventory outcome is unresolved");
+        }
+    }
     private void project(Binding binding, UUID team, int cycle) throws IOException {
         var target = FtbQuestTasks.evidenceTarget(server, team, binding.taskId()); validate(binding, target);
         journal.validateCycle(binding, team, target.cycle());
@@ -209,6 +222,7 @@ public final class CommerceQuestTasks implements AutoCloseable {
         authorize(source, true); Entry entry = journal.entry(id); var binding = entry.binding();
         var actor = server.getPlayerList().getPlayer(entry.request().actorId()); online(actor);
         Object provider = provider(actor); Position position = position(provider, actor); journal.cursor(binding, actor.getUUID(), position.id(), position.sequence());
+        validateRetained(provider, actor, position);
         Object outcome = outcome(provider, actor, entry.receipt().operationId()); validateOutcome(entry.receipt(), outcome);
         if (accept && !settled(binding, outcome)) throw new IllegalStateException("Provider inventory outcome is still unresolved");
         Attribution attribution = entry.attribution();

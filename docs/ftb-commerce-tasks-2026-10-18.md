@@ -58,6 +58,14 @@ uniqueness and checkpoint evidence manifests detect inconsistent retained histor
 Cursor checkpoints follow durable retention of all matching rows, including REVIEW.
 Provider UUID changes and observed global high-water regression stop replay.
 
+Since 2026-10-22, replay, new attribution and administrator resolution also
+revalidate the current online actor's retained WAITING/CONFIRMED/APPLIED receipts
+through the public operation lookup. Equal or higher sequence after unrelated
+trades cannot hide a missing admitted settlement. Consumer rejection preserves
+native money/items/progress and does not cancel Economy trades. See the
+[financial backup recovery boundary](commerce-financial-backup-recovery-2026-10-22.md)
+for stopped-restore evidence and the separate shared/offline/reward gates.
+
 FTB saves independently. A process kill can leave retained APPLIED while FTB still
 has an older progress total. Reconciliation rechecks the original public settlements
 and restores the exact absolute total; it does not execute another trade. Lower

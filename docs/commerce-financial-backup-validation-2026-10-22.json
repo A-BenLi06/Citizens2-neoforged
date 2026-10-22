@@ -1,0 +1,339 @@
+{
+  "createdAt": "2026-10-22T14:53:35.240825+08:00",
+  "timezone": "UTC+08:00",
+  "neoForge": "21.1.248",
+  "nativeChecks": 39,
+  "nativeRun": {
+    "run": "170325b07e6845ed9007cbf434087208",
+    "fixture": "artifacts/financial-backup-170325b07e6845ed9007cbf434087208-server",
+    "neoForge": "21.1.248",
+    "createdAt": "2026-10-22T14:52:36.8193589+08:00",
+    "stages": [
+      {
+        "phase": "seed",
+        "checks": 3,
+        "log": "artifacts/financial-backup-verified-2026-10-22-seed.log"
+      },
+      {
+        "phase": "regressed",
+        "checks": 10,
+        "log": "artifacts/financial-backup-verified-2026-10-22-regressed.log"
+      },
+      {
+        "phase": "caughtup",
+        "checks": 10,
+        "log": "artifacts/financial-backup-verified-2026-10-22-caughtup.log"
+      },
+      {
+        "phase": "higher",
+        "checks": 10,
+        "log": "artifacts/financial-backup-verified-2026-10-22-higher.log"
+      },
+      {
+        "phase": "consistent",
+        "checks": 6,
+        "log": "artifacts/financial-backup-verified-2026-10-22-consistent.log"
+      }
+    ]
+  },
+  "originalIdentity": {
+    "run": "170325b07e6845ed9007cbf434087208",
+    "actor": "af51beb7-103b-47fb-9998-49ac48e38024",
+    "task": "4AF2A3752D131437",
+    "pendingTask": "233EDDB87D0BA205",
+    "boundShop": "financial-bound-af51beb7-103b-47fb-9998-49ac48e38024",
+    "entry": "7d7e99ebdccfc6017cd48f0e526f0049625af4c91e1edef6f0a08986cfaae7d6",
+    "operation": "996b3b1c-9929-4145-ac2c-571447237bc3",
+    "transaction": "82e124ed-ecff-434d-8165-8085d4c556c9",
+    "currency": "8d6810f0-d3f7-4bfc-8598-68f54b96f834",
+    "provider": "51784274-311f-43f9-b9e3-32303510b15b",
+    "sequence": 1,
+    "unrelatedShop": "financial-unbound-af51beb7-103b-47fb-9998-49ac48e38024"
+  },
+  "productionTree": {
+    "root": "neoforge/src/main",
+    "files": 611,
+    "algorithm": "SHA256 of sorted relative path + NUL + SHA256 lines joined by LF",
+    "sha256": "5ddfa5e2ce0c2c0d4c04a5f3af62ae6dd61d9c6f8954e351c3bcc781744480ea"
+  },
+  "sources": [
+    {
+      "path": "neoforge/src/main/java/net/citizensnpcs/util/CommerceQuestTasks.java",
+      "bytes": 27147,
+      "sha256": "236d4f67c15c3246ae15ea75099c5afe1ac5a4e4af4bc37da9e66883c350958f"
+    },
+    {
+      "path": "tools/financial-backup-runtime-audit.gradle",
+      "bytes": 2246,
+      "sha256": "98e8bdcabbf65e6eba89e23069c53921e2b870aa9e4a6bbe2c402d6bf44978e3"
+    },
+    {
+      "path": "tools/run-financial-backup-audit.ps1",
+      "bytes": 5080,
+      "sha256": "e4620ddbc34ba63793aac58e32b3edaed2913b89e53f4af0c4a022c5a35a71d5"
+    },
+    {
+      "path": "tools/financial-backup-runtime-audit/net/citizensnpcs/audit/FinancialBackupRuntimeAudit.java",
+      "bytes": 14038,
+      "sha256": "c097489deb5cde88dd027a71927c8f4d86cc2193009b75a604671f5ff5bc20d3"
+    }
+  ],
+  "nativeLogs": [
+    {
+      "path": "artifacts/financial-backup-verified-2026-10-22-seed.log",
+      "bytes": 16770,
+      "sha256": "2231d824f4666af65afacebd06c6f3e09f37dc72ab325f7b62cef267617420f6"
+    },
+    {
+      "path": "artifacts/financial-backup-verified-2026-10-22-regressed.log",
+      "bytes": 25010,
+      "sha256": "48dff6018b5620163d0c7853cdf8a0ef5e2dbff1dd9979e6f9b7e6d897aa51af"
+    },
+    {
+      "path": "artifacts/financial-backup-verified-2026-10-22-caughtup.log",
+      "bytes": 32884,
+      "sha256": "a0e00f50816024837914d6f5104c38f333bf2264253a6888f5d98bfdc3f49110"
+    },
+    {
+      "path": "artifacts/financial-backup-verified-2026-10-22-higher.log",
+      "bytes": 40772,
+      "sha256": "f6a30fbc5d13cab6f0afd1bda31a7084ecd84f0417e80cd4645e0eccbec7d8ea"
+    },
+    {
+      "path": "artifacts/financial-backup-verified-2026-10-22-consistent.log",
+      "bytes": 16775,
+      "sha256": "9967a154c222f8a2b0e9d39ce99dc3b71ecfb1d6e68ce7b13f493785935d93c8"
+    }
+  ],
+  "regression": {
+    "xmod": 44,
+    "commerce": 27,
+    "partyRewards": 19,
+    "log": {
+      "path": "artifacts/financial-xmod-2026-10-22.log",
+      "bytes": 161915,
+      "sha256": "f64a2a3cd4aa2422a946cb567841f765d1a8e6ed6ad769914f46fa34c6f1a1d9"
+    }
+  },
+  "ordinaryBuilds": [
+    {
+      "neoForge": "21.1.248",
+      "results": {
+        "tests": 775.0,
+        "failures": 0.0,
+        "errors": 0.0,
+        "skipped": 0.0,
+        "suites": 113
+      },
+      "summary": {
+        "path": "artifacts/financial-ordinary-248-tests-2026-10-22.json",
+        "bytes": 99,
+        "sha256": "8e247ea7e5af54901ce1871ce41ad9eaa1bcdcf4fbb342bafddf4111a7296849"
+      },
+      "log": {
+        "path": "artifacts/financial-ordinary-248-2026-10-22.log",
+        "bytes": 68837,
+        "sha256": "9b2468b467ed0b9fa6ebeb62e635bec375ee6c4ffe725bb7c39ec4c2813edfaf"
+      }
+    },
+    {
+      "neoForge": "21.1.233",
+      "results": {
+        "tests": 775.0,
+        "failures": 0.0,
+        "errors": 0.0,
+        "skipped": 0.0,
+        "suites": 113
+      },
+      "summary": {
+        "path": "artifacts/financial-ordinary-233-tests-2026-10-22.json",
+        "bytes": 99,
+        "sha256": "8e247ea7e5af54901ce1871ce41ad9eaa1bcdcf4fbb342bafddf4111a7296849"
+      },
+      "log": {
+        "path": "artifacts/financial-ordinary-233-2026-10-22.log",
+        "bytes": 68691,
+        "sha256": "4105d71a68c152d5822c15070f0050cf528e525ed67fa64f65d73c1c600111bc"
+      }
+    }
+  ],
+  "interactions": {
+    "results": {
+      "tests": 100,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "suites": 9
+    },
+    "log": {
+      "path": "artifacts/financial-interactions-2026-10-22.log",
+      "bytes": 9904,
+      "sha256": "bf60e5ce7b052e3c31116635a9e0629fcbc7e71494888182bd73316bcff744d2"
+    }
+  },
+  "packages": [
+    {
+      "path": "artifacts/financial-release-248-jars-2026-10-22/citizens-2.0.43-neoforge-SNAPSHOT-sources.jar",
+      "bytes": 1119866,
+      "sha256": "5cc3558e275b93134be697a3bd56bec20f5963a91ff5956d0597eeabc2dcf9f4",
+      "entries": 662,
+      "auditAndProviderClassesExcluded": true,
+      "separateOwnership": true
+    },
+    {
+      "path": "artifacts/financial-release-248-jars-2026-10-22/citizens-2.0.43-neoforge-SNAPSHOT.jar",
+      "bytes": 4064106,
+      "sha256": "8935166ad0da5a71a64e4bb89f8ddd8fe0c354fa60cb5e2bb94b6d03c8317c87",
+      "entries": 1090,
+      "auditAndProviderClassesExcluded": true,
+      "separateOwnership": true
+    },
+    {
+      "path": "artifacts/financial-release-248-jars-2026-10-22/yuuniverse-interactions-2.0.43-neoforge-SNAPSHOT.jar",
+      "bytes": 204146,
+      "sha256": "d2b42bba50be10f132e0b96b3b8d5e4d863e709f937f3253c884b563a0437f7a",
+      "entries": 82,
+      "auditAndProviderClassesExcluded": true,
+      "separateOwnership": true
+    },
+    {
+      "path": "artifacts/financial-release-233-jars-2026-10-22/citizens-2.0.43-neoforge-SNAPSHOT-sources.jar",
+      "bytes": 1119866,
+      "sha256": "d66aeb2e4634ea28e5a7e0f9e8186162ad06b7ad4fbc0310f053bf6e9d57295b",
+      "entries": 662,
+      "auditAndProviderClassesExcluded": true,
+      "separateOwnership": true
+    },
+    {
+      "path": "artifacts/financial-release-233-jars-2026-10-22/citizens-2.0.43-neoforge-SNAPSHOT.jar",
+      "bytes": 4064106,
+      "sha256": "49dc71730efa7bf8426dd11cd3149a23ad951476afaa980e707241715ecc4350",
+      "entries": 1090,
+      "auditAndProviderClassesExcluded": true,
+      "separateOwnership": true
+    },
+    {
+      "path": "artifacts/financial-release-233-jars-2026-10-22/yuuniverse-interactions-2.0.43-neoforge-SNAPSHOT.jar",
+      "bytes": 204146,
+      "sha256": "465323d7af83bd03f6b0328ee9bd3e98d0608520f2f621f50fb8fc44f96a2ea4",
+      "entries": 82,
+      "auditAndProviderClassesExcluded": true,
+      "separateOwnership": true
+    }
+  ],
+  "databaseIntegrity": [
+    {
+      "path": "artifacts/financial-backup-170325b07e6845ed9007cbf434087208-server/financial-before.db",
+      "bytes": 368640,
+      "sha256": "8fe53b0823406d076ac8c05e42519a2c3c496a1e79e57cf3a9855f556fdc6442",
+      "readOnlyQuickCheck": [
+        "ok"
+      ]
+    },
+    {
+      "path": "artifacts/financial-backup-170325b07e6845ed9007cbf434087208-server/financial-after.db",
+      "bytes": 368640,
+      "sha256": "c14a88bfa136585fa73c124c70596397942bd9576c1a80cc4120498c428d64b5",
+      "readOnlyQuickCheck": [
+        "ok"
+      ]
+    },
+    {
+      "path": "artifacts/financial-backup-170325b07e6845ed9007cbf434087208-server/financial-world/yuuniverse_economy/economy.db",
+      "bytes": 368640,
+      "sha256": "5cd17e19cd9f5b9c4154b37757f28eec217308e67217f1d3bd9571d470459ca9",
+      "readOnlyQuickCheck": [
+        "ok"
+      ]
+    }
+  ],
+  "providers": [
+    {
+      "path": "artifacts/financial-backup-170325b07e6845ed9007cbf434087208-server/mods/architectury-13.0.11-neoforge.jar",
+      "bytes": 584734,
+      "sha256": "9cc92f2c09533fc5482c60f993bd891c655a0e32b637037cdcb7c2b23adedeeb"
+    },
+    {
+      "path": "artifacts/financial-backup-170325b07e6845ed9007cbf434087208-server/mods/economy.jar",
+      "bytes": 14431850,
+      "sha256": "179115e5301ee6629acd3bdcbb6779d2549a35f7493821ab0fca79bcc43645f5"
+    },
+    {
+      "path": "artifacts/financial-backup-170325b07e6845ed9007cbf434087208-server/mods/ftb-library-neoforge-2101.1.37.jar",
+      "bytes": 1439881,
+      "sha256": "624c2d2d1cbadb946d967e17757bd5b2d129d4d3ed71f2da0c70607d04476ac2"
+    },
+    {
+      "path": "artifacts/financial-backup-170325b07e6845ed9007cbf434087208-server/mods/ftb-quests-neoforge-2101.1.36.jar",
+      "bytes": 1609984,
+      "sha256": "6a39982c4b3afc00b1e788041a4f0d394e1659e3b3a6e5d078cd790bc36d0018"
+    },
+    {
+      "path": "artifacts/financial-backup-170325b07e6845ed9007cbf434087208-server/mods/ftb-teams-neoforge-2101.1.11.jar",
+      "bytes": 308236,
+      "sha256": "e6bcd670493624e6906df872a9c6af4a33fe6405cac57a32c59cd4cd5838c655"
+    }
+  ],
+  "stoppedRestoreEvidence": [
+    {
+      "path": "artifacts/financial-backup-170325b07e6845ed9007cbf434087208-server/financial-state.json",
+      "bytes": 580,
+      "sha256": "04ff336cf3d4df0f41857b3735765864712a375ecd5d6cad7a6a5c8e728ad58a"
+    },
+    {
+      "path": "artifacts/financial-backup-170325b07e6845ed9007cbf434087208-server/financial-player.dat",
+      "bytes": 859,
+      "sha256": "cfc29b776a98c94ad1dea0a314e0de09398715ee63d684bfc731aecf0433a559"
+    },
+    {
+      "path": "artifacts/financial-backup-170325b07e6845ed9007cbf434087208-server/financial-audit-fixture.txt",
+      "bytes": 34,
+      "sha256": "9fd82ed0d907843a6f7fc3b4606eaa5d28edb03d4d0809195cb4d7e43a0aa435"
+    },
+    {
+      "path": "artifacts/financial-backup-170325b07e6845ed9007cbf434087208-server/server.properties",
+      "bytes": 1628,
+      "sha256": "acc3823de53952aeb8b271ebc23ad188fec09391330705b77d0ce53a6074bb3d"
+    },
+    {
+      "path": "artifacts/financial-backup-verified-2026-10-22-result.json",
+      "bytes": 927,
+      "sha256": "eb08d209dcf7363a71c5a5a2c372c098535b56077bcd16ff1f28357a66b7295e"
+    }
+  ],
+  "beforeFix": {
+    "revision": "11e08fb",
+    "equalSequenceReproductionFailedAsExpected": true,
+    "evidence": [
+      {
+        "path": "artifacts/financial-backup-before-2026-10-22-seed.log",
+        "bytes": 20044,
+        "sha256": "38a051a5fa008e7c9723f1eb1b84932a0b03444787badaf78fd472dc487f0015"
+      },
+      {
+        "path": "artifacts/financial-backup-before-2026-10-22-regressed.log",
+        "bytes": 17104,
+        "sha256": "098e648026037d4576aa188c12b029128fcc4c06bb9b5f7f3dcd04e56feaa6f4"
+      },
+      {
+        "path": "artifacts/financial-backup-before-2026-10-22-caughtup.log",
+        "bytes": 18517,
+        "sha256": "f7cb52ade18d82aa63918e7fcaac7b95e60ae24ad2bfc269039b3b1cb4ffba38"
+      },
+      {
+        "path": "artifacts/financial-backup-before-2026-10-22-result.json",
+        "bytes": 503,
+        "sha256": "b4f66beb111eace9104e37a76687b5acc72a5c2f58481d75f7c31e1099323cd4"
+      }
+    ]
+  },
+  "newProcessKillClaim": false,
+  "scope": "Current online actor retained WAITING/CONFIRMED/APPLIED receipt lookup before replay, new attribution and review resolution",
+  "limits": [
+    "Shared/offline member receipt admission requires supported provider read-only inspection",
+    "Monetary PAID claims and native reward admission need separate settlement verification",
+    "Large retained-history throughput remains unmeasured",
+    "All-copies rollback or deletion cannot be detected",
+    "Original content provenance and physical clients remain open; ordinary-client test deferred by user"
+  ]
+}

@@ -1,0 +1,33 @@
+allprojects {
+    layout.buildDirectory.set(file('../artifacts/financial-backup-build'))
+    afterEvaluate { p ->
+        if (p.extensions.findByName('neoForge') == null) return
+        def phase = p.findProperty('financialAuditPhase') ?: 'seed'
+        if (!(phase in ['seed','regressed','caughtup','higher','consistent'])) throw new GradleException('Unknown financial backup phase')
+        def fixture = p.file(p.property('financialAuditFixture'))
+        def artifacts = p.file('../artifacts').toPath().toAbsolutePath().normalize()
+        if (!fixture.toPath().toAbsolutePath().normalize().startsWith(artifacts)) throw new GradleException('Financial fixture must be inside artifacts')
+        p.sourceSets.main.java.srcDir(p.file('../tools/financial-backup-runtime-audit'))
+        p.sourceSets.main.compileClasspath += p.files(p.fileTree(new File(fixture, 'mods')) { include '*.jar' })
+        p.neoForge.runs.named('server') { gameDirectory = fixture }
+        p.tasks.named('prepareServerRun') {
+            doLast {
+                def marker = new File(fixture, 'financial-audit-fixture.txt')
+                if (!marker.isFile() || marker.getText('UTF-8').trim() != p.property('financialAuditRun')) throw new GradleException('Financial fixture identity mismatch')
+                def properties = new Properties()
+                new File(fixture, 'server.properties').withInputStream { properties.load(it) }
+                for (entry in ['server-ip':'127.0.0.1','server-port':'25646','level-name':'financial-world'])
+                    if (properties.getProperty(entry.key) != entry.value) throw new GradleException('Unexpected financial fixture properties')
+            }
+        }
+        p.tasks.named('runServer') {
+            environment 'CITIZENS_FINANCIAL_AUDIT_PHASE', phase
+            environment 'CITIZENS_FINANCIAL_AUDIT_RUN', p.property('financialAuditRun')
+            timeout = java.time.Duration.ofMinutes(3)
+            doLast {
+                def log = new File(fixture, 'logs/latest.log').getText('UTF-8')
+                if (log.contains('[FINANCIALAUDIT] FAILED') || !log.contains('[FINANCIALAUDIT] COMPLETE')) throw new GradleException('Financial audit failed or incomplete')
+            }
+        }
+    }
+}

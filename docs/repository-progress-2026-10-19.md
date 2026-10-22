@@ -10,6 +10,16 @@ This review covers repository structure, native implementation boundaries, upstr
 
 ## Repository and implementation boundaries
 
+Update 2026-10-22, UTC+08:00: [financial backup recovery](commerce-financial-backup-recovery-2026-10-22.md)
+closes the current-actor commerce replay gap where unrelated trades could hide a
+missing settlement behind an equal/higher ledger sequence. Native stopped-restore
+validation passes 39 checks with retained identities, unchanged native state on
+rejection and matching-backup recovery. Fresh regression passes 90 native checks,
+775 ordinary tests per target and 100 Interactions tests; six archives and three
+read-only SQLite checks pass. Shared/offline receipt admission, monetary reward
+backup validation and throughput remain open. No production activation occurred;
+the user will run the pinned ordinary-client acceptance later.
+
 The reviewed gameplay revision contains 2,047 tracked files, including 562 Citizens Java sources, 46 Interactions Java sources and 114 default test-source files. The trait factory declares 96 registered trait classes. There are 185 files under `docs`, 339 under `tools`, and 73 opt-in Gradle audit scripts.
 
 | Area | Role and current implementation |
