@@ -1,4 +1,6 @@
 allprojects {
+    def auditBuild = gradle.startParameter.projectProperties.get('machineAuditBuildDir')
+    if (auditBuild != null) layout.buildDirectory.set(file(auditBuild))
     afterEvaluate { p ->
         if (p.extensions.findByName('neoForge') == null) return
         def fixture = p.file('../artifacts/create-audit-server')
@@ -17,6 +19,8 @@ allprojects {
         }
         p.tasks.named('runServer') {
             if (p.hasProperty('machineAuditPhase')) environment 'CITIZENS_MACHINE_AUDIT_PHASE', p.property('machineAuditPhase')
+            if (p.hasProperty('machineAuditType')) environment 'CITIZENS_MACHINE_AUDIT_TYPE', p.property('machineAuditType')
+            if (p.hasProperty('machineAuditRun')) environment 'CITIZENS_MACHINE_AUDIT_RUN', p.property('machineAuditRun')
             timeout = java.time.Duration.ofMinutes(3)
             doLast {
                 def log = new File(fixture, 'logs/latest.log').getText('UTF-8')

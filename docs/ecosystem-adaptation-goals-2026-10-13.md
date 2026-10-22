@@ -29,6 +29,15 @@ Exact artifact sources, SHA-512/SHA-256 hashes and installation paths are record
 
 ## Ordered adaptation backlog
 
+Progress 2026-10-22, UTC+08:00: [assembly process-kill recovery](create-assembly-recovery-2026-10-20.md)
+verifies the retained 24 actual JVM kills across depot/belt pressing, deploying and
+filling at PREPARED/CONFIRMED/APPLIED on both NeoForge targets (268 recovery checks).
+Exact restored input/components, assignment, tool/tank state and immutable final
+assembly payload retain the original quest generation and independently saved FTB
+rollback fences. Final regression and isolated-cache runner verification accompany
+the recovery manifest. Arbitrary storage-interior kill points, other machine paths,
+party/offline/repeat/financial backups, migration and physical-client gates stay open.
+
 Progress 2026-10-19, UTC+08:00: [native sequenced assembly](create-assembly-evidence-2026-10-19.md)
 adds separate weighted/ordered recipe discovery and actual final parent advancement
 through native pressing, deploying, filling and cutting storage. Forty-one assembly

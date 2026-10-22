@@ -126,7 +126,7 @@ public final class MachineCrashRuntimeAudit {
         try (var channel = FileChannel.open(path, StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING, StandardOpenOption.WRITE)) {
             var bytes = StandardCharsets.UTF_8.encode(state.toString()); while (bytes.hasRemaining()) channel.write(bytes); channel.force(true);
         } catch (java.io.IOException failure) { throw new IllegalStateException(failure); }
-        org.slf4j.LoggerFactory.getLogger("interactions").info("[MACHINECRASHAUDIT] KILL_READY pid={} entry={}", ProcessHandle.current().pid(), entryId);
+        org.slf4j.LoggerFactory.getLogger("interactions").info("[MACHINECRASHAUDIT] KILL_READY pid={} entry={} run={}", ProcessHandle.current().pid(), entryId, System.getenv("CITIZENS_MACHINE_AUDIT_RUN"));
         while (true) java.util.concurrent.locks.LockSupport.parkNanos(100_000_000L);
     }
     private static void check(boolean condition, String name) {

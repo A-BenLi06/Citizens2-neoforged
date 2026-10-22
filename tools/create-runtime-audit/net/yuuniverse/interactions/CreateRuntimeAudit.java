@@ -38,6 +38,13 @@ public final class CreateRuntimeAudit {
     @SubscribeEvent public static void tick(ServerTickEvent.Post event) {
         if (ran) return;
         var server=event.getServer(); var level=server.overworld();
+        var assemblyCrashType = System.getenv("CITIZENS_MACHINE_AUDIT_TYPE");
+        if (assemblyCrashType != null && System.getenv("CITIZENS_MACHINE_AUDIT_PHASE") != null) {
+            ran = true; level.getChunkAt(new BlockPos(10,-58,2));
+            level.setChunkForced(0,0,true);
+            AssemblyCrashRuntimeAudit.run(server, System.getenv("CITIZENS_MACHINE_AUDIT_PHASE"), assemblyCrashType);
+            return;
+        }
         level.setChunkForced(0,0,true);
         if(server.getTickCount()<20 || !level.isPositionEntityTicking(new BlockPos(1,-60,1))) return;
         var crashPhase = System.getenv("CITIZENS_MACHINE_AUDIT_PHASE");

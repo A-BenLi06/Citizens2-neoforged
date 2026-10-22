@@ -1,6 +1,7 @@
 param(
     [Parameter(Mandatory = $true)][string]$CreateJar,
-    [string]$ProviderDirectory = (Join-Path (Split-Path $PSScriptRoot -Parent) 'artifacts/selected-integrations-2026-10-12')
+    [string]$ProviderDirectory = (Join-Path (Split-Path $PSScriptRoot -Parent) 'artifacts/selected-integrations-2026-10-12'),
+    [ValidateSet('depot','belt','deployer','spout')][string]$AssemblyCrashMachine
 )
 $ErrorActionPreference = 'Stop'
 $fixture = Join-Path (Split-Path $PSScriptRoot -Parent) 'artifacts/create-audit-server'
@@ -33,4 +34,17 @@ ServerEvents.recipes(event => {
         results: [{ id: 'minecraft:paper', count: 3 }, { id: 'minecraft:diamond', chance: 0.25 }] }).id('citizens_audit:create_milling')
 })
 '@ | Set-Content -LiteralPath (Join-Path $fixture 'kubejs/server_scripts/citizens_create_audit.js') -Encoding utf8
+$assemblyScript = Join-Path $fixture 'kubejs/server_scripts/citizens_assembly_crash.js'
+if ($AssemblyCrashMachine) {
+    $step = switch ($AssemblyCrashMachine) {
+        'deployer' { @{type='create:deploying';ingredients=@(@{item='minecraft:prismarine_shard'},@{item='minecraft:flint'});results=@(@{id='minecraft:prismarine_shard'})} }
+        'spout' { @{type='create:filling';ingredients=@(@{item='minecraft:prismarine_shard'},@{type='fluid_stack';fluid='minecraft:water';amount=100});results=@(@{id='minecraft:prismarine_shard'})} }
+        default { @{type='create:pressing';ingredients=@(@{item='minecraft:prismarine_shard'});results=@(@{id='minecraft:prismarine_shard'})} }
+    }
+    $recipe = @{type='create:sequenced_assembly';ingredient=@{item='minecraft:snowball'};transitional_item=@{id='minecraft:prismarine_shard'};loops=1;
+        sequence=@(@{type='create:pressing';ingredients=@(@{item='minecraft:prismarine_shard'});results=@(@{id='minecraft:prismarine_shard'})},$step);
+        results=@(@{id='minecraft:paper';count=2;components=@{'minecraft:custom_name'='"Assembly crash output"'}})}
+    $json = $recipe | ConvertTo-Json -Depth 10 -Compress
+    "ServerEvents.recipes(event => { event.custom($json).id('citizens_audit:assembly_crash') })" | Set-Content -LiteralPath $assemblyScript -Encoding utf8
+} elseif (Test-Path -LiteralPath $assemblyScript) { Remove-Item -LiteralPath $assemblyScript }
 Write-Output "Prepared $fixture"

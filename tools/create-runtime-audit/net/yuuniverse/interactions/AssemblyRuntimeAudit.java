@@ -155,8 +155,9 @@ public final class AssemblyRuntimeAudit {
             finally{MachineRemainderItem.fail=false;clear(level,pos);}
             for(int tick=0;tick<600&&press.pressingBehaviour.running;tick++){motor.tick();press.tick();}
             AllConfigs.server().recipes.bulkPressing.set(false);throwOutput=true;
-            try{runPress(press,motor,new ItemStack(MachineRemainderItem.item,2));throw new AssertionError("Native storage exception hidden");}
-            catch(IllegalStateException expected){check(outcomes.getLast().getOutcome()==MachineOutcomeEvent.Outcome.INTERRUPTED&&team.getProgress(task)==6,"assembly_native_storage_exception_after_admission_is_interrupted");}
+            before=observations.size();int outcomesBefore=outcomes.size();
+            try{var result=runPress(press,motor,new ItemStack(MachineRemainderItem.item,2));throw new AssertionError("Native storage exception hidden: input="+result.getItem()+", observations="+(observations.size()-before)+", outcomes="+(outcomes.size()-outcomesBefore)+", nearby="+level.getEntitiesOfClass(ItemEntity.class,new AABB(pos).inflate(2)).stream().map(e->e.getItem()+" grounded="+e.onGround()+" alive="+e.isAlive()).toList());}
+            catch(IllegalStateException expected){check("Expected native assembly storage failure".equals(expected.getMessage())&&observations.size()==before+1&&outcomes.size()==outcomesBefore+1&&outcomes.getLast().getOutcome()==MachineOutcomeEvent.Outcome.INTERRUPTED&&team.getProgress(task)==6,"assembly_native_storage_exception_after_admission_is_interrupted");}
             finally{throwOutput=false;AllConfigs.server().recipes.bulkPressing.set(true);clear(level,pos);}resolve(service,source);
         }finally{rejectBucket=false;throwOutput=false;MachineRemainderItem.fail=false;MachineRemainderItem.distinctRemainders=false;manager.replaceRecipes(original);clear(level,pos);}
     }

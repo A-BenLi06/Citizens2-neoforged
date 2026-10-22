@@ -1,0 +1,1192 @@
+{
+  "createdAt": "2026-10-22T12:32:48.2715855+08:00",
+  "timezone": "UTC+08:00",
+  "recoveryEvidenceDate": "2026-10-20",
+  "regressionDate": "2026-10-22",
+  "provider": {
+    "path": "artifacts/create-provider-pinned.jar",
+    "bytes": 19138095,
+    "sha256": "5602a16796957cb5c7fb829c10c6b54bf9d228931c7680636710b6a60d92822e"
+  },
+  "providerVersion": "6.0.10-mc1.21.1-performance-v6",
+  "recoverySources": [
+    {
+      "path": "tools/create-runtime-audit/net/yuuniverse/interactions/AssemblyCrashRuntimeAudit.java",
+      "bytes": 23607,
+      "sha256": "35950957a18d76eeca23eef163cf40e87157d9fd84bf3e32546eb82b01dc8823"
+    },
+    {
+      "path": "tools/create-runtime-audit/net/yuuniverse/interactions/MachineCrashRuntimeAudit.java",
+      "bytes": 11817,
+      "sha256": "d0846960f1b4dda628f382cbb8849844a54812a800d6b53636f9c469ac46d60f"
+    },
+    {
+      "path": "tools/create-runtime-audit/net/yuuniverse/interactions/CreateRuntimeAudit.java",
+      "bytes": 28236,
+      "sha256": "7f591a3785bde1e64e308cea765710379e774f5b736b8d24944f5a57d4796bfc"
+    },
+    {
+      "path": "tools/create-runtime-audit.gradle",
+      "bytes": 2082,
+      "sha256": "ae56d934b15fc488518c8131b79fb90d0029125d54f0c6d0c6c5b3a7e51de5e0"
+    },
+    {
+      "path": "tools/prepare-create-audit.ps1",
+      "bytes": 4118,
+      "sha256": "8b4462d3b2a4c77774b35ae78588e473c4551639919a8463c71c3f24acaff86a"
+    },
+    {
+      "path": "tools/run-machine-crash-audit.ps1",
+      "bytes": 5016,
+      "sha256": "918b90159c992441d204cd8ace442a228eaa435dca58f6c5afcbce3b0b5b8284"
+    },
+    {
+      "path": "tools/record-assembly-crash-validation.ps1",
+      "bytes": 6239,
+      "sha256": "d55144cbb1b1799c5011f5c1a973c38e54734c73fc10b9052e8cfb0ad9d756e7"
+    },
+    {
+      "path": "neoforge/src/main/java/net/citizensnpcs/util/CreateMachineEvidence.java",
+      "bytes": 84365,
+      "sha256": "2d643d537f60c019f782f6d512cbf58dfabb9e41bb506a8f3fdaba26701e8bfe"
+    },
+    {
+      "path": "neoforge/src/main/java/net/citizensnpcs/util/CraftQuestEvidence.java",
+      "bytes": 20208,
+      "sha256": "38379fc0d16814a051f44f8c5f0bddaf3c73bcece6ed7d3c31e585f87e954b25"
+    },
+    {
+      "path": "neoforge/src/main/java/net/citizensnpcs/util/QuestEvidenceJournal.java",
+      "bytes": 18505,
+      "sha256": "dfa328f1e13c7eb610f3e8aa2aee710e1e12826936903c34334f6627d456b03c"
+    }
+  ],
+  "sources": [
+    {
+      "path": "tools/create-runtime-audit/net/yuuniverse/interactions/AssemblyCrashRuntimeAudit.java",
+      "bytes": 23607,
+      "sha256": "35950957a18d76eeca23eef163cf40e87157d9fd84bf3e32546eb82b01dc8823"
+    },
+    {
+      "path": "tools/create-runtime-audit/net/yuuniverse/interactions/MachineCrashRuntimeAudit.java",
+      "bytes": 11817,
+      "sha256": "d0846960f1b4dda628f382cbb8849844a54812a800d6b53636f9c469ac46d60f"
+    },
+    {
+      "path": "tools/create-runtime-audit/net/yuuniverse/interactions/CreateRuntimeAudit.java",
+      "bytes": 28236,
+      "sha256": "7f591a3785bde1e64e308cea765710379e774f5b736b8d24944f5a57d4796bfc"
+    },
+    {
+      "path": "tools/create-runtime-audit/net/yuuniverse/interactions/AssemblyRuntimeAudit.java",
+      "bytes": 38824,
+      "sha256": "30c862817bc93127b77796b02c576786f3a501b7cf69fa3878498daef8493c5b"
+    },
+    {
+      "path": "tools/create-runtime-audit.gradle",
+      "bytes": 2082,
+      "sha256": "ae56d934b15fc488518c8131b79fb90d0029125d54f0c6d0c6c5b3a7e51de5e0"
+    },
+    {
+      "path": "tools/prepare-create-audit.ps1",
+      "bytes": 4118,
+      "sha256": "8b4462d3b2a4c77774b35ae78588e473c4551639919a8463c71c3f24acaff86a"
+    },
+    {
+      "path": "tools/run-machine-crash-audit.ps1",
+      "bytes": 5080,
+      "sha256": "aec81e9502ccb4e46deaf8092f7819695dc23b73cd9f3a8a97ae41252d58a8fa"
+    },
+    {
+      "path": "tools/record-assembly-crash-validation.ps1",
+      "bytes": 13929,
+      "sha256": "b6b6b6abe692ab89719db7ada42f2b43f8db48ee471d53a1bc420d8eb01aff48"
+    },
+    {
+      "path": "neoforge/src/main/java/net/citizensnpcs/util/CreateMachineEvidence.java",
+      "bytes": 84365,
+      "sha256": "2d643d537f60c019f782f6d512cbf58dfabb9e41bb506a8f3fdaba26701e8bfe"
+    },
+    {
+      "path": "neoforge/src/main/java/net/citizensnpcs/util/CraftQuestEvidence.java",
+      "bytes": 20208,
+      "sha256": "38379fc0d16814a051f44f8c5f0bddaf3c73bcece6ed7d3c31e585f87e954b25"
+    },
+    {
+      "path": "neoforge/src/main/java/net/citizensnpcs/util/QuestEvidenceJournal.java",
+      "bytes": 18505,
+      "sha256": "dfa328f1e13c7eb610f3e8aa2aee710e1e12826936903c34334f6627d456b03c"
+    }
+  ],
+  "actualProcessKills": 24,
+  "recoveryChecks": 268,
+  "cases": [
+    {
+      "neoForge": "21.1.248",
+      "machine": "depot",
+      "stage": "prepared",
+      "recoveryChecks": 11,
+      "killed": {
+        "path": "artifacts/assembly-crash-final-depot-prepared-248-v2-2026-10-20-killed.log",
+        "bytes": 38417,
+        "sha256": "cc70143a952cb18cd7ca60bbbb15a0b8f11510487dee81ca43d2c3f2aecc3a4c"
+      },
+      "killedStderr": {
+        "path": "artifacts/assembly-crash-final-depot-prepared-248-v2-2026-10-20-killed-stderr.log",
+        "bytes": 517,
+        "sha256": "0bae5da620002160615b84cb60e58fe3dabcff17e6ed38d4b6d1b0c4187a3300"
+      },
+      "recovered": {
+        "path": "artifacts/assembly-crash-final-depot-prepared-248-v2-2026-10-20-recovered.log",
+        "bytes": 48849,
+        "sha256": "c8e355736a3590fd2c35be886fe913a25d82ecdc907df39004821f483c1470e3"
+      },
+      "runner": {
+        "path": "artifacts/assembly-crash-final-depot-prepared-248-v2-2026-10-20-runner.log",
+        "bytes": 126,
+        "sha256": "908fea50fe2e3b14d45d19e82ba94612412c4f055907ea5c40c8ad0bba6a8f3b"
+      },
+      "termination": {
+        "path": "artifacts/assembly-crash-final-depot-prepared-248-v2-2026-10-20-termination.json",
+        "bytes": 517,
+        "sha256": "d153e94f3ee99eacababc547ddbbea17222122d53423bc945a947f1ce19ddb52"
+      },
+      "savedAndLiveState": {
+        "path": "artifacts/assembly-crash-final-depot-prepared-248-v2-2026-10-20-state.json",
+        "bytes": 4184,
+        "sha256": "b647680a46a684ce52d7f60d67b5f1d8c29a0eeb35cddd8daf96611227274884"
+      }
+    },
+    {
+      "neoForge": "21.1.248",
+      "machine": "depot",
+      "stage": "confirmed",
+      "recoveryChecks": 11,
+      "killed": {
+        "path": "artifacts/assembly-crash-final-depot-confirmed-248-v2-2026-10-20-killed.log",
+        "bytes": 38688,
+        "sha256": "1d7b2edfe958f76e111d1eb7a0cc282f0435c750bc6f617ca17d6db2575a8468"
+      },
+      "killedStderr": {
+        "path": "artifacts/assembly-crash-final-depot-confirmed-248-v2-2026-10-20-killed-stderr.log",
+        "bytes": 517,
+        "sha256": "2de7987b0ed6f0bedd0ace3cfea05712cc687e3a6aca0f30e2ac84d08e858520"
+      },
+      "recovered": {
+        "path": "artifacts/assembly-crash-final-depot-confirmed-248-v2-2026-10-20-recovered.log",
+        "bytes": 41210,
+        "sha256": "22ff752a113859505b59449e414e4e504df662e089ea3acce5fdf05ebd6c39eb"
+      },
+      "runner": {
+        "path": "artifacts/assembly-crash-final-depot-confirmed-248-v2-2026-10-20-runner.log",
+        "bytes": 127,
+        "sha256": "f2c947a84daafe035710e939a75c279ca52cbe6e51f51c3903b38822bd8d8d38"
+      },
+      "termination": {
+        "path": "artifacts/assembly-crash-final-depot-confirmed-248-v2-2026-10-20-termination.json",
+        "bytes": 518,
+        "sha256": "df2149342f94a00f993cfb2a5da1047b5498e425d33aa5d9a31dab6b61a8f1fc"
+      },
+      "savedAndLiveState": {
+        "path": "artifacts/assembly-crash-final-depot-confirmed-248-v2-2026-10-20-state.json",
+        "bytes": 4135,
+        "sha256": "fd5474365624007c0e2032953a134c8c15fd6fd577e262f06e5c7541a95665cc"
+      }
+    },
+    {
+      "neoForge": "21.1.248",
+      "machine": "depot",
+      "stage": "applied",
+      "recoveryChecks": 10,
+      "killed": {
+        "path": "artifacts/assembly-crash-final-depot-applied-248-v2-2026-10-20-killed.log",
+        "bytes": 38837,
+        "sha256": "6d5b576d964469ee9c7ff4342ed35cedda7fb8aeec6b2d7a541871e3d2ac1d6b"
+      },
+      "killedStderr": {
+        "path": "artifacts/assembly-crash-final-depot-applied-248-v2-2026-10-20-killed-stderr.log",
+        "bytes": 517,
+        "sha256": "dfb380e9b4a35490e8f93cd50ca5af75e93d81d5ee2a965f799ea72e80ae7b37"
+      },
+      "recovered": {
+        "path": "artifacts/assembly-crash-final-depot-applied-248-v2-2026-10-20-recovered.log",
+        "bytes": 48732,
+        "sha256": "b00b27d80599fd4fdeaa3a88fc233990a057748dd804776f7894b52581bb11d8"
+      },
+      "runner": {
+        "path": "artifacts/assembly-crash-final-depot-applied-248-v2-2026-10-20-runner.log",
+        "bytes": 124,
+        "sha256": "c551a83a3cc8bf91023c37c8662b5bde50e69d4dcbf6dfd0d878484b04e2a4ce"
+      },
+      "termination": {
+        "path": "artifacts/assembly-crash-final-depot-applied-248-v2-2026-10-20-termination.json",
+        "bytes": 515,
+        "sha256": "38edaf72a41777bcb9962e5b8a203b34e73915e1db84f74b261226184cb12575"
+      },
+      "savedAndLiveState": {
+        "path": "artifacts/assembly-crash-final-depot-applied-248-v2-2026-10-20-state.json",
+        "bytes": 4134,
+        "sha256": "d92aec3fadb25fa21a616947e91538350b428a20256dbc6cd5120b88c97e9ffa"
+      }
+    },
+    {
+      "neoForge": "21.1.248",
+      "machine": "belt",
+      "stage": "prepared",
+      "recoveryChecks": 11,
+      "killed": {
+        "path": "artifacts/assembly-crash-final-belt-prepared-248-v2-2026-10-20-killed.log",
+        "bytes": 38538,
+        "sha256": "deab55cbbc36fae1eb058c0bf6014c60f24a187e269fb4b4ce8a54a9472df354"
+      },
+      "killedStderr": {
+        "path": "artifacts/assembly-crash-final-belt-prepared-248-v2-2026-10-20-killed-stderr.log",
+        "bytes": 517,
+        "sha256": "c258b17e3c4c9c6fa2de5c21ae96b3d1fdb8de8d8148cd4ba117f2e0dead11b6"
+      },
+      "recovered": {
+        "path": "artifacts/assembly-crash-final-belt-prepared-248-v2-2026-10-20-recovered.log",
+        "bytes": 48857,
+        "sha256": "d94a2e7d7c72eda387beccf6683b9d31cbdd3b276a367226eebece981bc46df3"
+      },
+      "runner": {
+        "path": "artifacts/assembly-crash-final-belt-prepared-248-v2-2026-10-20-runner.log",
+        "bytes": 126,
+        "sha256": "a20c73a88e430316a81b7640051ddb8e52d03206522c8b8b0f40b154c7389376"
+      },
+      "termination": {
+        "path": "artifacts/assembly-crash-final-belt-prepared-248-v2-2026-10-20-termination.json",
+        "bytes": 516,
+        "sha256": "221e7afdfde4eb7b1ff96b4835c65b39cc122e8b0704cd21015a7706e5d453b2"
+      },
+      "savedAndLiveState": {
+        "path": "artifacts/assembly-crash-final-belt-prepared-248-v2-2026-10-20-state.json",
+        "bytes": 4159,
+        "sha256": "4cefba065c1c0891f162494691c3351c9d1369fcfaa8f0c87283486388c9016a"
+      }
+    },
+    {
+      "neoForge": "21.1.248",
+      "machine": "belt",
+      "stage": "confirmed",
+      "recoveryChecks": 11,
+      "killed": {
+        "path": "artifacts/assembly-crash-final-belt-confirmed-248-v2-2026-10-20-killed.log",
+        "bytes": 38463,
+        "sha256": "5f8a2175cd307e4116fc33263013d1fbce94f7c637d6d4c26d9ebf8ba62cf23e"
+      },
+      "killedStderr": {
+        "path": "artifacts/assembly-crash-final-belt-confirmed-248-v2-2026-10-20-killed-stderr.log",
+        "bytes": 517,
+        "sha256": "530094cb4e24d0117ef514133129f5263078c42bc5924be42f9df24ba01d0377"
+      },
+      "recovered": {
+        "path": "artifacts/assembly-crash-final-belt-confirmed-248-v2-2026-10-20-recovered.log",
+        "bytes": 41079,
+        "sha256": "f8510c8cdcc4d402465e4f869cfdf4a78bcc6079dd907f8ad4c6d2ad4bd36401"
+      },
+      "runner": {
+        "path": "artifacts/assembly-crash-final-belt-confirmed-248-v2-2026-10-20-runner.log",
+        "bytes": 127,
+        "sha256": "3eac1065e7f7677f36dfb4c72b514ca5839bfa2f0f19acf9ff29f1f852ed3bf6"
+      },
+      "termination": {
+        "path": "artifacts/assembly-crash-final-belt-confirmed-248-v2-2026-10-20-termination.json",
+        "bytes": 517,
+        "sha256": "ce690e4c4afa18df5056578c6851adf54d4dac9c21ce1473c889e85b0c457c3b"
+      },
+      "savedAndLiveState": {
+        "path": "artifacts/assembly-crash-final-belt-confirmed-248-v2-2026-10-20-state.json",
+        "bytes": 4110,
+        "sha256": "547d7b1838ae250a2aa821bbc7705fdaf6687d944f76ff581157ff5b87a7fc8d"
+      }
+    },
+    {
+      "neoForge": "21.1.248",
+      "machine": "belt",
+      "stage": "applied",
+      "recoveryChecks": 10,
+      "killed": {
+        "path": "artifacts/assembly-crash-final-belt-applied-248-v2-2026-10-20-killed.log",
+        "bytes": 38612,
+        "sha256": "665a124c8109fc38339a06f1a47c8efdacce18d0b9f37f378f4481fe085298c4"
+      },
+      "killedStderr": {
+        "path": "artifacts/assembly-crash-final-belt-applied-248-v2-2026-10-20-killed-stderr.log",
+        "bytes": 517,
+        "sha256": "2de7987b0ed6f0bedd0ace3cfea05712cc687e3a6aca0f30e2ac84d08e858520"
+      },
+      "recovered": {
+        "path": "artifacts/assembly-crash-final-belt-applied-248-v2-2026-10-20-recovered.log",
+        "bytes": 48741,
+        "sha256": "acd7554cbfdbf0c1d667165570a48aa25e5dd36a2dc7388a250a1c5a38248b2b"
+      },
+      "runner": {
+        "path": "artifacts/assembly-crash-final-belt-applied-248-v2-2026-10-20-runner.log",
+        "bytes": 125,
+        "sha256": "69c331cd502bc5fc99dfac48822afdd75bd6eba1643ed114404576583ec5668c"
+      },
+      "termination": {
+        "path": "artifacts/assembly-crash-final-belt-applied-248-v2-2026-10-20-termination.json",
+        "bytes": 515,
+        "sha256": "54549180b3e57719d5685b7d762ae5d873847032d4ca2d00b728615d0e9a215e"
+      },
+      "savedAndLiveState": {
+        "path": "artifacts/assembly-crash-final-belt-applied-248-v2-2026-10-20-state.json",
+        "bytes": 4108,
+        "sha256": "1b2ac3ae32fda600b765b1af801bce417d4ced77692839d4751320077473d7e6"
+      }
+    },
+    {
+      "neoForge": "21.1.248",
+      "machine": "deployer",
+      "stage": "prepared",
+      "recoveryChecks": 12,
+      "killed": {
+        "path": "artifacts/assembly-crash-final-deployer-prepared-248-v2-2026-10-20-killed.log",
+        "bytes": 14355,
+        "sha256": "2c9fe65459ed6e4a45b7af8cfe65d857a88c85eae14d8bef0483c0dcdce62b6c"
+      },
+      "killedStderr": {
+        "path": "artifacts/assembly-crash-final-deployer-prepared-248-v2-2026-10-20-killed-stderr.log",
+        "bytes": 517,
+        "sha256": "2de7987b0ed6f0bedd0ace3cfea05712cc687e3a6aca0f30e2ac84d08e858520"
+      },
+      "recovered": {
+        "path": "artifacts/assembly-crash-final-deployer-prepared-248-v2-2026-10-20-recovered.log",
+        "bytes": 24957,
+        "sha256": "c7e78793c06b010965a7ff9c82b414650e94bc7e32081e3fecf97252bd3e147f"
+      },
+      "runner": {
+        "path": "artifacts/assembly-crash-final-deployer-prepared-248-v2-2026-10-20-runner.log",
+        "bytes": 126,
+        "sha256": "85c2640f8d29ad55e7ee8ad9997ae8389d1c69a1767ced66f2c0f172d941ab39"
+      },
+      "termination": {
+        "path": "artifacts/assembly-crash-final-deployer-prepared-248-v2-2026-10-20-termination.json",
+        "bytes": 520,
+        "sha256": "f750224cfaf05a1636e8fa862be26b768eeae765193b774afe47a7e798896b3a"
+      },
+      "savedAndLiveState": {
+        "path": "artifacts/assembly-crash-final-deployer-prepared-248-v2-2026-10-20-state.json",
+        "bytes": 4655,
+        "sha256": "cf94a7a207f264a73ea265affe64754586830adb1939596da304d379c5b9436a"
+      }
+    },
+    {
+      "neoForge": "21.1.248",
+      "machine": "deployer",
+      "stage": "confirmed",
+      "recoveryChecks": 12,
+      "killed": {
+        "path": "artifacts/assembly-crash-final-deployer-confirmed-248-v2-2026-10-20-killed.log",
+        "bytes": 14501,
+        "sha256": "e0cb103a4f35507c695991f03a5962677d43b500e4315802d10d38f12c0a0519"
+      },
+      "killedStderr": {
+        "path": "artifacts/assembly-crash-final-deployer-confirmed-248-v2-2026-10-20-killed-stderr.log",
+        "bytes": 517,
+        "sha256": "d25e8e45cd4cda56e829140780dce2f0f68756e9a86f2b62d16a78f714d3a5dc"
+      },
+      "recovered": {
+        "path": "artifacts/assembly-crash-final-deployer-confirmed-248-v2-2026-10-20-recovered.log",
+        "bytes": 17027,
+        "sha256": "988e1111bdd9a664fec19fcf5e8afe74625ebc70056f04423fff4efb499980a2"
+      },
+      "runner": {
+        "path": "artifacts/assembly-crash-final-deployer-confirmed-248-v2-2026-10-20-runner.log",
+        "bytes": 127,
+        "sha256": "c605162573389b2963f3d125ea661ffc2e902a2396b11330a4fce59affd80e0a"
+      },
+      "termination": {
+        "path": "artifacts/assembly-crash-final-deployer-confirmed-248-v2-2026-10-20-termination.json",
+        "bytes": 521,
+        "sha256": "29ca7684fab70c940fdeb55370ab6188adbeb2081ca6abd4740fcd31137e8c8d"
+      },
+      "savedAndLiveState": {
+        "path": "artifacts/assembly-crash-final-deployer-confirmed-248-v2-2026-10-20-state.json",
+        "bytes": 4605,
+        "sha256": "b4a6199066e67b2b6b67fd74e712e25a9e55fc77dc329006e3c6ca199a359aeb"
+      }
+    },
+    {
+      "neoForge": "21.1.248",
+      "machine": "deployer",
+      "stage": "applied",
+      "recoveryChecks": 11,
+      "killed": {
+        "path": "artifacts/assembly-crash-final-deployer-applied-248-v2-2026-10-20-killed.log",
+        "bytes": 14744,
+        "sha256": "cf5d0cc6e921cf0012ccba362c9cf2a3b0647527a9608c4733e2e1652f5ce90f"
+      },
+      "killedStderr": {
+        "path": "artifacts/assembly-crash-final-deployer-applied-248-v2-2026-10-20-killed-stderr.log",
+        "bytes": 517,
+        "sha256": "dfb380e9b4a35490e8f93cd50ca5af75e93d81d5ee2a965f799ea72e80ae7b37"
+      },
+      "recovered": {
+        "path": "artifacts/assembly-crash-final-deployer-applied-248-v2-2026-10-20-recovered.log",
+        "bytes": 24918,
+        "sha256": "6690619e06fd67692bf66a06e649be29ce4700743a3be5a7d6ce142715c7ebd6"
+      },
+      "runner": {
+        "path": "artifacts/assembly-crash-final-deployer-applied-248-v2-2026-10-20-runner.log",
+        "bytes": 125,
+        "sha256": "93159a0403cf3c279394e262bfaa432899b0ef886d97858a33489d8d7951e0e7"
+      },
+      "termination": {
+        "path": "artifacts/assembly-crash-final-deployer-applied-248-v2-2026-10-20-termination.json",
+        "bytes": 519,
+        "sha256": "2acc0c7246237e3c2adbc45f2a0bcb5815bbef92871b0cca770806d8f6338f22"
+      },
+      "savedAndLiveState": {
+        "path": "artifacts/assembly-crash-final-deployer-applied-248-v2-2026-10-20-state.json",
+        "bytes": 4604,
+        "sha256": "fad0db6d15871bd16d63409a8d5d35187f67bccff84369f0f9b142c02553b1dd"
+      }
+    },
+    {
+      "neoForge": "21.1.248",
+      "machine": "spout",
+      "stage": "prepared",
+      "recoveryChecks": 12,
+      "killed": {
+        "path": "artifacts/assembly-crash-final-spout-prepared-248-v2-2026-10-20-killed.log",
+        "bytes": 14354,
+        "sha256": "60114d0466bbaba72cef2003a2acf65dffaab9dca56df3873e8e3d8ace24acd8"
+      },
+      "killedStderr": {
+        "path": "artifacts/assembly-crash-final-spout-prepared-248-v2-2026-10-20-killed-stderr.log",
+        "bytes": 517,
+        "sha256": "eae4b1d4c3b96956fb177e966c319edc5eddf8dc728d242fae7e7fac879dc9ba"
+      },
+      "recovered": {
+        "path": "artifacts/assembly-crash-final-spout-prepared-248-v2-2026-10-20-recovered.log",
+        "bytes": 25414,
+        "sha256": "246a03effdef5d6606aaf59f02ee61d37a84a8f07c9f242518a2b2493eef0ce7"
+      },
+      "runner": {
+        "path": "artifacts/assembly-crash-final-spout-prepared-248-v2-2026-10-20-runner.log",
+        "bytes": 126,
+        "sha256": "d5a98765b59691f99df4c2d17dc6cbb598dd3aa54e95bb9a71378fa04d034dd6"
+      },
+      "termination": {
+        "path": "artifacts/assembly-crash-final-spout-prepared-248-v2-2026-10-20-termination.json",
+        "bytes": 517,
+        "sha256": "85fec8234c053ca206969646f4bc17e3d2004fcf5dc558d087eb6b5066bc937a"
+      },
+      "savedAndLiveState": {
+        "path": "artifacts/assembly-crash-final-spout-prepared-248-v2-2026-10-20-state.json",
+        "bytes": 4751,
+        "sha256": "50e3454843dbda4125e985f8d49cfddb8a00667fd20482f3b9a484dd904a0462"
+      }
+    },
+    {
+      "neoForge": "21.1.248",
+      "machine": "spout",
+      "stage": "confirmed",
+      "recoveryChecks": 12,
+      "killed": {
+        "path": "artifacts/assembly-crash-final-spout-confirmed-248-v2-2026-10-20-killed.log",
+        "bytes": 14496,
+        "sha256": "0f7dc8ba49f0a68e9ca7a33e612129b6d96a809269587f93ff17aa86c10d988a"
+      },
+      "killedStderr": {
+        "path": "artifacts/assembly-crash-final-spout-confirmed-248-v2-2026-10-20-killed-stderr.log",
+        "bytes": 517,
+        "sha256": "dfb380e9b4a35490e8f93cd50ca5af75e93d81d5ee2a965f799ea72e80ae7b37"
+      },
+      "recovered": {
+        "path": "artifacts/assembly-crash-final-spout-confirmed-248-v2-2026-10-20-recovered.log",
+        "bytes": 17020,
+        "sha256": "1845bfa11905ba2aa2bb8be10e6c4749b8e2a562c2bbd0912f1f34c7fc7ccd74"
+      },
+      "runner": {
+        "path": "artifacts/assembly-crash-final-spout-confirmed-248-v2-2026-10-20-runner.log",
+        "bytes": 126,
+        "sha256": "f465de90ffc1bccc7ff2ae5162846bd2a7f5190e65fc56e2f8fddc24bbec2c7b"
+      },
+      "termination": {
+        "path": "artifacts/assembly-crash-final-spout-confirmed-248-v2-2026-10-20-termination.json",
+        "bytes": 517,
+        "sha256": "27e3e6b23068f646e17003ca77ea984e3b65b1dc5416801b0ea17eed51350c94"
+      },
+      "savedAndLiveState": {
+        "path": "artifacts/assembly-crash-final-spout-confirmed-248-v2-2026-10-20-state.json",
+        "bytes": 4702,
+        "sha256": "a58c7e8338413b047231620c93d57aa279c9a2133b7357eb5b3b763271a80936"
+      }
+    },
+    {
+      "neoForge": "21.1.248",
+      "machine": "spout",
+      "stage": "applied",
+      "recoveryChecks": 11,
+      "killed": {
+        "path": "artifacts/assembly-crash-final-spout-applied-248-v2-2026-10-20-killed.log",
+        "bytes": 14744,
+        "sha256": "3f8257a7285159a9de4717fa2df3a7291cf8fc2dc5e662ea7f4ffa9faed854e2"
+      },
+      "killedStderr": {
+        "path": "artifacts/assembly-crash-final-spout-applied-248-v2-2026-10-20-killed-stderr.log",
+        "bytes": 517,
+        "sha256": "530094cb4e24d0117ef514133129f5263078c42bc5924be42f9df24ba01d0377"
+      },
+      "recovered": {
+        "path": "artifacts/assembly-crash-final-spout-applied-248-v2-2026-10-20-recovered.log",
+        "bytes": 25374,
+        "sha256": "a3ea10ff1a6dedb9820041957206a295038f64989226556cb9770c423350dfd7"
+      },
+      "runner": {
+        "path": "artifacts/assembly-crash-final-spout-applied-248-v2-2026-10-20-runner.log",
+        "bytes": 125,
+        "sha256": "20659b82b3584a888fba9b0f0b923dbe0382b49768490eedcb08860598bf5af5"
+      },
+      "termination": {
+        "path": "artifacts/assembly-crash-final-spout-applied-248-v2-2026-10-20-termination.json",
+        "bytes": 516,
+        "sha256": "238c3d72028c262fae5dce515b4bd2d80e03918e262796519603fa6e9067a0ad"
+      },
+      "savedAndLiveState": {
+        "path": "artifacts/assembly-crash-final-spout-applied-248-v2-2026-10-20-state.json",
+        "bytes": 4699,
+        "sha256": "4e824e64593abb973b7fc9e2ac64f2909cbde132a6467c6e29f7fd4cc6aaad92"
+      }
+    },
+    {
+      "neoForge": "21.1.233",
+      "machine": "depot",
+      "stage": "prepared",
+      "recoveryChecks": 11,
+      "killed": {
+        "path": "artifacts/assembly-crash-final-depot-prepared-233-v2-2026-10-20-killed.log",
+        "bytes": 40888,
+        "sha256": "759c1d7da609c46b11117cec243b3d318b5e1b4d20cf669c6adf167781428eed"
+      },
+      "killedStderr": {
+        "path": "artifacts/assembly-crash-final-depot-prepared-233-v2-2026-10-20-killed-stderr.log",
+        "bytes": 2324,
+        "sha256": "ad97855aff68aca316721e336607ec7992475623640c9e2b135a612a3e99350c"
+      },
+      "recovered": {
+        "path": "artifacts/assembly-crash-final-depot-prepared-233-v2-2026-10-20-recovered.log",
+        "bytes": 48850,
+        "sha256": "85944df2c98401a77d006db3538d30501beef0c7a68b31d9991609bbb67523ad"
+      },
+      "runner": {
+        "path": "artifacts/assembly-crash-final-depot-prepared-233-v2-2026-10-20-runner.log",
+        "bytes": 126,
+        "sha256": "1b05268cee4a879e7dc98b5270eac85269dc66a768c74df014ef6f596cc7ade0"
+      },
+      "termination": {
+        "path": "artifacts/assembly-crash-final-depot-prepared-233-v2-2026-10-20-termination.json",
+        "bytes": 517,
+        "sha256": "2a022959fe6b1a244ff1249443541d5dff7cc205338ee24c76c31ccc53288732"
+      },
+      "savedAndLiveState": {
+        "path": "artifacts/assembly-crash-final-depot-prepared-233-v2-2026-10-20-state.json",
+        "bytes": 4184,
+        "sha256": "70f1eb608d65f3e4cfced91d8a8c656bb73fcd7445e03c22372810d043499afa"
+      }
+    },
+    {
+      "neoForge": "21.1.233",
+      "machine": "depot",
+      "stage": "confirmed",
+      "recoveryChecks": 11,
+      "killed": {
+        "path": "artifacts/assembly-crash-final-depot-confirmed-233-v2-2026-10-20-killed.log",
+        "bytes": 38457,
+        "sha256": "f94cbf4a4ede3706206f53ef02278d62a80ed59f4e25d2f91874f910cca0ede0"
+      },
+      "killedStderr": {
+        "path": "artifacts/assembly-crash-final-depot-confirmed-233-v2-2026-10-20-killed-stderr.log",
+        "bytes": 517,
+        "sha256": "4e6893797873f4c4dfcd1ce644b8f13ddc72f8f849ed88e659e5816eeb90a57d"
+      },
+      "recovered": {
+        "path": "artifacts/assembly-crash-final-depot-confirmed-233-v2-2026-10-20-recovered.log",
+        "bytes": 41210,
+        "sha256": "463c4457572d28c2f66532f5d80458a3d3ea4c05f496b6bd8bde9847573b440c"
+      },
+      "runner": {
+        "path": "artifacts/assembly-crash-final-depot-confirmed-233-v2-2026-10-20-runner.log",
+        "bytes": 127,
+        "sha256": "32c708c5a5bcc463f85dae39deceb315b6b4ec1a428055dacbc6cce2115c0cb0"
+      },
+      "termination": {
+        "path": "artifacts/assembly-crash-final-depot-confirmed-233-v2-2026-10-20-termination.json",
+        "bytes": 518,
+        "sha256": "9b7c808e9b2ddb45f656943a11d86e170ba469c7446eac0c7881c3dc715b3408"
+      },
+      "savedAndLiveState": {
+        "path": "artifacts/assembly-crash-final-depot-confirmed-233-v2-2026-10-20-state.json",
+        "bytes": 4136,
+        "sha256": "1738c1eb9d9de5e8e0320ef2fb87d4bf8c708cbb45d5db2dfb0cfc339bed6c74"
+      }
+    },
+    {
+      "neoForge": "21.1.233",
+      "machine": "depot",
+      "stage": "applied",
+      "recoveryChecks": 10,
+      "killed": {
+        "path": "artifacts/assembly-crash-final-depot-applied-233-v2-2026-10-20-killed.log",
+        "bytes": 38838,
+        "sha256": "d066b35861e977800b3901800bdfb447df6a6067d19e6fb20fba3e281a02d6e7"
+      },
+      "killedStderr": {
+        "path": "artifacts/assembly-crash-final-depot-applied-233-v2-2026-10-20-killed-stderr.log",
+        "bytes": 517,
+        "sha256": "d7cf02aa773c2ba6e6ddb95be4b71c72bd912c95e94b661a57f32ee25c2babf6"
+      },
+      "recovered": {
+        "path": "artifacts/assembly-crash-final-depot-applied-233-v2-2026-10-20-recovered.log",
+        "bytes": 49042,
+        "sha256": "5bd7fd016f46b01e33ded4396532ecca8aea484097f09cdd465ca140b986d9e4"
+      },
+      "runner": {
+        "path": "artifacts/assembly-crash-final-depot-applied-233-v2-2026-10-20-runner.log",
+        "bytes": 125,
+        "sha256": "4a76efc36e3441cc02b3c4ed17affb0f8823a40c3e20e9422b3d400357edc923"
+      },
+      "termination": {
+        "path": "artifacts/assembly-crash-final-depot-applied-233-v2-2026-10-20-termination.json",
+        "bytes": 516,
+        "sha256": "8ac8c6fcb4e7fc76256e276a65ee8ec452e3275fab9599fff077d85fcfa798ce"
+      },
+      "savedAndLiveState": {
+        "path": "artifacts/assembly-crash-final-depot-applied-233-v2-2026-10-20-state.json",
+        "bytes": 4134,
+        "sha256": "5d345580c76cef4c53439f477f3334749ce65e94c838db074fe0e53420c54bb5"
+      }
+    },
+    {
+      "neoForge": "21.1.233",
+      "machine": "belt",
+      "stage": "prepared",
+      "recoveryChecks": 11,
+      "killed": {
+        "path": "artifacts/assembly-crash-final-belt-prepared-233-v2-2026-10-20-killed.log",
+        "bytes": 38445,
+        "sha256": "8dd19008b96d57b3c2b80e62f4b092e23eb8fd73d631aa1c3297a2de638e74e3"
+      },
+      "killedStderr": {
+        "path": "artifacts/assembly-crash-final-belt-prepared-233-v2-2026-10-20-killed-stderr.log",
+        "bytes": 517,
+        "sha256": "eae4b1d4c3b96956fb177e966c319edc5eddf8dc728d242fae7e7fac879dc9ba"
+      },
+      "recovered": {
+        "path": "artifacts/assembly-crash-final-belt-prepared-233-v2-2026-10-20-recovered.log",
+        "bytes": 48856,
+        "sha256": "9baedba6ab271d82b3b34a746cbd975d4d32f5a26e705ae9d38488c8c4bf94d6"
+      },
+      "runner": {
+        "path": "artifacts/assembly-crash-final-belt-prepared-233-v2-2026-10-20-runner.log",
+        "bytes": 126,
+        "sha256": "15bb080488cc2d368c1848a019bd6aeef4cf5caaf4fd45bacbeae620af942d35"
+      },
+      "termination": {
+        "path": "artifacts/assembly-crash-final-belt-prepared-233-v2-2026-10-20-termination.json",
+        "bytes": 516,
+        "sha256": "afead89ea194e1300394722425b0ebd9c92e343af64ca8cc97765ed8ef044131"
+      },
+      "savedAndLiveState": {
+        "path": "artifacts/assembly-crash-final-belt-prepared-233-v2-2026-10-20-state.json",
+        "bytes": 4158,
+        "sha256": "2857824e2fde3da0d64a6ee57c00d44ac8c9fc298e51c34f210d00ee11bfb09a"
+      }
+    },
+    {
+      "neoForge": "21.1.233",
+      "machine": "belt",
+      "stage": "confirmed",
+      "recoveryChecks": 11,
+      "killed": {
+        "path": "artifacts/assembly-crash-final-belt-confirmed-233-v2-2026-10-20-killed.log",
+        "bytes": 38463,
+        "sha256": "f49f8427bf562eb49e71fa8cc3a2364aaa25770224305cd5e4290b4b726a5fff"
+      },
+      "killedStderr": {
+        "path": "artifacts/assembly-crash-final-belt-confirmed-233-v2-2026-10-20-killed-stderr.log",
+        "bytes": 517,
+        "sha256": "30be6e5c2d0dc65cd0dc6a6781c5cef5093cf50177d908af3e2e235833095f91"
+      },
+      "recovered": {
+        "path": "artifacts/assembly-crash-final-belt-confirmed-233-v2-2026-10-20-recovered.log",
+        "bytes": 40984,
+        "sha256": "902298a9531a37efc4962dfa3b15aa54696d293c843c0c92d2e0331b779e02c3"
+      },
+      "runner": {
+        "path": "artifacts/assembly-crash-final-belt-confirmed-233-v2-2026-10-20-runner.log",
+        "bytes": 127,
+        "sha256": "c5c5f1a947cb214011a7f2884935309c91b47e7ed122117618c0dcb20d9cb1ea"
+      },
+      "termination": {
+        "path": "artifacts/assembly-crash-final-belt-confirmed-233-v2-2026-10-20-termination.json",
+        "bytes": 517,
+        "sha256": "e2a841fa5fe1378c5e6cd9c856c3675502475f39bc1fd3a0a72cb3b331ad9b98"
+      },
+      "savedAndLiveState": {
+        "path": "artifacts/assembly-crash-final-belt-confirmed-233-v2-2026-10-20-state.json",
+        "bytes": 4110,
+        "sha256": "eb64bab9841825d4dbe4327db5a5447d550334165e588033c783e1b84a67a1c8"
+      }
+    },
+    {
+      "neoForge": "21.1.233",
+      "machine": "belt",
+      "stage": "applied",
+      "recoveryChecks": 10,
+      "killed": {
+        "path": "artifacts/assembly-crash-final-belt-applied-233-v2-2026-10-20-killed.log",
+        "bytes": 38612,
+        "sha256": "96829a58e7720f789e564b9fdb58b62f90945ec91322426d1975841160b2758f"
+      },
+      "killedStderr": {
+        "path": "artifacts/assembly-crash-final-belt-applied-233-v2-2026-10-20-killed-stderr.log",
+        "bytes": 517,
+        "sha256": "dfb380e9b4a35490e8f93cd50ca5af75e93d81d5ee2a965f799ea72e80ae7b37"
+      },
+      "recovered": {
+        "path": "artifacts/assembly-crash-final-belt-applied-233-v2-2026-10-20-recovered.log",
+        "bytes": 48740,
+        "sha256": "83a47a2a8ddd5e6ee4ce5c5d3bb7f0d300db8b92df64f2601ade71b7109784a1"
+      },
+      "runner": {
+        "path": "artifacts/assembly-crash-final-belt-applied-233-v2-2026-10-20-runner.log",
+        "bytes": 125,
+        "sha256": "17bdf81b31508362e92d53f30443dd734bc58604269d668c68667737fad25ded"
+      },
+      "termination": {
+        "path": "artifacts/assembly-crash-final-belt-applied-233-v2-2026-10-20-termination.json",
+        "bytes": 515,
+        "sha256": "dfbdc81d8831fab62e3e63d6568dd320a78b437e1e3b522535392e9d13fc8136"
+      },
+      "savedAndLiveState": {
+        "path": "artifacts/assembly-crash-final-belt-applied-233-v2-2026-10-20-state.json",
+        "bytes": 4109,
+        "sha256": "8c22ef49109be65f2cb8d44948027066d185e7a26d9ae396ee210e74dc5c76cd"
+      }
+    },
+    {
+      "neoForge": "21.1.233",
+      "machine": "deployer",
+      "stage": "prepared",
+      "recoveryChecks": 12,
+      "killed": {
+        "path": "artifacts/assembly-crash-final-deployer-prepared-233-v2-2026-10-20-killed.log",
+        "bytes": 14354,
+        "sha256": "10637f5ec75a3e8d430b7d94dc8090f9f485a1c1c9836208f906d62bbec8123e"
+      },
+      "killedStderr": {
+        "path": "artifacts/assembly-crash-final-deployer-prepared-233-v2-2026-10-20-killed-stderr.log",
+        "bytes": 517,
+        "sha256": "eae4b1d4c3b96956fb177e966c319edc5eddf8dc728d242fae7e7fac879dc9ba"
+      },
+      "recovered": {
+        "path": "artifacts/assembly-crash-final-deployer-prepared-233-v2-2026-10-20-recovered.log",
+        "bytes": 25032,
+        "sha256": "e318a506cbb5e2b7c14bb5f652a1ed51e08fd322007ae4176a711d6dda479193"
+      },
+      "runner": {
+        "path": "artifacts/assembly-crash-final-deployer-prepared-233-v2-2026-10-20-runner.log",
+        "bytes": 126,
+        "sha256": "4c16196cef439ec55979a564147e8e0ec474bf2201d369d9fac3d19127a54ddc"
+      },
+      "termination": {
+        "path": "artifacts/assembly-crash-final-deployer-prepared-233-v2-2026-10-20-termination.json",
+        "bytes": 520,
+        "sha256": "8b47f6cfd68128721866d3fae590df63d83b4d4b47f2982f80cc8e665223f134"
+      },
+      "savedAndLiveState": {
+        "path": "artifacts/assembly-crash-final-deployer-prepared-233-v2-2026-10-20-state.json",
+        "bytes": 4655,
+        "sha256": "e4c03e4d5fa48da8c1c5e20246fff94e5789aedd3789776bf2c8ae6c3bff9dd1"
+      }
+    },
+    {
+      "neoForge": "21.1.233",
+      "machine": "deployer",
+      "stage": "confirmed",
+      "recoveryChecks": 12,
+      "killed": {
+        "path": "artifacts/assembly-crash-final-deployer-confirmed-233-v2-2026-10-20-killed.log",
+        "bytes": 14501,
+        "sha256": "b0cd9e01f2709945560a5efa07992ca81743faac0a515c8b0ac15da418a91951"
+      },
+      "killedStderr": {
+        "path": "artifacts/assembly-crash-final-deployer-confirmed-233-v2-2026-10-20-killed-stderr.log",
+        "bytes": 517,
+        "sha256": "d470b3f5726aced8523fabdf8b5b3dfe6b03956dc42f95e5103d336fecb8aa90"
+      },
+      "recovered": {
+        "path": "artifacts/assembly-crash-final-deployer-confirmed-233-v2-2026-10-20-recovered.log",
+        "bytes": 21364,
+        "sha256": "e79bfbfa99bd249fcf9ca03af5f6c206b336ad66b9580e5e2dec5a519cd76d85"
+      },
+      "runner": {
+        "path": "artifacts/assembly-crash-final-deployer-confirmed-233-v2-2026-10-20-runner.log",
+        "bytes": 127,
+        "sha256": "74f651d7583cc1e97ef09dea850ccd040485cac209326ef8ef229120e5bec3de"
+      },
+      "termination": {
+        "path": "artifacts/assembly-crash-final-deployer-confirmed-233-v2-2026-10-20-termination.json",
+        "bytes": 521,
+        "sha256": "e29e808c589a61016f1c9f3b5ffc74e79a19c2a14d5dc222efbbcf6185c69f93"
+      },
+      "savedAndLiveState": {
+        "path": "artifacts/assembly-crash-final-deployer-confirmed-233-v2-2026-10-20-state.json",
+        "bytes": 4605,
+        "sha256": "21c83b5e128345c9db385bb7419651b0922691dd803370faf2d83ca0a88a18f7"
+      }
+    },
+    {
+      "neoForge": "21.1.233",
+      "machine": "deployer",
+      "stage": "applied",
+      "recoveryChecks": 11,
+      "killed": {
+        "path": "artifacts/assembly-crash-final-deployer-applied-233-v2-2026-10-20-killed.log",
+        "bytes": 16898,
+        "sha256": "1bbaefda2d47146e5ed0985459b62305add798d439fffd90ec5ef1b9cdf231a7"
+      },
+      "killedStderr": {
+        "path": "artifacts/assembly-crash-final-deployer-applied-233-v2-2026-10-20-killed-stderr.log",
+        "bytes": 2596,
+        "sha256": "57e992e012047608ea320d72cea4abe817fd9eca09b32645bdb359999f14b437"
+      },
+      "recovered": {
+        "path": "artifacts/assembly-crash-final-deployer-applied-233-v2-2026-10-20-recovered.log",
+        "bytes": 28492,
+        "sha256": "377ac729a86f87ccf1fdc330a8061cce346be42687f6ee982d27cd51cf4ff66e"
+      },
+      "runner": {
+        "path": "artifacts/assembly-crash-final-deployer-applied-233-v2-2026-10-20-runner.log",
+        "bytes": 125,
+        "sha256": "2b934e28b99c947fab7b2c8915b0c09b9e16dac51b759a7cb3df61467f2987b5"
+      },
+      "termination": {
+        "path": "artifacts/assembly-crash-final-deployer-applied-233-v2-2026-10-20-termination.json",
+        "bytes": 519,
+        "sha256": "52695a4e6b8e90fa2359c02dd01b91bfa713642b636b8dc1dbb6b679b58c5d68"
+      },
+      "savedAndLiveState": {
+        "path": "artifacts/assembly-crash-final-deployer-applied-233-v2-2026-10-20-state.json",
+        "bytes": 4603,
+        "sha256": "56bb9d810270d03a480ffb5f077602b9cce5b14b6dcf123b2a354032de8dada9"
+      }
+    },
+    {
+      "neoForge": "21.1.233",
+      "machine": "spout",
+      "stage": "prepared",
+      "recoveryChecks": 12,
+      "killed": {
+        "path": "artifacts/assembly-crash-final-spout-prepared-233-v2-2026-10-20-killed.log",
+        "bytes": 14355,
+        "sha256": "0dc7463cd58f12272b2d75e35c0ce77bb802808a19db903e59d01db8015962f6"
+      },
+      "killedStderr": {
+        "path": "artifacts/assembly-crash-final-spout-prepared-233-v2-2026-10-20-killed-stderr.log",
+        "bytes": 517,
+        "sha256": "1fbbb11fefb8bc621250ed9e3ec7fecb3accde5ad6d93adb7911a0953ca51ce1"
+      },
+      "recovered": {
+        "path": "artifacts/assembly-crash-final-spout-prepared-233-v2-2026-10-20-recovered.log",
+        "bytes": 25491,
+        "sha256": "23bc94aad1fceac4ea363e977c0e8cefcb53eeaf80734b04c2804cb4f9711017"
+      },
+      "runner": {
+        "path": "artifacts/assembly-crash-final-spout-prepared-233-v2-2026-10-20-runner.log",
+        "bytes": 126,
+        "sha256": "16c529d9ea76987d19bab1d1fe8f97927fc2bf398d1c9d7d4e8351544c50323e"
+      },
+      "termination": {
+        "path": "artifacts/assembly-crash-final-spout-prepared-233-v2-2026-10-20-termination.json",
+        "bytes": 517,
+        "sha256": "1f6bcec6f296837c4e1f562945fa980ab379fff800eb83f1fa10196295547db8"
+      },
+      "savedAndLiveState": {
+        "path": "artifacts/assembly-crash-final-spout-prepared-233-v2-2026-10-20-state.json",
+        "bytes": 4751,
+        "sha256": "95d2b6cd8661c344e2e63b2df7f703aa0ea5dfba31e48ff903107e8e3133ccf6"
+      }
+    },
+    {
+      "neoForge": "21.1.233",
+      "machine": "spout",
+      "stage": "confirmed",
+      "recoveryChecks": 12,
+      "killed": {
+        "path": "artifacts/assembly-crash-final-spout-confirmed-233-v2-2026-10-20-killed.log",
+        "bytes": 14499,
+        "sha256": "9fb32bab325e2ba5c058e20c7988bb79f77a85f01da6f9403d5bf85ba2a41154"
+      },
+      "killedStderr": {
+        "path": "artifacts/assembly-crash-final-spout-confirmed-233-v2-2026-10-20-killed-stderr.log",
+        "bytes": 517,
+        "sha256": "1fbbb11fefb8bc621250ed9e3ec7fecb3accde5ad6d93adb7911a0953ca51ce1"
+      },
+      "recovered": {
+        "path": "artifacts/assembly-crash-final-spout-confirmed-233-v2-2026-10-20-recovered.log",
+        "bytes": 17019,
+        "sha256": "98a9c905444c42427b2eb4bacbe001fefae5d2dbc59e6756d66afe328cb1328c"
+      },
+      "runner": {
+        "path": "artifacts/assembly-crash-final-spout-confirmed-233-v2-2026-10-20-runner.log",
+        "bytes": 127,
+        "sha256": "4ef4c250987b4e36528c943ab71da0388d16b779b83882996ecebab42de30f31"
+      },
+      "termination": {
+        "path": "artifacts/assembly-crash-final-spout-confirmed-233-v2-2026-10-20-termination.json",
+        "bytes": 518,
+        "sha256": "bce1be20110ceca4edffa9a67a6f8b979f5eeca0938eb8f75af4b5689e5d2094"
+      },
+      "savedAndLiveState": {
+        "path": "artifacts/assembly-crash-final-spout-confirmed-233-v2-2026-10-20-state.json",
+        "bytes": 4702,
+        "sha256": "815515db761e81d661195b3b5e610a4afd61555f9d5bbb86a7a878e1a62438af"
+      }
+    },
+    {
+      "neoForge": "21.1.233",
+      "machine": "spout",
+      "stage": "applied",
+      "recoveryChecks": 11,
+      "killed": {
+        "path": "artifacts/assembly-crash-final-spout-applied-233-v2-2026-10-20-killed.log",
+        "bytes": 14649,
+        "sha256": "ecca52eae2b05effa517f38a910e59db7f9ca8d004cfc047b347a0af2c001daf"
+      },
+      "killedStderr": {
+        "path": "artifacts/assembly-crash-final-spout-applied-233-v2-2026-10-20-killed-stderr.log",
+        "bytes": 517,
+        "sha256": "a39899d229865a85cc880b91694857d368adaad6966f3025c167ac90a765b017"
+      },
+      "recovered": {
+        "path": "artifacts/assembly-crash-final-spout-applied-233-v2-2026-10-20-recovered.log",
+        "bytes": 25375,
+        "sha256": "ba6b7dc5417bf80c2f98570d1f8b7c0c20ea6bd37abb1d98472f0d358ff4b64c"
+      },
+      "runner": {
+        "path": "artifacts/assembly-crash-final-spout-applied-233-v2-2026-10-20-runner.log",
+        "bytes": 125,
+        "sha256": "2081e3e11d4700332dd4c48909103ba550d53d4bc5c87fba7bbd7b1663481976"
+      },
+      "termination": {
+        "path": "artifacts/assembly-crash-final-spout-applied-233-v2-2026-10-20-termination.json",
+        "bytes": 516,
+        "sha256": "601c4c6f36987a0ca89bbb42a6b6332518caddb7afa526296986f0cf5b238973"
+      },
+      "savedAndLiveState": {
+        "path": "artifacts/assembly-crash-final-spout-applied-233-v2-2026-10-20-state.json",
+        "bytes": 4699,
+        "sha256": "ab82c6cacd5aa1283c4f8c0bf5feae145ecd528b5bf09f173eadbca747a1ce75"
+      }
+    }
+  ],
+  "ordinaryTests": {
+    "21.1.233": {
+      "summary": {
+        "tests": 767,
+        "errors": 0,
+        "skipped": 0,
+        "failures": 0
+      },
+      "summaryFile": {
+        "path": "artifacts/assembly-recovery-final-core-tests-233-2026-10-22.json",
+        "bytes": 73,
+        "sha256": "d3723c444b116a86a2e0bdcce4521971803f7cb149d9585faf17e86bad8a1428"
+      },
+      "build": {
+        "path": "artifacts/assembly-recovery-final-core-233-2026-10-22.log",
+        "bytes": 67649,
+        "sha256": "595c71de58c488514e72505ac17886f146003f0935c35eeeb59823095c5de32a"
+      }
+    },
+    "21.1.248": {
+      "summary": {
+        "tests": 767,
+        "errors": 0,
+        "skipped": 0,
+        "failures": 0
+      },
+      "summaryFile": {
+        "path": "artifacts/assembly-recovery-final-core-tests-248-2026-10-22.json",
+        "bytes": 73,
+        "sha256": "d3723c444b116a86a2e0bdcce4521971803f7cb149d9585faf17e86bad8a1428"
+      },
+      "build": {
+        "path": "artifacts/assembly-recovery-final-core-248-2026-10-22.log",
+        "bytes": 67648,
+        "sha256": "547f07dbef17d7698c6347949c9fa913a610b5cacafaeca598537de2cc20d448"
+      }
+    }
+  },
+  "nativeRegression": {
+    "21.1.233": {
+      "checks": 263,
+      "suites": {
+        "CREATEAUDIT": 54,
+        "CREATEBATCHAUDIT": 23,
+        "CREATEPRESSAUDIT": 16,
+        "CREATETRANSPORTAUDIT": 21,
+        "CREATEBASINAUDIT": 23,
+        "CREATEFLUIDAUDIT": 28,
+        "CREATEDEPLOYERAUDIT": 26,
+        "CREATEFANAUDIT": 31,
+        "CREATEASSEMBLYAUDIT": 41
+      },
+      "log": {
+        "path": "artifacts/assembly-recovery-final-native-233-2026-10-22.log",
+        "bytes": 72628,
+        "sha256": "4b9a5e936d30a0547da726415c63c1bd5eb75ffbece062530b7b189f6565a027"
+      }
+    },
+    "21.1.248": {
+      "checks": 263,
+      "suites": {
+        "CREATEAUDIT": 54,
+        "CREATEBATCHAUDIT": 23,
+        "CREATEPRESSAUDIT": 16,
+        "CREATETRANSPORTAUDIT": 21,
+        "CREATEBASINAUDIT": 23,
+        "CREATEFLUIDAUDIT": 28,
+        "CREATEDEPLOYERAUDIT": 26,
+        "CREATEFANAUDIT": 31,
+        "CREATEASSEMBLYAUDIT": 41
+      },
+      "log": {
+        "path": "artifacts/assembly-recovery-final-native-248-2026-10-22.log",
+        "bytes": 72151,
+        "sha256": "afc4a0bf11cab03d1902a4b38a3b1650c8a2a4fd5587e2caf19d170a694b6bcc"
+      }
+    }
+  },
+  "packages": [
+    {
+      "neoForge": "21.1.233",
+      "archive": {
+        "path": "artifacts/assembly-recovery-release-233-jars-2026-10-22/citizens-2.0.43-neoforge-SNAPSHOT-sources.jar",
+        "bytes": 1107639,
+        "sha256": "78c6bdf4422ed283214be9ab519e83500e3af2c5492e3b4d58f9efc725012e90"
+      },
+      "probeAndForeignProviderCodeAbsent": true,
+      "independentModContents": true
+    },
+    {
+      "neoForge": "21.1.233",
+      "archive": {
+        "path": "artifacts/assembly-recovery-release-233-jars-2026-10-22/citizens-2.0.43-neoforge-SNAPSHOT.jar",
+        "bytes": 4030804,
+        "sha256": "ff16273313b9ab4d34212801502b8952dad5022aaf65f83bfcbb829334f47987"
+      },
+      "probeAndForeignProviderCodeAbsent": true,
+      "independentModContents": true
+    },
+    {
+      "neoForge": "21.1.233",
+      "archive": {
+        "path": "artifacts/assembly-recovery-release-233-jars-2026-10-22/yuuniverse-interactions-2.0.43-neoforge-SNAPSHOT.jar",
+        "bytes": 204123,
+        "sha256": "31f5434ffb9fc44a03abcc129dab968e3a0bd8fd4127a8431bab2428639e4623"
+      },
+      "probeAndForeignProviderCodeAbsent": true,
+      "independentModContents": true
+    },
+    {
+      "neoForge": "21.1.248",
+      "archive": {
+        "path": "artifacts/assembly-recovery-release-248-jars-2026-10-22/citizens-2.0.43-neoforge-SNAPSHOT-sources.jar",
+        "bytes": 1107639,
+        "sha256": "f74da6a04a88fbf6e73a11994e7c4f0e47817e7ad8c9ef0e9e78615291f0a778"
+      },
+      "probeAndForeignProviderCodeAbsent": true,
+      "independentModContents": true
+    },
+    {
+      "neoForge": "21.1.248",
+      "archive": {
+        "path": "artifacts/assembly-recovery-release-248-jars-2026-10-22/citizens-2.0.43-neoforge-SNAPSHOT.jar",
+        "bytes": 4030804,
+        "sha256": "b7a1ee4312e3057d1d8c5fa5bb71147b87003fd3ab63f3fdac2758b909920de1"
+      },
+      "probeAndForeignProviderCodeAbsent": true,
+      "independentModContents": true
+    },
+    {
+      "neoForge": "21.1.248",
+      "archive": {
+        "path": "artifacts/assembly-recovery-release-248-jars-2026-10-22/yuuniverse-interactions-2.0.43-neoforge-SNAPSHOT.jar",
+        "bytes": 204123,
+        "sha256": "1ca6a271ef45b6f4228810f5031261682d53a27bcd44a4b1a67ea292b5066305"
+      },
+      "probeAndForeignProviderCodeAbsent": true,
+      "independentModContents": true
+    }
+  ],
+  "isolatedCacheRunner": {
+    "actualProcessKills": 1,
+    "recoveryChecks": 12,
+    "files": [
+      {
+        "path": "artifacts/assembly-crash-isolated-cache-spout-prepared-248-2026-10-22-termination.json",
+        "bytes": 517,
+        "sha256": "938dc6a540afe896a4014608662f170b601f168b32742064bd87036564fa839a"
+      },
+      {
+        "path": "artifacts/assembly-crash-isolated-cache-spout-prepared-248-2026-10-22-state.json",
+        "bytes": 4750,
+        "sha256": "62017ec7a6489dfdc4cc7a51fa233f55597bfd1a0095465e4b1bf85b50ce456b"
+      },
+      {
+        "path": "artifacts/assembly-crash-isolated-cache-spout-prepared-248-2026-10-22-killed.log",
+        "bytes": 16634,
+        "sha256": "d53d0bea2095390951f157ca953bcfba9c5585fbb26a161699c982166265ba4d"
+      },
+      {
+        "path": "artifacts/assembly-crash-isolated-cache-spout-prepared-248-2026-10-22-killed-stderr.log",
+        "bytes": 519,
+        "sha256": "1ab0403ab8290bfc823b1ac2d689eb73a6cb02855b073c7cabc69f455166f6a1"
+      },
+      {
+        "path": "artifacts/assembly-crash-isolated-cache-spout-prepared-248-2026-10-22-recovered.log",
+        "bytes": 25588,
+        "sha256": "7d78f1c5fd3b8f58757b39b455f8ae371a471ce5b91eddcae69f13151b0becdb"
+      },
+      {
+        "path": "artifacts/assembly-crash-isolated-cache-spout-prepared-248-2026-10-22-runner.log",
+        "bytes": 126,
+        "sha256": "723fe5ddc462a190924ee8ed7ed34ddb26a1959a18929857fbfbf2b0fd08dabb"
+      }
+    ]
+  },
+  "dialogueTests": {
+    "summary": {
+      "tests": 100,
+      "errors": 0,
+      "skipped": 0,
+      "failures": 0
+    },
+    "summaryFile": {
+      "path": "artifacts/assembly-recovery-final-dialogue-tests-248-2026-10-22.json",
+      "bytes": 73,
+      "sha256": "d95efa03adde1ac68ea308d04688fddf48f188d292992641bb766ed166957734"
+    },
+    "log": {
+      "path": "artifacts/assembly-recovery-final-dialogue-248-2026-10-22.log",
+      "bytes": 12875,
+      "sha256": "3762679154ad3c967c7fad13a5ea647389ef2dc614b39b0c323a4bded95ddcb8"
+    }
+  },
+  "unchangedProductionRevision": "b10515f",
+  "productionActivated": false,
+  "remaining": [
+    "Other machine paths and arbitrary storage-interior kill points",
+    "Repeatable/party/offline/reconnect and financial backup matrix",
+    "Contraption copying and original legacy provenance",
+    "Logging operations and supported Paradigm inbound formatting",
+    "Physical VR/non-VR integrated migration"
+  ]
+}

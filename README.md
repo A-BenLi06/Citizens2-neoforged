@@ -68,7 +68,13 @@ actual random outputs and remainders. Real JVM termination/restart exercises
 durable phases and independently saved world/FTB rollback fences.
 [World pressing evidence](docs/create-press-evidence-2026-10-19.md) observes native
 mechanical press bulk/single processing with exact entity outputs and remainders.
-Belt/basin/assembly and remaining machine acceptance stay in the adopted backlog.
+Native evidence also covers depot/belt pressing, basin mixing/compacting,
+spout/drain fluid processing, deploying, fan washing/haunting and
+[sequenced assembly completion](docs/create-assembly-evidence-2026-10-19.md).
+[Assembly process-kill recovery](docs/create-assembly-recovery-2026-10-20.md)
+checks independently saved input, tool/fluid state and quest rollback at durable
+admission, confirmation and application. Further recovery and integrated acceptance
+remain in the adopted backlog.
 
 [NeoProtect/GriefLogger attribution](docs/logging-attribution-2026-10-19.md)
 retains independent native histories, corrects duplicate multi-block placement
