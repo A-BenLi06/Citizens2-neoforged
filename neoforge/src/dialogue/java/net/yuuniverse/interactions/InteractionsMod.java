@@ -371,15 +371,16 @@ public class InteractionsMod implements Session.Engine {
             items.load(new File(dataFolder, "items.yml"), server.registryAccess());
             library.load(new File(dataFolder, "conversations"));
             progress.loadAll();
-            context.getSource().sendSuccess(() -> Component.literal("Interactions reloaded: " + library.size()
-                    + " conversation(s) on " + library.npcCount() + " NPC(s), " + items.size() + " saved item(s)"),
+            context.getSource().sendSuccess(() -> Component.translatableWithFallback("interactions.command.reload",
+                    "Interactions reloaded: %s conversation(s), %s NPC ID(s), %s NPC name(s), %s saved item(s)",
+                    library.size(), library.npcCount(), library.npcNameCount(), items.size()),
                     true);
             return 1;
         }));
         root.then(Commands.literal("status").executes(context -> {
-            context.getSource().sendSuccess(() -> Component.literal("Interactions: " + library.size()
-                    + " conversation(s) on " + library.npcCount() + " NPC(s), " + items.size() + " saved item(s), "
-                    + sessions.size() + " in progress"), false);
+            context.getSource().sendSuccess(() -> Component.translatableWithFallback("interactions.command.status",
+                    "Interactions: %s conversation(s), %s NPC ID(s), %s NPC name(s), %s saved item(s), %s in progress",
+                    library.size(), library.npcCount(), library.npcNameCount(), items.size(), sessions.size()), false);
             return 1;
         }));
         event.getDispatcher().register(root);

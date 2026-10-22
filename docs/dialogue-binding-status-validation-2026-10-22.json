@@ -1,0 +1,32 @@
+{
+  "recordedAt": "2026-10-22T13:06:36.9604522+08:00",
+  "neoForge": "21.1.248",
+  "tests": {
+    "skipped": 0,
+    "errors": 0,
+    "failures": 0,
+    "suites": 9,
+    "tests": 100
+  },
+  "scope": "Interactions status/reload readout only; no routing or persistence changes",
+  "jar": {
+    "sha256": "D37262D08935BE0F3371FE10055FB5257E55926C845FCCC74D3BFB6106F0EDA6",
+    "archiveBoundary": "No Citizens, FTB or audit implementation classes",
+    "path": "artifacts/dialogue-status-build/libs/yuuniverse-interactions-2.0.43-neoforge-SNAPSHOT.jar"
+  },
+  "log": {
+    "path": "artifacts/dialogue-status-tests-2026-10-22.log",
+    "sha256": "7A23CC89F84DD2A39E8916103A07B9EF0F5BEAFEC0FAAF69EAD41EA22770BD92"
+  },
+  "sources": [
+    {
+      "path": "neoforge/src/dialogue/java/net/yuuniverse/interactions/ConversationLibrary.java",
+      "sha256": "F59790E1172F06B67F3317090EDFD636C5139CEA72E4607C9C119F12A30F90E0"
+    },
+    {
+      "path": "neoforge/src/dialogue/java/net/yuuniverse/interactions/InteractionsMod.java",
+      "sha256": "D68D81322F886F3F06ACB812F0F64ECC94B534D571F9F12CCD3F43D7957363A6"
+    }
+  ],
+  "candidateFixture": "Still pinned to previous validated JARs for physical client acceptance; not hot-replaced"
+}

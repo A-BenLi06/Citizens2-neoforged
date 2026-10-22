@@ -97,8 +97,13 @@ public final class ConversationLibrary {
         return all.size();
     }
 
+    /** Number of distinct numeric NPC triggers; name triggers are counted separately. */
     public int npcCount() {
         return byNpcId.size();
+    }
+
+    public int npcNameCount() {
+        return byNpcName.size();
     }
 
     public int skipped() {
