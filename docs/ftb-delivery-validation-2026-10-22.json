@@ -1,0 +1,890 @@
+{
+  "recordedAt": "2026-10-22T13:41:36.1363837+08:00",
+  "timezone": "UTC+08:00",
+  "scope": "Citizens native consuming ItemTask adapter; independent saved owners and conservative operator review",
+  "ordinaryBuilds": [
+    {
+      "neoForge": "21.1.233",
+      "tests": {
+        "target": "21.1.233",
+        "tests": 775.0,
+        "failures": 0.0,
+        "errors": 0.0,
+        "skipped": 0.0,
+        "suites": 113
+      },
+      "log": {
+        "path": "artifacts/quest-delivery-build-233-2026-10-22.log",
+        "bytes": 70008,
+        "sha256": "f9d17aa3901164d173cc724ebb9c6a32eccc7aa24a2253bc0f05aafd00830e9a"
+      },
+      "counts": {
+        "path": "artifacts/quest-delivery-tests-233-2026-10-22.json",
+        "bytes": 124,
+        "sha256": "cc18e39a1d66b1ed29f417bfd2dfc70a4519bc325156928cdf1ec7cfd7556a0b"
+      }
+    },
+    {
+      "neoForge": "21.1.248",
+      "tests": {
+        "failures": 0,
+        "errors": 0,
+        "suites": 113,
+        "skipped": 0,
+        "tests": 775
+      },
+      "log": {
+        "path": "artifacts/quest-delivery-build-248-2026-10-22.log",
+        "bytes": 68680,
+        "sha256": "c8340486463f52073f331d317e3bde8a4032eb8fea34ab26f7e37c7b74239692"
+      },
+      "counts": {
+        "path": "artifacts/quest-delivery-tests-248-2026-10-22.json",
+        "bytes": 91,
+        "sha256": "8a312463e4e2c73f7d2f0cd6bd414c31a4ebfd9dfd1904f400a527e0f4e016e5"
+      }
+    }
+  ],
+  "interactionsTests": 100,
+  "journalUnitTests": 8,
+  "normalNative": {
+    "checks": {
+      "DELIVERYAUDIT": 17
+    },
+    "log": {
+      "path": "artifacts/delivery-native-normal-retry-2026-10-22.log",
+      "bytes": 16843,
+      "sha256": "61eab652d9953d1c57f9e9fc6352820e19e1203a7c29f899e8d0cc1c46287d93"
+    }
+  },
+  "forcedKills": [
+    {
+      "boundary": "before",
+      "actor": "6a131ef9-910a-4753-b651-28f9ccb83ba8",
+      "team": "6a131ef9-910a-4753-b651-28f9ccb83ba8",
+      "entry": "8d55deed-7b04-4d1e-a824-3d640cede505",
+      "run": "5ed4663de395436eb7a8112b4e49d014",
+      "savedInventory": 3,
+      "savedProgress": 0,
+      "preKillChecks": 3,
+      "recovery": {
+        "checks": {
+          "DELIVERYAUDIT": 7
+        },
+        "log": {
+          "path": "artifacts/delivery-crash-before-2026-10-22-recovered.log",
+          "bytes": 15509,
+          "sha256": "f085ddb35fa94c9a5b5d861764915bb71ceb8e9ad6e3d5440247eff69e51dd16"
+        }
+      },
+      "state": {
+        "path": "artifacts/delivery-crash-before-2026-10-22-state.json",
+        "bytes": 239,
+        "sha256": "1a9c83e55f1622ad1dd81f73ac42213be1f6713c6fec5181509c1b2fc552d157"
+      },
+      "termination": {
+        "path": "artifacts/delivery-crash-before-2026-10-22-termination.json",
+        "bytes": 494,
+        "sha256": "1ccea94a335b3ada34d6ca5b9b7fb35e1515972af6d6f8e539a890fab8cc3379"
+      },
+      "killedLog": {
+        "path": "artifacts/delivery-crash-before-2026-10-22-killed.log",
+        "bytes": 14573,
+        "sha256": "4d5794e48e1935ab442b6179059547aacb018b12c6373e4b1fe3c243d4c8cbd7"
+      },
+      "retainedRevisions": [
+        {
+          "path": "artifacts/delivery-audit-server/delivery-world/citizens/quest-deliveries/delivery-6-8d55deed-7b04-4d1e-a824-3d640cede505-0.json",
+          "bytes": 820,
+          "sha256": "5257f7eb7c38e26d71b961de6836529d188bc4f1c8d592fb7193f72db4f72408"
+        },
+        {
+          "path": "artifacts/delivery-audit-server/delivery-world/citizens/quest-deliveries/delivery-6-8d55deed-7b04-4d1e-a824-3d640cede505-1.json",
+          "bytes": 864,
+          "sha256": "7a7c0183017d670aef3d54c3c6028e3dbe5ad06fc567bbfe93405d52232bc698"
+        },
+        {
+          "path": "artifacts/delivery-audit-server/delivery-world/citizens/quest-deliveries/delivery-6-8d55deed-7b04-4d1e-a824-3d640cede505-2.json",
+          "bytes": 1063,
+          "sha256": "e251e069f89046afb4c0203b3c975d51334e013e3158ba46ab93e97437f77223"
+        }
+      ]
+    },
+    {
+      "boundary": "progress",
+      "actor": "d26c8e6d-015e-404f-a3b9-d135ec368669",
+      "team": "d26c8e6d-015e-404f-a3b9-d135ec368669",
+      "entry": "1eedaa37-c065-47d3-a5ee-8d598d84b7a4",
+      "run": "55d8d82c89f64286a66bb8f88ebac0e4",
+      "savedInventory": 3,
+      "savedProgress": 3,
+      "preKillChecks": 3,
+      "recovery": {
+        "checks": {
+          "DELIVERYAUDIT": 7
+        },
+        "log": {
+          "path": "artifacts/delivery-crash-progress-2026-10-22-recovered.log",
+          "bytes": 15509,
+          "sha256": "547ae9a0fb8543c089b7ffcc27997f96854408d2fea4d3ef1f9b5119c0f58a42"
+        }
+      },
+      "state": {
+        "path": "artifacts/delivery-crash-progress-2026-10-22-state.json",
+        "bytes": 241,
+        "sha256": "5df05c54f4405190c2f955695c677d1383db64b7c6e657ed90bbf6244880d88b"
+      },
+      "termination": {
+        "path": "artifacts/delivery-crash-progress-2026-10-22-termination.json",
+        "bytes": 496,
+        "sha256": "f9d133cda3aebf68b85a282bdc4ca4fc2a63dfc9ad02698d4db57de2183026ff"
+      },
+      "killedLog": {
+        "path": "artifacts/delivery-crash-progress-2026-10-22-killed.log",
+        "bytes": 14454,
+        "sha256": "3261ab6b1a4117e1512c76cff4eb5e1a75557aa8c0527d2a2fa0933404642165"
+      },
+      "retainedRevisions": [
+        {
+          "path": "artifacts/delivery-audit-server/delivery-world/citizens/quest-deliveries/delivery-7-1eedaa37-c065-47d3-a5ee-8d598d84b7a4-0.json",
+          "bytes": 820,
+          "sha256": "eb848b3846db1ea85684dd43e0927f49d83ab828a0768d9dd0cb7c341d3e29f9"
+        },
+        {
+          "path": "artifacts/delivery-audit-server/delivery-world/citizens/quest-deliveries/delivery-7-1eedaa37-c065-47d3-a5ee-8d598d84b7a4-1.json",
+          "bytes": 864,
+          "sha256": "874c6f2c109a98e444bb66e9da569c8dd24670ec913e10677b5b7569dd097bdf"
+        },
+        {
+          "path": "artifacts/delivery-audit-server/delivery-world/citizens/quest-deliveries/delivery-7-1eedaa37-c065-47d3-a5ee-8d598d84b7a4-2.json",
+          "bytes": 1063,
+          "sha256": "518a9a97da1e702242d0f872e59559201a045d42896b76ecdcdfe87a7e8a5070"
+        }
+      ]
+    },
+    {
+      "boundary": "inventory",
+      "actor": "919f5871-7bab-4be1-871a-4dd64494881a",
+      "team": "919f5871-7bab-4be1-871a-4dd64494881a",
+      "entry": "6e4fc0de-eb9f-4b4d-82f5-0a3a24cd3338",
+      "run": "2f4f55e4c11e4915a11a8a44eadb607b",
+      "savedInventory": 0,
+      "savedProgress": 0,
+      "preKillChecks": 3,
+      "recovery": {
+        "checks": {
+          "DELIVERYAUDIT": 7
+        },
+        "log": {
+          "path": "artifacts/delivery-crash-inventory-2026-10-22-recovered.log",
+          "bytes": 15604,
+          "sha256": "86a54a3c16889ca4363b18f03cd1d0de9a5d87f7ab9a5c7e471d470c16cd65c1"
+        }
+      },
+      "state": {
+        "path": "artifacts/delivery-crash-inventory-2026-10-22-state.json",
+        "bytes": 242,
+        "sha256": "f68dbd3329f3cf71be518be2192803217901677c6d9d4bd9a36367924e726f4a"
+      },
+      "termination": {
+        "path": "artifacts/delivery-crash-inventory-2026-10-22-termination.json",
+        "bytes": 497,
+        "sha256": "21938a1f9fed110c10a1411c9b23e258a68db9825d5f3111fe8094ec5bad110e"
+      },
+      "killedLog": {
+        "path": "artifacts/delivery-crash-inventory-2026-10-22-killed.log",
+        "bytes": 14576,
+        "sha256": "a69883598e262cf77a19c22ebd33c70f375aae95a82c51bdf572f2d99a99a8c1"
+      },
+      "retainedRevisions": [
+        {
+          "path": "artifacts/delivery-audit-server/delivery-world/citizens/quest-deliveries/delivery-5-6e4fc0de-eb9f-4b4d-82f5-0a3a24cd3338-0.json",
+          "bytes": 820,
+          "sha256": "5cb79bb8015e2dc31effe145475e292a1d87b65a709d05509ca109684742a5b6"
+        },
+        {
+          "path": "artifacts/delivery-audit-server/delivery-world/citizens/quest-deliveries/delivery-5-6e4fc0de-eb9f-4b4d-82f5-0a3a24cd3338-1.json",
+          "bytes": 864,
+          "sha256": "7e51009e1ecfde38ee9fed6d84a47b045d2e46bc993753d0a082b817f2fc7748"
+        },
+        {
+          "path": "artifacts/delivery-audit-server/delivery-world/citizens/quest-deliveries/delivery-5-6e4fc0de-eb9f-4b4d-82f5-0a3a24cd3338-2.json",
+          "bytes": 1063,
+          "sha256": "221e8d31a00aac77a3b99d6303a347a2ec72ee74ae2e515bd4f38c9b7fecad3b"
+        }
+      ]
+    },
+    {
+      "boundary": "confirmed",
+      "actor": "8faa1832-5db9-4b06-8613-f677232d3ebb",
+      "team": "8faa1832-5db9-4b06-8613-f677232d3ebb",
+      "entry": "fd8ab182-bac4-4c4e-81f3-b40e870566e3",
+      "run": "a85fed0151d145d4ab172413c2fd2933",
+      "savedInventory": 0,
+      "savedProgress": 3,
+      "preKillChecks": 3,
+      "recovery": {
+        "checks": {
+          "DELIVERYAUDIT": 5
+        },
+        "log": {
+          "path": "artifacts/delivery-crash-confirmed-2026-10-22-recovered.log",
+          "bytes": 15363,
+          "sha256": "39439a2d49c4d9e1dc598935f42b6e730acdb83eb8ceb857a8c2442dc7e0e8ff"
+        }
+      },
+      "state": {
+        "path": "artifacts/delivery-crash-confirmed-2026-10-22-state.json",
+        "bytes": 242,
+        "sha256": "8d464f8e013d69fddecc4e6327a7f9f22051ec58fee187bb1a85971e6a54b668"
+      },
+      "termination": {
+        "path": "artifacts/delivery-crash-confirmed-2026-10-22-termination.json",
+        "bytes": 497,
+        "sha256": "bfe210335bc73da0acc778753199d88aa2f862053f257736882d9f5794397e19"
+      },
+      "killedLog": {
+        "path": "artifacts/delivery-crash-confirmed-2026-10-22-killed.log",
+        "bytes": 14455,
+        "sha256": "a07d53857e115068d620dfd9adbccbb1321b69e494ebee84e6c8a09b310d58ce"
+      },
+      "retainedRevisions": [
+        {
+          "path": "artifacts/delivery-audit-server/delivery-world/citizens/quest-deliveries/delivery-8-fd8ab182-bac4-4c4e-81f3-b40e870566e3-0.json",
+          "bytes": 820,
+          "sha256": "808339cb1e0d9d1f002d13578504c8fda371f6bd504840d8a14a0923d4890722"
+        },
+        {
+          "path": "artifacts/delivery-audit-server/delivery-world/citizens/quest-deliveries/delivery-8-fd8ab182-bac4-4c4e-81f3-b40e870566e3-1.json",
+          "bytes": 1178,
+          "sha256": "759bc2282bec76e0835468f4595ca5b08dc11ed1a44013474a73c6115dc0ecbd"
+        }
+      ]
+    },
+    {
+      "boundary": "player_rollback",
+      "actor": "887c37a3-3b15-4639-bb28-ec5f61da813b",
+      "team": "887c37a3-3b15-4639-bb28-ec5f61da813b",
+      "entry": "4ba251d3-38e5-4694-a6c6-e6ef8bb38b11",
+      "run": "6539360079194507beb8e6f72bbf3998",
+      "savedInventory": 3,
+      "savedProgress": 3,
+      "preKillChecks": 3,
+      "recovery": {
+        "checks": {
+          "DELIVERYAUDIT": 7
+        },
+        "log": {
+          "path": "artifacts/delivery-crash-player_rollback-2026-10-22-recovered.log",
+          "bytes": 15509,
+          "sha256": "00c25e93dbe720617b35b14115850cfb574381598b658b5c928558ec12f124b2"
+        }
+      },
+      "state": {
+        "path": "artifacts/delivery-crash-player_rollback-2026-10-22-state.json",
+        "bytes": 248,
+        "sha256": "a79654ab30736fdaeb9946a3f985f9053e6426c68e0a6da56d90f80772074a7e"
+      },
+      "termination": {
+        "path": "artifacts/delivery-crash-player_rollback-2026-10-22-termination.json",
+        "bytes": 503,
+        "sha256": "8fcdc6d363a2544671854e6727c9b34a4b0b0461e30e0b80737be1b711328472"
+      },
+      "killedLog": {
+        "path": "artifacts/delivery-crash-player_rollback-2026-10-22-killed.log",
+        "bytes": 14556,
+        "sha256": "cd57ed1a9d8ee7cc58ab256cd4cfe05ffe40265f133667f73c401dc9a7dc5f77"
+      },
+      "retainedRevisions": [
+        {
+          "path": "artifacts/delivery-audit-server/delivery-world/citizens/quest-deliveries/delivery-10-4ba251d3-38e5-4694-a6c6-e6ef8bb38b11-0.json",
+          "bytes": 821,
+          "sha256": "205f8cf1637bf748ea7c3da21c667fc69b260ba34dbe2a2708d04478f4646f9a"
+        },
+        {
+          "path": "artifacts/delivery-audit-server/delivery-world/citizens/quest-deliveries/delivery-10-4ba251d3-38e5-4694-a6c6-e6ef8bb38b11-1.json",
+          "bytes": 1179,
+          "sha256": "fbb540dd1f57441f86287298df4e1c10eb226994698b55a3c4b92c162dad735c"
+        },
+        {
+          "path": "artifacts/delivery-audit-server/delivery-world/citizens/quest-deliveries/delivery-10-4ba251d3-38e5-4694-a6c6-e6ef8bb38b11-2.json",
+          "bytes": 1242,
+          "sha256": "15af874873bea86d0d0e518b5a6ac0c59732c094595ccfe31ddac31d5addb1d1"
+        },
+        {
+          "path": "artifacts/delivery-audit-server/delivery-world/citizens/quest-deliveries/delivery-10-4ba251d3-38e5-4694-a6c6-e6ef8bb38b11-3.json",
+          "bytes": 1441,
+          "sha256": "c28fe9ab7e2e74ea4775ef8f5dc1a12c0b258be2308b7239cb839a1c3a96b01e"
+        }
+      ]
+    },
+    {
+      "boundary": "task_rollback",
+      "actor": "4ec7d0ec-76ce-4c60-9ffa-eef3ae48e8e4",
+      "team": "4ec7d0ec-76ce-4c60-9ffa-eef3ae48e8e4",
+      "entry": "0e9d33b7-77dd-4077-86c5-fe21f696d6d6",
+      "run": "8ffba202408b4923b3c33e2009bdbe31",
+      "savedInventory": 0,
+      "savedProgress": 0,
+      "preKillChecks": 3,
+      "recovery": {
+        "checks": {
+          "DELIVERYAUDIT": 7
+        },
+        "log": {
+          "path": "artifacts/delivery-crash-task_rollback-2026-10-22-recovered.log",
+          "bytes": 15606,
+          "sha256": "e809cdece903067b5b907ccc7df9f4b41f890775016b429c07fda3561ee25fab"
+        }
+      },
+      "state": {
+        "path": "artifacts/delivery-crash-task_rollback-2026-10-22-state.json",
+        "bytes": 246,
+        "sha256": "39a32ca44c1e03146a52511500283eb60497f95d36ebef46b94e96bb1ee98d24"
+      },
+      "termination": {
+        "path": "artifacts/delivery-crash-task_rollback-2026-10-22-termination.json",
+        "bytes": 501,
+        "sha256": "f0616152e77eb596e1843f0d48133dc5412d56e40344c43daf899d9bfc5122c8"
+      },
+      "killedLog": {
+        "path": "artifacts/delivery-crash-task_rollback-2026-10-22-killed.log",
+        "bytes": 14554,
+        "sha256": "d9045683486ae09a137ff0a96fc6476d7d9a12ce2126c1b03057cbac847ecc15"
+      },
+      "retainedRevisions": [
+        {
+          "path": "artifacts/delivery-audit-server/delivery-world/citizens/quest-deliveries/delivery-11-0e9d33b7-77dd-4077-86c5-fe21f696d6d6-0.json",
+          "bytes": 821,
+          "sha256": "59ded41ec2479deb818eebeda179ac0528aeaebf8e3cdba959694b7af197bc13"
+        },
+        {
+          "path": "artifacts/delivery-audit-server/delivery-world/citizens/quest-deliveries/delivery-11-0e9d33b7-77dd-4077-86c5-fe21f696d6d6-1.json",
+          "bytes": 1179,
+          "sha256": "87d2d846d1ca51d765c1541b3625b65339587ad29bc98a982c85548df0bc47b3"
+        },
+        {
+          "path": "artifacts/delivery-audit-server/delivery-world/citizens/quest-deliveries/delivery-11-0e9d33b7-77dd-4077-86c5-fe21f696d6d6-2.json",
+          "bytes": 1249,
+          "sha256": "304a99d9e1594ef547dd5a939892af4b58c2a5a9582863ddf0210198cfa48e63"
+        },
+        {
+          "path": "artifacts/delivery-audit-server/delivery-world/citizens/quest-deliveries/delivery-11-0e9d33b7-77dd-4077-86c5-fe21f696d6d6-3.json",
+          "bytes": 1448,
+          "sha256": "f153d40d978bf876097187edb9967a7c9c89eea0e583585c1ee335fc6e8cbe99"
+        }
+      ]
+    }
+  ],
+  "questRegression": {
+    "checks": {
+      "QUESTAUDIT": 141
+    },
+    "log": {
+      "path": "artifacts/delivery-quest-regression-final-2026-10-22.log",
+      "bytes": 87878,
+      "sha256": "6b16640d18da5605868de89ab6e9c71d530e81810b52d88e6632b853075500f6"
+    }
+  },
+  "selectedStackRegression": {
+    "checks": {
+      "COMMERCETASKAUDIT": 27,
+      "PARTYREWARDAUDIT": 19,
+      "XMODAUDIT": 44
+    },
+    "log": {
+      "path": "artifacts/delivery-xmod-regression-retry-2026-10-22.log",
+      "bytes": 150199,
+      "sha256": "f724370a0f03d2e62b313ee1cf6368d8d3cd9489feb5d03d1ebd9befe928eaf3"
+    }
+  },
+  "createRegression248": {
+    "checks": {
+      "CREATEBATCHAUDIT": 23,
+      "CREATEPRESSAUDIT": 16,
+      "CREATETRANSPORTAUDIT": 21,
+      "CREATEBASINAUDIT": 23,
+      "CREATEFLUIDAUDIT": 28,
+      "CREATEDEPLOYERAUDIT": 26,
+      "CREATEFANAUDIT": 31,
+      "CREATEASSEMBLYAUDIT": 41,
+      "CREATEAUDIT": 54
+    },
+    "log": {
+      "path": "artifacts/delivery-create-regression-retry-248-2026-10-22.log",
+      "bytes": 74198,
+      "sha256": "ec04cc2526f916ad09b94f332a4b4b280c9dfde80c4cf4b41a38e09812f082a2"
+    }
+  },
+  "createRegression233": {
+    "checks": {
+      "CREATEBATCHAUDIT": 23,
+      "CREATEPRESSAUDIT": 16,
+      "CREATETRANSPORTAUDIT": 21,
+      "CREATEBASINAUDIT": 23,
+      "CREATEFLUIDAUDIT": 28,
+      "CREATEDEPLOYERAUDIT": 26,
+      "CREATEFANAUDIT": 31,
+      "CREATEASSEMBLYAUDIT": 41,
+      "CREATEAUDIT": 54
+    },
+    "log": {
+      "path": "artifacts/delivery-create-regression-233-2026-10-22.log",
+      "bytes": 74316,
+      "sha256": "b32f628c5d999ad380236b6758974a8e01e08b2e9f4b692b94d8f3b4cca36adc"
+    }
+  },
+  "interactionsLog": {
+    "path": "artifacts/quest-delivery-interactions-tests-2026-10-22.log",
+    "bytes": 9519,
+    "sha256": "51cfc1296db130c1baf33ad41db6cd02e5db5b7648426bce014b932f89b55242"
+  },
+  "unitLog": {
+    "path": "artifacts/quest-delivery-unit-2026-10-22.log",
+    "bytes": 5522,
+    "sha256": "b458e0975eba426f787a7cd159a4bd512eb5d66923060579068a401bd779e6d5"
+  },
+  "archiveInspection": [
+    {
+      "path": "artifacts/quest-delivery-release-233-jars-2026-10-22/citizens-2.0.43-neoforge-SNAPSHOT-sources.jar",
+      "sha256": "338565798e873e9169cd57b83b637a3252af5c3d85d7c87448bbc07fa0f1c72d",
+      "entries": 658,
+      "foreignOrAuditEntries": [],
+      "citizensEntries": 631,
+      "interactionsEntries": 0,
+      "deliveryJournal": 1
+    },
+    {
+      "path": "artifacts/quest-delivery-release-233-jars-2026-10-22/citizens-2.0.43-neoforge-SNAPSHOT.jar",
+      "sha256": "48a66d278cb7fa1e96d50ed79de7a6ef818bf6c0639d88afef38ee63974df0cd",
+      "entries": 1085,
+      "foreignOrAuditEntries": [],
+      "citizensEntries": 1047,
+      "interactionsEntries": 0,
+      "deliveryJournal": 1
+    },
+    {
+      "path": "artifacts/quest-delivery-release-233-jars-2026-10-22/yuuniverse-interactions-2.0.43-neoforge-SNAPSHOT.jar",
+      "sha256": "b9e291455d3e62b7455ba3dcde4fae593b2d3ed113d6127244b05f4526aa5105",
+      "entries": 82,
+      "foreignOrAuditEntries": [],
+      "citizensEntries": 0,
+      "interactionsEntries": 76,
+      "deliveryJournal": 0
+    },
+    {
+      "path": "artifacts/quest-delivery-release-248-jars-2026-10-22/citizens-2.0.43-neoforge-SNAPSHOT-sources.jar",
+      "sha256": "e8dfab8b1a49f6ba9f96d22c931b8e5333652aedfeae363cac6cc4385d4f76c0",
+      "entries": 658,
+      "foreignOrAuditEntries": [],
+      "citizensEntries": 631,
+      "interactionsEntries": 0,
+      "deliveryJournal": 1
+    },
+    {
+      "path": "artifacts/quest-delivery-release-248-jars-2026-10-22/citizens-2.0.43-neoforge-SNAPSHOT.jar",
+      "sha256": "8896899db8888e79e6043ebe2dd89460cf376cbb8abbfdf4e8cb1b340cbd590b",
+      "entries": 1085,
+      "foreignOrAuditEntries": [],
+      "citizensEntries": 1047,
+      "interactionsEntries": 0,
+      "deliveryJournal": 1
+    },
+    {
+      "path": "artifacts/quest-delivery-release-248-jars-2026-10-22/yuuniverse-interactions-2.0.43-neoforge-SNAPSHOT.jar",
+      "sha256": "80107a834b504b10026490ff50bc45d5bd838524e6f8e1be90ca9a683212bdea",
+      "entries": 82,
+      "foreignOrAuditEntries": [],
+      "citizensEntries": 0,
+      "interactionsEntries": 76,
+      "deliveryJournal": 0
+    }
+  ],
+  "sources": [
+    {
+      "path": "tools/create-runtime-audit/net/yuuniverse/interactions/AssemblyCrashRuntimeAudit.java",
+      "bytes": 23607,
+      "sha256": "35950957a18d76eeca23eef163cf40e87157d9fd84bf3e32546eb82b01dc8823"
+    },
+    {
+      "path": "tools/create-runtime-audit/net/yuuniverse/interactions/AssemblyRuntimeAudit.java",
+      "bytes": 38824,
+      "sha256": "30c862817bc93127b77796b02c576786f3a501b7cf69fa3878498daef8493c5b"
+    },
+    {
+      "path": "tools/create-runtime-audit/net/yuuniverse/interactions/BasinMachineRuntimeAudit.java",
+      "bytes": 23532,
+      "sha256": "bb40ac00ef1e84bf141ad3eb8b10432d4d9f202042fef1d3537ae5141cfb41c6"
+    },
+    {
+      "path": "tools/create-runtime-audit/net/yuuniverse/interactions/BatchMachineRuntimeAudit.java",
+      "bytes": 20007,
+      "sha256": "eea2293ec4d54f4c5a9d276b8e02969309527bcc67f2193b2eb80575034251c4"
+    },
+    {
+      "path": "tools/create-runtime-audit/net/yuuniverse/interactions/CreateRuntimeAudit.java",
+      "bytes": 28236,
+      "sha256": "7f591a3785bde1e64e308cea765710379e774f5b736b8d24944f5a57d4796bfc"
+    },
+    {
+      "path": "tools/create-runtime-audit/net/yuuniverse/interactions/DeployerRuntimeAudit.java",
+      "bytes": 20854,
+      "sha256": "33b97bd6229fcf624b60f87e455dbc4b9f5cbf44a9eff1e08560d7f30c5e9f78"
+    },
+    {
+      "path": "tools/create-runtime-audit/net/yuuniverse/interactions/FanRuntimeAudit.java",
+      "bytes": 26873,
+      "sha256": "8f5aab69cf080b7ffac9bc6f1dc795695977495c9a44356bbd698bfd8af0379e"
+    },
+    {
+      "path": "tools/create-runtime-audit/net/yuuniverse/interactions/FluidMachineRuntimeAudit.java",
+      "bytes": 22729,
+      "sha256": "b2c255d6eb896c4c308a658dbca808d76655ed379e10de8d562f8c7b489d1f9a"
+    },
+    {
+      "path": "tools/create-runtime-audit/net/yuuniverse/interactions/MachineCrashRuntimeAudit.java",
+      "bytes": 11817,
+      "sha256": "d0846960f1b4dda628f382cbb8849844a54812a800d6b53636f9c469ac46d60f"
+    },
+    {
+      "path": "tools/create-runtime-audit/net/yuuniverse/interactions/MachineRemainderItem.java",
+      "bytes": 1706,
+      "sha256": "b332e864308ef7393e868741d2504e9fdcb0e603538983efa24ca52531d69897"
+    },
+    {
+      "path": "tools/create-runtime-audit/net/yuuniverse/interactions/PressMachineRuntimeAudit.java",
+      "bytes": 13556,
+      "sha256": "a8d32df6ed0710fd410d6832aa20238e24034ad517cdb0be4348a1b65fc87317"
+    },
+    {
+      "path": "tools/create-runtime-audit/net/yuuniverse/interactions/TransportPressRuntimeAudit.java",
+      "bytes": 20539,
+      "sha256": "d9dec9fa5cb31fc9b7f6a675ba4943eaa7b2a6480fb0cdc08e77a9e346911538"
+    },
+    {
+      "path": "tools/delivery-runtime-audit/citizens-delivery-audit.mixins.json",
+      "bytes": 212,
+      "sha256": "a0f8e0f496e1328a8da135bfa3fb736b5c8a28725c8524618021f1f86217ea97"
+    },
+    {
+      "path": "tools/delivery-runtime-audit/net/citizensnpcs/audit/delivery/DeliveryRuntimeAudit.java",
+      "bytes": 15503,
+      "sha256": "c67e83610220afbec0dfc3bb58eca947c72c5abf6626abbc98283840f523aad3"
+    },
+    {
+      "path": "tools/delivery-runtime-audit/net/citizensnpcs/audit/delivery/mixin/DeliveryBoundaryMixin.java",
+      "bytes": 1813,
+      "sha256": "99731d32796603d4799f09a8af030c7da2867da5b1a2aebdd079457674318e6a"
+    },
+    {
+      "path": "tools/quest-runtime-audit/net/yuuniverse/interactions/CraftFailureIngredient.java",
+      "bytes": 1293,
+      "sha256": "0ab0f4f517557126ce15c1517dbf76179962875645bf9cdb89a643139f777235"
+    },
+    {
+      "path": "tools/quest-runtime-audit/net/yuuniverse/interactions/QuestRuntimeAudit.java",
+      "bytes": 88954,
+      "sha256": "90399f8522faecdc8877b1b14bf413b7646b9cbddebab25250abfe010bd03bff"
+    },
+    {
+      "path": "tools/quest-runtime-audit/README.md",
+      "bytes": 1119,
+      "sha256": "295755ed258c09ad6f5a05ddd22856ff1b0fb1d4b5f40b50c50be7d623f089fd"
+    },
+    {
+      "path": "tools/xmod-runtime-audit/citizens_xmod_audit.js",
+      "bytes": 2219,
+      "sha256": "8f47c3734251a4bab3428522a6b611a2dd81f7b6516ea905178c1589f17d7639"
+    },
+    {
+      "path": "tools/xmod-runtime-audit/net/citizensnpcs/audit/CommerceTaskRuntimeAudit.java",
+      "bytes": 26686,
+      "sha256": "53d87b7a65480d78c74bc6f40062161c4c47ecf7a7cb516e7cf0147092864e11"
+    },
+    {
+      "path": "tools/xmod-runtime-audit/net/citizensnpcs/audit/PartyRewardRuntimeAudit.java",
+      "bytes": 13343,
+      "sha256": "f69162a6039ed41d1e1d7b08fa94ca7aa2a2c2822dc24bf8f20d78e4cd782cbf"
+    },
+    {
+      "path": "tools/xmod-runtime-audit/net/citizensnpcs/audit/XModRuntimeAudit.java",
+      "bytes": 32305,
+      "sha256": "98c6879ce43d3f6fa9d58f84eb88b2a75f9ce2aee2007fed12a14aa2f6c3150a"
+    },
+    {
+      "path": "tools/xmod-runtime-audit/README.md",
+      "bytes": 1762,
+      "sha256": "c509bb546c9b0c47a0233ed5e16ec405f65045c6ec967d9e570b544388b7a17e"
+    },
+    {
+      "path": "neoforge/build.gradle",
+      "bytes": 6251,
+      "sha256": "1868e4bdef668af415d43ddbee5177778514abae177d35415c83b19c1831dedc"
+    },
+    {
+      "path": "neoforge/gradle.properties",
+      "bytes": 825,
+      "sha256": "f422416a0385a6cc224b0709b8cc20d6f381cbed70f156452c739017749fd1d4"
+    },
+    {
+      "path": "neoforge/src/main/java/net/citizensnpcs/Citizens.java",
+      "bytes": 32898,
+      "sha256": "a5ca5802ea52d5cd6bc26b4a3bca903c03a4c14cfe9b43a484d12e7c99749d91"
+    },
+    {
+      "path": "neoforge/src/main/java/net/citizensnpcs/commands/QuestDeliveryCommands.java",
+      "bytes": 3724,
+      "sha256": "f6afd3ee9e9fba9239d4a1e4344cf9a2fc55741edb585a75bd9429bf5641c229"
+    },
+    {
+      "path": "neoforge/src/main/java/net/citizensnpcs/util/FtbQuestTasks.java",
+      "bytes": 27324,
+      "sha256": "e16e37376cac6b8c04c9fd0593d64d9c211f34600708c32c5650c02fded1b9f4"
+    },
+    {
+      "path": "neoforge/src/main/java/net/citizensnpcs/util/QuestDeliveryJournal.java",
+      "bytes": 15074,
+      "sha256": "d42a25f255635a3251a6f32950eeec3f170c45b44dd59366a18344b3ccbc0d26"
+    },
+    {
+      "path": "neoforge/src/main/java/net/citizensnpcs/util/QuestDeliveryRecovery.java",
+      "bytes": 8024,
+      "sha256": "eed547160bee33f049e341df3b54f1012a8426eaa7a3bb16335e3f5748346960"
+    },
+    {
+      "path": "neoforge/src/main/resources/citizens/en.json",
+      "bytes": 91025,
+      "sha256": "2c34e702abf0430a082a8b2b10b214e2e7a248bfe0e9c50900440b71c48da35b"
+    },
+    {
+      "path": "neoforge/src/test/java/net/citizensnpcs/util/QuestDeliveryJournalTest.java",
+      "bytes": 6140,
+      "sha256": "0490437c9c4648d9a945b3afb0fbb7966f02717ee48f08170e1ca7995accb8cc"
+    },
+    {
+      "path": "tools/create-runtime-audit.gradle",
+      "bytes": 2082,
+      "sha256": "ae56d934b15fc488518c8131b79fb90d0029125d54f0c6d0c6c5b3a7e51de5e0"
+    },
+    {
+      "path": "tools/delivery-runtime-audit.gradle",
+      "bytes": 2084,
+      "sha256": "6755741bb8a311f9e410a4530bce46059f25f5c9128bf4e562e88652f582530a"
+    },
+    {
+      "path": "tools/prepare-create-audit.ps1",
+      "bytes": 4118,
+      "sha256": "8b4462d3b2a4c77774b35ae78588e473c4551639919a8463c71c3f24acaff86a"
+    },
+    {
+      "path": "tools/prepare-delivery-audit.ps1",
+      "bytes": 2670,
+      "sha256": "5ac9a73f5688d33acc64d622921498ff605b0d2b291f5ddae1f31e4f10c69007"
+    },
+    {
+      "path": "tools/prepare-quest-audit.ps1",
+      "bytes": 5007,
+      "sha256": "a47d486f9883a2042949ce145802641a24be19d19e09cf61817fb3f836492e08"
+    },
+    {
+      "path": "tools/prepare-xmod-audit.ps1",
+      "bytes": 2188,
+      "sha256": "e46313d02188e45ceee27e432a40da7e7989a4acf5f563cdd96ad0c0b8bd9e89"
+    },
+    {
+      "path": "tools/quest-runtime-audit.gradle",
+      "bytes": 1480,
+      "sha256": "0107ba52f0c6f80d8e91220a433bb9f5b23dd9e7ceed1446e53683e534b73169"
+    },
+    {
+      "path": "tools/run-delivery-crash-audit.ps1",
+      "bytes": 5011,
+      "sha256": "19867fd847a77d4364e7c7a4be9d685b1956cadfba3f9124221f9e1fe3a83011"
+    },
+    {
+      "path": "tools/xmod-runtime-audit.gradle",
+      "bytes": 1851,
+      "sha256": "028372e83cb483d19ede66543edbc06b2c0128f2710d4296b457d6339dac7eef"
+    }
+  ],
+  "providers": [
+    {
+      "path": "artifacts/delivery-audit-server/mods/architectury-13.0.11-neoforge.jar",
+      "bytes": 584734,
+      "sha256": "9cc92f2c09533fc5482c60f993bd891c655a0e32b637037cdcb7c2b23adedeeb"
+    },
+    {
+      "path": "artifacts/delivery-audit-server/mods/ftb-library-neoforge-2101.1.37.jar",
+      "bytes": 1439881,
+      "sha256": "624c2d2d1cbadb946d967e17757bd5b2d129d4d3ed71f2da0c70607d04476ac2"
+    },
+    {
+      "path": "artifacts/delivery-audit-server/mods/ftb-quests-neoforge-2101.1.36.jar",
+      "bytes": 1609984,
+      "sha256": "6a39982c4b3afc00b1e788041a4f0d394e1659e3b3a6e5d078cd790bc36d0018"
+    },
+    {
+      "path": "artifacts/delivery-audit-server/mods/ftb-teams-neoforge-2101.1.11.jar",
+      "bytes": 308236,
+      "sha256": "e6bcd670493624e6906df872a9c6af4a33fe6405cac57a32c59cd4cd5838c655"
+    },
+    {
+      "path": "artifacts/quest-audit-server/mods/[自修改]Immersive Vehicles-1.21.1-25.0.0.jar",
+      "bytes": 6254864,
+      "sha256": "4d5461dfff5108e1c4fffabee92a6cfa66cb24a4616aa19d4b966f7ec4672dc2"
+    },
+    {
+      "path": "artifacts/quest-audit-server/mods/[自研]prosperous-2026.2.1-neoforge-1.21.1.jar",
+      "bytes": 32396891,
+      "sha256": "31164410e50b110b8114f8f7b99eb35402c7f5abc89ab8075583c8021c23f7f7"
+    },
+    {
+      "path": "artifacts/quest-audit-server/mods/architectury-13.0.11-neoforge.jar",
+      "bytes": 584734,
+      "sha256": "9cc92f2c09533fc5482c60f993bd891c655a0e32b637037cdcb7c2b23adedeeb"
+    },
+    {
+      "path": "artifacts/quest-audit-server/mods/framework-neoforge-1.21.1-0.13.11.jar",
+      "bytes": 387334,
+      "sha256": "429ea90a162d7c25c1463ee60979e4d7b1ddb525d9384a3a2a2f45d70bda03f5"
+    },
+    {
+      "path": "artifacts/quest-audit-server/mods/ftb-library-neoforge-2101.1.37.jar",
+      "bytes": 1439881,
+      "sha256": "624c2d2d1cbadb946d967e17757bd5b2d129d4d3ed71f2da0c70607d04476ac2"
+    },
+    {
+      "path": "artifacts/quest-audit-server/mods/ftb-quests-neoforge-2101.1.36.jar",
+      "bytes": 1609984,
+      "sha256": "6a39982c4b3afc00b1e788041a4f0d394e1659e3b3a6e5d078cd790bc36d0018"
+    },
+    {
+      "path": "artifacts/quest-audit-server/mods/ftb-teams-neoforge-2101.1.11.jar",
+      "bytes": 308236,
+      "sha256": "e6bcd670493624e6906df872a9c6af4a33fe6405cac57a32c59cd4cd5838c655"
+    },
+    {
+      "path": "artifacts/quest-audit-server/mods/kotlinforforge-5.12.0-all.jar",
+      "bytes": 7279264,
+      "sha256": "2785a4dd6de5c6c56065fd8eb789c82771bd2ee773c30794c23160a3b2c39139"
+    },
+    {
+      "path": "artifacts/quest-audit-server/mods/kubejs-neoforge-2101.7.2-build.377.jar",
+      "bytes": 2294111,
+      "sha256": "df9a8458b1f83fed06ba54684977911795a5153a462b81a610895f5b1f2f0cbf"
+    },
+    {
+      "path": "artifacts/quest-audit-server/mods/netmusic-1.5.1-neoforge+mc1.21.1.jar",
+      "bytes": 1472671,
+      "sha256": "54d5bd0a82af2d4e2b1cbe03d45fb2962d242ec6deca0e5b016d3092ce74dcdb"
+    },
+    {
+      "path": "artifacts/quest-audit-server/mods/Paradigm-neoforge-1.21.1-2.5.0.jar",
+      "bytes": 2232920,
+      "sha256": "4748c11f64d0cf6c172714353ef1e7a4d137bf6c4b6e0d3964a49d59971c766d"
+    },
+    {
+      "path": "artifacts/quest-audit-server/mods/refurbished_furniture-neoforge-1.21.1-1.0.22.jar",
+      "bytes": 7133477,
+      "sha256": "953a7840261eb79959769a97caa60cba2ee141700a4cbe208825268327136bdf"
+    },
+    {
+      "path": "artifacts/quest-audit-server/mods/rhino-2101.2.8-build.91.jar",
+      "bytes": 980936,
+      "sha256": "1d53d962aa4dac54bcbb4f998c1845980cf194318f1d6b1580ea6ac15cce5ef3"
+    },
+    {
+      "path": "artifacts/quest-audit-server/mods/rsitemeditor-1.0.1.jar",
+      "bytes": 163718,
+      "sha256": "c2194c5f97a06b1472a5c7bc39c6fd2f3866e237c1ccf9c70787a09fc3109472"
+    },
+    {
+      "path": "artifacts/create-audit-server/mods/architectury-13.0.11-neoforge.jar",
+      "bytes": 584734,
+      "sha256": "9cc92f2c09533fc5482c60f993bd891c655a0e32b637037cdcb7c2b23adedeeb"
+    },
+    {
+      "path": "artifacts/create-audit-server/mods/create.jar",
+      "bytes": 19138095,
+      "sha256": "5602a16796957cb5c7fb829c10c6b54bf9d228931c7680636710b6a60d92822e"
+    },
+    {
+      "path": "artifacts/create-audit-server/mods/ftb-library-neoforge-2101.1.37.jar",
+      "bytes": 1439881,
+      "sha256": "624c2d2d1cbadb946d967e17757bd5b2d129d4d3ed71f2da0c70607d04476ac2"
+    },
+    {
+      "path": "artifacts/create-audit-server/mods/ftb-quests-neoforge-2101.1.36.jar",
+      "bytes": 1609984,
+      "sha256": "6a39982c4b3afc00b1e788041a4f0d394e1659e3b3a6e5d078cd790bc36d0018"
+    },
+    {
+      "path": "artifacts/create-audit-server/mods/ftb-teams-neoforge-2101.1.11.jar",
+      "bytes": 308236,
+      "sha256": "e6bcd670493624e6906df872a9c6af4a33fe6405cac57a32c59cd4cd5838c655"
+    },
+    {
+      "path": "artifacts/create-audit-server/mods/kubejs-neoforge-2101.7.2-build.377.jar",
+      "bytes": 2294111,
+      "sha256": "df9a8458b1f83fed06ba54684977911795a5153a462b81a610895f5b1f2f0cbf"
+    },
+    {
+      "path": "artifacts/create-audit-server/mods/rhino-2101.2.8-build.91.jar",
+      "bytes": 980936,
+      "sha256": "1d53d962aa4dac54bcbb4f998c1845980cf194318f1d6b1580ea6ac15cce5ef3"
+    },
+    {
+      "path": "artifacts/xmod-audit-server/mods/architectury-13.0.11-neoforge.jar",
+      "bytes": 584734,
+      "sha256": "9cc92f2c09533fc5482c60f993bd891c655a0e32b637037cdcb7c2b23adedeeb"
+    },
+    {
+      "path": "artifacts/xmod-audit-server/mods/economy.jar",
+      "bytes": 14431850,
+      "sha256": "179115e5301ee6629acd3bdcbb6779d2549a35f7493821ab0fca79bcc43645f5"
+    },
+    {
+      "path": "artifacts/xmod-audit-server/mods/ftb-library-neoforge-2101.1.37.jar",
+      "bytes": 1439881,
+      "sha256": "624c2d2d1cbadb946d967e17757bd5b2d129d4d3ed71f2da0c70607d04476ac2"
+    },
+    {
+      "path": "artifacts/xmod-audit-server/mods/ftb-quests-neoforge-2101.1.36.jar",
+      "bytes": 1609984,
+      "sha256": "6a39982c4b3afc00b1e788041a4f0d394e1659e3b3a6e5d078cd790bc36d0018"
+    },
+    {
+      "path": "artifacts/xmod-audit-server/mods/ftb-teams-neoforge-2101.1.11.jar",
+      "bytes": 308236,
+      "sha256": "e6bcd670493624e6906df872a9c6af4a33fe6405cac57a32c59cd4cd5838c655"
+    },
+    {
+      "path": "artifacts/xmod-audit-server/mods/ftb-xmod-compat-neoforge-21.1.12.jar",
+      "bytes": 148575,
+      "sha256": "f587e13131101bac33d4cc7a04d13d06c00f8f88a892be90d6ffc8ad96119ae8"
+    },
+    {
+      "path": "artifacts/xmod-audit-server/mods/jei-1.21.1-neoforge-19.53.0.425.jar",
+      "bytes": 1847925,
+      "sha256": "3683c743c1b6192913abc2a969486344eee98aa2924e8deb5087109645c3abc6"
+    },
+    {
+      "path": "artifacts/xmod-audit-server/mods/kubejs-neoforge-2101.7.2-build.377.jar",
+      "bytes": 2294111,
+      "sha256": "df9a8458b1f83fed06ba54684977911795a5153a462b81a610895f5b1f2f0cbf"
+    },
+    {
+      "path": "artifacts/xmod-audit-server/mods/rhino-2101.2.8-build.91.jar",
+      "bytes": 980936,
+      "sha256": "1d53d962aa4dac54bcbb4f998c1845980cf194318f1d6b1580ea6ac15cce5ef3"
+    }
+  ],
+  "limits": [
+    "No atomic transaction across player/team/journal/reward/ledger saves",
+    "No automatic item/progress/reward/money repair",
+    "Direct FTB GUI/other-mod submissions do not join this adapter journal",
+    "Whole-history removal and arbitrary external inventory changes outside acceptance",
+    "Ordinary client fixture remains pinned to earlier release hashes; physical ordinary/VR acceptance pending",
+    "No production deployment or restart"
+  ]
+}

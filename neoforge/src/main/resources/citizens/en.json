@@ -1017,5 +1017,15 @@
   "citizens.commands.recipe.processing-item": "Output: up to {0} × {1}, {2}% chance per item.",
   "citizens.commands.recipe.processing-fluid": "Fluid output: {0} mB of {1}.",
   "citizens.commands.recipe.unsupported": "Recipe {0} uses type {1} and serializer {2}; crafting guidance for this recipe is unavailable.",
-  "citizens.commands.recipe.failed": "Could not inspect that recipe. Check its ID, providers and current server data."
+  "citizens.commands.recipe.failed": "Could not inspect that recipe. Check its ID, providers and current server data.",
+  "citizens.commands.questdelivery.description": "Inspect and resolve uncertain native quest deliveries",
+  "citizens.commands.questdelivery.entry": "Delivery {0}, task {1}: {2}",
+  "citizens.commands.questdelivery.details": "Actor {0}, team {1}: progress {2} -> {3} / {4}, cycle {5} -> {6}.",
+  "citizens.commands.questdelivery.uncertainty": "Review reason: {0}",
+  "citizens.commands.questdelivery.resolved": "Delivery {0}: review decision recorded.",
+  "citizens.commands.questdelivery.failed": "The delivery recovery request failed. Check the server log and retained delivery records.",
+  "citizens.commands.questdelivery.state.prepared": "Awaiting native delivery outcome",
+  "citizens.commands.questdelivery.state.confirmed": "Native delivery returned; independent saves require matching checkpoints",
+  "citizens.commands.questdelivery.state.review": "Operator review required",
+  "citizens.commands.questdelivery.state.resolved": "Operator decision recorded"
 }

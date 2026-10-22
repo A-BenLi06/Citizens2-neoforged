@@ -241,6 +241,15 @@ Physical clients, full-world restart and combined migration acceptance remain op
 
 All rows are accepted goals. An unchecked row means adaptation remains to be implemented/validated, even when its provider is installed.
 
+Progress 2026-10-22, UTC+08:00: [native delivery recovery](ftb-delivery-recovery-2026-10-22.md)
+retains durable component-sensitive intent/outcome revisions, independently checks
+the actor checkpoint and requested team/task outcome, and fences uncertain retries
+for online administrator review. Actual ItemTask progress/inventory boundaries,
+confirmed returns and independently older player/task files are covered by the
+isolated process-termination matrix. Resolution records a decision without native
+item/progress/reward/financial side effects. Independent save domains, wider
+financial/multi-member recovery, original content and physical clients remain gates.
+
 Progress 2026-10-22, UTC+08:00: the user confirmed an ordinary Minecraft client
 is available. The [ordinary-client acceptance fixture](ordinary-client-acceptance-2026-10-22.md)
 provides a separate loopback server, pinned release/provider artifacts, a synthetic

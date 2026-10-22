@@ -99,6 +99,10 @@ public final class FtbQuestTasks {
     static String evidenceRevision(net.minecraft.server.MinecraftServer server, UUID teamId, String taskId) {
         return invoke(() -> {
             Prepared prepared = evidencePrepared(server, teamId, taskId); evidenceTarget(prepared);
+            return definitionRevision(server, prepared);
+        });
+    }
+    private static String definitionRevision(net.minecraft.server.MinecraftServer server, Prepared prepared) throws ReflectiveOperationException {
             var questType = Class.forName(QUEST + "Quest"); var base = Class.forName(QUEST + "QuestObjectBase");
             var objects = new java.util.ArrayList<Object>(); objects.add(prepared.quest());
             var tasks = (java.util.Collection<?>) questType.getMethod("getTasksAsList").invoke(prepared.quest());
@@ -119,7 +123,6 @@ public final class FtbQuestTasks {
             definition.add("taskOrder", json.toJsonTree(taskOrder));
             definition.add("rewardOrder", json.toJsonTree(rewardOrder));
             return QuestRewardJournal.digest(definition.toString());
-        });
     }
     private static String canonicalEvidence(net.minecraft.nbt.Tag tag) {
         if (tag instanceof net.minecraft.nbt.CompoundTag compound) {
@@ -182,6 +185,9 @@ public final class FtbQuestTasks {
             Prepared prepared = prepare(player, parseId(taskId));
             State before = snapshot(prepared);
             if (!before.consumingDelivery()) throw new IllegalArgumentException("Task is not a supported consuming delivery");
+            var recovery = QuestDeliveryRecovery.current(player.getServer());
+            var admitted = deliveryTarget(player.getServer(), prepared);
+            recovery.check(player, admitted, !validate);
             if (!before.available() && !before.completed()) throw new IllegalStateException("Task cannot currently start");
             if (before.completed()) return before;
             Class<?> itemType = Class.forName(QUEST + "task.ItemTask");
@@ -193,15 +199,34 @@ public final class FtbQuestTasks {
             if (!matching) throw new IllegalStateException("No matching delivery items are available");
             if (validate) return before;
             if (!DELIVERING.add(player.getUUID())) throw new IllegalStateException("A quest delivery is already in progress");
+            QuestDeliveryJournal.Entry delivery = null;
             try {
+                delivery = recovery.prepare(player, admitted);
                 prepared.taskType().getMethod("submitTask", prepared.teamType(), ServerPlayer.class)
                         .invoke(prepared.task(), prepared.team(), player);
                 State after = snapshot(prepared);
-                if (after.progress() <= before.progress() && !after.completed())
+                var outcome = deliveryTarget(player.getServer(), prepared);
+                if (after.progress() <= before.progress() && !after.completed() && outcome.cycle() <= admitted.cycle())
                     throw new IllegalStateException("FTB did not accept the delivery");
+                recovery.confirm(delivery, player, outcome);
                 return after;
+            } catch (ReflectiveOperationException | RuntimeException | Error failure) {
+                if (delivery != null) recovery.interrupted(delivery, failure);
+                throw failure;
             } finally { DELIVERING.remove(player.getUUID()); }
         });
+    }
+
+    static QuestDeliveryJournal.Target deliveryTarget(net.minecraft.server.MinecraftServer server, UUID teamId, String taskId) {
+        return invoke(() -> deliveryTarget(server, evidencePrepared(server, teamId, taskId)));
+    }
+    private static QuestDeliveryJournal.Target deliveryTarget(net.minecraft.server.MinecraftServer server, Prepared prepared) throws ReflectiveOperationException {
+        State state = snapshot(prepared);
+        boolean repeatable = (boolean) Class.forName(QUEST + "Quest").getMethod("canBeRepeated").invoke(prepared.quest());
+        int cycle = repeatable ? (int) prepared.teamType().getMethod("getCompletionCount", Class.forName(QUEST + "Quest"))
+                .invoke(prepared.team(), prepared.quest()) : 0;
+        return new QuestDeliveryJournal.Target(state.teamId(), state.taskId(), code(prepared.quest()), cycle, state.maximum(),
+                state.progress(), state.completed(), definitionRevision(server, prepared));
     }
 
     private static Prepared prepare(ServerPlayer player, long id) throws ReflectiveOperationException {

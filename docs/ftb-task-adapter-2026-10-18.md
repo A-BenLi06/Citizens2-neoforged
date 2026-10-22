@@ -40,10 +40,12 @@ on return/failure. Party changes resolve the new team on the next call; already
 admitted work belongs to the team admitted by FTB. Repeatable-quest generations,
 monetary rewards and receipt/craft evidence require their own supported adapters.
 
-This adapter does not make Minecraft inventory and FTB progress persistence atomic
-on process crash, provide a retry-intent protocol for partial deliveries, or import
-legacy quest content. It establishes the native task/query/delivery boundary;
-ADAPT-04/05 and the integrated release remain open.
+Follow-up 2026-10-22, UTC+08:00: [delivery outcome recovery](ftb-delivery-recovery-2026-10-22.md)
+retains component-sensitive intent/outcome revisions for partial submissions,
+checks independent player/task checkpoints and fences uncertain retries for
+authenticated operator review. It never automatically replays consumption or
+repairs native inventory/progress/rewards. Minecraft inventory and FTB persistence
+remain independent; legacy content and broader ADAPT-04/05/release gates remain open.
 
 Validation: 17 native FTB checks on 21.1.248, 121 actual Economy 0.5.5/CMDCam/
 CreativeCore service checks, and the ordinary test/build pass. Separate binary/
