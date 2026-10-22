@@ -1,5 +1,5 @@
 allprojects {
-    layout.buildDirectory.set(file('../artifacts/delivery-storage-load-build'))
+    layout.buildDirectory.set(file(gradle.startParameter.projectProperties.get('storageAuditBuildDir') ?: '../artifacts/delivery-storage-load-build'))
     afterEvaluate { p ->
         p.sourceSets.create('storageAudit') {
             java.srcDir(p.file('../tools/delivery-storage-audit'))

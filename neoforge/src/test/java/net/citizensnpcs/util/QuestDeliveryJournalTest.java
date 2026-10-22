@@ -5,6 +5,8 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.UUID;
+import java.util.List;
+import java.util.Comparator;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 
@@ -96,5 +98,87 @@ class QuestDeliveryJournalTest {
     @Test void cycleAdvanceIsDistinctFromProgressRollback() {
         var next = new QuestDeliveryJournal.Target(team, "a1", "a2", 1, 3, 0, false, "a".repeat(64));
         assertTrue(next.retains(target(3))); assertFalse(target(3).retains(next));
+    }
+    private void queriesMatchHistory(QuestDeliveryJournal journal, List<UUID> actors, List<QuestDeliveryJournal.Target> targets) {
+        var retained = journal.entries();
+        for (var actor : actors) {
+            assertEquals(retained.stream().filter(e -> e.actorId().equals(actor))
+                    .max(Comparator.comparingLong(QuestDeliveryJournal.Entry::sequence)), journal.latest(actor));
+            for (var target : targets) {
+                assertEquals(retained.stream().filter(QuestDeliveryJournal::pending).filter(e -> e.actorId().equals(actor)
+                        || e.before().teamId().equals(target.teamId()) && e.before().taskId().equals(target.taskId()))
+                        .min(Comparator.comparingLong(QuestDeliveryJournal.Entry::sequence)), journal.pending(actor, target));
+            }
+        }
+        for (var target : targets) {
+            assertEquals(retained.stream().filter(e -> e.before().teamId().equals(target.teamId())
+                    && e.before().taskId().equals(target.taskId()))
+                    .max(Comparator.comparingLong(QuestDeliveryJournal.Entry::sequence)), journal.latestTask(target));
+        }
+    }
+    @Test void indexedQueriesPreserveEveryHistoricalReviewAndTheLatestActorAndTaskAcrossReopen() throws Exception {
+        UUID other = UUID.randomUUID();
+        var actors = List.of(actor, other, UUID.randomUUID());
+        var first = target(0);
+        var second = new QuestDeliveryJournal.Target(team, "b1", "b2", 0, 3, 0, false, "b".repeat(64));
+        var secondAfter = new QuestDeliveryJournal.Target(team, "b1", "b2", 0, 3, 3, true, "b".repeat(64));
+        // Query ownership stays actor or team/task, independently of today's quest/cycle/definition.
+        var targets = List.of(first, second,
+                new QuestDeliveryJournal.Target(team, "a1", "ff", 8, 5, 1, false, "c".repeat(64)),
+                new QuestDeliveryJournal.Target(UUID.randomUUID(), "a1", "a2", 0, 3, 0, false, "a".repeat(64)));
+        var ids = new java.util.ArrayList<UUID>();
+        try (var journal = QuestDeliveryJournal.open(directory)) {
+            for (int i = 0; i < 4; i++) {
+                boolean onFirst = i == 0 || i == 3;
+                var entry = journal.prepare(i % 2 == 0 ? actor : other, onFirst ? first : second, "[]");
+                ids.add(entry.id()); queriesMatchHistory(journal, actors, targets);
+                journal.confirm(entry.id(), onFirst ? target(3) : secondAfter, "[]");
+                queriesMatchHistory(journal, actors, targets);
+            }
+            for (var id : ids) {
+                journal.review(id, "Original native save requires inspection");
+                queriesMatchHistory(journal, actors, targets);
+            }
+        }
+        try (var journal = QuestDeliveryJournal.open(directory)) {
+            queriesMatchHistory(journal, actors, targets);
+            assertEquals(ids.get(2), journal.latest(actor).orElseThrow().id());
+            assertEquals(ids.get(3), journal.latestTask(first).orElseThrow().id());
+            assertEquals(ids.getFirst(), journal.pending(actor, second).orElseThrow().id());
+            for (int index : new int[] {0, 2, 1}) {
+                journal.resolve(ids.get(index), UUID.randomUUID(), false, "Inspected retained native effects");
+                queriesMatchHistory(journal, actors, targets);
+            }
+            // Another actor/task still needs review, but this independent scope may proceed.
+            var entry = journal.prepare(actor, second, "[]");
+            journal.confirm(entry.id(), secondAfter, "[]");
+            queriesMatchHistory(journal, actors, targets);
+            journal.resolve(ids.get(3), UUID.randomUUID(), true, "Inspected original native outcome");
+            queriesMatchHistory(journal, actors, targets);
+            assertTrue(journal.pending(actor, first).isEmpty());
+        }
+        try (var journal = QuestDeliveryJournal.open(directory)) { queriesMatchHistory(journal, actors, targets); }
+    }
+    @Test void startupRecoveryIndexesEachPreparedActorAndTaskWithoutDroppingOtherFences() throws Exception {
+        UUID other = UUID.randomUUID(), fresh = UUID.randomUUID();
+        var elsewhere = new QuestDeliveryJournal.Target(UUID.randomUUID(), "b1", "b2", 0, 3, 0, false, "b".repeat(64));
+        var actors = List.of(actor, other, fresh); var targets = List.of(target(0), elsewhere);
+        UUID initial;
+        try (var journal = QuestDeliveryJournal.open(directory)) { initial = journal.prepare(actor, target(0), "[]").id(); }
+        try (var journal = QuestDeliveryJournal.open(directory)) {
+            queriesMatchHistory(journal, actors, targets);
+            assertEquals(QuestDeliveryJournal.State.REVIEW, journal.pending(fresh, target(0)).orElseThrow().state());
+            journal.resolve(initial, fresh, false, "Inspected saved native inventory and task");
+            journal.prepare(other, target(0), "[]"); journal.prepare(actor, elsewhere, "[]");
+            queriesMatchHistory(journal, actors, targets);
+        }
+        try (var journal = QuestDeliveryJournal.open(directory)) {
+            queriesMatchHistory(journal, actors, targets);
+            var first = journal.pending(actor, target(0)).orElseThrow();
+            journal.resolve(first.id(), fresh, true, "Retained native effects after inspection");
+            queriesMatchHistory(journal, actors, targets);
+            assertTrue(journal.pending(actor, target(0)).isPresent());
+            assertEquals(QuestDeliveryJournal.State.REVIEW, journal.pending(actor, target(0)).orElseThrow().state());
+        }
     }
 }

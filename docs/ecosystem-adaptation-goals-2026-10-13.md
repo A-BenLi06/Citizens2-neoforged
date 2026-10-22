@@ -8,6 +8,13 @@ Citizens retains NPC behavior and its existing native extension contracts. Yuuni
 
 ## Selected artifacts and sides
 
+Progress 2026-10-22, UTC+08:00: [delivery ownership indexes](delivery-admission-indexes-2026-10-22.md)
+keep latest actor/task and all unresolved owners available without full-history
+admission scans. Historical reviews retain their earliest original fence across
+resolution/restart. Real-file lookup/allocation costs remain small through 16,384
+entries; forced writes, full loading and retention keep their own costs and gates.
+Fresh acceptance passes 302 native checks, 782 ordinary tests per target and 100 Interactions tests.
+
 Progress 2026-10-22, UTC+08:00: [delivery storage and load probe](delivery-storage-acceptance-2026-10-22.md)
 verifies failed publication preserves original records and fences live/restarted
 consumption until review. The production implementation is unchanged. Real-file

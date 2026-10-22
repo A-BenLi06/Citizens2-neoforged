@@ -70,6 +70,13 @@ public final class DeliveryStorageAudit {
                 sample.addProperty("latestLookupIterations", 10000);
                 sample.addProperty("latestLookupNanosPerCall", (System.nanoTime() - started) / 10000.0);
                 sample.addProperty("latestLookupAllocatedBytesPerCall", (allocation() - allocated) / 10000.0);
+                var admissionTarget = target(team, size, size);
+                for (int i = 0; i < 1000; i++) admissionReads(journal, actors.get(i % actors.size()), admissionTarget);
+                started = System.nanoTime(); allocated = allocation();
+                for (int i = 0; i < 10000; i++) admissionReads(journal, actors.get(i % actors.size()), admissionTarget);
+                sample.addProperty("admissionReadIterations", 10000);
+                sample.addProperty("admissionReadNanosPerCall", (System.nanoTime() - started) / 10000.0);
+                sample.addProperty("admissionReadAllocatedBytesPerCall", (allocation() - allocated) / 10000.0);
                 started = System.nanoTime(); allocated = allocation();
                 for (int i = 0; i < 1000; i++) sink += journal.entries().size();
                 sample.addProperty("snapshotIterations", 1000);
@@ -87,6 +94,11 @@ public final class DeliveryStorageAudit {
         System.out.println("[DELIVERYSTORAGEAUDIT] COMPLETE " + root);
     }
     private static long allocation() { return THREADS.getThreadAllocatedBytes(Thread.currentThread().threadId()); }
+    private static void admissionReads(QuestDeliveryJournal journal, UUID actor, QuestDeliveryJournal.Target target) {
+        require(journal.pending(actor, target).isEmpty(), "Confirmed history retained an unresolved admission");
+        sink ^= journal.latest(actor).orElseThrow().sequence();
+        sink ^= journal.latestTask(target).orElseThrow().sequence();
+    }
     private static void require(boolean condition, String message) { if (!condition) throw new AssertionError(message); }
     private DeliveryStorageAudit() { }
 }

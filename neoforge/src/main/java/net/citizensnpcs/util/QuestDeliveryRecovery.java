@@ -34,12 +34,9 @@ public final class QuestDeliveryRecovery implements AutoCloseable {
     }
     void check(ServerPlayer actor, QuestDeliveryJournal.Target target, boolean recordMismatch) {
         active();
-        for (var entry : journal.entries()) {
-            boolean actorOwns = entry.actorId().equals(actor.getUUID());
-            boolean taskOwns = entry.before().teamId().equals(target.teamId()) && entry.before().taskId().equals(target.taskId());
-            if (QuestDeliveryJournal.pending(entry) && (actorOwns || taskOwns))
-                throw new IllegalStateException("Delivery " + entry.id() + " requires its native outcome or operator review");
-        }
+        var pending = journal.pending(actor.getUUID(), target).orElse(null);
+        if (pending != null)
+            throw new IllegalStateException("Delivery " + pending.id() + " requires its native outcome or operator review");
         verifyCheckpoint(actor);
         var latestActor = journal.latest(actor.getUUID()).orElse(null);
         if (latestActor != null && latestActor.state() == QuestDeliveryJournal.State.CONFIRMED) {
@@ -48,8 +45,7 @@ public final class QuestDeliveryRecovery implements AutoCloseable {
         }
         // A teammate can restore/use a different player file. The team's task fence
         // must therefore be checked independently of the current actor checkpoint.
-        var latestTask = journal.entries().stream().filter(entry -> entry.before().teamId().equals(target.teamId())
-                && entry.before().taskId().equals(target.taskId())).max(java.util.Comparator.comparingLong(QuestDeliveryJournal.Entry::sequence)).orElse(null);
+        var latestTask = journal.latestTask(target).orElse(null);
         if (latestTask != null && latestTask.state() == QuestDeliveryJournal.State.CONFIRMED) verify(latestTask, recordMismatch);
     }
     private void verifyCheckpoint(ServerPlayer actor) {

@@ -10,6 +10,13 @@ This review covers repository structure, native implementation boundaries, upstr
 
 ## Repository and implementation boundaries
 
+Update 2026-10-22, UTC+08:00: [indexed delivery admission](delivery-admission-indexes-2026-10-22.md)
+removes full-history scans/copies from actor/task admission and preparation while
+preserving every historical review fence. Startup derives indexes from the same
+validated immutable history; no pruning or schema change. Fresh acceptance passes
+302 native checks, 782 ordinary tests per target and 100 Interactions tests.
+Full loading/admin snapshots, broader failure/retention and migration/client gates remain.
+
 Update 2026-10-22, UTC+08:00: [delivery storage acceptance](delivery-storage-acceptance-2026-10-22.md)
 adds real immutable-publication failures and damaged-history restoration tests
 (13 focused tests per target), plus 17 native consumption/restart checks. Journals

@@ -79,6 +79,14 @@ Other unresolved entries can still fence the next attempt.
 
 ## Acceptance and limits
 
+Follow-up 2026-10-22, UTC+08:00: [indexed admission](delivery-admission-indexes-2026-10-22.md)
+uses derived latest actor/task and ordered unresolved ownership without copying
+all retained history per call. Older reviews never replace newer actor/task heads
+or disappear when another review resolves. Original checkpoint/outcome validation,
+forced publication and full-history reload validation remain required. Fresh
+acceptance passes 302 native checks, 782 ordinary tests per target and 100 Interactions
+tests; full loading/admin snapshot cost, other failures and migration/client gates remain.
+
 Follow-up 2026-10-22, UTC+08:00: [delivery storage acceptance](delivery-storage-acceptance-2026-10-22.md)
 adds 13 focused journal/storage tests per target and 17 native confirmation-write
 failure/restart assertions. Previously consumed paper and progress remain intact;

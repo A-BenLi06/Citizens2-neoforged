@@ -4,6 +4,11 @@ Recorded 2026-10-22, UTC+08:00. Extends
 [checkpoint backing](delivery-checkpoint-history-2026-10-22.md) without changing
 production code or the journal schema.
 
+Follow-up: [indexed delivery admission](delivery-admission-indexes-2026-10-22.md)
+removes the measured full-history lookup/copy cost from delivery admission. The
+figures below retain this earlier baseline; immutable loading, administrator
+snapshots and forced writes remain independently measured.
+
 Five new real-filesystem tests exercise failed immutable confirmation, review and
 resolution publication, loss of a whole middle delivery, truncated/unsupported
 records, changed actor/admission payloads and exact restoration. An existing path

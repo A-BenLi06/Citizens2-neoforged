@@ -1,6 +1,8 @@
 param(
     [Parameter(Mandatory)][string]$JavaHome,
-    [ValidatePattern('^[a-zA-Z0-9_-]+$')][string]$LogPrefix='delivery-storage-native-2026-10-22'
+    [ValidatePattern('^[a-zA-Z0-9_-]+$')][string]$LogPrefix='delivery-storage-native-2026-10-22',
+    [string]$BuildDirectory='artifacts/delivery-storage-native-build',
+    [string]$ProjectCache='artifacts/delivery-storage-native-cache'
 )
 $ErrorActionPreference='Stop'
 $taskRoot=Split-Path $PSScriptRoot -Parent
@@ -9,12 +11,19 @@ $runId=[Guid]::NewGuid().ToString('N')
 $relativeFixture="artifacts/delivery-storage-$runId-server"
 $fixture=[IO.Path]::GetFullPath((Join-Path $taskRoot $relativeFixture))
 $artifactRoot=[IO.Path]::GetFullPath((Join-Path $taskRoot 'artifacts'))+[IO.Path]::DirectorySeparatorChar
+function Resolve-AuditPath([string]$path){
+    $resolved=[IO.Path]::GetFullPath((Join-Path $taskRoot $path))
+    if(!$resolved.StartsWith($artifactRoot,[StringComparison]::OrdinalIgnoreCase)){throw 'Storage build/cache paths must be inside task artifacts'}
+    return $resolved
+}
+$buildOutput=Resolve-AuditPath $BuildDirectory
+$cache=Resolve-AuditPath $ProjectCache
 if(!$fixture.StartsWith($artifactRoot,[StringComparison]::OrdinalIgnoreCase)-or(Test-Path -LiteralPath $fixture)){throw 'Storage fixture must be fresh and inside task artifacts'}
 New-Item -ItemType Directory -Path $fixture|Out-Null
 foreach($part in @('mods','config','server.properties','eula.txt','delivery-audit-fixture.txt')){Copy-Item -LiteralPath (Join-Path $taskRoot "artifacts/delivery-callback-normal-server/$part") -Destination $fixture -Recurse}
 $runId|Set-Content -LiteralPath (Join-Path $fixture 'delivery-storage-fixture.txt') -Encoding ascii
-$arguments=@('--project-cache-dir','../artifacts/delivery-storage-native-cache','-I','../tools/delivery-runtime-audit.gradle','-Pneo_version=21.1.248',
-    '-PdeliveryAuditBuildDir=../artifacts/delivery-storage-native-build',"-PdeliveryAuditFixture=../$relativeFixture","-PdeliveryAuditRun=$runId")
+$arguments=@('--project-cache-dir',$cache,'-I','../tools/delivery-runtime-audit.gradle','-Pneo_version=21.1.248',
+    "-PdeliveryAuditBuildDir=$buildOutput","-PdeliveryAuditFixture=../$relativeFixture","-PdeliveryAuditRun=$runId")
 $stages=[Collections.Generic.List[object]]::new()
 try{
     foreach($phase in @('failure','recovered')){

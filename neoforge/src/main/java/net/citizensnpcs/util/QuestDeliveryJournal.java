@@ -63,6 +63,11 @@ public final class QuestDeliveryJournal implements AutoCloseable {
     private final FileChannel channel;
     private final FileLock lock;
     private final Map<UUID, Entry> entries = new LinkedHashMap<>();
+    private record Scope(UUID team, String task) { }
+    private final Map<UUID, Entry> latestActors = new HashMap<>();
+    private final Map<Scope, Entry> latestTasks = new HashMap<>();
+    private final Map<UUID, NavigableMap<Long, Entry>> pendingActors = new HashMap<>();
+    private final Map<Scope, NavigableMap<Long, Entry>> pendingTasks = new HashMap<>();
     private long sequence;
     private boolean failed, closed;
     public static QuestDeliveryJournal open(Path path) throws IOException { return new QuestDeliveryJournal(path); }
@@ -85,15 +90,24 @@ public final class QuestDeliveryJournal implements AutoCloseable {
     }
     public List<Entry> entries() { active(); return List.copyOf(entries.values()); }
     public Optional<Entry> latest(UUID actor) {
-        active(); return entries.values().stream().filter(entry -> entry.actorId().equals(actor)).max(Comparator.comparingLong(Entry::sequence));
+        active(); return Optional.ofNullable(latestActors.get(actor));
+    }
+    public Optional<Entry> latestTask(Target target) {
+        active(); return Optional.ofNullable(latestTasks.get(scope(target)));
+    }
+    /** Earliest unresolved actor or team/task owner, including reviews of older deliveries. */
+    public Optional<Entry> pending(UUID actor, Target target) {
+        active();
+        Entry actorEntry = first(pendingActors.get(actor)), taskEntry = first(pendingTasks.get(scope(target)));
+        return Optional.ofNullable(actorEntry == null ? taskEntry : taskEntry == null
+                || actorEntry.sequence() <= taskEntry.sequence() ? actorEntry : taskEntry);
     }
     public Entry get(UUID id) {
         active(); Entry entry = entries.get(id); if (entry == null) throw new IllegalArgumentException("Unknown delivery"); return entry;
     }
     public Entry prepare(UUID actor, Target before, String inventory) throws IOException {
         active();
-        if (entries.values().stream().anyMatch(entry -> pending(entry) && (entry.actorId().equals(actor)
-                || entry.before().teamId().equals(before.teamId()) && entry.before().taskId().equals(before.taskId()))))
+        if (pending(actor, before).isPresent())
             throw new IllegalStateException("An unresolved delivery owns this inventory or team task");
         Entry entry = new Entry(UUID.randomUUID(), Math.addExact(sequence, 1), latest(actor).map(Entry::id).orElse(null),
                 0, actor, before, inventory, State.PREPARED, null, null, null, null);
@@ -134,8 +148,32 @@ public final class QuestDeliveryJournal implements AutoCloseable {
                 while (bytes.hasRemaining()) output.write(bytes); output.force(true);
             }
             Files.move(temporary, target, StandardCopyOption.ATOMIC_MOVE);
+            install(entry);
         } catch (IOException | RuntimeException | Error failure) { failed = true; throw failure; }
-        entries.put(entry.id(), entry); return entry;
+        return entry;
+    }
+    private static Scope scope(Target target) { return new Scope(target.teamId(), target.taskId()); }
+    private static Entry first(NavigableMap<Long, Entry> values) { return values == null ? null : values.firstEntry().getValue(); }
+    private static <K> void latest(Map<K, Entry> index, K key, Entry entry) {
+        Entry previous = index.get(key);
+        if (previous == null || previous.sequence() <= entry.sequence()) index.put(key, entry);
+    }
+    private static <K> void pending(Map<K, NavigableMap<Long, Entry>> index, K key, Entry entry) {
+        if (pending(entry)) index.computeIfAbsent(key, ignored -> new TreeMap<>()).put(entry.sequence(), entry);
+        else {
+            var values = index.get(key);
+            if (values != null) {
+                values.remove(entry.sequence());
+                if (values.isEmpty()) index.remove(key);
+            }
+        }
+    }
+    /** Called only after durable publication or after validating a loaded history. */
+    private void install(Entry entry) {
+        entries.put(entry.id(), entry);
+        Scope scope = scope(entry.before());
+        latest(latestActors, entry.actorId(), entry); latest(latestTasks, scope, entry);
+        pending(pendingActors, entry.actorId(), entry); pending(pendingTasks, scope, entry);
     }
     private void load() throws IOException {
         var histories = new HashMap<UUID, NavigableMap<Integer, Entry>>();
@@ -171,7 +209,7 @@ public final class QuestDeliveryJournal implements AutoCloseable {
         for (Entry entry : ordered.values()) {
             if (entry.sequence() != ++sequence || !Objects.equals(entry.previousActorEntry(), actors.get(entry.actorId())))
                 throw new IOException("Delivery history has a gap or changed actor chain");
-            actors.put(entry.actorId(), entry.id()); entries.put(entry.id(), entry);
+            actors.put(entry.actorId(), entry.id()); install(entry);
         }
     }
     private static void follows(Entry previous, Entry next) {
