@@ -1,0 +1,281 @@
+{
+  "createdAt": "2026-10-22T14:28:26.725522+08:00",
+  "timezone": "UTC+08:00",
+  "neoForge": "21.1.248",
+  "lavaNativeChecks": 22,
+  "lavaRestartChecks": 7,
+  "lavaAbsentChecks": 3,
+  "environmentNativeChecks": 30,
+  "environmentRestartChecks": 24,
+  "environmentAbsentChecks": 6,
+  "ordinaryBuilds": [
+    {
+      "neoForge": "21.1.248",
+      "results": {
+        "tests": 775.0,
+        "failures": 0.0,
+        "errors": 0.0,
+        "skipped": 0.0,
+        "suites": 113
+      },
+      "summary": {
+        "path": "artifacts/lava-ordinary-248-tests-2026-10-22.json",
+        "bytes": 99,
+        "sha256": "8e247ea7e5af54901ce1871ce41ad9eaa1bcdcf4fbb342bafddf4111a7296849"
+      },
+      "log": {
+        "path": "artifacts/lava-ordinary-248-2026-10-22.log",
+        "bytes": 69899,
+        "sha256": "6fea7fd7c5b75783c37c8a35bf63d84c4d61ef09d10b516ec6b7a431d5d063fd"
+      }
+    },
+    {
+      "neoForge": "21.1.233",
+      "results": {
+        "tests": 775.0,
+        "failures": 0.0,
+        "errors": 0.0,
+        "skipped": 0.0,
+        "suites": 113
+      },
+      "summary": {
+        "path": "artifacts/lava-ordinary-233-tests-2026-10-22.json",
+        "bytes": 99,
+        "sha256": "8e247ea7e5af54901ce1871ce41ad9eaa1bcdcf4fbb342bafddf4111a7296849"
+      },
+      "log": {
+        "path": "artifacts/lava-ordinary-233-2026-10-22.log",
+        "bytes": 70026,
+        "sha256": "ae7397229800e9a549add5bc07d9bcf8f19d721e7d8bb34ae71cf965cb88e27a"
+      }
+    }
+  ],
+  "interactions": {
+    "tests": 100,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0,
+    "suites": 9
+  },
+  "packages": [
+    {
+      "path": "artifacts/lava-release-248-jars-2026-10-22/citizens-2.0.43-neoforge-SNAPSHOT-sources.jar",
+      "bytes": 1119724,
+      "sha256": "7bad7830becd46c5bf316bce95515072b9211ce5477b93f0bebbc5defdaa9b06",
+      "entries": 662,
+      "auditAndProviderClassesExcluded": true,
+      "separateOwnership": true
+    },
+    {
+      "path": "artifacts/lava-release-248-jars-2026-10-22/citizens-2.0.43-neoforge-SNAPSHOT.jar",
+      "bytes": 4063864,
+      "sha256": "1bb7f351b5ee3723da4606b9a2e24ffd5981066d1ec07d2e8607ee45a837120d",
+      "entries": 1090,
+      "auditAndProviderClassesExcluded": true,
+      "separateOwnership": true
+    },
+    {
+      "path": "artifacts/lava-release-248-jars-2026-10-22/yuuniverse-interactions-2.0.43-neoforge-SNAPSHOT.jar",
+      "bytes": 204146,
+      "sha256": "bd6f549e72531fe50f2f2a0d0657819dcecd52869bb76d0a0deb05d685fa2bc5",
+      "entries": 82,
+      "auditAndProviderClassesExcluded": true,
+      "separateOwnership": true
+    },
+    {
+      "path": "artifacts/lava-release-233-jars-2026-10-22/citizens-2.0.43-neoforge-SNAPSHOT-sources.jar",
+      "bytes": 1119724,
+      "sha256": "7415645c2270399e45d29ad5203c9ca557c4263576d6d14636a3470de1d62283",
+      "entries": 662,
+      "auditAndProviderClassesExcluded": true,
+      "separateOwnership": true
+    },
+    {
+      "path": "artifacts/lava-release-233-jars-2026-10-22/citizens-2.0.43-neoforge-SNAPSHOT.jar",
+      "bytes": 4063864,
+      "sha256": "94f126547543e0c18746f45013e50eb7e59bf74a194237d322f3c50df4a0f9da",
+      "entries": 1090,
+      "auditAndProviderClassesExcluded": true,
+      "separateOwnership": true
+    },
+    {
+      "path": "artifacts/lava-release-233-jars-2026-10-22/yuuniverse-interactions-2.0.43-neoforge-SNAPSHOT.jar",
+      "bytes": 204146,
+      "sha256": "345ef87a5d1a36d246107a5b07611b183ced81193c95ac0490eaab9bee320e2a",
+      "entries": 82,
+      "auditAndProviderClassesExcluded": true,
+      "separateOwnership": true
+    }
+  ],
+  "sourceTrees": [
+    {
+      "path": "neoforge/src/main",
+      "files": 611,
+      "sha256": "39373b7358e7387a943a0092b6ac1979efbe59759c0c8a8fe58fc6ee86112dfd",
+      "algorithm": "SHA-256 of compact sorted-key JSON array of path/bytes/sha256 records ordered by path"
+    },
+    {
+      "path": "neoforge/src/dialogue",
+      "files": 48,
+      "sha256": "a08fe8e655014f5b26ec981cef4590278f7bffef8a8feabe9c9d5ab6d4aa5ddd",
+      "algorithm": "SHA-256 of compact sorted-key JSON array of path/bytes/sha256 records ordered by path"
+    }
+  ],
+  "sources": [
+    {
+      "path": "neoforge/src/main/java/net/citizensnpcs/mixin/LavaFluidLoggingMixin.java",
+      "bytes": 1297,
+      "sha256": "4e5d4955bd8037c81d486faabaee177e6e3bb368034aba6732d21ad0363dfda0"
+    },
+    {
+      "path": "neoforge/src/main/resources/citizens.mixins.json",
+      "bytes": 1972,
+      "sha256": "694de887396830c47babce90400b9b5aa9d86d8e9e2a5967fb14aa534a2548b4"
+    },
+    {
+      "path": "neoforge/src/main/java/net/citizensnpcs/mixin/FireBlockLoggingMixin.java",
+      "bytes": 2725,
+      "sha256": "9275cc8715baf34c25c7ef11e772e6767d7ad959c4e122c2bcb3af758bfa7f22"
+    },
+    {
+      "path": "neoforge/src/main/java/net/citizensnpcs/mixin/NeoProtectFireStateMixin.java",
+      "bytes": 1119,
+      "sha256": "9588a874e540595596c87dcfa369cee5b40986ea317f8d744f6cefc4c4f8be80"
+    },
+    {
+      "path": "neoforge/src/main/java/net/citizensnpcs/util/NeoProtectFireObservations.java",
+      "bytes": 3058,
+      "sha256": "ee7691d368c5468348aaaeb35f23950164b794a68d73c0d2ebb44d4a2af52ae4"
+    },
+    {
+      "path": "tools/lava-logging-runtime-audit.gradle",
+      "bytes": 2196,
+      "sha256": "e825a0a186664d518f6dbd2573b6a0d2479259bc9ee90447f3e89c71e2eb55ef"
+    },
+    {
+      "path": "tools/lava-logging-runtime-audit/net/yuuniverse/interactions/LavaLoggingRuntimeAudit.java",
+      "bytes": 9498,
+      "sha256": "7dfd63bd4f6b8d9684364a04cea2cb9b03f83bae9f60f8cfdabba130809949c8"
+    },
+    {
+      "path": "tools/environment-logging-runtime-audit.gradle",
+      "bytes": 2233,
+      "sha256": "ddafb63ce3444832266c7ed96c8b441b75f3787e755761d682de4eaaebf7490a"
+    },
+    {
+      "path": "tools/environment-logging-runtime-audit/net/yuuniverse/interactions/EnvironmentalLoggingRuntimeAudit.java",
+      "bytes": 15797,
+      "sha256": "3e34498c5a27bdf3866bc15ca6009b3b177a9b9e9d45fb5cc03dd067034de9ef"
+    },
+    {
+      "path": "tools/prepare-logging-audit.ps1",
+      "bytes": 3884,
+      "sha256": "6863b62daca2b61dee2fa3815d8510e57378f4744bdd97eceb7bdf27e6c53447"
+    },
+    {
+      "path": "artifacts/LavaFluid.java",
+      "bytes": 10369,
+      "sha256": "be1253fd9d64b50464a1d62853f7f4629f3eebb38f84aa5f8499d64c3ccbf435"
+    }
+  ],
+  "files": [
+    {
+      "path": "artifacts/lava-logging-native-2026-10-22.log",
+      "bytes": 16105,
+      "sha256": "3765ed87319badd79d0c0bdf1b44146051ae2b2742764558d6461fe4903cbfb8"
+    },
+    {
+      "path": "artifacts/lava-logging-recover-2026-10-22.log",
+      "bytes": 13762,
+      "sha256": "dfa33c0bc94988fc973e5bd39fae6bc91eb9ecfdcb69413e82213ef032d05a5c"
+    },
+    {
+      "path": "artifacts/lava-logging-absent-2026-10-22.log",
+      "bytes": 13083,
+      "sha256": "275386fd412c225636b25cc9378dd8f87542914921c6d7979b9213cc52ea076f"
+    },
+    {
+      "path": "artifacts/lava-environment-native-2026-10-22.log",
+      "bytes": 19007,
+      "sha256": "f07ccb9f1e4cf8bea1e042c2ad66d1d4b03b82f80d04cadad99234c5dc55b687"
+    },
+    {
+      "path": "artifacts/lava-environment-recover-2026-10-22.log",
+      "bytes": 17643,
+      "sha256": "6fec5fc9836e72214da70a930c98418a661ddea2b9ebc1bbb5208a41c6476d38"
+    },
+    {
+      "path": "artifacts/lava-environment-absent-2026-10-22.log",
+      "bytes": 13628,
+      "sha256": "a6537f9101cccf913c79bd2692b8f9a223acc837a2d51255bc0f07f9c8557994"
+    },
+    {
+      "path": "artifacts/lava-logging-before-2026-10-22.log",
+      "bytes": 16861,
+      "sha256": "79635ad15e49bbf8a5beafbf381f39fb8c5828d93507601ad0154d42b418b4ca"
+    },
+    {
+      "path": "artifacts/lava-interactions-2026-10-22.log",
+      "bytes": 9719,
+      "sha256": "babca7c7f12348da46fbf34327a3016a2c540fd235368cf8e29540ff980752a3"
+    },
+    {
+      "path": "artifacts/lava-logging-state-2026-10-22.json",
+      "bytes": 68,
+      "sha256": "c2b016fd040330b4d59cc1d02ae53b85dc4e04ad25c59414ed6d49ace0e7a1f9"
+    },
+    {
+      "path": "artifacts/lava-environment-state-2026-10-22.json",
+      "bytes": 430,
+      "sha256": "f759fbfa7e7bb539e546671eed267f1fe570ad6d407983a70c15b2e18cefd950"
+    }
+  ],
+  "providers": [
+    {
+      "path": "artifacts/lava-logging-audit-server/mods/architectury-13.0.11-neoforge.jar",
+      "bytes": 584734,
+      "sha256": "9cc92f2c09533fc5482c60f993bd891c655a0e32b637037cdcb7c2b23adedeeb"
+    },
+    {
+      "path": "artifacts/lava-logging-audit-server/mods/create.jar",
+      "bytes": 19138095,
+      "sha256": "5602a16796957cb5c7fb829c10c6b54bf9d228931c7680636710b6a60d92822e"
+    },
+    {
+      "path": "artifacts/lava-logging-audit-server/mods/economy.jar",
+      "bytes": 14431850,
+      "sha256": "179115e5301ee6629acd3bdcbb6779d2549a35f7493821ab0fca79bcc43645f5"
+    },
+    {
+      "path": "artifacts/lava-logging-audit-server/mods/grieflogger-1.2.10-1.21.1-yuuniverse.1-neoforge.jar",
+      "bytes": 18915537,
+      "sha256": "a897f22fca7705144b26749f7baa097b4e1cc0d16eed1ddeed3a9fed270806e0"
+    },
+    {
+      "path": "artifacts/lava-logging-audit-server/mods/neoprotect-1.0.4-mc1.21.1-neoforge.jar",
+      "bytes": 2614693,
+      "sha256": "2cbcec7aeef26ef3f5b54dae90fc16da353a1534462353b9f516d7d2e0a138ce"
+    },
+    {
+      "path": "artifacts/lava-logging-audit-server/mods/supermartijn642configlib-1.1.8-neoforge-mc1.21.jar",
+      "bytes": 207514,
+      "sha256": "d2ba7b839a2268e4e223457e813d11aa2476c3bf708a7bba691d8fc851778a4b"
+    }
+  ],
+  "previousProcessKillEvidence": {
+    "revision": "5d7185a",
+    "manifest": {
+      "path": "docs/native-fire-logging-validation-2026-10-22.json",
+      "bytes": 11510,
+      "sha256": "bbdcef17a6640da54dcd2c42deed6e63cfb9940b8edf2f8c8ac20a3564417294"
+    },
+    "newProcessKillForLavaRevision": false
+  },
+  "nativeEventContract": "The pinned EventHooks helper returns newState even when canceled is set; AIR replacement suppresses ignition, STONE replacement changes state, flag-only cancellation still places fire.",
+  "limits": [
+    "Natural-lava unknown actor is not player-bucket causal attribution",
+    "Other mod-specific ignition and observer coexistence",
+    "Failed provider writes, queue/retention/load and write-interior crashes",
+    "Physical clients and original migration provenance"
+  ]
+}

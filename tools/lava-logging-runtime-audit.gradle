@@ -1,0 +1,35 @@
+allprojects {
+    layout.buildDirectory.set(file('../artifacts/lava-logging-build'))
+    afterEvaluate { p ->
+        if (p.extensions.findByName('neoForge') == null) return
+        def phase = p.findProperty('lavaAuditPhase') ?: 'native'
+        if (!(phase in ['native', 'recover', 'absent'])) throw new GradleException('Unknown lava audit phase')
+        def absent = phase == 'absent'
+        def fixture = p.file(absent ? '../artifacts/lava-logging-absent-server' : '../artifacts/lava-logging-audit-server')
+        def providers = p.file('../artifacts/lava-logging-audit-server')
+        p.sourceSets.dialogue.java.srcDir(p.file('../tools/lava-logging-runtime-audit'))
+        p.sourceSets.dialogue.compileClasspath += p.files(p.fileTree(new File(providers, 'mods')) { include '*.jar' },
+                p.fileTree(new File(providers, 'compile-libs')) { include '*.jar' })
+        p.neoForge.runs.named('server') { gameDirectory = fixture }
+        p.tasks.named('prepareServerRun') {
+            doLast {
+                def marker = new File(fixture, 'logging-audit-fixture.txt')
+                if (!marker.isFile() || marker.getText('UTF-8').trim() != 'citizens-logging-audit')
+                    throw new GradleException('Missing lava logging fixture marker')
+                def properties = new Properties()
+                new File(fixture, 'server.properties').withInputStream { properties.load(it) }
+                for (entry in ['server-ip':'127.0.0.1','server-port':absent?'25645':'25644','level-name':absent?'lava-absent-world':'lava-world'])
+                    if (properties.getProperty(entry.key) != entry.value) throw new GradleException('Unexpected lava fixture properties')
+            }
+        }
+        p.tasks.named('runServer') {
+            environment 'CITIZENS_LAVA_AUDIT_PHASE', phase
+            timeout = java.time.Duration.ofMinutes(3)
+            doLast {
+                def log = new File(fixture, 'logs/latest.log').getText('UTF-8')
+                if (log.contains('[LAVAAUDIT] FAILED') || !log.contains('[LAVAAUDIT] COMPLETE'))
+                    throw new GradleException('Lava logging audit failed or incomplete')
+            }
+        }
+    }
+}

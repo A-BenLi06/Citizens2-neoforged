@@ -29,6 +29,13 @@ Exact artifact sources, SHA-512/SHA-256 hashes and installation paths are record
 
 ## Ordered adaptation backlog
 
+Progress 2026-10-22, UTC+08:00: [native lava ignition logging](native-lava-logging-2026-10-22.md)
+extends the observed fire mutations to both lava random-tick branches, preserving
+NeoForge's actual event-selected states and cancellation-flag semantics. Natural
+lava retains the provider's unknown actor and actual air/fire snapshots. Tracking
+configuration, restart and optional absence are checked separately; player-bucket
+causal attribution and arbitrary mod-specific fire remain outside this boundary.
+
 Progress 2026-10-22, UTC+08:00: [native fire logging](native-fire-logging-2026-10-22.md)
 repairs an actual vanilla fire mutation/event gap and the provider's null-entity
 state interpretation. Native burning retains original/result snapshots and the

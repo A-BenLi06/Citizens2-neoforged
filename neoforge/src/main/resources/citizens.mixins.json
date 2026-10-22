@@ -5,6 +5,7 @@
   "compatibilityLevel": "JAVA_21",
   "mixins": [
     "FireBlockLoggingMixin",
+    "LavaFluidLoggingMixin",
     "NeoProtectFireStateMixin",
     "FtbRewardClaimMixin",
     "CreateMillstoneEvidenceMixin",

@@ -112,6 +112,7 @@ world session lock. Provider/native phases run sequentially against their own
 directories. Production and the pending ordinary-client fixture are unchanged.
 
 This closes the stated vanilla fire write and bounded environmental attribution
-cases. Lava ignition, mod-specific fire implementations, arbitrary cause chains,
+cases. The separate [lava follow-up](native-lava-logging-2026-10-22.md) covers both
+native lava ignition writes. Mod-specific fire implementations, arbitrary cause chains,
 write-interior crashes, queue overflow/storage failure, timed retention,
 production load and integrated physical-client/migration acceptance remain open.

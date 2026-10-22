@@ -273,7 +273,7 @@
     }
   ],
   "environmentalSavedState": {
-    "path": "artifacts/environment-logging-audit-server/environment-state.json",
+    "path": "artifacts/environment-logging-state-2026-10-22.json",
     "bytes": 430,
     "sha256": "f72ca935f6a8c5e6f46819cd3313c6554c5f7c67b2727daadfbbe4b6152582e6"
   },

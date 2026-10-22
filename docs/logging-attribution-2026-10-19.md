@@ -77,6 +77,8 @@ records read-only integrity checks for the two SQLite databases.
 The [native fire follow-up](native-fire-logging-2026-10-22.md) repairs vanilla
 burn/spread observations and verifies bounded native fire and owned/unowned TNT
 attribution, configured tracking, optional absence and restart.
+The separate [lava follow-up](native-lava-logging-2026-10-22.md) adds both native
+lava ignition branches and preserves actual fluid-event state selection.
 
 Queue overflow, database failures, termination during writes, retention tooling,
 wider modded inventories/entities and environmental cause paths, production load,
