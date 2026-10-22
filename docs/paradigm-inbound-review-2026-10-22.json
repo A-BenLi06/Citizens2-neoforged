@@ -1,0 +1,40 @@
+{
+  "recordedAt": "2026-10-22T13:46:47.4514298+08:00",
+  "upstream": "https://github.com/Avalanche7CZ/Paradigm",
+  "commit": "3e22c73d7d8b7dcbaff8b1122c0ffc2ce294a037",
+  "declaredVersion": "2.5.2",
+  "companionApiVersion": 1,
+  "inboundEvaluation": false,
+  "sourceModified": false,
+  "scope": "Read-only source/API review; no provider build, installation, runtime acceptance or external message",
+  "files": [
+    {
+      "path": "common/src/main/java/eu/avalanche7/paradigm/api/PlaceholderService.java",
+      "sha256": "917b89bd1fc524ee1ed2f94f8de2b67c3a73f63d99bbaa0d0a948abacedea2dc"
+    },
+    {
+      "path": "common/src/main/java/eu/avalanche7/paradigm/api/ParadigmAPI.java",
+      "sha256": "69dbd7654588b0aa912e5b837e2a5856c535db5fe54ca886431e7868ffdbd5e5"
+    },
+    {
+      "path": "common/src/main/java/eu/avalanche7/paradigm/api/internal/ParadigmApiProvider.java",
+      "sha256": "9602e9686290d0085be8b8bd61c098d32601eedb79dfce15290e3f7b96ad0981"
+    },
+    {
+      "path": "common/src/main/java/eu/avalanche7/paradigm/ParadigmAPI.java",
+      "sha256": "b791032df63b7789c8f5cb2d34405c9f879df7d3256495490d1401a5b94ab271"
+    },
+    {
+      "path": "common/build.gradle",
+      "sha256": "5c6619bb34bc6922721ee16d5deb6b74dcc4aa2953869d2b40510985eaddbbf5"
+    },
+    {
+      "path": "gradle.properties",
+      "sha256": "8e293a660c8474304517715cde019d8d28d3c4d97dae4770793f190c4ce4b9d2"
+    },
+    {
+      "path": "LICENSE",
+      "sha256": "cc28874dc381e09a05d5175a7ab11dac848dedc78b5eea35ed4a26d96b6751d0"
+    }
+  ]
+}
