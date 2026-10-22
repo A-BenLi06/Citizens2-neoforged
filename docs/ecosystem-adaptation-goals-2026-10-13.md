@@ -29,6 +29,13 @@ Exact artifact sources, SHA-512/SHA-256 hashes and installation paths are record
 
 ## Ordered adaptation backlog
 
+Progress 2026-10-22, UTC+08:00: [two-member reward acceptance](ftb-party-reward-acceptance-2026-10-22.md)
+adds 19 native checks for shared/individual party claims, offline payment, new and
+retired sessions, distinct repeat cycles and settlement after leaving. Original
+beneficiaries, generation fences and exact balanced-ledger totals survive these
+permutations. Wider task/delivery crash points, financial backup combinations,
+legacy provenance and physical-client acceptance remain required.
+
 Progress 2026-10-22, UTC+08:00: [assembly process-kill recovery](create-assembly-recovery-2026-10-20.md)
 verifies the retained 24 actual JVM kills across depot/belt pressing, deploying and
 filling at PREPARED/CONFIRMED/APPLIED on both NeoForge targets (268 recovery checks).

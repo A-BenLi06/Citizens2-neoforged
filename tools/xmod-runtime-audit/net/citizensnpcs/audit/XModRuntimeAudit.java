@@ -144,6 +144,7 @@ public final class XModRuntimeAudit {
             CommerceTaskRuntimeAudit.run(actor, file, economy);
             team=file.getTeamData(actor).orElseThrow();
             monetaryRewards(actor, file, team, economy);
+            PartyRewardRuntimeAudit.run(actor, file, economy);
             LoggerFactory.getLogger("citizens").info("[XMODAUDIT] COMPLETE {} checks",passed);
         } catch(Throwable failure) { LoggerFactory.getLogger("citizens").error("[XMODAUDIT] FAILED",failure); }
         finally {

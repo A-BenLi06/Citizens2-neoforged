@@ -139,7 +139,7 @@ passes 21 additional native checks on both NeoForge targets. Remaining machine,
 transport crash/recovery and integrated release gates below stay open.
 
 1. Extend machine-specific hard-kill/inventory rollback beyond the accepted assembly boundary matrix, and extend actual evidence to other required unsupported machine types while preserving provider-native outputs and recipe revisions. See [assembly recovery](create-assembly-recovery-2026-10-20.md) for the 2026-10-22 review.
-2. Complete concrete party/offline/reconnect, repeat-generation, inventory-mutation kill and financial/world-backup recovery cases for the adopted quest/commerce/reward workflow.
+2. Extend the accepted [two-member reward/reconnect/repeat cases](ftb-party-reward-acceptance-2026-10-22.md) to the remaining task/delivery inventory-mutation kill and financial/world-backup combinations.
 3. Resolve original quest IDs, group/account/shop identities and missing legacy items with source provenance; keep unsupported content recoverable.
 4. Add the required logging retention/failure/load coverage and a supported Paradigm inbound contract where the pack requires one.
 5. Run the complete migrated server/client workflow with physical VR and ordinary clients, external skins, camera playback, menus, mounts/dimensions and proxy/backend transfers.

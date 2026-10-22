@@ -1,10 +1,10 @@
 # Actual FTB XMod / Rhino fixture
 
-Prepare the pinned providers, including Economy 0.5.5 from its source build:
+Prepare the pinned providers, including Economy 0.5.6 from its source build:
 
 ```powershell
 ./tools/prepare-xmod-audit.ps1 -EconomyJar <absolute-provider-jar>
-./neoforge/gradlew.bat -p neoforge -Pneo_version=21.1.248 -I ../tools/xmod-runtime-audit.gradle runServer --console=plain
+./neoforge/gradlew.bat -p neoforge --project-cache-dir ../artifacts/xmod-audit-gradle-cache -Pneo_version=21.1.248 -PxmodAuditBuildDir=../artifacts/xmod-audit-build -I ../tools/xmod-runtime-audit.gradle runServer --console=plain
 ./neoforge/gradlew.bat -p neoforge test build --console=plain
 ```
 
@@ -17,5 +17,12 @@ The selected JEI requires NeoForge 21.1.238 and Economy requires 21.1.247;
 the complete fixture cannot start on Citizens' 21.1.233 baseline. Use the selected
 21.1.248 acceptance target for native runs and the ordinary build for baseline
 compatibility. Provider metadata is not rewritten to bypass those requirements.
+
+The two-member reward fixture also checks native party joins/leaves, shared and
+individual ownership, offline settlement, new/retired sessions and repeat cycles.
+See `docs/ftb-party-reward-acceptance-2026-10-22.md`. Its 19 checks run alongside
+the existing 44 XMod and 27 commerce checks. Both buildDirectory and project cache
+must be isolated when using a separate audit build; changing only the output path
+can let Gradle's stale-output cleanup delete another build's classes.
 
 See `docs/kubejs-ftb-script-contracts-2026-10-18.md` for supported APIs and limits.

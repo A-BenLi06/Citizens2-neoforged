@@ -1,0 +1,101 @@
+{
+  "createdAt": "2026-10-22T12:40:53+08:00",
+  "timezone": "UTC+08:00",
+  "neoForge": "21.1.248",
+  "checks": {
+    "XMODAUDIT": 44,
+    "COMMERCETASKAUDIT": 27,
+    "PARTYREWARDAUDIT": 19
+  },
+  "totalChecks": 90,
+  "log": {
+    "path": "artifacts/party-reward-native-248-final-2026-10-22.log",
+    "bytes": 133907,
+    "sha256": "43b8ff0952e923b8881fb2b38579098c785f0f6bf3f81e9e87444c4080b1632b"
+  },
+  "sources": [
+    {
+      "path": "tools/xmod-runtime-audit.gradle",
+      "bytes": 1851,
+      "sha256": "028372e83cb483d19ede66543edbc06b2c0128f2710d4296b457d6339dac7eef"
+    },
+    {
+      "path": "tools/xmod-runtime-audit/net/citizensnpcs/audit/PartyRewardRuntimeAudit.java",
+      "bytes": 13343,
+      "sha256": "f69162a6039ed41d1e1d7b08fa94ca7aa2a2c2822dc24bf8f20d78e4cd782cbf"
+    },
+    {
+      "path": "tools/xmod-runtime-audit/net/citizensnpcs/audit/XModRuntimeAudit.java",
+      "bytes": 32305,
+      "sha256": "98c6879ce43d3f6fa9d58f84eb88b2a75f9ce2aee2007fed12a14aa2f6c3150a"
+    },
+    {
+      "path": "neoforge/src/main/java/net/citizensnpcs/util/FtbMonetaryRewards.java",
+      "bytes": 19355,
+      "sha256": "530cadbfec138d5c365168a16ddda3e4eb10db2f3dbb4531b505ddfe9ea45643"
+    },
+    {
+      "path": "neoforge/src/main/java/net/citizensnpcs/util/QuestRewardJournal.java",
+      "bytes": 16628,
+      "sha256": "af66f74390228b174ab7bd63c4c452cc542b3f059d77da53b5c1a19f6af2ae89"
+    }
+  ],
+  "providers": [
+    {
+      "path": "artifacts/xmod-audit-server/mods/architectury-13.0.11-neoforge.jar",
+      "bytes": 584734,
+      "sha256": "9cc92f2c09533fc5482c60f993bd891c655a0e32b637037cdcb7c2b23adedeeb"
+    },
+    {
+      "path": "artifacts/xmod-audit-server/mods/economy.jar",
+      "bytes": 14431850,
+      "sha256": "179115e5301ee6629acd3bdcbb6779d2549a35f7493821ab0fca79bcc43645f5"
+    },
+    {
+      "path": "artifacts/xmod-audit-server/mods/ftb-library-neoforge-2101.1.37.jar",
+      "bytes": 1439881,
+      "sha256": "624c2d2d1cbadb946d967e17757bd5b2d129d4d3ed71f2da0c70607d04476ac2"
+    },
+    {
+      "path": "artifacts/xmod-audit-server/mods/ftb-quests-neoforge-2101.1.36.jar",
+      "bytes": 1609984,
+      "sha256": "6a39982c4b3afc00b1e788041a4f0d394e1659e3b3a6e5d078cd790bc36d0018"
+    },
+    {
+      "path": "artifacts/xmod-audit-server/mods/ftb-teams-neoforge-2101.1.11.jar",
+      "bytes": 308236,
+      "sha256": "e6bcd670493624e6906df872a9c6af4a33fe6405cac57a32c59cd4cd5838c655"
+    },
+    {
+      "path": "artifacts/xmod-audit-server/mods/ftb-xmod-compat-neoforge-21.1.12.jar",
+      "bytes": 148575,
+      "sha256": "f587e13131101bac33d4cc7a04d13d06c00f8f88a892be90d6ffc8ad96119ae8"
+    },
+    {
+      "path": "artifacts/xmod-audit-server/mods/jei-1.21.1-neoforge-19.53.0.425.jar",
+      "bytes": 1847925,
+      "sha256": "3683c743c1b6192913abc2a969486344eee98aa2924e8deb5087109645c3abc6"
+    },
+    {
+      "path": "artifacts/xmod-audit-server/mods/kubejs-neoforge-2101.7.2-build.377.jar",
+      "bytes": 2294111,
+      "sha256": "df9a8458b1f83fed06ba54684977911795a5153a462b81a610895f5b1f2f0cbf"
+    },
+    {
+      "path": "artifacts/xmod-audit-server/mods/rhino-2101.2.8-build.91.jar",
+      "bytes": 980936,
+      "sha256": "1d53d962aa4dac54bcbb4f998c1845980cf194318f1d6b1580ea6ac15cce5ef3"
+    }
+  ],
+  "ordinaryRegression": {
+    "path": "docs/create-assembly-recovery-validation-2026-10-20.json",
+    "bytes": 49914,
+    "sha256": "f8ab7588bbfe4ef79a60083763e4cd5283b413caf99205af3045d2e7e2847c3f"
+  },
+  "productionBehaviorChanged": false,
+  "productionActivated": false,
+  "remaining": [
+    "Wider task/delivery kill and financial-backup matrix",
+    "Legacy provenance and physical clients"
+  ]
+}
