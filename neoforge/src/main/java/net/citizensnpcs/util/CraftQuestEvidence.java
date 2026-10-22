@@ -226,15 +226,39 @@ public final class CraftQuestEvidence implements AutoCloseable {
     /** Explicit recovery retries absolute totals, including when FTB saved progress before journal APPLIED. */
     public int reconcile(CommandSourceStack source) throws IOException {
         authorize(source); int count = 0;
-        var groups = new java.util.LinkedHashSet<String>();
-        for (var entry : journal.entries()) if (entry.state() == QuestEvidenceJournal.State.CONFIRMED)
-            groups.add(entry.admission().generationId() + ":" + entry.admission().taskId());
-        for (String group : groups) {
-            int separator = group.indexOf(':');
-            project(UUID.fromString(group.substring(0, separator)), group.substring(separator + 1)); count++;
+        var generations = new java.util.HashMap<UUID, QuestEvidenceJournal.Generation>();
+        for (var generation : journal.generations()) generations.put(generation.id(), generation);
+        var pending = new LinkedHashMap<Projection, Exception>();
+        for (var entry : journal.entries()) if (entry.state() == QuestEvidenceJournal.State.CONFIRMED) {
+            var generation = java.util.Objects.requireNonNull(generations.get(entry.admission().generationId()), "Missing evidence generation");
+            pending.put(new Projection(generation.id(), entry.admission().taskId(), generation.scope().teamId(), generation.nativeCycle()), null);
+        }
+        boolean advanced;
+        do {
+            advanced = false;
+            for (var scope : List.copyOf(pending.keySet())) {
+                try {
+                    project(scope.generationId(), scope.taskId());
+                    pending.remove(scope); advanced = true; count++;
+                } catch (IOException | RuntimeException failure) { pending.put(scope, failure); }
+            }
+            // Native completion can unlock another scope. Successful scopes leave the batch,
+            // and an iteration without progress stops instead of retrying invalid targets forever.
+        } while (advanced && !pending.isEmpty());
+        if (!pending.isEmpty()) {
+            IllegalStateException reported = null;
+            for (var failure : pending.entrySet()) {
+                var scope = failure.getKey();
+                var contextual = new IllegalStateException("Craft projection remains pending for task " + scope.taskId()
+                        + ", team " + scope.teamId() + ", cycle " + scope.cycle() + ", generation " + scope.generationId(), failure.getValue());
+                if (reported == null) reported = contextual; else reported.addSuppressed(contextual);
+            }
+            throw reported;
         }
         return count;
     }
+
+    private record Projection(UUID generationId, String taskId, UUID teamId, int cycle) { }
 
     public QuestEvidenceJournal.Entry resolve(CommandSourceStack source, String entryId, boolean accept, String explanation) throws IOException {
         authorize(source);

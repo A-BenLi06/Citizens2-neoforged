@@ -10,6 +10,12 @@ This review covers repository structure, native implementation boundaries, upstr
 
 ## Repository and implementation boundaries
 
+Update 2026-10-22, UTC+08:00: [craft recovery isolation](craft-recovery-isolation-2026-10-22.md)
+prevents an invalid target from starving unrelated confirmed crafts during offline
+administrator reconciliation. Both native versions pass the actual-craft/restart/
+repair cases (36 checks), Create passes263 on21.1.248, and ordinary tests pass823
+per target. Wider recovery/retention, migration and physical-client gates remain.
+
 Update 2026-10-22, UTC+08:00: [journal record decoding](journal-record-decoding-2026-10-22.md)
 prevents all four retained journals from truncating/wrapping numeric evidence,
 coercing field types or silently accepting duplicate members. All 36 reproduced

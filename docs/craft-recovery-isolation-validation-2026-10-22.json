@@ -1,0 +1,1014 @@
+{
+  "createdAt": "2026-10-22T23:22:44.645939+08:00",
+  "timezone": "UTC+08:00",
+  "baseRevision": "7105171",
+  "before": {
+    "logs": [
+      {
+        "path": "artifacts/craft-recovery-before-seed-2026-10-22.log",
+        "bytes": 32432,
+        "sha256": "4a6e393fa9ce55cb1fe155dba7ec4f95e2889bd2db624c718b23a334c645b369"
+      },
+      {
+        "path": "artifacts/craft-recovery-before-recover-2026-10-22.log",
+        "bytes": 17162,
+        "sha256": "1d82face8fb3331fef5babc67a106968e3e1295012ed8955a42f62834a70814c"
+      }
+    ],
+    "state": {
+      "path": "artifacts/craft-recovery-before-server/craft-recovery-state.json",
+      "bytes": 6201,
+      "sha256": "eabc270cbea68546606c8519641c25c389453e09d057db461b0f42c469353477"
+    },
+    "observation": {
+      "path": "artifacts/craft-recovery-before-server/craft-recovery-observation.json",
+      "bytes": 5845,
+      "sha256": "cf7a4dd56491ff69477f408dc1a56b41ef6a8bb2bf4383383b02d718f3ae9353"
+    },
+    "initialRecoveryObservation": {
+      "reported": true,
+      "progress": [
+        0,
+        0,
+        0
+      ],
+      "entries": [
+        {
+          "id": "548acb6d0171fa9b4020f40693bfe6f3ce168bac9fde61c92cfc0554dc08ba5d",
+          "revision": 1,
+          "admission": {
+            "observationId": "83ac8cb5-5432-4286-9b56-efc190aa0d4e",
+            "generationId": "7f450a77-9ce8-4572-b46f-ac5e35bad940",
+            "taskId": "6F51FC28360EED27",
+            "actorId": "047f6841-7590-4001-97c3-c26e7805009a",
+            "recipeId": "minecraft:oak_planks",
+            "recipeRevision": "3aefaa3f38d0da98e939feaa4d77a81574881fdee49979d732552999c6e633f8",
+            "units": 4,
+            "evidence": "{\"id\":\"83ac8cb5-5432-4286-9b56-efc190aa0d4e\",\"actorId\":\"047f6841-7590-4001-97c3-c26e7805009a\",\"dimension\":\"minecraft:overworld\",\"serverTick\":20,\"menuId\":91,\"source\":\"CRAFTING_TABLE\",\"width\":3,\"height\":3,\"inputs\":[{\"id\":\"minecraft:oak_log\",\"count\":1},null,null,null,null,null,null,null,null],\"output\":{\"id\":\"minecraft:oak_planks\",\"count\":4},\"recipe\":{\"id\":\"minecraft:oak_planks\",\"type\":\"minecraft:crafting\",\"serializer\":\"minecraft:crafting_shapeless\",\"kind\":\"SHAPELESS\",\"workstation\":\"minecraft:crafting_table\",\"width\":0,\"height\":0,\"revision\":\"3aefaa3f38d0da98e939feaa4d77a81574881fdee49979d732552999c6e633f8\",\"definition\":{\"category\":\"building\",\"group\":\"planks\",\"ingredients\":[{\"tag\":\"minecraft:oak_logs\"}],\"result\":{\"count\":4,\"id\":\"minecraft:oak_planks\"},\"type\":\"minecraft:crafting_shapeless\"},\"inputs\":[{\"definition\":{\"tag\":\"minecraft:oak_logs\"},\"custom\":false,\"alternatives\":[{\"id\":\"minecraft:oak_log\",\"count\":1},{\"id\":\"minecraft:oak_wood\",\"count\":1},{\"id\":\"minecraft:stripped_oak_log\",\"count\":1},{\"id\":\"minecraft:stripped_oak_wood\",\"count\":1}]}]}}"
+          },
+          "state": "CONFIRMED",
+          "outcome": "RETURNED",
+          "resolution": null,
+          "createdAt": 1792681739077,
+          "updatedAt": 1792681739105
+        },
+        {
+          "id": "c7efadbf86d05b8c046dfcbc398b2e9b2fdf8697ea3de63ab5827a74a5983d46",
+          "revision": 1,
+          "admission": {
+            "observationId": "bba4efa1-b87a-44c7-a991-f2ea8a425a7d",
+            "generationId": "9df6f7ec-8a8a-40cb-b0fd-514eac0c26c8",
+            "taskId": "676E8FF3D9A4BFB3",
+            "actorId": "047f6841-7590-4001-97c3-c26e7805009a",
+            "recipeId": "minecraft:birch_planks",
+            "recipeRevision": "9191c03f411f2c9a769c1894dcdb92a0ab94d9cfdf38e9a90b5473f7df13f257",
+            "units": 4,
+            "evidence": "{\"id\":\"bba4efa1-b87a-44c7-a991-f2ea8a425a7d\",\"actorId\":\"047f6841-7590-4001-97c3-c26e7805009a\",\"dimension\":\"minecraft:overworld\",\"serverTick\":20,\"menuId\":91,\"source\":\"CRAFTING_TABLE\",\"width\":3,\"height\":3,\"inputs\":[{\"id\":\"minecraft:birch_log\",\"count\":1},null,null,null,null,null,null,null,null],\"output\":{\"id\":\"minecraft:birch_planks\",\"count\":4},\"recipe\":{\"id\":\"minecraft:birch_planks\",\"type\":\"minecraft:crafting\",\"serializer\":\"minecraft:crafting_shapeless\",\"kind\":\"SHAPELESS\",\"workstation\":\"minecraft:crafting_table\",\"width\":0,\"height\":0,\"revision\":\"9191c03f411f2c9a769c1894dcdb92a0ab94d9cfdf38e9a90b5473f7df13f257\",\"definition\":{\"category\":\"building\",\"group\":\"planks\",\"ingredients\":[{\"tag\":\"minecraft:birch_logs\"}],\"result\":{\"count\":4,\"id\":\"minecraft:birch_planks\"},\"type\":\"minecraft:crafting_shapeless\"},\"inputs\":[{\"definition\":{\"tag\":\"minecraft:birch_logs\"},\"custom\":false,\"alternatives\":[{\"id\":\"minecraft:birch_log\",\"count\":1},{\"id\":\"minecraft:birch_wood\",\"count\":1},{\"id\":\"minecraft:stripped_birch_log\",\"count\":1},{\"id\":\"minecraft:stripped_birch_wood\",\"count\":1}]}]}}"
+          },
+          "state": "CONFIRMED",
+          "outcome": "RETURNED",
+          "resolution": null,
+          "createdAt": 1792681739138,
+          "updatedAt": 1792681739146
+        },
+        {
+          "id": "a43c73c8d9a7eb46f59a0576f7cf690e4746ba3e41789914dfaa7b1eb492e268",
+          "revision": 1,
+          "admission": {
+            "observationId": "ab4ef687-78d1-4f68-86d8-94ce1201a07c",
+            "generationId": "b08183ed-7772-4cac-83ae-033b6474ae03",
+            "taskId": "6F8D67C17361AE38",
+            "actorId": "047f6841-7590-4001-97c3-c26e7805009a",
+            "recipeId": "minecraft:spruce_planks",
+            "recipeRevision": "e4e91da7110e5a88918f1fe6d039b6c202d978026389b618a7d0badded39d09e",
+            "units": 4,
+            "evidence": "{\"id\":\"ab4ef687-78d1-4f68-86d8-94ce1201a07c\",\"actorId\":\"047f6841-7590-4001-97c3-c26e7805009a\",\"dimension\":\"minecraft:overworld\",\"serverTick\":20,\"menuId\":91,\"source\":\"CRAFTING_TABLE\",\"width\":3,\"height\":3,\"inputs\":[{\"id\":\"minecraft:spruce_log\",\"count\":1},null,null,null,null,null,null,null,null],\"output\":{\"id\":\"minecraft:spruce_planks\",\"count\":4},\"recipe\":{\"id\":\"minecraft:spruce_planks\",\"type\":\"minecraft:crafting\",\"serializer\":\"minecraft:crafting_shapeless\",\"kind\":\"SHAPELESS\",\"workstation\":\"minecraft:crafting_table\",\"width\":0,\"height\":0,\"revision\":\"e4e91da7110e5a88918f1fe6d039b6c202d978026389b618a7d0badded39d09e\",\"definition\":{\"category\":\"building\",\"group\":\"planks\",\"ingredients\":[{\"tag\":\"minecraft:spruce_logs\"}],\"result\":{\"count\":4,\"id\":\"minecraft:spruce_planks\"},\"type\":\"minecraft:crafting_shapeless\"},\"inputs\":[{\"definition\":{\"tag\":\"minecraft:spruce_logs\"},\"custom\":false,\"alternatives\":[{\"id\":\"minecraft:spruce_log\",\"count\":1},{\"id\":\"minecraft:spruce_wood\",\"count\":1},{\"id\":\"minecraft:stripped_spruce_log\",\"count\":1},{\"id\":\"minecraft:stripped_spruce_wood\",\"count\":1}]}]}}"
+          },
+          "state": "CONFIRMED",
+          "outcome": "RETURNED",
+          "resolution": null,
+          "createdAt": 1792681739180,
+          "updatedAt": 1792681739192
+        }
+      ],
+      "message": "Native binding definition changed"
+    }
+  },
+  "native": [
+    {
+      "target": "21.1.248",
+      "checks": 18,
+      "logs": [
+        {
+          "path": "artifacts/craft-recovery-final-21.1.248-seed-2026-10-22.log",
+          "bytes": 32501,
+          "sha256": "0fe2b83ab4ad12bb845ea30b00618fe999fd9e893f9aa34fb214f92cd7bf7512"
+        },
+        {
+          "path": "artifacts/craft-recovery-final-21.1.248-recover-2026-10-22.log",
+          "bytes": 16611,
+          "sha256": "9db3d861d6a86e494270e986be8ae81097c1712b625305dab6f7c2f72ef0d0a8"
+        }
+      ],
+      "identity": {
+        "actor": "e9f7ec2c-a2a7-44b1-aba9-5e9ce65ce49a",
+        "team": "e9f7ec2c-a2a7-44b1-aba9-5e9ce65ce49a",
+        "tasks": [
+          "7B67372112FACBA8",
+          "7433DE5331A82A25",
+          "295843A61C470ABC"
+        ],
+        "entries": [
+          {
+            "id": "27e74e3470636a5d7e7ac4e24f009d40a8bdc3fd395feec4725ae4940e9df2e3",
+            "revision": 1,
+            "admission": {
+              "observationId": "ec63bec7-ece5-4220-b6f2-295d109e1a9b",
+              "generationId": "1c2bdf71-40ec-47d1-87c9-00ccb63f80af",
+              "taskId": "7B67372112FACBA8",
+              "actorId": "e9f7ec2c-a2a7-44b1-aba9-5e9ce65ce49a",
+              "recipeId": "minecraft:oak_planks",
+              "recipeRevision": "3aefaa3f38d0da98e939feaa4d77a81574881fdee49979d732552999c6e633f8",
+              "units": 4,
+              "evidence": "{\"id\":\"ec63bec7-ece5-4220-b6f2-295d109e1a9b\",\"actorId\":\"e9f7ec2c-a2a7-44b1-aba9-5e9ce65ce49a\",\"dimension\":\"minecraft:overworld\",\"serverTick\":20,\"menuId\":91,\"source\":\"CRAFTING_TABLE\",\"width\":3,\"height\":3,\"inputs\":[{\"id\":\"minecraft:oak_log\",\"count\":1},null,null,null,null,null,null,null,null],\"output\":{\"id\":\"minecraft:oak_planks\",\"count\":4},\"recipe\":{\"id\":\"minecraft:oak_planks\",\"type\":\"minecraft:crafting\",\"serializer\":\"minecraft:crafting_shapeless\",\"kind\":\"SHAPELESS\",\"workstation\":\"minecraft:crafting_table\",\"width\":0,\"height\":0,\"revision\":\"3aefaa3f38d0da98e939feaa4d77a81574881fdee49979d732552999c6e633f8\",\"definition\":{\"category\":\"building\",\"group\":\"planks\",\"ingredients\":[{\"tag\":\"minecraft:oak_logs\"}],\"result\":{\"count\":4,\"id\":\"minecraft:oak_planks\"},\"type\":\"minecraft:crafting_shapeless\"},\"inputs\":[{\"definition\":{\"tag\":\"minecraft:oak_logs\"},\"custom\":false,\"alternatives\":[{\"id\":\"minecraft:oak_log\",\"count\":1},{\"id\":\"minecraft:oak_wood\",\"count\":1},{\"id\":\"minecraft:stripped_oak_log\",\"count\":1},{\"id\":\"minecraft:stripped_oak_wood\",\"count\":1}]}]}}"
+            },
+            "state": "CONFIRMED",
+            "outcome": "RETURNED",
+            "resolution": null,
+            "createdAt": 1792681965285,
+            "updatedAt": 1792681965369
+          },
+          {
+            "id": "fddd48529acec2b02d66c7f0735a2be75729f7c60cd15434112b9fe3750bd890",
+            "revision": 1,
+            "admission": {
+              "observationId": "e8639d95-2ddf-4ffa-b5ba-4308ec82be26",
+              "generationId": "bd50472f-4838-481d-8360-32f9ab820cdf",
+              "taskId": "7433DE5331A82A25",
+              "actorId": "e9f7ec2c-a2a7-44b1-aba9-5e9ce65ce49a",
+              "recipeId": "minecraft:birch_planks",
+              "recipeRevision": "9191c03f411f2c9a769c1894dcdb92a0ab94d9cfdf38e9a90b5473f7df13f257",
+              "units": 4,
+              "evidence": "{\"id\":\"e8639d95-2ddf-4ffa-b5ba-4308ec82be26\",\"actorId\":\"e9f7ec2c-a2a7-44b1-aba9-5e9ce65ce49a\",\"dimension\":\"minecraft:overworld\",\"serverTick\":20,\"menuId\":91,\"source\":\"CRAFTING_TABLE\",\"width\":3,\"height\":3,\"inputs\":[{\"id\":\"minecraft:birch_log\",\"count\":1},null,null,null,null,null,null,null,null],\"output\":{\"id\":\"minecraft:birch_planks\",\"count\":4},\"recipe\":{\"id\":\"minecraft:birch_planks\",\"type\":\"minecraft:crafting\",\"serializer\":\"minecraft:crafting_shapeless\",\"kind\":\"SHAPELESS\",\"workstation\":\"minecraft:crafting_table\",\"width\":0,\"height\":0,\"revision\":\"9191c03f411f2c9a769c1894dcdb92a0ab94d9cfdf38e9a90b5473f7df13f257\",\"definition\":{\"category\":\"building\",\"group\":\"planks\",\"ingredients\":[{\"tag\":\"minecraft:birch_logs\"}],\"result\":{\"count\":4,\"id\":\"minecraft:birch_planks\"},\"type\":\"minecraft:crafting_shapeless\"},\"inputs\":[{\"definition\":{\"tag\":\"minecraft:birch_logs\"},\"custom\":false,\"alternatives\":[{\"id\":\"minecraft:birch_log\",\"count\":1},{\"id\":\"minecraft:birch_wood\",\"count\":1},{\"id\":\"minecraft:stripped_birch_log\",\"count\":1},{\"id\":\"minecraft:stripped_birch_wood\",\"count\":1}]}]}}"
+            },
+            "state": "CONFIRMED",
+            "outcome": "RETURNED",
+            "resolution": null,
+            "createdAt": 1792681965439,
+            "updatedAt": 1792681965484
+          },
+          {
+            "id": "9b69717ab0c2327d840d13bed79bf2b855a1158eddedc0d54ab44a497c32718d",
+            "revision": 1,
+            "admission": {
+              "observationId": "5f7fc130-f107-45d9-8cd1-08dd684b658d",
+              "generationId": "5cb3a509-bb08-489a-b46f-b4415903b304",
+              "taskId": "295843A61C470ABC",
+              "actorId": "e9f7ec2c-a2a7-44b1-aba9-5e9ce65ce49a",
+              "recipeId": "minecraft:spruce_planks",
+              "recipeRevision": "e4e91da7110e5a88918f1fe6d039b6c202d978026389b618a7d0badded39d09e",
+              "units": 4,
+              "evidence": "{\"id\":\"5f7fc130-f107-45d9-8cd1-08dd684b658d\",\"actorId\":\"e9f7ec2c-a2a7-44b1-aba9-5e9ce65ce49a\",\"dimension\":\"minecraft:overworld\",\"serverTick\":20,\"menuId\":91,\"source\":\"CRAFTING_TABLE\",\"width\":3,\"height\":3,\"inputs\":[{\"id\":\"minecraft:spruce_log\",\"count\":1},null,null,null,null,null,null,null,null],\"output\":{\"id\":\"minecraft:spruce_planks\",\"count\":4},\"recipe\":{\"id\":\"minecraft:spruce_planks\",\"type\":\"minecraft:crafting\",\"serializer\":\"minecraft:crafting_shapeless\",\"kind\":\"SHAPELESS\",\"workstation\":\"minecraft:crafting_table\",\"width\":0,\"height\":0,\"revision\":\"e4e91da7110e5a88918f1fe6d039b6c202d978026389b618a7d0badded39d09e\",\"definition\":{\"category\":\"building\",\"group\":\"planks\",\"ingredients\":[{\"tag\":\"minecraft:spruce_logs\"}],\"result\":{\"count\":4,\"id\":\"minecraft:spruce_planks\"},\"type\":\"minecraft:crafting_shapeless\"},\"inputs\":[{\"definition\":{\"tag\":\"minecraft:spruce_logs\"},\"custom\":false,\"alternatives\":[{\"id\":\"minecraft:spruce_log\",\"count\":1},{\"id\":\"minecraft:spruce_wood\",\"count\":1},{\"id\":\"minecraft:stripped_spruce_log\",\"count\":1},{\"id\":\"minecraft:stripped_spruce_wood\",\"count\":1}]}]}}"
+            },
+            "state": "CONFIRMED",
+            "outcome": "RETURNED",
+            "resolution": null,
+            "createdAt": 1792681965515,
+            "updatedAt": 1792681965535
+          }
+        ],
+        "inventory": "[{\"id\":\"minecraft:oak_planks\",\"count\":4},{\"id\":\"minecraft:birch_planks\",\"count\":4},{\"id\":\"minecraft:spruce_planks\",\"count\":4},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{}]"
+      },
+      "initialRecoveryObservation": {
+        "reported": true,
+        "progress": [
+          0,
+          0,
+          1
+        ],
+        "entries": [
+          {
+            "id": "27e74e3470636a5d7e7ac4e24f009d40a8bdc3fd395feec4725ae4940e9df2e3",
+            "revision": 1,
+            "admission": {
+              "observationId": "ec63bec7-ece5-4220-b6f2-295d109e1a9b",
+              "generationId": "1c2bdf71-40ec-47d1-87c9-00ccb63f80af",
+              "taskId": "7B67372112FACBA8",
+              "actorId": "e9f7ec2c-a2a7-44b1-aba9-5e9ce65ce49a",
+              "recipeId": "minecraft:oak_planks",
+              "recipeRevision": "3aefaa3f38d0da98e939feaa4d77a81574881fdee49979d732552999c6e633f8",
+              "units": 4,
+              "evidence": "{\"id\":\"ec63bec7-ece5-4220-b6f2-295d109e1a9b\",\"actorId\":\"e9f7ec2c-a2a7-44b1-aba9-5e9ce65ce49a\",\"dimension\":\"minecraft:overworld\",\"serverTick\":20,\"menuId\":91,\"source\":\"CRAFTING_TABLE\",\"width\":3,\"height\":3,\"inputs\":[{\"id\":\"minecraft:oak_log\",\"count\":1},null,null,null,null,null,null,null,null],\"output\":{\"id\":\"minecraft:oak_planks\",\"count\":4},\"recipe\":{\"id\":\"minecraft:oak_planks\",\"type\":\"minecraft:crafting\",\"serializer\":\"minecraft:crafting_shapeless\",\"kind\":\"SHAPELESS\",\"workstation\":\"minecraft:crafting_table\",\"width\":0,\"height\":0,\"revision\":\"3aefaa3f38d0da98e939feaa4d77a81574881fdee49979d732552999c6e633f8\",\"definition\":{\"category\":\"building\",\"group\":\"planks\",\"ingredients\":[{\"tag\":\"minecraft:oak_logs\"}],\"result\":{\"count\":4,\"id\":\"minecraft:oak_planks\"},\"type\":\"minecraft:crafting_shapeless\"},\"inputs\":[{\"definition\":{\"tag\":\"minecraft:oak_logs\"},\"custom\":false,\"alternatives\":[{\"id\":\"minecraft:oak_log\",\"count\":1},{\"id\":\"minecraft:oak_wood\",\"count\":1},{\"id\":\"minecraft:stripped_oak_log\",\"count\":1},{\"id\":\"minecraft:stripped_oak_wood\",\"count\":1}]}]}}"
+            },
+            "state": "CONFIRMED",
+            "outcome": "RETURNED",
+            "resolution": null,
+            "createdAt": 1792681965285,
+            "updatedAt": 1792681965369
+          },
+          {
+            "id": "fddd48529acec2b02d66c7f0735a2be75729f7c60cd15434112b9fe3750bd890",
+            "revision": 1,
+            "admission": {
+              "observationId": "e8639d95-2ddf-4ffa-b5ba-4308ec82be26",
+              "generationId": "bd50472f-4838-481d-8360-32f9ab820cdf",
+              "taskId": "7433DE5331A82A25",
+              "actorId": "e9f7ec2c-a2a7-44b1-aba9-5e9ce65ce49a",
+              "recipeId": "minecraft:birch_planks",
+              "recipeRevision": "9191c03f411f2c9a769c1894dcdb92a0ab94d9cfdf38e9a90b5473f7df13f257",
+              "units": 4,
+              "evidence": "{\"id\":\"e8639d95-2ddf-4ffa-b5ba-4308ec82be26\",\"actorId\":\"e9f7ec2c-a2a7-44b1-aba9-5e9ce65ce49a\",\"dimension\":\"minecraft:overworld\",\"serverTick\":20,\"menuId\":91,\"source\":\"CRAFTING_TABLE\",\"width\":3,\"height\":3,\"inputs\":[{\"id\":\"minecraft:birch_log\",\"count\":1},null,null,null,null,null,null,null,null],\"output\":{\"id\":\"minecraft:birch_planks\",\"count\":4},\"recipe\":{\"id\":\"minecraft:birch_planks\",\"type\":\"minecraft:crafting\",\"serializer\":\"minecraft:crafting_shapeless\",\"kind\":\"SHAPELESS\",\"workstation\":\"minecraft:crafting_table\",\"width\":0,\"height\":0,\"revision\":\"9191c03f411f2c9a769c1894dcdb92a0ab94d9cfdf38e9a90b5473f7df13f257\",\"definition\":{\"category\":\"building\",\"group\":\"planks\",\"ingredients\":[{\"tag\":\"minecraft:birch_logs\"}],\"result\":{\"count\":4,\"id\":\"minecraft:birch_planks\"},\"type\":\"minecraft:crafting_shapeless\"},\"inputs\":[{\"definition\":{\"tag\":\"minecraft:birch_logs\"},\"custom\":false,\"alternatives\":[{\"id\":\"minecraft:birch_log\",\"count\":1},{\"id\":\"minecraft:birch_wood\",\"count\":1},{\"id\":\"minecraft:stripped_birch_log\",\"count\":1},{\"id\":\"minecraft:stripped_birch_wood\",\"count\":1}]}]}}"
+            },
+            "state": "CONFIRMED",
+            "outcome": "RETURNED",
+            "resolution": null,
+            "createdAt": 1792681965439,
+            "updatedAt": 1792681965484
+          },
+          {
+            "id": "9b69717ab0c2327d840d13bed79bf2b855a1158eddedc0d54ab44a497c32718d",
+            "revision": 2,
+            "admission": {
+              "observationId": "5f7fc130-f107-45d9-8cd1-08dd684b658d",
+              "generationId": "5cb3a509-bb08-489a-b46f-b4415903b304",
+              "taskId": "295843A61C470ABC",
+              "actorId": "e9f7ec2c-a2a7-44b1-aba9-5e9ce65ce49a",
+              "recipeId": "minecraft:spruce_planks",
+              "recipeRevision": "e4e91da7110e5a88918f1fe6d039b6c202d978026389b618a7d0badded39d09e",
+              "units": 4,
+              "evidence": "{\"id\":\"5f7fc130-f107-45d9-8cd1-08dd684b658d\",\"actorId\":\"e9f7ec2c-a2a7-44b1-aba9-5e9ce65ce49a\",\"dimension\":\"minecraft:overworld\",\"serverTick\":20,\"menuId\":91,\"source\":\"CRAFTING_TABLE\",\"width\":3,\"height\":3,\"inputs\":[{\"id\":\"minecraft:spruce_log\",\"count\":1},null,null,null,null,null,null,null,null],\"output\":{\"id\":\"minecraft:spruce_planks\",\"count\":4},\"recipe\":{\"id\":\"minecraft:spruce_planks\",\"type\":\"minecraft:crafting\",\"serializer\":\"minecraft:crafting_shapeless\",\"kind\":\"SHAPELESS\",\"workstation\":\"minecraft:crafting_table\",\"width\":0,\"height\":0,\"revision\":\"e4e91da7110e5a88918f1fe6d039b6c202d978026389b618a7d0badded39d09e\",\"definition\":{\"category\":\"building\",\"group\":\"planks\",\"ingredients\":[{\"tag\":\"minecraft:spruce_logs\"}],\"result\":{\"count\":4,\"id\":\"minecraft:spruce_planks\"},\"type\":\"minecraft:crafting_shapeless\"},\"inputs\":[{\"definition\":{\"tag\":\"minecraft:spruce_logs\"},\"custom\":false,\"alternatives\":[{\"id\":\"minecraft:spruce_log\",\"count\":1},{\"id\":\"minecraft:spruce_wood\",\"count\":1},{\"id\":\"minecraft:stripped_spruce_log\",\"count\":1},{\"id\":\"minecraft:stripped_spruce_wood\",\"count\":1}]}]}}"
+            },
+            "state": "APPLIED",
+            "outcome": "RETURNED",
+            "resolution": null,
+            "createdAt": 1792681965515,
+            "updatedAt": 1792682051392
+          }
+        ],
+        "message": "Craft projection remains pending for task 7B67372112FACBA8, team e9f7ec2c-a2a7-44b1-aba9-5e9ce65ce49a, cycle 0, generation 1c2bdf71-40ec-47d1-87c9-00ccb63f80af",
+        "recovered": true,
+        "finalEntries": [
+          {
+            "id": "27e74e3470636a5d7e7ac4e24f009d40a8bdc3fd395feec4725ae4940e9df2e3",
+            "revision": 2,
+            "admission": {
+              "observationId": "ec63bec7-ece5-4220-b6f2-295d109e1a9b",
+              "generationId": "1c2bdf71-40ec-47d1-87c9-00ccb63f80af",
+              "taskId": "7B67372112FACBA8",
+              "actorId": "e9f7ec2c-a2a7-44b1-aba9-5e9ce65ce49a",
+              "recipeId": "minecraft:oak_planks",
+              "recipeRevision": "3aefaa3f38d0da98e939feaa4d77a81574881fdee49979d732552999c6e633f8",
+              "units": 4,
+              "evidence": "{\"id\":\"ec63bec7-ece5-4220-b6f2-295d109e1a9b\",\"actorId\":\"e9f7ec2c-a2a7-44b1-aba9-5e9ce65ce49a\",\"dimension\":\"minecraft:overworld\",\"serverTick\":20,\"menuId\":91,\"source\":\"CRAFTING_TABLE\",\"width\":3,\"height\":3,\"inputs\":[{\"id\":\"minecraft:oak_log\",\"count\":1},null,null,null,null,null,null,null,null],\"output\":{\"id\":\"minecraft:oak_planks\",\"count\":4},\"recipe\":{\"id\":\"minecraft:oak_planks\",\"type\":\"minecraft:crafting\",\"serializer\":\"minecraft:crafting_shapeless\",\"kind\":\"SHAPELESS\",\"workstation\":\"minecraft:crafting_table\",\"width\":0,\"height\":0,\"revision\":\"3aefaa3f38d0da98e939feaa4d77a81574881fdee49979d732552999c6e633f8\",\"definition\":{\"category\":\"building\",\"group\":\"planks\",\"ingredients\":[{\"tag\":\"minecraft:oak_logs\"}],\"result\":{\"count\":4,\"id\":\"minecraft:oak_planks\"},\"type\":\"minecraft:crafting_shapeless\"},\"inputs\":[{\"definition\":{\"tag\":\"minecraft:oak_logs\"},\"custom\":false,\"alternatives\":[{\"id\":\"minecraft:oak_log\",\"count\":1},{\"id\":\"minecraft:oak_wood\",\"count\":1},{\"id\":\"minecraft:stripped_oak_log\",\"count\":1},{\"id\":\"minecraft:stripped_oak_wood\",\"count\":1}]}]}}"
+            },
+            "state": "APPLIED",
+            "outcome": "RETURNED",
+            "resolution": null,
+            "createdAt": 1792681965285,
+            "updatedAt": 1792682051451
+          },
+          {
+            "id": "fddd48529acec2b02d66c7f0735a2be75729f7c60cd15434112b9fe3750bd890",
+            "revision": 2,
+            "admission": {
+              "observationId": "e8639d95-2ddf-4ffa-b5ba-4308ec82be26",
+              "generationId": "bd50472f-4838-481d-8360-32f9ab820cdf",
+              "taskId": "7433DE5331A82A25",
+              "actorId": "e9f7ec2c-a2a7-44b1-aba9-5e9ce65ce49a",
+              "recipeId": "minecraft:birch_planks",
+              "recipeRevision": "9191c03f411f2c9a769c1894dcdb92a0ab94d9cfdf38e9a90b5473f7df13f257",
+              "units": 4,
+              "evidence": "{\"id\":\"e8639d95-2ddf-4ffa-b5ba-4308ec82be26\",\"actorId\":\"e9f7ec2c-a2a7-44b1-aba9-5e9ce65ce49a\",\"dimension\":\"minecraft:overworld\",\"serverTick\":20,\"menuId\":91,\"source\":\"CRAFTING_TABLE\",\"width\":3,\"height\":3,\"inputs\":[{\"id\":\"minecraft:birch_log\",\"count\":1},null,null,null,null,null,null,null,null],\"output\":{\"id\":\"minecraft:birch_planks\",\"count\":4},\"recipe\":{\"id\":\"minecraft:birch_planks\",\"type\":\"minecraft:crafting\",\"serializer\":\"minecraft:crafting_shapeless\",\"kind\":\"SHAPELESS\",\"workstation\":\"minecraft:crafting_table\",\"width\":0,\"height\":0,\"revision\":\"9191c03f411f2c9a769c1894dcdb92a0ab94d9cfdf38e9a90b5473f7df13f257\",\"definition\":{\"category\":\"building\",\"group\":\"planks\",\"ingredients\":[{\"tag\":\"minecraft:birch_logs\"}],\"result\":{\"count\":4,\"id\":\"minecraft:birch_planks\"},\"type\":\"minecraft:crafting_shapeless\"},\"inputs\":[{\"definition\":{\"tag\":\"minecraft:birch_logs\"},\"custom\":false,\"alternatives\":[{\"id\":\"minecraft:birch_log\",\"count\":1},{\"id\":\"minecraft:birch_wood\",\"count\":1},{\"id\":\"minecraft:stripped_birch_log\",\"count\":1},{\"id\":\"minecraft:stripped_birch_wood\",\"count\":1}]}]}}"
+            },
+            "state": "APPLIED",
+            "outcome": "RETURNED",
+            "resolution": null,
+            "createdAt": 1792681965439,
+            "updatedAt": 1792682051468
+          },
+          {
+            "id": "9b69717ab0c2327d840d13bed79bf2b855a1158eddedc0d54ab44a497c32718d",
+            "revision": 2,
+            "admission": {
+              "observationId": "5f7fc130-f107-45d9-8cd1-08dd684b658d",
+              "generationId": "5cb3a509-bb08-489a-b46f-b4415903b304",
+              "taskId": "295843A61C470ABC",
+              "actorId": "e9f7ec2c-a2a7-44b1-aba9-5e9ce65ce49a",
+              "recipeId": "minecraft:spruce_planks",
+              "recipeRevision": "e4e91da7110e5a88918f1fe6d039b6c202d978026389b618a7d0badded39d09e",
+              "units": 4,
+              "evidence": "{\"id\":\"5f7fc130-f107-45d9-8cd1-08dd684b658d\",\"actorId\":\"e9f7ec2c-a2a7-44b1-aba9-5e9ce65ce49a\",\"dimension\":\"minecraft:overworld\",\"serverTick\":20,\"menuId\":91,\"source\":\"CRAFTING_TABLE\",\"width\":3,\"height\":3,\"inputs\":[{\"id\":\"minecraft:spruce_log\",\"count\":1},null,null,null,null,null,null,null,null],\"output\":{\"id\":\"minecraft:spruce_planks\",\"count\":4},\"recipe\":{\"id\":\"minecraft:spruce_planks\",\"type\":\"minecraft:crafting\",\"serializer\":\"minecraft:crafting_shapeless\",\"kind\":\"SHAPELESS\",\"workstation\":\"minecraft:crafting_table\",\"width\":0,\"height\":0,\"revision\":\"e4e91da7110e5a88918f1fe6d039b6c202d978026389b618a7d0badded39d09e\",\"definition\":{\"category\":\"building\",\"group\":\"planks\",\"ingredients\":[{\"tag\":\"minecraft:spruce_logs\"}],\"result\":{\"count\":4,\"id\":\"minecraft:spruce_planks\"},\"type\":\"minecraft:crafting_shapeless\"},\"inputs\":[{\"definition\":{\"tag\":\"minecraft:spruce_logs\"},\"custom\":false,\"alternatives\":[{\"id\":\"minecraft:spruce_log\",\"count\":1},{\"id\":\"minecraft:spruce_wood\",\"count\":1},{\"id\":\"minecraft:stripped_spruce_log\",\"count\":1},{\"id\":\"minecraft:stripped_spruce_wood\",\"count\":1}]}]}}"
+            },
+            "state": "APPLIED",
+            "outcome": "RETURNED",
+            "resolution": null,
+            "createdAt": 1792681965515,
+            "updatedAt": 1792682051392
+          }
+        ]
+      },
+      "state": {
+        "path": "artifacts/craft-recovery-final-21.1.248-server/craft-recovery-state.json",
+        "bytes": 6201,
+        "sha256": "e6340c4318a4ee2facd4ca2f72e1c0e864a4dac3c36d253b7cb8d58ca5a54509"
+      },
+      "observation": {
+        "path": "artifacts/craft-recovery-final-21.1.248-server/craft-recovery-observation.json",
+        "bytes": 11721,
+        "sha256": "3892acc8e784c63660b858bf99aaa3502fbca9e3ccc85d2869fe091385a1fdd7"
+      },
+      "journal": [
+        {
+          "path": "artifacts/craft-recovery-final-21.1.248-server/craft-world/citizens/quest-evidence/bindings/295843A61C470ABC.json",
+          "bytes": 347,
+          "sha256": "19daf3180beb82e40f8f4deef66fbfe0503408d8e90bce64cdb84d6dd2cea227"
+        },
+        {
+          "path": "artifacts/craft-recovery-final-21.1.248-server/craft-world/citizens/quest-evidence/bindings/7433DE5331A82A25.json",
+          "bytes": 346,
+          "sha256": "1f61a3a9e1442e45f4fcd78a46f02ead9cfc4f4bba17c61bc587c1e2b51bd18e"
+        },
+        {
+          "path": "artifacts/craft-recovery-final-21.1.248-server/craft-world/citizens/quest-evidence/bindings/7B67372112FACBA8.json",
+          "bytes": 344,
+          "sha256": "6558e10d87fb830a0d2c8b0e76fecd68b254a242aa42e7cb8d0ccf97a594f200"
+        },
+        {
+          "path": "artifacts/craft-recovery-final-21.1.248-server/craft-world/citizens/quest-evidence/journal/.journal.lock",
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "path": "artifacts/craft-recovery-final-21.1.248-server/craft-world/citizens/quest-evidence/journal/entry-27e74e3470636a5d7e7ac4e24f009d40a8bdc3fd395feec4725ae4940e9df2e3-0.json",
+          "bytes": 1756,
+          "sha256": "d02a93373d543a320c114ace038a9385a25191fafe13663dc55de458139b61de"
+        },
+        {
+          "path": "artifacts/craft-recovery-final-21.1.248-server/craft-world/citizens/quest-evidence/journal/entry-27e74e3470636a5d7e7ac4e24f009d40a8bdc3fd395feec4725ae4940e9df2e3-1.json",
+          "bytes": 1763,
+          "sha256": "c183a76ab1884971661d19b7b0bc5969d31de8869daba3445a53aed9980207c1"
+        },
+        {
+          "path": "artifacts/craft-recovery-final-21.1.248-server/craft-world/citizens/quest-evidence/journal/entry-27e74e3470636a5d7e7ac4e24f009d40a8bdc3fd395feec4725ae4940e9df2e3-2.json",
+          "bytes": 1761,
+          "sha256": "822a9f040eb5cd0b48654028c97a7278d3bd0b736f7c56240595860f28885b7e"
+        },
+        {
+          "path": "artifacts/craft-recovery-final-21.1.248-server/craft-world/citizens/quest-evidence/journal/entry-9b69717ab0c2327d840d13bed79bf2b855a1158eddedc0d54ab44a497c32718d-0.json",
+          "bytes": 1789,
+          "sha256": "18d0d1c346c0ea744b35c2a11b84152453a9f266acdb68bc353e5b15fe50d34e"
+        },
+        {
+          "path": "artifacts/craft-recovery-final-21.1.248-server/craft-world/citizens/quest-evidence/journal/entry-9b69717ab0c2327d840d13bed79bf2b855a1158eddedc0d54ab44a497c32718d-1.json",
+          "bytes": 1796,
+          "sha256": "ce9b947818c361f9d93e59538928ff789d8ecfd731946d35e5973c62362ce407"
+        },
+        {
+          "path": "artifacts/craft-recovery-final-21.1.248-server/craft-world/citizens/quest-evidence/journal/entry-9b69717ab0c2327d840d13bed79bf2b855a1158eddedc0d54ab44a497c32718d-2.json",
+          "bytes": 1794,
+          "sha256": "270b343125d5ae1585aa38413b983d032aba503f2bec02f01c8b27d689c84f44"
+        },
+        {
+          "path": "artifacts/craft-recovery-final-21.1.248-server/craft-world/citizens/quest-evidence/journal/entry-fddd48529acec2b02d66c7f0735a2be75729f7c60cd15434112b9fe3750bd890-0.json",
+          "bytes": 1778,
+          "sha256": "ae9e3244967a0936c82d4f61d5fb6d97b88205f336dcf1205e93ba32fb2cffd8"
+        },
+        {
+          "path": "artifacts/craft-recovery-final-21.1.248-server/craft-world/citizens/quest-evidence/journal/entry-fddd48529acec2b02d66c7f0735a2be75729f7c60cd15434112b9fe3750bd890-1.json",
+          "bytes": 1785,
+          "sha256": "53eebdebbb412136c0dee8542dd1bd1b5a31e67ac98185e6d87b564a1609ccb7"
+        },
+        {
+          "path": "artifacts/craft-recovery-final-21.1.248-server/craft-world/citizens/quest-evidence/journal/entry-fddd48529acec2b02d66c7f0735a2be75729f7c60cd15434112b9fe3750bd890-2.json",
+          "bytes": 1783,
+          "sha256": "a2ab8bc9a760a5aab3e110d780c5878ddd54f5a81edf126f33cfe5b4fdb653f5"
+        },
+        {
+          "path": "artifacts/craft-recovery-final-21.1.248-server/craft-world/citizens/quest-evidence/journal/generation-1c2bdf71-40ec-47d1-87c9-00ccb63f80af.json",
+          "bytes": 265,
+          "sha256": "dfe3e20591e8191651787f31955c8f737e0c8a3e79fcecb25bdbe4bc93b4d20d"
+        },
+        {
+          "path": "artifacts/craft-recovery-final-21.1.248-server/craft-world/citizens/quest-evidence/journal/generation-5cb3a509-bb08-489a-b46f-b4415903b304.json",
+          "bytes": 265,
+          "sha256": "53b13db37d9e7ff08fc76034f84ad8388db3ee98ebae5d0db1cd2a486d4002ac"
+        },
+        {
+          "path": "artifacts/craft-recovery-final-21.1.248-server/craft-world/citizens/quest-evidence/journal/generation-bd50472f-4838-481d-8360-32f9ab820cdf.json",
+          "bytes": 265,
+          "sha256": "3caf584d8572eac3bb8722244f64b2b492d2dcbbf2c8bc5dd06531e1e2af45ec"
+        }
+      ],
+      "nativeProgress": {
+        "295843A61C470ABC": 1,
+        "7433DE5331A82A25": 1,
+        "7B67372112FACBA8": 1
+      },
+      "team": {
+        "path": "artifacts/craft-recovery-final-21.1.248-server/craft-world/ftbquests/e9f7ec2c-a2a7-44b1-aba9-5e9ce65ce49a.snbt",
+        "bytes": 889,
+        "sha256": "365ba09bdcc501c7a647611e88377dfe947159c4a571c967d7b23b2df5481566"
+      },
+      "player": {
+        "path": "artifacts/craft-recovery-final-21.1.248-server/craft-world/playerdata/e9f7ec2c-a2a7-44b1-aba9-5e9ce65ce49a.dat",
+        "bytes": 1042,
+        "sha256": "0c1b349583d4a7d7a1d5f6c43f2b68324e4cd2c27fdf5aa461299a785bdd2dc5"
+      }
+    },
+    {
+      "target": "21.1.233",
+      "checks": 18,
+      "logs": [
+        {
+          "path": "artifacts/craft-recovery-final-21.1.233-seed-2026-10-22.log",
+          "bytes": 32528,
+          "sha256": "7ee25aecc53b71c89366667143998d948cfc838fc85f61318719db38f12e34cf"
+        },
+        {
+          "path": "artifacts/craft-recovery-final-21.1.233-recover-2026-10-22.log",
+          "bytes": 16513,
+          "sha256": "e8f39f1a9086631463f229b07c191f7a6e57bce9e7f684f7d8aee8f03c4014d5"
+        }
+      ],
+      "identity": {
+        "actor": "79f66b56-85f6-41ee-9af7-6e8a909a3153",
+        "team": "79f66b56-85f6-41ee-9af7-6e8a909a3153",
+        "tasks": [
+          "7C76C3F684B87ACD",
+          "3DE30F41AECF2CC8",
+          "41E3AB101D6C3698"
+        ],
+        "entries": [
+          {
+            "id": "22b46b69d96eb9d3c3500ef56ea496310690e4cf001b9f14ab5805ce85309aa9",
+            "revision": 1,
+            "admission": {
+              "observationId": "4673d74e-142a-4207-9a1b-2d3da0730a2d",
+              "generationId": "038aca35-3d1e-4e09-896d-d632c6c5e064",
+              "taskId": "7C76C3F684B87ACD",
+              "actorId": "79f66b56-85f6-41ee-9af7-6e8a909a3153",
+              "recipeId": "minecraft:oak_planks",
+              "recipeRevision": "3aefaa3f38d0da98e939feaa4d77a81574881fdee49979d732552999c6e633f8",
+              "units": 4,
+              "evidence": "{\"id\":\"4673d74e-142a-4207-9a1b-2d3da0730a2d\",\"actorId\":\"79f66b56-85f6-41ee-9af7-6e8a909a3153\",\"dimension\":\"minecraft:overworld\",\"serverTick\":20,\"menuId\":91,\"source\":\"CRAFTING_TABLE\",\"width\":3,\"height\":3,\"inputs\":[{\"id\":\"minecraft:oak_log\",\"count\":1},null,null,null,null,null,null,null,null],\"output\":{\"id\":\"minecraft:oak_planks\",\"count\":4},\"recipe\":{\"id\":\"minecraft:oak_planks\",\"type\":\"minecraft:crafting\",\"serializer\":\"minecraft:crafting_shapeless\",\"kind\":\"SHAPELESS\",\"workstation\":\"minecraft:crafting_table\",\"width\":0,\"height\":0,\"revision\":\"3aefaa3f38d0da98e939feaa4d77a81574881fdee49979d732552999c6e633f8\",\"definition\":{\"category\":\"building\",\"group\":\"planks\",\"ingredients\":[{\"tag\":\"minecraft:oak_logs\"}],\"result\":{\"count\":4,\"id\":\"minecraft:oak_planks\"},\"type\":\"minecraft:crafting_shapeless\"},\"inputs\":[{\"definition\":{\"tag\":\"minecraft:oak_logs\"},\"custom\":false,\"alternatives\":[{\"id\":\"minecraft:oak_log\",\"count\":1},{\"id\":\"minecraft:oak_wood\",\"count\":1},{\"id\":\"minecraft:stripped_oak_log\",\"count\":1},{\"id\":\"minecraft:stripped_oak_wood\",\"count\":1}]}]}}"
+            },
+            "state": "CONFIRMED",
+            "outcome": "RETURNED",
+            "resolution": null,
+            "createdAt": 1792682263372,
+            "updatedAt": 1792682263430
+          },
+          {
+            "id": "35b629997f3d7c7c4de0dbc04cf9f97a8df16d073f6e31293288eabf7113250f",
+            "revision": 1,
+            "admission": {
+              "observationId": "611d63f8-fcab-4601-8482-19fe7cba1448",
+              "generationId": "c29c8326-142b-4f53-9593-1c947dfd958e",
+              "taskId": "3DE30F41AECF2CC8",
+              "actorId": "79f66b56-85f6-41ee-9af7-6e8a909a3153",
+              "recipeId": "minecraft:birch_planks",
+              "recipeRevision": "9191c03f411f2c9a769c1894dcdb92a0ab94d9cfdf38e9a90b5473f7df13f257",
+              "units": 4,
+              "evidence": "{\"id\":\"611d63f8-fcab-4601-8482-19fe7cba1448\",\"actorId\":\"79f66b56-85f6-41ee-9af7-6e8a909a3153\",\"dimension\":\"minecraft:overworld\",\"serverTick\":20,\"menuId\":91,\"source\":\"CRAFTING_TABLE\",\"width\":3,\"height\":3,\"inputs\":[{\"id\":\"minecraft:birch_log\",\"count\":1},null,null,null,null,null,null,null,null],\"output\":{\"id\":\"minecraft:birch_planks\",\"count\":4},\"recipe\":{\"id\":\"minecraft:birch_planks\",\"type\":\"minecraft:crafting\",\"serializer\":\"minecraft:crafting_shapeless\",\"kind\":\"SHAPELESS\",\"workstation\":\"minecraft:crafting_table\",\"width\":0,\"height\":0,\"revision\":\"9191c03f411f2c9a769c1894dcdb92a0ab94d9cfdf38e9a90b5473f7df13f257\",\"definition\":{\"category\":\"building\",\"group\":\"planks\",\"ingredients\":[{\"tag\":\"minecraft:birch_logs\"}],\"result\":{\"count\":4,\"id\":\"minecraft:birch_planks\"},\"type\":\"minecraft:crafting_shapeless\"},\"inputs\":[{\"definition\":{\"tag\":\"minecraft:birch_logs\"},\"custom\":false,\"alternatives\":[{\"id\":\"minecraft:birch_log\",\"count\":1},{\"id\":\"minecraft:birch_wood\",\"count\":1},{\"id\":\"minecraft:stripped_birch_log\",\"count\":1},{\"id\":\"minecraft:stripped_birch_wood\",\"count\":1}]}]}}"
+            },
+            "state": "CONFIRMED",
+            "outcome": "RETURNED",
+            "resolution": null,
+            "createdAt": 1792682263482,
+            "updatedAt": 1792682263491
+          },
+          {
+            "id": "5045c36d2c54ebfbd02236d271b5f6c8e47f3dc782389b93bbb1a0c73459b07b",
+            "revision": 1,
+            "admission": {
+              "observationId": "3d6d8d26-030f-4f72-bc2c-cad5f1bcdd15",
+              "generationId": "1f2a932c-4b53-411a-84e8-35ccda6ecec5",
+              "taskId": "41E3AB101D6C3698",
+              "actorId": "79f66b56-85f6-41ee-9af7-6e8a909a3153",
+              "recipeId": "minecraft:spruce_planks",
+              "recipeRevision": "e4e91da7110e5a88918f1fe6d039b6c202d978026389b618a7d0badded39d09e",
+              "units": 4,
+              "evidence": "{\"id\":\"3d6d8d26-030f-4f72-bc2c-cad5f1bcdd15\",\"actorId\":\"79f66b56-85f6-41ee-9af7-6e8a909a3153\",\"dimension\":\"minecraft:overworld\",\"serverTick\":20,\"menuId\":91,\"source\":\"CRAFTING_TABLE\",\"width\":3,\"height\":3,\"inputs\":[{\"id\":\"minecraft:spruce_log\",\"count\":1},null,null,null,null,null,null,null,null],\"output\":{\"id\":\"minecraft:spruce_planks\",\"count\":4},\"recipe\":{\"id\":\"minecraft:spruce_planks\",\"type\":\"minecraft:crafting\",\"serializer\":\"minecraft:crafting_shapeless\",\"kind\":\"SHAPELESS\",\"workstation\":\"minecraft:crafting_table\",\"width\":0,\"height\":0,\"revision\":\"e4e91da7110e5a88918f1fe6d039b6c202d978026389b618a7d0badded39d09e\",\"definition\":{\"category\":\"building\",\"group\":\"planks\",\"ingredients\":[{\"tag\":\"minecraft:spruce_logs\"}],\"result\":{\"count\":4,\"id\":\"minecraft:spruce_planks\"},\"type\":\"minecraft:crafting_shapeless\"},\"inputs\":[{\"definition\":{\"tag\":\"minecraft:spruce_logs\"},\"custom\":false,\"alternatives\":[{\"id\":\"minecraft:spruce_log\",\"count\":1},{\"id\":\"minecraft:spruce_wood\",\"count\":1},{\"id\":\"minecraft:stripped_spruce_log\",\"count\":1},{\"id\":\"minecraft:stripped_spruce_wood\",\"count\":1}]}]}}"
+            },
+            "state": "CONFIRMED",
+            "outcome": "RETURNED",
+            "resolution": null,
+            "createdAt": 1792682263505,
+            "updatedAt": 1792682263511
+          }
+        ],
+        "inventory": "[{\"id\":\"minecraft:oak_planks\",\"count\":4},{\"id\":\"minecraft:birch_planks\",\"count\":4},{\"id\":\"minecraft:spruce_planks\",\"count\":4},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{}]"
+      },
+      "initialRecoveryObservation": {
+        "reported": true,
+        "progress": [
+          0,
+          0,
+          1
+        ],
+        "entries": [
+          {
+            "id": "22b46b69d96eb9d3c3500ef56ea496310690e4cf001b9f14ab5805ce85309aa9",
+            "revision": 1,
+            "admission": {
+              "observationId": "4673d74e-142a-4207-9a1b-2d3da0730a2d",
+              "generationId": "038aca35-3d1e-4e09-896d-d632c6c5e064",
+              "taskId": "7C76C3F684B87ACD",
+              "actorId": "79f66b56-85f6-41ee-9af7-6e8a909a3153",
+              "recipeId": "minecraft:oak_planks",
+              "recipeRevision": "3aefaa3f38d0da98e939feaa4d77a81574881fdee49979d732552999c6e633f8",
+              "units": 4,
+              "evidence": "{\"id\":\"4673d74e-142a-4207-9a1b-2d3da0730a2d\",\"actorId\":\"79f66b56-85f6-41ee-9af7-6e8a909a3153\",\"dimension\":\"minecraft:overworld\",\"serverTick\":20,\"menuId\":91,\"source\":\"CRAFTING_TABLE\",\"width\":3,\"height\":3,\"inputs\":[{\"id\":\"minecraft:oak_log\",\"count\":1},null,null,null,null,null,null,null,null],\"output\":{\"id\":\"minecraft:oak_planks\",\"count\":4},\"recipe\":{\"id\":\"minecraft:oak_planks\",\"type\":\"minecraft:crafting\",\"serializer\":\"minecraft:crafting_shapeless\",\"kind\":\"SHAPELESS\",\"workstation\":\"minecraft:crafting_table\",\"width\":0,\"height\":0,\"revision\":\"3aefaa3f38d0da98e939feaa4d77a81574881fdee49979d732552999c6e633f8\",\"definition\":{\"category\":\"building\",\"group\":\"planks\",\"ingredients\":[{\"tag\":\"minecraft:oak_logs\"}],\"result\":{\"count\":4,\"id\":\"minecraft:oak_planks\"},\"type\":\"minecraft:crafting_shapeless\"},\"inputs\":[{\"definition\":{\"tag\":\"minecraft:oak_logs\"},\"custom\":false,\"alternatives\":[{\"id\":\"minecraft:oak_log\",\"count\":1},{\"id\":\"minecraft:oak_wood\",\"count\":1},{\"id\":\"minecraft:stripped_oak_log\",\"count\":1},{\"id\":\"minecraft:stripped_oak_wood\",\"count\":1}]}]}}"
+            },
+            "state": "CONFIRMED",
+            "outcome": "RETURNED",
+            "resolution": null,
+            "createdAt": 1792682263372,
+            "updatedAt": 1792682263430
+          },
+          {
+            "id": "35b629997f3d7c7c4de0dbc04cf9f97a8df16d073f6e31293288eabf7113250f",
+            "revision": 1,
+            "admission": {
+              "observationId": "611d63f8-fcab-4601-8482-19fe7cba1448",
+              "generationId": "c29c8326-142b-4f53-9593-1c947dfd958e",
+              "taskId": "3DE30F41AECF2CC8",
+              "actorId": "79f66b56-85f6-41ee-9af7-6e8a909a3153",
+              "recipeId": "minecraft:birch_planks",
+              "recipeRevision": "9191c03f411f2c9a769c1894dcdb92a0ab94d9cfdf38e9a90b5473f7df13f257",
+              "units": 4,
+              "evidence": "{\"id\":\"611d63f8-fcab-4601-8482-19fe7cba1448\",\"actorId\":\"79f66b56-85f6-41ee-9af7-6e8a909a3153\",\"dimension\":\"minecraft:overworld\",\"serverTick\":20,\"menuId\":91,\"source\":\"CRAFTING_TABLE\",\"width\":3,\"height\":3,\"inputs\":[{\"id\":\"minecraft:birch_log\",\"count\":1},null,null,null,null,null,null,null,null],\"output\":{\"id\":\"minecraft:birch_planks\",\"count\":4},\"recipe\":{\"id\":\"minecraft:birch_planks\",\"type\":\"minecraft:crafting\",\"serializer\":\"minecraft:crafting_shapeless\",\"kind\":\"SHAPELESS\",\"workstation\":\"minecraft:crafting_table\",\"width\":0,\"height\":0,\"revision\":\"9191c03f411f2c9a769c1894dcdb92a0ab94d9cfdf38e9a90b5473f7df13f257\",\"definition\":{\"category\":\"building\",\"group\":\"planks\",\"ingredients\":[{\"tag\":\"minecraft:birch_logs\"}],\"result\":{\"count\":4,\"id\":\"minecraft:birch_planks\"},\"type\":\"minecraft:crafting_shapeless\"},\"inputs\":[{\"definition\":{\"tag\":\"minecraft:birch_logs\"},\"custom\":false,\"alternatives\":[{\"id\":\"minecraft:birch_log\",\"count\":1},{\"id\":\"minecraft:birch_wood\",\"count\":1},{\"id\":\"minecraft:stripped_birch_log\",\"count\":1},{\"id\":\"minecraft:stripped_birch_wood\",\"count\":1}]}]}}"
+            },
+            "state": "CONFIRMED",
+            "outcome": "RETURNED",
+            "resolution": null,
+            "createdAt": 1792682263482,
+            "updatedAt": 1792682263491
+          },
+          {
+            "id": "5045c36d2c54ebfbd02236d271b5f6c8e47f3dc782389b93bbb1a0c73459b07b",
+            "revision": 2,
+            "admission": {
+              "observationId": "3d6d8d26-030f-4f72-bc2c-cad5f1bcdd15",
+              "generationId": "1f2a932c-4b53-411a-84e8-35ccda6ecec5",
+              "taskId": "41E3AB101D6C3698",
+              "actorId": "79f66b56-85f6-41ee-9af7-6e8a909a3153",
+              "recipeId": "minecraft:spruce_planks",
+              "recipeRevision": "e4e91da7110e5a88918f1fe6d039b6c202d978026389b618a7d0badded39d09e",
+              "units": 4,
+              "evidence": "{\"id\":\"3d6d8d26-030f-4f72-bc2c-cad5f1bcdd15\",\"actorId\":\"79f66b56-85f6-41ee-9af7-6e8a909a3153\",\"dimension\":\"minecraft:overworld\",\"serverTick\":20,\"menuId\":91,\"source\":\"CRAFTING_TABLE\",\"width\":3,\"height\":3,\"inputs\":[{\"id\":\"minecraft:spruce_log\",\"count\":1},null,null,null,null,null,null,null,null],\"output\":{\"id\":\"minecraft:spruce_planks\",\"count\":4},\"recipe\":{\"id\":\"minecraft:spruce_planks\",\"type\":\"minecraft:crafting\",\"serializer\":\"minecraft:crafting_shapeless\",\"kind\":\"SHAPELESS\",\"workstation\":\"minecraft:crafting_table\",\"width\":0,\"height\":0,\"revision\":\"e4e91da7110e5a88918f1fe6d039b6c202d978026389b618a7d0badded39d09e\",\"definition\":{\"category\":\"building\",\"group\":\"planks\",\"ingredients\":[{\"tag\":\"minecraft:spruce_logs\"}],\"result\":{\"count\":4,\"id\":\"minecraft:spruce_planks\"},\"type\":\"minecraft:crafting_shapeless\"},\"inputs\":[{\"definition\":{\"tag\":\"minecraft:spruce_logs\"},\"custom\":false,\"alternatives\":[{\"id\":\"minecraft:spruce_log\",\"count\":1},{\"id\":\"minecraft:spruce_wood\",\"count\":1},{\"id\":\"minecraft:stripped_spruce_log\",\"count\":1},{\"id\":\"minecraft:stripped_spruce_wood\",\"count\":1}]}]}}"
+            },
+            "state": "APPLIED",
+            "outcome": "RETURNED",
+            "resolution": null,
+            "createdAt": 1792682263505,
+            "updatedAt": 1792682305917
+          }
+        ],
+        "message": "Craft projection remains pending for task 7C76C3F684B87ACD, team 79f66b56-85f6-41ee-9af7-6e8a909a3153, cycle 0, generation 038aca35-3d1e-4e09-896d-d632c6c5e064",
+        "recovered": true,
+        "finalEntries": [
+          {
+            "id": "22b46b69d96eb9d3c3500ef56ea496310690e4cf001b9f14ab5805ce85309aa9",
+            "revision": 2,
+            "admission": {
+              "observationId": "4673d74e-142a-4207-9a1b-2d3da0730a2d",
+              "generationId": "038aca35-3d1e-4e09-896d-d632c6c5e064",
+              "taskId": "7C76C3F684B87ACD",
+              "actorId": "79f66b56-85f6-41ee-9af7-6e8a909a3153",
+              "recipeId": "minecraft:oak_planks",
+              "recipeRevision": "3aefaa3f38d0da98e939feaa4d77a81574881fdee49979d732552999c6e633f8",
+              "units": 4,
+              "evidence": "{\"id\":\"4673d74e-142a-4207-9a1b-2d3da0730a2d\",\"actorId\":\"79f66b56-85f6-41ee-9af7-6e8a909a3153\",\"dimension\":\"minecraft:overworld\",\"serverTick\":20,\"menuId\":91,\"source\":\"CRAFTING_TABLE\",\"width\":3,\"height\":3,\"inputs\":[{\"id\":\"minecraft:oak_log\",\"count\":1},null,null,null,null,null,null,null,null],\"output\":{\"id\":\"minecraft:oak_planks\",\"count\":4},\"recipe\":{\"id\":\"minecraft:oak_planks\",\"type\":\"minecraft:crafting\",\"serializer\":\"minecraft:crafting_shapeless\",\"kind\":\"SHAPELESS\",\"workstation\":\"minecraft:crafting_table\",\"width\":0,\"height\":0,\"revision\":\"3aefaa3f38d0da98e939feaa4d77a81574881fdee49979d732552999c6e633f8\",\"definition\":{\"category\":\"building\",\"group\":\"planks\",\"ingredients\":[{\"tag\":\"minecraft:oak_logs\"}],\"result\":{\"count\":4,\"id\":\"minecraft:oak_planks\"},\"type\":\"minecraft:crafting_shapeless\"},\"inputs\":[{\"definition\":{\"tag\":\"minecraft:oak_logs\"},\"custom\":false,\"alternatives\":[{\"id\":\"minecraft:oak_log\",\"count\":1},{\"id\":\"minecraft:oak_wood\",\"count\":1},{\"id\":\"minecraft:stripped_oak_log\",\"count\":1},{\"id\":\"minecraft:stripped_oak_wood\",\"count\":1}]}]}}"
+            },
+            "state": "APPLIED",
+            "outcome": "RETURNED",
+            "resolution": null,
+            "createdAt": 1792682263372,
+            "updatedAt": 1792682305934
+          },
+          {
+            "id": "35b629997f3d7c7c4de0dbc04cf9f97a8df16d073f6e31293288eabf7113250f",
+            "revision": 2,
+            "admission": {
+              "observationId": "611d63f8-fcab-4601-8482-19fe7cba1448",
+              "generationId": "c29c8326-142b-4f53-9593-1c947dfd958e",
+              "taskId": "3DE30F41AECF2CC8",
+              "actorId": "79f66b56-85f6-41ee-9af7-6e8a909a3153",
+              "recipeId": "minecraft:birch_planks",
+              "recipeRevision": "9191c03f411f2c9a769c1894dcdb92a0ab94d9cfdf38e9a90b5473f7df13f257",
+              "units": 4,
+              "evidence": "{\"id\":\"611d63f8-fcab-4601-8482-19fe7cba1448\",\"actorId\":\"79f66b56-85f6-41ee-9af7-6e8a909a3153\",\"dimension\":\"minecraft:overworld\",\"serverTick\":20,\"menuId\":91,\"source\":\"CRAFTING_TABLE\",\"width\":3,\"height\":3,\"inputs\":[{\"id\":\"minecraft:birch_log\",\"count\":1},null,null,null,null,null,null,null,null],\"output\":{\"id\":\"minecraft:birch_planks\",\"count\":4},\"recipe\":{\"id\":\"minecraft:birch_planks\",\"type\":\"minecraft:crafting\",\"serializer\":\"minecraft:crafting_shapeless\",\"kind\":\"SHAPELESS\",\"workstation\":\"minecraft:crafting_table\",\"width\":0,\"height\":0,\"revision\":\"9191c03f411f2c9a769c1894dcdb92a0ab94d9cfdf38e9a90b5473f7df13f257\",\"definition\":{\"category\":\"building\",\"group\":\"planks\",\"ingredients\":[{\"tag\":\"minecraft:birch_logs\"}],\"result\":{\"count\":4,\"id\":\"minecraft:birch_planks\"},\"type\":\"minecraft:crafting_shapeless\"},\"inputs\":[{\"definition\":{\"tag\":\"minecraft:birch_logs\"},\"custom\":false,\"alternatives\":[{\"id\":\"minecraft:birch_log\",\"count\":1},{\"id\":\"minecraft:birch_wood\",\"count\":1},{\"id\":\"minecraft:stripped_birch_log\",\"count\":1},{\"id\":\"minecraft:stripped_birch_wood\",\"count\":1}]}]}}"
+            },
+            "state": "APPLIED",
+            "outcome": "RETURNED",
+            "resolution": null,
+            "createdAt": 1792682263482,
+            "updatedAt": 1792682305944
+          },
+          {
+            "id": "5045c36d2c54ebfbd02236d271b5f6c8e47f3dc782389b93bbb1a0c73459b07b",
+            "revision": 2,
+            "admission": {
+              "observationId": "3d6d8d26-030f-4f72-bc2c-cad5f1bcdd15",
+              "generationId": "1f2a932c-4b53-411a-84e8-35ccda6ecec5",
+              "taskId": "41E3AB101D6C3698",
+              "actorId": "79f66b56-85f6-41ee-9af7-6e8a909a3153",
+              "recipeId": "minecraft:spruce_planks",
+              "recipeRevision": "e4e91da7110e5a88918f1fe6d039b6c202d978026389b618a7d0badded39d09e",
+              "units": 4,
+              "evidence": "{\"id\":\"3d6d8d26-030f-4f72-bc2c-cad5f1bcdd15\",\"actorId\":\"79f66b56-85f6-41ee-9af7-6e8a909a3153\",\"dimension\":\"minecraft:overworld\",\"serverTick\":20,\"menuId\":91,\"source\":\"CRAFTING_TABLE\",\"width\":3,\"height\":3,\"inputs\":[{\"id\":\"minecraft:spruce_log\",\"count\":1},null,null,null,null,null,null,null,null],\"output\":{\"id\":\"minecraft:spruce_planks\",\"count\":4},\"recipe\":{\"id\":\"minecraft:spruce_planks\",\"type\":\"minecraft:crafting\",\"serializer\":\"minecraft:crafting_shapeless\",\"kind\":\"SHAPELESS\",\"workstation\":\"minecraft:crafting_table\",\"width\":0,\"height\":0,\"revision\":\"e4e91da7110e5a88918f1fe6d039b6c202d978026389b618a7d0badded39d09e\",\"definition\":{\"category\":\"building\",\"group\":\"planks\",\"ingredients\":[{\"tag\":\"minecraft:spruce_logs\"}],\"result\":{\"count\":4,\"id\":\"minecraft:spruce_planks\"},\"type\":\"minecraft:crafting_shapeless\"},\"inputs\":[{\"definition\":{\"tag\":\"minecraft:spruce_logs\"},\"custom\":false,\"alternatives\":[{\"id\":\"minecraft:spruce_log\",\"count\":1},{\"id\":\"minecraft:spruce_wood\",\"count\":1},{\"id\":\"minecraft:stripped_spruce_log\",\"count\":1},{\"id\":\"minecraft:stripped_spruce_wood\",\"count\":1}]}]}}"
+            },
+            "state": "APPLIED",
+            "outcome": "RETURNED",
+            "resolution": null,
+            "createdAt": 1792682263505,
+            "updatedAt": 1792682305917
+          }
+        ]
+      },
+      "state": {
+        "path": "artifacts/craft-recovery-final-21.1.233-server/craft-recovery-state.json",
+        "bytes": 6201,
+        "sha256": "017ad7c0c4003076ce872d45773b09d1cf3d989d3beaef16d3bff75c193d6bf6"
+      },
+      "observation": {
+        "path": "artifacts/craft-recovery-final-21.1.233-server/craft-recovery-observation.json",
+        "bytes": 11721,
+        "sha256": "32dc0c0e7ceff98379e36f0fdc926233f04f7976ea2dc2b01bf123551b3d9f6a"
+      },
+      "journal": [
+        {
+          "path": "artifacts/craft-recovery-final-21.1.233-server/craft-world/citizens/quest-evidence/bindings/3DE30F41AECF2CC8.json",
+          "bytes": 346,
+          "sha256": "3be9e77757d997639063b6898cbcc7887f9e07c485d21ccddd20e72a0ecd70cf"
+        },
+        {
+          "path": "artifacts/craft-recovery-final-21.1.233-server/craft-world/citizens/quest-evidence/bindings/41E3AB101D6C3698.json",
+          "bytes": 347,
+          "sha256": "bba5524cd61bd7822527407d3165c3461a2b0e09af806dca6a909b4a351c4b4e"
+        },
+        {
+          "path": "artifacts/craft-recovery-final-21.1.233-server/craft-world/citizens/quest-evidence/bindings/7C76C3F684B87ACD.json",
+          "bytes": 344,
+          "sha256": "fbf58c0121a23d8eec012420462523ca2290ff7a7f622a288d293d03dcc85c7d"
+        },
+        {
+          "path": "artifacts/craft-recovery-final-21.1.233-server/craft-world/citizens/quest-evidence/journal/.journal.lock",
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "path": "artifacts/craft-recovery-final-21.1.233-server/craft-world/citizens/quest-evidence/journal/entry-22b46b69d96eb9d3c3500ef56ea496310690e4cf001b9f14ab5805ce85309aa9-0.json",
+          "bytes": 1756,
+          "sha256": "c9e796403156ce80a08ad06ee5a0fcb0c0f9b60f9eaf04a213268026700638bf"
+        },
+        {
+          "path": "artifacts/craft-recovery-final-21.1.233-server/craft-world/citizens/quest-evidence/journal/entry-22b46b69d96eb9d3c3500ef56ea496310690e4cf001b9f14ab5805ce85309aa9-1.json",
+          "bytes": 1763,
+          "sha256": "83fdd31714c7aaef09424394a48d16dddf70ed99ac927bcd24c161de845f0ff6"
+        },
+        {
+          "path": "artifacts/craft-recovery-final-21.1.233-server/craft-world/citizens/quest-evidence/journal/entry-22b46b69d96eb9d3c3500ef56ea496310690e4cf001b9f14ab5805ce85309aa9-2.json",
+          "bytes": 1761,
+          "sha256": "098a273d5aa302ab1a272373cbef6ed1822129f2aed704077694b7a73f6a332b"
+        },
+        {
+          "path": "artifacts/craft-recovery-final-21.1.233-server/craft-world/citizens/quest-evidence/journal/entry-35b629997f3d7c7c4de0dbc04cf9f97a8df16d073f6e31293288eabf7113250f-0.json",
+          "bytes": 1778,
+          "sha256": "cfa4c668919ebb3e0223e1bdfea02734d489430a8cf028a894b129be2c9375b9"
+        },
+        {
+          "path": "artifacts/craft-recovery-final-21.1.233-server/craft-world/citizens/quest-evidence/journal/entry-35b629997f3d7c7c4de0dbc04cf9f97a8df16d073f6e31293288eabf7113250f-1.json",
+          "bytes": 1785,
+          "sha256": "afb89fd89f6d094d7bec43a71706768a0205702a1fdd9d8ef09efca308f24856"
+        },
+        {
+          "path": "artifacts/craft-recovery-final-21.1.233-server/craft-world/citizens/quest-evidence/journal/entry-35b629997f3d7c7c4de0dbc04cf9f97a8df16d073f6e31293288eabf7113250f-2.json",
+          "bytes": 1783,
+          "sha256": "869c077d507d56eb6e9a3a7064457ea71716498d81ccb5653f1ec7a2b92bdbde"
+        },
+        {
+          "path": "artifacts/craft-recovery-final-21.1.233-server/craft-world/citizens/quest-evidence/journal/entry-5045c36d2c54ebfbd02236d271b5f6c8e47f3dc782389b93bbb1a0c73459b07b-0.json",
+          "bytes": 1789,
+          "sha256": "b2e9feb11c450e9641e7b86df9d9a8753a5da96028484269898af7e45edf33e1"
+        },
+        {
+          "path": "artifacts/craft-recovery-final-21.1.233-server/craft-world/citizens/quest-evidence/journal/entry-5045c36d2c54ebfbd02236d271b5f6c8e47f3dc782389b93bbb1a0c73459b07b-1.json",
+          "bytes": 1796,
+          "sha256": "9751b6c86c5de2b75913618569b0ba373c469addb4551b3c223b6b258dfff47a"
+        },
+        {
+          "path": "artifacts/craft-recovery-final-21.1.233-server/craft-world/citizens/quest-evidence/journal/entry-5045c36d2c54ebfbd02236d271b5f6c8e47f3dc782389b93bbb1a0c73459b07b-2.json",
+          "bytes": 1794,
+          "sha256": "701697f6518c4af17397ad5b541be993f364bd8fd8af0af4455f721c84360ef2"
+        },
+        {
+          "path": "artifacts/craft-recovery-final-21.1.233-server/craft-world/citizens/quest-evidence/journal/generation-038aca35-3d1e-4e09-896d-d632c6c5e064.json",
+          "bytes": 265,
+          "sha256": "9ed30edbc47ed061e0cd1e1c72bd05ff5a0985288502bb2ff63e09c63de93aea"
+        },
+        {
+          "path": "artifacts/craft-recovery-final-21.1.233-server/craft-world/citizens/quest-evidence/journal/generation-1f2a932c-4b53-411a-84e8-35ccda6ecec5.json",
+          "bytes": 265,
+          "sha256": "801cd7ba9d205feebde03e2231250dd8c96287c2858759a037c5489ab515dfe9"
+        },
+        {
+          "path": "artifacts/craft-recovery-final-21.1.233-server/craft-world/citizens/quest-evidence/journal/generation-c29c8326-142b-4f53-9593-1c947dfd958e.json",
+          "bytes": 265,
+          "sha256": "320bd8611eb5a5100c7d1037cbbf8156dd24bd06634b6ce10849fca419931aa8"
+        }
+      ],
+      "nativeProgress": {
+        "41E3AB101D6C3698": 1,
+        "7C76C3F684B87ACD": 1,
+        "3DE30F41AECF2CC8": 1
+      },
+      "team": {
+        "path": "artifacts/craft-recovery-final-21.1.233-server/craft-world/ftbquests/79f66b56-85f6-41ee-9af7-6e8a909a3153.snbt",
+        "bytes": 889,
+        "sha256": "3d674e17c98d7e451e92a9d529b030207c8ce4744fb85a0f610eb89248c3fa1b"
+      },
+      "player": {
+        "path": "artifacts/craft-recovery-final-21.1.233-server/craft-world/playerdata/79f66b56-85f6-41ee-9af7-6e8a909a3153.dat",
+        "bytes": 1034,
+        "sha256": "964b6a1e8e5ad99c533d80cdc024b8739b91d62c15204be60fea23f2a6fd8db5"
+      }
+    }
+  ],
+  "nativeRecoveryChecks": 36,
+  "create": {
+    "target": "21.1.248",
+    "checks": 263,
+    "groups": {
+      "CREATEBATCHAUDIT": 23,
+      "CREATEPRESSAUDIT": 16,
+      "CREATETRANSPORTAUDIT": 21,
+      "CREATEBASINAUDIT": 23,
+      "CREATEFLUIDAUDIT": 28,
+      "CREATEDEPLOYERAUDIT": 26,
+      "CREATEFANAUDIT": 31,
+      "CREATEASSEMBLYAUDIT": 41,
+      "CREATEAUDIT": 54
+    },
+    "log": {
+      "path": "artifacts/craft-recovery-create-248-2026-10-22.log",
+      "bytes": 74373,
+      "sha256": "4cb00d43c08b62d48d5349597cb888bae8fd0c85296441b29f5dddd84e3e6a58"
+    }
+  },
+  "totalNativeChecks": 299,
+  "ordinary": [
+    {
+      "target": "21.1.248",
+      "results": {
+        "tests": 823,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "log": {
+        "path": "artifacts/craft-recovery-ordinary-248-2026-10-22.log",
+        "bytes": 76828,
+        "sha256": "aae577417c34380d5244f191060e4bde1e0d2b5ec6d2b7e9c8205bcdde901fe2"
+      }
+    },
+    {
+      "target": "21.1.233",
+      "results": {
+        "tests": 823,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "log": {
+        "path": "artifacts/craft-recovery-ordinary-233-2026-10-22.log",
+        "bytes": 76827,
+        "sha256": "8fc9a0734dc127a50153857be32eb4938237f164a92dee317924579a8bcc816d"
+      }
+    }
+  ],
+  "packages": [
+    {
+      "path": "artifacts/craft-recovery-ordinary-21.1.248-build/libs/citizens-2.0.43-neoforge-SNAPSHOT-sources.jar",
+      "bytes": 1128285,
+      "sha256": "f206dd7f5914faf095ec20fa73199f8741d6c6f4b05f80b8ce33e1c9ca36fbd2",
+      "auditAndForeignClassesExcluded": true,
+      "separateOwnership": true,
+      "changedBinaries": []
+    },
+    {
+      "path": "artifacts/craft-recovery-ordinary-21.1.248-build/libs/citizens-2.0.43-neoforge-SNAPSHOT.jar",
+      "bytes": 4091290,
+      "sha256": "9829c575104db9838a107c5c0882e0d660e3001ab3d7ff651f16bfc9452d3b7b",
+      "auditAndForeignClassesExcluded": true,
+      "separateOwnership": true,
+      "changedBinaries": [
+        {
+          "path": "net/citizensnpcs/util/CraftQuestEvidence$Binding.class",
+          "sha256": "0b89df0f6569d11d08417c1d7d8ee0c565e6577f155ffc2b4e02fc2ce24343ac"
+        },
+        {
+          "path": "net/citizensnpcs/util/CraftQuestEvidence$Lifecycle.class",
+          "sha256": "e18c249f28e86c1eca81cd095f49bf7841ad63a4df05c0f654875b34b7839f58"
+        },
+        {
+          "path": "net/citizensnpcs/util/CraftQuestEvidence$Projection.class",
+          "sha256": "96aed687afd43563ea32817defbb3171b83af7910df50c9d92ff2a46797f590b"
+        },
+        {
+          "path": "net/citizensnpcs/util/CraftQuestEvidence.class",
+          "sha256": "acd736c6b5b71916a156970501703d3fba6826a947633b17d0f89e2e314bc1d8"
+        }
+      ]
+    },
+    {
+      "path": "artifacts/craft-recovery-ordinary-21.1.248-build/libs/yuuniverse-interactions-2.0.43-neoforge-SNAPSHOT.jar",
+      "bytes": 204146,
+      "sha256": "47acd4f0fa94275acb86856d0fef21ba4bc9bc8c3454cf5fec8856334ac89e04",
+      "auditAndForeignClassesExcluded": true,
+      "separateOwnership": true,
+      "changedBinaries": []
+    },
+    {
+      "path": "artifacts/craft-recovery-ordinary-21.1.233-build/libs/citizens-2.0.43-neoforge-SNAPSHOT-sources.jar",
+      "bytes": 1128285,
+      "sha256": "a3bdff5419b335c101e321c1d45e94046972a282301a09698fbba4a5960f6031",
+      "auditAndForeignClassesExcluded": true,
+      "separateOwnership": true,
+      "changedBinaries": []
+    },
+    {
+      "path": "artifacts/craft-recovery-ordinary-21.1.233-build/libs/citizens-2.0.43-neoforge-SNAPSHOT.jar",
+      "bytes": 4091290,
+      "sha256": "3982e843f7acd2a68958f48bee1ac07eb9422e0772be7aa0a611635fc6554525",
+      "auditAndForeignClassesExcluded": true,
+      "separateOwnership": true,
+      "changedBinaries": [
+        {
+          "path": "net/citizensnpcs/util/CraftQuestEvidence$Binding.class",
+          "sha256": "0b89df0f6569d11d08417c1d7d8ee0c565e6577f155ffc2b4e02fc2ce24343ac"
+        },
+        {
+          "path": "net/citizensnpcs/util/CraftQuestEvidence$Lifecycle.class",
+          "sha256": "e18c249f28e86c1eca81cd095f49bf7841ad63a4df05c0f654875b34b7839f58"
+        },
+        {
+          "path": "net/citizensnpcs/util/CraftQuestEvidence$Projection.class",
+          "sha256": "96aed687afd43563ea32817defbb3171b83af7910df50c9d92ff2a46797f590b"
+        },
+        {
+          "path": "net/citizensnpcs/util/CraftQuestEvidence.class",
+          "sha256": "acd736c6b5b71916a156970501703d3fba6826a947633b17d0f89e2e314bc1d8"
+        }
+      ]
+    },
+    {
+      "path": "artifacts/craft-recovery-ordinary-21.1.233-build/libs/yuuniverse-interactions-2.0.43-neoforge-SNAPSHOT.jar",
+      "bytes": 204146,
+      "sha256": "b277f94815cd7d91ff123cf7271c8267729b106017d536b5ea42f5facf347bf0",
+      "auditAndForeignClassesExcluded": true,
+      "separateOwnership": true,
+      "changedBinaries": []
+    }
+  ],
+  "reusedInteractions": {
+    "results": {
+      "tests": 100,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    "log": {
+      "path": "artifacts/journal-decode-interactions-2026-10-22.log",
+      "bytes": 11724,
+      "sha256": "774084257c55e5b2db93cf6d3bac201f942915b4aba6a5c5c99cb7238915ac85"
+    },
+    "unchangedDialogueAndAuditSourcesSince": "7105171",
+    "freshRun": false
+  },
+  "sources": [
+    {
+      "path": "neoforge/src/main/java/net/citizensnpcs/util/CraftQuestEvidence.java",
+      "bytes": 21750,
+      "sha256": "d9c27f41cdaface712d1efd4cb9ce7e2d30a3dc9ca783f3d23bd3bd5862688a8"
+    },
+    {
+      "path": "tools/create-runtime-audit.gradle",
+      "bytes": 2342,
+      "sha256": "52b44bd53f61b2b7692dfc2692d8cbfed12eef2babadf11f146d997e0c0bbb8b"
+    },
+    {
+      "path": "tools/craft-recovery-runtime-audit.gradle",
+      "bytes": 2081,
+      "sha256": "4a359dc01d720881a44b25521b08fdecfb30625bb993af4a4367b9f2df5b2a65"
+    },
+    {
+      "path": "tools/craft-recovery-runtime-audit/net/citizensnpcs/audit/CraftRecoveryRuntimeAudit.java",
+      "bytes": 12969,
+      "sha256": "e63a1836217a8e473f0016dbfc95ec195cba15db0ccd8e68b70596dcbef7eb54"
+    },
+    {
+      "path": "artifacts/craft-recovery-before-sources/CraftQuestEvidence.java",
+      "bytes": 20208,
+      "sha256": "38379fc0d16814a051f44f8c5f0bddaf3c73bcece6ed7d3c31e585f87e954b25"
+    },
+    {
+      "path": "artifacts/craft-recovery-before-sources/CraftRecoveryRuntimeAudit.java",
+      "bytes": 12969,
+      "sha256": "e63a1836217a8e473f0016dbfc95ec195cba15db0ccd8e68b70596dcbef7eb54"
+    },
+    {
+      "path": "artifacts/run-craft-recovery-native.ps1",
+      "bytes": 1372,
+      "sha256": "2aa0c00c6dbf47e5ff7e134ca7a67f8b2e8075be63ccd156113a3abd7d833dee"
+    },
+    {
+      "path": "artifacts/check-craft-recovery-stopped.ps1",
+      "bytes": 1338,
+      "sha256": "157ed021e0b54bbddbf58e62c92ec222b8a1cbe40cbb046d0385e420dde700ce"
+    },
+    {
+      "path": "artifacts/craft-recovery-ordinary-isolation.gradle",
+      "bytes": 149,
+      "sha256": "81eb85e4c332a4fbe08d32e85cbef32647253bde098a7d095614de8d0ad2475c"
+    },
+    {
+      "path": "artifacts/record-craft-recovery-validation.py",
+      "bytes": 9841,
+      "sha256": "9e7e1617ac1a50d23e512b5127b76765ddce9388e79ac64a7531d07d8cf4f031"
+    }
+  ],
+  "productionTree": {
+    "files": 613,
+    "sha256": "1557c2263d0fca7672ec50346181fefe23ebb3f718d47b9c74209aa7fbeda875"
+  },
+  "providers": [
+    {
+      "path": "artifacts/craft-recovery-final-21.1.248-server/mods/architectury-13.0.11-neoforge.jar",
+      "bytes": 584734,
+      "sha256": "9cc92f2c09533fc5482c60f993bd891c655a0e32b637037cdcb7c2b23adedeeb"
+    },
+    {
+      "path": "artifacts/craft-recovery-final-21.1.248-server/mods/ftb-library-neoforge-2101.1.37.jar",
+      "bytes": 1439881,
+      "sha256": "624c2d2d1cbadb946d967e17757bd5b2d129d4d3ed71f2da0c70607d04476ac2"
+    },
+    {
+      "path": "artifacts/craft-recovery-final-21.1.248-server/mods/ftb-quests-neoforge-2101.1.36.jar",
+      "bytes": 1609984,
+      "sha256": "6a39982c4b3afc00b1e788041a4f0d394e1659e3b3a6e5d078cd790bc36d0018"
+    },
+    {
+      "path": "artifacts/craft-recovery-final-21.1.248-server/mods/ftb-teams-neoforge-2101.1.11.jar",
+      "bytes": 308236,
+      "sha256": "e6bcd670493624e6906df872a9c6af4a33fe6405cac57a32c59cd4cd5838c655"
+    },
+    {
+      "path": "artifacts/craft-recovery-create-server/mods/architectury-13.0.11-neoforge.jar",
+      "bytes": 584734,
+      "sha256": "9cc92f2c09533fc5482c60f993bd891c655a0e32b637037cdcb7c2b23adedeeb"
+    },
+    {
+      "path": "artifacts/craft-recovery-create-server/mods/create.jar",
+      "bytes": 19138095,
+      "sha256": "5602a16796957cb5c7fb829c10c6b54bf9d228931c7680636710b6a60d92822e"
+    },
+    {
+      "path": "artifacts/craft-recovery-create-server/mods/ftb-library-neoforge-2101.1.37.jar",
+      "bytes": 1439881,
+      "sha256": "624c2d2d1cbadb946d967e17757bd5b2d129d4d3ed71f2da0c70607d04476ac2"
+    },
+    {
+      "path": "artifacts/craft-recovery-create-server/mods/ftb-quests-neoforge-2101.1.36.jar",
+      "bytes": 1609984,
+      "sha256": "6a39982c4b3afc00b1e788041a4f0d394e1659e3b3a6e5d078cd790bc36d0018"
+    },
+    {
+      "path": "artifacts/craft-recovery-create-server/mods/ftb-teams-neoforge-2101.1.11.jar",
+      "bytes": 308236,
+      "sha256": "e6bcd670493624e6906df872a9c6af4a33fe6405cac57a32c59cd4cd5838c655"
+    },
+    {
+      "path": "artifacts/craft-recovery-create-server/mods/kubejs-neoforge-2101.7.2-build.377.jar",
+      "bytes": 2294111,
+      "sha256": "df9a8458b1f83fed06ba54684977911795a5153a462b81a610895f5b1f2f0cbf"
+    },
+    {
+      "path": "artifacts/craft-recovery-create-server/mods/rhino-2101.2.8-build.91.jar",
+      "bytes": 980936,
+      "sha256": "1d53d962aa4dac54bcbb4f998c1845980cf194318f1d6b1580ea6ac15cce5ef3"
+    }
+  ],
+  "stopped": {
+    "path": "artifacts/craft-recovery-stopped-2026-10-22.json",
+    "bytes": 2991,
+    "sha256": "acfcab791c79ffcc41f32020dc196b8692692c6615b2d43a7d265d1a1799898a"
+  },
+  "productionDeploymentChanged": false,
+  "limits": [
+    "Native acceptance covers three independent craft scopes, not every dependency graph or provider failure",
+    "Existing native gates, target validation, recipe/evidence ownership, financial/world-backup and retention boundaries remain required",
+    "Original migration provenance, supported Paradigm inbound contract and deferred physical ordinary/VR/proxy acceptance"
+  ]
+}

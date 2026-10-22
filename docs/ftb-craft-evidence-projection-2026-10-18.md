@@ -1,5 +1,10 @@
 # Explicit FTB craft bindings and retained progress
 
+Update 2026-10-22, UTC+08:00: [craft recovery isolation](craft-recovery-isolation-2026-10-22.md)
+attempts valid original task/generation scopes even when another target is invalid.
+Remaining failures retain their evidence and report original task/team/cycle
+context. Repairing a target resumes only its outstanding projection.
+
 Update 2026-10-22, UTC+08:00: [exact journal decoding](journal-record-decoding-2026-10-22.md)
 rejects altered numeric/type/duplicate-member evidence and unsupported outcome
 names before startup recovery. An invalid optional outcome cannot silently become

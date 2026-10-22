@@ -8,6 +8,12 @@ Citizens retains NPC behavior and its existing native extension contracts. Yuuni
 
 ## Selected artifacts and sides
 
+Progress 2026-10-22, UTC+08:00: [craft recovery isolation](craft-recovery-isolation-2026-10-22.md)
+recovers valid original scopes before reporting independent invalid targets.
+Offline native crafting/restart/repair passes36 checks across both targets;
+Create regression passes263 and ordinary builds pass823 tests each. Broader
+recovery, migration, provider and deferred client gates remain open.
+
 Progress 2026-10-22, UTC+08:00: [journal record types](journal-record-decoding-2026-10-22.md)
 remain exact during delivery, craft, reward and commerce restart decoding.
 Damaged numeric/type/duplicate-member evidence rejects without repair; valid
