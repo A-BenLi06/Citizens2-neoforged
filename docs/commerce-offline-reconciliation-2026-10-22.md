@@ -4,6 +4,11 @@ Recorded 2026-10-22, UTC+08:00. Extends
 [shared contribution validation](commerce-shared-backup-recovery-2026-10-22.md).
 Offline inspection requires Economy 0.5.7 / Commerce capability 4.
 
+Update 2026-10-22, UTC+08:00: [PREPARED request discovery](commerce-prepared-recovery-2026-10-22.md)
+extends console recovery to original keyed requests with no retained operation UUID.
+Economy 0.5.9/Commerce capability 5 supplies supported offline request inspection.
+The remaining-acceptance paragraph below describes this earlier revision's limits.
+
 ## Recovery behavior
 
 The old administrator reconcile command only called replay for online players.

@@ -32,6 +32,11 @@ public final class CommerceTaskRuntimeAudit {
         NeoForge.EVENT_BUS.addListener(EventPriority.HIGHEST, false, CommerceCommittedEvent.class, e -> {
             if ("audit:suppress-commit".equals(e.entry().origin())) throw new IllegalStateException("Fixture suppresses committed dispatch");
         });
+        NeoForge.EVENT_BUS.addListener(EventPriority.LOWEST, false, CommerceStartingEvent.class, e -> {
+            if ("audit:freeze-after-start".equals(e.request().origin()))
+                ((net.yuuniverse.economy.EconomyRuntime)YuuniverseEconomyApi.current().orElseThrow()).ledger()
+                        .setAccountFrozen(e.request().playerAccountId(),true,"fixture","failure-after-native-attribution");
+        });
     }
     public static void run(ServerPlayer actor, ServerQuestFile file, EconomyApi economy) throws Exception {
         var server=actor.getServer(); var source=actor.createCommandSourceStack().withPermission(2);

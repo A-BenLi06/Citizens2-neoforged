@@ -10,6 +10,13 @@ This review covers repository structure, native implementation boundaries, upstr
 
 ## Repository and implementation boundaries
 
+Update 2026-10-22, UTC+08:00: [offline PREPARED commerce recovery](commerce-prepared-recovery-2026-10-22.md)
+discovers exact original receipts through Economy 0.5.9/Commerce capability 5
+without an online owner or retained operation UUID. Missing evidence remains
+PREPARED; pending delivery retains its native outcome. Original attribution is
+never redirected to the administrator or a later party. Removed-team/callback,
+load/retention, original migration and physical-client gates remain open.
+
 Update 2026-10-22, UTC+08:00: [PAID monetary restore validation](monetary-paid-backup-recovery-2026-10-22.md)
 verifies original public credit metadata/postings and the retained transaction UUID
 before pending settlement or new claims in the same native team quest. Economy

@@ -347,6 +347,7 @@ public final class CommerceQuestTasks implements AutoCloseable {
             if (!entries.isEmpty()) validateEntries(provider(), entries);
             int count = 0;
             for (ServerPlayer player : List.copyOf(server.getPlayerList().getPlayers())) count += replay(player);
+            count += discoverPrepared();
             entries = journal.entries().stream().filter(CommerceQuestTasks::retained).toList();
             if (!entries.isEmpty()) {
                 Object provider = provider(); validateEntries(provider, entries);
@@ -359,6 +360,41 @@ public final class CommerceQuestTasks implements AutoCloseable {
             }
             return count;
         } finally { reconciling = false; }
+    }
+    private record Discovered(Entry entry, Receipt receipt, boolean confirmed) { }
+    /** Recover missed receipts from exact pre-trade requests without inventing an owner session. */
+    private int discoverPrepared() throws IOException {
+        var prepared = journal.entries().stream().filter(entry -> entry.state() == State.PREPARED).toList();
+        if (prepared.isEmpty()) return 0;
+        Object provider = provider();
+        if (version(provider) < 5) throw new IllegalStateException("Commerce capability revision 5 is required to inspect unresolved PREPARED requests");
+        var observations = new HashMap<Request, Object>();
+        var discovered = new ArrayList<Discovered>();
+        for (Entry entry : prepared) {
+            var original = entry.request();
+            Object inspection = observations.computeIfAbsent(original, request -> reflected(() -> {
+                var shop = Class.forName(CORE + "CommerceShopType"); var action = Class.forName(CORE + "CommerceAction");
+                var requestType = Class.forName(CORE + "CommerceRequest");
+                Object nativeRequest = requestType.getConstructor(shop, String.class, String.class, action, String.class, int.class, String.class, String.class)
+                        .newInstance(shop.getMethod("valueOf", String.class).invoke(null, request.shopType().name()), request.shopId(), request.itemKey(),
+                                action.getMethod("valueOf", String.class).invoke(null, request.action().name()), account(request.actorId()), request.trades(), request.requestKey(), request.origin());
+                return Class.forName(API + "CommerceApi").getMethod("inspectRequest", UUID.class, requestType).invoke(provider, request.actorId(), nativeRequest);
+            }));
+            Object position = property(inspection, "position");
+            journal.cursor(entry.binding(), original.actorId(), (UUID) property(position, "journalId"), ((Number) property(position, "sequence")).longValue());
+            var metadata = (Optional<?>) property(inspection, "entry"); var outcome = (Optional<?>) property(inspection, "outcome");
+            if (metadata.isPresent() != outcome.isPresent()) throw new IllegalStateException("Provider request inspection has inconsistent evidence");
+            // No provider evidence cannot distinguish an uncommitted request from a conflicting financial restore.
+            if (metadata.isEmpty()) continue;
+            if (!request(metadata.get(), original.actorId()).equals(original)) throw new IllegalStateException("Provider request differs from original native attribution");
+            var receipt = receipt(property(metadata.get(), "receipt"), metadata.get()); validateOutcome(receipt, outcome.get());
+            discovered.add(new Discovered(entry, receipt, settled(entry.binding(), outcome.get())
+                    && (entry.binding().measure() != Measure.TRADES || receipt.trades() != null)
+                    && (entry.binding().measure() != Measure.MINOR_UNITS || entry.binding().currencyId().equals(receipt.currencyId()))));
+        }
+        // Inspect every unresolved request before retaining any discovered receipt; missing evidence remains PREPARED.
+        for (Discovered value : discovered) journal.receipt(value.entry().binding(), value.entry().request(), value.receipt(), value.confirmed());
+        return discovered.size();
     }
     public List<Binding> bindings(CommandSourceStack source) { authorize(source, false); return journal.bindings(); }
     public List<Entry> entries(CommandSourceStack source) { authorize(source, false); return journal.entries(); }

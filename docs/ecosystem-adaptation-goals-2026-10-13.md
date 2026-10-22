@@ -8,6 +8,12 @@ Citizens retains NPC behavior and its existing native extension contracts. Yuuni
 
 ## Selected artifacts and sides
 
+Progress 2026-10-22, UTC+08:00: [offline PREPARED request recovery](commerce-prepared-recovery-2026-10-22.md)
+uses Economy 0.5.9/Commerce capability 5 to discover exact missed receipts without
+reconnecting contributors. Original team/cycle and provider outcomes remain
+authoritative; missing requests remain uncertain and pending delivery stays WAITING.
+Removed-team/callback, migration/client and recovery/load gates remain open.
+
 Progress 2026-10-22, UTC+08:00: [monetary PAID restore validation](monetary-paid-backup-recovery-2026-10-22.md)
 uses supported Economy 0.5.8/API revision 5 inspection to verify original credit
 payload/postings and acknowledged transaction UUID. Startup/reconciliation hold

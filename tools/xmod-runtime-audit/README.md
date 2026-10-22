@@ -1,6 +1,6 @@
 # Actual FTB XMod / Rhino fixture
 
-Prepare the pinned providers, including Economy 0.5.8 from its source build:
+Prepare the pinned providers, including Economy 0.5.9 from its source build:
 
 ```powershell
 ./tools/prepare-xmod-audit.ps1 -EconomyJar <absolute-provider-jar>
@@ -29,3 +29,9 @@ must be isolated when using a separate audit build; changing only the output pat
 can let Gradle's stale-output cleanup delete another build's classes.
 
 See `docs/kubejs-ftb-script-contracts-2026-10-18.md` for supported APIs and limits.
+
+The PREPARED commerce fixture disconnects an original buyer after a deliberately
+missed native commit event. It verifies exact receipt discovery into the original
+team despite a later party change, actual pending delivery, a failed native commit,
+missing/older provider handling and repeated console reconciliation. See
+`docs/commerce-prepared-recovery-2026-10-22.md` for the supported boundary and results.

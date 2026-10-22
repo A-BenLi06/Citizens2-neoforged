@@ -141,6 +141,7 @@ public final class XModRuntimeAudit {
             catch(IllegalStateException expected) { check(true,"public_script_api_rejects_unregistered_same_uuid_player"); }
             try { CitizensScripts.validateEconomyMenu(actor,List.of("browser","-1")); throw new AssertionError("Invalid menu accepted"); }
             catch(IllegalArgumentException expected) { check(economy.balance(actor.getUUID(),currency)==balance,"script_rejects_invalid_menu_without_payment"); }
+            PreparedCommerceRuntimeAudit.run(actor, file, economy);
             CommerceTaskRuntimeAudit.run(actor, file, economy);
             team=file.getTeamData(actor).orElseThrow();
             monetaryRewards(actor, file, team, economy);
