@@ -143,11 +143,19 @@ public final class FtbQuestTasks {
                     || before.state().progress() != expectedProgress || absoluteProgress < expectedProgress
                     || absoluteProgress > maximum || (!before.state().available() && !before.state().completed()))
                 throw new IllegalStateException("Native task changed; evidence reconciliation is required");
+            String revision = definitionRevision(server, prepared);
             if (before.state().progress() != absoluteProgress)
                 prepared.teamType().getMethod("setProgress", prepared.taskType(), long.class)
                         .invoke(prepared.team(), prepared.task(), absoluteProgress);
-            EvidenceTarget after = evidenceTarget(prepared);
-            if (after.cycle() != cycle || after.state().progress() != absoluteProgress
+            // Native completion listeners can remove teams, reload objects or edit definitions synchronously.
+            Prepared current = evidencePrepared(server, teamId, taskId);
+            if (current.file() != prepared.file() || current.team() != prepared.team()
+                    || current.task() != prepared.task() || current.quest() != prepared.quest()
+                    || !revision.equals(definitionRevision(server, current)))
+                throw new IllegalStateException("Native evidence target changed during projection; review is required");
+            EvidenceTarget after = evidenceTarget(current);
+            if (!after.questId().equals(questId) || after.cycle() != cycle || after.state().maximum() != maximum
+                    || after.repeatable() != before.repeatable() || after.state().progress() != absoluteProgress
                     || (absoluteProgress == maximum && !after.state().completed()))
                 throw new IllegalStateException("Native task did not retain the projected total; review is required");
             return after;
@@ -160,6 +168,11 @@ public final class FtbQuestTasks {
         Class<?> base = Class.forName(QUEST + "BaseQuestFile");
         Object file = ((Optional<?>) Class.forName(QUEST + "ServerQuestFile").getMethod("getInstance").invoke(null))
                 .orElseThrow(() -> new IllegalStateException("FTB Quests is unavailable"));
+        Object api = Class.forName("dev.ftb.mods.ftbteams.api.FTBTeamsAPI").getMethod("api").invoke(null);
+        Object manager = Class.forName("dev.ftb.mods.ftbteams.api.FTBTeamsAPI$API").getMethod("getManager").invoke(api);
+        if (((Optional<?>) Class.forName("dev.ftb.mods.ftbteams.api.TeamManager")
+                .getMethod("getTeamByID", UUID.class).invoke(manager, teamId)).isEmpty())
+            throw new IllegalStateException("Admitted team no longer exists");
         Object team = base.getMethod("getNullableTeamData", UUID.class).invoke(file, teamId);
         if (team == null) throw new IllegalStateException("Admitted team no longer exists");
         Object task = base.getMethod("getTask", long.class).invoke(file, parseId(taskId));

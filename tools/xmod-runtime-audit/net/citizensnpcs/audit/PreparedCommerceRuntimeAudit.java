@@ -16,6 +16,7 @@ import net.yuuniverse.economy.core.*;
 /** Lost native commit notification followed by original-owner disconnect, with no payment replay. */
 final class PreparedCommerceRuntimeAudit {
     private static int passed;
+    static void seedFixture(Path database,String shop,String currency)throws Exception { FinancialSeed.seed(database,shop,currency); }
     static void run(ServerPlayer administrator,ServerQuestFile file,EconomyApi economy)throws Exception {
         var server=administrator.getServer();var runtime=(net.yuuniverse.economy.EconomyRuntime)economy;var api=economy.commerceApi().orElseThrow();
         var service=CommerceQuestTasks.current(server);var console=server.createCommandSourceStack();

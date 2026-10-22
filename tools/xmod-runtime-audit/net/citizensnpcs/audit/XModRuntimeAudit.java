@@ -41,6 +41,7 @@ public final class XModRuntimeAudit {
         if(ran) return;
         var server=event.getServer(); var level=server.overworld(); level.setChunkForced(0,0,true);
         if(server.getTickCount()<20 || !level.isPositionEntityTicking(new BlockPos(1,-60,1))) return;
+        if(System.getenv("CITIZENS_TEAM_MUTATION_AUDIT")!=null) { ran=true; TeamMutationRuntimeAudit.run(server,System.getenv("CITIZENS_TEAM_MUTATION_AUDIT")); return; }
         if(System.getenv("CITIZENS_REWARD_AUDIT_PHASE")!=null) { ran=true; crashRewards(server,System.getenv("CITIZENS_REWARD_AUDIT_PHASE")); return; }
         if(System.getenv("CITIZENS_COMMERCE_AUDIT_PHASE")!=null) { ran=true; CommerceTaskRuntimeAudit.crash(server,System.getenv("CITIZENS_COMMERCE_AUDIT_PHASE")); return; }
         ran=true; notes.clear(); ServerPlayer actor=null; EmbeddedChannel channel=null; CraftQuestEvidence service=null;

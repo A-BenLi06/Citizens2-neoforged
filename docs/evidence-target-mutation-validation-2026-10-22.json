@@ -1,0 +1,1153 @@
+{
+  "createdAt": "2026-10-22T20:11:34.841849+08:00",
+  "timezone": "UTC+08:00",
+  "baseRevision": "eb5666f",
+  "productionTree": {
+    "files": 612,
+    "algorithm": "SHA256 of sorted relative path + NUL + SHA256 lines joined by LF",
+    "sha256": "01517d5c855c27504c38b45240f0a468b24a5af8eb660f1e4343f64a14e16566"
+  },
+  "beforeFix": [
+    {
+      "log": {
+        "path": "artifacts/team-removed-before-xmod-2026-10-22.log",
+        "bytes": 30108,
+        "sha256": "98829153ef1d175d603a039de499f8c689f6d4596c69ff8dfce5c733f4565b29"
+      },
+      "fixture": "artifacts/team-removed-before-xmod-audit-server",
+      "identity": {
+        "mode": "removed",
+        "owner": "2ba0ebc8-3a04-493f-9dc6-1931fb1f2e32",
+        "team": "e2730491-0fa3-42ca-8176-65d618702e13",
+        "task": "3E0C4AFB7BD83A24",
+        "entry": "9bf01e3d3ae17473082c9b31b27b90051d0a90ff09dc44571d91d848285385fa",
+        "operation": "c88abd96-32c1-41de-a249-c92449655cb6",
+        "transaction": "0943dc35-4f59-4fd2-949a-42801e34e4e4",
+        "requestKey": "team-mutation:2ba0ebc8-3a04-493f-9dc6-1931fb1f2e32",
+        "nativeTeamPresent": false,
+        "retainedTeamDataPresent": true,
+        "entryState": "APPLIED",
+        "reported": false
+      },
+      "state": {
+        "path": "artifacts/team-removed-before-xmod-audit-server/team-mutation-state.json",
+        "bytes": 479,
+        "sha256": "c403c058d58c46ce7564b019dffb24a86cd8efae50852482070ba40fe336f057"
+      },
+      "database": {
+        "path": "artifacts/team-removed-before-xmod-audit-server/xmod-world/yuuniverse_economy/economy.db",
+        "bytes": 368640,
+        "sha256": "5f0eec6796f4c0ebdf160c006b645ef9c7ed0943b097ff83b1b6bdd8ed7a59f4",
+        "quickCheck": "ok",
+        "balanced": true,
+        "originalRows": [
+          [
+            "c88abd96-32c1-41de-a249-c92449655cb6",
+            "0943dc35-4f59-4fd2-949a-42801e34e4e4",
+            "player:2ba0ebc8-3a04-493f-9dc6-1931fb1f2e32"
+          ]
+        ]
+      },
+      "journals": [
+        {
+          "path": "artifacts/team-removed-before-xmod-audit-server/xmod-world/citizens/commerce-tasks/binding-3E0C4AFB7BD83A24.json",
+          "bytes": 599,
+          "sha256": "b157a830ef328115ad59925b1f58652bc8d728e59032fd1067179d9441402b42"
+        },
+        {
+          "path": "artifacts/team-removed-before-xmod-audit-server/xmod-world/citizens/commerce-tasks/cursor-6e9209387c62ff1a98e4d722e9fff0c2b629f7e7cbf1e442f83015e01b2b39e6-0.json",
+          "bytes": 311,
+          "sha256": "37865414779165179c49fddd1ead24fc87b9ccfd6fc6a20ef27d95913b64f8d6"
+        },
+        {
+          "path": "artifacts/team-removed-before-xmod-audit-server/xmod-world/citizens/commerce-tasks/entry-9bf01e3d3ae17473082c9b31b27b90051d0a90ff09dc44571d91d848285385fa-0.json",
+          "bytes": 1241,
+          "sha256": "15315168b6ac58d3cc3b6aac841d9b8f436b88fefa141c4c77bbbfd7a21ed840"
+        },
+        {
+          "path": "artifacts/team-removed-before-xmod-audit-server/xmod-world/citizens/commerce-tasks/entry-9bf01e3d3ae17473082c9b31b27b90051d0a90ff09dc44571d91d848285385fa-1.json",
+          "bytes": 1599,
+          "sha256": "39c4248d1718fc66d1c848ec793d27ff6b7ebb6d8acb855cca50ea3079a6bc77"
+        },
+        {
+          "path": "artifacts/team-removed-before-xmod-audit-server/xmod-world/citizens/commerce-tasks/entry-9bf01e3d3ae17473082c9b31b27b90051d0a90ff09dc44571d91d848285385fa-2.json",
+          "bytes": 1597,
+          "sha256": "78ab8339064afcb1e39659efa39ea620990e248aeed49aa2537b5f683dda2e0a"
+        }
+      ],
+      "nativeTeam": {
+        "path": "artifacts/team-removed-before-xmod-audit-server/xmod-world/ftbquests/e2730491-0fa3-42ca-8176-65d618702e13.snbt",
+        "bytes": 661,
+        "sha256": "0dc51a321a5bf2adfb3d0d404a96d0eea3c91061d1b23bc003cce2bbd3491959"
+      }
+    },
+    {
+      "log": {
+        "path": "artifacts/team-callback-before-xmod-2026-10-22.log",
+        "bytes": 26496,
+        "sha256": "0b9ad6f6dab20958a580bef6b7df623d19f155c5b4de594b0e5385e47ac01737"
+      },
+      "fixture": "artifacts/team-callback-before-xmod-audit-server",
+      "identity": {
+        "mode": "callback",
+        "owner": "29dc2384-861e-48fa-bdc1-0e6807190e8e",
+        "team": "5e930a21-712e-4f39-892c-34acba9bbd68",
+        "task": "4397AA799B841DB0",
+        "entry": "51f71914ff6131d46f91b03d007c24c0f1304f2f72bb7d77dcfdfed2b7a3e9c1",
+        "operation": "931ffa09-e3f0-4b74-94a1-db3f252c8310",
+        "transaction": "1ebfc6fa-e540-4bc1-bdef-beffec5466cb",
+        "requestKey": "team-mutation:29dc2384-861e-48fa-bdc1-0e6807190e8e",
+        "nativeTeamPresent": false,
+        "retainedTeamDataPresent": true,
+        "entryState": "APPLIED",
+        "reported": false
+      },
+      "state": {
+        "path": "artifacts/team-callback-before-xmod-audit-server/team-mutation-state.json",
+        "bytes": 480,
+        "sha256": "2f05b4201ab326057deaa8ac3c1a94651d6a18d3be6f4f7ad089e2d2630f8f97"
+      },
+      "database": {
+        "path": "artifacts/team-callback-before-xmod-audit-server/xmod-world/yuuniverse_economy/economy.db",
+        "bytes": 368640,
+        "sha256": "a8b1ae046493f7399cdda903c8719adaf754944c3a1141c8c1808481aaf3c099",
+        "quickCheck": "ok",
+        "balanced": true,
+        "originalRows": [
+          [
+            "931ffa09-e3f0-4b74-94a1-db3f252c8310",
+            "1ebfc6fa-e540-4bc1-bdef-beffec5466cb",
+            "player:29dc2384-861e-48fa-bdc1-0e6807190e8e"
+          ]
+        ]
+      },
+      "journals": [
+        {
+          "path": "artifacts/team-callback-before-xmod-audit-server/xmod-world/citizens/commerce-tasks/binding-4397AA799B841DB0.json",
+          "bytes": 599,
+          "sha256": "2023bc18adee774135fd74266c19495cc4e6046cafdcb0bd7dcc66420dae9ff0"
+        },
+        {
+          "path": "artifacts/team-callback-before-xmod-audit-server/xmod-world/citizens/commerce-tasks/cursor-5f85954452204ed374a29e501b34619f1ff3bdb89a5c676c553f7e4382a89ac1-0.json",
+          "bytes": 311,
+          "sha256": "188072b24bde59f94001b37314641f8549cce7e838740c2c0fda880a94e50eb7"
+        },
+        {
+          "path": "artifacts/team-callback-before-xmod-audit-server/xmod-world/citizens/commerce-tasks/entry-51f71914ff6131d46f91b03d007c24c0f1304f2f72bb7d77dcfdfed2b7a3e9c1-0.json",
+          "bytes": 1241,
+          "sha256": "433b5775d3e9790038a5a0f451c4e9cf0e7fc6b4e34d8ff002ef1b0c04eed24b"
+        },
+        {
+          "path": "artifacts/team-callback-before-xmod-audit-server/xmod-world/citizens/commerce-tasks/entry-51f71914ff6131d46f91b03d007c24c0f1304f2f72bb7d77dcfdfed2b7a3e9c1-1.json",
+          "bytes": 1599,
+          "sha256": "fe4841418ec0f59960404bc29d90d3fd05c98d6d6d992efa19358d01f66918f0"
+        },
+        {
+          "path": "artifacts/team-callback-before-xmod-audit-server/xmod-world/citizens/commerce-tasks/entry-51f71914ff6131d46f91b03d007c24c0f1304f2f72bb7d77dcfdfed2b7a3e9c1-2.json",
+          "bytes": 1597,
+          "sha256": "88f3db1217f11f219d3110ce8128f58ade1f2666de20c1fedf00e07c5e31d0e6"
+        }
+      ],
+      "nativeTeam": {
+        "path": "artifacts/team-callback-before-xmod-audit-server/xmod-world/ftbquests/5e930a21-712e-4f39-892c-34acba9bbd68.snbt",
+        "bytes": 661,
+        "sha256": "c4d5304c6f9d8b1a6d0ffe3daa507d2f8a7f5d7acc2ef096efe54af33a39b68f"
+      }
+    }
+  ],
+  "beforeSources": [
+    {
+      "path": "artifacts/team-removed-before-ftb-source-2026-10-22.java",
+      "bytes": 27324,
+      "sha256": "e16e37376cac6b8c04c9fd0593d64d9c211f34600708c32c5650c02fded1b9f4"
+    },
+    {
+      "path": "artifacts/team-removed-before-audit-source-2026-10-22.java",
+      "bytes": 6023,
+      "sha256": "e39b6e9992708c26c594c7bafef9b2ca0c2d3bc0aed1a32539fc992813a01875"
+    },
+    {
+      "path": "artifacts/team-callback-before-audit-source-2026-10-22.java",
+      "bytes": 6023,
+      "sha256": "e39b6e9992708c26c594c7bafef9b2ca0c2d3bc0aed1a32539fc992813a01875"
+    }
+  ],
+  "mutations": [
+    {
+      "mode": "removed",
+      "checks": 5,
+      "log": {
+        "path": "artifacts/team-removed-verified-xmod-2026-10-22.log",
+        "bytes": 24773,
+        "sha256": "17de6d7e55325b4aac1225f1f43fd6ad47a3ea9ca251aea84567362037f858c7"
+      },
+      "fixture": "artifacts/team-removed-verified-xmod-audit-server",
+      "identity": {
+        "mode": "removed",
+        "owner": "c1e4e5b1-e0cd-48d9-a96d-76fa521760d0",
+        "team": "67e9d443-2e1a-481b-ba30-dbc7cfb390e5",
+        "task": "5307CC53171563CE",
+        "entry": "5f7ca53b85f2f5517544d5c4d5b28ac90ce18812cef915860a05640dbd248d87",
+        "operation": "8162a509-6a4c-4544-9fc7-c32509d4e785",
+        "transaction": "7b29aead-5642-4db2-9b50-84d9ed636ac0",
+        "requestKey": "team-mutation:c1e4e5b1-e0cd-48d9-a96d-76fa521760d0",
+        "nativeTeamPresent": false,
+        "retainedTeamDataPresent": true,
+        "entryState": "CONFIRMED",
+        "reported": true,
+        "callbacks": 0,
+        "recoveredState": "CONFIRMED",
+        "retryReported": true
+      },
+      "state": {
+        "path": "artifacts/team-removed-verified-xmod-audit-server/team-mutation-state.json",
+        "bytes": 544,
+        "sha256": "cc2022a54b1c8d297f08be2cc36d2c2cbbcd98b4799e4d735c1c274f3b64c559"
+      },
+      "database": {
+        "path": "artifacts/team-removed-verified-xmod-audit-server/xmod-world/yuuniverse_economy/economy.db",
+        "bytes": 368640,
+        "sha256": "cad5a7d13d300c44cc5d0717455d3bf2fa269c2a90b2ef7ca104a482131179ac",
+        "quickCheck": "ok",
+        "balanced": true,
+        "originalRows": [
+          [
+            "8162a509-6a4c-4544-9fc7-c32509d4e785",
+            "7b29aead-5642-4db2-9b50-84d9ed636ac0",
+            "player:c1e4e5b1-e0cd-48d9-a96d-76fa521760d0"
+          ]
+        ]
+      },
+      "journals": [
+        {
+          "path": "artifacts/team-removed-verified-xmod-audit-server/xmod-world/citizens/commerce-tasks/binding-5307CC53171563CE.json",
+          "bytes": 599,
+          "sha256": "51a9d3fd4f34b00c13988fd5fd5d720f206a87b380be49fdd343c0687a88c98c"
+        },
+        {
+          "path": "artifacts/team-removed-verified-xmod-audit-server/xmod-world/citizens/commerce-tasks/cursor-da17c6c89dc65cc3eab627fd8b4ad17e0de0a5ba5cfa2964772bdc6ce97d225a-0.json",
+          "bytes": 311,
+          "sha256": "a50b8fa506ef3ec4f9142125bbd7f4707090c067794fc02b0a6238a43bbb141a"
+        },
+        {
+          "path": "artifacts/team-removed-verified-xmod-audit-server/xmod-world/citizens/commerce-tasks/entry-5f7ca53b85f2f5517544d5c4d5b28ac90ce18812cef915860a05640dbd248d87-0.json",
+          "bytes": 1241,
+          "sha256": "098d3ac0f2c038977d1fb86205560f246978c3730135f787bb68dad4e68e19e0"
+        },
+        {
+          "path": "artifacts/team-removed-verified-xmod-audit-server/xmod-world/citizens/commerce-tasks/entry-5f7ca53b85f2f5517544d5c4d5b28ac90ce18812cef915860a05640dbd248d87-1.json",
+          "bytes": 1599,
+          "sha256": "2d3575f399cbbf143dfa61a5f1d8b05dbcbad1117272bf2d439453ad8ca54011"
+        }
+      ],
+      "nativeTeam": {
+        "path": "artifacts/team-removed-verified-xmod-audit-server/xmod-world/ftbquests/67e9d443-2e1a-481b-ba30-dbc7cfb390e5.snbt",
+        "bytes": 307,
+        "sha256": "2fb34604049da70ca5aeb444a37839e6d75db476e7d3f7bdf048f561a22d3cfa"
+      }
+    },
+    {
+      "mode": "callback",
+      "checks": 5,
+      "log": {
+        "path": "artifacts/team-callback-verified-xmod-2026-10-22.log",
+        "bytes": 24794,
+        "sha256": "3d972426c9605f52be01ceef46737bf2fe131d4c78638b2d62ea32995d097b70"
+      },
+      "fixture": "artifacts/team-callback-verified-xmod-audit-server",
+      "identity": {
+        "mode": "callback",
+        "owner": "8e6c8dc9-e111-49a7-abea-2c7c7b08519b",
+        "team": "599c00fb-3c36-472f-8640-dc606cd55de6",
+        "task": "59619A5D5FC0E77E",
+        "entry": "85f6ae41afb5a043b568b56734edf66a64f04ff357a18217986b0c877705d102",
+        "operation": "23ae8837-d935-4500-b2fb-3fb38eb95add",
+        "transaction": "2ec7ede6-f033-49eb-9b38-32e08dc5a29b",
+        "requestKey": "team-mutation:8e6c8dc9-e111-49a7-abea-2c7c7b08519b",
+        "nativeTeamPresent": false,
+        "retainedTeamDataPresent": true,
+        "entryState": "CONFIRMED",
+        "reported": true,
+        "callbacks": 1,
+        "recoveredState": "CONFIRMED",
+        "retryReported": true
+      },
+      "state": {
+        "path": "artifacts/team-callback-verified-xmod-audit-server/team-mutation-state.json",
+        "bytes": 545,
+        "sha256": "99dd41114b8005f165bf828b97d8b156b356b60102ea93889cd0abc038ed9c53"
+      },
+      "database": {
+        "path": "artifacts/team-callback-verified-xmod-audit-server/xmod-world/yuuniverse_economy/economy.db",
+        "bytes": 368640,
+        "sha256": "3119d5cbf5e21af4893ec8ef9222eddf1c6fea9bc385a0b44cb1e796707b0017",
+        "quickCheck": "ok",
+        "balanced": true,
+        "originalRows": [
+          [
+            "23ae8837-d935-4500-b2fb-3fb38eb95add",
+            "2ec7ede6-f033-49eb-9b38-32e08dc5a29b",
+            "player:8e6c8dc9-e111-49a7-abea-2c7c7b08519b"
+          ]
+        ]
+      },
+      "journals": [
+        {
+          "path": "artifacts/team-callback-verified-xmod-audit-server/xmod-world/citizens/commerce-tasks/binding-59619A5D5FC0E77E.json",
+          "bytes": 599,
+          "sha256": "d79cd0b03ae5c6d6e97a71efd82c90f09e3f2146ff3192c9319a3fbfc0088612"
+        },
+        {
+          "path": "artifacts/team-callback-verified-xmod-audit-server/xmod-world/citizens/commerce-tasks/cursor-5e848575677ba29236191106aedd923c2a9338ff3a4c482414c5c2c2cfe8656c-0.json",
+          "bytes": 311,
+          "sha256": "41a4e584882f41716610c57f45d9738f3647b7a43662a31344e08196027c149c"
+        },
+        {
+          "path": "artifacts/team-callback-verified-xmod-audit-server/xmod-world/citizens/commerce-tasks/entry-85f6ae41afb5a043b568b56734edf66a64f04ff357a18217986b0c877705d102-0.json",
+          "bytes": 1241,
+          "sha256": "f0ffb3d9f2e1ca0c6671cb76039cd34d3db096a865a3f4123cc0a02b265567fc"
+        },
+        {
+          "path": "artifacts/team-callback-verified-xmod-audit-server/xmod-world/citizens/commerce-tasks/entry-85f6ae41afb5a043b568b56734edf66a64f04ff357a18217986b0c877705d102-1.json",
+          "bytes": 1599,
+          "sha256": "512b566deab1f92da6df3c2ac10637b9a984e316ee040ea6df9c2625814d1e60"
+        }
+      ],
+      "nativeTeam": {
+        "path": "artifacts/team-callback-verified-xmod-audit-server/xmod-world/ftbquests/599c00fb-3c36-472f-8640-dc606cd55de6.snbt",
+        "bytes": 661,
+        "sha256": "e2ea82cff0d2055398f5e40ccf4cd0f4926e028250f9740a4d4dc856822346e7"
+      }
+    },
+    {
+      "mode": "definition",
+      "checks": 5,
+      "log": {
+        "path": "artifacts/team-definition-verified-xmod-2026-10-22.log",
+        "bytes": 24728,
+        "sha256": "8ddabe492ebc4fb3fc3e1c094446e47ba4557898e7a0e270933e0aedaf7e1f53"
+      },
+      "fixture": "artifacts/team-definition-verified-xmod-audit-server",
+      "identity": {
+        "mode": "definition",
+        "owner": "0cdde070-675c-4cf2-8903-0e70e30608dc",
+        "team": "1aa9c5fb-bbc1-4e52-9de2-15a17ecf9091",
+        "task": "6F61ABF544879C25",
+        "entry": "6d6c944b7c3dd9c211225b5577ebfe9700e8b1ea86be10a99a84ce27d55e4056",
+        "operation": "d0f5c05c-e0fa-4946-b2ee-c0dc0459d2fc",
+        "transaction": "03bbf52c-a880-464f-9b7e-35454b40575d",
+        "requestKey": "team-mutation:0cdde070-675c-4cf2-8903-0e70e30608dc",
+        "nativeTeamPresent": true,
+        "retainedTeamDataPresent": true,
+        "entryState": "CONFIRMED",
+        "reported": true,
+        "callbacks": 1,
+        "recoveredState": "APPLIED",
+        "retryReported": false
+      },
+      "state": {
+        "path": "artifacts/team-definition-verified-xmod-audit-server/team-mutation-state.json",
+        "bytes": 545,
+        "sha256": "2d07e676eeb74b4e7b7b57b558bf67305d57c1f0b5379b8b15895295d91a24f1"
+      },
+      "database": {
+        "path": "artifacts/team-definition-verified-xmod-audit-server/xmod-world/yuuniverse_economy/economy.db",
+        "bytes": 368640,
+        "sha256": "32ffcc6be1c64a3a9eec6b0fb2e3dab64d20650e9c1720096691bbd0e374355d",
+        "quickCheck": "ok",
+        "balanced": true,
+        "originalRows": [
+          [
+            "d0f5c05c-e0fa-4946-b2ee-c0dc0459d2fc",
+            "03bbf52c-a880-464f-9b7e-35454b40575d",
+            "player:0cdde070-675c-4cf2-8903-0e70e30608dc"
+          ]
+        ]
+      },
+      "journals": [
+        {
+          "path": "artifacts/team-definition-verified-xmod-audit-server/xmod-world/citizens/commerce-tasks/binding-6F61ABF544879C25.json",
+          "bytes": 599,
+          "sha256": "a8e1e11adcfa06c2034589eaf697673409cf9ea892a9fbd4b538ee54d00b27b1"
+        },
+        {
+          "path": "artifacts/team-definition-verified-xmod-audit-server/xmod-world/citizens/commerce-tasks/cursor-af1c815d1a754cb4dbe5ba57303755e9c79c30b1902162b79360e17cee8e30cb-0.json",
+          "bytes": 311,
+          "sha256": "bcbaf9d0a4b3e870d11dc55ea43b56af187dbc4ca6095d6ea58c9fb9ca64fc1f"
+        },
+        {
+          "path": "artifacts/team-definition-verified-xmod-audit-server/xmod-world/citizens/commerce-tasks/entry-6d6c944b7c3dd9c211225b5577ebfe9700e8b1ea86be10a99a84ce27d55e4056-0.json",
+          "bytes": 1241,
+          "sha256": "4fca92577d7bf303eefbf7eaa5a499cf7de5e677475e337091a49dedd9136273"
+        },
+        {
+          "path": "artifacts/team-definition-verified-xmod-audit-server/xmod-world/citizens/commerce-tasks/entry-6d6c944b7c3dd9c211225b5577ebfe9700e8b1ea86be10a99a84ce27d55e4056-1.json",
+          "bytes": 1599,
+          "sha256": "0afc31ed1c1801e385a91d3291cc324d5d19def8c139b72d793ca11ae3b49ff0"
+        },
+        {
+          "path": "artifacts/team-definition-verified-xmod-audit-server/xmod-world/citizens/commerce-tasks/entry-6d6c944b7c3dd9c211225b5577ebfe9700e8b1ea86be10a99a84ce27d55e4056-2.json",
+          "bytes": 1597,
+          "sha256": "a2267f62547468c4a2b02877fecb0fe4341c6509b050eee1897ef6923bc2eff6"
+        }
+      ],
+      "nativeTeam": {
+        "path": "artifacts/team-definition-verified-xmod-audit-server/xmod-world/ftbquests/1aa9c5fb-bbc1-4e52-9de2-15a17ecf9091.snbt",
+        "bytes": 661,
+        "sha256": "72b528c73d28050922903478a2918cfff49a0555c698d099e7e9d3d48097f1b5"
+      }
+    },
+    {
+      "mode": "replacement",
+      "checks": 5,
+      "log": {
+        "path": "artifacts/team-replacement-accepted-xmod-2026-10-22.log",
+        "bytes": 24706,
+        "sha256": "4f796f661e7fb7b9035860ceb8c3988670289bc9bc3c61b9fc7907dba3fc1d85"
+      },
+      "fixture": "artifacts/team-replacement-accepted-xmod-audit-server",
+      "identity": {
+        "mode": "replacement",
+        "owner": "1a1549f2-ae7c-4dac-a091-f90295e6e07e",
+        "team": "f7936614-f381-4ef2-8f38-f2cd18dfcbeb",
+        "task": "3FEF8DCDA9863A4B",
+        "entry": "1c4e778dd958fab1ea44dd1be4ba3784103ba3681f9a7e86ce72c336f1d45466",
+        "operation": "edea29ae-431f-43f5-a5f1-971771399511",
+        "transaction": "702bb8b1-f656-4dfc-a174-91340bad5683",
+        "requestKey": "team-mutation:1a1549f2-ae7c-4dac-a091-f90295e6e07e",
+        "nativeTeamPresent": true,
+        "retainedTeamDataPresent": true,
+        "entryState": "CONFIRMED",
+        "reported": true,
+        "callbacks": 1,
+        "recoveredState": "APPLIED",
+        "retryReported": false
+      },
+      "state": {
+        "path": "artifacts/team-replacement-accepted-xmod-audit-server/team-mutation-state.json",
+        "bytes": 546,
+        "sha256": "ef38b6dfd733c9f902b6e2a16cad534b1c8acdd34bdd18d5ea0415b8e8dfc53c"
+      },
+      "database": {
+        "path": "artifacts/team-replacement-accepted-xmod-audit-server/xmod-world/yuuniverse_economy/economy.db",
+        "bytes": 368640,
+        "sha256": "e66d3439562f2ca735b6c952f94f5ae6591af3f4ab0675adec74ed634d9c1f9d",
+        "quickCheck": "ok",
+        "balanced": true,
+        "originalRows": [
+          [
+            "edea29ae-431f-43f5-a5f1-971771399511",
+            "702bb8b1-f656-4dfc-a174-91340bad5683",
+            "player:1a1549f2-ae7c-4dac-a091-f90295e6e07e"
+          ]
+        ]
+      },
+      "journals": [
+        {
+          "path": "artifacts/team-replacement-accepted-xmod-audit-server/xmod-world/citizens/commerce-tasks/binding-3FEF8DCDA9863A4B.json",
+          "bytes": 599,
+          "sha256": "3ddc97434e00d3dee6b38d71d965f1f876841753b022b817edad857adc911a32"
+        },
+        {
+          "path": "artifacts/team-replacement-accepted-xmod-audit-server/xmod-world/citizens/commerce-tasks/cursor-5954b7402fa6319eb02a32f5285c81a9eacfc0715d151ba24257efe4fba5346b-0.json",
+          "bytes": 311,
+          "sha256": "8446610ce919a2ce753fba749516ba198626a59a395b70f068b3476c74feca0f"
+        },
+        {
+          "path": "artifacts/team-replacement-accepted-xmod-audit-server/xmod-world/citizens/commerce-tasks/entry-1c4e778dd958fab1ea44dd1be4ba3784103ba3681f9a7e86ce72c336f1d45466-0.json",
+          "bytes": 1241,
+          "sha256": "d8e8a345eb2b5bed9a70839726b4d8bd7e0a51d53f0677f37063d4af599f7d6d"
+        },
+        {
+          "path": "artifacts/team-replacement-accepted-xmod-audit-server/xmod-world/citizens/commerce-tasks/entry-1c4e778dd958fab1ea44dd1be4ba3784103ba3681f9a7e86ce72c336f1d45466-1.json",
+          "bytes": 1599,
+          "sha256": "6c6dfdaf5a75124e7d238f170376c27d8c40f16a11d19b72b1efc956ec9df15f"
+        },
+        {
+          "path": "artifacts/team-replacement-accepted-xmod-audit-server/xmod-world/citizens/commerce-tasks/entry-1c4e778dd958fab1ea44dd1be4ba3784103ba3681f9a7e86ce72c336f1d45466-2.json",
+          "bytes": 1597,
+          "sha256": "52f48da53fe82f784ff69f5041d081f86a43a6e44f7cf23a13521625e929db27"
+        }
+      ],
+      "nativeTeam": {
+        "path": "artifacts/team-replacement-accepted-xmod-audit-server/xmod-world/ftbquests/f7936614-f381-4ef2-8f38-f2cd18dfcbeb.snbt",
+        "bytes": 661,
+        "sha256": "cde5a9c6f7a9595f303b1abd66d52fcbe26059b915edd0239aebaaa4dc9e66a8"
+      }
+    },
+    {
+      "mode": "normal",
+      "checks": 5,
+      "log": {
+        "path": "artifacts/team-normal-verified-xmod-2026-10-22.log",
+        "bytes": 24359,
+        "sha256": "9c92dc97a5fc7ade23eb3bf7e61c324412a05f3bfb04301a614e9ec1cfeef8d0"
+      },
+      "fixture": "artifacts/team-normal-verified-xmod-audit-server",
+      "identity": {
+        "mode": "normal",
+        "owner": "e6f9cfa8-05eb-401c-b86b-3c473ad1fd68",
+        "team": "b91c1009-711e-4630-befd-00bfd5e6bdf5",
+        "task": "0134DF67F2F7AD4A",
+        "entry": "969c629dcf4f7eca874b26556084a6f58ba75c53c06ace59acd3b857c78275f1",
+        "operation": "e30a25b8-6f07-4998-b1eb-444fe2e25516",
+        "transaction": "886eb0c4-58c5-4e3a-a8a3-1054b96c9b61",
+        "requestKey": "team-mutation:e6f9cfa8-05eb-401c-b86b-3c473ad1fd68",
+        "nativeTeamPresent": true,
+        "retainedTeamDataPresent": true,
+        "entryState": "APPLIED",
+        "reported": false,
+        "callbacks": 1,
+        "recoveredState": "APPLIED",
+        "retryReported": false
+      },
+      "state": {
+        "path": "artifacts/team-normal-verified-xmod-audit-server/team-mutation-state.json",
+        "bytes": 540,
+        "sha256": "29b306dafefe08ec89c31ea9ca7902e8cee65f5a4152ee83de096505b19de64d"
+      },
+      "database": {
+        "path": "artifacts/team-normal-verified-xmod-audit-server/xmod-world/yuuniverse_economy/economy.db",
+        "bytes": 368640,
+        "sha256": "bb123e2724bb0699977634402478cb1441a5da566c55e6562303205cedd74fd2",
+        "quickCheck": "ok",
+        "balanced": true,
+        "originalRows": [
+          [
+            "e30a25b8-6f07-4998-b1eb-444fe2e25516",
+            "886eb0c4-58c5-4e3a-a8a3-1054b96c9b61",
+            "player:e6f9cfa8-05eb-401c-b86b-3c473ad1fd68"
+          ]
+        ]
+      },
+      "journals": [
+        {
+          "path": "artifacts/team-normal-verified-xmod-audit-server/xmod-world/citizens/commerce-tasks/binding-0134DF67F2F7AD4A.json",
+          "bytes": 599,
+          "sha256": "655d7f383b82b5ff8667a271805e56100f4f1d0725a146b506de15b620f6cacb"
+        },
+        {
+          "path": "artifacts/team-normal-verified-xmod-audit-server/xmod-world/citizens/commerce-tasks/cursor-2c1241c49b46e606b27348b71659bf3f6afe7a9a551fd72f7aacbb854b99bd9f-0.json",
+          "bytes": 311,
+          "sha256": "6f762c6499831b8ecd1e7a0d53aa984e5dfa56c462dd7ee476f12ea611855401"
+        },
+        {
+          "path": "artifacts/team-normal-verified-xmod-audit-server/xmod-world/citizens/commerce-tasks/entry-969c629dcf4f7eca874b26556084a6f58ba75c53c06ace59acd3b857c78275f1-0.json",
+          "bytes": 1241,
+          "sha256": "ca9ce2fb32c32db0a8217f5a496ca51dd48d3f45e869c3891a7d371062a651cb"
+        },
+        {
+          "path": "artifacts/team-normal-verified-xmod-audit-server/xmod-world/citizens/commerce-tasks/entry-969c629dcf4f7eca874b26556084a6f58ba75c53c06ace59acd3b857c78275f1-1.json",
+          "bytes": 1599,
+          "sha256": "b51fd904e3ca7f6fa9975ac71dc83070e504c4a322cc530b18bda0e4bef52b52"
+        },
+        {
+          "path": "artifacts/team-normal-verified-xmod-audit-server/xmod-world/citizens/commerce-tasks/entry-969c629dcf4f7eca874b26556084a6f58ba75c53c06ace59acd3b857c78275f1-2.json",
+          "bytes": 1597,
+          "sha256": "8ceb43f83ce90d60cce3cfafbacaaed66d2f539c9f4bdc59ae0885e9ae4aa6bd"
+        }
+      ],
+      "nativeTeam": {
+        "path": "artifacts/team-normal-verified-xmod-audit-server/xmod-world/ftbquests/b91c1009-711e-4630-befd-00bfd5e6bdf5.snbt",
+        "bytes": 661,
+        "sha256": "b22c54f2a54d2a162598a7ce87b4a09e9a3ebff40db1673bda412e674c904fa2"
+      }
+    }
+  ],
+  "financialRegressions": [
+    {
+      "scope": "rewardgraph",
+      "checks": 277,
+      "run": {
+        "run": "e807fcb7411f46b3a1511ae4c99ed2a6",
+        "fixture": "artifacts/financial-backup-e807fcb7411f46b3a1511ae4c99ed2a6-server",
+        "scope": "rewardgraph",
+        "neoForge": "21.1.248",
+        "createdAt": "2026-10-22T20:01:06.5669899+08:00",
+        "stages": [
+          {
+            "phase": "seed",
+            "checks": 23,
+            "log": "artifacts/team-graph-final-2026-10-22-seed.log"
+          },
+          {
+            "phase": "regressed",
+            "checks": 61,
+            "log": "artifacts/team-graph-final-2026-10-22-regressed.log"
+          },
+          {
+            "phase": "caughtup",
+            "checks": 61,
+            "log": "artifacts/team-graph-final-2026-10-22-caughtup.log"
+          },
+          {
+            "phase": "higher",
+            "checks": 61,
+            "log": "artifacts/team-graph-final-2026-10-22-higher.log"
+          },
+          {
+            "phase": "consistent",
+            "checks": 71,
+            "log": "artifacts/team-graph-final-2026-10-22-consistent.log"
+          }
+        ]
+      },
+      "identity": {
+        "roots": [
+          {
+            "quest": "26E0E499D15C7716",
+            "reward": "674FD09330FA0B9A",
+            "label": "required",
+            "alternative": false
+          },
+          {
+            "quest": "12B7F02C7B1A82D5",
+            "reward": "2B8D0E1698E205DA",
+            "label": "transitive",
+            "alternative": false
+          },
+          {
+            "quest": "4BA5BF45EEBBADF5",
+            "reward": "7FEDC06ED010FAE9",
+            "label": "task",
+            "alternative": false
+          },
+          {
+            "quest": "7AF1932E44FAF621",
+            "reward": "745A6667657F5089",
+            "label": "chapter",
+            "alternative": false
+          },
+          {
+            "quest": "20E4FF30917B6EFF",
+            "reward": "5A213FDD5AB2A915",
+            "label": "started_quest",
+            "alternative": false
+          },
+          {
+            "quest": "62CADC408098AA35",
+            "reward": "3CE9D1F3BF83181D",
+            "label": "started_task",
+            "alternative": false
+          },
+          {
+            "quest": "4E3AC5D0271C71AA",
+            "reward": "04B6EEA13D850E4C",
+            "label": "sequential_task",
+            "alternative": false
+          },
+          {
+            "quest": "356C23658F601969",
+            "reward": "7679ABB5EF93892E",
+            "label": "any_complete",
+            "alternative": true
+          },
+          {
+            "quest": "247D69AD506D5446",
+            "reward": "745BC9612537C3F0",
+            "label": "minimum_one",
+            "alternative": true
+          },
+          {
+            "quest": "210A46345EDF004B",
+            "reward": "2B939DD3502B6DED",
+            "label": "minimum_two",
+            "alternative": false
+          },
+          {
+            "quest": "16047706A4404B56",
+            "reward": "4F38672D64995501",
+            "label": "any_started",
+            "alternative": true
+          },
+          {
+            "quest": "657B8409959D7673",
+            "reward": "3F4FA0702EED5940",
+            "label": "minimum_started_two",
+            "alternative": false
+          },
+          {
+            "quest": "097164E9B98409D1",
+            "reward": "5C5166BB52B6D236",
+            "label": "optional_chapter",
+            "alternative": true
+          },
+          {
+            "quest": "520C0861B6333E0E",
+            "reward": "4DD97CD39A4023BF",
+            "label": "started_chapter",
+            "alternative": false
+          },
+          {
+            "quest": "1F8FC05742760DC1",
+            "reward": "4A693E39FEE907D9",
+            "label": "optional_started_chapter",
+            "alternative": true
+          },
+          {
+            "quest": "5983BA568023505E",
+            "reward": "1166CF4350337EC6",
+            "label": "mixed_started_quest",
+            "alternative": true
+          },
+          {
+            "quest": "446E193A7A65DE35",
+            "reward": "2CAD81A625B03DB9",
+            "label": "independent_sibling_task",
+            "alternative": true
+          },
+          {
+            "quest": "7DC9401CAB6D858B",
+            "reward": "27B23F3444F75099",
+            "label": "optional_task_dependency",
+            "alternative": true
+          },
+          {
+            "quest": "7142B7D16164E02E",
+            "reward": "77A7C5DA93BDB00C",
+            "label": "optional_task_direct",
+            "alternative": true
+          },
+          {
+            "quest": "6D980D7CC8CFD7C8",
+            "reward": "1A6A1130965956CF",
+            "label": "flexible_complete",
+            "alternative": true
+          },
+          {
+            "quest": "19FA7B0817ADAD28",
+            "reward": "23E9CD002D2583A3",
+            "label": "flexible_started",
+            "alternative": true
+          }
+        ],
+        "run": "e807fcb7411f46b3a1511ae4c99ed2a6",
+        "actor": "3843f4a1-993d-4119-85e7-481d54800637",
+        "team": "3843f4a1-993d-4119-85e7-481d54800637",
+        "scope": "rewardgraph",
+        "partialTask": "373B0ED3DC4E7ABB",
+        "command": "227AFFE8A3119015",
+        "money": "2BE2840FF760410D",
+        "operation": "8e01d9d1-658f-4c37-9378-fee6d8ed3e63",
+        "transaction": "f9063df7-c27f-40b3-af02-b25f9ca14313",
+        "currency": "8d6810f0-d3f7-4bfc-8598-68f54b96f834",
+        "unrelatedShop": "graph-unrelated-3843f4a1-993d-4119-85e7-481d54800637",
+        "provider": "dcd1d12f-797c-4109-9e1a-bcbed132b264",
+        "sequence": 1
+      },
+      "databases": [
+        {
+          "path": "artifacts/financial-backup-e807fcb7411f46b3a1511ae4c99ed2a6-server/financial-before.db",
+          "bytes": 368640,
+          "sha256": "480160f5e856f0b610d5d7265f4312ce57872168ba36dc3e976ee5322de9ff33",
+          "quickCheck": "ok",
+          "balanced": true,
+          "originalRows": []
+        },
+        {
+          "path": "artifacts/financial-backup-e807fcb7411f46b3a1511ae4c99ed2a6-server/financial-after.db",
+          "bytes": 368640,
+          "sha256": "a2b94cc43f85219f9ca5b6ea22a816a978e0a796e5174c489e4e44596b6eee7a",
+          "quickCheck": "ok",
+          "balanced": true,
+          "originalRows": [
+            [
+              "f9063df7-c27f-40b3-af02-b25f9ca14313",
+              "player:3843f4a1-993d-4119-85e7-481d54800637"
+            ]
+          ]
+        },
+        {
+          "path": "artifacts/financial-backup-e807fcb7411f46b3a1511ae4c99ed2a6-server/financial-world/yuuniverse_economy/economy.db",
+          "bytes": 368640,
+          "sha256": "89872a72812d3432b10f8ca90509c29aa0771ec4bf92ff81dcc2e97686b6c34f",
+          "quickCheck": "ok",
+          "balanced": true,
+          "originalRows": [
+            [
+              "f9063df7-c27f-40b3-af02-b25f9ca14313",
+              "player:3843f4a1-993d-4119-85e7-481d54800637"
+            ]
+          ]
+        }
+      ],
+      "logs": [
+        {
+          "path": "artifacts/team-graph-final-2026-10-22-seed.log",
+          "bytes": 19087,
+          "sha256": "bc5cf2b94d2b0e6f162da4c98997aa34c3a92e0c233e8b6d027dde3947585c13"
+        },
+        {
+          "path": "artifacts/team-graph-final-2026-10-22-regressed.log",
+          "bytes": 23761,
+          "sha256": "2d81f9ef793d8b5bdbe20837dee4791b0687da96ad7252b5d78d289986513ea7"
+        },
+        {
+          "path": "artifacts/team-graph-final-2026-10-22-caughtup.log",
+          "bytes": 31440,
+          "sha256": "f2ab903011f4297e5b88c80eb023a7949111e0a507ff9557c3d551bbe4f1d294"
+        },
+        {
+          "path": "artifacts/team-graph-final-2026-10-22-higher.log",
+          "bytes": 39559,
+          "sha256": "4b4da96b9670f731479d79a46197ff197c5e97432167053c3c50e3952eb2bcd8"
+        },
+        {
+          "path": "artifacts/team-graph-final-2026-10-22-consistent.log",
+          "bytes": 24839,
+          "sha256": "8409168ef6538916357ec114e6cc8ad6beb21989a9caed72359c4a023c67f743"
+        }
+      ],
+      "result": {
+        "path": "artifacts/team-graph-final-2026-10-22-result.json",
+        "bytes": 911,
+        "sha256": "462082aaee134c5d7a6a9e42328a7892fc1724902dc1676253abab7150b18962"
+      }
+    },
+    {
+      "scope": "paid",
+      "checks": 46,
+      "run": {
+        "run": "a6a3fd5bd09e4adfabaf34e9ccabdb83",
+        "fixture": "artifacts/financial-backup-a6a3fd5bd09e4adfabaf34e9ccabdb83-server",
+        "scope": "paid",
+        "neoForge": "21.1.248",
+        "createdAt": "2026-10-22T20:07:42.1826404+08:00",
+        "stages": [
+          {
+            "phase": "seed",
+            "checks": 3,
+            "log": "artifacts/team-paid-final-2026-10-22-seed.log"
+          },
+          {
+            "phase": "regressed",
+            "checks": 11,
+            "log": "artifacts/team-paid-final-2026-10-22-regressed.log"
+          },
+          {
+            "phase": "caughtup",
+            "checks": 11,
+            "log": "artifacts/team-paid-final-2026-10-22-caughtup.log"
+          },
+          {
+            "phase": "higher",
+            "checks": 11,
+            "log": "artifacts/team-paid-final-2026-10-22-higher.log"
+          },
+          {
+            "phase": "consistent",
+            "checks": 10,
+            "log": "artifacts/team-paid-final-2026-10-22-consistent.log"
+          }
+        ]
+      },
+      "identity": {
+        "run": "a6a3fd5bd09e4adfabaf34e9ccabdb83",
+        "actor": "096e7b45-82f3-4642-9df8-1fdf89cf0fea",
+        "team": "096e7b45-82f3-4642-9df8-1fdf89cf0fea",
+        "scope": "paid",
+        "quest": "181A13EEE9B5211C",
+        "money": "4630AD880A5C6A69",
+        "claim": "7acaa63ce69a6273c3cf41b1b9c44c6cfdd98035238e13c1e8b3d838e96514dd",
+        "transaction": "1d64bddf-055f-418b-a4e0-4be82699ee27",
+        "operationKey": "citizens:ftb-reward:v1:7acaa63ce69a6273c3cf41b1b9c44c6cfdd98035238e13c1e8b3d838e96514dd:096e7b45-82f3-4642-9df8-1fdf89cf0fea",
+        "currency": "8d6810f0-d3f7-4bfc-8598-68f54b96f834",
+        "transactionCount": 2,
+        "pendingClaim": "08b4d1a3de47515e2d238be11b45fd50f4711b3ac8546d5b7113a3e2fb31f565",
+        "pendingReward": "38B1E7472C793ED1",
+        "laterReward": "2BA93AAFC77DFDBD",
+        "provider": "4ca81586-7e5e-4f7d-b7c2-a2ddf6f33b70"
+      },
+      "databases": [
+        {
+          "path": "artifacts/financial-backup-a6a3fd5bd09e4adfabaf34e9ccabdb83-server/financial-before.db",
+          "bytes": 368640,
+          "sha256": "0c1c3692a717d80b0cb1f8ccb0b711646bec7adbe77c73339f4e4532e2a955e4",
+          "quickCheck": "ok",
+          "balanced": true,
+          "originalRows": []
+        },
+        {
+          "path": "artifacts/financial-backup-a6a3fd5bd09e4adfabaf34e9ccabdb83-server/financial-after.db",
+          "bytes": 368640,
+          "sha256": "1e0b61038c071a1934aa53186de6f5508dacf1b3b96dff8bd93d933e9552706b",
+          "quickCheck": "ok",
+          "balanced": true,
+          "originalRows": [
+            [
+              "1d64bddf-055f-418b-a4e0-4be82699ee27"
+            ]
+          ]
+        },
+        {
+          "path": "artifacts/financial-backup-a6a3fd5bd09e4adfabaf34e9ccabdb83-server/financial-world/yuuniverse_economy/economy.db",
+          "bytes": 368640,
+          "sha256": "884f8605d6e16329d2f9e32acb569f17504e078c2b32cb6ea2e8ee60f0ff2b7e",
+          "quickCheck": "ok",
+          "balanced": true,
+          "originalRows": [
+            [
+              "1d64bddf-055f-418b-a4e0-4be82699ee27"
+            ]
+          ]
+        }
+      ],
+      "logs": [
+        {
+          "path": "artifacts/team-paid-final-2026-10-22-seed.log",
+          "bytes": 20613,
+          "sha256": "50878df3ea1164bb8988436a84bcc6e095c48025649c37d015952150b2ea5d30"
+        },
+        {
+          "path": "artifacts/team-paid-final-2026-10-22-regressed.log",
+          "bytes": 19959,
+          "sha256": "8a5d284a34342d193d43a9cf627c7a68bc7e935e0ddf601a451b2636b324cef5"
+        },
+        {
+          "path": "artifacts/team-paid-final-2026-10-22-caughtup.log",
+          "bytes": 19958,
+          "sha256": "2845445b2430379f8aaccd6537c1315f35ff1fdc54764780823e2c8291f986e9"
+        },
+        {
+          "path": "artifacts/team-paid-final-2026-10-22-higher.log",
+          "bytes": 19954,
+          "sha256": "47fc2369a9dfde4b9ca138cec0ec79ee6c1f45e84922e84fcb71eaf1f88dc92a"
+        },
+        {
+          "path": "artifacts/team-paid-final-2026-10-22-consistent.log",
+          "bytes": 17373,
+          "sha256": "1d9529602463cfd396ba82b0b494f9b547895aee1adbfff4f8c4345be39dc84a"
+        }
+      ],
+      "result": {
+        "path": "artifacts/team-paid-final-2026-10-22-result.json",
+        "bytes": 898,
+        "sha256": "6c1492d8e2ca9c35cfe5f344eb367eaf97fb57f3a398ecbfa1f973abbecd7e34"
+      }
+    }
+  ],
+  "ordinary": [
+    {
+      "target": "21.1.248",
+      "results": {
+        "tests": 775,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "summary": {
+        "path": "artifacts/team-final-ordinary-248-tests-2026-10-22.json",
+        "bytes": 73,
+        "sha256": "ac98a3b8eb796941b40462e1a3e17cc316124bf72e85bf82264fe3d7ad2aaa44"
+      },
+      "log": {
+        "path": "artifacts/team-final-ordinary-248-2026-10-22.log",
+        "bytes": 68867,
+        "sha256": "dc4612e9cafaf209f02e7b2fd32d2f092609aa4246e029cd4858ecaa9d8465e6"
+      }
+    },
+    {
+      "target": "21.1.233",
+      "results": {
+        "tests": 775,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "summary": {
+        "path": "artifacts/team-final-ordinary-233-tests-2026-10-22.json",
+        "bytes": 73,
+        "sha256": "ac98a3b8eb796941b40462e1a3e17cc316124bf72e85bf82264fe3d7ad2aaa44"
+      },
+      "log": {
+        "path": "artifacts/team-final-ordinary-233-2026-10-22.log",
+        "bytes": 68867,
+        "sha256": "3cf5975042bca509c2b9c688db1bb9b3fe6337cf12560cab325c3bc8c5a30943"
+      }
+    }
+  ],
+  "packages": [
+    {
+      "path": "artifacts/team-final-ordinary-21.1.248-build/libs/citizens-2.0.43-neoforge-SNAPSHOT-sources.jar",
+      "bytes": 1125914,
+      "sha256": "2e9d4be413d3958d32beab074333e08a29ecb96ed1de794874cd62f2ab129d9f",
+      "auditAndForeignClassesExcluded": true,
+      "separateOwnership": true
+    },
+    {
+      "path": "artifacts/team-final-ordinary-21.1.248-build/libs/citizens-2.0.43-neoforge-SNAPSHOT.jar",
+      "bytes": 4082802,
+      "sha256": "572e898e3c00a1596e2b13438d43d3d21e97c11c4d50975e845d1a2b59d160de",
+      "auditAndForeignClassesExcluded": true,
+      "separateOwnership": true
+    },
+    {
+      "path": "artifacts/team-final-ordinary-21.1.248-build/libs/yuuniverse-interactions-2.0.43-neoforge-SNAPSHOT.jar",
+      "bytes": 204146,
+      "sha256": "1910931405998660db902ebc057a80ad9176b0cf4aa14bec0c9b55df545e8687",
+      "auditAndForeignClassesExcluded": true,
+      "separateOwnership": true
+    },
+    {
+      "path": "artifacts/team-final-ordinary-21.1.233-build/libs/citizens-2.0.43-neoforge-SNAPSHOT-sources.jar",
+      "bytes": 1125914,
+      "sha256": "ffc054b015c7739b7c13fd9ba8f13f3b705ba5632f276192727a092f9f939e2b",
+      "auditAndForeignClassesExcluded": true,
+      "separateOwnership": true
+    },
+    {
+      "path": "artifacts/team-final-ordinary-21.1.233-build/libs/citizens-2.0.43-neoforge-SNAPSHOT.jar",
+      "bytes": 4082802,
+      "sha256": "16b1e01f96f24ea75dc31ccd345a0cb9481e84e7fc123342e865b375125d82bc",
+      "auditAndForeignClassesExcluded": true,
+      "separateOwnership": true
+    },
+    {
+      "path": "artifacts/team-final-ordinary-21.1.233-build/libs/yuuniverse-interactions-2.0.43-neoforge-SNAPSHOT.jar",
+      "bytes": 204146,
+      "sha256": "3e55efd5bd9b269fb4bb026b23151ac86593ceea348d3a32a1aa5eb9c7a5f046",
+      "auditAndForeignClassesExcluded": true,
+      "separateOwnership": true
+    }
+  ],
+  "selected": {
+    "checks": 104,
+    "log": {
+      "path": "artifacts/team-standard-verified-xmod-2026-10-22.log",
+      "bytes": 86477,
+      "sha256": "40e3011443142757be814339b6cfa0d6063bbf336e4e435c09220c89451b4dbb"
+    }
+  },
+  "delivery": {
+    "checks": 17,
+    "log": {
+      "path": "artifacts/team-delivery-final-2026-10-22.log",
+      "bytes": 20591,
+      "sha256": "f481a4428db31169208c4f01fb0e0246e1543bb08359952652ad03c74584b32b"
+    }
+  },
+  "interactions": {
+    "results": {
+      "tests": 100,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    "log": {
+      "path": "artifacts/team-final-interactions-2026-10-22.log",
+      "bytes": 11723,
+      "sha256": "db15d8e4d3f0e19777dbc2cc50e985c0d840462f2c68a1d50a44db3c59d95565"
+    }
+  },
+  "sources": [
+    {
+      "path": "neoforge/src/main/java/net/citizensnpcs/util/FtbQuestTasks.java",
+      "bytes": 28588,
+      "sha256": "f55248aa4b079e811c0b358ec05f54501f9cada7716b773fd11f64e3734d221b"
+    },
+    {
+      "path": "tools/xmod-runtime-audit.gradle",
+      "bytes": 2234,
+      "sha256": "bf55d230ad1dea6b5fd4170d16deba2210b51e5963471f2d7f9eeb0f92c749a9"
+    },
+    {
+      "path": "tools/xmod-runtime-audit/net/citizensnpcs/audit/TeamMutationRuntimeAudit.java",
+      "bytes": 8255,
+      "sha256": "1ce7e2cd5c4e74a97e48b772b166eb92553f8a4968cef1210b586f008e68cf30"
+    },
+    {
+      "path": "tools/xmod-runtime-audit/net/citizensnpcs/audit/PreparedCommerceRuntimeAudit.java",
+      "bytes": 13358,
+      "sha256": "c038c789c9ddd998909b638b51f310fa6a80ea118dcd7d99f3e8ae6de2126090"
+    },
+    {
+      "path": "tools/xmod-runtime-audit/net/citizensnpcs/audit/XModRuntimeAudit.java",
+      "bytes": 33492,
+      "sha256": "f3aa28b96d1512591dc3ebebe457a6ede9f781d40506e3347784d7782bbca5cf"
+    }
+  ],
+  "providers": [
+    {
+      "path": "artifacts/team-standard-verified-xmod-audit-server/mods/architectury-13.0.11-neoforge.jar",
+      "bytes": 584734,
+      "sha256": "9cc92f2c09533fc5482c60f993bd891c655a0e32b637037cdcb7c2b23adedeeb"
+    },
+    {
+      "path": "artifacts/team-standard-verified-xmod-audit-server/mods/ftb-library-neoforge-2101.1.37.jar",
+      "bytes": 1439881,
+      "sha256": "624c2d2d1cbadb946d967e17757bd5b2d129d4d3ed71f2da0c70607d04476ac2"
+    },
+    {
+      "path": "artifacts/team-standard-verified-xmod-audit-server/mods/ftb-quests-neoforge-2101.1.36.jar",
+      "bytes": 1609984,
+      "sha256": "6a39982c4b3afc00b1e788041a4f0d394e1659e3b3a6e5d078cd790bc36d0018"
+    },
+    {
+      "path": "artifacts/team-standard-verified-xmod-audit-server/mods/ftb-teams-neoforge-2101.1.11.jar",
+      "bytes": 308236,
+      "sha256": "e6bcd670493624e6906df872a9c6af4a33fe6405cac57a32c59cd4cd5838c655"
+    },
+    {
+      "path": "artifacts/team-standard-verified-xmod-audit-server/mods/ftb-xmod-compat-neoforge-21.1.12.jar",
+      "bytes": 148575,
+      "sha256": "f587e13131101bac33d4cc7a04d13d06c00f8f88a892be90d6ffc8ad96119ae8"
+    },
+    {
+      "path": "artifacts/team-standard-verified-xmod-audit-server/mods/jei-1.21.1-neoforge-19.53.0.425.jar",
+      "bytes": 1847925,
+      "sha256": "3683c743c1b6192913abc2a969486344eee98aa2924e8deb5087109645c3abc6"
+    },
+    {
+      "path": "artifacts/team-standard-verified-xmod-audit-server/mods/kubejs-neoforge-2101.7.2-build.377.jar",
+      "bytes": 2294111,
+      "sha256": "df9a8458b1f83fed06ba54684977911795a5153a462b81a610895f5b1f2f0cbf"
+    },
+    {
+      "path": "artifacts/team-standard-verified-xmod-audit-server/mods/rhino-2101.2.8-build.91.jar",
+      "bytes": 980936,
+      "sha256": "1d53d962aa4dac54bcbb4f998c1845980cf194318f1d6b1580ea6ac15cce5ef3"
+    },
+    {
+      "path": "artifacts/team-standard-verified-xmod-audit-server/mods/yuuniverse-economy-0.5.9-SNAPSHOT.jar",
+      "bytes": 14436199,
+      "sha256": "fc24deb2eefab0cb3eb87a3bb70a59897b9ad1a3b13f851ebb6f73994fdd75b7"
+    }
+  ],
+  "stopped": {
+    "path": "artifacts/team-stopped-checks-2026-10-22.json",
+    "bytes": 1486,
+    "sha256": "0904d03f3816c3969b869707ed35c91bd55937f0a42d8f1b05b7c9aab3248c3f"
+  },
+  "draftDiagnostics": {
+    "ineffectiveTitleReadDataProbe": true,
+    "log": {
+      "path": "artifacts/team-definition-final-xmod-2026-10-22.log",
+      "bytes": 26464,
+      "sha256": "dbea6e6a7aa56513b07988debbcfde0b53be6e0a48a0fb1cb03ebca9e069efdb"
+    },
+    "source": {
+      "path": "artifacts/team-definition-diagnostic-source-2026-10-22.java",
+      "bytes": 7914,
+      "sha256": "c2655efd8e5d2d4794689c20ae10499f1bec26c0b81c38fc7131982e81bc5c41"
+    },
+    "identicalReplacementCorrectlyRevalidatedWithinSameCommand": true,
+    "replacementLog": {
+      "path": "artifacts/team-replacement-verified-xmod-2026-10-22.log",
+      "bytes": 26728,
+      "sha256": "d52a116105841e23648ea0c8152c4c30a3ba9692e7b9bf64aae0da777b4b403c"
+    },
+    "replacementSource": {
+      "path": "artifacts/team-replacement-diagnostic-source-2026-10-22.java",
+      "bytes": 8126,
+      "sha256": "422241e4eb0c5d30d30d603c0ee03039b293db4648a08dee95f234c2ad74c485"
+    }
+  },
+  "productionDeploymentChanged": false,
+  "newProcessKillClaim": false,
+  "limits": [
+    "Callbacks that change and restore a definition before returning",
+    "Separate native delivery submission callbacks",
+    "Retention/storage/load/large-history throughput and remaining crash boundaries",
+    "Original migration provenance and physical ordinary/VR/proxy acceptance"
+  ]
+}

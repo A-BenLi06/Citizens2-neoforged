@@ -8,6 +8,13 @@ Citizens retains NPC behavior and its existing native extension contracts. Yuuni
 
 ## Selected artifacts and sides
 
+Progress 2026-10-22, UTC+08:00: [native evidence target mutation](evidence-target-mutation-2026-10-22.md)
+checks that admitted FTB teams still exist and reacquires authoritative objects
+after projection callbacks. Deleted parties, replaced tasks and changed serialized
+definitions retain CONFIRMED evidence for review rather than acknowledging APPLIED.
+Delivery submission callbacks, broader recovery/load and migration/client gates
+remain open.
+
 Progress 2026-10-22, UTC+08:00: [offline PREPARED request recovery](commerce-prepared-recovery-2026-10-22.md)
 uses Economy 0.5.9/Commerce capability 5 to discover exact missed receipts without
 reconnecting contributors. Original team/cycle and provider outcomes remain

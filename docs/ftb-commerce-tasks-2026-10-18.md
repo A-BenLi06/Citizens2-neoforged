@@ -6,6 +6,12 @@ receipts into absolute native progress. Economy 0.5.6 exposes Commerce capabilit
 native observation before each new trade mutates inventory or money. Production
 Citizens has no compile dependency on Economy or FTB. Interactions stays separate.
 
+The [native target mutation fence](evidence-target-mutation-2026-10-22.md) verifies
+that the original native team still exists and reacquires file/team/task/quest
+objects after projection callbacks. Deleted teams, object replacement and changed
+serialized definitions retain confirmed receipts for review; reconciliation never
+redirects their attribution or repeats payment.
+
 ## Binding
 
 An active operator with `citizens.admin` can use:

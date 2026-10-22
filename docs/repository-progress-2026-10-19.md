@@ -10,6 +10,12 @@ This review covers repository structure, native implementation boundaries, upstr
 
 ## Repository and implementation boundaries
 
+Update 2026-10-22, UTC+08:00: [native evidence target mutation](evidence-target-mutation-2026-10-22.md)
+fences retained TeamData for deleted native parties and checks live file/team/task/
+quest identity and serialized definitions after completion callbacks. Uncertain
+receipts retain their original attribution and CONFIRMED state. Separate delivery
+submission callbacks, load/retention, migration and physical-client gates remain.
+
 Update 2026-10-22, UTC+08:00: [offline PREPARED commerce recovery](commerce-prepared-recovery-2026-10-22.md)
 discovers exact original receipts through Economy 0.5.9/Commerce capability 5
 without an online owner or retained operation UUID. Missing evidence remains
