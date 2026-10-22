@@ -8,6 +8,14 @@ Citizens retains NPC behavior and its existing native extension contracts. Yuuni
 
 ## Selected artifacts and sides
 
+Progress 2026-10-22, UTC+08:00: [dependent commerce recovery](commerce-dependent-recovery-2026-10-22.md)
+retries retained projections after other native scopes succeed, covering quest
+prerequisites and sequential tasks without overriding FTB gates. Missing financial
+settlements still reject before any projection; remaining definition failures are
+reported after recoverable scopes finish. Native reward admission, offline
+discovery of unretained operations, removed teams, throughput and client/content
+acceptance remain separate gates.
+
 Progress 2026-10-22, UTC+08:00: [offline retained-receipt reconciliation](commerce-offline-reconciliation-2026-10-22.md)
 adds direct administrator recovery of original team/task/cycle projections with
 no connected contributor, including delivery settlement after disconnect. Replay

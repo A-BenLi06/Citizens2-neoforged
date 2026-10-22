@@ -80,6 +80,13 @@ validates/projects the actor's current team scopes, so a noncontributing party
 member can recover valid shared progress. Offline discovery of a PREPARED request
 without its operation UUID still requires a supported provider history contract.
 
+[Dependency recovery](commerce-dependent-recovery-2026-10-22.md) attempts all
+eligible retained scopes and retries blocked projections after other scopes
+succeed. Native quest prerequisites and sequential task gates remain authoritative.
+Administrator reconciliation reports remaining task/team/cycle failures after
+recovering valid scopes; no-progress passes terminate. Financial prevalidation
+still rejects a missing settlement before any scope is projected.
+
 FTB saves independently. A process kill can leave retained APPLIED while FTB still
 has an older progress total. Reconciliation rechecks the original public settlements
 and restores the exact absolute total; it does not execute another trade. Lower

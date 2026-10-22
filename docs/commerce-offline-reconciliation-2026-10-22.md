@@ -74,8 +74,13 @@ to be read; the current history API requires that actor online. Fully offline
 discovery of such missing receipts needs a supported provider contract, not a
 guessed operation ID or direct database access. Native item/command/monetary reward
 admission and monetary PAID backup validation remain separate work. Large-history
-throughput, recovery across multiple dependent tasks or removed teams,
+throughput, recovery of removed teams,
 deletion/rollback of all evidence copies, original migration sources
 and physical ordinary/VR/proxy workflows remain open. No new process-kill or
 production deployment/restart is claimed; the user's pinned client fixture stays
 unchanged for their later test.
+
+The subsequent [dependency recovery extension](commerce-dependent-recovery-2026-10-22.md)
+addresses retained receipts loaded before their native prerequisites, including
+sequential tasks within one quest. Its separate native acceptance and failure
+reporting contract supplement this earlier validation.

@@ -1,6 +1,6 @@
 param(
     [Parameter(Mandatory)][string]$JavaHome,
-    [ValidateSet('actor','shared','offline','newmember')][string]$Scope = 'actor',
+    [ValidateSet('actor','shared','offline','newmember','dependency','sequential')][string]$Scope = 'actor',
     [string]$EconomyJar,
     [ValidatePattern('^[a-zA-Z0-9_-]+$')][string]$LogPrefix = 'financial-backup-2026-10-22'
 )
@@ -73,7 +73,7 @@ try {
         Copy-Item -LiteralPath (Join-Path $fixture $backupName) -Destination $database -Force
         Copy-Item -LiteralPath $playerSnapshot -Destination $playerPath -Force
         if ($Scope -eq 'newmember') { Copy-Item -LiteralPath $newPlayerSnapshot -Destination $newPlayerPath -Force }
-        if ($Scope -in @('offline','newmember')) {
+        if ($Scope -in @('offline','newmember','dependency','sequential')) {
             $teamId = [Guid]::Parse($state.team).ToString()
             Copy-Item -LiteralPath (Join-Path $fixture 'financial-progress-before.snbt') -Destination (Join-Path $fixture "financial-world/ftbquests/$teamId.snbt") -Force
         }

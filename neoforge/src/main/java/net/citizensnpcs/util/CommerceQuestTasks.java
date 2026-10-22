@@ -150,14 +150,35 @@ public final class CommerceQuestTasks implements AutoCloseable {
             }
             // Checkpoint only after retaining each matching receipt. Delivery can settle after its page was checkpointed.
             var scopes = ready(provider, journal.entries().stream().filter(entry -> retained(entry) && eligibleScopes.contains(projection(entry))).toList());
-            for (Projection scope : scopes) try { project(scope.binding(), scope.team(), scope.cycle()); }
-            catch (IOException | RuntimeException failure) { LOGGER.warn("Commerce projection remains pending for task {}, team {}, cycle {}: {}",
-                    scope.binding().taskId(), scope.team(), scope.cycle(), failure.getMessage()); }
+            for (ProjectionFailure failure : projectAll(scopes)) LOGGER.warn("Commerce projection remains pending for task {}, team {}, cycle {}: {}",
+                    failure.scope().binding().taskId(), failure.scope().team(), failure.scope().cycle(), failure.cause().getMessage());
             return count;
         } finally { processing.remove(actor.getUUID()); }
     }
     private static Object receiptFromOutcome(Object outcome) { return property(outcome, "receipt"); }
     private record Projection(Binding binding, UUID team, int cycle) { }
+    private record ProjectionFailure(Projection scope, Exception cause) {
+        IllegalStateException reported() {
+            return new IllegalStateException("Commerce projection remains pending for task " + scope.binding().taskId()
+                    + ", team " + scope.team() + ", cycle " + scope.cycle(), cause);
+        }
+    }
+    private List<ProjectionFailure> projectAll(Set<Projection> scopes) {
+        var pending = new LinkedHashMap<Projection, Exception>();
+        for (Projection scope : scopes) pending.put(scope, null);
+        boolean advanced;
+        do {
+            advanced = false;
+            for (Projection scope : List.copyOf(pending.keySet())) {
+                try {
+                    project(scope.binding(), scope.team(), scope.cycle());
+                    pending.remove(scope); advanced = true;
+                } catch (IOException | RuntimeException failure) { pending.put(scope, failure); }
+            }
+            // A successful scope can unlock another native task. Each successful scope leaves this batch.
+        } while (advanced && !pending.isEmpty());
+        return pending.entrySet().stream().map(value -> new ProjectionFailure(value.getKey(), value.getValue())).toList();
+    }
     private static Projection projection(Entry entry) {
         return new Projection(entry.binding(), entry.attribution().teamId(), entry.attribution().cycle());
     }
@@ -289,7 +310,12 @@ public final class CommerceQuestTasks implements AutoCloseable {
             entries = journal.entries().stream().filter(CommerceQuestTasks::retained).toList();
             if (!entries.isEmpty()) {
                 Object provider = provider(); validateEntries(provider, entries);
-                for (Projection scope : ready(provider, entries)) project(scope.binding(), scope.team(), scope.cycle());
+                var failures = projectAll(ready(provider, entries));
+                if (!failures.isEmpty()) {
+                    var reported = failures.getFirst().reported();
+                    for (ProjectionFailure failure : failures.subList(1, failures.size())) reported.addSuppressed(failure.reported());
+                    throw reported;
+                }
             }
             return count;
         } finally { reconciling = false; }

@@ -10,6 +10,14 @@ This review covers repository structure, native implementation boundaries, upstr
 
 ## Repository and implementation boundaries
 
+Update 2026-10-22, UTC+08:00: [dependent commerce recovery](commerce-dependent-recovery-2026-10-22.md)
+recovers retained projections loaded before their native quest prerequisites or
+sequential tasks. Batches retry only after a successful scope, keep native gates
+and report remaining contextual failures after valid scopes recover. Financial
+prevalidation remains before any projection. Native reward admission, unretained
+offline operation discovery, removed teams, throughput and migration/client gates
+remain open; exact fresh acceptance is recorded in the linked manifest.
+
 Update 2026-10-22, UTC+08:00: [offline commerce reconciliation](commerce-offline-reconciliation-2026-10-22.md)
 recovers retained absolute task progress through console administration with every
 contributor offline, including settled WAITING deliveries. Current native team
