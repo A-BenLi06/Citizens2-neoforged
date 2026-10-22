@@ -10,6 +10,13 @@ This review covers repository structure, native implementation boundaries, upstr
 
 ## Repository and implementation boundaries
 
+Update 2026-10-22, UTC+08:00: [commerce reward prerequisite admission](commerce-reward-graph-admission-2026-10-22.md)
+extends validation through native quest, task, sequential, chapter and started
+dependencies. FTB retains its alternative/minimum, optional-child and flexible
+progression rules. Scoped predicate validation avoids reading or populating the
+normal dependency cache. Monetary PAID settlement inspection, unretained offline
+discovery and the remaining migration/client/recovery gates stay open.
+
 Update 2026-10-22, UTC+08:00: [direct commerce reward admission](commerce-direct-reward-admission-2026-10-22.md)
 checks same-quest commerce backing before FTB marks item, command or monetary
 claims or resets repeat progress. Financial inspection includes offline party

@@ -8,6 +8,13 @@ Citizens retains NPC behavior and its existing native extension contracts. Yuuni
 
 ## Selected artifacts and sides
 
+Progress 2026-10-22, UTC+08:00: [commerce prerequisite reward admission](commerce-reward-graph-admission-2026-10-22.md)
+checks retained backing through native quest/task/chapter/sequential and started
+paths before item, command or monetary claims. Native alternatives, minimums,
+optional children and flexible progression remain authoritative. The dependency
+cache is bypassed only within the read-only admission scope. Separate monetary
+PAID inspection and the remaining migration/client/recovery gates remain open.
+
 Progress 2026-10-22, UTC+08:00: [direct commerce reward admission](commerce-direct-reward-admission-2026-10-22.md)
 revalidates same-quest retained settlements and native progress before FTB's
 claim marker, repeat reset or item/command/monetary outcome. The native matrices

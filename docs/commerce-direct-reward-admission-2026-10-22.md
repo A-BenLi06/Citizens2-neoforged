@@ -3,6 +3,10 @@
 Recorded 2026-10-22, UTC+08:00. Extends
 [retained receipt recovery](commerce-dependent-recovery-2026-10-22.md).
 
+Subsequent work: [prerequisite admission](commerce-reward-graph-admission-2026-10-22.md)
+extends the boundary recorded here through native dependencies and optional tasks.
+This document and its validation manifest retain the original same-quest results.
+
 ## Confirmed failure
 
 On `043dd90`, a real paid/delivered commerce trade completes an owned CustomTask

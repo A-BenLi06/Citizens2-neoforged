@@ -71,13 +71,16 @@ validates every retained contributor in the relevant task/team/cycle, including
 before an already-matching projection returns. Economy 0.5.7 Commerce capability 4
 supplies owner-scoped read-only inspection without an online contributor session.
 Capability 3 remains usable when all required contributors are online; offline
-inspection requires capability 4. Native reward admission is a separate open gate.
+inspection requires capability 4. Native reward admission is described below.
 
 [Direct native reward admission](commerce-direct-reward-admission-2026-10-22.md)
 now validates those retained settlements, native definitions/cycles and absolute
 progress before item, command or monetary rewards in the bound task's own quest
-can be marked claimed. Other-quest prerequisite paths and monetary PAID journal
-inspection remain separate open gates.
+can be marked claimed. The [prerequisite extension](commerce-reward-graph-admission-2026-10-22.md)
+also validates native quest/task/chapter, sequential and started paths. FTB owns
+alternative/minimum requirements, optional-child completion and flexible
+progression. Admission evaluates filtered predicates without changing native
+progress or the dependency cache. Monetary PAID journal inspection remains open.
 
 [Offline administrator reconciliation](commerce-offline-reconciliation-2026-10-22.md)
 now validates and projects retained receipts even with no connected players,

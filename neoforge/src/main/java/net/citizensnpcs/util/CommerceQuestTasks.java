@@ -238,9 +238,9 @@ public final class CommerceQuestTasks implements AutoCloseable {
     }
     private boolean validateReward(Object nativeTeam, Object nativeReward, ServerPlayer actor) {
         return reflected(() -> {
-            String questId = (String) property(property(nativeReward, "getQuest"), "getCodeString");
-            var bindings = journal.bindings().stream().filter(binding -> binding.questId().equals(questId)).toList();
-            if (bindings.isEmpty()) return true;
+            Object quest = property(nativeReward, "getQuest");
+            var graph = new FtbCommerceRewardGraph(nativeTeam, journal.bindings());
+            if (!graph.affects(quest)) return true;
             online(actor);
             String ftb = "dev.ftb.mods.ftbquests.quest.";
             Class<?> teamType = Class.forName(ftb + "TeamData"), rewardType = Class.forName(ftb + "reward.Reward");
@@ -255,18 +255,21 @@ public final class CommerceQuestTasks implements AutoCloseable {
             Enum<?> status = (Enum<?>) teamType.getMethod("getClaimType", UUID.class, rewardType).invoke(team, actor.getUUID(), nativeReward);
             if (!status.name().equals("CAN_CLAIM")) return false;
             UUID teamId = (UUID) teamType.getMethod("getTeamId").invoke(team);
-            var entries = journal.entries().stream().filter(entry -> retained(entry) && bindings.contains(entry.binding())
-                    && entry.attribution().teamId().equals(teamId)).toList();
-            if (!entries.isEmpty()) validateEntries(provider(), entries);
-            for (Binding binding : bindings) {
-                var target = FtbQuestTasks.evidenceTarget(server, teamId, binding.taskId()); validate(binding, target);
-                journal.validateCycle(binding, teamId, target.cycle());
-                // CONFIRMED progress can trigger native automatic rewards before project() acknowledges APPLIED.
-                if (target.state().progress() != journal.total(binding, teamId, target.cycle(), false))
-                    throw new IllegalStateException("Commerce-backed reward task has unowned or unreconciled progress: " + binding.taskId());
-            }
+            graph.validate(quest, bindings -> validateRewardBindings(bindings, teamId));
             return true;
         });
+    }
+    private void validateRewardBindings(List<Binding> bindings, UUID teamId) {
+        var entries = journal.entries().stream().filter(entry -> retained(entry) && bindings.contains(entry.binding())
+                && entry.attribution().teamId().equals(teamId)).toList();
+        if (!entries.isEmpty()) validateEntries(provider(), entries);
+        for (Binding binding : bindings) {
+            var target = FtbQuestTasks.evidenceTarget(server, teamId, binding.taskId()); validate(binding, target);
+            journal.validateCycle(binding, teamId, target.cycle());
+            // CONFIRMED progress can trigger native automatic rewards before project() acknowledges APPLIED.
+            if (target.state().progress() != journal.total(binding, teamId, target.cycle(), false))
+                throw new IllegalStateException("Commerce-backed reward task has unowned or unreconciled progress: " + binding.taskId());
+        }
     }
     private record Operation(UUID actor, UUID operation) { }
     private record Observation(Position position, Object metadata, Object outcome) { }
