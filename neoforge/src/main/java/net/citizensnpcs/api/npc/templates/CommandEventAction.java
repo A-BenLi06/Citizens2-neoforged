@@ -49,7 +49,8 @@ public class CommandEventAction implements Consumer<NPC>, AutoCloseable {
     <T extends NPCEvent> CommandEventAction(Class<T> clazz, Consumer<NPC> commands,
             BiConsumer<Class<T>, Consumer<T>> registrar, Consumer<Consumer<T>> unregistrar) {
         eventClass = clazz;
-        savedCommands = commands instanceof CommandListExecutor executor ? executor.getCommands() : null;
+        savedCommands = commands != null && commands.getClass() == CommandListExecutor.class
+                ? ((CommandListExecutor) commands).getCommands() : null;
         Consumer<T> listener = event -> {
             // exact class only, so a subclass event does not trigger its parent's template commands as well
             if (event.getClass() != clazz)
@@ -165,6 +166,10 @@ public class CommandEventAction implements Consumer<NPC>, AutoCloseable {
             uuids.remove(npc.getUniqueId());
             if (uuids.isEmpty()) targets.remove(registry);
         }
+        unregisterIfUnused();
+    }
+
+    private synchronized void unregisterIfUnused() {
         if (targets.isEmpty() && registered) {
             unregister.run();
             registered = false;
@@ -258,23 +263,34 @@ public class CommandEventAction implements Consumer<NPC>, AutoCloseable {
         public void commit() {
             if (finished) throw new IllegalStateException("Template subscription transfer is finished");
             copy();
-            remove(previous);
             finished = true;
             synchronized (LIVE) { TRANSFERS.remove(candidate, this); }
+            remove(previous);
         }
 
         @Override public void close() {
             if (!finished) {
-                remove(candidate);
                 finished = true;
                 synchronized (LIVE) { TRANSFERS.remove(candidate, this); }
+                remove(candidate);
             }
         }
 
         private static void remove(NPCRegistry registry) {
+            Throwable failure = null;
             for (CommandEventAction action : liveActions()) {
-                synchronized (action) { action.targets.remove(registry); }
+                try {
+                    synchronized (action) {
+                        action.targets.remove(registry);
+                        action.unregisterIfUnused();
+                    }
+                } catch (RuntimeException | Error cleanup) {
+                    if (failure == null) failure = cleanup;
+                    else if (failure != cleanup) failure.addSuppressed(cleanup);
+                }
             }
+            if (failure instanceof RuntimeException ex) throw ex;
+            if (failure instanceof Error ex) throw ex;
         }
     }
 

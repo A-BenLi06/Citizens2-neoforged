@@ -16,7 +16,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 
-import net.citizensnpcs.api.event.NPCEvent;
 import net.citizensnpcs.api.event.NPCSpawnEvent;
 import net.citizensnpcs.api.npc.NPC;
 import net.citizensnpcs.api.npc.NPCRegistry;
@@ -150,19 +149,54 @@ class TemplateEventPersistenceTest {
 
     @Test void shutdownAdmissionPreservesDefinitionsForSaveAndStopsDispatch() {
         NPC npc = new Group().create();
+        definition("test:persisted", Map.of("on_spawn", List.of("say saved"))).apply(npc);
         var calls = new AtomicInteger();
         Consumer<NPCSpawnEvent>[] listener = new Consumer[1];
-        var commands = new CommandListExecutor(List.of("say saved")) {
-            @Override public void accept(NPC target) { calls.incrementAndGet(); }
-        };
-        var action = new CommandEventAction(NPCSpawnEvent.class, commands, (type, consumer) -> listener[0] = consumer);
+        var action = new CommandEventAction(NPCSpawnEvent.class, target -> calls.incrementAndGet(),
+                (type, consumer) -> listener[0] = consumer);
         new Template(ResourceLocation.parse("test:shutdown"), List.of(action)).apply(npc);
         var before = snapshot(npc).getValuesDeep();
+        assertTrue(before.toString().contains("say saved"));
         CommandEventAction.beginShutdown();
         listener[0].accept(new NPCSpawnEvent(npc, null, net.citizensnpcs.api.event.SpawnReason.RESPAWN));
         assertEquals(0, calls.get());
         assertEquals(before, snapshot(npc).getValuesDeep());
         assertThrows(IllegalStateException.class, () -> action.accept(npc));
+    }
+
+    @Test void customExecutorSubclassesRemainRuntimeCallbacks() {
+        NPC npc = new Group().create();
+        var action = new CommandEventAction(NPCSpawnEvent.class, new CommandListExecutor(List.of("say not equivalent")) {
+            @Override public void accept(NPC target) { throw new AssertionError("custom semantics"); }
+        }, (type, listener) -> { });
+        new Template(ResourceLocation.parse("test:custom"), List.of(action)).apply(npc);
+        assertEquals(snapshot(new Group().create()).getValuesDeep(), snapshot(npc).getValuesDeep());
+    }
+
+    @Test void transferReleasesUnusedListenersAndCleanupFailureKeepsCommittedCandidate() {
+        var oldGroup = new Group(); NPC oldNpc = oldGroup.create();
+        var nextGroup = new Group(); NPC nextNpc = nextGroup.create(oldNpc.getUniqueId());
+        var oldRemovals = new AtomicInteger();
+        var old = new CommandEventAction(NPCSpawnEvent.class, target -> { }, (type, listener) -> { },
+                listener -> {
+                    if (oldRemovals.incrementAndGet() == 1) throw new IllegalStateException("cleanup failure");
+                });
+        var key = ResourceLocation.parse("test:transfer-cleanup");
+        new Template(key, List.of(old)).apply(oldNpc);
+        var freshRemovals = new AtomicInteger();
+        var freshCalls = new AtomicInteger();
+        Consumer<NPCSpawnEvent>[] freshListener = new Consumer[1];
+        var fresh = new CommandEventAction(NPCSpawnEvent.class, target -> freshCalls.incrementAndGet(),
+                (type, listener) -> freshListener[0] = listener, listener -> freshRemovals.incrementAndGet());
+        try (var transfer = CommandEventAction.prepareRegistryTransfer(oldGroup.registry, nextGroup.registry)) {
+            new Template(key, List.of(fresh)).apply(nextNpc);
+            assertThrows(IllegalStateException.class, transfer::commit);
+        }
+        freshListener[0].accept(new NPCSpawnEvent(nextNpc, null, net.citizensnpcs.api.event.SpawnReason.RESPAWN));
+        assertEquals(1, freshCalls.get()); assertEquals(0, freshRemovals.get()); assertEquals(1, oldRemovals.get());
+        CommandEventAction.shutdown();
+        assertEquals(1, freshRemovals.get());
+        assertEquals(2, oldRemovals.get());
     }
 
     @Test void failureRegisteringLaterTemplateRollsBackTheWholeReplacement() {

@@ -5,11 +5,6 @@ import java.util.List;
 import java.util.function.Consumer;
 
 import net.citizensnpcs.api.event.DespawnReason;
-import net.citizensnpcs.api.event.NPCDamageEvent;
-import net.citizensnpcs.api.event.NPCDeathEvent;
-import net.citizensnpcs.api.event.NPCLeftClickEvent;
-import net.citizensnpcs.api.event.NPCRightClickEvent;
-import net.citizensnpcs.api.event.NPCSpawnEvent;
 import net.citizensnpcs.api.npc.NPC;
 import net.citizensnpcs.api.npc.templates.TemplateRegistry.TemplateErrorReporter;
 import net.citizensnpcs.api.persistence.PersistenceLoader;

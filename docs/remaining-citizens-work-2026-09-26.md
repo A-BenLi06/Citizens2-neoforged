@@ -93,7 +93,7 @@ Recent follow-ups cover [`powered`, `name` and `home` options](command-options-h
 
 - [Template event reapplication](template-event-reapplication-2026-10-06.md) replaces the same template's old event bindings on the reapplied NPC, preserves other subscriptions and rolls back failed registration. Candidate registry publication respects explicit reapplication. Applied command bindings now persist across restart without replaying `on_template_apply`; see [template event persistence](template-event-persistence-2026-10-24.md). Runtime-only callbacks remain provider-owned.
 
-- [Registry-scoped template events](template-event-registry-2026-10-06.md) isolate identical UUIDs across registries and transfer subscriptions through reload/default-store replacement with preparation rollback. Definition reapplication is covered by the follow-up above; persistent application records remain separate work.
+- [Registry-scoped template events](template-event-registry-2026-10-06.md) isolate identical UUIDs across registries and transfer subscriptions through reload/default-store replacement with preparation rollback. The [October 24 persistence follow-up](template-event-persistence-2026-10-24.md) now saves applied built-in event command definitions and restores them across full restart. Both supported targets pass 836 ordinary tests and 63 native seed/restart checks each. Legacy missing-provenance saves require explicit reapplication.
 
 - [Template event shutdown](template-event-shutdown-2026-10-06.md) unregisters active and superseded template consumers, rejects subscriptions during shutdown and keeps old action objects closed across lifetimes. Registry migration and explicit reapplication are covered by the follow-ups above.
 

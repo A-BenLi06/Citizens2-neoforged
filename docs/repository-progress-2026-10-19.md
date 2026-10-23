@@ -1,5 +1,13 @@
 # Repository progress review
 
+Update 2026-10-24, UTC+08:00: [template event persistence](template-event-persistence-2026-10-24.md)
+now has complete ordinary build/test runs (836 tests per target) and 126 native
+seed/restart checks on 21.1.233/21.1.248. Stopped NPC YAML and scoreboard NBT are
+independently verified; ordinary production classes match the fixture classes.
+The latest explicit reapplication survives normal shutdown without one-time
+command/YAML replay. Listener retirement and custom callback semantics have focused
+regressions. This supersedes earlier unit-only and pending template-restart clauses.
+
 Scope update 2026-10-24, UTC+08:00: the user's [current instruction](core-completion-scope-2026-10-24.md)
 prioritizes Citizens core on 1.21.1 and stable native extension interfaces.
 Individual provider implementations and full acceptance are no longer completion

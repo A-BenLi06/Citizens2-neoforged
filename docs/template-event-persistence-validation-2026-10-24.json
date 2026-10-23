@@ -1,0 +1,1395 @@
+{
+  "recordedAt": "2026-10-24T00:58:50.712160+08:00",
+  "minecraft": "1.21.1",
+  "targets": [
+    {
+      "neoForge": "21.1.233",
+      "tests": {
+        "tests": 836,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "suites": 116,
+      "focusedTests": 8,
+      "reports": [
+        {
+          "path": "artifacts/template-events-core-build/test-results/test/TEST-net.citizensnpcs.api.ai.BehaviorRemovalTest.xml",
+          "bytes": 1173,
+          "sha256": "b4ea6f1ca75d8a8858fb73a5d01d0d296ed652cb24f001500b8cacb388d57f18"
+        },
+        {
+          "path": "artifacts/template-events-core-build/test-results/test/TEST-net.citizensnpcs.api.ai.CoalescedBehaviorTest.xml",
+          "bytes": 1061,
+          "sha256": "01fb8b684e8d7974f8a13406cd176f8f217b9ad5b77927c75caa9f973440b28e"
+        },
+        {
+          "path": "artifacts/template-events-core-build/test-results/test/TEST-net.citizensnpcs.api.ai.IfElseResetTest.xml",
+          "bytes": 482,
+          "sha256": "4562021191e51a713047987c67c958f5ae369597db3935b3aa2bbab4a41454d5"
+        },
+        {
+          "path": "artifacts/template-events-core-build/test-results/test/TEST-net.citizensnpcs.api.ai.ParallelBehaviorLifecycleTest.xml",
+          "bytes": 957,
+          "sha256": "0cebc33f0753d396e7ca6b23546b81f678e249cf5f5981fcc87a7f012eb1f761"
+        },
+        {
+          "path": "artifacts/template-events-core-build/test-results/test/TEST-net.citizensnpcs.api.ai.ParallelCompositeTest.xml",
+          "bytes": 909,
+          "sha256": "0a19e753483463321e337f4abf06ca114ba6c0665667a605f5252dd0d7ed7b22"
+        },
+        {
+          "path": "artifacts/template-events-core-build/test-results/test/TEST-net.citizensnpcs.api.ai.SelectorTerminalResetTest.xml",
+          "bytes": 651,
+          "sha256": "c405284f5797e71c92029d7d950f9d9cbf02fe29579c0edaac403a26bcc52743"
+        },
+        {
+          "path": "artifacts/template-events-core-build/test-results/test/TEST-net.citizensnpcs.api.ai.SequenceRemovalTest.xml",
+          "bytes": 902,
+          "sha256": "4f64631af0189b1ee98042c77606b51a1c81444f7049717488e71677b52d0bee"
+        },
+        {
+          "path": "artifacts/template-events-core-build/test-results/test/TEST-net.citizensnpcs.api.ai.SequenceResetCallbackTest.xml",
+          "bytes": 656,
+          "sha256": "4976859adee53dd09a1e485a5a7d08abbbcdf6512e5c80be9bc7bdbc5e0ae538"
+        },
+        {
+          "path": "artifacts/template-events-core-build/test-results/test/TEST-net.citizensnpcs.api.ai.TimeoutDecoratorTest.xml",
+          "bytes": 2041,
+          "sha256": "d022aae198f95dda0e1cd35235ddb52b367e7475fd0573d9722a790c40c45ed9"
+        },
+        {
+          "path": "artifacts/template-events-core-build/test-results/test/TEST-net.citizensnpcs.api.ai.tree.BehaviorContextTest.xml",
+          "bytes": 1388,
+          "sha256": "2eb0f341f0554aa0079c0729766fc40df8243f9bccc6f185aa30e966f349136b"
+        },
+        {
+          "path": "artifacts/template-events-core-build/test-results/test/TEST-net.citizensnpcs.api.ai.tree.BehaviorSignalsTest.xml",
+          "bytes": 1252,
+          "sha256": "0af2f03ef16730c9629edd1b9b2481252e9a3261f4ba1171b34afaa3da09ea54"
+        },
+        {
+          "path": "artifacts/template-events-core-build/test-results/test/TEST-net.citizensnpcs.api.ai.tree.BlockBehaviorInputTest.xml",
+          "bytes": 814,
+          "sha256": "474d5ddc1e4fff1447ab8a43811b736696949a0eb4fca681319f82c08bcdeabf"
+        },
+        {
+          "path": "artifacts/template-events-core-build/test-results/test/TEST-net.citizensnpcs.api.ai.tree.CooldownBehaviorTest.xml",
+          "bytes": 781,
+          "sha256": "e9e8f99bba21ea9a2e77da1aaceae16cebe9e7a6e7716ec47d6b560454f2f787"
+        },
+        {
+          "path": "artifacts/template-events-core-build/test-results/test/TEST-net.citizensnpcs.api.ai.tree.DecoratorTest.xml",
+          "bytes": 935,
+          "sha256": "ca5654528ad8889c1ab6e78d3ca940e78fd97460138d83a29a299bc5d8ce0503"
+        },
+        {
+          "path": "artifacts/template-events-core-build/test-results/test/TEST-net.citizensnpcs.api.ai.tree.IfElseLifecycleTest.xml",
+          "bytes": 906,
+          "sha256": "f28813322d9bcb96dfd299f6a4a8613ada75e98dd8c798e6205d8609d8371993"
+        },
+        {
+          "path": "artifacts/template-events-core-build/test-results/test/TEST-net.citizensnpcs.api.ai.tree.LoopTest.xml",
+          "bytes": 1301,
+          "sha256": "819ad7fac5f0ae65f77ad7f1328f6af72e58a92ef2f5bb246f087ec1a7e43bbb"
+        },
+        {
+          "path": "artifacts/template-events-core-build/test-results/test/TEST-net.citizensnpcs.api.ai.tree.RepeatTest.xml",
+          "bytes": 1592,
+          "sha256": "354d0c35f68239d9a0be2194c52c1eed73205f84a15890066e00640b1b714d2f"
+        },
+        {
+          "path": "artifacts/template-events-core-build/test-results/test/TEST-net.citizensnpcs.api.ai.tree.RetryDecoratorTest.xml",
+          "bytes": 1981,
+          "sha256": "edf5dffd8fcc2412f7a1db744a1cccc8895e74b2c581d262a67fce8f612d0f32"
+        },
+        {
+          "path": "artifacts/template-events-core-build/test-results/test/TEST-net.citizensnpcs.api.ai.tree.SignalTargetIdTest.xml",
+          "bytes": 788,
+          "sha256": "4183062d57dcf6e5dc60c06f6bbffcec3ab2832a71ce36673e310348b69357c6"
+        },
+        {
+          "path": "artifacts/template-events-core-build/test-results/test/TEST-net.citizensnpcs.api.ai.tree.StatusMapperTest.xml",
+          "bytes": 801,
+          "sha256": "c3f4857ef4ac8b12eb07208a272dc061219571eaa66348e576adcc01a145163f"
+        },
+        {
+          "path": "artifacts/template-events-core-build/test-results/test/TEST-net.citizensnpcs.api.ai.tree.TimerDecoratorTest.xml",
+          "bytes": 1878,
+          "sha256": "414d3173ff07329ebd1231359bb8e6815fae929606592a0066d2b227a7295a2c"
+        },
+        {
+          "path": "artifacts/template-events-core-build/test-results/test/TEST-net.citizensnpcs.api.ai.tree.WaitBehaviorTest.xml",
+          "bytes": 1333,
+          "sha256": "81f7d171ae5d3756a8df17501cb5f3ec310c2441749fc562cd8add1004c0407c"
+        },
+        {
+          "path": "artifacts/template-events-core-build/test-results/test/TEST-net.citizensnpcs.api.ai.tree.WaitForSignalTest.xml",
+          "bytes": 940,
+          "sha256": "709de79e3450df1ae92403782b3c0c502ea28ab99bca055de8f33c61448a3350"
+        },
+        {
+          "path": "artifacts/template-events-core-build/test-results/test/TEST-net.citizensnpcs.api.ai.tree.WaitUntilBehaviorTest.xml",
+          "bytes": 1546,
+          "sha256": "5a766727a9b7d291ed996a6e73355a02113b472c57445a4407ac0baaf5cb695f"
+        },
+        {
+          "path": "artifacts/template-events-core-build/test-results/test/TEST-net.citizensnpcs.api.ai.tree.WalkToValidationTest.xml",
+          "bytes": 797,
+          "sha256": "2a5d30b7e201d7213c91f79de9db8cf75a15757fc869e5a069bd59cbc4531cbd"
+        },
+        {
+          "path": "artifacts/template-events-core-build/test-results/test/TEST-net.citizensnpcs.api.ai.tree.WanderBehaviorTest.xml",
+          "bytes": 635,
+          "sha256": "9fefd247b2a8e082bfa5bfe8af34af204204c48df19b1b3a1773a15f6bc80ac7"
+        },
+        {
+          "path": "artifacts/template-events-core-build/test-results/test/TEST-net.citizensnpcs.api.command.CommandContextQuotingTest.xml",
+          "bytes": 672,
+          "sha256": "a66df6d0d39137096e27673621ee836cd67426e0cba713fac1640c478901c2ef"
+        },
+        {
+          "path": "artifacts/template-events-core-build/test-results/test/TEST-net.citizensnpcs.api.command.CommandLocationTest.xml",
+          "bytes": 1196,
+          "sha256": "cbaaf72b929a378337a24bcf67cb30ff7ffb5a08a1230d685e08920ffb461694"
+        },
+        {
+          "path": "artifacts/template-events-core-build/test-results/test/TEST-net.citizensnpcs.api.command.NPCCommandTargetTest.xml",
+          "bytes": 1121,
+          "sha256": "9cce394be1496645ff1c8f305c81f9f38b51081c1fb5b0045917b8c63fed7342"
+        },
+        {
+          "path": "artifacts/template-events-core-build/test-results/test/TEST-net.citizensnpcs.api.command.StrictCommandArgumentsTest.xml",
+          "bytes": 630,
+          "sha256": "68a16c61a1931123b3e2d8fb0a47dd74dd6f95943b9db0bcdb7141063f5f7ac6"
+        },
+        {
+          "path": "artifacts/template-events-core-build/test-results/test/TEST-net.citizensnpcs.api.expr.ExpressionRegistryTest.xml",
+          "bytes": 11673,
+          "sha256": "d278ebc3460aca77638a05ad2f2ba215fa964234ade6b3cd0639e540aa202859"
+        },
+        {
+          "path": "artifacts/template-events-core-build/test-results/test/TEST-net.citizensnpcs.api.expr.ExpressionScopeTest.xml",
+          "bytes": 2214,
+          "sha256": "83331bedfa363e2d2bbfbda199105eda352855e025ec309a1ebd220f7651a5f5"
+        },
+        {
+          "path": "artifacts/template-events-core-build/test-results/test/TEST-net.citizensnpcs.api.expr.MemoryCharacterTest.xml",
+          "bytes": 648,
+          "sha256": "4ededff2bf7b5c7fdcbf9d6dff5f7b9ddf7f07c77874b03e180448855af59b11"
+        },
+        {
+          "path": "artifacts/template-events-core-build/test-results/test/TEST-net.citizensnpcs.api.expr.MemoryKeyIdentityTest.xml",
+          "bytes": 794,
+          "sha256": "df825521543a21414df2ade5d7cc412ac38b264972031dde4eb72d616c506142"
+        },
+        {
+          "path": "artifacts/template-events-core-build/test-results/test/TEST-net.citizensnpcs.api.expr.MemoryKeysTest.xml",
+          "bytes": 919,
+          "sha256": "a15711cb81fc593d35320b5bf29b614dd5fb463348676b94c35246aeb3c37ebd"
+        },
+        {
+          "path": "artifacts/template-events-core-build/test-results/test/TEST-net.citizensnpcs.api.expr.MemoryListPersistenceTest.xml",
+          "bytes": 1110,
+          "sha256": "4804bfb7331526a98192095e8ad667d15c932fba9d4f544990b8c0fd33fec399"
+        },
+        {
+          "path": "artifacts/template-events-core-build/test-results/test/TEST-net.citizensnpcs.api.expr.MemoryListQueriesTest.xml",
+          "bytes": 779,
+          "sha256": "78d715dccdf0d75aa3311cbe41d89e46d477337110905667c775ed1fd28a834a"
+        },
+        {
+          "path": "artifacts/template-events-core-build/test-results/test/TEST-net.citizensnpcs.api.gui.InventoryMenuTest.xml",
+          "bytes": 1975,
+          "sha256": "77559ee5a300ceb1a4cff3a9d9d70e55a6933fe91d80d9f6e7f026c0491b2f72"
+        },
+        {
+          "path": "artifacts/template-events-core-build/test-results/test/TEST-net.citizensnpcs.api.hpastar.HPAGraphTest.xml",
+          "bytes": 2641,
+          "sha256": "2cd60dfca46ef5f7a65a3cbb2a2d8e41521054c75121b86437baa016169750cd"
+        },
+        {
+          "path": "artifacts/template-events-core-build/test-results/test/TEST-net.citizensnpcs.api.npc.NPCDataStoreTest.xml",
+          "bytes": 4317,
+          "sha256": "abf846d08293772723d393eac16bf3f484b4ea031a6ff78898fc3a4d9b656ab6"
+        },
+        {
+          "path": "artifacts/template-events-core-build/test-results/test/TEST-net.citizensnpcs.api.npc.templates.CommandEventRegistrationTest.xml",
+          "bytes": 1536,
+          "sha256": "a9d80404be23a8d4db201b029ede84c469cb332a6ca673f4623f6db32513d6a6"
+        },
+        {
+          "path": "artifacts/template-events-core-build/test-results/test/TEST-net.citizensnpcs.api.npc.templates.TemplateApplicationLifecycleTest.xml",
+          "bytes": 2526,
+          "sha256": "873352f0547fec8e6d367bbc57d9c81bdc76c3dc0bed1ff71c5e220a0c5d9d0a"
+        },
+        {
+          "path": "artifacts/template-events-core-build/test-results/test/TEST-net.citizensnpcs.api.npc.templates.TemplateEventPersistenceTest.xml",
+          "bytes": 1766,
+          "sha256": "91bac2b98ab3014999077e1dbcb513705e2c354ebb93a7c8b686d906ea070f53"
+        },
+        {
+          "path": "artifacts/template-events-core-build/test-results/test/TEST-net.citizensnpcs.api.npc.templates.TemplateEventReplacementTest.xml",
+          "bytes": 1043,
+          "sha256": "3a891f907a195686b776f9eca775f40124eb04b80079df6b3acda8ff0db2d0ad"
+        },
+        {
+          "path": "artifacts/template-events-core-build/test-results/test/TEST-net.citizensnpcs.api.npc.templates.TemplateGenerationTest.xml",
+          "bytes": 2365,
+          "sha256": "7f721d3d51ff8013dc177a7ea30a77bd248683486a417e320ba5a8d84c8849a0"
+        },
+        {
+          "path": "artifacts/template-events-core-build/test-results/test/TEST-net.citizensnpcs.api.npc.templates.TemplateMigrationTest.xml",
+          "bytes": 3415,
+          "sha256": "777dfa77ad5ccb47011a8b094edd7040ca8fdb3a4b20392d5f75ccccab1ecba0"
+        },
+        {
+          "path": "artifacts/template-events-core-build/test-results/test/TEST-net.citizensnpcs.api.npc.templates.TemplateRegistryReloadTest.xml",
+          "bytes": 45017,
+          "sha256": "f2a7857e04967ae7975433e54a9b218cf191ea26a1cbb5ef4ab7694349f02d90"
+        },
+        {
+          "path": "artifacts/template-events-core-build/test-results/test/TEST-net.citizensnpcs.api.npc.templates.TemplateWorkspaceTest.xml",
+          "bytes": 799,
+          "sha256": "82d310a1cb9997118f2594431449786443ed303a9acae1a7f455002ce3e4e371"
+        },
+        {
+          "path": "artifacts/template-events-core-build/test-results/test/TEST-net.citizensnpcs.api.npc.templates.TraitTemplateFormTest.xml",
+          "bytes": 1665,
+          "sha256": "5eee4d5ff84bfaeec753fa921e8613a4ac134fd765cad9b8b64d63515a9e9904"
+        },
+        {
+          "path": "artifacts/template-events-core-build/test-results/test/TEST-net.citizensnpcs.api.npc.templates.YamlReplacementActionTest.xml",
+          "bytes": 1935,
+          "sha256": "513c77321c0a11f43a89ea67255b56785f5b602a4a877aedf6427833448dbd9c"
+        },
+        {
+          "path": "artifacts/template-events-core-build/test-results/test/TEST-net.citizensnpcs.api.npc.templates.YamlReplacementValidationTest.xml",
+          "bytes": 829,
+          "sha256": "d1fed9883e2edde4e35b9e3f11ab1bb11c056db5eddadd1b622f1c5e42218522"
+        },
+        {
+          "path": "artifacts/template-events-core-build/test-results/test/TEST-net.citizensnpcs.api.persistence.LocationWorldNameTest.xml",
+          "bytes": 930,
+          "sha256": "bdccbd2c7eeaa16b6d6b4c57094efab589e52d38fd5aeee9d1235f1aa0e49322"
+        },
+        {
+          "path": "artifacts/template-events-core-build/test-results/test/TEST-net.citizensnpcs.api.persistence.PersistenceDelegateFailureTest.xml",
+          "bytes": 869,
+          "sha256": "1ef386e36e248f6a59549d5f6a2780120927efda36e3798c94c16c158bdf12a5"
+        },
+        {
+          "path": "artifacts/template-events-core-build/test-results/test/TEST-net.citizensnpcs.api.persistence.PersistenceLoaderLegacyValuesTest.xml",
+          "bytes": 10998,
+          "sha256": "4142a1db394d2432d9c978223cd0d1031864c27fa7a2dc65c04a3caa67521fc8"
+        },
+        {
+          "path": "artifacts/template-events-core-build/test-results/test/TEST-net.citizensnpcs.api.persistence.PersistenceMapKeysTest.xml",
+          "bytes": 819,
+          "sha256": "2258c770472ed65471fa56f9ccd1e83760635e2f5191cf4a98762984a0a0b8bf"
+        },
+        {
+          "path": "artifacts/template-events-core-build/test-results/test/TEST-net.citizensnpcs.api.persistence.StrictPersistenceTest.xml",
+          "bytes": 513,
+          "sha256": "e275c760b8ce58f21ba2ac2a89c6353792be0f0444df13da7470fcf8ec38f8d4"
+        },
+        {
+          "path": "artifacts/template-events-core-build/test-results/test/TEST-net.citizensnpcs.api.util.DurationConversionTest.xml",
+          "bytes": 764,
+          "sha256": "736b4d8619b07c821be33cd57c1391018fa8b1e819d3c5768e5dba641fe96a37"
+        },
+        {
+          "path": "artifacts/template-events-core-build/test-results/test/TEST-net.citizensnpcs.api.util.DurationParsingTest.xml",
+          "bytes": 892,
+          "sha256": "f6f0e8dd47123851f4d56af0a9bfeb0676dae557c1647d110fe7017a79ad4256"
+        },
+        {
+          "path": "artifacts/template-events-core-build/test-results/test/TEST-net.citizensnpcs.api.util.ItemStorageTest.xml",
+          "bytes": 3195,
+          "sha256": "193d781b12f6599b18eaa57bc6efb2cae4fb9c017bbb28b85e2ac7c028b22193"
+        },
+        {
+          "path": "artifacts/template-events-core-build/test-results/test/TEST-net.citizensnpcs.api.util.LegacyBukkitMetaTest.xml",
+          "bytes": 3376,
+          "sha256": "d507cb3704f374bcb37b0f05bb22bbca5b7757769b71bb2094ff09f8406afb45"
+        },
+        {
+          "path": "artifacts/template-events-core-build/test-results/test/TEST-net.citizensnpcs.api.util.LegacyBukkitMetaTypesTest.xml",
+          "bytes": 3701,
+          "sha256": "32f02f38bd332b10e0d0de575726885b34a431a1fa24f6272ad273be8e83d8c2"
+        },
+        {
+          "path": "artifacts/template-events-core-build/test-results/test/TEST-net.citizensnpcs.api.util.LegacyFireworksTest.xml",
+          "bytes": 4313,
+          "sha256": "3df93e4068e98c354e246242ada5550c0c71618aeca2ec69696de454e537bbac"
+        },
+        {
+          "path": "artifacts/template-events-core-build/test-results/test/TEST-net.citizensnpcs.api.util.LegacyStructuredItemsTest.xml",
+          "bytes": 5172,
+          "sha256": "191fb8a05c89c5d0d31f6b5b3ea3787d88e5693a4f0d50295f00f994b466d218"
+        },
+        {
+          "path": "artifacts/template-events-core-build/test-results/test/TEST-net.citizensnpcs.api.util.MemoryDataKeyCopyTest.xml",
+          "bytes": 662,
+          "sha256": "fa2614b2907427fc35cb7c8d4f48f91c200161a2ae8a7a7141c22e3dcb0622a4"
+        },
+        {
+          "path": "artifacts/template-events-core-build/test-results/test/TEST-net.citizensnpcs.api.util.MemoryDataKeyTransactionTest.xml",
+          "bytes": 2180,
+          "sha256": "f83f78d9346bfaa29bb926090f5fa3bae7a70cca3e7cb9e085e89d90b8cab932"
+        },
+        {
+          "path": "artifacts/template-events-core-build/test-results/test/TEST-net.citizensnpcs.api.util.NPCCommandFormatTest.xml",
+          "bytes": 1459,
+          "sha256": "1c8eca6fee9d8b93f68675c3e409e3caecbb5d16887a4384988126460c98402d"
+        },
+        {
+          "path": "artifacts/template-events-core-build/test-results/test/TEST-net.citizensnpcs.api.util.PermissionDefaultsTest.xml",
+          "bytes": 1108,
+          "sha256": "f25b46d4b4560602447131918ff7915580250267e6a4efdf903ea13ac5b45b0a"
+        },
+        {
+          "path": "artifacts/template-events-core-build/test-results/test/TEST-net.citizensnpcs.api.util.schedulers.adapter.NeoForgeSchedulerTest.xml",
+          "bytes": 1013,
+          "sha256": "eb2459edbe173196173a90d26b44179270cb858775057e2d3d3e7438f27178ad"
+        },
+        {
+          "path": "artifacts/template-events-core-build/test-results/test/TEST-net.citizensnpcs.api.util.StoredItemListTest.xml",
+          "bytes": 2730,
+          "sha256": "48cc5dad67bfee1365f501f912af0e7319735f0ed4ad99bb50e523f068532e4d"
+        },
+        {
+          "path": "artifacts/template-events-core-build/test-results/test/TEST-net.citizensnpcs.api.util.StoredItemsTest.xml",
+          "bytes": 2992,
+          "sha256": "4eaaa64a17c4cee0f23004f860e1e2ad014fc1e8ca3c018e10652b87a458e2fd"
+        },
+        {
+          "path": "artifacts/template-events-core-build/test-results/test/TEST-net.citizensnpcs.api.util.TextParserTest.xml",
+          "bytes": 3408,
+          "sha256": "b5e4a4a6e7c1785eb7c29fc52e211741335491794b7472d6a933bb2a7bf58af2"
+        },
+        {
+          "path": "artifacts/template-events-core-build/test-results/test/TEST-net.citizensnpcs.api.util.TranslatorFormatTest.xml",
+          "bytes": 841,
+          "sha256": "0dfd8d74b37487e7a80dcaa1b38a46e7f710dcf2302322d707b6fb49e7a13315"
+        },
+        {
+          "path": "artifacts/template-events-core-build/test-results/test/TEST-net.citizensnpcs.api.util.TriggerAddInputTest.xml",
+          "bytes": 767,
+          "sha256": "91d6bc9e7c800eb22f151dfbe338b0e549e85b8b352226e28864b1ddb402b0a2"
+        },
+        {
+          "path": "artifacts/template-events-core-build/test-results/test/TEST-net.citizensnpcs.api.util.YamlStorageRoundTripTest.xml",
+          "bytes": 59910,
+          "sha256": "dfda0b0d54ebe0c8b6b9a54443e9c234e6320d77516d7a2858366dc45cbe42af"
+        },
+        {
+          "path": "artifacts/template-events-core-build/test-results/test/TEST-net.citizensnpcs.api.util.YamlStorageWriteTest.xml",
+          "bytes": 4032,
+          "sha256": "d75ed7647d00a65ba1af49846f52985316593afbf9fee608bd9827eea26d3590"
+        },
+        {
+          "path": "artifacts/template-events-core-build/test-results/test/TEST-net.citizensnpcs.commands.EntityCommandParsingTest.xml",
+          "bytes": 666,
+          "sha256": "dd0d4e9c08c5ce9589dc17b63a012b5ab764ead33a4117d3d242c388a60cefda"
+        },
+        {
+          "path": "artifacts/template-events-core-build/test-results/test/TEST-net.citizensnpcs.commands.history.CommandHistoryTest.xml",
+          "bytes": 1277,
+          "sha256": "591d82b0459ccb3eefa0db44701a5c57a320f8874a333e7e6fece25d9351c75b"
+        },
+        {
+          "path": "artifacts/template-events-core-build/test-results/test/TEST-net.citizensnpcs.commands.PresentationCommandParsingTest.xml",
+          "bytes": 1002,
+          "sha256": "2740128e9d2352bd12c948eb48349e3ebae1b895abd51e5d43533bbba46d4397"
+        },
+        {
+          "path": "artifacts/template-events-core-build/test-results/test/TEST-net.citizensnpcs.commands.TemplateCommandValidationTest.xml",
+          "bytes": 510,
+          "sha256": "ea0018b708ecca7bccb07537871f6c59752e325a35fcf31fafc9b2504b6e7dbc"
+        },
+        {
+          "path": "artifacts/template-events-core-build/test-results/test/TEST-net.citizensnpcs.npc.ai.tree.BehaviorCommandFlagsTest.xml",
+          "bytes": 790,
+          "sha256": "4624245601a213b1ca12176c39c867e49633c5930af9c78424525b39f617aa6b"
+        },
+        {
+          "path": "artifacts/template-events-core-build/test-results/test/TEST-net.citizensnpcs.npc.ai.tree.BehaviorTreeParserTest.xml",
+          "bytes": 9168,
+          "sha256": "b44e40bb8ce88d0874ac460ab980e888d928dd680922ea92e0ac202f340a2072"
+        },
+        {
+          "path": "artifacts/template-events-core-build/test-results/test/TEST-net.citizensnpcs.npc.ai.tree.MolangMemoryBindingTest.xml",
+          "bytes": 1448,
+          "sha256": "3124d450e41eabdccc4889716e8d6938de64669886f27331b6170a49025b3be1"
+        },
+        {
+          "path": "artifacts/template-events-core-build/test-results/test/TEST-net.citizensnpcs.npc.ai.tree.MolangScopeIsolationTest.xml",
+          "bytes": 12098,
+          "sha256": "7270655c4967abeda452ca9855cbd1fa06d7a0202bad75047eeb382e85f0eedb"
+        },
+        {
+          "path": "artifacts/template-events-core-build/test-results/test/TEST-net.citizensnpcs.npc.skin.SkinCacheReloadTest.xml",
+          "bytes": 1195,
+          "sha256": "d59340fc3c28ac823f6782fc016f163a668801d7ba4ecd3f44c25cf0b3030b89"
+        },
+        {
+          "path": "artifacts/template-events-core-build/test-results/test/TEST-net.citizensnpcs.SettingsTest.xml",
+          "bytes": 35771,
+          "sha256": "d488fec4a6c79e8fde46583f13db28ee70a8d61c8026fdb175479453a73e0b19"
+        },
+        {
+          "path": "artifacts/template-events-core-build/test-results/test/TEST-net.citizensnpcs.trait.HologramItemTest.xml",
+          "bytes": 898,
+          "sha256": "07e5ead9bd2d752eb800417bfdcb04d094b8ac6367f7b9ac530cb593473d6574"
+        },
+        {
+          "path": "artifacts/template-events-core-build/test-results/test/TEST-net.citizensnpcs.trait.SentinelTargetMatchingTest.xml",
+          "bytes": 1138,
+          "sha256": "adfee37ed203a1347974e6fd4d564fc646d5b95c71a99ad9dfbe1ff030abbb17"
+        },
+        {
+          "path": "artifacts/template-events-core-build/test-results/test/TEST-net.citizensnpcs.trait.shop.ExperienceArithmeticTest.xml",
+          "bytes": 773,
+          "sha256": "3ec5ccbef0ed987fa146704d68b607e7f94d9a0b21a2aee38a222cec76e56086"
+        },
+        {
+          "path": "artifacts/template-events-core-build/test-results/test/TEST-net.citizensnpcs.trait.shop.InventoryPublicationRecoveryTest.xml",
+          "bytes": 1504,
+          "sha256": "c1df610fd4aa9f28f446b43de020794ea22175b01de21b9afa784def6ccf9144"
+        },
+        {
+          "path": "artifacts/template-events-core-build/test-results/test/TEST-net.citizensnpcs.trait.shop.InventoryTransactionIsolationTest.xml",
+          "bytes": 1199,
+          "sha256": "7e393762c7af7bab3b7ea4e0c2ef2b673269d4c8446c46bdccb7fa37d0ea2017"
+        },
+        {
+          "path": "artifacts/template-events-core-build/test-results/test/TEST-net.citizensnpcs.trait.shop.ItemActionTest.xml",
+          "bytes": 1581,
+          "sha256": "1e1019715bf3bb07a0d03a0da073387965150fa937c8560f4a8dba98bba208f6"
+        },
+        {
+          "path": "artifacts/template-events-core-build/test-results/test/TEST-net.citizensnpcs.trait.shop.ItemQuantityTest.xml",
+          "bytes": 1433,
+          "sha256": "272711242a365a8b326a78d412ef916b8ede641ef5eb4b46769929f4c87b13a0"
+        },
+        {
+          "path": "artifacts/template-events-core-build/test-results/test/TEST-net.citizensnpcs.trait.shop.ItemReceiptTest.xml",
+          "bytes": 1208,
+          "sha256": "c069110f0ef7facc56dd46141c709dcb364b4b40debfa77421cca1ada7c38eea"
+        },
+        {
+          "path": "artifacts/template-events-core-build/test-results/test/TEST-net.citizensnpcs.trait.shop.MoneyArithmeticTest.xml",
+          "bytes": 900,
+          "sha256": "273c91d9d4a904240e2349fd655c7eb7e12b1800ce5cb7d7c713ccb80209deb7"
+        },
+        {
+          "path": "artifacts/template-events-core-build/test-results/test/TEST-net.citizensnpcs.trait.shop.NPCShopTest.xml",
+          "bytes": 1594,
+          "sha256": "98ce0a136929aab24004f2e71c10182d934795ab59d58cbe7c28aafafbc89a85"
+        },
+        {
+          "path": "artifacts/template-events-core-build/test-results/test/TEST-net.citizensnpcs.trait.shop.ShopSessionOwnerTest.xml",
+          "bytes": 661,
+          "sha256": "0c3161c9da464d0bb68e0697dc51e9d014f32df984c005ea52ff69c9f609d8c9"
+        },
+        {
+          "path": "artifacts/template-events-core-build/test-results/test/TEST-net.citizensnpcs.trait.shop.ShopTransactionTest.xml",
+          "bytes": 1066,
+          "sha256": "3ed6090a85cd47f06be9184b8b31ce4dfb025a4007706bd620a603fa976e27a6"
+        },
+        {
+          "path": "artifacts/template-events-core-build/test-results/test/TEST-net.citizensnpcs.trait.shop.StoredShopsTest.xml",
+          "bytes": 2717,
+          "sha256": "72ba4288a7fa66fd329230eaf2e73993876b9419d9c84c0ae367e9ab83c93786"
+        },
+        {
+          "path": "artifacts/template-events-core-build/test-results/test/TEST-net.citizensnpcs.trait.text.TextEditorInputTest.xml",
+          "bytes": 769,
+          "sha256": "11e266a63b6754afb5e3adaed890574cb131c75afe613cc700acc7e28f2544ea"
+        },
+        {
+          "path": "artifacts/template-events-core-build/test-results/test/TEST-net.citizensnpcs.trait.TraitNameMappingTest.xml",
+          "bytes": 1064,
+          "sha256": "4c1b36d0f958b57ca11001e3ae73e59c0bf60276088b471132a6aa0fa5185360"
+        },
+        {
+          "path": "artifacts/template-events-core-build/test-results/test/TEST-net.citizensnpcs.trait.waypoint.triggers.NumericTriggerInputTest.xml",
+          "bytes": 867,
+          "sha256": "7713418bbac0a51dc104fba3b14932ddf4b96e9ec245458d7a977ce4966dd661"
+        },
+        {
+          "path": "artifacts/template-events-core-build/test-results/test/TEST-net.citizensnpcs.trait.waypoint.triggers.TeleportTriggerInputTest.xml",
+          "bytes": 853,
+          "sha256": "1d0ea8995e2324421b4313f02cd185696d366a34b177e4bb85faa1a99a8a28e8"
+        },
+        {
+          "path": "artifacts/template-events-core-build/test-results/test/TEST-net.citizensnpcs.trait.waypoint.triggers.WaypointTriggerSaveTest.xml",
+          "bytes": 1024,
+          "sha256": "5f2ea38a5368180fd32622b92eb1a0d664f220020f0d0af5154d442dd26267d5"
+        },
+        {
+          "path": "artifacts/template-events-core-build/test-results/test/TEST-net.citizensnpcs.util.CommerceTaskJournalTest.xml",
+          "bytes": 2374,
+          "sha256": "31bc16bd754ba826ed3934fc157f8bf8fb581a40a7714d190ae5c5ce8ca1bc61"
+        },
+        {
+          "path": "artifacts/template-events-core-build/test-results/test/TEST-net.citizensnpcs.util.DimensionLookupTest.xml",
+          "bytes": 746,
+          "sha256": "42fc6ac5366840ff5bb3bb226d15d29466a7988ecc8062be4a1d32c3d382b533"
+        },
+        {
+          "path": "artifacts/template-events-core-build/test-results/test/TEST-net.citizensnpcs.util.EconomyShopMenusTest.xml",
+          "bytes": 607,
+          "sha256": "20498b7c972d6800b776ff5b6d0e47a0ab4434b532ef132ea993bae7ced9a8fa"
+        },
+        {
+          "path": "artifacts/template-events-core-build/test-results/test/TEST-net.citizensnpcs.util.JournalRecordDecodingTest.xml",
+          "bytes": 5323,
+          "sha256": "462985341e27daee4599ea1371533921e99edd13f77a595aecfc6db6ea2ff087"
+        },
+        {
+          "path": "artifacts/template-events-core-build/test-results/test/TEST-net.citizensnpcs.util.LuckPermsGroupsTest.xml",
+          "bytes": 609,
+          "sha256": "6b4579a2afb9c59214782e4f5120d9e8e321b6abfca529a29e02177ebac588d7"
+        },
+        {
+          "path": "artifacts/template-events-core-build/test-results/test/TEST-net.citizensnpcs.util.ParadigmGroupsTest.xml",
+          "bytes": 1209,
+          "sha256": "0cb81024f3d2eab74f10b6736daae178daffe924e7b9095b50a393244698c7a6"
+        },
+        {
+          "path": "artifacts/template-events-core-build/test-results/test/TEST-net.citizensnpcs.util.ParadigmPermissionWriterTest.xml",
+          "bytes": 2856,
+          "sha256": "2a7bd323331375042be92ebc3bd52ee3870705fcd0440192238b1c2fdd3e7665"
+        },
+        {
+          "path": "artifacts/template-events-core-build/test-results/test/TEST-net.citizensnpcs.util.ProviderPlaceholderExportsTest.xml",
+          "bytes": 1093,
+          "sha256": "587eb11d51db2012fd95db220e698aa5342303fcd4edbd767f8c8533b405467e"
+        },
+        {
+          "path": "artifacts/template-events-core-build/test-results/test/TEST-net.citizensnpcs.util.QuestDeliveryJournalTest.xml",
+          "bytes": 1864,
+          "sha256": "12c1c36f01d39e77811f847ff2a959753cca2d5b581b1a82508885efdcf66326"
+        },
+        {
+          "path": "artifacts/template-events-core-build/test-results/test/TEST-net.citizensnpcs.util.QuestDeliveryStorageTest.xml",
+          "bytes": 1137,
+          "sha256": "3a2d00671e1c09b318aacc14c6103740ededc1ab67c3542d92e3e979f8173bf4"
+        },
+        {
+          "path": "artifacts/template-events-core-build/test-results/test/TEST-net.citizensnpcs.util.QuestEvidenceJournalTest.xml",
+          "bytes": 2811,
+          "sha256": "8ee9eaffa5dd1f4df58aa0a67448118e5f97b386968cbbd7f82a936a4f05d1c9"
+        },
+        {
+          "path": "artifacts/template-events-core-build/test-results/test/TEST-net.citizensnpcs.util.QuestRewardJournalTest.xml",
+          "bytes": 1539,
+          "sha256": "8380256ec2802d06ced1fdaf4b252ae62619ddfd05d615a7ed46639731a5faec"
+        },
+        {
+          "path": "artifacts/template-events-core-build/test-results/test/TEST-net.citizensnpcs.util.YuuniverseEconomyTest.xml",
+          "bytes": 1500,
+          "sha256": "c6c2ba9d79652ede8f08d5d55c12c72985ae6b11c0b3112242eb71d98c06b3d6"
+        }
+      ],
+      "native": [
+        {
+          "phase": "seed",
+          "checks": 42,
+          "log": {
+            "path": "artifacts/template-events-native-233-seed.log",
+            "bytes": 30312,
+            "sha256": "a3b94f59092ab3cbf884308fc9175ad26dcc2d853b60964669a6a3910f3f7d89"
+          },
+          "stoppedState": [
+            {
+              "path": "artifacts/template-events-fixed-233-server/evidence/seed/saves.yml",
+              "bytes": 2056,
+              "sha256": "e48261e2430dec63bc884cb63abdfff1de024c2bd054c0613458e96c65ddcc27"
+            },
+            {
+              "path": "artifacts/template-events-fixed-233-server/evidence/seed/scoreboard.dat",
+              "bytes": 299,
+              "sha256": "0381b42ccad33044338c7ee1874cfef9df1e43391eeba6a6c3aa4fcf90eefe75"
+            }
+          ]
+        },
+        {
+          "phase": "recover",
+          "checks": 21,
+          "log": {
+            "path": "artifacts/template-events-native-233-recover.log",
+            "bytes": 19674,
+            "sha256": "1c669b4fe3b2ab6603f9f2d7725dd18ef94195ccb4ebaf63ecb940f507ebf26f"
+          },
+          "stoppedState": [
+            {
+              "path": "artifacts/template-events-fixed-233-server/evidence/recover/saves.yml",
+              "bytes": 1067,
+              "sha256": "b658e8164a2dc45e5a2cd9aa01e33378013fcdb89866bc9471821182c9cd8d41"
+            },
+            {
+              "path": "artifacts/template-events-fixed-233-server/evidence/recover/scoreboard.dat",
+              "bytes": 309,
+              "sha256": "b9586946e4a4b274e2bd14c5155ec3f96389ba3e0897019068e1f8a75427c6b6"
+            }
+          ]
+        }
+      ],
+      "productionClassesMatchNative": 1024,
+      "packages": [
+        {
+          "path": "artifacts/template-events-core-build/libs/citizens-2.0.43-neoforge-SNAPSHOT-sources.jar",
+          "bytes": 1131442,
+          "sha256": "9964946b08c7cb52c33b910af2a34f0f1b2cd61ec6b4171f3242aef5c3feb8a8"
+        },
+        {
+          "path": "artifacts/template-events-core-build/libs/citizens-2.0.43-neoforge-SNAPSHOT.jar",
+          "bytes": 4101459,
+          "sha256": "574fef4bf44b425a6cda3e67000a82e1c2011c401d983676d60669bc2f3a5018"
+        },
+        {
+          "path": "artifacts/template-events-core-build/libs/yuuniverse-interactions-2.0.43-neoforge-SNAPSHOT.jar",
+          "bytes": 204146,
+          "sha256": "85181dd27147d6b575869d07f9efa363770541109a3a431a557a07f74c84e4b7"
+        }
+      ]
+    },
+    {
+      "neoForge": "21.1.248",
+      "tests": {
+        "tests": 836,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "suites": 116,
+      "focusedTests": 8,
+      "reports": [
+        {
+          "path": "artifacts/template-events-selected-build/test-results/test/TEST-net.citizensnpcs.api.ai.BehaviorRemovalTest.xml",
+          "bytes": 1172,
+          "sha256": "0d4c9b872634e951ef09dd86d87fde26ce4d8d207e556f1e6156c519f79337fa"
+        },
+        {
+          "path": "artifacts/template-events-selected-build/test-results/test/TEST-net.citizensnpcs.api.ai.CoalescedBehaviorTest.xml",
+          "bytes": 1061,
+          "sha256": "031451b260753021f083a42c275a97fa23d15a709c9fd8f5e5c3a8bb90e978c1"
+        },
+        {
+          "path": "artifacts/template-events-selected-build/test-results/test/TEST-net.citizensnpcs.api.ai.IfElseResetTest.xml",
+          "bytes": 482,
+          "sha256": "5f52de085067cffd1910ef89788234b91a9e083e59fd90e047930b42a75e9117"
+        },
+        {
+          "path": "artifacts/template-events-selected-build/test-results/test/TEST-net.citizensnpcs.api.ai.ParallelBehaviorLifecycleTest.xml",
+          "bytes": 961,
+          "sha256": "c3d746e203af738e2eb93d342b04a72c776a76195df157190112b001efa8f475"
+        },
+        {
+          "path": "artifacts/template-events-selected-build/test-results/test/TEST-net.citizensnpcs.api.ai.ParallelCompositeTest.xml",
+          "bytes": 907,
+          "sha256": "73fbb76222491e80cf3e4d2b6e9911e156d81da3a953a48c95d7fff18565bb2e"
+        },
+        {
+          "path": "artifacts/template-events-selected-build/test-results/test/TEST-net.citizensnpcs.api.ai.SelectorTerminalResetTest.xml",
+          "bytes": 651,
+          "sha256": "a7ffacaaafcc8be86af16cdc669c97e0a2c3f5e128e4d78fc2a567fe8fa0fd4e"
+        },
+        {
+          "path": "artifacts/template-events-selected-build/test-results/test/TEST-net.citizensnpcs.api.ai.SequenceRemovalTest.xml",
+          "bytes": 902,
+          "sha256": "846babb67ec9b855a22ed11fa9a70ffb6512a991c4681ff70e86fb667ab8ee3a"
+        },
+        {
+          "path": "artifacts/template-events-selected-build/test-results/test/TEST-net.citizensnpcs.api.ai.SequenceResetCallbackTest.xml",
+          "bytes": 656,
+          "sha256": "cc986d0d3368c04d25f4f9c0bda7a16eb6a75795e51530b3c84774f8ac250cf5"
+        },
+        {
+          "path": "artifacts/template-events-selected-build/test-results/test/TEST-net.citizensnpcs.api.ai.TimeoutDecoratorTest.xml",
+          "bytes": 2043,
+          "sha256": "3e3d99ad6c920b6902f31c263ef9eb88d7c0933d43fce0bb28142b1e79195c0a"
+        },
+        {
+          "path": "artifacts/template-events-selected-build/test-results/test/TEST-net.citizensnpcs.api.ai.tree.BehaviorContextTest.xml",
+          "bytes": 1388,
+          "sha256": "a909a318d728e93dfc5bf39d9a6d1493266ffb8456101f0bc3ff7bb8719d6c4c"
+        },
+        {
+          "path": "artifacts/template-events-selected-build/test-results/test/TEST-net.citizensnpcs.api.ai.tree.BehaviorSignalsTest.xml",
+          "bytes": 1253,
+          "sha256": "54e4f6e8687f54fff5fbb4cf8786bd2accd8ae81def30cab261097bddd92f76e"
+        },
+        {
+          "path": "artifacts/template-events-selected-build/test-results/test/TEST-net.citizensnpcs.api.ai.tree.BlockBehaviorInputTest.xml",
+          "bytes": 815,
+          "sha256": "5d5273dc8713be292457f19d4e05a01f8c6711624f4ec9048e1c5236690f25bc"
+        },
+        {
+          "path": "artifacts/template-events-selected-build/test-results/test/TEST-net.citizensnpcs.api.ai.tree.CooldownBehaviorTest.xml",
+          "bytes": 781,
+          "sha256": "3fabb3c354aec7bab8f584ca0a8a68906317d0e6087039382d58041e7cab6099"
+        },
+        {
+          "path": "artifacts/template-events-selected-build/test-results/test/TEST-net.citizensnpcs.api.ai.tree.DecoratorTest.xml",
+          "bytes": 935,
+          "sha256": "fda89c2c3f141dc57d2b92001396d6d160c805eb035f40cc999ee3c90c0e0fc1"
+        },
+        {
+          "path": "artifacts/template-events-selected-build/test-results/test/TEST-net.citizensnpcs.api.ai.tree.IfElseLifecycleTest.xml",
+          "bytes": 908,
+          "sha256": "51900cfbbba86297c7ee4823dc0001909dd3631723a578a9c7deae9f0701dde8"
+        },
+        {
+          "path": "artifacts/template-events-selected-build/test-results/test/TEST-net.citizensnpcs.api.ai.tree.LoopTest.xml",
+          "bytes": 1300,
+          "sha256": "afb1fba7e764f2b52d87aa231c1e5d58c93e5cb345582c04b5d965909e2c0ad3"
+        },
+        {
+          "path": "artifacts/template-events-selected-build/test-results/test/TEST-net.citizensnpcs.api.ai.tree.RepeatTest.xml",
+          "bytes": 1589,
+          "sha256": "dc341f69d7203374dee057a9390d082b926b922432f2c7e2398ad05e3aec7565"
+        },
+        {
+          "path": "artifacts/template-events-selected-build/test-results/test/TEST-net.citizensnpcs.api.ai.tree.RetryDecoratorTest.xml",
+          "bytes": 1971,
+          "sha256": "207e27714edda3fd2f5a2ccf96abce613aebb526cdaa703c5806f332e28129c4"
+        },
+        {
+          "path": "artifacts/template-events-selected-build/test-results/test/TEST-net.citizensnpcs.api.ai.tree.SignalTargetIdTest.xml",
+          "bytes": 788,
+          "sha256": "f324916750603d4ad9941b805c306d85836c88229abf63f788503c7594cbb2d9"
+        },
+        {
+          "path": "artifacts/template-events-selected-build/test-results/test/TEST-net.citizensnpcs.api.ai.tree.StatusMapperTest.xml",
+          "bytes": 801,
+          "sha256": "819c572eef8603822ee7b7945679e3d02e2e591db99f58d9009f37f855f24026"
+        },
+        {
+          "path": "artifacts/template-events-selected-build/test-results/test/TEST-net.citizensnpcs.api.ai.tree.TimerDecoratorTest.xml",
+          "bytes": 1874,
+          "sha256": "84aac70cb1901c522edc6c64e4d14951ab88fe9df0684ac955d3f5a4106b78cd"
+        },
+        {
+          "path": "artifacts/template-events-selected-build/test-results/test/TEST-net.citizensnpcs.api.ai.tree.WaitBehaviorTest.xml",
+          "bytes": 1333,
+          "sha256": "704ac2d5ba1baa45b0d8583778ac724dd2eed55ca686dce39f1043dca046afaf"
+        },
+        {
+          "path": "artifacts/template-events-selected-build/test-results/test/TEST-net.citizensnpcs.api.ai.tree.WaitForSignalTest.xml",
+          "bytes": 936,
+          "sha256": "8e2d31482ba0193fb0abe843919f41168922d7f4b8f28b8a0b0c0d8a85a6e181"
+        },
+        {
+          "path": "artifacts/template-events-selected-build/test-results/test/TEST-net.citizensnpcs.api.ai.tree.WaitUntilBehaviorTest.xml",
+          "bytes": 1547,
+          "sha256": "9bfe830b3d40a592159008fcf2e04f5c398e0ff50bc5e3d732c0ce2bbe6307f8"
+        },
+        {
+          "path": "artifacts/template-events-selected-build/test-results/test/TEST-net.citizensnpcs.api.ai.tree.WalkToValidationTest.xml",
+          "bytes": 799,
+          "sha256": "561bec3984fe658ca3ea2b57e3a41dad7aab114022db0b4f215d020a2b14a3b5"
+        },
+        {
+          "path": "artifacts/template-events-selected-build/test-results/test/TEST-net.citizensnpcs.api.ai.tree.WanderBehaviorTest.xml",
+          "bytes": 635,
+          "sha256": "8955da488968db313e0c7cc79a084b0fe3d59747f620614fe705bbe5314db88d"
+        },
+        {
+          "path": "artifacts/template-events-selected-build/test-results/test/TEST-net.citizensnpcs.api.command.CommandContextQuotingTest.xml",
+          "bytes": 672,
+          "sha256": "e1fb5e625a8789a9b60850d5763d5e4bd4edc08f429d709da657f0ba871cc574"
+        },
+        {
+          "path": "artifacts/template-events-selected-build/test-results/test/TEST-net.citizensnpcs.api.command.CommandLocationTest.xml",
+          "bytes": 1190,
+          "sha256": "b616e86365f069d388c71baebf21b0fb70a202957fcb713dc2487b5a306823a5"
+        },
+        {
+          "path": "artifacts/template-events-selected-build/test-results/test/TEST-net.citizensnpcs.api.command.NPCCommandTargetTest.xml",
+          "bytes": 1121,
+          "sha256": "cd7756ed2861392fef42ba1709d8bf9dd53f9cb47d514ffdfa7f32ebd3d69afa"
+        },
+        {
+          "path": "artifacts/template-events-selected-build/test-results/test/TEST-net.citizensnpcs.api.command.StrictCommandArgumentsTest.xml",
+          "bytes": 630,
+          "sha256": "4d9e5e984c322f51fec44548b9297c43f1ccb7479c018d2632f545e00d4344b0"
+        },
+        {
+          "path": "artifacts/template-events-selected-build/test-results/test/TEST-net.citizensnpcs.api.expr.ExpressionRegistryTest.xml",
+          "bytes": 11672,
+          "sha256": "429bed3a01ad7e97f29958a1427275284497d2b9359bae17103b7a40fd1126bf"
+        },
+        {
+          "path": "artifacts/template-events-selected-build/test-results/test/TEST-net.citizensnpcs.api.expr.ExpressionScopeTest.xml",
+          "bytes": 2216,
+          "sha256": "9fdea76b6a5bb1db177d4357c36bf8977b96a4c75f6b0f78e8da8d9d0d6c8c38"
+        },
+        {
+          "path": "artifacts/template-events-selected-build/test-results/test/TEST-net.citizensnpcs.api.expr.MemoryCharacterTest.xml",
+          "bytes": 648,
+          "sha256": "6575a596e2dfde4c436c2c7ac9f3b5533511eee88ce7f7cea926f2988982606c"
+        },
+        {
+          "path": "artifacts/template-events-selected-build/test-results/test/TEST-net.citizensnpcs.api.expr.MemoryKeyIdentityTest.xml",
+          "bytes": 796,
+          "sha256": "9659f629387c20c9747308a3434dc67d4938c161096a4c5696af10b519bc45de"
+        },
+        {
+          "path": "artifacts/template-events-selected-build/test-results/test/TEST-net.citizensnpcs.api.expr.MemoryKeysTest.xml",
+          "bytes": 921,
+          "sha256": "2deb125351ad9bca680a4bc713fb38726cf26fe09ba654d0e6750783389b948a"
+        },
+        {
+          "path": "artifacts/template-events-selected-build/test-results/test/TEST-net.citizensnpcs.api.expr.MemoryListPersistenceTest.xml",
+          "bytes": 1108,
+          "sha256": "0785bfc8d3c0999f0d18b064556afe28b38bf4c50b22da65a7944bea47eb5c76"
+        },
+        {
+          "path": "artifacts/template-events-selected-build/test-results/test/TEST-net.citizensnpcs.api.expr.MemoryListQueriesTest.xml",
+          "bytes": 779,
+          "sha256": "1593f9127e6df1219c90b63938affaa56f362b15ebbae4e805a29d9961fec3aa"
+        },
+        {
+          "path": "artifacts/template-events-selected-build/test-results/test/TEST-net.citizensnpcs.api.gui.InventoryMenuTest.xml",
+          "bytes": 1975,
+          "sha256": "fbea0cacfe112c81610f3fda92c9701aeb7b831511f9a21e30a75ab7d51e2f0b"
+        },
+        {
+          "path": "artifacts/template-events-selected-build/test-results/test/TEST-net.citizensnpcs.api.hpastar.HPAGraphTest.xml",
+          "bytes": 2638,
+          "sha256": "acbefdde65b73450dba0bbaa68767cfe1e97db624fe6ae4ef5617f163e024c31"
+        },
+        {
+          "path": "artifacts/template-events-selected-build/test-results/test/TEST-net.citizensnpcs.api.npc.NPCDataStoreTest.xml",
+          "bytes": 4316,
+          "sha256": "c2854016bc3ea61a7d3f4aa810cf1f47996c9868de3bb4026f6d33f4c67caa3f"
+        },
+        {
+          "path": "artifacts/template-events-selected-build/test-results/test/TEST-net.citizensnpcs.api.npc.templates.CommandEventRegistrationTest.xml",
+          "bytes": 1536,
+          "sha256": "21df9fb5879da6b494f00ad7130cfa4fceeedf3126f484e897c480a4aead4127"
+        },
+        {
+          "path": "artifacts/template-events-selected-build/test-results/test/TEST-net.citizensnpcs.api.npc.templates.TemplateApplicationLifecycleTest.xml",
+          "bytes": 2533,
+          "sha256": "171a6668ffcc106c339ebfe16afab96b074b982de0d1f63acffb8dd28107519b"
+        },
+        {
+          "path": "artifacts/template-events-selected-build/test-results/test/TEST-net.citizensnpcs.api.npc.templates.TemplateEventPersistenceTest.xml",
+          "bytes": 1764,
+          "sha256": "f4411f51c003bee9a750fd8381eb9eafdc25cc3ee76453153c8d374b8554f3ce"
+        },
+        {
+          "path": "artifacts/template-events-selected-build/test-results/test/TEST-net.citizensnpcs.api.npc.templates.TemplateEventReplacementTest.xml",
+          "bytes": 1042,
+          "sha256": "834d4bcd1f1bba4c32a68137ec9c7946fc9ca45805430089967e2f17a57b8987"
+        },
+        {
+          "path": "artifacts/template-events-selected-build/test-results/test/TEST-net.citizensnpcs.api.npc.templates.TemplateGenerationTest.xml",
+          "bytes": 2365,
+          "sha256": "96c50c4859344ba7baeda34890cc4188ee709cd77e595be9036779c5a8b591f5"
+        },
+        {
+          "path": "artifacts/template-events-selected-build/test-results/test/TEST-net.citizensnpcs.api.npc.templates.TemplateMigrationTest.xml",
+          "bytes": 3416,
+          "sha256": "d287248a7ffecea2d37ee9e17abe4b188ac2c9bac0f3390b1bcaba38d7dc1150"
+        },
+        {
+          "path": "artifacts/template-events-selected-build/test-results/test/TEST-net.citizensnpcs.api.npc.templates.TemplateRegistryReloadTest.xml",
+          "bytes": 45015,
+          "sha256": "0dc97a577ad9826494791c78d5b490e23446d4650d4a8be6abd1c08a8b303f0b"
+        },
+        {
+          "path": "artifacts/template-events-selected-build/test-results/test/TEST-net.citizensnpcs.api.npc.templates.TemplateWorkspaceTest.xml",
+          "bytes": 799,
+          "sha256": "369132e746ea87954435f6294c598198435ebec12be3e7ba00e577809d03a0fd"
+        },
+        {
+          "path": "artifacts/template-events-selected-build/test-results/test/TEST-net.citizensnpcs.api.npc.templates.TraitTemplateFormTest.xml",
+          "bytes": 1665,
+          "sha256": "1b304dce24d59ceaacc38ea9d7e0b4d2b575990e2e682e96cf9aa660df2da439"
+        },
+        {
+          "path": "artifacts/template-events-selected-build/test-results/test/TEST-net.citizensnpcs.api.npc.templates.YamlReplacementActionTest.xml",
+          "bytes": 1928,
+          "sha256": "26136cb5b8fb072ab7aca8c8cfc3bf5489ac7207767de690a4090cd855b5d727"
+        },
+        {
+          "path": "artifacts/template-events-selected-build/test-results/test/TEST-net.citizensnpcs.api.npc.templates.YamlReplacementValidationTest.xml",
+          "bytes": 829,
+          "sha256": "9eb3ba632d8e715eab21a03a63eb39a46c68d7dc3a63fe2d4a30e88b40c7936b"
+        },
+        {
+          "path": "artifacts/template-events-selected-build/test-results/test/TEST-net.citizensnpcs.api.persistence.LocationWorldNameTest.xml",
+          "bytes": 930,
+          "sha256": "3a8426b8063dbad8c5cfd2f30bfbda1264b72cfbeb2b422600d62f5d787a4053"
+        },
+        {
+          "path": "artifacts/template-events-selected-build/test-results/test/TEST-net.citizensnpcs.api.persistence.PersistenceDelegateFailureTest.xml",
+          "bytes": 868,
+          "sha256": "cc949a38ddebe645c4ebc9ca3b8f5bd7ce4bd7d686160151d718d6cbace9e625"
+        },
+        {
+          "path": "artifacts/template-events-selected-build/test-results/test/TEST-net.citizensnpcs.api.persistence.PersistenceLoaderLegacyValuesTest.xml",
+          "bytes": 10998,
+          "sha256": "2c0118ec70c0a3e88a56aff6736b34769f2dddc9c489fd7ac6060e5943618442"
+        },
+        {
+          "path": "artifacts/template-events-selected-build/test-results/test/TEST-net.citizensnpcs.api.persistence.PersistenceMapKeysTest.xml",
+          "bytes": 819,
+          "sha256": "d467f91e65e55b5c4e627de7cb951a703064010a387b2a51c27f0f7f884739e6"
+        },
+        {
+          "path": "artifacts/template-events-selected-build/test-results/test/TEST-net.citizensnpcs.api.persistence.StrictPersistenceTest.xml",
+          "bytes": 513,
+          "sha256": "adaa425bdf7b0c452d9082fbd1e2410d01c08e8e1e30871c00c2c21218131957"
+        },
+        {
+          "path": "artifacts/template-events-selected-build/test-results/test/TEST-net.citizensnpcs.api.util.DurationConversionTest.xml",
+          "bytes": 766,
+          "sha256": "80d7ed9d3de5ae6805093dd1537c3dcfbbc52d3d2603798134a0bc44991a0261"
+        },
+        {
+          "path": "artifacts/template-events-selected-build/test-results/test/TEST-net.citizensnpcs.api.util.DurationParsingTest.xml",
+          "bytes": 892,
+          "sha256": "28f580a8990dec41c2760433d1a8d7e22a32734aafb6e18eea4e305376a726cd"
+        },
+        {
+          "path": "artifacts/template-events-selected-build/test-results/test/TEST-net.citizensnpcs.api.util.ItemStorageTest.xml",
+          "bytes": 3196,
+          "sha256": "e8ceb3a5c64fd12b440a206c287ac81bba75044eedbf3e1d6281f939975f3454"
+        },
+        {
+          "path": "artifacts/template-events-selected-build/test-results/test/TEST-net.citizensnpcs.api.util.LegacyBukkitMetaTest.xml",
+          "bytes": 3377,
+          "sha256": "c33908a9b5ca2fa88cf7b35fd7037ae9a29ee5d266a5b2658439e03d4e4f5f87"
+        },
+        {
+          "path": "artifacts/template-events-selected-build/test-results/test/TEST-net.citizensnpcs.api.util.LegacyBukkitMetaTypesTest.xml",
+          "bytes": 3700,
+          "sha256": "ca7ced7acd460a393562fb03bdcd6cb3443f6ab02769429d0e02f81050b6b491"
+        },
+        {
+          "path": "artifacts/template-events-selected-build/test-results/test/TEST-net.citizensnpcs.api.util.LegacyFireworksTest.xml",
+          "bytes": 4313,
+          "sha256": "f8d1fc76ed337a8b41993db253e3b4f95caf94cf66eaa779f4b493e2fc06ff4a"
+        },
+        {
+          "path": "artifacts/template-events-selected-build/test-results/test/TEST-net.citizensnpcs.api.util.LegacyStructuredItemsTest.xml",
+          "bytes": 5172,
+          "sha256": "bed82b73c4dacbd7a69b3818032bf3e320d563a530cac92b0f4c723882c20e18"
+        },
+        {
+          "path": "artifacts/template-events-selected-build/test-results/test/TEST-net.citizensnpcs.api.util.MemoryDataKeyCopyTest.xml",
+          "bytes": 658,
+          "sha256": "0371fad7ba9fdd5323072ea9a40e6b01cf7001ac5b3b1825a9d1fbfcdc13528c"
+        },
+        {
+          "path": "artifacts/template-events-selected-build/test-results/test/TEST-net.citizensnpcs.api.util.MemoryDataKeyTransactionTest.xml",
+          "bytes": 2179,
+          "sha256": "d6fa1c38f28d1d8938a6a0df95bcd5ed55198620d14602d32c046f83168c8f23"
+        },
+        {
+          "path": "artifacts/template-events-selected-build/test-results/test/TEST-net.citizensnpcs.api.util.NPCCommandFormatTest.xml",
+          "bytes": 1458,
+          "sha256": "0bf7d70da9a9762fcf0cb09b4075ff2709695388f7042bd933c5271a4bfab0d6"
+        },
+        {
+          "path": "artifacts/template-events-selected-build/test-results/test/TEST-net.citizensnpcs.api.util.PermissionDefaultsTest.xml",
+          "bytes": 1110,
+          "sha256": "8969fd1df9ac4a001cb460669d488aea15a359c7cbb29940b1bf31e67ae21f3e"
+        },
+        {
+          "path": "artifacts/template-events-selected-build/test-results/test/TEST-net.citizensnpcs.api.util.schedulers.adapter.NeoForgeSchedulerTest.xml",
+          "bytes": 1013,
+          "sha256": "485e7b04497e7b5b44ce0be7eaef48a701a186ea87aa6eeeb69dc4622a4d2f49"
+        },
+        {
+          "path": "artifacts/template-events-selected-build/test-results/test/TEST-net.citizensnpcs.api.util.StoredItemListTest.xml",
+          "bytes": 2729,
+          "sha256": "e2626e15b58fecaef4d39b17779fca352a0ec29202b50658f18940c47bda9591"
+        },
+        {
+          "path": "artifacts/template-events-selected-build/test-results/test/TEST-net.citizensnpcs.api.util.StoredItemsTest.xml",
+          "bytes": 2992,
+          "sha256": "fac02f361d9b082036d3b361741914ceab12aa67fb640141959aebb3482001d5"
+        },
+        {
+          "path": "artifacts/template-events-selected-build/test-results/test/TEST-net.citizensnpcs.api.util.TextParserTest.xml",
+          "bytes": 3409,
+          "sha256": "3ae6c1d88ab277a97a8d3700a50207b472bf5a403fc9d787b6c5a99a5949d064"
+        },
+        {
+          "path": "artifacts/template-events-selected-build/test-results/test/TEST-net.citizensnpcs.api.util.TranslatorFormatTest.xml",
+          "bytes": 841,
+          "sha256": "2f147b9e0b1d1d6d1f68c91a17a9ae7eabf96cf87bfb794f5b4bfa8afdd1903b"
+        },
+        {
+          "path": "artifacts/template-events-selected-build/test-results/test/TEST-net.citizensnpcs.api.util.TriggerAddInputTest.xml",
+          "bytes": 767,
+          "sha256": "e47373a1a12c4018d4b1dd41161214749c301e040c73f4a22dac4c8c3e6abd3a"
+        },
+        {
+          "path": "artifacts/template-events-selected-build/test-results/test/TEST-net.citizensnpcs.api.util.YamlStorageRoundTripTest.xml",
+          "bytes": 59912,
+          "sha256": "f35615fe7e9a0e6b2654e310a38183b4b09cb8a20b98ede1b19a26be10418ce1"
+        },
+        {
+          "path": "artifacts/template-events-selected-build/test-results/test/TEST-net.citizensnpcs.api.util.YamlStorageWriteTest.xml",
+          "bytes": 4033,
+          "sha256": "72e63e429a455bee165c03f9bb6fb7a5cbb7eccf71d6393867795243c88e02d5"
+        },
+        {
+          "path": "artifacts/template-events-selected-build/test-results/test/TEST-net.citizensnpcs.commands.EntityCommandParsingTest.xml",
+          "bytes": 666,
+          "sha256": "e230f25badb4a54557e065a1246fe04d5db7c3e9be5363ba8a5f6775279a0d96"
+        },
+        {
+          "path": "artifacts/template-events-selected-build/test-results/test/TEST-net.citizensnpcs.commands.history.CommandHistoryTest.xml",
+          "bytes": 1277,
+          "sha256": "d666479106cffbad3328e985dce065627b8e48196c7f9b90db219ca8477f88a5"
+        },
+        {
+          "path": "artifacts/template-events-selected-build/test-results/test/TEST-net.citizensnpcs.commands.PresentationCommandParsingTest.xml",
+          "bytes": 1002,
+          "sha256": "e4bc73ab200624478b7ebb76754acec2f6ef7ce696308bf7454a2c20dc734e19"
+        },
+        {
+          "path": "artifacts/template-events-selected-build/test-results/test/TEST-net.citizensnpcs.commands.TemplateCommandValidationTest.xml",
+          "bytes": 510,
+          "sha256": "49cf043ef739a1826fa73ec4c689d7d539808b134ec598d121a3e59350de41cf"
+        },
+        {
+          "path": "artifacts/template-events-selected-build/test-results/test/TEST-net.citizensnpcs.npc.ai.tree.BehaviorCommandFlagsTest.xml",
+          "bytes": 790,
+          "sha256": "0709b98b0bc2c1ed788e54d54934814e37cbb5368a522ace803157b01441d307"
+        },
+        {
+          "path": "artifacts/template-events-selected-build/test-results/test/TEST-net.citizensnpcs.npc.ai.tree.BehaviorTreeParserTest.xml",
+          "bytes": 9167,
+          "sha256": "529d4fe84ae587ad50654154571b86e301905832f2fb897e16e6596db3ea0a55"
+        },
+        {
+          "path": "artifacts/template-events-selected-build/test-results/test/TEST-net.citizensnpcs.npc.ai.tree.MolangMemoryBindingTest.xml",
+          "bytes": 1451,
+          "sha256": "1ac035b52fec6b29af1afd9c7405567b42b01f4f78817a47d29c15b7ce19a70c"
+        },
+        {
+          "path": "artifacts/template-events-selected-build/test-results/test/TEST-net.citizensnpcs.npc.ai.tree.MolangScopeIsolationTest.xml",
+          "bytes": 12097,
+          "sha256": "f6cc2f79076df82c9b176d44538255c2c9d312812b0af3a1a4845c9bd8f6ca8b"
+        },
+        {
+          "path": "artifacts/template-events-selected-build/test-results/test/TEST-net.citizensnpcs.npc.skin.SkinCacheReloadTest.xml",
+          "bytes": 1194,
+          "sha256": "bb4553890838edf9cfd1b0c85aa119916554e8cbeeb03c516a41e00d36a539e8"
+        },
+        {
+          "path": "artifacts/template-events-selected-build/test-results/test/TEST-net.citizensnpcs.SettingsTest.xml",
+          "bytes": 35772,
+          "sha256": "c174f42e95bb5a49dc4c8fdad843e999b35452bb0d41676072f2b07f3286592f"
+        },
+        {
+          "path": "artifacts/template-events-selected-build/test-results/test/TEST-net.citizensnpcs.trait.HologramItemTest.xml",
+          "bytes": 896,
+          "sha256": "9329d396820019c4c841a100c59fad45bdcbaac58c3bc95913871c131efe5723"
+        },
+        {
+          "path": "artifacts/template-events-selected-build/test-results/test/TEST-net.citizensnpcs.trait.SentinelTargetMatchingTest.xml",
+          "bytes": 1138,
+          "sha256": "dd22a62662c47799a3673905257ee02a281a87ff16ec2b916dda584d48d378a3"
+        },
+        {
+          "path": "artifacts/template-events-selected-build/test-results/test/TEST-net.citizensnpcs.trait.shop.ExperienceArithmeticTest.xml",
+          "bytes": 771,
+          "sha256": "41df4891cbb83f6ee596b19b15448b528999efec0f9e38b04ef9bfbbc9d34831"
+        },
+        {
+          "path": "artifacts/template-events-selected-build/test-results/test/TEST-net.citizensnpcs.trait.shop.InventoryPublicationRecoveryTest.xml",
+          "bytes": 1504,
+          "sha256": "28c41bb60ce29ccd10ce1dffd6553e124b6c98df57b1d9f514cb5c7adddb56ed"
+        },
+        {
+          "path": "artifacts/template-events-selected-build/test-results/test/TEST-net.citizensnpcs.trait.shop.InventoryTransactionIsolationTest.xml",
+          "bytes": 1197,
+          "sha256": "345cbc986e0a5d088c4f5631d05900e46b1bbbd8469aadb54fcd09d5cadd2d3b"
+        },
+        {
+          "path": "artifacts/template-events-selected-build/test-results/test/TEST-net.citizensnpcs.trait.shop.ItemActionTest.xml",
+          "bytes": 1581,
+          "sha256": "c0da63cc384f4a361efc4a40b66a967da060786c552a32b5fdd49a9f448d38c9"
+        },
+        {
+          "path": "artifacts/template-events-selected-build/test-results/test/TEST-net.citizensnpcs.trait.shop.ItemQuantityTest.xml",
+          "bytes": 1433,
+          "sha256": "412e93983d3f826a4efad617dd34b1235444f233f707e584baf1a3f8683d132d"
+        },
+        {
+          "path": "artifacts/template-events-selected-build/test-results/test/TEST-net.citizensnpcs.trait.shop.ItemReceiptTest.xml",
+          "bytes": 1208,
+          "sha256": "51b371b4269922bd93868eac1cf3bbe3e97869403642d6565f6bd8e0aae801b0"
+        },
+        {
+          "path": "artifacts/template-events-selected-build/test-results/test/TEST-net.citizensnpcs.trait.shop.MoneyArithmeticTest.xml",
+          "bytes": 896,
+          "sha256": "95c2cae675b6abee3dccae70bd108ebf7decea9bf7b2af4b4915ffd1fe1ce499"
+        },
+        {
+          "path": "artifacts/template-events-selected-build/test-results/test/TEST-net.citizensnpcs.trait.shop.NPCShopTest.xml",
+          "bytes": 1594,
+          "sha256": "458e611100db6ef8afd75719ede7b9b1496f43440564e8afc253472b569e6261"
+        },
+        {
+          "path": "artifacts/template-events-selected-build/test-results/test/TEST-net.citizensnpcs.trait.shop.ShopSessionOwnerTest.xml",
+          "bytes": 662,
+          "sha256": "b1346da4200bb52d4a901f0c8e64ff2d8e8f2acabdd37b99a4e4c0332ee41f9d"
+        },
+        {
+          "path": "artifacts/template-events-selected-build/test-results/test/TEST-net.citizensnpcs.trait.shop.ShopTransactionTest.xml",
+          "bytes": 1067,
+          "sha256": "bcd05433cf72f26ae0273c4299174386621fb4d0168c857bf3347531efa2a5f1"
+        },
+        {
+          "path": "artifacts/template-events-selected-build/test-results/test/TEST-net.citizensnpcs.trait.shop.StoredShopsTest.xml",
+          "bytes": 2717,
+          "sha256": "126947f747348ac09caaed5bb1230d4834a590f6a65dc936fc9b0bb1502f85c4"
+        },
+        {
+          "path": "artifacts/template-events-selected-build/test-results/test/TEST-net.citizensnpcs.trait.text.TextEditorInputTest.xml",
+          "bytes": 771,
+          "sha256": "5fcbd400a52b0aa0cb56a125730cc823eece846d34697bf393cb19cd90da7527"
+        },
+        {
+          "path": "artifacts/template-events-selected-build/test-results/test/TEST-net.citizensnpcs.trait.TraitNameMappingTest.xml",
+          "bytes": 1066,
+          "sha256": "3acc5913cdf47a92f16d6c8aa63a377042a4771fae39325f08274eb61a645f87"
+        },
+        {
+          "path": "artifacts/template-events-selected-build/test-results/test/TEST-net.citizensnpcs.trait.waypoint.triggers.NumericTriggerInputTest.xml",
+          "bytes": 869,
+          "sha256": "111055b71fabf08c1d6c078fcdb6f9f516fafb3c405009900ab0e31c9ac91a3a"
+        },
+        {
+          "path": "artifacts/template-events-selected-build/test-results/test/TEST-net.citizensnpcs.trait.waypoint.triggers.TeleportTriggerInputTest.xml",
+          "bytes": 849,
+          "sha256": "19ac357fc4b065b2c8dd0a5477b0ce22fa9138cb6ae91235651178d9f0f5d293"
+        },
+        {
+          "path": "artifacts/template-events-selected-build/test-results/test/TEST-net.citizensnpcs.trait.waypoint.triggers.WaypointTriggerSaveTest.xml",
+          "bytes": 1022,
+          "sha256": "e1e6a85890c93a69cab7a81e2d86f13fac70398c23c87a1662d53453efe29ace"
+        },
+        {
+          "path": "artifacts/template-events-selected-build/test-results/test/TEST-net.citizensnpcs.util.CommerceTaskJournalTest.xml",
+          "bytes": 2373,
+          "sha256": "d273165a3d0fa7ac93351b85ea611d818b560047f76c37a76923a01133a580b3"
+        },
+        {
+          "path": "artifacts/template-events-selected-build/test-results/test/TEST-net.citizensnpcs.util.DimensionLookupTest.xml",
+          "bytes": 748,
+          "sha256": "b6718e7957b66413ed1699d7105a16bced5f535e4ba3d04efabff15cf4e61a28"
+        },
+        {
+          "path": "artifacts/template-events-selected-build/test-results/test/TEST-net.citizensnpcs.util.EconomyShopMenusTest.xml",
+          "bytes": 607,
+          "sha256": "b0901f45dda9a659ff869002d3211caf53c819f74f43aa6cdac72a0f870a93f0"
+        },
+        {
+          "path": "artifacts/template-events-selected-build/test-results/test/TEST-net.citizensnpcs.util.JournalRecordDecodingTest.xml",
+          "bytes": 5325,
+          "sha256": "cf350232e826515b93b309ac82c219e2fea6af0d7681b7e802229f2f3d1a23e7"
+        },
+        {
+          "path": "artifacts/template-events-selected-build/test-results/test/TEST-net.citizensnpcs.util.LuckPermsGroupsTest.xml",
+          "bytes": 609,
+          "sha256": "585857108edf119c41be43a20e6b429050626e54dbea7c02a96683bf57621b6b"
+        },
+        {
+          "path": "artifacts/template-events-selected-build/test-results/test/TEST-net.citizensnpcs.util.ParadigmGroupsTest.xml",
+          "bytes": 1211,
+          "sha256": "b5f27b5ac8a8862f37036e1b9311dadc9baba116f7596519da310e943f0eb2aa"
+        },
+        {
+          "path": "artifacts/template-events-selected-build/test-results/test/TEST-net.citizensnpcs.util.ParadigmPermissionWriterTest.xml",
+          "bytes": 2858,
+          "sha256": "01fe10686242687c84d38a2bf74eef5f7ae2051a3739770e0dac8e86866d8d49"
+        },
+        {
+          "path": "artifacts/template-events-selected-build/test-results/test/TEST-net.citizensnpcs.util.ProviderPlaceholderExportsTest.xml",
+          "bytes": 1093,
+          "sha256": "b09617d63db541370e04a74921edc029a276ec184d30acaaa4169a6bc49a164f"
+        },
+        {
+          "path": "artifacts/template-events-selected-build/test-results/test/TEST-net.citizensnpcs.util.QuestDeliveryJournalTest.xml",
+          "bytes": 1865,
+          "sha256": "c85d002fb71a27a5789f7c997f59c9847afc85ac94f5482d0245bf8c1b44adec"
+        },
+        {
+          "path": "artifacts/template-events-selected-build/test-results/test/TEST-net.citizensnpcs.util.QuestDeliveryStorageTest.xml",
+          "bytes": 1137,
+          "sha256": "36da7f1883dd5454424d0daed615806c14f8df4eb1514d1e3eb45b99740b8d6a"
+        },
+        {
+          "path": "artifacts/template-events-selected-build/test-results/test/TEST-net.citizensnpcs.util.QuestEvidenceJournalTest.xml",
+          "bytes": 2814,
+          "sha256": "09997827b894ff868310aeaefe9ead6cb9527f08eb498dd4a3bd8b085daa8f1d"
+        },
+        {
+          "path": "artifacts/template-events-selected-build/test-results/test/TEST-net.citizensnpcs.util.QuestRewardJournalTest.xml",
+          "bytes": 1537,
+          "sha256": "fa7b16b2699b648494a8133c14e27c537233ecaf6c25395768cc0c7046da5403"
+        },
+        {
+          "path": "artifacts/template-events-selected-build/test-results/test/TEST-net.citizensnpcs.util.YuuniverseEconomyTest.xml",
+          "bytes": 1500,
+          "sha256": "f0a908b2fdd21c294b64eecbd9a91ffd5747007f76f57912fe18408be1a9e32b"
+        }
+      ],
+      "native": [
+        {
+          "phase": "seed",
+          "checks": 42,
+          "log": {
+            "path": "artifacts/template-events-native-248-seed.log",
+            "bytes": 30312,
+            "sha256": "e765bb2cf386b56085aade5239cb63eed9b864721d00d7c3393b4bc81439e5ae"
+          },
+          "stoppedState": [
+            {
+              "path": "artifacts/template-events-fixed-248-server/evidence/seed/saves.yml",
+              "bytes": 2056,
+              "sha256": "32ce709c333ca61e6c0eda6c75ad77a1a297434e202c0e880e26282aaf3975a3"
+            },
+            {
+              "path": "artifacts/template-events-fixed-248-server/evidence/seed/scoreboard.dat",
+              "bytes": 299,
+              "sha256": "0381b42ccad33044338c7ee1874cfef9df1e43391eeba6a6c3aa4fcf90eefe75"
+            }
+          ]
+        },
+        {
+          "phase": "recover",
+          "checks": 21,
+          "log": {
+            "path": "artifacts/template-events-native-248-recover.log",
+            "bytes": 19674,
+            "sha256": "e8d0504519d6818c54bec8d242436b82207e0a0f731ce2917b09f5c654fe83d1"
+          },
+          "stoppedState": [
+            {
+              "path": "artifacts/template-events-fixed-248-server/evidence/recover/saves.yml",
+              "bytes": 1067,
+              "sha256": "0afe5964fc200667be51c710dbac716ccc10c93953d12985ec178fb30ed98fc6"
+            },
+            {
+              "path": "artifacts/template-events-fixed-248-server/evidence/recover/scoreboard.dat",
+              "bytes": 309,
+              "sha256": "b9586946e4a4b274e2bd14c5155ec3f96389ba3e0897019068e1f8a75427c6b6"
+            }
+          ]
+        }
+      ],
+      "productionClassesMatchNative": 1024,
+      "packages": [
+        {
+          "path": "artifacts/template-events-selected-build/libs/citizens-2.0.43-neoforge-SNAPSHOT-sources.jar",
+          "bytes": 1131442,
+          "sha256": "64536eb1f50005c77ccbfe7758fd109c231a1068fa641c0cd4d2e313bcf8b487"
+        },
+        {
+          "path": "artifacts/template-events-selected-build/libs/citizens-2.0.43-neoforge-SNAPSHOT.jar",
+          "bytes": 4101459,
+          "sha256": "69d420b722ff31d560bcb2c262fc315e9d74512bca120bb06287e91053a4a9e3"
+        },
+        {
+          "path": "artifacts/template-events-selected-build/libs/yuuniverse-interactions-2.0.43-neoforge-SNAPSHOT.jar",
+          "bytes": 204146,
+          "sha256": "da9da866c9829d568e65607469f2f49e24579826841f4d99fc302ddb6338314f"
+        }
+      ]
+    }
+  ],
+  "totalNativeChecks": 126,
+  "negativeControl": {
+    "path": "artifacts/template-events-native-before-retry.log",
+    "bytes": 21320,
+    "sha256": "a676306bbc94cfaadfffa9281a27d67f1540d6c9b2d98278e5f287fb059cc844"
+  },
+  "sources": [
+    {
+      "path": "neoforge/src/main/java/net/citizensnpcs/Citizens.java",
+      "bytes": 33019,
+      "sha256": "94677d5edd007987dceca71e11228b9418a2a461dcdc606402c22f6efd036135"
+    },
+    {
+      "path": "neoforge/src/main/java/net/citizensnpcs/api/npc/AbstractNPC.java",
+      "bytes": 24973,
+      "sha256": "5b0e3443a2861a219c7026bc24f83c500736d1971f099550814689756200916d"
+    },
+    {
+      "path": "neoforge/src/main/java/net/citizensnpcs/api/npc/templates/CommandEventAction.java",
+      "bytes": 13284,
+      "sha256": "eecfbdf31e253d5e464d09434be4e54b9ad0ebaf8af9b3bfd1b00efd3212ea5a"
+    },
+    {
+      "path": "neoforge/src/main/java/net/citizensnpcs/api/npc/templates/CommandListExecutor.java",
+      "bytes": 2189,
+      "sha256": "e9564f0de52ece40ccb53c0bd197dbd304a069b72ce5d3646e268eb809d2852d"
+    },
+    {
+      "path": "neoforge/src/main/java/net/citizensnpcs/api/npc/templates/Template.java",
+      "bytes": 6836,
+      "sha256": "d7f188e01cc9b6ea2005d9ae33fbdb5433f11d4ee2775895dd824f94cebad793"
+    },
+    {
+      "path": "neoforge/src/main/java/net/citizensnpcs/api/npc/templates/TemplateEventBindings.java",
+      "bytes": 5146,
+      "sha256": "e8e5b4f3965d5a8677288fbb5f83d481af1cc4510dc77c19011546f576e54efa"
+    },
+    {
+      "path": "neoforge/src/test/java/net/citizensnpcs/api/npc/templates/TemplateEventPersistenceTest.java",
+      "bytes": 12692,
+      "sha256": "7d7b8337a7d697e834cb83df7c92e8eebc0b70278919ebe7aa6d2448c3e94ba9"
+    },
+    {
+      "path": "tools/template-events-runtime-audit.gradle",
+      "bytes": 2941,
+      "sha256": "2ab6831e488b35e5f03def1cbbdb2da67d02ec6be71f4375ea6493f8eca4ea47"
+    },
+    {
+      "path": "tools/prepare-template-events-audit.ps1",
+      "bytes": 1449,
+      "sha256": "216c32a56fefab2751a66848cb4423049f048929d670750216c51f5c9c0e8861"
+    },
+    {
+      "path": "tools/record-template-events-validation.py",
+      "bytes": 8687,
+      "sha256": "6cf9079b7820c1c087f460e58f2768f5ba38f8796117d6b5e447bcecd48b5ebc"
+    },
+    {
+      "path": "tools/record-guard-restart-validation.py",
+      "bytes": 15367,
+      "sha256": "207eaf9d9854560651d9ad79b0de5e5e7a932367eed9fd6180339642e4631249"
+    },
+    {
+      "path": "tools/template-events-runtime-audit/net/citizensnpcs/audit/TemplateEventsRuntimeAudit.java",
+      "bytes": 12511,
+      "sha256": "23d749ce58fcd20e01501ed8722451a6712be637b7a442f44fa0c5fe5ac6bfec"
+    },
+    {
+      "path": "tools/template-events-runtime-audit/README.md",
+      "bytes": 2211,
+      "sha256": "71254c6c78d8cde2ea0a300d9844172565393460473f3e2e3984f5dedc3b7174"
+    }
+  ],
+  "limits": [
+    "Native synthetic actors/events; ordinary physical client test remains deferred",
+    "Legacy saves have no historical application provenance; explicitly reapply templates to record hooks",
+    "Runtime extension callbacks are not serialized",
+    "No production or provider activation"
+  ]
+}
