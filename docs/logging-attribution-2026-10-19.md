@@ -132,3 +132,11 @@ names while retaining the working blocks index. Bounded native queued workload,
 enabled/disabled/re-enabled creation and restart preserve all original rows and
 exact query results. Coordinate search plans improve; retention expiry, sustained
 load and production throughput remain separate acceptance.
+
+The [repository read repair](logging-read-isolation-2026-10-23.md) fixes lookups
+reading the shared JDBC connection between queued writes before eventual rollback.
+Provider `.8` protects all nine public repository read paths through result-set
+closure. Same-thread read reentry during a write and uncertain write outcomes
+reject with the existing logged lookup failure behavior. Exact commit/rollback
+results, components and fresh-process restart pass; single-connection contention,
+sustained load, MySQL and broader release gates remain separate acceptance.

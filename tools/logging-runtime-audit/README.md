@@ -83,6 +83,14 @@ setup. Fresh/completed-phase guards run directly before launch too. Keep separat
 build/cache directories and preserve all stopped images and original fixtures.
 See the [index report](../../docs/logging-coordinate-indexes-2026-10-23.md).
 
+For repository transaction isolation, prepare a fresh copied stopped fixture
+through `tools/prepare-logging-index-audit.ps1` with provider `.8`, then run `reads`
+and `reads-recover`. All nine actual repository APIs must wait for an active
+transaction to commit or roll back, return exact committed rows/components, and
+retain the same results in a new process. The fixture SQL workload has its own
+identity and does not replace gameplay observations. Completed phases reject
+even with preparation skipped. See the [read report](../../docs/logging-read-isolation-2026-10-23.md).
+
 For an actual forced termination after observed native histories and saved
 player/world state:
 

@@ -1,4 +1,12 @@
 # GriefLogger SQLite packaging compatibility
+Follow-up 2026-10-23, UTC+08:00: [repository read isolation](../../docs/logging-read-isolation-2026-10-23.md)
+repairs public lookups exposing uncommitted rows which later roll back. Apply
+`repository-read-isolation.patch` after `.7` to build `.8`. All nine repository
+read paths hold the transaction monitor through cursor consumption and closure;
+same-thread write reentry and uncertain outcomes reject. The report records
+143 actual-provider SQLite and 187 native/restart checks, including exact public
+lookups, normal commerce, shutdown and index regressions. MySQL, sustained load,
+wider recovery, migration and deferred clients remain separate acceptance.
 
 Follow-up 2026-10-23, UTC+08:00: [coordinate index repair](../../docs/logging-coordinate-indexes-2026-10-23.md)
 fixes the shared SQLite index name that silently left five history tables without

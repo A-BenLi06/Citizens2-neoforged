@@ -1,0 +1,791 @@
+diff --git a/common/src/main/java/com/daqem/grieflogger/database/Database.java b/common/src/main/java/com/daqem/grieflogger/database/Database.java
+index 6cbe30e..818fc17 100644
+--- a/common/src/main/java/com/daqem/grieflogger/database/Database.java
++++ b/common/src/main/java/com/daqem/grieflogger/database/Database.java
+@@ -28,6 +28,7 @@ public class Database {
+     public final IQueue queue;
+     public final IQueue batchQueue;
+     private boolean writeOutcomeUncertain;
++    private boolean writing;
+ 
+     public Database() {
+         queue = new Queue(this, false);
+@@ -133,6 +134,20 @@ public class Database {
+         }
+     }
+ 
++    @FunctionalInterface
++    public interface StatementReader<T> {
++        T read(PreparedStatement statement) throws SQLException;
++    }
++
++    /** Consume and close the whole query while owning the connection's transaction monitor. */
++    public synchronized <T> T read(String query, StatementReader<T> reader) throws SQLException {
++        if (writing) throw new SQLException("Cannot read from inside an active write transaction");
++        if (writeOutcomeUncertain) throw new SQLException("Database write outcome requires review before reading");
++        try (var prepared = prepareStatement(query)) {
++            return reader.read(prepared);
++        }
++    }
++
+     public QueuedStatement prepareQueuedStatement(String query) throws SQLException {
+         // Preserve native admission-time SQL validation without retaining a JDBC resource.
+         try (var validated = prepareStatement(query)) {
+@@ -179,6 +194,7 @@ public class Database {
+         boolean committing = false;
+         SQLiteConnection sqlite = connection instanceof SQLiteConnection direct ? direct : null;
+         var outcome = new SqliteOutcome();
++        writing = true;
+         try {
+             if (connection == null || connection.getAutoCommit()) throw new SQLException("Queued writes require a manual-commit connection");
+             if (sqlite != null) sqlite.addCommitListener(outcome);
+@@ -211,6 +227,7 @@ public class Database {
+             return false;
+         } finally {
+             if (sqlite != null) sqlite.removeCommitListener(outcome);
++            writing = false;
+         }
+         for (var write : writes) {
+             try { write.closeAfterCommit(); }
+diff --git a/common/src/main/java/com/daqem/grieflogger/database/repository/BlockRepository.java b/common/src/main/java/com/daqem/grieflogger/database/repository/BlockRepository.java
+index da83989..4ffccfc 100644
+--- a/common/src/main/java/com/daqem/grieflogger/database/repository/BlockRepository.java
++++ b/common/src/main/java/com/daqem/grieflogger/database/repository/BlockRepository.java
+@@ -7,7 +7,6 @@ import com.daqem.grieflogger.model.history.BlockHistory;
+ import com.daqem.grieflogger.model.history.IHistory;
+ import org.jetbrains.annotations.Nullable;
+ 
+-import java.sql.PreparedStatement;
+ import java.sql.ResultSet;
+ import java.sql.SQLException;
+ import java.sql.Types;
+@@ -200,24 +199,28 @@ public class BlockRepository extends Repository {
+                 ORDER BY blocks.time DESC
+                 """;
+ 
+-        try (PreparedStatement preparedStatement = database.prepareStatement(query)) {
+-            preparedStatement.setString(1, levelName);
+-            preparedStatement.setInt(2, x);
+-            preparedStatement.setInt(3, y);
+-            preparedStatement.setInt(4, z);
+-            ResultSet resultSet = preparedStatement.executeQuery();
+-            while (resultSet.next()) {
+-                blockHistory.add(new BlockHistory(
+-                        resultSet.getLong(1),
+-                        resultSet.getString(2),
+-                        resultSet.getString(3),
+-                        resultSet.getInt(4),
+-                        resultSet.getInt(5),
+-                        resultSet.getInt(6),
+-                        resultSet.getString(7),
+-                        resultSet.getInt(8)
+-                ));
+-            }
++        try {
++            database.read(query, preparedStatement -> {
++                preparedStatement.setString(1, levelName);
++                preparedStatement.setInt(2, x);
++                preparedStatement.setInt(3, y);
++                preparedStatement.setInt(4, z);
++                try (ResultSet resultSet = preparedStatement.executeQuery()) {
++                    while (resultSet.next()) {
++                        blockHistory.add(new BlockHistory(
++                                resultSet.getLong(1),
++                                resultSet.getString(2),
++                                resultSet.getString(3),
++                                resultSet.getInt(4),
++                                resultSet.getInt(5),
++                                resultSet.getInt(6),
++                                resultSet.getString(7),
++                                resultSet.getInt(8)
++                        ));
++                    }
++                }
++                return null;
++            });
+         } catch (SQLException e) {
+             GriefLogger.LOGGER.error("Failed to get block history", e);
+         }
+@@ -238,24 +241,28 @@ public class BlockRepository extends Repository {
+                 ORDER BY blocks.time DESC
+                 """;
+ 
+-        try (PreparedStatement preparedStatement = database.prepareStatement(query)) {
+-            preparedStatement.setString(1, levelName);
+-            preparedStatement.setInt(2, x);
+-            preparedStatement.setInt(3, y);
+-            preparedStatement.setInt(4, z);
+-            ResultSet resultSet = preparedStatement.executeQuery();
+-            while (resultSet.next()) {
+-                blockHistory.add(new BlockHistory(
+-                        resultSet.getLong(1),
+-                        resultSet.getString(2),
+-                        resultSet.getString(3),
+-                        resultSet.getInt(4),
+-                        resultSet.getInt(5),
+-                        resultSet.getInt(6),
+-                        resultSet.getString(7),
+-                        resultSet.getInt(8)
+-                ));
+-            }
++        try {
++            database.read(query, preparedStatement -> {
++                preparedStatement.setString(1, levelName);
++                preparedStatement.setInt(2, x);
++                preparedStatement.setInt(3, y);
++                preparedStatement.setInt(4, z);
++                try (ResultSet resultSet = preparedStatement.executeQuery()) {
++                    while (resultSet.next()) {
++                        blockHistory.add(new BlockHistory(
++                                resultSet.getLong(1),
++                                resultSet.getString(2),
++                                resultSet.getString(3),
++                                resultSet.getInt(4),
++                                resultSet.getInt(5),
++                                resultSet.getInt(6),
++                                resultSet.getString(7),
++                                resultSet.getInt(8)
++                        ));
++                    }
++                }
++                return null;
++            });
+         } catch (SQLException e) {
+             GriefLogger.LOGGER.error("Failed to get block history", e);
+         }
+@@ -322,55 +329,58 @@ public class BlockRepository extends Repository {
+                 LIMIT 1000;
+                 """.formatted(actions, users, includeMaterials, excludeMaterials);
+ 
+-        try (PreparedStatement preparedStatement = database.prepareStatement(query)) {
+-            preparedStatement.setString(1, levelName);
+-            preparedStatement.setLong(2, filterList.getTime());
+-
+-            if (actions == null || actions.isEmpty()) {
+-                preparedStatement.setNull(3, Types.VARCHAR);
+-            } else {
+-                preparedStatement.setString(3, "not null");
+-            }
+-
+-            if (users == null || users.isEmpty()) {
+-                preparedStatement.setNull(4, Types.VARCHAR);
+-            } else {
+-                preparedStatement.setString(4, "not null");
+-            }
+-
+-            if (includeMaterials == null || includeMaterials.isEmpty()) {
+-                preparedStatement.setNull(5, Types.VARCHAR);
+-            } else {
+-                preparedStatement.setString(5, "not null");
+-            }
+-
+-            if (excludeMaterials == null || excludeMaterials.isEmpty()) {
+-                preparedStatement.setNull(6, Types.VARCHAR);
+-            } else {
+-                preparedStatement.setString(6, "not null");
+-            }
+-
+-            preparedStatement.setInt(7, filterList.getRadiusMinX());
+-            preparedStatement.setInt(8, filterList.getRadiusMaxX());
+-            preparedStatement.setInt(9, filterList.getRadiusMinY());
+-            preparedStatement.setInt(10, filterList.getRadiusMaxY());
+-            preparedStatement.setInt(11, filterList.getRadiusMinZ());
+-            preparedStatement.setInt(12, filterList.getRadiusMaxZ());
+-
+-            List<IHistory> blockHistory = new ArrayList<>();
+-            ResultSet resultSet = preparedStatement.executeQuery();
+-            while (resultSet.next()) {
+-                blockHistory.add(new BlockHistory(
+-                        resultSet.getLong(1),
+-                        resultSet.getString(2),
+-                        resultSet.getString(3),
+-                        resultSet.getInt(4),
+-                        resultSet.getInt(5),
+-                        resultSet.getInt(6),
+-                        resultSet.getString(7),
+-                        resultSet.getInt(8)));
+-            }
+-            return blockHistory;
++        try {
++            return database.read(query, preparedStatement -> {
++                preparedStatement.setString(1, levelName);
++                preparedStatement.setLong(2, filterList.getTime());
++
++                if (actions == null || actions.isEmpty()) {
++                    preparedStatement.setNull(3, Types.VARCHAR);
++                } else {
++                    preparedStatement.setString(3, "not null");
++                }
++
++                if (users == null || users.isEmpty()) {
++                    preparedStatement.setNull(4, Types.VARCHAR);
++                } else {
++                    preparedStatement.setString(4, "not null");
++                }
++
++                if (includeMaterials == null || includeMaterials.isEmpty()) {
++                    preparedStatement.setNull(5, Types.VARCHAR);
++                } else {
++                    preparedStatement.setString(5, "not null");
++                }
++
++                if (excludeMaterials == null || excludeMaterials.isEmpty()) {
++                    preparedStatement.setNull(6, Types.VARCHAR);
++                } else {
++                    preparedStatement.setString(6, "not null");
++                }
++
++                preparedStatement.setInt(7, filterList.getRadiusMinX());
++                preparedStatement.setInt(8, filterList.getRadiusMaxX());
++                preparedStatement.setInt(9, filterList.getRadiusMinY());
++                preparedStatement.setInt(10, filterList.getRadiusMaxY());
++                preparedStatement.setInt(11, filterList.getRadiusMinZ());
++                preparedStatement.setInt(12, filterList.getRadiusMaxZ());
++
++                List<IHistory> blockHistory = new ArrayList<>();
++                try (ResultSet resultSet = preparedStatement.executeQuery()) {
++                    while (resultSet.next()) {
++                        blockHistory.add(new BlockHistory(
++                                resultSet.getLong(1),
++                                resultSet.getString(2),
++                                resultSet.getString(3),
++                                resultSet.getInt(4),
++                                resultSet.getInt(5),
++                                resultSet.getInt(6),
++                                resultSet.getString(7),
++                                resultSet.getInt(8)));
++                    }
++                }
++                return blockHistory;
++            });
+         } catch (SQLException exception) {
+             GriefLogger.LOGGER.error("Failed to get block history from database", exception);
+             return List.of();
+diff --git a/common/src/main/java/com/daqem/grieflogger/database/repository/ContainerRepository.java b/common/src/main/java/com/daqem/grieflogger/database/repository/ContainerRepository.java
+index 14df33f..35b92ee 100644
+--- a/common/src/main/java/com/daqem/grieflogger/database/repository/ContainerRepository.java
++++ b/common/src/main/java/com/daqem/grieflogger/database/repository/ContainerRepository.java
+@@ -15,7 +15,6 @@ import net.minecraft.resources.ResourceLocation;
+ import net.minecraft.world.level.Level;
+ import org.jetbrains.annotations.Nullable;
+ 
+-import java.sql.PreparedStatement;
+ import java.sql.ResultSet;
+ import java.sql.SQLException;
+ import java.sql.Types;
+@@ -268,30 +267,34 @@ public class ContainerRepository extends Repository {
+                 ORDER BY containers.time DESC
+                 """;
+ 
+-        try (PreparedStatement preparedStatement = database.prepareStatement(query)) {
+-            preparedStatement.setString(1, level.dimension().location().toString());
+-            preparedStatement.setInt(2, x);
+-            preparedStatement.setInt(3, y);
+-            preparedStatement.setInt(4, z);
+-
+-            ResultSet resultSet = preparedStatement.executeQuery();
+-            while (resultSet.next()) {
+-                ByteBuf buf1 = Unpooled.wrappedBuffer(resultSet.getBytes(8));
+-                RegistryFriendlyByteBuf buf = new RegistryFriendlyByteBuf(buf1, level.registryAccess());
+-                DataComponentPatch patch = DataComponentPatch.STREAM_CODEC.decode(buf);
+-                containerHistory.add(new ContainerHistory(
+-                        resultSet.getLong(1),
+-                        resultSet.getString(2),
+-                        resultSet.getString(3),
+-                        resultSet.getInt(4),
+-                        resultSet.getInt(5),
+-                        resultSet.getInt(6),
+-                        resultSet.getString(7),
+-                        patch,
+-                        resultSet.getInt(9),
+-                        resultSet.getInt(10)
+-                ));
+-            }
++        try {
++            database.read(query, preparedStatement -> {
++                preparedStatement.setString(1, level.dimension().location().toString());
++                preparedStatement.setInt(2, x);
++                preparedStatement.setInt(3, y);
++                preparedStatement.setInt(4, z);
++
++                try (ResultSet resultSet = preparedStatement.executeQuery()) {
++                    while (resultSet.next()) {
++                        ByteBuf buf1 = Unpooled.wrappedBuffer(resultSet.getBytes(8));
++                        RegistryFriendlyByteBuf buf = new RegistryFriendlyByteBuf(buf1, level.registryAccess());
++                        DataComponentPatch patch = DataComponentPatch.STREAM_CODEC.decode(buf);
++                        containerHistory.add(new ContainerHistory(
++                                resultSet.getLong(1),
++                                resultSet.getString(2),
++                                resultSet.getString(3),
++                                resultSet.getInt(4),
++                                resultSet.getInt(5),
++                                resultSet.getInt(6),
++                                resultSet.getString(7),
++                                patch,
++                                resultSet.getInt(9),
++                                resultSet.getInt(10)
++                        ));
++                    }
++                }
++                return null;
++            });
+         } catch (SQLException e) {
+             GriefLogger.LOGGER.error("Failed to get container history", e);
+         }
+@@ -312,33 +315,37 @@ public class ContainerRepository extends Repository {
+                 ORDER BY containers.time DESC
+                 """;
+ 
+-        try (PreparedStatement preparedStatement = database.prepareStatement(query)) {
+-            preparedStatement.setString(1, level.dimension().location().toString());
+-            preparedStatement.setInt(2, x);
+-            preparedStatement.setInt(3, x2);
+-            preparedStatement.setInt(4, y);
+-            preparedStatement.setInt(5, y2);
+-            preparedStatement.setInt(6, z);
+-            preparedStatement.setInt(7, z2);
+-
+-            ResultSet resultSet = preparedStatement.executeQuery();
+-            while (resultSet.next()) {
+-                ByteBuf buf1 = Unpooled.wrappedBuffer(resultSet.getBytes(8));
+-                RegistryFriendlyByteBuf buf = new RegistryFriendlyByteBuf(buf1, level.registryAccess());
+-                DataComponentPatch patch = DataComponentPatch.STREAM_CODEC.decode(buf);
+-                containerHistory.add(new ContainerHistory(
+-                        resultSet.getLong(1),
+-                        resultSet.getString(2),
+-                        resultSet.getString(3),
+-                        resultSet.getInt(4),
+-                        resultSet.getInt(5),
+-                        resultSet.getInt(6),
+-                        resultSet.getString(7),
+-                        patch,
+-                        resultSet.getInt(9),
+-                        resultSet.getInt(10)
+-                ));
+-            }
++        try {
++            database.read(query, preparedStatement -> {
++                preparedStatement.setString(1, level.dimension().location().toString());
++                preparedStatement.setInt(2, x);
++                preparedStatement.setInt(3, x2);
++                preparedStatement.setInt(4, y);
++                preparedStatement.setInt(5, y2);
++                preparedStatement.setInt(6, z);
++                preparedStatement.setInt(7, z2);
++
++                try (ResultSet resultSet = preparedStatement.executeQuery()) {
++                    while (resultSet.next()) {
++                        ByteBuf buf1 = Unpooled.wrappedBuffer(resultSet.getBytes(8));
++                        RegistryFriendlyByteBuf buf = new RegistryFriendlyByteBuf(buf1, level.registryAccess());
++                        DataComponentPatch patch = DataComponentPatch.STREAM_CODEC.decode(buf);
++                        containerHistory.add(new ContainerHistory(
++                                resultSet.getLong(1),
++                                resultSet.getString(2),
++                                resultSet.getString(3),
++                                resultSet.getInt(4),
++                                resultSet.getInt(5),
++                                resultSet.getInt(6),
++                                resultSet.getString(7),
++                                patch,
++                                resultSet.getInt(9),
++                                resultSet.getInt(10)
++                        ));
++                    }
++                }
++                return null;
++            });
+         } catch (SQLException e) {
+             GriefLogger.LOGGER.error("Failed to get container history", e);
+         }
+@@ -370,60 +377,63 @@ public class ContainerRepository extends Repository {
+                 LIMIT 1000;
+                 """.formatted(actions, users, includeMaterials, excludeMaterials);
+ 
+-        try (PreparedStatement preparedStatement = database.prepareStatement(query)) {
+-            preparedStatement.setString(1, level.dimension().location().toString());
+-            preparedStatement.setLong(2, filterList.getTime());
+-
+-            if (actions == null || actions.isEmpty()) {
+-                preparedStatement.setNull(3, Types.VARCHAR);
+-            } else {
+-                preparedStatement.setString(3, "not null");
+-            }
++        try {
++            return database.read(query, preparedStatement -> {
++                preparedStatement.setString(1, level.dimension().location().toString());
++                preparedStatement.setLong(2, filterList.getTime());
++
++                if (actions == null || actions.isEmpty()) {
++                    preparedStatement.setNull(3, Types.VARCHAR);
++                } else {
++                    preparedStatement.setString(3, "not null");
++                }
+ 
+-            if (users == null || users.isEmpty()) {
+-                preparedStatement.setNull(4, Types.VARCHAR);
+-            } else {
+-                preparedStatement.setString(4, "not null");
+-            }
++                if (users == null || users.isEmpty()) {
++                    preparedStatement.setNull(4, Types.VARCHAR);
++                } else {
++                    preparedStatement.setString(4, "not null");
++                }
+ 
+-            if (includeMaterials == null || includeMaterials.isEmpty()) {
+-                preparedStatement.setNull(5, Types.VARCHAR);
+-            } else {
+-                preparedStatement.setString(5, "not null");
+-            }
++                if (includeMaterials == null || includeMaterials.isEmpty()) {
++                    preparedStatement.setNull(5, Types.VARCHAR);
++                } else {
++                    preparedStatement.setString(5, "not null");
++                }
+ 
+-            if (excludeMaterials == null || excludeMaterials.isEmpty()) {
+-                preparedStatement.setNull(6, Types.VARCHAR);
+-            } else {
+-                preparedStatement.setString(6, "not null");
+-            }
++                if (excludeMaterials == null || excludeMaterials.isEmpty()) {
++                    preparedStatement.setNull(6, Types.VARCHAR);
++                } else {
++                    preparedStatement.setString(6, "not null");
++                }
+ 
+-            preparedStatement.setInt(7, filterList.getRadiusMinX());
+-            preparedStatement.setInt(8, filterList.getRadiusMaxX());
+-            preparedStatement.setInt(9, filterList.getRadiusMinY());
+-            preparedStatement.setInt(10, filterList.getRadiusMaxY());
+-            preparedStatement.setInt(11, filterList.getRadiusMinZ());
+-            preparedStatement.setInt(12, filterList.getRadiusMaxZ());
+-
+-            List<IHistory> blockHistory = new ArrayList<>();
+-            ResultSet resultSet = preparedStatement.executeQuery();
+-            while (resultSet.next()) {
+-                ByteBuf buf1 = Unpooled.wrappedBuffer(resultSet.getBytes(8));
+-                RegistryFriendlyByteBuf buf = new RegistryFriendlyByteBuf(buf1, level.registryAccess());
+-                DataComponentPatch patch = DataComponentPatch.STREAM_CODEC.decode(buf);
+-                blockHistory.add(new ContainerHistory(
+-                        resultSet.getLong(1),
+-                        resultSet.getString(2),
+-                        resultSet.getString(3),
+-                        resultSet.getInt(4),
+-                        resultSet.getInt(5),
+-                        resultSet.getInt(6),
+-                        resultSet.getString(7),
+-                        patch,
+-                        resultSet.getInt(9),
+-                        resultSet.getInt(10)));
+-            }
+-            return blockHistory;
++                preparedStatement.setInt(7, filterList.getRadiusMinX());
++                preparedStatement.setInt(8, filterList.getRadiusMaxX());
++                preparedStatement.setInt(9, filterList.getRadiusMinY());
++                preparedStatement.setInt(10, filterList.getRadiusMaxY());
++                preparedStatement.setInt(11, filterList.getRadiusMinZ());
++                preparedStatement.setInt(12, filterList.getRadiusMaxZ());
++
++                List<IHistory> blockHistory = new ArrayList<>();
++                try (ResultSet resultSet = preparedStatement.executeQuery()) {
++                    while (resultSet.next()) {
++                        ByteBuf buf1 = Unpooled.wrappedBuffer(resultSet.getBytes(8));
++                        RegistryFriendlyByteBuf buf = new RegistryFriendlyByteBuf(buf1, level.registryAccess());
++                        DataComponentPatch patch = DataComponentPatch.STREAM_CODEC.decode(buf);
++                        blockHistory.add(new ContainerHistory(
++                                resultSet.getLong(1),
++                                resultSet.getString(2),
++                                resultSet.getString(3),
++                                resultSet.getInt(4),
++                                resultSet.getInt(5),
++                                resultSet.getInt(6),
++                                resultSet.getString(7),
++                                patch,
++                                resultSet.getInt(9),
++                                resultSet.getInt(10)));
++                    }
++                }
++                return blockHistory;
++            });
+         } catch (SQLException exception) {
+             GriefLogger.LOGGER.error("Failed to get block history from database", exception);
+             return List.of();
+diff --git a/common/src/main/java/com/daqem/grieflogger/database/repository/ItemRepository.java b/common/src/main/java/com/daqem/grieflogger/database/repository/ItemRepository.java
+index 6cb26e9..1881322 100644
+--- a/common/src/main/java/com/daqem/grieflogger/database/repository/ItemRepository.java
++++ b/common/src/main/java/com/daqem/grieflogger/database/repository/ItemRepository.java
+@@ -14,7 +14,6 @@ import net.minecraft.resources.ResourceLocation;
+ import net.minecraft.world.level.Level;
+ import org.jetbrains.annotations.Nullable;
+ 
+-import java.sql.PreparedStatement;
+ import java.sql.ResultSet;
+ import java.sql.SQLException;
+ import java.sql.Types;
+@@ -220,60 +219,63 @@ public class ItemRepository extends Repository {
+                 LIMIT 1000;
+                 """.formatted(actions, users, includeMaterials, excludeMaterials);
+ 
+-        try (PreparedStatement preparedStatement = database.prepareStatement(query)) {
+-            preparedStatement.setString(1, level.dimension().location().toString());
+-            preparedStatement.setLong(2, filterList.getTime());
++        try {
++            return database.read(query, preparedStatement -> {
++                preparedStatement.setString(1, level.dimension().location().toString());
++                preparedStatement.setLong(2, filterList.getTime());
+ 
+-            if (actions == null || actions.isEmpty()) {
+-                preparedStatement.setNull(3, Types.VARCHAR);
+-            } else {
+-                preparedStatement.setString(3, "not null");
+-            }
++                if (actions == null || actions.isEmpty()) {
++                    preparedStatement.setNull(3, Types.VARCHAR);
++                } else {
++                    preparedStatement.setString(3, "not null");
++                }
+ 
+-            if (users == null || users.isEmpty()) {
+-                preparedStatement.setNull(4, Types.VARCHAR);
+-            } else {
+-                preparedStatement.setString(4, "not null");
+-            }
++                if (users == null || users.isEmpty()) {
++                    preparedStatement.setNull(4, Types.VARCHAR);
++                } else {
++                    preparedStatement.setString(4, "not null");
++                }
+ 
+-            if (includeMaterials == null || includeMaterials.isEmpty()) {
+-                preparedStatement.setNull(5, Types.VARCHAR);
+-            } else {
+-                preparedStatement.setString(5, "not null");
+-            }
++                if (includeMaterials == null || includeMaterials.isEmpty()) {
++                    preparedStatement.setNull(5, Types.VARCHAR);
++                } else {
++                    preparedStatement.setString(5, "not null");
++                }
+ 
+-            if (excludeMaterials == null || excludeMaterials.isEmpty()) {
+-                preparedStatement.setNull(6, Types.VARCHAR);
+-            } else {
+-                preparedStatement.setString(6, "not null");
+-            }
++                if (excludeMaterials == null || excludeMaterials.isEmpty()) {
++                    preparedStatement.setNull(6, Types.VARCHAR);
++                } else {
++                    preparedStatement.setString(6, "not null");
++                }
+ 
+-            preparedStatement.setInt(7, filterList.getRadiusMinX());
+-            preparedStatement.setInt(8, filterList.getRadiusMaxX());
+-            preparedStatement.setInt(9, filterList.getRadiusMinY());
+-            preparedStatement.setInt(10, filterList.getRadiusMaxY());
+-            preparedStatement.setInt(11, filterList.getRadiusMinZ());
+-            preparedStatement.setInt(12, filterList.getRadiusMaxZ());
++                preparedStatement.setInt(7, filterList.getRadiusMinX());
++                preparedStatement.setInt(8, filterList.getRadiusMaxX());
++                preparedStatement.setInt(9, filterList.getRadiusMinY());
++                preparedStatement.setInt(10, filterList.getRadiusMaxY());
++                preparedStatement.setInt(11, filterList.getRadiusMinZ());
++                preparedStatement.setInt(12, filterList.getRadiusMaxZ());
+ 
+-            List<ItemHistory> itemHistory = new ArrayList<>();
+-            ResultSet resultSet = preparedStatement.executeQuery();
+-            while (resultSet.next()) {
+-                ByteBuf buf1 = Unpooled.wrappedBuffer(resultSet.getBytes(8));
+-                RegistryFriendlyByteBuf buf = new RegistryFriendlyByteBuf(buf1, level.registryAccess());
+-                DataComponentPatch patch = DataComponentPatch.STREAM_CODEC.decode(buf);
+-                itemHistory.add(new ItemHistory(
+-                        resultSet.getLong(1),
+-                        resultSet.getString(2),
+-                        resultSet.getString(3),
+-                        resultSet.getInt(4),
+-                        resultSet.getInt(5),
+-                        resultSet.getInt(6),
+-                        resultSet.getString(7),
+-                        patch,
+-                        resultSet.getInt(9),
+-                        resultSet.getInt(10)));
+-            }
+-            return itemHistory;
++                List<ItemHistory> itemHistory = new ArrayList<>();
++                try (ResultSet resultSet = preparedStatement.executeQuery()) {
++                    while (resultSet.next()) {
++                        ByteBuf buf1 = Unpooled.wrappedBuffer(resultSet.getBytes(8));
++                        RegistryFriendlyByteBuf buf = new RegistryFriendlyByteBuf(buf1, level.registryAccess());
++                        DataComponentPatch patch = DataComponentPatch.STREAM_CODEC.decode(buf);
++                        itemHistory.add(new ItemHistory(
++                                resultSet.getLong(1),
++                                resultSet.getString(2),
++                                resultSet.getString(3),
++                                resultSet.getInt(4),
++                                resultSet.getInt(5),
++                                resultSet.getInt(6),
++                                resultSet.getString(7),
++                                patch,
++                                resultSet.getInt(9),
++                                resultSet.getInt(10)));
++                    }
++                }
++                return itemHistory;
++            });
+         } catch (SQLException exception) {
+             GriefLogger.LOGGER.error("Failed to get block history from database", exception);
+             return List.of();
+diff --git a/common/src/main/java/com/daqem/grieflogger/database/repository/SessionRepository.java b/common/src/main/java/com/daqem/grieflogger/database/repository/SessionRepository.java
+index cbe1c95..12f7fe5 100644
+--- a/common/src/main/java/com/daqem/grieflogger/database/repository/SessionRepository.java
++++ b/common/src/main/java/com/daqem/grieflogger/database/repository/SessionRepository.java
+@@ -119,42 +119,45 @@ public class SessionRepository extends Repository {
+                 LIMIT 1000;
+                 """.formatted(actions, users);
+ 
+-        try (PreparedStatement preparedStatement = database.prepareStatement(query)) {
+-            preparedStatement.setString(1, levelName);
+-            preparedStatement.setLong(2, filterList.getTime());
+-
+-            if (actions == null || actions.isEmpty()) {
+-                preparedStatement.setNull(3, Types.VARCHAR);
+-            } else {
+-                preparedStatement.setString(3, actions);
+-            }
+-
+-            if (users == null || users.isEmpty()) {
+-                preparedStatement.setNull(4, Types.VARCHAR);
+-            } else {
+-                preparedStatement.setString(4, users);
+-            }
+-
+-            preparedStatement.setInt(5, filterList.getRadiusMinX());
+-            preparedStatement.setInt(6, filterList.getRadiusMaxX());
+-            preparedStatement.setInt(7, filterList.getRadiusMinY());
+-            preparedStatement.setInt(8, filterList.getRadiusMaxY());
+-            preparedStatement.setInt(9, filterList.getRadiusMinZ());
+-            preparedStatement.setInt(10, filterList.getRadiusMaxZ());
+-
+-            List<SessionHistory> sessionHistory = new ArrayList<>();
+-            ResultSet resultSet = preparedStatement.executeQuery();
+-            while (resultSet.next()) {
+-                sessionHistory.add(new SessionHistory(
+-                        resultSet.getLong("time"),
+-                        resultSet.getString("name"),
+-                        resultSet.getString("uuid"),
+-                        resultSet.getInt("x"),
+-                        resultSet.getInt("y"),
+-                        resultSet.getInt("z"),
+-                        resultSet.getInt("action")));
+-            }
+-            return sessionHistory;
++        try {
++            return database.read(query, preparedStatement -> {
++                preparedStatement.setString(1, levelName);
++                preparedStatement.setLong(2, filterList.getTime());
++
++                if (actions == null || actions.isEmpty()) {
++                    preparedStatement.setNull(3, Types.VARCHAR);
++                } else {
++                    preparedStatement.setString(3, actions);
++                }
++
++                if (users == null || users.isEmpty()) {
++                    preparedStatement.setNull(4, Types.VARCHAR);
++                } else {
++                    preparedStatement.setString(4, users);
++                }
++
++                preparedStatement.setInt(5, filterList.getRadiusMinX());
++                preparedStatement.setInt(6, filterList.getRadiusMaxX());
++                preparedStatement.setInt(7, filterList.getRadiusMinY());
++                preparedStatement.setInt(8, filterList.getRadiusMaxY());
++                preparedStatement.setInt(9, filterList.getRadiusMinZ());
++                preparedStatement.setInt(10, filterList.getRadiusMaxZ());
++
++                List<SessionHistory> sessionHistory = new ArrayList<>();
++                try (ResultSet resultSet = preparedStatement.executeQuery()) {
++                    while (resultSet.next()) {
++                        sessionHistory.add(new SessionHistory(
++                                resultSet.getLong("time"),
++                                resultSet.getString("name"),
++                                resultSet.getString("uuid"),
++                                resultSet.getInt("x"),
++                                resultSet.getInt("y"),
++                                resultSet.getInt("z"),
++                                resultSet.getInt("action")));
++                    }
++                }
++                return sessionHistory;
++            });
+         } catch (SQLException exception) {
+             GriefLogger.LOGGER.error("Failed to get session history from database", exception);
+             return List.of();
+diff --git a/common/src/main/java/com/daqem/grieflogger/database/repository/UserRepository.java b/common/src/main/java/com/daqem/grieflogger/database/repository/UserRepository.java
+index 5704f07..a793ff6 100644
+--- a/common/src/main/java/com/daqem/grieflogger/database/repository/UserRepository.java
++++ b/common/src/main/java/com/daqem/grieflogger/database/repository/UserRepository.java
+@@ -3,7 +3,6 @@ package com.daqem.grieflogger.database.repository;
+ import com.daqem.grieflogger.GriefLogger;
+ import com.daqem.grieflogger.database.Database;
+ 
+-import java.sql.PreparedStatement;
+ import java.sql.ResultSet;
+ import java.sql.SQLException;
+ import java.util.*;
+@@ -95,14 +94,18 @@ public class UserRepository extends Repository {
+                 SELECT id, name FROM users
+                 """;
+ 
+-        try (PreparedStatement preparedStatement = database.prepareStatement(query)) {
+-            ResultSet resultSet = preparedStatement.executeQuery();
+-            while (resultSet.next()) {
+-                usernames.put(
+-                        resultSet.getInt(1),
+-                        resultSet.getString(2)
+-                );
+-            }
++        try {
++            database.read(query, preparedStatement -> {
++                try (ResultSet resultSet = preparedStatement.executeQuery()) {
++                    while (resultSet.next()) {
++                        usernames.put(
++                                resultSet.getInt(1),
++                                resultSet.getString(2)
++                        );
++                    }
++                }
++                return null;
++            });
+         } catch (SQLException exception) {
+             GriefLogger.LOGGER.error("Failed to get all usernames from database", exception);
+         }
+diff --git a/gradle.properties b/gradle.properties
+index 25c45bb..1766b7f 100644
+--- a/gradle.properties
++++ b/gradle.properties
+@@ -4,7 +4,7 @@ minecraft_version=1.21.1
+ enabled_platforms=fabric,neoforge
+ 
+ archives_base_name=grieflogger
+-mod_version=1.2.10-1.21.1-yuuniverse.7
++mod_version=1.2.10-1.21.1-yuuniverse.8
+ sqlite_version=3.47.2.0
+ maven_group=com.daqem.grieflogger
+ mod_name=GriefLogger
+diff --git a/walkthrough.md b/walkthrough.md
+index c38a078..b5e65a8 100644
+--- a/walkthrough.md
++++ b/walkthrough.md
+@@ -45,3 +45,11 @@ No production activation. Pending writes remain in memory; unflushed process ter
+ - Provider .7 gives chats, commands, containers, items and sessions distinct table-specific SQLite index names. Existing blocks coordinates is retained. Indexed columns, data/schema payloads, lookup SQL/limits/order, MySQL statements and the useIndexes creation policy remain unchanged. No history deletion or inferred retention policy is introduced; disabling creation does not drop existing indexes.
+ - Fresh Java 21 :neoforge:build succeeds in an isolated source/cache. The actual provider and embedded SQLite pass all 109 storage assertions across 24 databases. Native enabled-index acceptance passes 26 checks and a fresh-process restart passes 25: every original history/dictionary/identity row remains exact, all 12,288 independently owned workload history rows persist, six coordinate plans use their own indexes, results keep exact payload/order and repeated initialization adds no duplicate indexes. Configuration-disabled/enabling and normal/shutdown regressions are recorded separately by the consuming repository when complete.
+ - Workload SQL has its own synthetic identity and is not claimed as native gameplay evidence or production throughput. Native fixture input is copied only from a stopped artifact-confined .6 world/database; originals remain retained. Retention/load, MySQL acceptance, broader recovery/migration and deferred clients remain open. No production activation. Author and committer use A-BenLi06 <ben_li06@outlook.com>.
++
++## 2026-10-23T19:11:57.4245248+08:00 (UTC+08:00) - Serialize complete repository reads against write transactions
++
++- Reproduced an actual UserRepository lookup publishing a username after a real SQLite INSERT but before the enclosing executeWrites transaction later rolled back. An independent JDBC connection saw zero committed users. The source .7 and diagnostic remain retained.
++- Add Database.read with the existing transaction monitor covering statement preparation, binding, complete result consumption and closure. All nine public read paths across users, blocks/interactions, containers/ranges, filtered items and sessions use it. Explicit result-set scopes retain existing query SQL, order, filters and payload decoding.
++- Reject same-thread read reentry during an active write and reads after an uncertain write outcome with SQLException, preserving repository error logging/fallback behavior. Successful detached values still reflect committed data. Queued-write recovery and transaction ownership stay with executeWrites.
++- Bump the isolated provider to .8. Java 21 :neoforge:build succeeds; the actual-provider/embedded SQLite suite passes 143 assertions, including all 109 previous storage checks, rollback/commit lookup barriers, open-cursor writer blocking, statement/cursor cleanup, failure propagation, other-thread progress and uncertainty/reentry fences.
++- Native all-nine-repository and restart acceptance is maintained in the owning project. This change does not establish MySQL or sustained load acceptance, add a read-only connection pool, or provide crash spooling. No production/deferred client activation occurs.

@@ -10,6 +10,14 @@ This review covers repository structure, native implementation boundaries, upstr
 
 ## Repository and implementation boundaries
 
+Update 2026-10-23, UTC+08:00: [repository read isolation](logging-read-isolation-2026-10-23.md)
+repairs actual GriefLogger lookups publishing uncommitted rows before rollback.
+Provider `.8` protects all nine repository read paths through cursor closure and
+rejects write-callback reentry/uncertain outcomes. Acceptance adds 143 actual
+SQLite and 187 native/restart checks with exact rows/components, normal commerce,
+shutdown and index regressions. The ordinary-client run remains deferred; full
+release, sustained load, MySQL, recovery and migration gates remain open.
+
 Update 2026-10-23, UTC+08:00: [logging coordinate indexes](logging-coordinate-indexes-2026-10-23.md)
 repairs five missing SQLite history indexes caused by a shared name. Provider `.7`
 adds distinct names, preserves original rows and checks exact coordinate plans

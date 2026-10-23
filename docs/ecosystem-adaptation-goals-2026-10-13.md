@@ -8,6 +8,14 @@ Citizens retains NPC behavior and its existing native extension contracts. Yuuni
 
 ## Selected artifacts and sides
 
+Progress 2026-10-23, UTC+08:00: [repository read isolation](logging-read-isolation-2026-10-23.md)
+repairs GriefLogger lookup results containing records that later rolled back.
+Provider `.8` serializes all nine public repository reads with write transactions
+through complete result consumption/closure. Exact commit/rollback/restart data
+and normal commerce/shutdown/index regressions add 143 actual SQLite and 187
+native/restart checks. Sustained load, MySQL, broader recovery, missing migration
+inputs and deferred physical-client acceptance remain open.
+
 Progress 2026-10-23, UTC+08:00: [logging coordinate indexes](logging-coordinate-indexes-2026-10-23.md)
 repairs a database-wide SQLite name collision that left five configured history
 indexes missing. Provider `.7` adds distinct names without rewriting history.

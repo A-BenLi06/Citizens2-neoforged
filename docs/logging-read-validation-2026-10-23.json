@@ -1,0 +1,5308 @@
+{
+  "createdAt": "2026-10-23T19:26:23.285945+08:00",
+  "timezone": "UTC+08:00",
+  "baseRevision": "d70cc6c",
+  "provider": {
+    "path": "artifacts/grieflogger-read-source/neoforge/build/libs/grieflogger-1.2.10-1.21.1-yuuniverse.8-neoforge.jar",
+    "bytes": 18928350,
+    "sha256": "193f7e35cfa0d672125030bfc018bbf1dde884cc66f88cbeb726036d433ebfbc"
+  },
+  "providerCommit": "c84322860c9d6c39b0b3c76ad8510c59060b7ae4",
+  "patch": {
+    "path": "tools/grieflogger-compat/repository-read-isolation.patch",
+    "bytes": 41281,
+    "sha256": "e472f06d9fcb5f4c1bdbd86151e456bb02d181e3008d1e13d157ab4418638dfb"
+  },
+  "unchangedDriverFiles": 163,
+  "providerSources": [
+    {
+      "path": "artifacts/grieflogger-read-source/common/src/main/java/com/daqem/grieflogger/database/Database.java",
+      "bytes": 11485,
+      "sha256": "6527f69c4051f683b3b9897d08cc0a0f84f4dd9fa07ddd1680cba545b0373e79"
+    },
+    {
+      "path": "artifacts/grieflogger-read-source/common/src/main/java/com/daqem/grieflogger/database/repository/BlockRepository.java",
+      "bytes": 15877,
+      "sha256": "05752fc79be306ad0dfef8d676cba2c45fa64986fd2ac6d6f428c47cebf1cf2b"
+    },
+    {
+      "path": "artifacts/grieflogger-read-source/common/src/main/java/com/daqem/grieflogger/database/repository/ContainerRepository.java",
+      "bytes": 19909,
+      "sha256": "d67990de8fa50357782730bf7e601b549a7afe4e957f8412937d25315b097b01"
+    },
+    {
+      "path": "artifacts/grieflogger-read-source/common/src/main/java/com/daqem/grieflogger/database/repository/ItemRepository.java",
+      "bytes": 12250,
+      "sha256": "aec022d070a802a7fa7d1ee863a2aaf26f792ec5c611408fcdb45578938271d6"
+    },
+    {
+      "path": "artifacts/grieflogger-read-source/common/src/main/java/com/daqem/grieflogger/database/repository/SessionRepository.java",
+      "bytes": 6656,
+      "sha256": "84e14d914bb59f13ea75c697883c8a9a6dca3fe540c5bfe60e6356f1af089542"
+    },
+    {
+      "path": "artifacts/grieflogger-read-source/common/src/main/java/com/daqem/grieflogger/database/repository/UserRepository.java",
+      "bytes": 3647,
+      "sha256": "d5a7fca3db9d0f327e3a293af4fbbf54658e17885e124b773f8a8ec63e1f69b3"
+    },
+    {
+      "path": "artifacts/grieflogger-read-source/gradle.properties",
+      "bytes": 718,
+      "sha256": "2846573be0977857af86f84e210db6f9be314262a59b25369ad765ba02250d03"
+    },
+    {
+      "path": "artifacts/grieflogger-read-source/walkthrough.md",
+      "bytes": 12236,
+      "sha256": "3acb6da82ae18063947549129a66a0968ab02bc42b41ea78066004c71c3aacaa"
+    }
+  ],
+  "providerBuild": {
+    "path": "artifacts/grieflogger-read-provider-build.log",
+    "bytes": 3381,
+    "sha256": "5480f2d050ddb0d5f044c867012922fb9bf8498dfffddcbf5becd31ef5e76684"
+  },
+  "installedProviders": [
+    {
+      "path": "artifacts/logging-read-accepted-server/mods/grieflogger-1.2.10-1.21.1-yuuniverse.8-neoforge.jar",
+      "bytes": 18928350,
+      "sha256": "193f7e35cfa0d672125030bfc018bbf1dde884cc66f88cbeb726036d433ebfbc"
+    },
+    {
+      "path": "artifacts/logging-read-normal-regression-server/mods/grieflogger-1.2.10-1.21.1-yuuniverse.8-neoforge.jar",
+      "bytes": 18928350,
+      "sha256": "193f7e35cfa0d672125030bfc018bbf1dde884cc66f88cbeb726036d433ebfbc"
+    },
+    {
+      "path": "artifacts/logging-read-shutdown-regression-server/mods/grieflogger-1.2.10-1.21.1-yuuniverse.8-neoforge.jar",
+      "bytes": 18928350,
+      "sha256": "193f7e35cfa0d672125030bfc018bbf1dde884cc66f88cbeb726036d433ebfbc"
+    },
+    {
+      "path": "artifacts/logging-read-index-regression-server/mods/grieflogger-1.2.10-1.21.1-yuuniverse.8-neoforge.jar",
+      "bytes": 18928350,
+      "sha256": "193f7e35cfa0d672125030bfc018bbf1dde884cc66f88cbeb726036d433ebfbc"
+    }
+  ],
+  "reproduction": [
+    {
+      "path": "artifacts/grieflogger-read-before-final/diagnostic.log",
+      "bytes": 526,
+      "sha256": "47e373ddf4ce75e033b33f3e82d33ec244407ad8cadcedc82b4b2680438e713f"
+    },
+    {
+      "path": "artifacts/grieflogger-read-before-final/ReadBefore.java",
+      "bytes": 2484,
+      "sha256": "e60ff849726a2c74ddc20b9e2d4b2f2fb9da5087b08c6ed3d546c4c6f9773b4c"
+    },
+    {
+      "path": "artifacts/grieflogger-read-before-final/classes/ReadBefore.class",
+      "bytes": 6998,
+      "sha256": "c604de4fdd0918a8dfcf418958c2af02a7ebecbf76f4fbc2a531b5c798779c3c"
+    },
+    {
+      "path": "artifacts/grieflogger-read-before-final/database.db",
+      "bytes": 12288,
+      "sha256": "4cd9fe930915aec6491e36bc3fd60a1ad43dfb8ca361cadad72df52289c3753a"
+    }
+  ],
+  "retainedDiagnosticFailures": [
+    {
+      "path": "artifacts/grieflogger-read-before/diagnostic.log",
+      "bytes": 1452,
+      "sha256": "5ab9fc75b5b8a8179f4e4137ab38ed5b0070008b2ca31388356841d42f8e1726"
+    },
+    {
+      "path": "artifacts/logging-read-final-reads.log",
+      "bytes": 7535,
+      "sha256": "e3352a722d8e8bfe63d5c2477ce121fd700f33792d0e5b048c6775b7aa4fff7a"
+    }
+  ],
+  "standalone": {
+    "createdAt": "2026-10-23T19:09:23.3827927+08:00",
+    "timezone": "UTC+08:00",
+    "checks": 143,
+    "actualProviderBytecode": true,
+    "minecraftBootstrapOwnerSubstitutedForStandaloneLogger": true,
+    "files": [
+      {
+        "path": "C:\\Users\\ben_l\\Documents\\Coding\\citizens2-neoforged\\artifacts\\grieflogger-read-source\\neoforge\\build\\libs\\grieflogger-1.2.10-1.21.1-yuuniverse.8-neoforge.jar",
+        "bytes": 18928350,
+        "sha256": "193f7e35cfa0d672125030bfc018bbf1dde884cc66f88cbeb726036d433ebfbc"
+      },
+      {
+        "path": "C:\\Users\\ben_l\\.gradle\\caches\\modules-2\\files-2.1\\org.slf4j\\slf4j-api\\2.0.9\\7cf2726fdcfbc8610f9a71fb3ed639871f315340\\slf4j-api-2.0.9.jar",
+        "bytes": 64579,
+        "sha256": "0818930dc8d7debb403204611691da58e49d42c50b6ffcfdce02dadb7c3c2b6c"
+      },
+      {
+        "path": "C:\\Users\\ben_l\\Documents\\Coding\\citizens2-neoforged\\artifacts\\grieflogger-read-final\\sqlite.jar",
+        "bytes": 14268566,
+        "sha256": "b4455e842d1cc6c9c9c319684815fde61d742caffe7ff649635bfad1d16f4692"
+      },
+      {
+        "path": "C:\\Users\\ben_l\\Documents\\Coding\\citizens2-neoforged\\artifacts\\grieflogger-read-final\\tests.log",
+        "bytes": 16962,
+        "sha256": "b66aa46ce4c59c985d62e4d272053d73eea7e4347da76c14647935fb1c3a6d56"
+      },
+      {
+        "path": "C:\\Users\\ben_l\\Documents\\Coding\\citizens2-neoforged\\tools\\grieflogger-compat\\run-storage-tests.ps1",
+        "bytes": 3411,
+        "sha256": "db250ec08a8defa01b60c4245d39b604826ed75aef2dbd2f4e3d00e2832bd6c3"
+      },
+      {
+        "path": "C:\\Users\\ben_l\\Documents\\Coding\\citizens2-neoforged\\tools\\grieflogger-compat\\storage-tests\\StorageRecoveryTest.java",
+        "bytes": 40628,
+        "sha256": "4b1ddc1e02ddb271dcbe25074dcc88191de185a307a4e0790e50e7885fe980fc"
+      },
+      {
+        "path": "C:\\Users\\ben_l\\Documents\\Coding\\citizens2-neoforged\\tools\\grieflogger-compat\\storage-tests\\com\\daqem\\grieflogger\\GriefLogger.java",
+        "bytes": 1071,
+        "sha256": "1ba77f2b8051b6bd0869e5176650c8aa5d02cb1759566bdf3688c6b1540826fa"
+      }
+    ]
+  },
+  "standaloneDatabases": [
+    {
+      "path": "artifacts/grieflogger-read-final/databases/batch.db",
+      "bytes": 8192,
+      "sha256": "baf8b97728677d02abd29e092f328c0ae935b7a7726b94dd24e39bc729ba335e",
+      "quickCheck": "ok"
+    },
+    {
+      "path": "artifacts/grieflogger-read-final/databases/commit.db",
+      "bytes": 8192,
+      "sha256": "bdbb7c9059487b8b3ece86128bbda58217d76386ef96b23cd8c396ccedce8c1a",
+      "quickCheck": "ok"
+    },
+    {
+      "path": "artifacts/grieflogger-read-final/databases/concurrent.db",
+      "bytes": 20480,
+      "sha256": "23c4288e0bd8849ab8f4433756bac71bbee7ec4da36018657feb2c34e31c6bf7",
+      "quickCheck": "ok"
+    },
+    {
+      "path": "artifacts/grieflogger-read-final/databases/full_batch.db",
+      "bytes": 40960,
+      "sha256": "6e220b1793a9addc6e767150348ffde420187333719934fee388f4ab8ac5a581",
+      "quickCheck": "ok"
+    },
+    {
+      "path": "artifacts/grieflogger-read-final/databases/full_mode_DEFERRED_IMMEDIATE.db",
+      "bytes": 8192,
+      "sha256": "46dcfad3035e099720b902d1a907fcbc0e41263ca932e04126d766baa3a7dbfc",
+      "quickCheck": "ok"
+    },
+    {
+      "path": "artifacts/grieflogger-read-final/databases/full_mode_IMMEDIATE_DEFERRED.db",
+      "bytes": 8192,
+      "sha256": "46dcfad3035e099720b902d1a907fcbc0e41263ca932e04126d766baa3a7dbfc",
+      "quickCheck": "ok"
+    },
+    {
+      "path": "artifacts/grieflogger-read-final/databases/full_mode_IMMEDIATE_IMMEDIATE.db",
+      "bytes": 8192,
+      "sha256": "46dcfad3035e099720b902d1a907fcbc0e41263ca932e04126d766baa3a7dbfc",
+      "quickCheck": "ok"
+    },
+    {
+      "path": "artifacts/grieflogger-read-final/databases/full_ordinary.db",
+      "bytes": 40960,
+      "sha256": "6e220b1793a9addc6e767150348ffde420187333719934fee388f4ab8ac5a581",
+      "quickCheck": "ok"
+    },
+    {
+      "path": "artifacts/grieflogger-read-final/databases/fullaftercommit.db",
+      "bytes": 8192,
+      "sha256": "f6fd631a5fe058bfc1fdb781a56672174ecfedb8949177a046f2eed816a6973e",
+      "quickCheck": "ok"
+    },
+    {
+      "path": "artifacts/grieflogger-read-final/databases/legacy.db",
+      "bytes": 8192,
+      "sha256": "a32d7f45d70f744ac68e396c37a11d301a3041a3aa18a2070b82007a592a7785",
+      "quickCheck": "ok"
+    },
+    {
+      "path": "artifacts/grieflogger-read-final/databases/legacybatch.db",
+      "bytes": 8192,
+      "sha256": "d49cbcc404baea98d81b7f6fe146df94f47327b54c9fe42196e7eba44fcbb284",
+      "quickCheck": "ok"
+    },
+    {
+      "path": "artifacts/grieflogger-read-final/databases/legacyfull.db",
+      "bytes": 8192,
+      "sha256": "46dcfad3035e099720b902d1a907fcbc0e41263ca932e04126d766baa3a7dbfc",
+      "quickCheck": "ok"
+    },
+    {
+      "path": "artifacts/grieflogger-read-final/databases/locked.db",
+      "bytes": 8192,
+      "sha256": "4f4994ff1d9a84c419d752ea6962524af229d02787130e6a4577f4f92e8313c6",
+      "quickCheck": "ok"
+    },
+    {
+      "path": "artifacts/grieflogger-read-final/databases/lookup_commit.db",
+      "bytes": 16384,
+      "sha256": "c0bccc1f3486cb146323272e3f9589f67341b01f95c52579267ff287c65a6689",
+      "quickCheck": "ok"
+    },
+    {
+      "path": "artifacts/grieflogger-read-final/databases/lookup_cursor.db",
+      "bytes": 8192,
+      "sha256": "eb07be283eb7aa388f24259667ce4c9906d0c3d96bc71dd5b5bb95e95451b3ca",
+      "quickCheck": "ok"
+    },
+    {
+      "path": "artifacts/grieflogger-read-final/databases/lookup_failures.db",
+      "bytes": 8192,
+      "sha256": "f77af1f1a9d77eba22e19e0c32a7058046fd1a83600cba1b1d4e567ab5d3d4e6",
+      "quickCheck": "ok"
+    },
+    {
+      "path": "artifacts/grieflogger-read-final/databases/lookup_rollback.db",
+      "bytes": 16384,
+      "sha256": "5c737a07683aeac7fab393aadf5758d9c04f15251b90b943eee4bd844d812f27",
+      "quickCheck": "ok"
+    },
+    {
+      "path": "artifacts/grieflogger-read-final/databases/mode_DEFERRED_IMMEDIATE.db",
+      "bytes": 8192,
+      "sha256": "46dcfad3035e099720b902d1a907fcbc0e41263ca932e04126d766baa3a7dbfc",
+      "quickCheck": "ok"
+    },
+    {
+      "path": "artifacts/grieflogger-read-final/databases/mode_IMMEDIATE_DEFERRED.db",
+      "bytes": 8192,
+      "sha256": "46dcfad3035e099720b902d1a907fcbc0e41263ca932e04126d766baa3a7dbfc",
+      "quickCheck": "ok"
+    },
+    {
+      "path": "artifacts/grieflogger-read-final/databases/mode_IMMEDIATE_IMMEDIATE.db",
+      "bytes": 8192,
+      "sha256": "46dcfad3035e099720b902d1a907fcbc0e41263ca932e04126d766baa3a7dbfc",
+      "quickCheck": "ok"
+    },
+    {
+      "path": "artifacts/grieflogger-read-final/databases/prefix.db",
+      "bytes": 8192,
+      "sha256": "94f9863160be9e963d4a90f53ac0be46a026e869d6e9a8a4b3400f6a83539625",
+      "quickCheck": "ok"
+    },
+    {
+      "path": "artifacts/grieflogger-read-final/databases/reader_batch.db",
+      "bytes": 8192,
+      "sha256": "334c45f0c7679aa994118e0b59c44f39567ccd6d4bb3239ce927e64d33ed115c",
+      "quickCheck": "ok"
+    },
+    {
+      "path": "artifacts/grieflogger-read-final/databases/reader_ordinary.db",
+      "bytes": 8192,
+      "sha256": "05798d83e725ea8bf17179b758056e6eae871ce591cfa612bac999fc6f24f971",
+      "quickCheck": "ok"
+    },
+    {
+      "path": "artifacts/grieflogger-read-final/databases/rollback.db",
+      "bytes": 8192,
+      "sha256": "b1e6abc15076858628c97611c52174db9893371c35fd502bfbcd324c3f1a4d59",
+      "quickCheck": "ok"
+    },
+    {
+      "path": "artifacts/grieflogger-read-final/databases/shutdown_locked.db",
+      "bytes": 8192,
+      "sha256": "2652c97b46e975db44e2d2c882f1033ecb7e79e91d3e33aa96e43ccfe337efda",
+      "quickCheck": "ok"
+    },
+    {
+      "path": "artifacts/grieflogger-read-final/databases/shutdown_race.db",
+      "bytes": 8192,
+      "sha256": "a55ecd83cf9256bca86a2580912a78c55ce310daec404bd476ccb8f739cb9fd9",
+      "quickCheck": "ok"
+    },
+    {
+      "path": "artifacts/grieflogger-read-final/databases/shutdown_reentry.db",
+      "bytes": 8192,
+      "sha256": "ffdd03d1327e1b91b9857c71ae9003ae55cc728223505a54cb6a23deea30388e",
+      "quickCheck": "ok"
+    },
+    {
+      "path": "artifacts/grieflogger-read-final/databases/wrappedbusy.db",
+      "bytes": 8192,
+      "sha256": "f6fd631a5fe058bfc1fdb781a56672174ecfedb8949177a046f2eed816a6973e",
+      "quickCheck": "ok"
+    }
+  ],
+  "readAcceptance": {
+    "state": {
+      "tables": {
+        "users": [
+          [
+            1,
+            1,
+            "LoggingActor",
+            "dbda5e85-8e71-4400-a63c-00555eb44fe2"
+          ],
+          [
+            2,
+            2,
+            "ReadAudit",
+            "a7827ab9-5d78-4209-93b8-a1682f47130c"
+          ]
+        ],
+        "usernames": [
+          [
+            1,
+            1,
+            1792750842213,
+            "dbda5e85-8e71-4400-a63c-00555eb44fe2",
+            "LoggingActor"
+          ]
+        ],
+        "levels": [
+          [
+            1,
+            1,
+            "minecraft:overworld"
+          ],
+          [
+            2,
+            2,
+            "minecraft:the_nether"
+          ],
+          [
+            3,
+            3,
+            "minecraft:the_end"
+          ]
+        ],
+        "materials": [
+          [
+            1,
+            1,
+            "stone"
+          ],
+          [
+            2,
+            2,
+            "create:shaft"
+          ],
+          [
+            3,
+            3,
+            "oak_door"
+          ],
+          [
+            4,
+            4,
+            "chest"
+          ],
+          [
+            5,
+            5,
+            "paper"
+          ]
+        ],
+        "entities": [
+          [
+            1,
+            1,
+            "pig"
+          ]
+        ],
+        "blocks": [
+          [
+            1,
+            1792750842327,
+            1,
+            1,
+            3,
+            -60,
+            3,
+            1,
+            1
+          ],
+          [
+            2,
+            1792750842359,
+            1,
+            1,
+            5,
+            -60,
+            3,
+            2,
+            1
+          ],
+          [
+            3,
+            1792750842372,
+            1,
+            1,
+            11,
+            -60,
+            3,
+            3,
+            1
+          ],
+          [
+            4,
+            1792750842394,
+            1,
+            1,
+            7,
+            -60,
+            3,
+            4,
+            1
+          ],
+          [
+            5,
+            1792750842401,
+            1,
+            1,
+            7,
+            -60,
+            3,
+            4,
+            2
+          ],
+          [
+            6,
+            1792750842540,
+            1,
+            1,
+            4,
+            -60,
+            6,
+            1,
+            3
+          ],
+          [
+            7,
+            1792750842832,
+            1,
+            1,
+            13,
+            -60,
+            7,
+            1,
+            1
+          ],
+          [
+            8,
+            1792750842834,
+            1,
+            1,
+            13,
+            -60,
+            7,
+            1,
+            0
+          ],
+          [
+            9,
+            1792750842853,
+            1,
+            1,
+            13,
+            -60,
+            7,
+            1,
+            1
+          ],
+          [
+            10,
+            1792750842855,
+            1,
+            1,
+            13,
+            -60,
+            7,
+            1,
+            0
+          ],
+          [
+            11,
+            1792750842872,
+            1,
+            1,
+            13,
+            -60,
+            7,
+            1,
+            1
+          ],
+          [
+            12,
+            1792750842873,
+            1,
+            1,
+            13,
+            -60,
+            7,
+            1,
+            0
+          ],
+          [
+            13,
+            1792750842892,
+            1,
+            1,
+            13,
+            -60,
+            7,
+            1,
+            1
+          ],
+          [
+            14,
+            1792750842893,
+            1,
+            1,
+            13,
+            -60,
+            7,
+            1,
+            0
+          ],
+          [
+            15,
+            1792750842913,
+            1,
+            1,
+            13,
+            -60,
+            7,
+            1,
+            1
+          ],
+          [
+            16,
+            1792750842916,
+            1,
+            1,
+            13,
+            -60,
+            7,
+            1,
+            0
+          ],
+          [
+            17,
+            1792750842943,
+            1,
+            1,
+            13,
+            -60,
+            7,
+            1,
+            1
+          ],
+          [
+            18,
+            1792750842945,
+            1,
+            1,
+            13,
+            -60,
+            7,
+            1,
+            0
+          ],
+          [
+            19,
+            1792750842968,
+            1,
+            1,
+            13,
+            -60,
+            7,
+            1,
+            1
+          ],
+          [
+            20,
+            1792750842970,
+            1,
+            1,
+            13,
+            -60,
+            7,
+            1,
+            0
+          ],
+          [
+            21,
+            1792750842990,
+            1,
+            1,
+            13,
+            -60,
+            7,
+            1,
+            1
+          ],
+          [
+            22,
+            1792750842992,
+            1,
+            1,
+            13,
+            -60,
+            7,
+            1,
+            0
+          ],
+          [
+            23,
+            1792750843010,
+            1,
+            1,
+            13,
+            -60,
+            7,
+            1,
+            1
+          ],
+          [
+            24,
+            1792750843012,
+            1,
+            1,
+            13,
+            -60,
+            7,
+            1,
+            0
+          ],
+          [
+            25,
+            1792750843030,
+            1,
+            1,
+            13,
+            -60,
+            7,
+            1,
+            1
+          ],
+          [
+            26,
+            1792750843033,
+            1,
+            1,
+            13,
+            -60,
+            7,
+            1,
+            0
+          ],
+          [
+            27,
+            1792750843052,
+            1,
+            1,
+            13,
+            -60,
+            7,
+            1,
+            1
+          ],
+          [
+            28,
+            1792750843054,
+            1,
+            1,
+            13,
+            -60,
+            7,
+            1,
+            0
+          ],
+          [
+            29,
+            1792750843072,
+            1,
+            1,
+            13,
+            -60,
+            7,
+            1,
+            1
+          ],
+          [
+            30,
+            1792750843074,
+            1,
+            1,
+            13,
+            -60,
+            7,
+            1,
+            0
+          ],
+          [
+            31,
+            1792750843090,
+            1,
+            1,
+            13,
+            -60,
+            7,
+            1,
+            1
+          ],
+          [
+            32,
+            1792750843092,
+            1,
+            1,
+            13,
+            -60,
+            7,
+            1,
+            0
+          ],
+          [
+            33,
+            1792750843109,
+            1,
+            1,
+            13,
+            -60,
+            7,
+            1,
+            1
+          ],
+          [
+            34,
+            1792750843111,
+            1,
+            1,
+            13,
+            -60,
+            7,
+            1,
+            0
+          ],
+          [
+            35,
+            1792750843127,
+            1,
+            1,
+            13,
+            -60,
+            7,
+            1,
+            1
+          ],
+          [
+            36,
+            1792750843128,
+            1,
+            1,
+            13,
+            -60,
+            7,
+            1,
+            0
+          ],
+          [
+            37,
+            1792750843147,
+            1,
+            1,
+            13,
+            -60,
+            7,
+            1,
+            1
+          ],
+          [
+            38,
+            1792750843148,
+            1,
+            1,
+            13,
+            -60,
+            7,
+            1,
+            0
+          ],
+          [
+            39,
+            1792750843172,
+            1,
+            1,
+            13,
+            -60,
+            7,
+            1,
+            1
+          ],
+          [
+            40,
+            1792750843174,
+            1,
+            1,
+            13,
+            -60,
+            7,
+            1,
+            0
+          ],
+          [
+            41,
+            1792750843194,
+            1,
+            1,
+            13,
+            -60,
+            7,
+            1,
+            1
+          ],
+          [
+            42,
+            1792750843195,
+            1,
+            1,
+            13,
+            -60,
+            7,
+            1,
+            0
+          ],
+          [
+            43,
+            1792750843214,
+            1,
+            1,
+            13,
+            -60,
+            7,
+            1,
+            1
+          ],
+          [
+            44,
+            1792750843215,
+            1,
+            1,
+            13,
+            -60,
+            7,
+            1,
+            0
+          ],
+          [
+            45,
+            1792750843232,
+            1,
+            1,
+            13,
+            -60,
+            7,
+            1,
+            1
+          ],
+          [
+            46,
+            1792750843233,
+            1,
+            1,
+            13,
+            -60,
+            7,
+            1,
+            0
+          ],
+          [
+            47,
+            1792750843251,
+            1,
+            1,
+            13,
+            -60,
+            7,
+            1,
+            1
+          ],
+          [
+            48,
+            1792750843253,
+            1,
+            1,
+            13,
+            -60,
+            7,
+            1,
+            0
+          ],
+          [
+            49,
+            1792750843273,
+            1,
+            1,
+            13,
+            -60,
+            7,
+            1,
+            1
+          ],
+          [
+            50,
+            1792750843273,
+            1,
+            1,
+            13,
+            -60,
+            7,
+            1,
+            0
+          ],
+          [
+            51,
+            1792750843291,
+            1,
+            1,
+            13,
+            -60,
+            7,
+            1,
+            1
+          ],
+          [
+            52,
+            1792750843292,
+            1,
+            1,
+            13,
+            -60,
+            7,
+            1,
+            0
+          ],
+          [
+            53,
+            1792750843311,
+            1,
+            1,
+            13,
+            -60,
+            7,
+            1,
+            1
+          ],
+          [
+            54,
+            1792750843313,
+            1,
+            1,
+            13,
+            -60,
+            7,
+            1,
+            0
+          ],
+          [
+            55,
+            1792750843328,
+            1,
+            1,
+            13,
+            -60,
+            7,
+            1,
+            1
+          ],
+          [
+            56,
+            1792750843329,
+            1,
+            1,
+            13,
+            -60,
+            7,
+            1,
+            0
+          ],
+          [
+            57,
+            1792750843347,
+            1,
+            1,
+            13,
+            -60,
+            7,
+            1,
+            1
+          ],
+          [
+            58,
+            1792750843349,
+            1,
+            1,
+            13,
+            -60,
+            7,
+            1,
+            0
+          ],
+          [
+            59,
+            1792750843365,
+            1,
+            1,
+            13,
+            -60,
+            7,
+            1,
+            1
+          ],
+          [
+            60,
+            1792750843367,
+            1,
+            1,
+            13,
+            -60,
+            7,
+            1,
+            0
+          ],
+          [
+            61,
+            1792750843384,
+            1,
+            1,
+            13,
+            -60,
+            7,
+            1,
+            1
+          ],
+          [
+            62,
+            1792750843385,
+            1,
+            1,
+            13,
+            -60,
+            7,
+            1,
+            0
+          ],
+          [
+            63,
+            1792750843405,
+            1,
+            1,
+            13,
+            -60,
+            7,
+            1,
+            1
+          ],
+          [
+            64,
+            1792750843406,
+            1,
+            1,
+            13,
+            -60,
+            7,
+            1,
+            0
+          ],
+          [
+            65,
+            1792750843424,
+            1,
+            1,
+            13,
+            -60,
+            7,
+            1,
+            1
+          ],
+          [
+            66,
+            1792750843425,
+            1,
+            1,
+            13,
+            -60,
+            7,
+            1,
+            0
+          ],
+          [
+            67,
+            1792750843441,
+            1,
+            1,
+            13,
+            -60,
+            7,
+            1,
+            1
+          ],
+          [
+            68,
+            1792750843442,
+            1,
+            1,
+            13,
+            -60,
+            7,
+            1,
+            0
+          ],
+          [
+            69,
+            1792750843458,
+            1,
+            1,
+            13,
+            -60,
+            7,
+            1,
+            1
+          ],
+          [
+            70,
+            1792750843459,
+            1,
+            1,
+            13,
+            -60,
+            7,
+            1,
+            0
+          ],
+          [
+            71,
+            1792750843475,
+            1,
+            1,
+            13,
+            -60,
+            7,
+            1,
+            1
+          ],
+          [
+            72,
+            1792750843476,
+            1,
+            1,
+            13,
+            -60,
+            7,
+            1,
+            0
+          ],
+          [
+            73,
+            1792750843493,
+            1,
+            1,
+            13,
+            -60,
+            7,
+            1,
+            1
+          ],
+          [
+            74,
+            1792750843494,
+            1,
+            1,
+            13,
+            -60,
+            7,
+            1,
+            0
+          ],
+          [
+            75,
+            1792750843512,
+            1,
+            1,
+            13,
+            -60,
+            7,
+            1,
+            1
+          ],
+          [
+            76,
+            1792750843514,
+            1,
+            1,
+            13,
+            -60,
+            7,
+            1,
+            0
+          ],
+          [
+            77,
+            1792750843532,
+            1,
+            1,
+            13,
+            -60,
+            7,
+            1,
+            1
+          ],
+          [
+            78,
+            1792750843534,
+            1,
+            1,
+            13,
+            -60,
+            7,
+            1,
+            0
+          ],
+          [
+            79,
+            1792750843553,
+            1,
+            1,
+            13,
+            -60,
+            7,
+            1,
+            1
+          ],
+          [
+            80,
+            1792750843554,
+            1,
+            1,
+            13,
+            -60,
+            7,
+            1,
+            0
+          ],
+          [
+            81,
+            1792750843571,
+            1,
+            1,
+            13,
+            -60,
+            7,
+            1,
+            1
+          ],
+          [
+            82,
+            1792750843572,
+            1,
+            1,
+            13,
+            -60,
+            7,
+            1,
+            0
+          ],
+          [
+            83,
+            1792750843587,
+            1,
+            1,
+            13,
+            -60,
+            7,
+            1,
+            1
+          ],
+          [
+            84,
+            1792750843588,
+            1,
+            1,
+            13,
+            -60,
+            7,
+            1,
+            0
+          ],
+          [
+            85,
+            1792750843604,
+            1,
+            1,
+            13,
+            -60,
+            7,
+            1,
+            1
+          ],
+          [
+            86,
+            1792750843605,
+            1,
+            1,
+            13,
+            -60,
+            7,
+            1,
+            0
+          ],
+          [
+            87,
+            1792750843623,
+            1,
+            1,
+            13,
+            -60,
+            7,
+            1,
+            1
+          ],
+          [
+            88,
+            1792750843624,
+            1,
+            1,
+            13,
+            -60,
+            7,
+            1,
+            0
+          ],
+          [
+            89,
+            1792750843641,
+            1,
+            1,
+            13,
+            -60,
+            7,
+            1,
+            1
+          ],
+          [
+            90,
+            1792750843642,
+            1,
+            1,
+            13,
+            -60,
+            7,
+            1,
+            0
+          ],
+          [
+            91,
+            1792750843659,
+            1,
+            1,
+            13,
+            -60,
+            7,
+            1,
+            1
+          ],
+          [
+            92,
+            1792750843660,
+            1,
+            1,
+            13,
+            -60,
+            7,
+            1,
+            0
+          ],
+          [
+            93,
+            1792750843680,
+            1,
+            1,
+            13,
+            -60,
+            7,
+            1,
+            1
+          ],
+          [
+            94,
+            1792750843684,
+            1,
+            1,
+            13,
+            -60,
+            7,
+            1,
+            0
+          ],
+          [
+            95,
+            1792750843709,
+            1,
+            1,
+            13,
+            -60,
+            7,
+            1,
+            1
+          ],
+          [
+            96,
+            1792750843711,
+            1,
+            1,
+            13,
+            -60,
+            7,
+            1,
+            0
+          ],
+          [
+            97,
+            1792750843728,
+            1,
+            1,
+            13,
+            -60,
+            7,
+            1,
+            1
+          ],
+          [
+            98,
+            1792750843729,
+            1,
+            1,
+            13,
+            -60,
+            7,
+            1,
+            0
+          ],
+          [
+            99,
+            1792750843745,
+            1,
+            1,
+            13,
+            -60,
+            7,
+            1,
+            1
+          ],
+          [
+            100,
+            1792750843746,
+            1,
+            1,
+            13,
+            -60,
+            7,
+            1,
+            0
+          ],
+          [
+            101,
+            1792750843768,
+            1,
+            1,
+            13,
+            -60,
+            7,
+            1,
+            1
+          ],
+          [
+            102,
+            1792750843769,
+            1,
+            1,
+            13,
+            -60,
+            7,
+            1,
+            0
+          ],
+          [
+            103,
+            1792750843794,
+            1,
+            1,
+            13,
+            -60,
+            7,
+            1,
+            1
+          ],
+          [
+            104,
+            1792750843796,
+            1,
+            1,
+            13,
+            -60,
+            7,
+            1,
+            0
+          ],
+          [
+            105,
+            1792750843820,
+            1,
+            1,
+            13,
+            -60,
+            7,
+            1,
+            1
+          ],
+          [
+            106,
+            1792750843822,
+            1,
+            1,
+            13,
+            -60,
+            7,
+            1,
+            0
+          ],
+          [
+            107,
+            1792750843839,
+            1,
+            1,
+            13,
+            -60,
+            7,
+            1,
+            1
+          ],
+          [
+            108,
+            1792750843840,
+            1,
+            1,
+            13,
+            -60,
+            7,
+            1,
+            0
+          ],
+          [
+            109,
+            1792750843858,
+            1,
+            1,
+            13,
+            -60,
+            7,
+            1,
+            1
+          ],
+          [
+            110,
+            1792750843859,
+            1,
+            1,
+            13,
+            -60,
+            7,
+            1,
+            0
+          ],
+          [
+            111,
+            1792750843875,
+            1,
+            1,
+            13,
+            -60,
+            7,
+            1,
+            1
+          ],
+          [
+            112,
+            1792750843876,
+            1,
+            1,
+            13,
+            -60,
+            7,
+            1,
+            0
+          ],
+          [
+            113,
+            1792750843892,
+            1,
+            1,
+            13,
+            -60,
+            7,
+            1,
+            1
+          ],
+          [
+            114,
+            1792750843893,
+            1,
+            1,
+            13,
+            -60,
+            7,
+            1,
+            0
+          ],
+          [
+            115,
+            1792750843908,
+            1,
+            1,
+            13,
+            -60,
+            7,
+            1,
+            1
+          ],
+          [
+            116,
+            1792750843909,
+            1,
+            1,
+            13,
+            -60,
+            7,
+            1,
+            0
+          ],
+          [
+            117,
+            1792750843925,
+            1,
+            1,
+            13,
+            -60,
+            7,
+            1,
+            1
+          ],
+          [
+            118,
+            1792750843926,
+            1,
+            1,
+            13,
+            -60,
+            7,
+            1,
+            0
+          ],
+          [
+            119,
+            1792750843941,
+            1,
+            1,
+            13,
+            -60,
+            7,
+            1,
+            1
+          ],
+          [
+            120,
+            1792750843942,
+            1,
+            1,
+            13,
+            -60,
+            7,
+            1,
+            0
+          ],
+          [
+            121,
+            1792750843957,
+            1,
+            1,
+            13,
+            -60,
+            7,
+            1,
+            1
+          ],
+          [
+            122,
+            1792750843958,
+            1,
+            1,
+            13,
+            -60,
+            7,
+            1,
+            0
+          ],
+          [
+            123,
+            1792750843973,
+            1,
+            1,
+            13,
+            -60,
+            7,
+            1,
+            1
+          ],
+          [
+            124,
+            1792750843974,
+            1,
+            1,
+            13,
+            -60,
+            7,
+            1,
+            0
+          ],
+          [
+            125,
+            1792750843990,
+            1,
+            1,
+            13,
+            -60,
+            7,
+            1,
+            1
+          ],
+          [
+            126,
+            1792750843992,
+            1,
+            1,
+            13,
+            -60,
+            7,
+            1,
+            0
+          ],
+          [
+            127,
+            1792750844014,
+            1,
+            1,
+            13,
+            -60,
+            7,
+            1,
+            1
+          ],
+          [
+            128,
+            1792750844015,
+            1,
+            1,
+            13,
+            -60,
+            7,
+            1,
+            0
+          ],
+          [
+            129,
+            1792750844031,
+            1,
+            1,
+            13,
+            -60,
+            7,
+            1,
+            1
+          ],
+          [
+            130,
+            1792750844032,
+            1,
+            1,
+            13,
+            -60,
+            7,
+            1,
+            0
+          ],
+          [
+            131,
+            1792750844049,
+            1,
+            1,
+            13,
+            -60,
+            7,
+            1,
+            1
+          ],
+          [
+            132,
+            1792750844049,
+            1,
+            1,
+            13,
+            -60,
+            7,
+            1,
+            0
+          ],
+          [
+            133,
+            1792750844066,
+            1,
+            1,
+            13,
+            -60,
+            7,
+            1,
+            1
+          ],
+          [
+            134,
+            1792750844067,
+            1,
+            1,
+            13,
+            -60,
+            7,
+            1,
+            0
+          ],
+          [
+            135,
+            1792750844083,
+            1,
+            1,
+            13,
+            -60,
+            7,
+            1,
+            1
+          ],
+          [
+            136,
+            1792750844085,
+            1,
+            1,
+            13,
+            -60,
+            7,
+            1,
+            0
+          ],
+          [
+            137,
+            1792750844100,
+            1,
+            1,
+            13,
+            -60,
+            7,
+            1,
+            1
+          ],
+          [
+            138,
+            1792750844101,
+            1,
+            1,
+            13,
+            -60,
+            7,
+            1,
+            0
+          ],
+          [
+            139,
+            1792750844118,
+            1,
+            1,
+            13,
+            -60,
+            7,
+            1,
+            1
+          ],
+          [
+            140,
+            1792750844119,
+            1,
+            1,
+            13,
+            -60,
+            7,
+            1,
+            0
+          ],
+          [
+            141,
+            1792750844136,
+            1,
+            1,
+            13,
+            -60,
+            7,
+            1,
+            1
+          ],
+          [
+            142,
+            1792750844137,
+            1,
+            1,
+            13,
+            -60,
+            7,
+            1,
+            0
+          ],
+          [
+            143,
+            1792750844165,
+            1,
+            1,
+            13,
+            -60,
+            7,
+            1,
+            1
+          ],
+          [
+            144,
+            1792750844168,
+            1,
+            1,
+            13,
+            -60,
+            7,
+            1,
+            0
+          ],
+          [
+            145,
+            1792750844185,
+            1,
+            1,
+            13,
+            -60,
+            7,
+            1,
+            1
+          ],
+          [
+            146,
+            1792750844187,
+            1,
+            1,
+            13,
+            -60,
+            7,
+            1,
+            0
+          ],
+          [
+            147,
+            1792750844205,
+            1,
+            1,
+            13,
+            -60,
+            7,
+            1,
+            1
+          ],
+          [
+            148,
+            1792750844206,
+            1,
+            1,
+            13,
+            -60,
+            7,
+            1,
+            0
+          ],
+          [
+            149,
+            1792750844222,
+            1,
+            1,
+            13,
+            -60,
+            7,
+            1,
+            1
+          ],
+          [
+            150,
+            1792750844223,
+            1,
+            1,
+            13,
+            -60,
+            7,
+            1,
+            0
+          ],
+          [
+            151,
+            1792750844240,
+            1,
+            1,
+            13,
+            -60,
+            7,
+            1,
+            1
+          ],
+          [
+            152,
+            1792750844240,
+            1,
+            1,
+            13,
+            -60,
+            7,
+            1,
+            0
+          ],
+          [
+            153,
+            1792750844257,
+            1,
+            1,
+            13,
+            -60,
+            7,
+            1,
+            1
+          ],
+          [
+            154,
+            1792750844258,
+            1,
+            1,
+            13,
+            -60,
+            7,
+            1,
+            0
+          ],
+          [
+            155,
+            1792750844275,
+            1,
+            1,
+            13,
+            -60,
+            7,
+            1,
+            1
+          ],
+          [
+            156,
+            1792750844276,
+            1,
+            1,
+            13,
+            -60,
+            7,
+            1,
+            0
+          ],
+          [
+            157,
+            1792750844291,
+            1,
+            1,
+            13,
+            -60,
+            7,
+            1,
+            1
+          ],
+          [
+            158,
+            1792750844292,
+            1,
+            1,
+            13,
+            -60,
+            7,
+            1,
+            0
+          ],
+          [
+            159,
+            1792750844309,
+            1,
+            1,
+            13,
+            -60,
+            7,
+            1,
+            1
+          ],
+          [
+            160,
+            1792750844310,
+            1,
+            1,
+            13,
+            -60,
+            7,
+            1,
+            0
+          ],
+          [
+            161,
+            1792750844333,
+            1,
+            1,
+            13,
+            -60,
+            7,
+            1,
+            1
+          ],
+          [
+            162,
+            1792750844335,
+            1,
+            1,
+            13,
+            -60,
+            7,
+            1,
+            0
+          ],
+          [
+            163,
+            1792750844359,
+            1,
+            1,
+            13,
+            -60,
+            7,
+            1,
+            1
+          ],
+          [
+            164,
+            1792750844360,
+            1,
+            1,
+            13,
+            -60,
+            7,
+            1,
+            0
+          ],
+          [
+            165,
+            1792750844380,
+            1,
+            1,
+            13,
+            -60,
+            7,
+            1,
+            1
+          ],
+          [
+            166,
+            1792750844382,
+            1,
+            1,
+            13,
+            -60,
+            7,
+            1,
+            0
+          ],
+          [
+            167,
+            1792750844399,
+            1,
+            1,
+            13,
+            -60,
+            7,
+            1,
+            1
+          ],
+          [
+            168,
+            1792750844400,
+            1,
+            1,
+            13,
+            -60,
+            7,
+            1,
+            0
+          ],
+          [
+            169,
+            1792750844421,
+            1,
+            1,
+            13,
+            -60,
+            7,
+            1,
+            1
+          ],
+          [
+            170,
+            1792750844422,
+            1,
+            1,
+            13,
+            -60,
+            7,
+            1,
+            0
+          ],
+          [
+            171,
+            1792750844439,
+            1,
+            1,
+            13,
+            -60,
+            7,
+            1,
+            1
+          ],
+          [
+            172,
+            1792750844440,
+            1,
+            1,
+            13,
+            -60,
+            7,
+            1,
+            0
+          ],
+          [
+            173,
+            1792750844456,
+            1,
+            1,
+            13,
+            -60,
+            7,
+            1,
+            1
+          ],
+          [
+            174,
+            1792750844458,
+            1,
+            1,
+            13,
+            -60,
+            7,
+            1,
+            0
+          ],
+          [
+            175,
+            1792750844474,
+            1,
+            1,
+            13,
+            -60,
+            7,
+            1,
+            1
+          ],
+          [
+            176,
+            1792750844475,
+            1,
+            1,
+            13,
+            -60,
+            7,
+            1,
+            0
+          ],
+          [
+            177,
+            1792750844490,
+            1,
+            1,
+            13,
+            -60,
+            7,
+            1,
+            1
+          ],
+          [
+            178,
+            1792750844491,
+            1,
+            1,
+            13,
+            -60,
+            7,
+            1,
+            0
+          ],
+          [
+            179,
+            1792750844506,
+            1,
+            1,
+            13,
+            -60,
+            7,
+            1,
+            1
+          ],
+          [
+            180,
+            1792750844507,
+            1,
+            1,
+            13,
+            -60,
+            7,
+            1,
+            0
+          ],
+          [
+            181,
+            1792750844522,
+            1,
+            1,
+            13,
+            -60,
+            7,
+            1,
+            1
+          ],
+          [
+            182,
+            1792750844523,
+            1,
+            1,
+            13,
+            -60,
+            7,
+            1,
+            0
+          ],
+          [
+            183,
+            1792750844546,
+            1,
+            1,
+            13,
+            -60,
+            7,
+            1,
+            1
+          ],
+          [
+            184,
+            1792750844547,
+            1,
+            1,
+            13,
+            -60,
+            7,
+            1,
+            0
+          ],
+          [
+            185,
+            1792750844567,
+            1,
+            1,
+            13,
+            -60,
+            7,
+            1,
+            1
+          ],
+          [
+            186,
+            1792750844569,
+            1,
+            1,
+            13,
+            -60,
+            7,
+            1,
+            0
+          ],
+          [
+            187,
+            1792750844585,
+            1,
+            1,
+            13,
+            -60,
+            7,
+            1,
+            1
+          ],
+          [
+            188,
+            1792750844586,
+            1,
+            1,
+            13,
+            -60,
+            7,
+            1,
+            0
+          ],
+          [
+            189,
+            1792750844602,
+            1,
+            1,
+            13,
+            -60,
+            7,
+            1,
+            1
+          ],
+          [
+            190,
+            1792750844603,
+            1,
+            1,
+            13,
+            -60,
+            7,
+            1,
+            0
+          ],
+          [
+            191,
+            1792750844620,
+            1,
+            1,
+            13,
+            -60,
+            7,
+            1,
+            1
+          ],
+          [
+            192,
+            1792750844621,
+            1,
+            1,
+            13,
+            -60,
+            7,
+            1,
+            0
+          ],
+          [
+            193,
+            1792750844639,
+            1,
+            1,
+            13,
+            -60,
+            7,
+            1,
+            1
+          ],
+          [
+            194,
+            1792750844639,
+            1,
+            1,
+            13,
+            -60,
+            7,
+            1,
+            0
+          ],
+          [
+            195,
+            1792750844656,
+            1,
+            1,
+            13,
+            -60,
+            7,
+            1,
+            1
+          ],
+          [
+            196,
+            1792750844657,
+            1,
+            1,
+            13,
+            -60,
+            7,
+            1,
+            0
+          ],
+          [
+            197,
+            1792750844672,
+            1,
+            1,
+            13,
+            -60,
+            7,
+            1,
+            1
+          ],
+          [
+            198,
+            1792750844673,
+            1,
+            1,
+            13,
+            -60,
+            7,
+            1,
+            0
+          ],
+          [
+            199,
+            1792750847064,
+            1,
+            1,
+            9,
+            -60,
+            3,
+            4,
+            1
+          ],
+          [
+            200,
+            1792753985002,
+            2,
+            1,
+            29,
+            -60,
+            29,
+            5,
+            0
+          ],
+          [
+            201,
+            1792753985003,
+            2,
+            1,
+            29,
+            -60,
+            29,
+            5,
+            1
+          ],
+          [
+            202,
+            1792753985004,
+            2,
+            1,
+            29,
+            -60,
+            29,
+            5,
+            2
+          ]
+        ],
+        "chats": [],
+        "commands": [],
+        "containers": [
+          [
+            1,
+            1792750842454,
+            1,
+            1,
+            7,
+            -60,
+            3,
+            5,
+            {
+              "blob": "0100050800124c6f6767696e6720636f6d706f6e656e7473"
+            },
+            7,
+            0
+          ],
+          [
+            2,
+            1792753985002,
+            2,
+            1,
+            29,
+            -60,
+            29,
+            5,
+            {
+              "blob": "0100050800124c6f6767696e6720636f6d706f6e656e7473"
+            },
+            7,
+            0
+          ],
+          [
+            3,
+            1792753985003,
+            2,
+            1,
+            29,
+            -60,
+            29,
+            5,
+            {
+              "blob": "0100050800124c6f6767696e6720636f6d706f6e656e7473"
+            },
+            7,
+            1
+          ]
+        ],
+        "items": [
+          [
+            1,
+            1792753985002,
+            2,
+            1,
+            29,
+            -60,
+            29,
+            5,
+            {
+              "blob": "0100050800124c6f6767696e6720636f6d706f6e656e7473"
+            },
+            7,
+            0
+          ],
+          [
+            2,
+            1792753985003,
+            2,
+            1,
+            29,
+            -60,
+            29,
+            5,
+            {
+              "blob": "0100050800124c6f6767696e6720636f6d706f6e656e7473"
+            },
+            7,
+            1
+          ]
+        ],
+        "sessions": [
+          [
+            1,
+            1792750842214,
+            1,
+            1,
+            4,
+            -61,
+            4,
+            0
+          ],
+          [
+            2,
+            1792750849507,
+            1,
+            1,
+            9,
+            -61,
+            5,
+            1
+          ],
+          [
+            3,
+            1792750930286,
+            1,
+            1,
+            9,
+            -61,
+            5,
+            0
+          ],
+          [
+            4,
+            1792750930493,
+            1,
+            1,
+            9,
+            -61,
+            5,
+            1
+          ],
+          [
+            5,
+            1792753985002,
+            2,
+            1,
+            29,
+            -60,
+            29,
+            0
+          ],
+          [
+            6,
+            1792753985003,
+            2,
+            1,
+            29,
+            -60,
+            29,
+            1
+          ]
+        ]
+      },
+      "lookups": {
+        "blocks": [
+          {
+            "time": 1792753985003,
+            "name": "ReadAudit",
+            "uuid": "a7827ab9-5d78-4209-93b8-a1682f47130c",
+            "position": {
+              "x": 29,
+              "y": -60,
+              "z": 29
+            },
+            "action": 1
+          },
+          {
+            "time": 1792753985002,
+            "name": "ReadAudit",
+            "uuid": "a7827ab9-5d78-4209-93b8-a1682f47130c",
+            "position": {
+              "x": 29,
+              "y": -60,
+              "z": 29
+            },
+            "action": 0
+          }
+        ],
+        "interactions": [
+          {
+            "time": 1792753985004,
+            "name": "ReadAudit",
+            "uuid": "a7827ab9-5d78-4209-93b8-a1682f47130c",
+            "position": {
+              "x": 29,
+              "y": -60,
+              "z": 29
+            },
+            "action": 2
+          }
+        ],
+        "filteredBlocks": [
+          {
+            "time": 1792753985004,
+            "name": "ReadAudit",
+            "uuid": "a7827ab9-5d78-4209-93b8-a1682f47130c",
+            "position": {
+              "x": 29,
+              "y": -60,
+              "z": 29
+            },
+            "action": 2
+          },
+          {
+            "time": 1792753985003,
+            "name": "ReadAudit",
+            "uuid": "a7827ab9-5d78-4209-93b8-a1682f47130c",
+            "position": {
+              "x": 29,
+              "y": -60,
+              "z": 29
+            },
+            "action": 1
+          },
+          {
+            "time": 1792753985002,
+            "name": "ReadAudit",
+            "uuid": "a7827ab9-5d78-4209-93b8-a1682f47130c",
+            "position": {
+              "x": 29,
+              "y": -60,
+              "z": 29
+            },
+            "action": 0
+          }
+        ],
+        "containers": [
+          {
+            "time": 1792753985003,
+            "name": "ReadAudit",
+            "uuid": "a7827ab9-5d78-4209-93b8-a1682f47130c",
+            "position": {
+              "x": 29,
+              "y": -60,
+              "z": 29
+            },
+            "action": 1,
+            "paper": true,
+            "amount": 7,
+            "patch": "{minecraft:custom_name=>literal{Logging components}}"
+          },
+          {
+            "time": 1792753985002,
+            "name": "ReadAudit",
+            "uuid": "a7827ab9-5d78-4209-93b8-a1682f47130c",
+            "position": {
+              "x": 29,
+              "y": -60,
+              "z": 29
+            },
+            "action": 0,
+            "paper": true,
+            "amount": 7,
+            "patch": "{minecraft:custom_name=>literal{Logging components}}"
+          }
+        ],
+        "containerRange": [
+          {
+            "time": 1792753985003,
+            "name": "ReadAudit",
+            "uuid": "a7827ab9-5d78-4209-93b8-a1682f47130c",
+            "position": {
+              "x": 29,
+              "y": -60,
+              "z": 29
+            },
+            "action": 1,
+            "paper": true,
+            "amount": 7,
+            "patch": "{minecraft:custom_name=>literal{Logging components}}"
+          },
+          {
+            "time": 1792753985002,
+            "name": "ReadAudit",
+            "uuid": "a7827ab9-5d78-4209-93b8-a1682f47130c",
+            "position": {
+              "x": 29,
+              "y": -60,
+              "z": 29
+            },
+            "action": 0,
+            "paper": true,
+            "amount": 7,
+            "patch": "{minecraft:custom_name=>literal{Logging components}}"
+          }
+        ],
+        "filteredContainers": [
+          {
+            "time": 1792753985003,
+            "name": "ReadAudit",
+            "uuid": "a7827ab9-5d78-4209-93b8-a1682f47130c",
+            "position": {
+              "x": 29,
+              "y": -60,
+              "z": 29
+            },
+            "action": 1,
+            "paper": true,
+            "amount": 7,
+            "patch": "{minecraft:custom_name=>literal{Logging components}}"
+          },
+          {
+            "time": 1792753985002,
+            "name": "ReadAudit",
+            "uuid": "a7827ab9-5d78-4209-93b8-a1682f47130c",
+            "position": {
+              "x": 29,
+              "y": -60,
+              "z": 29
+            },
+            "action": 0,
+            "paper": true,
+            "amount": 7,
+            "patch": "{minecraft:custom_name=>literal{Logging components}}"
+          }
+        ],
+        "items": [
+          {
+            "time": 1792753985003,
+            "name": "ReadAudit",
+            "uuid": "a7827ab9-5d78-4209-93b8-a1682f47130c",
+            "position": {
+              "x": 29,
+              "y": -60,
+              "z": 29
+            },
+            "action": 1,
+            "paper": true,
+            "amount": 7,
+            "patch": "{minecraft:custom_name=>literal{Logging components}}"
+          },
+          {
+            "time": 1792753985002,
+            "name": "ReadAudit",
+            "uuid": "a7827ab9-5d78-4209-93b8-a1682f47130c",
+            "position": {
+              "x": 29,
+              "y": -60,
+              "z": 29
+            },
+            "action": 0,
+            "paper": true,
+            "amount": 7,
+            "patch": "{minecraft:custom_name=>literal{Logging components}}"
+          }
+        ],
+        "sessions": [
+          {
+            "time": 1792753985003,
+            "name": "ReadAudit",
+            "uuid": "a7827ab9-5d78-4209-93b8-a1682f47130c",
+            "position": {
+              "x": 29,
+              "y": -60,
+              "z": 29
+            },
+            "action": 1
+          },
+          {
+            "time": 1792753985002,
+            "name": "ReadAudit",
+            "uuid": "a7827ab9-5d78-4209-93b8-a1682f47130c",
+            "position": {
+              "x": 29,
+              "y": -60,
+              "z": 29
+            },
+            "action": 0
+          }
+        ],
+        "usernames": {
+          "1": "LoggingActor",
+          "2": "ReadAudit"
+        }
+      },
+      "checks": 61
+    },
+    "recovered": {
+      "lookups": {
+        "blocks": [
+          {
+            "time": 1792753985003,
+            "name": "ReadAudit",
+            "uuid": "a7827ab9-5d78-4209-93b8-a1682f47130c",
+            "position": {
+              "x": 29,
+              "y": -60,
+              "z": 29
+            },
+            "action": 1
+          },
+          {
+            "time": 1792753985002,
+            "name": "ReadAudit",
+            "uuid": "a7827ab9-5d78-4209-93b8-a1682f47130c",
+            "position": {
+              "x": 29,
+              "y": -60,
+              "z": 29
+            },
+            "action": 0
+          }
+        ],
+        "interactions": [
+          {
+            "time": 1792753985004,
+            "name": "ReadAudit",
+            "uuid": "a7827ab9-5d78-4209-93b8-a1682f47130c",
+            "position": {
+              "x": 29,
+              "y": -60,
+              "z": 29
+            },
+            "action": 2
+          }
+        ],
+        "filteredBlocks": [
+          {
+            "time": 1792753985004,
+            "name": "ReadAudit",
+            "uuid": "a7827ab9-5d78-4209-93b8-a1682f47130c",
+            "position": {
+              "x": 29,
+              "y": -60,
+              "z": 29
+            },
+            "action": 2
+          },
+          {
+            "time": 1792753985003,
+            "name": "ReadAudit",
+            "uuid": "a7827ab9-5d78-4209-93b8-a1682f47130c",
+            "position": {
+              "x": 29,
+              "y": -60,
+              "z": 29
+            },
+            "action": 1
+          },
+          {
+            "time": 1792753985002,
+            "name": "ReadAudit",
+            "uuid": "a7827ab9-5d78-4209-93b8-a1682f47130c",
+            "position": {
+              "x": 29,
+              "y": -60,
+              "z": 29
+            },
+            "action": 0
+          }
+        ],
+        "containers": [
+          {
+            "time": 1792753985003,
+            "name": "ReadAudit",
+            "uuid": "a7827ab9-5d78-4209-93b8-a1682f47130c",
+            "position": {
+              "x": 29,
+              "y": -60,
+              "z": 29
+            },
+            "action": 1,
+            "paper": true,
+            "amount": 7,
+            "patch": "{minecraft:custom_name=>literal{Logging components}}"
+          },
+          {
+            "time": 1792753985002,
+            "name": "ReadAudit",
+            "uuid": "a7827ab9-5d78-4209-93b8-a1682f47130c",
+            "position": {
+              "x": 29,
+              "y": -60,
+              "z": 29
+            },
+            "action": 0,
+            "paper": true,
+            "amount": 7,
+            "patch": "{minecraft:custom_name=>literal{Logging components}}"
+          }
+        ],
+        "containerRange": [
+          {
+            "time": 1792753985003,
+            "name": "ReadAudit",
+            "uuid": "a7827ab9-5d78-4209-93b8-a1682f47130c",
+            "position": {
+              "x": 29,
+              "y": -60,
+              "z": 29
+            },
+            "action": 1,
+            "paper": true,
+            "amount": 7,
+            "patch": "{minecraft:custom_name=>literal{Logging components}}"
+          },
+          {
+            "time": 1792753985002,
+            "name": "ReadAudit",
+            "uuid": "a7827ab9-5d78-4209-93b8-a1682f47130c",
+            "position": {
+              "x": 29,
+              "y": -60,
+              "z": 29
+            },
+            "action": 0,
+            "paper": true,
+            "amount": 7,
+            "patch": "{minecraft:custom_name=>literal{Logging components}}"
+          }
+        ],
+        "filteredContainers": [
+          {
+            "time": 1792753985003,
+            "name": "ReadAudit",
+            "uuid": "a7827ab9-5d78-4209-93b8-a1682f47130c",
+            "position": {
+              "x": 29,
+              "y": -60,
+              "z": 29
+            },
+            "action": 1,
+            "paper": true,
+            "amount": 7,
+            "patch": "{minecraft:custom_name=>literal{Logging components}}"
+          },
+          {
+            "time": 1792753985002,
+            "name": "ReadAudit",
+            "uuid": "a7827ab9-5d78-4209-93b8-a1682f47130c",
+            "position": {
+              "x": 29,
+              "y": -60,
+              "z": 29
+            },
+            "action": 0,
+            "paper": true,
+            "amount": 7,
+            "patch": "{minecraft:custom_name=>literal{Logging components}}"
+          }
+        ],
+        "items": [
+          {
+            "time": 1792753985003,
+            "name": "ReadAudit",
+            "uuid": "a7827ab9-5d78-4209-93b8-a1682f47130c",
+            "position": {
+              "x": 29,
+              "y": -60,
+              "z": 29
+            },
+            "action": 1,
+            "paper": true,
+            "amount": 7,
+            "patch": "{minecraft:custom_name=>literal{Logging components}}"
+          },
+          {
+            "time": 1792753985002,
+            "name": "ReadAudit",
+            "uuid": "a7827ab9-5d78-4209-93b8-a1682f47130c",
+            "position": {
+              "x": 29,
+              "y": -60,
+              "z": 29
+            },
+            "action": 0,
+            "paper": true,
+            "amount": 7,
+            "patch": "{minecraft:custom_name=>literal{Logging components}}"
+          }
+        ],
+        "sessions": [
+          {
+            "time": 1792753985003,
+            "name": "ReadAudit",
+            "uuid": "a7827ab9-5d78-4209-93b8-a1682f47130c",
+            "position": {
+              "x": 29,
+              "y": -60,
+              "z": 29
+            },
+            "action": 1
+          },
+          {
+            "time": 1792753985002,
+            "name": "ReadAudit",
+            "uuid": "a7827ab9-5d78-4209-93b8-a1682f47130c",
+            "position": {
+              "x": 29,
+              "y": -60,
+              "z": 29
+            },
+            "action": 0
+          }
+        ],
+        "usernames": {
+          "1": "LoggingActor",
+          "2": "ReadAudit"
+        }
+      },
+      "checks": 11
+    },
+    "logs": [
+      {
+        "path": "artifacts/logging-read-accepted-reads.log",
+        "bytes": 24428,
+        "sha256": "a117988399294901edc7cf300804f08240f90ac03c2155cf5ebb9bd71aa0bd68"
+      },
+      {
+        "path": "artifacts/logging-read-accepted-reads-recover.log",
+        "bytes": 13838,
+        "sha256": "68ef6eb0d19a5f97d7dbdd5bb31667237115d9a89287af13d0329861855b6ba9"
+      }
+    ]
+  },
+  "normal": {
+    "state": {
+      "actor": "68b1f7e3-1d74-40b7-82a7-f58a0c36460f",
+      "currency": "8d6810f0-d3f7-4bfc-8598-68f54b96f834",
+      "balance": 980,
+      "operation": "671adc69-ddf3-48b1-9bf7-c0fa05207f25",
+      "transaction": "e17092d8-a489-4dee-a3f6-4b814a64ddd7",
+      "shop": "coordinate:1778eb64-b9da-464c-8b94-b89685e9e209",
+      "run": null
+    },
+    "databases": [
+      {
+        "path": "artifacts/logging-read-normal-regression-server/database.db",
+        "bytes": 102400,
+        "sha256": "d8d0c61ef8b64ad66827db80a6838049b8cc27479d58a996306aa268e5abfdb3",
+        "quickCheck": "ok"
+      },
+      {
+        "path": "artifacts/logging-read-normal-regression-server/logging-world/yuuniverse_economy/economy.db",
+        "bytes": 368640,
+        "sha256": "5d8aa4242b5ff49cdaa2dfc6def54cca0fe15011f30fc062a280199033eb7a4a",
+        "quickCheck": "ok"
+      }
+    ],
+    "logs": [
+      {
+        "path": "artifacts/logging-read-normal-regression-native.log",
+        "bytes": 21009,
+        "sha256": "7f0d19691d13f7ac3ddcd392bfa039f4a723cc5cd5c317c4f39baef5e9182723"
+      },
+      {
+        "path": "artifacts/logging-read-normal-regression-recover.log",
+        "bytes": 13757,
+        "sha256": "e7e2ab79995e65e659112fd164c0edcee2898e3894e2d65529096a791bf0a020"
+      }
+    ]
+  },
+  "shutdown": {
+    "state": {
+      "actor": "dc5ae6b0-1c1f-492e-a64e-2aa2d447f537",
+      "beforeRows": [
+        [
+          "blocks",
+          1792754454433,
+          7,
+          -60,
+          3,
+          "chest",
+          1,
+          0,
+          null
+        ]
+      ],
+      "dropEntity": "2c8181d7-5aa0-4db5-9cfc-98f89b4a8803",
+      "storage": {
+        "inventory": [
+          {
+            "id": "minecraft:paper",
+            "count": 7,
+            "components": {
+              "minecraft:custom_name": "\"Shutdown paper\""
+            }
+          },
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {
+            "id": "minecraft:oak_planks",
+            "count": 1
+          },
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {}
+        ],
+        "chest": [
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {}
+        ],
+        "blocks": [
+          {
+            "Name": "minecraft:stone"
+          },
+          {
+            "Properties": {
+              "waterlogged": "false",
+              "axis": "z"
+            },
+            "Name": "create:shaft"
+          },
+          {
+            "Properties": {
+              "waterlogged": "false",
+              "type": "single",
+              "facing": "north"
+            },
+            "Name": "minecraft:chest"
+          },
+          {
+            "Name": "minecraft:oak_planks"
+          }
+        ],
+        "dropEntity": "2c8181d7-5aa0-4db5-9cfc-98f89b4a8803",
+        "dropStack": {
+          "id": "minecraft:snowball",
+          "count": 3,
+          "components": {
+            "minecraft:custom_name": "\"Shutdown snow\""
+          }
+        },
+        "dropNoGravity": true
+      },
+      "ordinaryPendingAtStop": 8,
+      "batchPendingAtStop": 2,
+      "committedRows": [
+        [
+          "blocks",
+          1792754454433,
+          7,
+          -60,
+          3,
+          "chest",
+          1,
+          0,
+          null
+        ],
+        [
+          "blocks",
+          1792754454536,
+          7,
+          -60,
+          3,
+          "chest",
+          2,
+          0,
+          null
+        ],
+        [
+          "blocks",
+          1792754454657,
+          3,
+          -60,
+          3,
+          "stone",
+          1,
+          0,
+          null
+        ],
+        [
+          "blocks",
+          1792754454677,
+          5,
+          -60,
+          3,
+          "create:shaft",
+          1,
+          0,
+          null
+        ],
+        [
+          "blocks",
+          1792754454698,
+          11,
+          -60,
+          3,
+          "oak_planks",
+          1,
+          0,
+          null
+        ],
+        [
+          "containers",
+          1792754454626,
+          7,
+          -60,
+          3,
+          "paper",
+          0,
+          7,
+          "01000508000E53687574646F776E207061706572"
+        ],
+        [
+          "items",
+          1792754454949,
+          11,
+          -60,
+          5,
+          "snowball",
+          2,
+          3,
+          "01000508000D53687574646F776E20736E6F77"
+        ]
+      ],
+      "checks": 11
+    },
+    "recovered": {
+      "actor": "dc5ae6b0-1c1f-492e-a64e-2aa2d447f537",
+      "beforeRows": [
+        [
+          "blocks",
+          1792754454433,
+          7,
+          -60,
+          3,
+          "chest",
+          1,
+          0,
+          null
+        ]
+      ],
+      "dropEntity": "2c8181d7-5aa0-4db5-9cfc-98f89b4a8803",
+      "storage": {
+        "inventory": [
+          {
+            "id": "minecraft:paper",
+            "count": 7,
+            "components": {
+              "minecraft:custom_name": "\"Shutdown paper\""
+            }
+          },
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {
+            "id": "minecraft:oak_planks",
+            "count": 1
+          },
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {}
+        ],
+        "chest": [
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {}
+        ],
+        "blocks": [
+          {
+            "Name": "minecraft:stone"
+          },
+          {
+            "Properties": {
+              "waterlogged": "false",
+              "axis": "z"
+            },
+            "Name": "create:shaft"
+          },
+          {
+            "Properties": {
+              "waterlogged": "false",
+              "type": "single",
+              "facing": "north"
+            },
+            "Name": "minecraft:chest"
+          },
+          {
+            "Name": "minecraft:oak_planks"
+          }
+        ],
+        "dropEntity": "2c8181d7-5aa0-4db5-9cfc-98f89b4a8803",
+        "dropStack": {
+          "id": "minecraft:snowball",
+          "count": 3,
+          "components": {
+            "minecraft:custom_name": "\"Shutdown snow\""
+          }
+        },
+        "dropNoGravity": true
+      },
+      "ordinaryPendingAtStop": 8,
+      "batchPendingAtStop": 2,
+      "committedRows": [
+        [
+          "blocks",
+          1792754454433,
+          7,
+          -60,
+          3,
+          "chest",
+          1,
+          0,
+          null
+        ],
+        [
+          "blocks",
+          1792754454536,
+          7,
+          -60,
+          3,
+          "chest",
+          2,
+          0,
+          null
+        ],
+        [
+          "blocks",
+          1792754454657,
+          3,
+          -60,
+          3,
+          "stone",
+          1,
+          0,
+          null
+        ],
+        [
+          "blocks",
+          1792754454677,
+          5,
+          -60,
+          3,
+          "create:shaft",
+          1,
+          0,
+          null
+        ],
+        [
+          "blocks",
+          1792754454698,
+          11,
+          -60,
+          3,
+          "oak_planks",
+          1,
+          0,
+          null
+        ],
+        [
+          "containers",
+          1792754454626,
+          7,
+          -60,
+          3,
+          "paper",
+          0,
+          7,
+          "01000508000E53687574646F776E207061706572"
+        ],
+        [
+          "items",
+          1792754454949,
+          11,
+          -60,
+          5,
+          "snowball",
+          2,
+          3,
+          "01000508000D53687574646F776E20736E6F77"
+        ]
+      ],
+      "checks": 11,
+      "recoveryChecks": 8
+    },
+    "phases": [
+      {
+        "log": {
+          "path": "artifacts/logging-read-shutdown-regression-shutdown.log",
+          "bytes": 16969,
+          "sha256": "43d1425ccc8755289eb595030e71365eba21054c3acc9ac7409c6045212c11ba"
+        },
+        "database": {
+          "path": "artifacts/logging-read-shutdown-regression-stopped-shutdown.db",
+          "bytes": 94208,
+          "sha256": "62790ed6edce0a591f8d22433d838014106fdb2c56c7c6faf715eda281648098",
+          "quickCheck": "ok",
+          "gameplayRows": [
+            [
+              "blocks",
+              1792754454433,
+              7,
+              -60,
+              3,
+              "chest",
+              1,
+              0,
+              null
+            ],
+            [
+              "blocks",
+              1792754454536,
+              7,
+              -60,
+              3,
+              "chest",
+              2,
+              0,
+              null
+            ],
+            [
+              "blocks",
+              1792754454657,
+              3,
+              -60,
+              3,
+              "stone",
+              1,
+              0,
+              null
+            ],
+            [
+              "blocks",
+              1792754454677,
+              5,
+              -60,
+              3,
+              "create:shaft",
+              1,
+              0,
+              null
+            ],
+            [
+              "blocks",
+              1792754454698,
+              11,
+              -60,
+              3,
+              "oak_planks",
+              1,
+              0,
+              null
+            ],
+            [
+              "containers",
+              1792754454626,
+              7,
+              -60,
+              3,
+              "paper",
+              0,
+              7,
+              "01000508000E53687574646F776E207061706572"
+            ],
+            [
+              "items",
+              1792754454949,
+              11,
+              -60,
+              5,
+              "snowball",
+              2,
+              3,
+              "01000508000D53687574646F776E20736E6F77"
+            ]
+          ],
+          "sessions": {
+            "0": 1,
+            "1": 1
+          }
+        },
+        "nativeStorage": {
+          "player": {
+            "path": "artifacts/logging-read-shutdown-regression-stopped-shutdown-world/playerdata/dc5ae6b0-1c1f-492e-a64e-2aa2d447f537.dat",
+            "bytes": 879,
+            "sha256": "54a7789f7169af8155b8c62a49f20f15a0e2eb09e6d236e6819b106755bfca24"
+          },
+          "inventory": [
+            {
+              "count": 7,
+              "components": {
+                "minecraft:custom_name": "\"Shutdown paper\""
+              },
+              "id": "minecraft:paper"
+            },
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {
+              "count": 1,
+              "id": "minecraft:oak_planks"
+            },
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {}
+          ],
+          "originalDrop": {
+            "components": {
+              "minecraft:custom_name": "\"Shutdown snow\""
+            },
+            "count": 3,
+            "id": "minecraft:snowball"
+          },
+          "dropEntity": "2c8181d7-5aa0-4db5-9cfc-98f89b4a8803",
+          "blocks": [
+            {
+              "Name": "minecraft:stone"
+            },
+            {
+              "Properties": {
+                "waterlogged": "false",
+                "axis": "z"
+              },
+              "Name": "create:shaft"
+            },
+            {
+              "Properties": {
+                "waterlogged": "false",
+                "facing": "north",
+                "type": "single"
+              },
+              "Name": "minecraft:chest"
+            },
+            {
+              "Name": "minecraft:oak_planks"
+            }
+          ],
+          "chestEmpty": true,
+          "entityFiles": [
+            {
+              "path": "artifacts/logging-read-shutdown-regression-stopped-shutdown-world/entities/r.-1.-1.mca",
+              "bytes": 0,
+              "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+            },
+            {
+              "path": "artifacts/logging-read-shutdown-regression-stopped-shutdown-world/entities/r.-1.0.mca",
+              "bytes": 0,
+              "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+            },
+            {
+              "path": "artifacts/logging-read-shutdown-regression-stopped-shutdown-world/entities/r.0.-1.mca",
+              "bytes": 0,
+              "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+            },
+            {
+              "path": "artifacts/logging-read-shutdown-regression-stopped-shutdown-world/entities/r.0.0.mca",
+              "bytes": 12288,
+              "sha256": "aa3e350e0233301941295e52950fc0b67021ea19d7184fc85e41ccbf1847a8e6"
+            }
+          ],
+          "regionFiles": [
+            {
+              "path": "artifacts/logging-read-shutdown-regression-stopped-shutdown-world/region/r.-1.-1.mca",
+              "bytes": 811008,
+              "sha256": "cddb97f814034a3ef36699f8468b4e701659b396297974e7df5a236e17d92156"
+            },
+            {
+              "path": "artifacts/logging-read-shutdown-regression-stopped-shutdown-world/region/r.-1.0.mca",
+              "bytes": 868352,
+              "sha256": "73f4599208e3edcc413454325966cc9ef0c4ed6cfc8016c6c37bb7526af184a2"
+            },
+            {
+              "path": "artifacts/logging-read-shutdown-regression-stopped-shutdown-world/region/r.0.-1.mca",
+              "bytes": 868352,
+              "sha256": "faf77383a75d9890eebbdfa7fde0031e3cf701f24de8c2c83f62f4c71f47be29"
+            },
+            {
+              "path": "artifacts/logging-read-shutdown-regression-stopped-shutdown-world/region/r.0.0.mca",
+              "bytes": 929792,
+              "sha256": "a97919de77492c6ca2c53983ade3989181b5136aba9cc76ee22381e1d8fb4fb0"
+            }
+          ]
+        }
+      },
+      {
+        "log": {
+          "path": "artifacts/logging-read-shutdown-regression-shutdown-recover.log",
+          "bytes": 14117,
+          "sha256": "568dce4bae5c8fb2adec1545da07463ad3f296a7ddfcfedb790208eddca1c9a3"
+        },
+        "database": {
+          "path": "artifacts/logging-read-shutdown-regression-stopped-shutdown-recover.db",
+          "bytes": 94208,
+          "sha256": "84a7c481cfac39efd83f42e15185cd718c10cd23a7802f6cd68970718181bea7",
+          "quickCheck": "ok",
+          "gameplayRows": [
+            [
+              "blocks",
+              1792754454433,
+              7,
+              -60,
+              3,
+              "chest",
+              1,
+              0,
+              null
+            ],
+            [
+              "blocks",
+              1792754454536,
+              7,
+              -60,
+              3,
+              "chest",
+              2,
+              0,
+              null
+            ],
+            [
+              "blocks",
+              1792754454657,
+              3,
+              -60,
+              3,
+              "stone",
+              1,
+              0,
+              null
+            ],
+            [
+              "blocks",
+              1792754454677,
+              5,
+              -60,
+              3,
+              "create:shaft",
+              1,
+              0,
+              null
+            ],
+            [
+              "blocks",
+              1792754454698,
+              11,
+              -60,
+              3,
+              "oak_planks",
+              1,
+              0,
+              null
+            ],
+            [
+              "containers",
+              1792754454626,
+              7,
+              -60,
+              3,
+              "paper",
+              0,
+              7,
+              "01000508000E53687574646F776E207061706572"
+            ],
+            [
+              "items",
+              1792754454949,
+              11,
+              -60,
+              5,
+              "snowball",
+              2,
+              3,
+              "01000508000D53687574646F776E20736E6F77"
+            ]
+          ],
+          "sessions": {
+            "0": 2,
+            "1": 2
+          }
+        },
+        "nativeStorage": {
+          "player": {
+            "path": "artifacts/logging-read-shutdown-regression-stopped-shutdown-recover-world/playerdata/dc5ae6b0-1c1f-492e-a64e-2aa2d447f537.dat",
+            "bytes": 1100,
+            "sha256": "6e786d9a756594c07d6fe6a4920adca4c05e633b9b1eb1624106f1de73a1d25d"
+          },
+          "inventory": [
+            {
+              "count": 7,
+              "components": {
+                "minecraft:custom_name": "\"Shutdown paper\""
+              },
+              "id": "minecraft:paper"
+            },
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {
+              "count": 1,
+              "id": "minecraft:oak_planks"
+            },
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {}
+          ],
+          "originalDrop": {
+            "components": {
+              "minecraft:custom_name": "\"Shutdown snow\""
+            },
+            "count": 3,
+            "id": "minecraft:snowball"
+          },
+          "dropEntity": "2c8181d7-5aa0-4db5-9cfc-98f89b4a8803",
+          "blocks": [
+            {
+              "Name": "minecraft:stone"
+            },
+            {
+              "Properties": {
+                "waterlogged": "false",
+                "axis": "z"
+              },
+              "Name": "create:shaft"
+            },
+            {
+              "Properties": {
+                "waterlogged": "false",
+                "facing": "north",
+                "type": "single"
+              },
+              "Name": "minecraft:chest"
+            },
+            {
+              "Name": "minecraft:oak_planks"
+            }
+          ],
+          "chestEmpty": true,
+          "entityFiles": [
+            {
+              "path": "artifacts/logging-read-shutdown-regression-stopped-shutdown-recover-world/entities/r.-1.-1.mca",
+              "bytes": 0,
+              "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+            },
+            {
+              "path": "artifacts/logging-read-shutdown-regression-stopped-shutdown-recover-world/entities/r.-1.0.mca",
+              "bytes": 0,
+              "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+            },
+            {
+              "path": "artifacts/logging-read-shutdown-regression-stopped-shutdown-recover-world/entities/r.0.-1.mca",
+              "bytes": 0,
+              "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+            },
+            {
+              "path": "artifacts/logging-read-shutdown-regression-stopped-shutdown-recover-world/entities/r.0.0.mca",
+              "bytes": 16384,
+              "sha256": "42b493be8a0566408e3008ca897a03a76861e75d969bef2fbdf8425f74f8f44b"
+            }
+          ],
+          "regionFiles": [
+            {
+              "path": "artifacts/logging-read-shutdown-regression-stopped-shutdown-recover-world/region/r.-1.-1.mca",
+              "bytes": 815104,
+              "sha256": "88ac21b3117a80bf85dce54e9aad4cac449bffc8cb0749e2ec907ce6cdeb1a2a"
+            },
+            {
+              "path": "artifacts/logging-read-shutdown-regression-stopped-shutdown-recover-world/region/r.-1.0.mca",
+              "bytes": 872448,
+              "sha256": "95665f2f584a943438996882c1a49361b839d09d656e26fbdf673e81a1544436"
+            },
+            {
+              "path": "artifacts/logging-read-shutdown-regression-stopped-shutdown-recover-world/region/r.0.-1.mca",
+              "bytes": 872448,
+              "sha256": "248ded6951634475bfc4deb13907cc76b53bc54b25edf9897b111cbbae724e56"
+            },
+            {
+              "path": "artifacts/logging-read-shutdown-regression-stopped-shutdown-recover-world/region/r.0.0.mca",
+              "bytes": 933888,
+              "sha256": "b3444931cce6080acd489426f99c77eb6d01124bc9edfbf19a60a1818c2a29e6"
+            }
+          ]
+        }
+      }
+    ]
+  },
+  "indexes": [
+    {
+      "log": {
+        "path": "artifacts/logging-read-index-regression-indexes.log",
+        "bytes": 18093,
+        "sha256": "e3f6da9329c7f7ab5d4dc39acc66635fe6ba49a4be6c61c4b7720e8184b32bf5"
+      },
+      "queries": {
+        "blocks": {
+          "indexes": [
+            "coordinates"
+          ],
+          "plan": [
+            "SEARCH blocks USING INDEX coordinates (x=? AND y=? AND z=?)",
+            "USE TEMP B-TREE FOR ORDER BY"
+          ],
+          "rows": [
+            [
+              2247,
+              1792754672556,
+              2,
+              1,
+              7,
+              -60,
+              3,
+              5,
+              0
+            ],
+            [
+              200,
+              1792754670509,
+              2,
+              1,
+              7,
+              -60,
+              3,
+              5,
+              0
+            ]
+          ]
+        },
+        "chats": {
+          "indexes": [
+            "chats_coordinates"
+          ],
+          "plan": [
+            "SEARCH chats USING INDEX chats_coordinates (x=? AND y=? AND z=?)",
+            "USE TEMP B-TREE FOR ORDER BY"
+          ],
+          "rows": [
+            [
+              2048,
+              1792754672556,
+              2,
+              1,
+              7,
+              -60,
+              3,
+              "Index payload '\" 2047"
+            ],
+            [
+              1,
+              1792754670509,
+              2,
+              1,
+              7,
+              -60,
+              3,
+              "Index payload '\" 0"
+            ]
+          ]
+        },
+        "commands": {
+          "indexes": [
+            "commands_coordinates"
+          ],
+          "plan": [
+            "SEARCH commands USING INDEX commands_coordinates (x=? AND y=? AND z=?)",
+            "USE TEMP B-TREE FOR ORDER BY"
+          ],
+          "rows": [
+            [
+              2048,
+              1792754672556,
+              2,
+              1,
+              7,
+              -60,
+              3,
+              "Index payload '\" 2047"
+            ],
+            [
+              1,
+              1792754670509,
+              2,
+              1,
+              7,
+              -60,
+              3,
+              "Index payload '\" 0"
+            ]
+          ]
+        },
+        "containers": {
+          "indexes": [
+            "containers_coordinates"
+          ],
+          "plan": [
+            "SEARCH containers USING INDEX containers_coordinates (x=? AND y=? AND z=?)",
+            "USE TEMP B-TREE FOR ORDER BY"
+          ],
+          "rows": [
+            [
+              2049,
+              1792754672556,
+              2,
+              1,
+              7,
+              -60,
+              3,
+              5,
+              {
+                "blob": "0100050800124c6f6767696e6720636f6d706f6e656e7473"
+              },
+              7,
+              0
+            ],
+            [
+              2,
+              1792754670509,
+              2,
+              1,
+              7,
+              -60,
+              3,
+              5,
+              {
+                "blob": "0100050800124c6f6767696e6720636f6d706f6e656e7473"
+              },
+              7,
+              0
+            ]
+          ]
+        },
+        "items": {
+          "indexes": [
+            "items_coordinates"
+          ],
+          "plan": [
+            "SEARCH items USING INDEX items_coordinates (x=? AND y=? AND z=?)",
+            "USE TEMP B-TREE FOR ORDER BY"
+          ],
+          "rows": [
+            [
+              2048,
+              1792754672556,
+              2,
+              1,
+              7,
+              -60,
+              3,
+              5,
+              {
+                "blob": "0100050800124c6f6767696e6720636f6d706f6e656e7473"
+              },
+              7,
+              0
+            ],
+            [
+              1,
+              1792754670509,
+              2,
+              1,
+              7,
+              -60,
+              3,
+              5,
+              {
+                "blob": "0100050800124c6f6767696e6720636f6d706f6e656e7473"
+              },
+              7,
+              0
+            ]
+          ]
+        },
+        "sessions": {
+          "indexes": [
+            "sessions_coordinates"
+          ],
+          "plan": [
+            "SEARCH sessions USING INDEX sessions_coordinates (x=? AND y=? AND z=?)",
+            "USE TEMP B-TREE FOR ORDER BY"
+          ],
+          "rows": [
+            [
+              2052,
+              1792754672556,
+              2,
+              1,
+              7,
+              -60,
+              3,
+              1
+            ],
+            [
+              5,
+              1792754670509,
+              2,
+              1,
+              7,
+              -60,
+              3,
+              0
+            ]
+          ]
+        }
+      }
+    },
+    {
+      "log": {
+        "path": "artifacts/logging-read-index-regression-indexes-recover.log",
+        "bytes": 15666,
+        "sha256": "a9e2f5e3b0081b12a429cf043944f12528c21cc0d09c936e07573507ea5383dc"
+      },
+      "queries": {
+        "blocks": {
+          "indexes": [
+            "coordinates"
+          ],
+          "plan": [
+            "SEARCH blocks USING INDEX coordinates (x=? AND y=? AND z=?)",
+            "USE TEMP B-TREE FOR ORDER BY"
+          ],
+          "rows": [
+            [
+              2247,
+              1792754672556,
+              2,
+              1,
+              7,
+              -60,
+              3,
+              5,
+              0
+            ],
+            [
+              200,
+              1792754670509,
+              2,
+              1,
+              7,
+              -60,
+              3,
+              5,
+              0
+            ]
+          ]
+        },
+        "chats": {
+          "indexes": [
+            "chats_coordinates"
+          ],
+          "plan": [
+            "SEARCH chats USING INDEX chats_coordinates (x=? AND y=? AND z=?)",
+            "USE TEMP B-TREE FOR ORDER BY"
+          ],
+          "rows": [
+            [
+              2048,
+              1792754672556,
+              2,
+              1,
+              7,
+              -60,
+              3,
+              "Index payload '\" 2047"
+            ],
+            [
+              1,
+              1792754670509,
+              2,
+              1,
+              7,
+              -60,
+              3,
+              "Index payload '\" 0"
+            ]
+          ]
+        },
+        "commands": {
+          "indexes": [
+            "commands_coordinates"
+          ],
+          "plan": [
+            "SEARCH commands USING INDEX commands_coordinates (x=? AND y=? AND z=?)",
+            "USE TEMP B-TREE FOR ORDER BY"
+          ],
+          "rows": [
+            [
+              2048,
+              1792754672556,
+              2,
+              1,
+              7,
+              -60,
+              3,
+              "Index payload '\" 2047"
+            ],
+            [
+              1,
+              1792754670509,
+              2,
+              1,
+              7,
+              -60,
+              3,
+              "Index payload '\" 0"
+            ]
+          ]
+        },
+        "containers": {
+          "indexes": [
+            "containers_coordinates"
+          ],
+          "plan": [
+            "SEARCH containers USING INDEX containers_coordinates (x=? AND y=? AND z=?)",
+            "USE TEMP B-TREE FOR ORDER BY"
+          ],
+          "rows": [
+            [
+              2049,
+              1792754672556,
+              2,
+              1,
+              7,
+              -60,
+              3,
+              5,
+              {
+                "blob": "0100050800124c6f6767696e6720636f6d706f6e656e7473"
+              },
+              7,
+              0
+            ],
+            [
+              2,
+              1792754670509,
+              2,
+              1,
+              7,
+              -60,
+              3,
+              5,
+              {
+                "blob": "0100050800124c6f6767696e6720636f6d706f6e656e7473"
+              },
+              7,
+              0
+            ]
+          ]
+        },
+        "items": {
+          "indexes": [
+            "items_coordinates"
+          ],
+          "plan": [
+            "SEARCH items USING INDEX items_coordinates (x=? AND y=? AND z=?)",
+            "USE TEMP B-TREE FOR ORDER BY"
+          ],
+          "rows": [
+            [
+              2048,
+              1792754672556,
+              2,
+              1,
+              7,
+              -60,
+              3,
+              5,
+              {
+                "blob": "0100050800124c6f6767696e6720636f6d706f6e656e7473"
+              },
+              7,
+              0
+            ],
+            [
+              1,
+              1792754670509,
+              2,
+              1,
+              7,
+              -60,
+              3,
+              5,
+              {
+                "blob": "0100050800124c6f6767696e6720636f6d706f6e656e7473"
+              },
+              7,
+              0
+            ]
+          ]
+        },
+        "sessions": {
+          "indexes": [
+            "sessions_coordinates"
+          ],
+          "plan": [
+            "SEARCH sessions USING INDEX sessions_coordinates (x=? AND y=? AND z=?)",
+            "USE TEMP B-TREE FOR ORDER BY"
+          ],
+          "rows": [
+            [
+              2052,
+              1792754672556,
+              2,
+              1,
+              7,
+              -60,
+              3,
+              1
+            ],
+            [
+              5,
+              1792754670509,
+              2,
+              1,
+              7,
+              -60,
+              3,
+              0
+            ]
+          ]
+        }
+      }
+    }
+  ],
+  "nativeChecks": 187,
+  "sources": [
+    {
+      "path": "tools/logging-runtime-audit.gradle",
+      "bytes": 5966,
+      "sha256": "806fc65fc3f1c95df893651b4f9dfc249cfaa9f5d924730a015bef398bc19c41"
+    },
+    {
+      "path": "tools/grieflogger-compat/run-storage-tests.ps1",
+      "bytes": 3411,
+      "sha256": "db250ec08a8defa01b60c4245d39b604826ed75aef2dbd2f4e3d00e2832bd6c3"
+    },
+    {
+      "path": "tools/prepare-logging-index-audit.ps1",
+      "bytes": 3570,
+      "sha256": "4b3d101106216d68bd1acd2090b8d5df84cbe082b98d97426d6ef9de07097910"
+    },
+    {
+      "path": "tools/record-logging-read-validation.py",
+      "bytes": 15948,
+      "sha256": "f9b90a6ca0e0a83df416ad8a8df695216cbcc30c49343179edc3237f03e4cc9e"
+    },
+    {
+      "path": "tools/record-logging-full-validation.py",
+      "bytes": 17628,
+      "sha256": "6c37c0227a89b19c153d1e1d521ee319c2e9b86712e7616e4a0f0a0ef011dd87"
+    },
+    {
+      "path": "tools/record-logging-shutdown-validation.py",
+      "bytes": 19768,
+      "sha256": "88063b0be24a5eece8722f04ca1208f8398a92770a46a0bc8c3c31e8bfb9dac6"
+    },
+    {
+      "path": "tools/record-logging-index-validation.py",
+      "bytes": 19674,
+      "sha256": "be0fa3c6cc869750b60ae61a4edbbb9b5a7d6127dec5edc7610e0fd5b3e3b481"
+    },
+    {
+      "path": "tools/grieflogger-compat/storage-tests/StorageRecoveryTest.java",
+      "bytes": 40628,
+      "sha256": "4b1ddc1e02ddb271dcbe25074dcc88191de185a307a4e0790e50e7885fe980fc"
+    },
+    {
+      "path": "tools/grieflogger-compat/storage-tests/com/daqem/grieflogger/GriefLogger.java",
+      "bytes": 1071,
+      "sha256": "1ba77f2b8051b6bd0869e5176650c8aa5d02cb1759566bdf3688c6b1540826fa"
+    },
+    {
+      "path": "tools/logging-runtime-audit/net/yuuniverse/interactions/LoggingIndexRuntimeAudit.java",
+      "bytes": 11375,
+      "sha256": "bdf710bd9a4e75bbfc8ecaa8a486579c5efc75620074c9f4e05e17a7b450d87a"
+    },
+    {
+      "path": "tools/logging-runtime-audit/net/yuuniverse/interactions/LoggingReadRuntimeAudit.java",
+      "bytes": 14564,
+      "sha256": "c8b09cc6b4a6dcd8b451292251fd5cc40a60b829d81ef2ee376c5ddd1f872a33"
+    },
+    {
+      "path": "tools/logging-runtime-audit/net/yuuniverse/interactions/LoggingRuntimeAudit.java",
+      "bytes": 27754,
+      "sha256": "de55ab7e9a35b3bc9bc284b5246156e556e604ded05b350ed2333f50d131f300"
+    },
+    {
+      "path": "tools/logging-runtime-audit/net/yuuniverse/interactions/LoggingShutdownRuntimeAudit.java",
+      "bytes": 13333,
+      "sha256": "60a921d50b647df5d821991502744d8a3d08c9a3a8e4f2d17bc751458b696126"
+    },
+    {
+      "path": "tools/logging-runtime-audit/net/yuuniverse/interactions/LoggingStorageRuntimeAudit.java",
+      "bytes": 21179,
+      "sha256": "ae14aaf824d1e41ebf84b94c821e0d4c5b29e96413cd759affbe3360eb99be77"
+    }
+  ],
+  "auditBinaries": [
+    {
+      "path": "artifacts/logging-read-accepted-build/classes/java/dialogue/net/yuuniverse/interactions/LoggingReadRuntimeAudit.class",
+      "bytes": 30179,
+      "sha256": "bb1d5666998ff67b04661109fbd27eca6c5834b77758f5c1c40aefe6674c33eb"
+    },
+    {
+      "path": "artifacts/logging-read-normal-regression-build/classes/java/dialogue/net/yuuniverse/interactions/LoggingReadRuntimeAudit.class",
+      "bytes": 30179,
+      "sha256": "bb1d5666998ff67b04661109fbd27eca6c5834b77758f5c1c40aefe6674c33eb"
+    },
+    {
+      "path": "artifacts/logging-read-shutdown-regression-build/classes/java/dialogue/net/yuuniverse/interactions/LoggingReadRuntimeAudit.class",
+      "bytes": 30179,
+      "sha256": "bb1d5666998ff67b04661109fbd27eca6c5834b77758f5c1c40aefe6674c33eb"
+    },
+    {
+      "path": "artifacts/logging-read-index-regression-build/classes/java/dialogue/net/yuuniverse/interactions/LoggingReadRuntimeAudit.class",
+      "bytes": 30179,
+      "sha256": "bb1d5666998ff67b04661109fbd27eca6c5834b77758f5c1c40aefe6674c33eb"
+    }
+  ],
+  "packages": [
+    {
+      "path": "artifacts/craft-index-ordinary-21.1.248-build/libs/citizens-2.0.43-neoforge-SNAPSHOT-sources.jar",
+      "bytes": 1129013,
+      "sha256": "2bd54a9502d6b43dc9b3f4cb7eaad5e2e80fd5945c0915fd76b2e1cf8a13c452",
+      "matchingProductionClasses": 0
+    },
+    {
+      "path": "artifacts/craft-index-ordinary-21.1.248-build/libs/citizens-2.0.43-neoforge-SNAPSHOT.jar",
+      "bytes": 4095780,
+      "sha256": "c080231255136cab12e906a8bfa8030e2d47c84929a4fc1460c4279d09f6aaed",
+      "matchingProductionClasses": 1023
+    },
+    {
+      "path": "artifacts/craft-index-ordinary-21.1.248-build/libs/yuuniverse-interactions-2.0.43-neoforge-SNAPSHOT.jar",
+      "bytes": 204146,
+      "sha256": "11a8a64c321d0117fa28ea38b4ad954ac74201dffd9996789d5bcfd13b3b7ae6",
+      "matchingProductionClasses": 74
+    },
+    {
+      "path": "artifacts/craft-index-ordinary-21.1.233-build/libs/citizens-2.0.43-neoforge-SNAPSHOT-sources.jar",
+      "bytes": 1129013,
+      "sha256": "426af016db7662837f17451757e345e759748c7598d065f3aa19d286f1a4c99d",
+      "matchingProductionClasses": 0
+    },
+    {
+      "path": "artifacts/craft-index-ordinary-21.1.233-build/libs/citizens-2.0.43-neoforge-SNAPSHOT.jar",
+      "bytes": 4095780,
+      "sha256": "e1d7753acbd0e7ba9adf4e5e373523e0e74d8f3d2a2e0fa057cdab4e5f112b30",
+      "matchingProductionClasses": 1023
+    },
+    {
+      "path": "artifacts/craft-index-ordinary-21.1.233-build/libs/yuuniverse-interactions-2.0.43-neoforge-SNAPSHOT.jar",
+      "bytes": 204146,
+      "sha256": "46c704a7528f785f2d70bfbcbf8b0baf78764ac68f4f813886cd87adc60edbb6",
+      "matchingProductionClasses": 74
+    }
+  ],
+  "reusedOrdinaryPerTarget": 828,
+  "reusedInteractions": 100,
+  "unchangedPinnedClient": {
+    "path": "artifacts/logging-reader-pinned-client-before.json",
+    "bytes": 17435,
+    "sha256": "1f2f9f42f4f6584508d78b1ec677a9f28254184197e56ac8c202b235a739e1fa"
+  },
+  "stopped": {
+    "createdAt": "2026-10-23T19:26:08.9824787+08:00",
+    "timezone": "UTC+08:00",
+    "exclusiveStoppedWorldAndDatabases": true,
+    "fixtures": [
+      {
+        "fixture": "logging-read-final-server",
+        "world": "logging-world",
+        "exclusive": true,
+        "files": [
+          {
+            "path": "artifacts/logging-read-final-server/logging-world/session.lock",
+            "bytes": 3,
+            "sha256": "51643361c79ecaef25a8de802de24f570ba25d9c2df1d22d94fade11b4f466cc"
+          },
+          {
+            "path": "artifacts/logging-read-final-server/database.db",
+            "bytes": 81920,
+            "sha256": "a5d3310c9d66a1dcaf7e0dac2ac13e025c7ec0df9c250ced65c7b97ffc46dbe6"
+          },
+          {
+            "path": "artifacts/logging-read-final-server/logging-world/neoprotect/neoprotect.mv.db",
+            "bytes": 106496,
+            "sha256": "6b2bbf523fb4221e41baf1927b72723dc93a45c63659e4eb0e678742bcaed0e7"
+          },
+          {
+            "path": "artifacts/logging-read-final-server/logging-world/yuuniverse_economy/economy.db",
+            "bytes": 368640,
+            "sha256": "0f4f09ea10ff11ae3e68b2248e8cebae956f36ca95bc22d40c3a55279f1f62d2"
+          }
+        ]
+      },
+      {
+        "fixture": "logging-read-accepted-server",
+        "world": "logging-world",
+        "exclusive": true,
+        "files": [
+          {
+            "path": "artifacts/logging-read-accepted-server/logging-world/session.lock",
+            "bytes": 3,
+            "sha256": "51643361c79ecaef25a8de802de24f570ba25d9c2df1d22d94fade11b4f466cc"
+          },
+          {
+            "path": "artifacts/logging-read-accepted-server/database.db",
+            "bytes": 102400,
+            "sha256": "534d6989b8caa8f9a0aa6681476c7b4a4520e3d1075fe516446f4a62a4d93b09"
+          },
+          {
+            "path": "artifacts/logging-read-accepted-server/logging-world/neoprotect/neoprotect.mv.db",
+            "bytes": 102400,
+            "sha256": "733ad57fbfe6530e38c162187940f7f3860af661398cfaca0cd313edae262f0e"
+          },
+          {
+            "path": "artifacts/logging-read-accepted-server/logging-world/yuuniverse_economy/economy.db",
+            "bytes": 368640,
+            "sha256": "de763960dde781fed006da0fcdf76e53db4c72d2caac44a246ad7f0073354115"
+          }
+        ]
+      },
+      {
+        "fixture": "logging-read-normal-regression-server",
+        "world": "logging-world",
+        "exclusive": true,
+        "files": [
+          {
+            "path": "artifacts/logging-read-normal-regression-server/logging-world/session.lock",
+            "bytes": 3,
+            "sha256": "51643361c79ecaef25a8de802de24f570ba25d9c2df1d22d94fade11b4f466cc"
+          },
+          {
+            "path": "artifacts/logging-read-normal-regression-server/database.db",
+            "bytes": 102400,
+            "sha256": "d8d0c61ef8b64ad66827db80a6838049b8cc27479d58a996306aa268e5abfdb3"
+          },
+          {
+            "path": "artifacts/logging-read-normal-regression-server/logging-world/neoprotect/neoprotect.mv.db",
+            "bytes": 98304,
+            "sha256": "c60a044c41871705406dcd03d19b954233359379678020369ad994132573ad7a"
+          },
+          {
+            "path": "artifacts/logging-read-normal-regression-server/logging-world/yuuniverse_economy/economy.db",
+            "bytes": 368640,
+            "sha256": "5d8aa4242b5ff49cdaa2dfc6def54cca0fe15011f30fc062a280199033eb7a4a"
+          }
+        ]
+      },
+      {
+        "fixture": "logging-read-shutdown-regression-server",
+        "world": "logging-world",
+        "exclusive": true,
+        "files": [
+          {
+            "path": "artifacts/logging-read-shutdown-regression-server/logging-world/session.lock",
+            "bytes": 3,
+            "sha256": "51643361c79ecaef25a8de802de24f570ba25d9c2df1d22d94fade11b4f466cc"
+          },
+          {
+            "path": "artifacts/logging-read-shutdown-regression-server/database.db",
+            "bytes": 94208,
+            "sha256": "84a7c481cfac39efd83f42e15185cd718c10cd23a7802f6cd68970718181bea7"
+          },
+          {
+            "path": "artifacts/logging-read-shutdown-regression-server/logging-world/neoprotect/neoprotect.mv.db",
+            "bytes": 36864,
+            "sha256": "b9c3d3d26c9bda6a0867bb69815a7f6ff09394c0636996dcf0494abd8ec6ebd2"
+          },
+          {
+            "path": "artifacts/logging-read-shutdown-regression-server/logging-world/yuuniverse_economy/economy.db",
+            "bytes": 368640,
+            "sha256": "7f61d75ca6061b9872ff36686d69602af9b2edb08abe03e67c9eecb29954ec3b"
+          }
+        ]
+      },
+      {
+        "fixture": "logging-read-index-regression-server",
+        "world": "logging-world",
+        "exclusive": true,
+        "files": [
+          {
+            "path": "artifacts/logging-read-index-regression-server/logging-world/session.lock",
+            "bytes": 3,
+            "sha256": "51643361c79ecaef25a8de802de24f570ba25d9c2df1d22d94fade11b4f466cc"
+          },
+          {
+            "path": "artifacts/logging-read-index-regression-server/database.db",
+            "bytes": 819200,
+            "sha256": "b91dd4cbf18aef266fd14d5c5c43d029f167e75191e7d73bcd3441d9509a1f9f"
+          },
+          {
+            "path": "artifacts/logging-read-index-regression-server/logging-world/neoprotect/neoprotect.mv.db",
+            "bytes": 102400,
+            "sha256": "240eeb7294d7e0f2c4a134ee71390f560721398875c2677fd6a49a74dc8a6508"
+          },
+          {
+            "path": "artifacts/logging-read-index-regression-server/logging-world/yuuniverse_economy/economy.db",
+            "bytes": 368640,
+            "sha256": "890ed43594b8b61436394d691024e5af3c5d423e7292eea6f913e60ec08caed7"
+          }
+        ]
+      },
+      {
+        "fixture": "logging-shutdown-normal-regression-server",
+        "world": "logging-world",
+        "exclusive": true,
+        "files": [
+          {
+            "path": "artifacts/logging-shutdown-normal-regression-server/logging-world/session.lock",
+            "bytes": 3,
+            "sha256": "51643361c79ecaef25a8de802de24f570ba25d9c2df1d22d94fade11b4f466cc"
+          },
+          {
+            "path": "artifacts/logging-shutdown-normal-regression-server/database.db",
+            "bytes": 81920,
+            "sha256": "a5d3310c9d66a1dcaf7e0dac2ac13e025c7ec0df9c250ced65c7b97ffc46dbe6"
+          },
+          {
+            "path": "artifacts/logging-shutdown-normal-regression-server/logging-world/neoprotect/neoprotect.mv.db",
+            "bytes": 106496,
+            "sha256": "6b2bbf523fb4221e41baf1927b72723dc93a45c63659e4eb0e678742bcaed0e7"
+          },
+          {
+            "path": "artifacts/logging-shutdown-normal-regression-server/logging-world/yuuniverse_economy/economy.db",
+            "bytes": 368640,
+            "sha256": "0f4f09ea10ff11ae3e68b2248e8cebae956f36ca95bc22d40c3a55279f1f62d2"
+          }
+        ]
+      },
+      {
+        "fixture": "ordinary-client-acceptance-server",
+        "world": "acceptance-world",
+        "exclusive": true,
+        "files": [
+          {
+            "path": "artifacts/ordinary-client-acceptance-server/acceptance-world/session.lock",
+            "bytes": 3,
+            "sha256": "51643361c79ecaef25a8de802de24f570ba25d9c2df1d22d94fade11b4f466cc"
+          }
+        ]
+      }
+    ],
+    "snapshots": [
+      {
+        "fixture": "logging-read-shutdown-regression-stopped-shutdown",
+        "world": "logging-read-shutdown-regression-stopped-shutdown-world",
+        "exclusive": true,
+        "files": [
+          {
+            "path": "artifacts/logging-read-shutdown-regression-stopped-shutdown-world/session.lock",
+            "bytes": 3,
+            "sha256": "51643361c79ecaef25a8de802de24f570ba25d9c2df1d22d94fade11b4f466cc"
+          },
+          {
+            "path": "artifacts/logging-read-shutdown-regression-stopped-shutdown.db",
+            "bytes": 94208,
+            "sha256": "62790ed6edce0a591f8d22433d838014106fdb2c56c7c6faf715eda281648098"
+          },
+          {
+            "path": "artifacts/logging-read-shutdown-regression-stopped-shutdown-world/neoprotect/neoprotect.mv.db",
+            "bytes": 36864,
+            "sha256": "073a3d138c07c3a67f71cda5a332f60244eb0bb58c4e91cab8d0fe1a42c4da60"
+          },
+          {
+            "path": "artifacts/logging-read-shutdown-regression-stopped-shutdown-world/yuuniverse_economy/economy.db",
+            "bytes": 368640,
+            "sha256": "cd12b1c775b909ffbf30dd2938c3a9d46bdce593708268b0cbd6c951c586958a"
+          }
+        ]
+      },
+      {
+        "fixture": "logging-read-shutdown-regression-stopped-shutdown-recover",
+        "world": "logging-read-shutdown-regression-stopped-shutdown-recover-world",
+        "exclusive": true,
+        "files": [
+          {
+            "path": "artifacts/logging-read-shutdown-regression-stopped-shutdown-recover-world/session.lock",
+            "bytes": 3,
+            "sha256": "51643361c79ecaef25a8de802de24f570ba25d9c2df1d22d94fade11b4f466cc"
+          },
+          {
+            "path": "artifacts/logging-read-shutdown-regression-stopped-shutdown-recover.db",
+            "bytes": 94208,
+            "sha256": "84a7c481cfac39efd83f42e15185cd718c10cd23a7802f6cd68970718181bea7"
+          },
+          {
+            "path": "artifacts/logging-read-shutdown-regression-stopped-shutdown-recover-world/neoprotect/neoprotect.mv.db",
+            "bytes": 36864,
+            "sha256": "b9c3d3d26c9bda6a0867bb69815a7f6ff09394c0636996dcf0494abd8ec6ebd2"
+          },
+          {
+            "path": "artifacts/logging-read-shutdown-regression-stopped-shutdown-recover-world/yuuniverse_economy/economy.db",
+            "bytes": 368640,
+            "sha256": "7f61d75ca6061b9872ff36686d69602af9b2edb08abe03e67c9eecb29954ec3b"
+          }
+        ]
+      }
+    ]
+  },
+  "guards": {
+    "createdAt": "2026-10-23T19:22:03.5026787+08:00",
+    "timezone": "UTC+08:00",
+    "before": {
+      "artifacts/logging-read-accepted-server/database.db": "534D6989B8CAA8F9A0AA6681476C7B4A4520E3D1075FE516446F4A62A4D93B09",
+      "artifacts/logging-read-accepted-server/logging-audit-fixture.txt": "6E1C484A75BCE37F311736D0078828C7E0B7B77D18765730A66612A1F2903E25",
+      "artifacts/logging-read-accepted-server/logging-read-recovery.json": "ABD24F038DD13D928F0ECA8BA8E536C480D02BDA5F9BCCECDAC11BA5F30C89CF",
+      "artifacts/logging-read-accepted-server/logging-read-state.json": "144ED4DF9A55FA0564FB81E0BD2F513798CD96E315E09DB70A53F45E4FFA6EA8",
+      "artifacts/logging-read-accepted-server/server.properties": "CF5598E0FBCA7AF640D043C821C8C6FC3FA04A0ED26BC92C5087D79502F6FF90",
+      "artifacts/logging-read-accepted-server/compile-libs/flywheel-neoforge-1.21.1-1.0.6.jar": "31DDA15C205EB596D3B3449EF03F6AF7363A6CD35B3DA4BFE916B304F9E5337E",
+      "artifacts/logging-read-accepted-server/compile-libs/ponder-neoforge-1.0.82+mc1.21.1.jar": "0CF4611AD853042B689AC386184C5BBE02950EFCFFDDB49E5F604E82BADDB0DC",
+      "artifacts/logging-read-accepted-server/compile-libs/Registrate-MC1.21-1.3.0+67.jar": "510F4041C41739F1D8EA8850AB8364D3E3A5FADA8529BEED5D9F479E2523DB52",
+      "artifacts/logging-read-accepted-server/compile-libs/sqlite-jdbc-3.46.1.3.jar": "4A4832720A65EAF7F4D6FD7EDE52087B994DC5633C076F9E994DC0C8B4B0B4FA",
+      "artifacts/logging-read-accepted-server/logging-world/session.lock": "51643361C79ECAEF25A8DE802DE24F570BA25D9C2DF1D22D94FADE11B4F466CC",
+      "artifacts/logging-read-accepted-server/logging-world/neoprotect/neoprotect.mv.db": "733AD57FBFE6530E38C162187940F7F3860AF661398CFACA0CD313EDAE262F0E",
+      "artifacts/logging-read-accepted-server/logging-world/yuuniverse_economy/economy.db": "DE763960DDE781FED006DA0FCDF76E53DB4C72D2CAAC44A246AD7F0073354115",
+      "artifacts/logging-read-accepted-server/logs/latest.log": "657B060F1EAA776DD5AD7F685A2CE3F53A786B9A826D187E8CC6D83F8B41702F",
+      "artifacts/logging-read-accepted-server/mods/architectury-13.0.11-neoforge.jar": "9CC92F2C09533FC5482C60F993BD891C655A0E32B637037CDCB7C2B23ADEDEEB",
+      "artifacts/logging-read-accepted-server/mods/create.jar": "5602A16796957CB5C7FB829C10C6B54BF9D228931C7680636710B6A60D92822E",
+      "artifacts/logging-read-accepted-server/mods/economy.jar": "179115E5301EE6629ACD3BDCBB6779D2549A35F7493821AB0FCA79BCC43645F5",
+      "artifacts/logging-read-accepted-server/mods/grieflogger-1.2.10-1.21.1-yuuniverse.8-neoforge.jar": "193F7E35CFA0D672125030BFC018BBF1DDE884CC66F88CBEB726036D433EBFBC",
+      "artifacts/logging-read-accepted-server/mods/neoprotect-1.0.4-mc1.21.1-neoforge.jar": "2CBCEC7AEEF26EF3F5B54DAE90FC16DA353A1534462353B9F516D7D2E0A138CE",
+      "artifacts/logging-read-accepted-server/mods/supermartijn642configlib-1.1.8-neoforge-mc1.21.jar": "D2BA7B839A2268E4E223457E813D11AA2476C3BF708A7BBA691D8FC851778A4B",
+      "artifacts/logging-shutdown-normal-regression-server/database.db": "A5D3310C9D66A1DCAF7E0DAC2AC13E025C7EC0DF9C250CED65C7B97FFC46DBE6",
+      "artifacts/logging-shutdown-normal-regression-server/logging-audit-fixture.txt": "6E1C484A75BCE37F311736D0078828C7E0B7B77D18765730A66612A1F2903E25",
+      "artifacts/logging-shutdown-normal-regression-server/server.properties": "058B0D977F723396A8E68617919AB5A30B4E170102659D53E8071D4F3B9B9DAD",
+      "artifacts/logging-shutdown-normal-regression-server/compile-libs/flywheel-neoforge-1.21.1-1.0.6.jar": "31DDA15C205EB596D3B3449EF03F6AF7363A6CD35B3DA4BFE916B304F9E5337E",
+      "artifacts/logging-shutdown-normal-regression-server/compile-libs/ponder-neoforge-1.0.82+mc1.21.1.jar": "0CF4611AD853042B689AC386184C5BBE02950EFCFFDDB49E5F604E82BADDB0DC",
+      "artifacts/logging-shutdown-normal-regression-server/compile-libs/Registrate-MC1.21-1.3.0+67.jar": "510F4041C41739F1D8EA8850AB8364D3E3A5FADA8529BEED5D9F479E2523DB52",
+      "artifacts/logging-shutdown-normal-regression-server/compile-libs/sqlite-jdbc-3.46.1.3.jar": "4A4832720A65EAF7F4D6FD7EDE52087B994DC5633C076F9E994DC0C8B4B0B4FA",
+      "artifacts/logging-shutdown-normal-regression-server/logging-world/session.lock": "51643361C79ECAEF25A8DE802DE24F570BA25D9C2DF1D22D94FADE11B4F466CC",
+      "artifacts/logging-shutdown-normal-regression-server/logging-world/neoprotect/neoprotect.mv.db": "6B2BBF523FB4221E41BAF1927B72723DC93A45C63659E4EB0E678742BCAED0E7",
+      "artifacts/logging-shutdown-normal-regression-server/logging-world/yuuniverse_economy/economy.db": "0F4F09EA10FF11AE3E68B2248E8CEBAE956F36CA95BC22D40C3A55279F1F62D2",
+      "artifacts/logging-shutdown-normal-regression-server/logs/latest.log": "7D5D74AAB87ECE552DCBA935B8E59F9D6652121421F3704B372B7701DFB16CFF",
+      "artifacts/logging-shutdown-normal-regression-server/mods/architectury-13.0.11-neoforge.jar": "9CC92F2C09533FC5482C60F993BD891C655A0E32B637037CDCB7C2B23ADEDEEB",
+      "artifacts/logging-shutdown-normal-regression-server/mods/create.jar": "5602A16796957CB5C7FB829C10C6B54BF9D228931C7680636710B6A60D92822E",
+      "artifacts/logging-shutdown-normal-regression-server/mods/economy.jar": "179115E5301EE6629ACD3BDCBB6779D2549A35F7493821AB0FCA79BCC43645F5",
+      "artifacts/logging-shutdown-normal-regression-server/mods/grieflogger-1.2.10-1.21.1-yuuniverse.6-neoforge.jar": "316E7B11D0F810EE6ABEDED569EF648D7EDEB5C9A3953076A13D0DC24A37AB8C",
+      "artifacts/logging-shutdown-normal-regression-server/mods/neoprotect-1.0.4-mc1.21.1-neoforge.jar": "2CBCEC7AEEF26EF3F5B54DAE90FC16DA353A1534462353B9F516D7D2E0A138CE",
+      "artifacts/logging-shutdown-normal-regression-server/mods/supermartijn642configlib-1.1.8-neoforge-mc1.21.jar": "D2BA7B839A2268E4E223457E813D11AA2476C3BF708A7BBA691D8FC851778A4B",
+      "artifacts/ordinary-client-acceptance-server/database.db": "8AB4E3666D59B8D954CD66FD2AD4A322A9D5F07246BAD8D7DF1CBBE2359FC281",
+      "artifacts/ordinary-client-acceptance-server/server.properties": "F705C564250AE74146C6CB2304C10887990B8AB4462C89A3A6D68C427375DBE6",
+      "artifacts/ordinary-client-acceptance-server/.cache/connector/Axiom-6.1.3-for-MC1.21.1_mapped_moj_1.21.1.jar": "447B4D584131F02A7CBE041A4A2829E75C20E44691CF610385B81CADA26CED74",
+      "artifacts/ordinary-client-acceptance-server/.cache/connector/Axiom-6.1.3-for-MC1.21.1$axiomclientapi_mapped_moj_1.21.1.jar": "65505AA024CEFE7869FA1C999828C4A2607D2B8A57B875F3274AA8EA0479D707",
+      "artifacts/ordinary-client-acceptance-server/.cache/connector/Axiom-6.1.3-for-MC1.21.1$lattice-1.3.0_mapped_moj_1.21.1.jar": "5C3A337275B1AA107227140DC87FC46E256FF8F93663E0CAE565C639326A47CB",
+      "artifacts/ordinary-client-acceptance-server/.cache/connector/Axiom-6.1.3-for-MC1.21.1$mixinconstraints-1.0.9_mapped_moj_1.21.1.jar": "0098B5BDE437166B5F10C8387F67BEDC4E9AA6AB4FF347DC89A82BA9C156A89E",
+      "artifacts/ordinary-client-acceptance-server/.cache/connector/temp/Axiom-6.1.3-for-MC1.21.1$axiomclientapi.jar": "0C269BA333B1B123922B415AC3B5D5BC901FD2ACFF476D9CFDAD17B581EAE94C",
+      "artifacts/ordinary-client-acceptance-server/.cache/connector/temp/Axiom-6.1.3-for-MC1.21.1$lattice-1.3.0.jar": "893AF797E8AFA234F0D1240C0BEDB01186BAFA144F24F568931BA6CF1A2701E6",
+      "artifacts/ordinary-client-acceptance-server/.cache/connector/temp/Axiom-6.1.3-for-MC1.21.1$mixinconstraints-1.0.9.jar": "6FB6C23FF6789619EFC87180DA2E4EBBA3B2C8A502B6BDF853A4D213F44CFB6E",
+      "artifacts/ordinary-client-acceptance-server/.cache/connector/temp/Axiom-6.1.3-for-MC1.21.1$mixinextras-fabric-0.3.5.jar": "743BF47E4FA24642F843B9F85A5F1BA5125FB4B7E656E96B9C010A5043396047",
+      "artifacts/ordinary-client-acceptance-server/acceptance-world/session.lock": "51643361C79ECAEF25A8DE802DE24F570BA25D9C2DF1D22D94FADE11B4F466CC",
+      "artifacts/ordinary-client-acceptance-server/acceptance-world/neoprotect/neoprotect.mv.db": "9C41C2EC03DA0F0C13A85075543050A3D45AFB3CDF30CC7839A29463683072D0",
+      "artifacts/ordinary-client-acceptance-server/acceptance-world/yuuniverse_economy/economy.db": "63D07D9DD61C85A15CDFA83F29236CC858B154BC4868F4583F9D48A1F9663B73",
+      "artifacts/ordinary-client-acceptance-server/client-overrides/[\u81ea\u4fee\u6539]create-6.0.10-mc1.21.1-performance-v6.jar": "5602A16796957CB5C7FB829C10C6B54BF9D228931C7680636710B6A60D92822E",
+      "artifacts/ordinary-client-acceptance-server/client-overrides/architectury-13.0.11-neoforge.jar": "9CC92F2C09533FC5482C60F993BD891C655A0E32B637037CDCB7C2B23ADEDEEB",
+      "artifacts/ordinary-client-acceptance-server/client-overrides/CMDCam_NEOFORGE_v2.2.9_mc1.21.1.jar": "2ACF1CCD2D320F7DA6D4D5EDFABBEBAC06B4EA15CCBC1B989B3DC8A53C976D7D",
+      "artifacts/ordinary-client-acceptance-server/client-overrides/CreativeCore_NEOFORGE_v2.13.50_mc1.21.1.jar": "D07F802239AB6B9B7FB1C7CC0CE607540D34EFB4584BC27EEBB9D6BD153522D6",
+      "artifacts/ordinary-client-acceptance-server/client-overrides/ftb-library-neoforge-2101.1.37.jar": "624C2D2D1CBADB946D967E17757BD5B2D129D4D3ED71F2DA0C70607D04476AC2",
+      "artifacts/ordinary-client-acceptance-server/client-overrides/ftb-quests-neoforge-2101.1.36.jar": "6A39982C4B3AFC00B1E788041A4F0D394E1659E3B3A6E5D078CD790BC36D0018",
+      "artifacts/ordinary-client-acceptance-server/client-overrides/ftb-teams-neoforge-2101.1.11.jar": "E6BCD670493624E6906DF872A9C6AF4A33FE6405CAC57A32C59CD4CD5838C655",
+      "artifacts/ordinary-client-acceptance-server/client-overrides/ftb-xmod-compat-neoforge-21.1.12.jar": "F587E13131101BAC33D4CC7A04D13D06C00F8F88A892BE90D6FFC8AD96119AE8",
+      "artifacts/ordinary-client-acceptance-server/client-overrides/guardvillagers-2.4.12-1.21.1.jar": "AAB03D59216BD931A05434B2527E0D5B7641793BD0178A9958100579C4F11407",
+      "artifacts/ordinary-client-acceptance-server/client-overrides/jei-1.21.1-neoforge-19.53.0.425.jar": "3683C743C1B6192913ABC2A969486344EEE98AA2924E8DEB5087109645C3ABC6",
+      "artifacts/ordinary-client-acceptance-server/client-overrides/kubejs-neoforge-2101.7.2-build.377.jar": "DF9A8458B1F83FED06BA54684977911795A5153A462B81A610895F5B1F2F0CBF",
+      "artifacts/ordinary-client-acceptance-server/client-overrides/rhino-2101.2.8-build.91.jar": "1D53D962AA4DAC54BCBB4F998C1845980CF194318F1D6B1580EA6AC15CCE5EF3",
+      "artifacts/ordinary-client-acceptance-server/client-overrides/vivecraft-1.21.1-1.3.15-neoforge.jar": "0712A6167421BF337477AB1766293887441514F5186EC94B13E081C0779A6474",
+      "artifacts/ordinary-client-acceptance-server/config/paradigm/libs/sqlite-jdbc-3.46.1.3.jar": "4A4832720A65EAF7F4D6FD7EDE52087B994DC5633C076F9E994DC0C8B4B0B4FA",
+      "artifacts/ordinary-client-acceptance-server/logs/latest.log": "4D8040E297D0C7D336DBF02308DEF582231833972D812ADE18F5BB419AE12B63",
+      "artifacts/ordinary-client-acceptance-server/mods/[\u5b9a\u5236]kaminari-motor-work-2.6.2-neoforge-1.21.1.jar": "16511A560D35A72A00B223C51AE6BCAF0A1AA3C3E4036E6A1D711B3826CE74CA",
+      "artifacts/ordinary-client-acceptance-server/mods/[\u81ea\u4fee\u6539]create-6.0.10-mc1.21.1-performance-v6.jar": "5602A16796957CB5C7FB829C10C6B54BF9D228931C7680636710B6A60D92822E",
+      "artifacts/ordinary-client-acceptance-server/mods/[\u81ea\u4fee\u6539]Immersive Vehicles-1.21.1-25.0.0.jar": "4D5461DFFF5108E1C4FFFABEE92A6CFA66CB24A4616AA19D4B966F7EC4672DC2",
+      "artifacts/ordinary-client-acceptance-server/mods/[\u81ea\u4fee\u6539]MTR-4.1.0-beta.2-mc1.21.1-performance-v6.jar": "8BD419BD798C2AB2FA03E08850409387804FDEB2E4F2987C66B9984236263585",
+      "artifacts/ordinary-client-acceptance-server/mods/[\u81ea\u7814]MTR-Station-Decoration-Addon-neoforge-1.4.5-yuuniverse.1.jar": "F38B00B15A36F4E2FE7F8C3AA90C5B6E61D70B979B86D25BC292B562DD92099D",
+      "artifacts/ordinary-client-acceptance-server/mods/[\u81ea\u7814]prosperous-2026.2.1-neoforge-1.21.1.jar": "31164410E50B110B8114F8F7B99EB35402C7F5ABC89AB8075583C8021C23F7F7",
+      "artifacts/ordinary-client-acceptance-server/mods/[\u81ea\u7814]Shirahane-Yorozuya-neoforge-1.21.1-1.2.1-r2.jar": "A343B0783E2BAC3B22B67D042326A6A822307A0B659017979A1A3DB9F7E72DE6",
+      "artifacts/ordinary-client-acceptance-server/mods/[\u81ea\u7814]udays-museum-7.241130-neoforge-1.21.1.jar": "D9AB8BF6B9D47DA2ABFB4D737F5D83AE67A907AA888B6CB36EEE77FEE4FB532F",
+      "artifacts/ordinary-client-acceptance-server/mods/architectury-13.0.11-neoforge.jar": "9CC92F2C09533FC5482C60F993BD891C655A0E32B637037CDCB7C2B23ADEDEEB",
+      "artifacts/ordinary-client-acceptance-server/mods/Axiom-6.1.3-for-MC1.21.1.jar": "6121B645EEEC340DD851F5DBE3B9CB9F018028388C00870174DA60DAEE309602",
+      "artifacts/ordinary-client-acceptance-server/mods/citizens-2.0.43-neoforge-SNAPSHOT.jar": "B7A1EE4312E3057D1D8C5FA5BB71147B87003FD3AB63F3FDAC2758B909920DE1",
+      "artifacts/ordinary-client-acceptance-server/mods/CMDCam_NEOFORGE_v2.2.9_mc1.21.1.jar": "2ACF1CCD2D320F7DA6D4D5EDFABBEBAC06B4EA15CCBC1B989B3DC8A53C976D7D",
+      "artifacts/ordinary-client-acceptance-server/mods/connector-2.0.0-beta.17+1.21.1-full.jar": "CA70B57DF3A7A4E8D211FEA7FF3AE77E768482AF374F26BF953FF5FD755564F0",
+      "artifacts/ordinary-client-acceptance-server/mods/copycats-3.0.4+mc.1.21.1-neoforge.jar": "8480E2A62EAA625F75776831C1D8A9EF3D77D2D816FA2E67566C6EC25BA745D1",
+      "artifacts/ordinary-client-acceptance-server/mods/copyfoxies-2.0.0.jar": "165A536BCAC24B0FE773A0C48FB94E31EF7139FA7E47E97C9AD22F8C9AAB32E7",
+      "artifacts/ordinary-client-acceptance-server/mods/createrailwaysnavigator-neoforge-1.21.1-beta-0.10.0-C6.jar": "1CE27FBCD80834F82F37429878901CA00496AC0E9C1A477A7B3DD4E12B4E41D4",
+      "artifacts/ordinary-client-acceptance-server/mods/createunlimited-0.7.1.jar": "DD785E26646943BDB90A935057B851FEE637C180EB4ECC5346D1C4769BA141E4",
+      "artifacts/ordinary-client-acceptance-server/mods/CreativeCore_NEOFORGE_v2.13.50_mc1.21.1.jar": "D07F802239AB6B9B7FB1C7CC0CE607540D34EFB4584BC27EEBB9D6BD153522D6",
+      "artifacts/ordinary-client-acceptance-server/mods/CRTools-MTR-Map-Overlay-1.5.1.jar": "1B2792A1CC2F0B5BE0D220CD447CD0273BBABC7B6A87B682713FC59C1BCBAE56",
+      "artifacts/ordinary-client-acceptance-server/mods/dragonlib-neoforge-1.21.1-beta-3.0.28.jar": "BA127947220504D1410716E422EF6A9A387D818A922AD5FDB3BE044F9F7556F7",
+      "artifacts/ordinary-client-acceptance-server/mods/ferritecore-7.0.2-neoforge.jar": "235E2081DFE050D7642B0D432A786668F079168505BA5D6BF0EC70C962A36539",
+      "artifacts/ordinary-client-acceptance-server/mods/forgified-fabric-api-0.116.15+2.3.5+1.21.1.jar": "96F8B489F401C64E87343DAF57A030CCD1B58BE40FC0AAD701278BA58A0FADAF",
+      "artifacts/ordinary-client-acceptance-server/mods/framework-neoforge-1.21.1-0.13.11.jar": "429EA90A162D7C25C1463EE60979E4D7B1DDB525D9384A3A2A2F45D70BDA03F5",
+      "artifacts/ordinary-client-acceptance-server/mods/ftb-library-neoforge-2101.1.37.jar": "624C2D2D1CBADB946D967E17757BD5B2D129D4D3ED71F2DA0C70607D04476AC2",
+      "artifacts/ordinary-client-acceptance-server/mods/ftb-quests-neoforge-2101.1.36.jar": "6A39982C4B3AFC00B1E788041A4F0D394E1659E3B3A6E5D078CD790BC36D0018",
+      "artifacts/ordinary-client-acceptance-server/mods/ftb-teams-neoforge-2101.1.11.jar": "E6BCD670493624E6906DF872A9C6AF4A33FE6405CAC57A32C59CD4CD5838C655",
+      "artifacts/ordinary-client-acceptance-server/mods/ftb-xmod-compat-neoforge-21.1.12.jar": "F587E13131101BAC33D4CC7A04D13D06C00F8F88A892BE90D6FFC8AD96119AE8",
+      "artifacts/ordinary-client-acceptance-server/mods/grieflogger-1.2.10-1.21.1-yuuniverse.1-neoforge.jar": "A897F22FCA7705144B26749F7BAA097B4E1CC0D16EED1DDEED3A9FED270806E0",
+      "artifacts/ordinary-client-acceptance-server/mods/guardvillagers-2.4.12-1.21.1.jar": "AAB03D59216BD931A05434B2527E0D5B7641793BD0178A9958100579C4F11407",
+      "artifacts/ordinary-client-acceptance-server/mods/iav-pack-8.2507-neoforge-1.21.1.jar": "AD07191670397011D43C176222E995361D7C84E41C72D851A0795D642D59EA5E",
+      "artifacts/ordinary-client-acceptance-server/mods/ImmersiveEngineering-1.21.1-12.4.2-194.jar": "45942985A4A4AEBF265B8E22A0C54A96208637471F36F2532FF5D4911322DEBC",
+      "artifacts/ordinary-client-acceptance-server/mods/interiors-1.21.1-neoforge-0.6.1.jar": "0D1326FB8B67623AE1C69A63B788DCDCECAF8DF400C7D8E5E55ACE79A5166FE5",
+      "artifacts/ordinary-client-acceptance-server/mods/jei-1.21.1-neoforge-19.53.0.425.jar": "3683C743C1B6192913ABC2A969486344EEE98AA2924E8DEB5087109645C3ABC6",
+      "artifacts/ordinary-client-acceptance-server/mods/kaleidoscope_world_liquor-1.1.9-neoforge+1.21.1-fix.jar": "3C3779945687BE248D91EA919B1F72B40A66AEED40249A6049F55B0158B149AE",
+      "artifacts/ordinary-client-acceptance-server/mods/kaleidoscopecookery-1.5.1-neoforge+mc1.21.1.jar": "FF86A0651CAD2061B2580AE978D18AD2900D5373C75D0318E00AC6DAC98B6465",
+      "artifacts/ordinary-client-acceptance-server/mods/kaleidoscopedoll-1.4.1-neoforge+mc1.21.1.jar": "AD63142CAE3B561D9BADCE1D8348268D85B8D4BC68084307810E22A48C7554EB",
+      "artifacts/ordinary-client-acceptance-server/mods/kaleidoscopetavern-1.2.0-neoforge+mc1.21.1.jar": "03F35E1E614953B22CD1F5E34345613F3A6A283BF1B1C99659B57D58970EDEFF",
+      "artifacts/ordinary-client-acceptance-server/mods/kotlinforforge-5.12.0-all.jar": "2785A4DD6DE5C6C56065FD8EB789C82771BD2EE773C30794C23160A3B2C39139",
+      "artifacts/ordinary-client-acceptance-server/mods/kubejs-neoforge-2101.7.2-build.377.jar": "DF9A8458B1F83FED06BA54684977911795A5153A462B81A610895F5B1F2F0CBF",
+      "artifacts/ordinary-client-acceptance-server/mods/lithium-neoforge-0.15.4+mc1.21.1.jar": "488F33216030C1CB0BAA33E59DE3D657D08D5795A6C2080C8C8BBBC133FC8757",
+      "artifacts/ordinary-client-acceptance-server/mods/LittleTiles_BETA_v1.6.0-pre231_mc1.21.1.jar": "99366BBADC2E75E6B78751553CFB6DA2B4E44F06CC98C58EC767EB16ADF277D3",
+      "artifacts/ordinary-client-acceptance-server/mods/modernfix-neoforge-5.27.20+mc1.21.1.jar": "6F367EA4002C39E3CFE27E0A0BE1008880A4B35A8482A78A437CFB9D8EE38273",
+      "artifacts/ordinary-client-acceptance-server/mods/neoprotect-1.0.4-mc1.21.1-neoforge.jar": "2CBCEC7AEEF26EF3F5B54DAE90FC16DA353A1534462353B9F516D7D2E0A138CE",
+      "artifacts/ordinary-client-acceptance-server/mods/netmusic-1.5.2-neoforge+mc1.21.1.jar": "731FBA4B4D47256D5F44F8392B093B53C7D1C650B66111EDA75B820F7F89A14B",
+      "artifacts/ordinary-client-acceptance-server/mods/Paradigm-neoforge-1.21.1-2.5.0.jar": "4748C11F64D0CF6C172714353EF1E7A4D137BF6C4B6E0D3964A49D59971C766D",
+      "artifacts/ordinary-client-acceptance-server/mods/railways-0.3.0-beta.2+neoforge-mc1.21.1.jar": "34F7D98B93967601313CBA314051422E1CA9A6F07CC955D5D9DB22AFA090D0F4",
+      "artifacts/ordinary-client-acceptance-server/mods/refurbished_furniture-neoforge-1.21.1-1.0.22.jar": "953A7840261EB79959769A97CAA60CBA2EE141700A4CBE208825268327136BDF",
+      "artifacts/ordinary-client-acceptance-server/mods/rhino-2101.2.8-build.91.jar": "1D53D962AA4DAC54BCBB4F998C1845980CF194318F1D6B1580EA6AC15CCE5EF3",
+      "artifacts/ordinary-client-acceptance-server/mods/rsitemeditor-1.0.1.jar": "C2194C5F97A06B1472A5C7BC39C6FD2F3866E237C1CCF9C70787A09FC3109472",
+      "artifacts/ordinary-client-acceptance-server/mods/skinrestorer-2.10.0+1.21-neoforge.jar": "CE01EAF0AEA3FB7A758BEBA08F111F0ABB2F43F17C622501AD547C3F4B6C974F",
+      "artifacts/ordinary-client-acceptance-server/mods/SkinStatues-neoforge-1.21.1-1.5.0.jar": "A17B4C5765E7933E433D5423724F160D4E47D0D894ACEAB250724C786C63DF10",
+      "artifacts/ordinary-client-acceptance-server/mods/slideshow_pro-neoforge-1.21.1-1.1.0.jar": "A445CC68987408E8ED5270DE0E0D7DE4040EA1A97BB2B36E2858E39F571B766C",
+      "artifacts/ordinary-client-acceptance-server/mods/spark-1.10.124-neoforge.jar": "647E8A81AFBE414DBA1DF4BA15FD06C5D32D4CB544E68828405E8E074C2E16DB",
+      "artifacts/ordinary-client-acceptance-server/mods/supermartijn642configlib-1.1.8-neoforge-mc1.21.jar": "D2BA7B839A2268E4E223457E813D11AA2476C3BF708A7BBA691D8FC851778A4B",
+      "artifacts/ordinary-client-acceptance-server/mods/tacz-neoforge-1.21.1-1.1.8-hotfix-r6.jar": "58F6AB47C59218BDB10BB9EEE1905B6CD27F3BC98D4AF13982A6002A99B1D3E7",
+      "artifacts/ordinary-client-acceptance-server/mods/touhoulittlemaid-1.5.3-neoforge+mc1.21.1.jar": "F6DB04195820C8508704277EA76D63723804FF236A7B780369BA59EBE5CD9C27",
+      "artifacts/ordinary-client-acceptance-server/mods/unu-parts-pack-6.7.1-neoforge-1.21.1.jar": "E2706219F6F6394F0C463B04C5197CEAD00B2408E6558D21D86F553261F1A402",
+      "artifacts/ordinary-client-acceptance-server/mods/vivecraft-1.21.1-1.3.15-neoforge.jar": "0712A6167421BF337477AB1766293887441514F5186EC94B13E081C0779A6474",
+      "artifacts/ordinary-client-acceptance-server/mods/worldedit-mod-7.3.8.jar": "5E7752C97876D87411E3760BCC573CC431F43C453722E6959FA7FE54DB1B01CA",
+      "artifacts/ordinary-client-acceptance-server/mods/ysm-2.6.5-neoforge+mc1.21.1-release.jar": "B285C73D4EC010D9A9BE3C53C1BEE890CF269645BE5F1BCF1C27A2E8E82807CB",
+      "artifacts/ordinary-client-acceptance-server/mods/yuuniverse-economy-0.5.6-SNAPSHOT.jar": "179115E5301EE6629ACD3BDCBB6779D2549A35F7493821AB0FCA79BCC43645F5",
+      "artifacts/ordinary-client-acceptance-server/mods/yuuniverse-interactions-2.0.43-neoforge-SNAPSHOT.jar": "1CA6A271EF45B6F4228810F5031261682D53A27BCD44A4B1A67EA292B5066305",
+      "artifacts/ordinary-client-acceptance-server/mods/yuushya_modelling-1.21.1-2.4.1.jar": "EEDE4BD24A1B20AEB007C03761903AED8061B9B826DC68349A8CA146C9944AE5",
+      "artifacts/ordinary-client-acceptance-server/mods/yuushya-1.21.0-neoforge-2.3.0.jar": "C410C51E1ECDD9D3FF55EB34B84D71DA761A8990EC0993A766C9BA40E8C360E8"
+    },
+    "after": {
+      "artifacts/logging-read-accepted-server/database.db": "534D6989B8CAA8F9A0AA6681476C7B4A4520E3D1075FE516446F4A62A4D93B09",
+      "artifacts/logging-read-accepted-server/logging-audit-fixture.txt": "6E1C484A75BCE37F311736D0078828C7E0B7B77D18765730A66612A1F2903E25",
+      "artifacts/logging-read-accepted-server/logging-read-recovery.json": "ABD24F038DD13D928F0ECA8BA8E536C480D02BDA5F9BCCECDAC11BA5F30C89CF",
+      "artifacts/logging-read-accepted-server/logging-read-state.json": "144ED4DF9A55FA0564FB81E0BD2F513798CD96E315E09DB70A53F45E4FFA6EA8",
+      "artifacts/logging-read-accepted-server/server.properties": "CF5598E0FBCA7AF640D043C821C8C6FC3FA04A0ED26BC92C5087D79502F6FF90",
+      "artifacts/logging-read-accepted-server/compile-libs/flywheel-neoforge-1.21.1-1.0.6.jar": "31DDA15C205EB596D3B3449EF03F6AF7363A6CD35B3DA4BFE916B304F9E5337E",
+      "artifacts/logging-read-accepted-server/compile-libs/ponder-neoforge-1.0.82+mc1.21.1.jar": "0CF4611AD853042B689AC386184C5BBE02950EFCFFDDB49E5F604E82BADDB0DC",
+      "artifacts/logging-read-accepted-server/compile-libs/Registrate-MC1.21-1.3.0+67.jar": "510F4041C41739F1D8EA8850AB8364D3E3A5FADA8529BEED5D9F479E2523DB52",
+      "artifacts/logging-read-accepted-server/compile-libs/sqlite-jdbc-3.46.1.3.jar": "4A4832720A65EAF7F4D6FD7EDE52087B994DC5633C076F9E994DC0C8B4B0B4FA",
+      "artifacts/logging-read-accepted-server/logging-world/session.lock": "51643361C79ECAEF25A8DE802DE24F570BA25D9C2DF1D22D94FADE11B4F466CC",
+      "artifacts/logging-read-accepted-server/logging-world/neoprotect/neoprotect.mv.db": "733AD57FBFE6530E38C162187940F7F3860AF661398CFACA0CD313EDAE262F0E",
+      "artifacts/logging-read-accepted-server/logging-world/yuuniverse_economy/economy.db": "DE763960DDE781FED006DA0FCDF76E53DB4C72D2CAAC44A246AD7F0073354115",
+      "artifacts/logging-read-accepted-server/logs/latest.log": "657B060F1EAA776DD5AD7F685A2CE3F53A786B9A826D187E8CC6D83F8B41702F",
+      "artifacts/logging-read-accepted-server/mods/architectury-13.0.11-neoforge.jar": "9CC92F2C09533FC5482C60F993BD891C655A0E32B637037CDCB7C2B23ADEDEEB",
+      "artifacts/logging-read-accepted-server/mods/create.jar": "5602A16796957CB5C7FB829C10C6B54BF9D228931C7680636710B6A60D92822E",
+      "artifacts/logging-read-accepted-server/mods/economy.jar": "179115E5301EE6629ACD3BDCBB6779D2549A35F7493821AB0FCA79BCC43645F5",
+      "artifacts/logging-read-accepted-server/mods/grieflogger-1.2.10-1.21.1-yuuniverse.8-neoforge.jar": "193F7E35CFA0D672125030BFC018BBF1DDE884CC66F88CBEB726036D433EBFBC",
+      "artifacts/logging-read-accepted-server/mods/neoprotect-1.0.4-mc1.21.1-neoforge.jar": "2CBCEC7AEEF26EF3F5B54DAE90FC16DA353A1534462353B9F516D7D2E0A138CE",
+      "artifacts/logging-read-accepted-server/mods/supermartijn642configlib-1.1.8-neoforge-mc1.21.jar": "D2BA7B839A2268E4E223457E813D11AA2476C3BF708A7BBA691D8FC851778A4B",
+      "artifacts/logging-shutdown-normal-regression-server/database.db": "A5D3310C9D66A1DCAF7E0DAC2AC13E025C7EC0DF9C250CED65C7B97FFC46DBE6",
+      "artifacts/logging-shutdown-normal-regression-server/logging-audit-fixture.txt": "6E1C484A75BCE37F311736D0078828C7E0B7B77D18765730A66612A1F2903E25",
+      "artifacts/logging-shutdown-normal-regression-server/server.properties": "058B0D977F723396A8E68617919AB5A30B4E170102659D53E8071D4F3B9B9DAD",
+      "artifacts/logging-shutdown-normal-regression-server/compile-libs/flywheel-neoforge-1.21.1-1.0.6.jar": "31DDA15C205EB596D3B3449EF03F6AF7363A6CD35B3DA4BFE916B304F9E5337E",
+      "artifacts/logging-shutdown-normal-regression-server/compile-libs/ponder-neoforge-1.0.82+mc1.21.1.jar": "0CF4611AD853042B689AC386184C5BBE02950EFCFFDDB49E5F604E82BADDB0DC",
+      "artifacts/logging-shutdown-normal-regression-server/compile-libs/Registrate-MC1.21-1.3.0+67.jar": "510F4041C41739F1D8EA8850AB8364D3E3A5FADA8529BEED5D9F479E2523DB52",
+      "artifacts/logging-shutdown-normal-regression-server/compile-libs/sqlite-jdbc-3.46.1.3.jar": "4A4832720A65EAF7F4D6FD7EDE52087B994DC5633C076F9E994DC0C8B4B0B4FA",
+      "artifacts/logging-shutdown-normal-regression-server/logging-world/session.lock": "51643361C79ECAEF25A8DE802DE24F570BA25D9C2DF1D22D94FADE11B4F466CC",
+      "artifacts/logging-shutdown-normal-regression-server/logging-world/neoprotect/neoprotect.mv.db": "6B2BBF523FB4221E41BAF1927B72723DC93A45C63659E4EB0E678742BCAED0E7",
+      "artifacts/logging-shutdown-normal-regression-server/logging-world/yuuniverse_economy/economy.db": "0F4F09EA10FF11AE3E68B2248E8CEBAE956F36CA95BC22D40C3A55279F1F62D2",
+      "artifacts/logging-shutdown-normal-regression-server/logs/latest.log": "7D5D74AAB87ECE552DCBA935B8E59F9D6652121421F3704B372B7701DFB16CFF",
+      "artifacts/logging-shutdown-normal-regression-server/mods/architectury-13.0.11-neoforge.jar": "9CC92F2C09533FC5482C60F993BD891C655A0E32B637037CDCB7C2B23ADEDEEB",
+      "artifacts/logging-shutdown-normal-regression-server/mods/create.jar": "5602A16796957CB5C7FB829C10C6B54BF9D228931C7680636710B6A60D92822E",
+      "artifacts/logging-shutdown-normal-regression-server/mods/economy.jar": "179115E5301EE6629ACD3BDCBB6779D2549A35F7493821AB0FCA79BCC43645F5",
+      "artifacts/logging-shutdown-normal-regression-server/mods/grieflogger-1.2.10-1.21.1-yuuniverse.6-neoforge.jar": "316E7B11D0F810EE6ABEDED569EF648D7EDEB5C9A3953076A13D0DC24A37AB8C",
+      "artifacts/logging-shutdown-normal-regression-server/mods/neoprotect-1.0.4-mc1.21.1-neoforge.jar": "2CBCEC7AEEF26EF3F5B54DAE90FC16DA353A1534462353B9F516D7D2E0A138CE",
+      "artifacts/logging-shutdown-normal-regression-server/mods/supermartijn642configlib-1.1.8-neoforge-mc1.21.jar": "D2BA7B839A2268E4E223457E813D11AA2476C3BF708A7BBA691D8FC851778A4B",
+      "artifacts/ordinary-client-acceptance-server/database.db": "8AB4E3666D59B8D954CD66FD2AD4A322A9D5F07246BAD8D7DF1CBBE2359FC281",
+      "artifacts/ordinary-client-acceptance-server/server.properties": "F705C564250AE74146C6CB2304C10887990B8AB4462C89A3A6D68C427375DBE6",
+      "artifacts/ordinary-client-acceptance-server/.cache/connector/Axiom-6.1.3-for-MC1.21.1_mapped_moj_1.21.1.jar": "447B4D584131F02A7CBE041A4A2829E75C20E44691CF610385B81CADA26CED74",
+      "artifacts/ordinary-client-acceptance-server/.cache/connector/Axiom-6.1.3-for-MC1.21.1$axiomclientapi_mapped_moj_1.21.1.jar": "65505AA024CEFE7869FA1C999828C4A2607D2B8A57B875F3274AA8EA0479D707",
+      "artifacts/ordinary-client-acceptance-server/.cache/connector/Axiom-6.1.3-for-MC1.21.1$lattice-1.3.0_mapped_moj_1.21.1.jar": "5C3A337275B1AA107227140DC87FC46E256FF8F93663E0CAE565C639326A47CB",
+      "artifacts/ordinary-client-acceptance-server/.cache/connector/Axiom-6.1.3-for-MC1.21.1$mixinconstraints-1.0.9_mapped_moj_1.21.1.jar": "0098B5BDE437166B5F10C8387F67BEDC4E9AA6AB4FF347DC89A82BA9C156A89E",
+      "artifacts/ordinary-client-acceptance-server/.cache/connector/temp/Axiom-6.1.3-for-MC1.21.1$axiomclientapi.jar": "0C269BA333B1B123922B415AC3B5D5BC901FD2ACFF476D9CFDAD17B581EAE94C",
+      "artifacts/ordinary-client-acceptance-server/.cache/connector/temp/Axiom-6.1.3-for-MC1.21.1$lattice-1.3.0.jar": "893AF797E8AFA234F0D1240C0BEDB01186BAFA144F24F568931BA6CF1A2701E6",
+      "artifacts/ordinary-client-acceptance-server/.cache/connector/temp/Axiom-6.1.3-for-MC1.21.1$mixinconstraints-1.0.9.jar": "6FB6C23FF6789619EFC87180DA2E4EBBA3B2C8A502B6BDF853A4D213F44CFB6E",
+      "artifacts/ordinary-client-acceptance-server/.cache/connector/temp/Axiom-6.1.3-for-MC1.21.1$mixinextras-fabric-0.3.5.jar": "743BF47E4FA24642F843B9F85A5F1BA5125FB4B7E656E96B9C010A5043396047",
+      "artifacts/ordinary-client-acceptance-server/acceptance-world/session.lock": "51643361C79ECAEF25A8DE802DE24F570BA25D9C2DF1D22D94FADE11B4F466CC",
+      "artifacts/ordinary-client-acceptance-server/acceptance-world/neoprotect/neoprotect.mv.db": "9C41C2EC03DA0F0C13A85075543050A3D45AFB3CDF30CC7839A29463683072D0",
+      "artifacts/ordinary-client-acceptance-server/acceptance-world/yuuniverse_economy/economy.db": "63D07D9DD61C85A15CDFA83F29236CC858B154BC4868F4583F9D48A1F9663B73",
+      "artifacts/ordinary-client-acceptance-server/client-overrides/[\u81ea\u4fee\u6539]create-6.0.10-mc1.21.1-performance-v6.jar": "5602A16796957CB5C7FB829C10C6B54BF9D228931C7680636710B6A60D92822E",
+      "artifacts/ordinary-client-acceptance-server/client-overrides/architectury-13.0.11-neoforge.jar": "9CC92F2C09533FC5482C60F993BD891C655A0E32B637037CDCB7C2B23ADEDEEB",
+      "artifacts/ordinary-client-acceptance-server/client-overrides/CMDCam_NEOFORGE_v2.2.9_mc1.21.1.jar": "2ACF1CCD2D320F7DA6D4D5EDFABBEBAC06B4EA15CCBC1B989B3DC8A53C976D7D",
+      "artifacts/ordinary-client-acceptance-server/client-overrides/CreativeCore_NEOFORGE_v2.13.50_mc1.21.1.jar": "D07F802239AB6B9B7FB1C7CC0CE607540D34EFB4584BC27EEBB9D6BD153522D6",
+      "artifacts/ordinary-client-acceptance-server/client-overrides/ftb-library-neoforge-2101.1.37.jar": "624C2D2D1CBADB946D967E17757BD5B2D129D4D3ED71F2DA0C70607D04476AC2",
+      "artifacts/ordinary-client-acceptance-server/client-overrides/ftb-quests-neoforge-2101.1.36.jar": "6A39982C4B3AFC00B1E788041A4F0D394E1659E3B3A6E5D078CD790BC36D0018",
+      "artifacts/ordinary-client-acceptance-server/client-overrides/ftb-teams-neoforge-2101.1.11.jar": "E6BCD670493624E6906DF872A9C6AF4A33FE6405CAC57A32C59CD4CD5838C655",
+      "artifacts/ordinary-client-acceptance-server/client-overrides/ftb-xmod-compat-neoforge-21.1.12.jar": "F587E13131101BAC33D4CC7A04D13D06C00F8F88A892BE90D6FFC8AD96119AE8",
+      "artifacts/ordinary-client-acceptance-server/client-overrides/guardvillagers-2.4.12-1.21.1.jar": "AAB03D59216BD931A05434B2527E0D5B7641793BD0178A9958100579C4F11407",
+      "artifacts/ordinary-client-acceptance-server/client-overrides/jei-1.21.1-neoforge-19.53.0.425.jar": "3683C743C1B6192913ABC2A969486344EEE98AA2924E8DEB5087109645C3ABC6",
+      "artifacts/ordinary-client-acceptance-server/client-overrides/kubejs-neoforge-2101.7.2-build.377.jar": "DF9A8458B1F83FED06BA54684977911795A5153A462B81A610895F5B1F2F0CBF",
+      "artifacts/ordinary-client-acceptance-server/client-overrides/rhino-2101.2.8-build.91.jar": "1D53D962AA4DAC54BCBB4F998C1845980CF194318F1D6B1580EA6AC15CCE5EF3",
+      "artifacts/ordinary-client-acceptance-server/client-overrides/vivecraft-1.21.1-1.3.15-neoforge.jar": "0712A6167421BF337477AB1766293887441514F5186EC94B13E081C0779A6474",
+      "artifacts/ordinary-client-acceptance-server/config/paradigm/libs/sqlite-jdbc-3.46.1.3.jar": "4A4832720A65EAF7F4D6FD7EDE52087B994DC5633C076F9E994DC0C8B4B0B4FA",
+      "artifacts/ordinary-client-acceptance-server/logs/latest.log": "4D8040E297D0C7D336DBF02308DEF582231833972D812ADE18F5BB419AE12B63",
+      "artifacts/ordinary-client-acceptance-server/mods/[\u5b9a\u5236]kaminari-motor-work-2.6.2-neoforge-1.21.1.jar": "16511A560D35A72A00B223C51AE6BCAF0A1AA3C3E4036E6A1D711B3826CE74CA",
+      "artifacts/ordinary-client-acceptance-server/mods/[\u81ea\u4fee\u6539]create-6.0.10-mc1.21.1-performance-v6.jar": "5602A16796957CB5C7FB829C10C6B54BF9D228931C7680636710B6A60D92822E",
+      "artifacts/ordinary-client-acceptance-server/mods/[\u81ea\u4fee\u6539]Immersive Vehicles-1.21.1-25.0.0.jar": "4D5461DFFF5108E1C4FFFABEE92A6CFA66CB24A4616AA19D4B966F7EC4672DC2",
+      "artifacts/ordinary-client-acceptance-server/mods/[\u81ea\u4fee\u6539]MTR-4.1.0-beta.2-mc1.21.1-performance-v6.jar": "8BD419BD798C2AB2FA03E08850409387804FDEB2E4F2987C66B9984236263585",
+      "artifacts/ordinary-client-acceptance-server/mods/[\u81ea\u7814]MTR-Station-Decoration-Addon-neoforge-1.4.5-yuuniverse.1.jar": "F38B00B15A36F4E2FE7F8C3AA90C5B6E61D70B979B86D25BC292B562DD92099D",
+      "artifacts/ordinary-client-acceptance-server/mods/[\u81ea\u7814]prosperous-2026.2.1-neoforge-1.21.1.jar": "31164410E50B110B8114F8F7B99EB35402C7F5ABC89AB8075583C8021C23F7F7",
+      "artifacts/ordinary-client-acceptance-server/mods/[\u81ea\u7814]Shirahane-Yorozuya-neoforge-1.21.1-1.2.1-r2.jar": "A343B0783E2BAC3B22B67D042326A6A822307A0B659017979A1A3DB9F7E72DE6",
+      "artifacts/ordinary-client-acceptance-server/mods/[\u81ea\u7814]udays-museum-7.241130-neoforge-1.21.1.jar": "D9AB8BF6B9D47DA2ABFB4D737F5D83AE67A907AA888B6CB36EEE77FEE4FB532F",
+      "artifacts/ordinary-client-acceptance-server/mods/architectury-13.0.11-neoforge.jar": "9CC92F2C09533FC5482C60F993BD891C655A0E32B637037CDCB7C2B23ADEDEEB",
+      "artifacts/ordinary-client-acceptance-server/mods/Axiom-6.1.3-for-MC1.21.1.jar": "6121B645EEEC340DD851F5DBE3B9CB9F018028388C00870174DA60DAEE309602",
+      "artifacts/ordinary-client-acceptance-server/mods/citizens-2.0.43-neoforge-SNAPSHOT.jar": "B7A1EE4312E3057D1D8C5FA5BB71147B87003FD3AB63F3FDAC2758B909920DE1",
+      "artifacts/ordinary-client-acceptance-server/mods/CMDCam_NEOFORGE_v2.2.9_mc1.21.1.jar": "2ACF1CCD2D320F7DA6D4D5EDFABBEBAC06B4EA15CCBC1B989B3DC8A53C976D7D",
+      "artifacts/ordinary-client-acceptance-server/mods/connector-2.0.0-beta.17+1.21.1-full.jar": "CA70B57DF3A7A4E8D211FEA7FF3AE77E768482AF374F26BF953FF5FD755564F0",
+      "artifacts/ordinary-client-acceptance-server/mods/copycats-3.0.4+mc.1.21.1-neoforge.jar": "8480E2A62EAA625F75776831C1D8A9EF3D77D2D816FA2E67566C6EC25BA745D1",
+      "artifacts/ordinary-client-acceptance-server/mods/copyfoxies-2.0.0.jar": "165A536BCAC24B0FE773A0C48FB94E31EF7139FA7E47E97C9AD22F8C9AAB32E7",
+      "artifacts/ordinary-client-acceptance-server/mods/createrailwaysnavigator-neoforge-1.21.1-beta-0.10.0-C6.jar": "1CE27FBCD80834F82F37429878901CA00496AC0E9C1A477A7B3DD4E12B4E41D4",
+      "artifacts/ordinary-client-acceptance-server/mods/createunlimited-0.7.1.jar": "DD785E26646943BDB90A935057B851FEE637C180EB4ECC5346D1C4769BA141E4",
+      "artifacts/ordinary-client-acceptance-server/mods/CreativeCore_NEOFORGE_v2.13.50_mc1.21.1.jar": "D07F802239AB6B9B7FB1C7CC0CE607540D34EFB4584BC27EEBB9D6BD153522D6",
+      "artifacts/ordinary-client-acceptance-server/mods/CRTools-MTR-Map-Overlay-1.5.1.jar": "1B2792A1CC2F0B5BE0D220CD447CD0273BBABC7B6A87B682713FC59C1BCBAE56",
+      "artifacts/ordinary-client-acceptance-server/mods/dragonlib-neoforge-1.21.1-beta-3.0.28.jar": "BA127947220504D1410716E422EF6A9A387D818A922AD5FDB3BE044F9F7556F7",
+      "artifacts/ordinary-client-acceptance-server/mods/ferritecore-7.0.2-neoforge.jar": "235E2081DFE050D7642B0D432A786668F079168505BA5D6BF0EC70C962A36539",
+      "artifacts/ordinary-client-acceptance-server/mods/forgified-fabric-api-0.116.15+2.3.5+1.21.1.jar": "96F8B489F401C64E87343DAF57A030CCD1B58BE40FC0AAD701278BA58A0FADAF",
+      "artifacts/ordinary-client-acceptance-server/mods/framework-neoforge-1.21.1-0.13.11.jar": "429EA90A162D7C25C1463EE60979E4D7B1DDB525D9384A3A2A2F45D70BDA03F5",
+      "artifacts/ordinary-client-acceptance-server/mods/ftb-library-neoforge-2101.1.37.jar": "624C2D2D1CBADB946D967E17757BD5B2D129D4D3ED71F2DA0C70607D04476AC2",
+      "artifacts/ordinary-client-acceptance-server/mods/ftb-quests-neoforge-2101.1.36.jar": "6A39982C4B3AFC00B1E788041A4F0D394E1659E3B3A6E5D078CD790BC36D0018",
+      "artifacts/ordinary-client-acceptance-server/mods/ftb-teams-neoforge-2101.1.11.jar": "E6BCD670493624E6906DF872A9C6AF4A33FE6405CAC57A32C59CD4CD5838C655",
+      "artifacts/ordinary-client-acceptance-server/mods/ftb-xmod-compat-neoforge-21.1.12.jar": "F587E13131101BAC33D4CC7A04D13D06C00F8F88A892BE90D6FFC8AD96119AE8",
+      "artifacts/ordinary-client-acceptance-server/mods/grieflogger-1.2.10-1.21.1-yuuniverse.1-neoforge.jar": "A897F22FCA7705144B26749F7BAA097B4E1CC0D16EED1DDEED3A9FED270806E0",
+      "artifacts/ordinary-client-acceptance-server/mods/guardvillagers-2.4.12-1.21.1.jar": "AAB03D59216BD931A05434B2527E0D5B7641793BD0178A9958100579C4F11407",
+      "artifacts/ordinary-client-acceptance-server/mods/iav-pack-8.2507-neoforge-1.21.1.jar": "AD07191670397011D43C176222E995361D7C84E41C72D851A0795D642D59EA5E",
+      "artifacts/ordinary-client-acceptance-server/mods/ImmersiveEngineering-1.21.1-12.4.2-194.jar": "45942985A4A4AEBF265B8E22A0C54A96208637471F36F2532FF5D4911322DEBC",
+      "artifacts/ordinary-client-acceptance-server/mods/interiors-1.21.1-neoforge-0.6.1.jar": "0D1326FB8B67623AE1C69A63B788DCDCECAF8DF400C7D8E5E55ACE79A5166FE5",
+      "artifacts/ordinary-client-acceptance-server/mods/jei-1.21.1-neoforge-19.53.0.425.jar": "3683C743C1B6192913ABC2A969486344EEE98AA2924E8DEB5087109645C3ABC6",
+      "artifacts/ordinary-client-acceptance-server/mods/kaleidoscope_world_liquor-1.1.9-neoforge+1.21.1-fix.jar": "3C3779945687BE248D91EA919B1F72B40A66AEED40249A6049F55B0158B149AE",
+      "artifacts/ordinary-client-acceptance-server/mods/kaleidoscopecookery-1.5.1-neoforge+mc1.21.1.jar": "FF86A0651CAD2061B2580AE978D18AD2900D5373C75D0318E00AC6DAC98B6465",
+      "artifacts/ordinary-client-acceptance-server/mods/kaleidoscopedoll-1.4.1-neoforge+mc1.21.1.jar": "AD63142CAE3B561D9BADCE1D8348268D85B8D4BC68084307810E22A48C7554EB",
+      "artifacts/ordinary-client-acceptance-server/mods/kaleidoscopetavern-1.2.0-neoforge+mc1.21.1.jar": "03F35E1E614953B22CD1F5E34345613F3A6A283BF1B1C99659B57D58970EDEFF",
+      "artifacts/ordinary-client-acceptance-server/mods/kotlinforforge-5.12.0-all.jar": "2785A4DD6DE5C6C56065FD8EB789C82771BD2EE773C30794C23160A3B2C39139",
+      "artifacts/ordinary-client-acceptance-server/mods/kubejs-neoforge-2101.7.2-build.377.jar": "DF9A8458B1F83FED06BA54684977911795A5153A462B81A610895F5B1F2F0CBF",
+      "artifacts/ordinary-client-acceptance-server/mods/lithium-neoforge-0.15.4+mc1.21.1.jar": "488F33216030C1CB0BAA33E59DE3D657D08D5795A6C2080C8C8BBBC133FC8757",
+      "artifacts/ordinary-client-acceptance-server/mods/LittleTiles_BETA_v1.6.0-pre231_mc1.21.1.jar": "99366BBADC2E75E6B78751553CFB6DA2B4E44F06CC98C58EC767EB16ADF277D3",
+      "artifacts/ordinary-client-acceptance-server/mods/modernfix-neoforge-5.27.20+mc1.21.1.jar": "6F367EA4002C39E3CFE27E0A0BE1008880A4B35A8482A78A437CFB9D8EE38273",
+      "artifacts/ordinary-client-acceptance-server/mods/neoprotect-1.0.4-mc1.21.1-neoforge.jar": "2CBCEC7AEEF26EF3F5B54DAE90FC16DA353A1534462353B9F516D7D2E0A138CE",
+      "artifacts/ordinary-client-acceptance-server/mods/netmusic-1.5.2-neoforge+mc1.21.1.jar": "731FBA4B4D47256D5F44F8392B093B53C7D1C650B66111EDA75B820F7F89A14B",
+      "artifacts/ordinary-client-acceptance-server/mods/Paradigm-neoforge-1.21.1-2.5.0.jar": "4748C11F64D0CF6C172714353EF1E7A4D137BF6C4B6E0D3964A49D59971C766D",
+      "artifacts/ordinary-client-acceptance-server/mods/railways-0.3.0-beta.2+neoforge-mc1.21.1.jar": "34F7D98B93967601313CBA314051422E1CA9A6F07CC955D5D9DB22AFA090D0F4",
+      "artifacts/ordinary-client-acceptance-server/mods/refurbished_furniture-neoforge-1.21.1-1.0.22.jar": "953A7840261EB79959769A97CAA60CBA2EE141700A4CBE208825268327136BDF",
+      "artifacts/ordinary-client-acceptance-server/mods/rhino-2101.2.8-build.91.jar": "1D53D962AA4DAC54BCBB4F998C1845980CF194318F1D6B1580EA6AC15CCE5EF3",
+      "artifacts/ordinary-client-acceptance-server/mods/rsitemeditor-1.0.1.jar": "C2194C5F97A06B1472A5C7BC39C6FD2F3866E237C1CCF9C70787A09FC3109472",
+      "artifacts/ordinary-client-acceptance-server/mods/skinrestorer-2.10.0+1.21-neoforge.jar": "CE01EAF0AEA3FB7A758BEBA08F111F0ABB2F43F17C622501AD547C3F4B6C974F",
+      "artifacts/ordinary-client-acceptance-server/mods/SkinStatues-neoforge-1.21.1-1.5.0.jar": "A17B4C5765E7933E433D5423724F160D4E47D0D894ACEAB250724C786C63DF10",
+      "artifacts/ordinary-client-acceptance-server/mods/slideshow_pro-neoforge-1.21.1-1.1.0.jar": "A445CC68987408E8ED5270DE0E0D7DE4040EA1A97BB2B36E2858E39F571B766C",
+      "artifacts/ordinary-client-acceptance-server/mods/spark-1.10.124-neoforge.jar": "647E8A81AFBE414DBA1DF4BA15FD06C5D32D4CB544E68828405E8E074C2E16DB",
+      "artifacts/ordinary-client-acceptance-server/mods/supermartijn642configlib-1.1.8-neoforge-mc1.21.jar": "D2BA7B839A2268E4E223457E813D11AA2476C3BF708A7BBA691D8FC851778A4B",
+      "artifacts/ordinary-client-acceptance-server/mods/tacz-neoforge-1.21.1-1.1.8-hotfix-r6.jar": "58F6AB47C59218BDB10BB9EEE1905B6CD27F3BC98D4AF13982A6002A99B1D3E7",
+      "artifacts/ordinary-client-acceptance-server/mods/touhoulittlemaid-1.5.3-neoforge+mc1.21.1.jar": "F6DB04195820C8508704277EA76D63723804FF236A7B780369BA59EBE5CD9C27",
+      "artifacts/ordinary-client-acceptance-server/mods/unu-parts-pack-6.7.1-neoforge-1.21.1.jar": "E2706219F6F6394F0C463B04C5197CEAD00B2408E6558D21D86F553261F1A402",
+      "artifacts/ordinary-client-acceptance-server/mods/vivecraft-1.21.1-1.3.15-neoforge.jar": "0712A6167421BF337477AB1766293887441514F5186EC94B13E081C0779A6474",
+      "artifacts/ordinary-client-acceptance-server/mods/worldedit-mod-7.3.8.jar": "5E7752C97876D87411E3760BCC573CC431F43C453722E6959FA7FE54DB1B01CA",
+      "artifacts/ordinary-client-acceptance-server/mods/ysm-2.6.5-neoforge+mc1.21.1-release.jar": "B285C73D4EC010D9A9BE3C53C1BEE890CF269645BE5F1BCF1C27A2E8E82807CB",
+      "artifacts/ordinary-client-acceptance-server/mods/yuuniverse-economy-0.5.6-SNAPSHOT.jar": "179115E5301EE6629ACD3BDCBB6779D2549A35F7493821AB0FCA79BCC43645F5",
+      "artifacts/ordinary-client-acceptance-server/mods/yuuniverse-interactions-2.0.43-neoforge-SNAPSHOT.jar": "1CA6A271EF45B6F4228810F5031261682D53A27BCD44A4B1A67EA292B5066305",
+      "artifacts/ordinary-client-acceptance-server/mods/yuushya_modelling-1.21.1-2.4.1.jar": "EEDE4BD24A1B20AEB007C03761903AED8061B9B826DC68349A8CA146C9944AE5",
+      "artifacts/ordinary-client-acceptance-server/mods/yuushya-1.21.0-neoforge-2.3.0.jar": "C410C51E1ECDD9D3FF55EB34B84D71DA761A8990EC0993A766C9BA40E8C360E8"
+    },
+    "checks": [
+      {
+        "phase": "reads",
+        "skipPreparation": false,
+        "exitCode": 1,
+        "expected": "Read acceptance requires a fresh fixture",
+        "log": "artifacts/logging-read-guard-reads-normal.log"
+      },
+      {
+        "phase": "reads",
+        "skipPreparation": true,
+        "exitCode": 1,
+        "expected": "Read acceptance requires a fresh fixture",
+        "log": "artifacts/logging-read-guard-reads-skip-preparation.log"
+      },
+      {
+        "phase": "reads-recover",
+        "skipPreparation": false,
+        "exitCode": 1,
+        "expected": "Read recovery has already completed; preserve its fixture",
+        "log": "artifacts/logging-read-guard-reads-recover-normal.log"
+      },
+      {
+        "phase": "reads-recover",
+        "skipPreparation": true,
+        "exitCode": 1,
+        "expected": "Read recovery has already completed; preserve its fixture",
+        "log": "artifacts/logging-read-guard-reads-recover-skip-preparation.log"
+      }
+    ]
+  },
+  "runner": {
+    "path": "artifacts/run-logging-read-audit.ps1",
+    "bytes": 1926,
+    "sha256": "512b6b3a3baa836f5e3bd2b93960bcc9bb906cee1d05698a3c33567b2f0cb64d"
+  },
+  "regressionRunner": {
+    "path": "artifacts/run-logging-read-regressions.ps1",
+    "bytes": 478,
+    "sha256": "9cbfd24135063a7299d668020542b5c823f340b4592c47c9fce5ca7b3a031225"
+  },
+  "stoppedVerifier": {
+    "path": "artifacts/confirm-logging-read-stopped.ps1",
+    "bytes": 2291,
+    "sha256": "175dafb3e176cb7b49c393fe0c9052dd86b81a45951e617316de27045726f463"
+  },
+  "guardVerifier": {
+    "path": "artifacts/check-logging-read-guards.ps1",
+    "bytes": 2809,
+    "sha256": "5537dc496ff10fd97d4e07a2381d754e196552276d5bfcb691a80bdf5eb0daa5"
+  },
+  "limits": [
+    "Nine repository reads serialize through complete cursor consumption; external raw JDBC callers remain responsible for transaction ownership",
+    "Fixture-owned deterministic writes exercise real repository APIs and decoding, not a new native gameplay observation",
+    "Existing repository SQLException logging/empty-or-partial fallback contracts remain; uncertainty is not a successful read",
+    "Single shared connection: long queries and writes can delay each other; sustained load and MySQL acceptance remain open",
+    "No history expiry, crash spool, wider backup recovery, migration completion or deferred physical-client acceptance claimed",
+    "No production or deferred client activation"
+  ]
+}

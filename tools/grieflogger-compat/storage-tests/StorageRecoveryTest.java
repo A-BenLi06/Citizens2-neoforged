@@ -6,6 +6,8 @@ import java.util.concurrent.*;
 import java.util.concurrent.atomic.*;
 import com.daqem.grieflogger.database.Database;
 import com.daqem.grieflogger.database.queue.QueuedStatement;
+import com.daqem.grieflogger.database.queue.QueuedWrite;
+import com.daqem.grieflogger.database.repository.UserRepository;
 
 /** Actual provider bytecode and SQLite, with independently committed/read database state. */
 public final class StorageRecoveryTest {
@@ -437,6 +439,99 @@ public final class StorageRecoveryTest {
             check(count(fixture)==1&&fixture.database.queue.pendingCount()==0&&real.isClosed(),"periodic_callback_reentry_cannot_repeat_or_drop_original_write");
         }
     }
+    private static void await(CountDownLatch latch) throws SQLException {
+        try { if (!latch.await(5, TimeUnit.SECONDS)) throw new SQLException("Test barrier timed out"); }
+        catch (InterruptedException failure) { Thread.currentThread().interrupt(); throw new SQLException(failure); }
+    }
+    private static void repositoryReadIsolation(boolean commit) throws Exception {
+        String label = commit ? "lookup_commit" : "lookup_rollback";
+        try (var fixture = fixture(label)) {
+            sql(fixture.connection,"CREATE TABLE users(id INTEGER PRIMARY KEY,name TEXT NOT NULL,uuid TEXT UNIQUE)");
+            fixture.connection.commit();
+            var repository = new UserRepository(fixture.database);
+            var entered = new CountDownLatch(1); var release = new CountDownLatch(1); var reading = new CountDownLatch(1);
+            var pool = Executors.newFixedThreadPool(2);
+            try {
+                var insert = fixture.database.prepareQueuedStatement("INSERT INTO users VALUES(1,'original',NULL)");
+                QueuedWrite barrier = connection -> { entered.countDown(); await(release); if (!commit) throw new SQLException("Expected lookup rollback"); };
+                var writer = pool.submit(() -> fixture.database.executeWrites(List.of(insert.freeze(false),barrier)));
+                check(entered.await(3,TimeUnit.SECONDS),label+"_real_insert_reaches_uncommitted_barrier");
+                var read = pool.submit(() -> {reading.countDown(); return repository.getAllUsernames();});
+                check(reading.await(3,TimeUnit.SECONDS),label+"_public_lookup_started");
+                try {read.get(150,TimeUnit.MILLISECONDS); throw new AssertionError("Public lookup exposed an active write");}
+                catch (TimeoutException expected) {check(true,label+"_public_lookup_waits_for_transaction_outcome");}
+                try(var query=fixture.observer.createStatement();var rows=query.executeQuery("SELECT COUNT(*) FROM users")) {
+                    check(rows.next()&&rows.getInt(1)==0,label+"_independent_reader_sees_no_uncommitted_row");
+                }
+                release.countDown();
+                check(writer.get(3,TimeUnit.SECONDS)==commit,label+"_expected_native_transaction_outcome");
+                check(read.get(3,TimeUnit.SECONDS).equals(commit?Map.of(1,"original"):Map.of()),label+"_lookup_returns_only_exact_committed_state");
+                check(repository.getAllUsernames().equals(commit?Map.of(1,"original"):Map.of()),label+"_subsequent_lookup_remains_exact");
+            } finally {release.countDown();pool.shutdownNow();pool.awaitTermination(5,TimeUnit.SECONDS);}
+        }
+    }
+    private static void cursorOwnsMonitor() throws Exception {
+        try(var fixture=fixture("lookup_cursor")) {
+            sql(fixture.observer,"INSERT INTO observations VALUES(1,'original',NULL),(2,'second',NULL)");
+            var entered=new CountDownLatch(1);var release=new CountDownLatch(1);var writing=new CountDownLatch(1);
+            var statement=new AtomicReference<PreparedStatement>();var cursor=new AtomicReference<ResultSet>();
+            var pool=Executors.newFixedThreadPool(2);
+            try {
+                var read=pool.submit(()->fixture.database.read("SELECT value FROM observations ORDER BY id",prepared->{
+                    statement.set(prepared);
+                    try(var rows=prepared.executeQuery()) {
+                        cursor.set(rows);if(!rows.next())throw new AssertionError("Missing first row");
+                        var first=rows.getString(1);entered.countDown();await(release);
+                        if(!rows.next())throw new AssertionError("Missing second row");
+                        var result=List.of(first,rows.getString(1));if(rows.next())throw new AssertionError("Dirty extra row");return result;
+                    }
+                }));
+                check(entered.await(3,TimeUnit.SECONDS),"lookup_cursor_stays_open_between_rows");
+                var insert=write(fixture.database,3,"later",null).freeze(false);
+                var writer=pool.submit(()->{writing.countDown();return fixture.database.executeWrites(List.of(insert));});
+                check(writing.await(3,TimeUnit.SECONDS),"lookup_cursor_concurrent_writer_started");
+                try {writer.get(150,TimeUnit.MILLISECONDS);throw new AssertionError("Writer ran during result consumption");}
+                catch(TimeoutException expected){check(count(fixture)==2,"lookup_cursor_blocks_writer_through_complete_result_consumption");}
+                release.countDown();
+                check(read.get(3,TimeUnit.SECONDS).equals(List.of("original","second")),"lookup_cursor_preserves_exact_complete_snapshot");
+                check(writer.get(3,TimeUnit.SECONDS)&&count(fixture)==3,"lookup_cursor_release_allows_next_write_commit");
+                check(statement.get().isClosed()&&cursor.get().isClosed(),"lookup_cursor_and_statement_close_before_monitor_release");
+            } finally {release.countDown();pool.shutdownNow();pool.awaitTermination(5,TimeUnit.SECONDS);}
+        }
+    }
+    private static void readFailures() throws Exception {
+        try(var fixture=fixture("lookup_failures")) {
+            for(boolean runtime:new boolean[]{false,true}) {
+                var statement=new AtomicReference<PreparedStatement>();var cursor=new AtomicReference<ResultSet>();
+                try {
+                    fixture.database.read("SELECT 1",prepared->{statement.set(prepared);cursor.set(prepared.executeQuery());
+                        if(runtime)throw new IllegalArgumentException("Expected decoder failure");throw new SQLException("Expected query failure");});
+                    throw new AssertionError("Read failure swallowed");
+                } catch(SQLException|IllegalArgumentException expected) {
+                    check(runtime?expected instanceof IllegalArgumentException:expected instanceof SQLException,"lookup_propagates_original_failure_"+runtime);
+                }
+                check(statement.get().isClosed()&&cursor.get().isClosed(),"lookup_failure_closes_statement_and_its_cursor_"+runtime);
+                var pool=Executors.newSingleThreadExecutor();
+                try {check(pool.submit(()->fixture.database.executeWrites(List.of(write(fixture.database,runtime?2:1,"after-read-failure",null).freeze(false)))).get(3,TimeUnit.SECONDS),"lookup_failure_releases_monitor_for_other_writer_"+runtime);}
+                finally {pool.shutdownNow();pool.awaitTermination(5,TimeUnit.SECONDS);}
+            }
+            var rejected=new AtomicBoolean();
+            QueuedWrite reentrant=connection->{
+                try {fixture.database.read("SELECT * FROM observations",prepared->{throw new AssertionError("Read inside own write reached JDBC");});throw new AssertionError("Reentrant read accepted");}
+                catch(SQLException expected){rejected.set(true);}
+            };
+            check(fixture.database.executeWrites(List.of(reentrant))&&rejected.get(),"lookup_rejects_same_thread_write_callback_reentry_without_deadlock");
+            var real=fixture.connection;
+            CONNECTION.set(fixture.database,proxy(real,(owner,method,args)->{
+                if(method.getName().equals("rollback"))throw new SQLException("Expected rollback failure");return invoke(real,method,args);
+            }));
+            QueuedWrite failed=connection->{throw new SQLException("Expected write failure");};
+            check(!fixture.database.executeWrites(List.of(write(fixture.database,3,"dirty",null).freeze(false),failed)),"lookup_fence_retains_failed_rollback_outcome");
+            try {fixture.database.read("SELECT * FROM observations",prepared->{throw new AssertionError("Uncertain read reached JDBC");});throw new AssertionError("Uncertain read accepted");}
+            catch(SQLException expected){check(true,"lookup_rejects_uncertain_transaction_instead_of_exposing_dirty_state");}
+            check(count(fixture)==2,"lookup_fence_keeps_uncommitted_prefix_invisible_to_independent_reader");
+        }
+    }
     public static void main(String[] arguments) throws Exception {
         root=Path.of(arguments[0]); Class.forName("org.sqlite.JDBC");
         System.out.println("PROVIDER " + Database.class.getProtectionDomain().getCodeSource().getLocation());
@@ -449,6 +544,7 @@ public final class StorageRecoveryTest {
         fullModeFence("IMMEDIATE", "IMMEDIATE"); fullModeFence("DEFERRED", "IMMEDIATE");
         fullModeFence("IMMEDIATE", "DEFERRED"); fullAfterCommit(); legacyFull();
         shutdownWaitsForWorker(); shutdownLocked(); shutdownReentry();
+        repositoryReadIsolation(false); repositoryReadIsolation(true); cursorOwnsMonitor(); readFailures();
         System.out.println("[GRIEFSTORAGE] COMPLETE " + passed + " checks");
     }
 }
