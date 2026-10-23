@@ -144,6 +144,60 @@ public final class StorageRecoveryTest {
             check(fixture.database.queue.pendingCount() == 0 && count(fixture) == 2, "ordinary_retry_replays_whole_rolled_back_prefix_once");
         }
     }
+    private static void fullDatabase(boolean batch) throws Exception {
+        String label = batch ? "full_batch" : "full_ordinary";
+        try (var fixture = fixture(label)) {
+            sql(fixture.connection, "PRAGMA max_page_count=2");
+            var rollbacks = new AtomicInteger();
+            ((org.sqlite.SQLiteConnection)fixture.connection).addCommitListener(new org.sqlite.SQLiteCommitListener() {
+                public void onCommit() {}
+                public void onRollback() { rollbacks.incrementAndGet(); }
+            });
+            var queue = batch ? fixture.database.batchQueue : fixture.database.queue;
+            var first = write(fixture.database, 1, "original-prefix", new byte[]{3, 7});
+            byte[] payload = new byte[32768];
+            for (int i = 0; i < payload.length; i++) payload[i] = (byte)(i * 31);
+            if (batch) {
+                first.addBatch(); first.setInt(1, 2); first.setString(2, null);
+                first.setBytes(3, payload); first.addBatch(); queue.add(first);
+            } else {
+                queue.add(first); queue.add(write(fixture.database, 2, null, payload));
+            }
+            int originalPending = batch ? 1 : 2;
+            Arrays.fill(payload, (byte)0);
+            for (int attempt = 1; attempt <= 2; attempt++) {
+                com.daqem.grieflogger.GriefLogger.lastFailure = null;
+                queue.execute();
+                check(com.daqem.grieflogger.GriefLogger.lastFailure instanceof org.sqlite.SQLiteException error
+                                && error.getResultCode() == org.sqlite.SQLiteErrorCode.SQLITE_FULL,
+                        label + "_actual_sqlite_full_attempt_" + attempt);
+                check(rollbacks.get() == attempt && count(fixture) == 0 && queue.pendingCount() == originalPending,
+                        label + "_native_auto_rollback_retains_entire_original_prefix_attempt_" + attempt);
+                check(!fixture.connection.getAutoCommit(), label + "_driver_remains_manual_commit_attempt_" + attempt);
+            }
+            var later = write(fixture.database, 3, "later", new byte[]{9});
+            if (batch) later.addBatch();
+            queue.add(later);
+            sql(fixture.connection, "PRAGMA max_page_count=100");
+            queue.execute();
+            check(queue.pendingCount() == 0 && count(fixture) == 3, label + "_capacity_restored_drains_original_and_later_once");
+            try (var query = fixture.observer.createStatement(); var rows = query.executeQuery("SELECT id,value,data FROM observations ORDER BY id")) {
+                rows.next(); check(rows.getInt(1) == 1 && rows.getString(2).equals("original-prefix")
+                        && Arrays.equals(rows.getBytes(3), new byte[]{3,7}), label + "_exact_prefix_parameters");
+                rows.next(); byte[] actual = rows.getBytes(3);
+                boolean exact = actual.length == 32768;
+                for (int i = 0; exact && i < actual.length; i++) exact = actual[i] == (byte)(i * 31);
+                check(rows.getInt(1) == 2 && rows.getString(2) == null && exact, label + "_exact_owned_large_binary_and_null");
+                rows.next(); check(rows.getInt(1) == 3 && rows.getString(2).equals("later")
+                        && Arrays.equals(rows.getBytes(3), new byte[]{9}), label + "_exact_later_parameters");
+            }
+            queue.execute();
+            check(count(fixture) == 3, label + "_committed_retry_never_duplicates");
+            try (var query = fixture.observer.createStatement(); var rows = query.executeQuery("PRAGMA quick_check")) {
+                check(rows.next() && rows.getString(1).equals("ok") && !rows.next(), label + "_sqlite_integrity_after_retry");
+            }
+        }
+    }
     private static void conservativeCommitModes(String current, String next) throws Exception {
         String label = "mode_" + current + "_" + next;
         try (var fixture = fixture(label, current)) {
@@ -159,6 +213,57 @@ public final class StorageRecoveryTest {
             fixture.database.queue.execute();
             check(count(fixture) == 0 && fixture.database.queue.pendingCount() == 1,
                     label + "_remains_fenced_without_known_deferred_path");
+        }
+    }
+    private static void fullModeFence(String current, String next) throws Exception {
+        String label = "full_mode_" + current + "_" + next;
+        try (var fixture = fixture(label, current)) {
+            ((org.sqlite.SQLiteConnection)fixture.connection).getConnectionConfig()
+                    .setTransactionMode(org.sqlite.SQLiteConfig.TransactionMode.valueOf(next));
+            sql(fixture.connection, "PRAGMA max_page_count=2");
+            fixture.database.queue.add(write(fixture.database, 1, "fenced", new byte[32768]));
+            fixture.database.queue.execute();
+            check(com.daqem.grieflogger.GriefLogger.lastFailure instanceof org.sqlite.SQLiteException error
+                            && error.getResultCode() == org.sqlite.SQLiteErrorCode.SQLITE_FULL,
+                    label + "_actual_full_auto_abort");
+            sql(fixture.connection, "PRAGMA max_page_count=100");
+            fixture.database.queue.execute();
+            check(count(fixture) == 0 && fixture.database.queue.pendingCount() == 1,
+                    label + "_retains_conservative_non_deferred_fence");
+            sql(fixture.connection, "BEGIN"); // Restore only test cleanup after the fenced abort.
+        }
+    }
+    private static void fullAfterCommit() throws Exception {
+        try (var fixture = fixture("fullaftercommit")) {
+            var armed = new AtomicBoolean(true);
+            CONNECTION.set(fixture.database, proxy(fixture.connection, (owner, method, arguments) -> {
+                var result = invoke(fixture.connection, method, arguments);
+                if (method.getName().equals("commit") && armed.compareAndSet(true, false))
+                    throw new org.sqlite.SQLiteException("Injected FULL after successful real commit", org.sqlite.SQLiteErrorCode.SQLITE_FULL);
+                return result;
+            }));
+            fixture.database.queue.add(write(fixture.database, 1, "saved", null));
+            fixture.database.queue.execute();
+            fixture.database.queue.add(write(fixture.database, 2, "later", null));
+            fixture.database.queue.execute(); fixture.database.batchQueue.execute();
+            check(count(fixture) == 1 && fixture.database.queue.pendingCount() == 2,
+                    "typed_full_after_commit_cannot_replay_original_or_flush_later_writes");
+        }
+    }
+    private static void legacyFull() throws Exception {
+        try (var fixture = fixture("legacyfull")) {
+            sql(fixture.connection, "PRAGMA max_page_count=2");
+            var statement = fixture.database.prepareStatement(INSERT);
+            statement.setInt(1, 1); statement.setString(2, "legacy"); statement.setBytes(3, new byte[32768]); statement.addBatch();
+            fixture.database.batchQueue.add(statement); fixture.database.batchQueue.execute();
+            check(com.daqem.grieflogger.GriefLogger.lastFailure instanceof org.sqlite.SQLiteException error
+                            && error.getResultCode() == org.sqlite.SQLiteErrorCode.SQLITE_FULL,
+                    "legacy_batch_actual_full_auto_abort");
+            sql(fixture.connection, "PRAGMA max_page_count=100");
+            fixture.database.batchQueue.execute();
+            check(count(fixture) == 0 && fixture.database.batchQueue.pendingCount() == 1,
+                    "legacy_full_abort_cannot_retry_driver_discarded_parameters");
+            statement.close();
         }
     }
     private static void wrappedBusyAfterCommit() throws Exception {
@@ -270,6 +375,9 @@ public final class StorageRecoveryTest {
         conservativeCommitModes("IMMEDIATE", "IMMEDIATE");
         conservativeCommitModes("DEFERRED", "IMMEDIATE");
         conservativeCommitModes("IMMEDIATE", "DEFERRED"); wrappedBusyAfterCommit();
+        fullDatabase(false); fullDatabase(true);
+        fullModeFence("IMMEDIATE", "IMMEDIATE"); fullModeFence("DEFERRED", "IMMEDIATE");
+        fullModeFence("IMMEDIATE", "DEFERRED"); fullAfterCommit(); legacyFull();
         System.out.println("[GRIEFSTORAGE] COMPLETE " + passed + " checks");
     }
 }

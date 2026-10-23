@@ -107,3 +107,12 @@ inside Minecraft. Known DEFERRED SQLite BUSY plus successful rollback may retry;
 other uncertain outcomes stay fenced. Acceptance passes 53 standalone and 111
 native/restart assertions across reader, writer and normal logging/commerce runs.
 Pending work remains in memory and the broader gates above remain open.
+
+The [SQLite FULL repair](logging-full-recovery-2026-10-23.md) builds provider `.4`
+after reproducing permanent queue suspension when SQLite itself aborts a write
+transaction. Recovery requires pre-commit typed FULL, native rollback proof, no
+commit hook and successful DEFERRED transaction restart. It preserves uncertain
+outcome and legacy-batch fences. Acceptance passes 93 standalone and 149 native/
+restart checks with direct page caps and reader/writer/commerce regressions.
+Physical device/IOERR/COMMIT-FULL, unflushed termination, administration,
+retention/load, MySQL, migration and deferred clients remain separate gates.

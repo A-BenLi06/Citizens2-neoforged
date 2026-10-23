@@ -1,5 +1,14 @@
 # GriefLogger SQLite packaging compatibility
 
+Follow-up 2026-10-23, UTC+08:00: [SQLite FULL recovery](../../docs/logging-full-recovery-2026-10-23.md)
+repairs automatic-rollback queue suspension in `.3`. Apply
+`sqlite-full-recovery.patch` after `reader-commit-recovery.patch` to build `.4`.
+Recovery requires a pre-commit typed FULL, native rollback proof, no commit hook
+and successful DEFERRED transaction restart. Uncertain outcomes stay fenced.
+Acceptance: 93 actual-bytecode SQLite and 149 native/restart assertions, including
+direct page-cap failure and reader/writer/normal commerce regressions. Physical
+device loss, unflushed death, retention/load and MySQL remain separate gates.
+
 Follow-up 2026-10-23, UTC+08:00: [reader-blocked COMMIT recovery](../../docs/logging-reader-recovery-2026-10-23.md)
 repairs permanent queue suspension after an external reader releases its lock.
 Apply `reader-commit-recovery.patch` after `queued-write-recovery.patch` to build

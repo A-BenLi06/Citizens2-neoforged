@@ -8,7 +8,7 @@ allprojects {
             throw new GradleException('Logging fixture must be inside task artifacts')
         def phase = p.findProperty('loggingAuditPhase') ?: 'native'
         def storageLock = p.findProperty('loggingAuditLock') ?: 'writer'
-        if (!(storageLock in ['writer', 'reader'])) throw new GradleException('Unknown logging storage lock mode')
+        if (!(storageLock in ['writer', 'reader', 'full'])) throw new GradleException('Unknown logging storage lock mode')
         if (!(phase in ['native', 'crash', 'recover', 'storage', 'storage-recover'])) throw new GradleException('Unknown logging audit phase')
         p.sourceSets.dialogue.java.srcDir(p.file('../tools/logging-runtime-audit'))
         p.sourceSets.dialogue.compileClasspath += p.files(p.fileTree(new File(fixture, 'mods')) { include '*.jar' },

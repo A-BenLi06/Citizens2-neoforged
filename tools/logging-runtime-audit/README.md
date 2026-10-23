@@ -43,11 +43,23 @@ fixture histories.
 
 For reader-blocked COMMIT, use the repaired `.3` provider and pass
 `-PloggingAuditLock=reader` to the same storage/storage-recover phases in a fresh
-fixture. Writer is the default; only reader/writer are accepted. A reader starts
+fixture. Writer is the default. A reader starts
 an explicit transaction and reads the actual blocks table before native producers
 run. The [reader recovery report](../../docs/logging-reader-recovery-2026-10-23.md)
 records the `.2` failure and `.3` acceptance, plus independent writer and normal
 regressions. Preserve earlier providers, source checkouts and completed worlds.
+
+For actual page-cap `SQLITE_FULL` recovery, use provider `.4` and
+`-PloggingAuditLock=full` in another fresh fixture. The selector accepts
+writer/reader/full. Setup commits separate-actor padding to exhaust existing
+block/container/item leaf capacity, then caps the real provider connection.
+Native gameplay observations fail directly in their existing tables; lifting
+the cap must drain their original queues. Padding is retained under its own
+actor and counted separately. The physical device is not filled. The
+[FULL recovery report](../../docs/logging-full-recovery-2026-10-23.md) records the
+`.3` reproduction, `.4` native/restart acceptance, actual-bytecode suite and
+reader/writer/normal commerce regressions. Keep outputs/caches separate and
+preserve historical fixtures and completed-phase launch guards.
 
 For an actual forced termination after observed native histories and saved
 player/world state:

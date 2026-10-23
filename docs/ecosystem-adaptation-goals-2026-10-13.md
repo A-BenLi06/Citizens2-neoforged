@@ -8,6 +8,13 @@ Citizens retains NPC behavior and its existing native extension contracts. Yuuni
 
 ## Selected artifacts and sides
 
+Progress 2026-10-23, UTC+08:00: [SQLite FULL recovery](logging-full-recovery-2026-10-23.md)
+repairs reproduced GriefLogger `.3` queue suspension after native automatic
+rollback. Provider `.4` requires pre-commit typed FULL, native rollback proof,
+no commit hook and successful DEFERRED restart. Acceptance passes 93 standalone
+and 149 native/restart checks across direct page-cap, reader/writer and normal
+commerce fixtures. Broader storage, migration and deferred client gates remain.
+
 Progress 2026-10-23, UTC+08:00: [shared craft recovery](ftb-craft-party-recovery-2026-10-23.md)
 adds two real native sessions, offline combined projection to the original party,
 personal/rejoined scopes, notification replay and two repeat resets through three

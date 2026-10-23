@@ -1,0 +1,101 @@
+diff --git a/common/src/main/java/com/daqem/grieflogger/database/Database.java b/common/src/main/java/com/daqem/grieflogger/database/Database.java
+index f9197c1..ae9cd1a 100644
+--- a/common/src/main/java/com/daqem/grieflogger/database/Database.java
++++ b/common/src/main/java/com/daqem/grieflogger/database/Database.java
+@@ -11,6 +11,7 @@ import com.supermartijn642.configlib.ConfigLib;
+ import org.jetbrains.annotations.Nullable;
+ import org.sqlite.SQLiteConfig;
+ import org.sqlite.SQLiteConnection;
++import org.sqlite.SQLiteCommitListener;
+ import org.sqlite.SQLiteErrorCode;
+ import org.sqlite.SQLiteException;
+ 
+@@ -167,8 +168,11 @@ public class Database {
+         if (writeOutcomeUncertain) return false;
+         if (writes.isEmpty()) return true;
+         boolean committing = false;
++        SQLiteConnection sqlite = connection instanceof SQLiteConnection direct ? direct : null;
++        var outcome = new SqliteOutcome();
+         try {
+             if (connection == null || connection.getAutoCommit()) throw new SQLException("Queued writes require a manual-commit connection");
++            if (sqlite != null) sqlite.addCommitListener(outcome);
+             for (var write : writes) write.execute(connection);
+             committing = true;
+             connection.commit();
+@@ -176,7 +180,16 @@ public class Database {
+             boolean commitRejected = committing && isDeferredSqliteCommitBusy(failure);
+             boolean rolledBack = false;
+             try {
+-                if (connection != null) { connection.rollback(); rolledBack = true; }
++                if (!committing && isAutomaticallyRolledBackFull(sqlite, outcome, failure)) {
++                    // SQLITE_FULL can abort the transaction before JDBC rollback(). Xerial
++                    // retains manual-commit configuration but no native transaction. The
++                    // native rollback hook proves the abort; BEGIN proves no transaction
++                    // remains and restores the same lock-free transaction mode.
++                    sqlite.getDatabase().exec("BEGIN DEFERRED;", false);
++                    sqlite.setFirstStatementExecuted(false);
++                    sqlite.setCurrentTransactionMode(SQLiteConfig.TransactionMode.DEFERRED);
++                    rolledBack = true;
++                } else if (connection != null) { connection.rollback(); rolledBack = true; }
+             } catch (SQLException rollbackFailure) {
+                 failure.addSuppressed(rollbackFailure);
+             }
+@@ -187,6 +200,8 @@ public class Database {
+                     ? "Database write outcome requires review; queued writes retained and automatic flush stopped"
+                     : "Database writes rolled back; queued writes retained for retry", failure);
+             return false;
++        } finally {
++            if (sqlite != null) sqlite.removeCommitListener(outcome);
+         }
+         for (var write : writes) {
+             try { write.closeAfterCommit(); }
+@@ -195,6 +210,21 @@ public class Database {
+         return true;
+     }
+ 
++    private static final class SqliteOutcome implements SQLiteCommitListener {
++        boolean rolledBack;
++        boolean commitAttempted;
++        public void onCommit() { commitAttempted = true; }
++        public void onRollback() { rolledBack = true; }
++    }
++
++    private static boolean isAutomaticallyRolledBackFull(SQLiteConnection sqlite, SqliteOutcome outcome, Throwable failure) {
++        return sqlite != null && outcome.rolledBack && !outcome.commitAttempted
++                && sqlite.getCurrentTransactionMode() == SQLiteConfig.TransactionMode.DEFERRED
++                && sqlite.getConnectionConfig().getTransactionMode() == SQLiteConfig.TransactionMode.DEFERRED
++                && failure instanceof SQLiteException error
++                && error.getResultCode() == SQLiteErrorCode.SQLITE_FULL;
++    }
++
+     private boolean isDeferredSqliteCommitBusy(Throwable failure) {
+         // SQLite leaves the transaction active when COMMIT returns SQLITE_BUSY.
+         // Xerial's commit() also starts the next transaction: BEGIN IMMEDIATE/EXCLUSIVE
+diff --git a/gradle.properties b/gradle.properties
+index cd1afb0..d4b6034 100644
+--- a/gradle.properties
++++ b/gradle.properties
+@@ -4,7 +4,7 @@ minecraft_version=1.21.1
+ enabled_platforms=fabric,neoforge
+ 
+ archives_base_name=grieflogger
+-mod_version=1.2.10-1.21.1-yuuniverse.3
++mod_version=1.2.10-1.21.1-yuuniverse.4
+ sqlite_version=3.47.2.0
+ maven_group=com.daqem.grieflogger
+ mod_name=GriefLogger
+diff --git a/walkthrough.md b/walkthrough.md
+index 5422c2e..eceee34 100644
+--- a/walkthrough.md
++++ b/walkthrough.md
+@@ -17,3 +17,10 @@ No production activation. Pending writes remain in memory; unflushed process ter
+ - Added a compile-only SQLite dependency to common and shared the existing 3.47.2.0 version across platform declarations. NeoForge nested selectable driver packaging remains intact; no root SQLite classes. Minecraft/bootstrap/runtime storage code is not substituted in native runs.
+ - Java 21 :neoforge:build succeeds. Expanded actual-provider standalone suite passes 53 assertions, including original writer/prefix/batch/concurrent/uncertain cases, exact ordinary/batch reader retry parameters, three current/next mode controls and wrapped BUSY after successful real commit. A fresh NeoForge 21.1.248 reader fixture passes 22 native and 11 clean-restart checks. Broader writer/normal acceptance is recorded by the consuming Citizens repository when complete.
+ - Pending work remains in memory. Unflushed termination, full-device failures, uncertain-outcome administration, retention/load, MySQL and wider integration/client acceptance remain open. No production or deferred client fixture changes. Author and committer use A-BenLi06 <ben_li06@outlook.com>.
++
++## 2026-10-23T17:17:55.1209892+08:00 (UTC+08:00) - Recover queued writes after SQLite automatic FULL rollback
++
++- Reproduced permanent flush suspension in provider .3 with its actual embedded Xerial driver and a real page-capped SQLite file. FULL aborts the entire native transaction, while JDBC retains manual-commit configuration; a second rollback fails and permanently fences retained writes after capacity returns.
++- Provider .4 observes native SQLite rollback/commit hooks only during each serialized flush. A pre-commit typed SQLITE_FULL with observed rollback, no commit callback, and current/next DEFERRED mode may reopen a native DEFERRED transaction before retry. Failed transaction restart, other drivers/wrappers/modes, uncertain commits and unreconstructable legacy batches preserve the existing fence. No error-message matching or queue replacement is used; listeners are removed in finally.
++- Fresh :neoforge:build succeeds with Java 21 in a separate artifact checkout/cache. Actual-provider standalone suite passes 93 assertions, including repeated ordinary/batch FULL aborts, exact original prefix/null/owned 32KiB binary/later write recovery, mode fences, typed FULL after real commit, legacy batches and the preceding lock/concurrency regressions. Native validation is recorded separately by the parent project. The physical drive is not filled and no production files are activated.
++

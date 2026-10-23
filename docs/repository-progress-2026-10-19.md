@@ -10,6 +10,13 @@ This review covers repository structure, native implementation boundaries, upstr
 
 ## Repository and implementation boundaries
 
+Update 2026-10-23, UTC+08:00: [SQLite FULL recovery](logging-full-recovery-2026-10-23.md)
+reproduces automatic-rollback queue suspension in provider `.3` outside and
+inside Minecraft. Provider `.4` restores only proven aborted DEFERRED writes,
+preserving uncertain-commit fences. Acceptance passes 93 actual-bytecode SQLite
+and 149 native/restart checks, including fresh reader/writer/commerce regressions.
+Physical device loss, retention/load, migration and deferred clients remain open.
+
 Update 2026-10-23, UTC+08:00: [shared craft recovery](ftb-craft-party-recovery-2026-10-23.md)
 verifies two native contributors, leave during consumption, offline original-party
 projection, personal progress/rejoin and two repeat resets across three processes

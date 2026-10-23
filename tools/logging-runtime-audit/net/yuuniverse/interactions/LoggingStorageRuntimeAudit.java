@@ -28,7 +28,7 @@ import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.phys.*;
 import net.neoforged.neoforge.event.tick.ServerTickEvent;
 
-/** Real native producers, real SQLite lock, provider workers and independent H2 logging. */
+/** Real native producers, SQLite locks/capacity failure, provider workers and independent H2 logging. */
 public final class LoggingStorageRuntimeAudit {
     private static final BlockPos STONE = new BlockPos(3,-60,3), SHAFT = new BlockPos(5,-60,3), CHEST = new BlockPos(7,-60,3), LATE = new BlockPos(11,-60,3);
     private static ServerPlayer actor;
@@ -70,14 +70,17 @@ public final class LoggingStorageRuntimeAudit {
                 initialRows=rows();
                 check(initialRows.size()>0,"native_join_and_seed_chest_history_commit_before_lock");
                 database.execute("PRAGMA busy_timeout=20",true);
-                blocker=DriverManager.getConnection("jdbc:sqlite:"+server.getServerDirectory().resolve("database.db").toAbsolutePath());
-                if ("reader".equals(state.get("lockMode").getAsString())) {
+                if (fullMode()) armCapacityFailure();
+                else {
+                  blocker=DriverManager.getConnection("jdbc:sqlite:"+server.getServerDirectory().resolve("database.db").toAbsolutePath());
+                  if ("reader".equals(state.get("lockMode").getAsString())) {
                     sql(blocker,"BEGIN");
                     try(var query=blocker.createStatement(); var rows=query.executeQuery("SELECT COUNT(*) FROM blocks")) {
                         if(!rows.next()) throw new AssertionError("Reader failed to acquire native database snapshot");
                     }
-                } else sql(blocker,"BEGIN IMMEDIATE");
-                locked=true;
+                  } else sql(blocker,"BEGIN IMMEDIATE");
+                  locked=true;
+                }
                 actor.setItemInHand(InteractionHand.MAIN_HAND,ItemStack.EMPTY);
                 var hit=new BlockHitResult(Vec3.atCenterOf(CHEST),Direction.UP,CHEST,false);
                 check(actor.gameMode.useItemOn(actor,level,ItemStack.EMPTY,InteractionHand.MAIN_HAND,hit).consumesAction(),"native_menu_opens_during_sqlite_storage_lock");
@@ -113,7 +116,8 @@ public final class LoggingStorageRuntimeAudit {
                 check(storage(server).equals(state.get("storage")),"failed_flush_retries_change_no_native_world_inventory_or_drop");
                 state.addProperty("lockedOrdinaryPending",database.queue.pendingCount()); state.addProperty("lockedBatchPending",database.batchQueue.pendingCount());
                 state.add("beforeLockRows",initialRows);
-                sql(blocker,"ROLLBACK"); locked=false; blocker.close(); blocker=null;
+                if (fullMode()) restoreCapacity();
+                else { sql(blocker,"ROLLBACK"); locked=false; blocker.close(); blocker=null; }
                 stage=4; readyTick=server.getTickCount()+8; return;
             }
             if(stage==4) {
@@ -165,6 +169,56 @@ public final class LoggingStorageRuntimeAudit {
         check(neoPlacements(STONE)==1&&neoPlacements(SHAFT)==1&&neoPlacements(LATE)==1,"both_log_owners_agree_on_all_three_original_outage_placements");
     }
     private static long neoPlacements(BlockPos pos) { return NeoProtect.service().lookup((ServerLevel)actor.level(),pos,0,100).stream().filter(e->e.actorUuid().equals(actor.getUUID())&&e.actionType()==ActionType.BLOCK_PLACE).count(); }
+    private static boolean fullMode() { return "full".equals(state.get("lockMode").getAsString()); }
+    private static void armCapacityFailure() throws SQLException {
+        var database=GriefLogger.getDatabase();
+        synchronized(database) {
+            try(var probe=database.prepareStatement("SELECT 1")) {
+                var connection=probe.getConnection();
+                int pages;
+                try(var query=connection.createStatement();var rows=query.executeQuery("PRAGMA page_count")) { rows.next(); pages=rows.getInt(1); }
+                connection.rollback(); // Release only the fixture setup's page-count read.
+                UUID paddingActor=UUID.randomUUID();
+                state.addProperty("capacityPaddingActor",paddingActor.toString());
+                try(var padding=DriverManager.getConnection(observer.getMetaData().getURL())) {
+                    try(var insert=padding.prepareStatement("INSERT INTO users(name,uuid) VALUES(?,?)")) {
+                        insert.setString(1,"CapacityPadding"); insert.setString(2,paddingActor.toString()); insert.executeUpdate();
+                    }
+                    sql(padding,"PRAGMA max_page_count="+pages);
+                    var paddingCounts=new JsonObject();
+                    for(var table:List.of("blocks","containers","items")) {
+                        String columns="time,user,level,x,y,z,type,action"+(table.equals("blocks")?"":",amount,data");
+                        String values="0,(SELECT id FROM users WHERE uuid=?),(SELECT MIN(id) FROM levels),0,0,0,(SELECT MIN(id) FROM materials),0"
+                                +(table.equals("blocks")?"":",1,NULL");
+                        int count=0;
+                        try(var insert=padding.prepareStatement("INSERT INTO "+table+"("+columns+") VALUES("+values+")")) {
+                            insert.setString(1,paddingActor.toString());
+                            while(true) {
+                                try { insert.executeUpdate(); if(++count>10000) throw new AssertionError("Capacity padding failed to reach FULL"); }
+                                catch(SQLException failure) { if(failure.getErrorCode()!=13) throw failure; break; }
+                            }
+                        }
+                        check(count>0,"native_"+table+"_leaf_capacity_exhausted_by_separate_fixture_actor");
+                        paddingCounts.addProperty(table,count);
+                    }
+                    state.add("capacityPaddingCounts",paddingCounts);
+                }
+                try(var query=connection.createStatement();var rows=query.executeQuery("PRAGMA max_page_count="+pages)) {
+                    check(rows.next()&&rows.getInt(1)==pages,"native_connection_capacity_is_capped_at_current_database_pages");
+                }
+                state.addProperty("capacityPageLimit",pages);
+            }
+        }
+    }
+    private static void restoreCapacity() throws SQLException {
+        var database=GriefLogger.getDatabase();
+        synchronized(database) {
+            try(var probe=database.prepareStatement("SELECT 1")) {
+                sql(probe.getConnection(),"PRAGMA max_page_count=2147483646");
+            }
+        }
+        check(true,"native_capacity_restored_without_replacing_or_resubmitting_queued_observations");
+    }
     private static JsonArray rows() throws SQLException {
         var rows=new JsonArray();
         for(var table:List.of("blocks","containers","items")) {
