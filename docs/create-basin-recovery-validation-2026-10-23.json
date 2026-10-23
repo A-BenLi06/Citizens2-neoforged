@@ -1,0 +1,2502 @@
+{
+  "createdAt": "2026-10-23T00:06:42.953778+08:00",
+  "timezone": "UTC+08:00",
+  "baseRevision": "69cf58f",
+  "cases": [
+    {
+      "target": "21.1.248",
+      "stage": "prepared",
+      "boundaryChecks": 2,
+      "recoveryChecks": 11,
+      "state": {
+        "actor": "5faffead-9efa-456f-b5cb-890a84d51d38",
+        "team": "5faffead-9efa-456f-b5cb-890a84d51d38",
+        "task": "21598E4CF966200B",
+        "stage": "prepared",
+        "maximum": 1,
+        "revision": "08f64f7c3ff1a8f6dd06ae3f37ab27f47b71d504f2dc85386f3bb1bbf6cf52c1",
+        "machine": "27d1ed28-41c9-4d07-a931-ce0b98ee32d4",
+        "evidenceDirectory": "basin-crash-evidence-4886233044470923690",
+        "savedStorage": {
+          "items": [
+            {
+              "id": "minecraft:snowball",
+              "count": 5
+            },
+            {
+              "id": "minecraft:flint",
+              "count": 2
+            },
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {}
+          ],
+          "fluids": [
+            {},
+            {},
+            {
+              "id": "minecraft:water",
+              "amount": 750
+            },
+            {}
+          ]
+        },
+        "entry": "c2ba9d502ec35be91361482b4762eeb057042abe9fff3608b42fd7853199f5ef",
+        "entries": 1,
+        "run": "db21dcd67ce04d78bd193fa1f72a755d",
+        "evidence": {
+          "id": "4da59362-0f15-4b6b-98df-1012ca63fcbe",
+          "source": "CREATE_MIXER",
+          "attribution": {
+            "machineId": "27d1ed28-41c9-4d07-a931-ce0b98ee32d4",
+            "beneficiaryId": "5faffead-9efa-456f-b5cb-890a84d51d38",
+            "operatorId": "5faffead-9efa-456f-b5cb-890a84d51d38",
+            "assignedAt": 1792684489624
+          },
+          "dimension": "minecraft:overworld",
+          "x": 4,
+          "y": -58,
+          "z": 10,
+          "serverTick": 1,
+          "recipeId": "citizens_audit:basin_crash",
+          "recipeRevision": "08f64f7c3ff1a8f6dd06ae3f37ab27f47b71d504f2dc85386f3bb1bbf6cf52c1",
+          "basin": {
+            "x": 4,
+            "y": -60,
+            "z": 10,
+            "consumedItems": [
+              {
+                "id": "minecraft:snowball",
+                "count": 2
+              },
+              {
+                "id": "minecraft:flint",
+                "count": 1
+              }
+            ],
+            "fluidOutputs": [
+              {
+                "id": "minecraft:lava",
+                "amount": 100
+              }
+            ],
+            "consumedFluids": [
+              {
+                "id": "minecraft:water",
+                "amount": 250
+              }
+            ],
+            "beforeFluids": [
+              {},
+              {},
+              {
+                "id": "minecraft:water",
+                "amount": 750
+              },
+              {}
+            ]
+          },
+          "recipeDefinition": {
+            "ingredients": [
+              {
+                "item": "minecraft:snowball"
+              },
+              {
+                "item": "minecraft:snowball"
+              },
+              {
+                "item": "minecraft:flint"
+              },
+              {
+                "amount": 250,
+                "fluid": "minecraft:water",
+                "type": "neoforge:single"
+              }
+            ],
+            "results": [
+              {
+                "components": {
+                  "minecraft:custom_name": "\"Basin crash output\""
+                },
+                "count": 2,
+                "id": "minecraft:paper"
+              },
+              {
+                "amount": 100,
+                "id": "minecraft:lava"
+              }
+            ],
+            "type": "create:mixing"
+          },
+          "processing": {
+            "process": "MIXING",
+            "recipeDuration": 0,
+            "heat": "none",
+            "heatTranslationKey": "recipe.heat_requirement.none",
+            "fluidInputs": [
+              {
+                "definition": {
+                  "amount": 250,
+                  "fluid": "minecraft:water"
+                },
+                "amount": 250,
+                "alternatives": [
+                  {
+                    "id": "minecraft:water",
+                    "amount": 250
+                  }
+                ]
+              }
+            ],
+            "itemResults": [
+              {
+                "stack": {
+                  "id": "minecraft:paper",
+                  "count": 2,
+                  "components": {
+                    "minecraft:custom_name": "\"Basin crash output\""
+                  }
+                },
+                "chancePerItem": 1.0
+              }
+            ],
+            "fluidResults": [
+              {
+                "id": "minecraft:lava",
+                "amount": 100
+              }
+            ],
+            "retainedItemSlots": []
+          },
+          "consumedInput": {
+            "id": "minecraft:snowball",
+            "count": 2
+          },
+          "remainingInput": {},
+          "nativeRemainder": {},
+          "beforeOutput": [
+            {
+              "id": "minecraft:snowball",
+              "count": 5
+            },
+            {
+              "id": "minecraft:flint",
+              "count": 2
+            },
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {}
+          ],
+          "rolledOutputs": [
+            {
+              "id": "minecraft:paper",
+              "count": 2,
+              "components": {
+                "minecraft:custom_name": "\"Basin crash output\""
+              }
+            }
+          ]
+        },
+        "liveStorage": {
+          "items": [
+            {
+              "id": "minecraft:snowball",
+              "count": 5
+            },
+            {
+              "id": "minecraft:flint",
+              "count": 2
+            },
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {}
+          ],
+          "fluids": [
+            {},
+            {},
+            {
+              "id": "minecraft:water",
+              "amount": 750
+            },
+            {}
+          ]
+        }
+      },
+      "logs": [
+        {
+          "path": "artifacts/basin-crash-21-1-248-prepared-killed.log",
+          "bytes": 16924,
+          "sha256": "a26588f625918d90ffe49cbb9d056da8d763f7fda08a2e74bd1746de2a79c155"
+        },
+        {
+          "path": "artifacts/basin-crash-21-1-248-prepared-killed-stderr.log",
+          "bytes": 2327,
+          "sha256": "a3e6d36957c08d70900de7abf76402cd68cff78d1e47619e1c94017521737ef0"
+        },
+        {
+          "path": "artifacts/basin-crash-21-1-248-prepared-recovered.log",
+          "bytes": 25113,
+          "sha256": "71bd24d525126eddc18e41f1d3eca23ac796b9d86352d0bc850b2d2a2107c6fc"
+        }
+      ],
+      "termination": {
+        "path": "artifacts/basin-crash-21-1-248-prepared-termination.json",
+        "bytes": 765,
+        "sha256": "86766e27dedae63e09ea46d10087ed183c57fcacbf715349241f0dfd19a678d8"
+      },
+      "savedState": {
+        "path": "artifacts/basin-crash-21-1-248-prepared-state.json",
+        "bytes": 2845,
+        "sha256": "f70e9fdee3c3d95ee08cf6396a7b4163a45f77ea1de90287f6f5eda2ab81de24"
+      },
+      "recovery": {
+        "path": "artifacts/basin-crash-21.1.248-prepared-server/basin-crash-recovery.json",
+        "bytes": 6178,
+        "sha256": "198d222e7780f1d4988de55db6455df3e40082180211bb8a29ef747e3cbd864f"
+      },
+      "journal": [
+        {
+          "path": "artifacts/basin-crash-21.1.248-prepared-server/basin-crash-evidence-4886233044470923690/bindings/21598E4CF966200B.json",
+          "bytes": 350,
+          "sha256": "3966dae634bca71d3b995ee72696b8e1d6c058549892482a176ed2352e0cab91"
+        },
+        {
+          "path": "artifacts/basin-crash-21.1.248-prepared-server/basin-crash-evidence-4886233044470923690/journal/entry-c2ba9d502ec35be91361482b4762eeb057042abe9fff3608b42fd7853199f5ef-0.json",
+          "bytes": 2786,
+          "sha256": "642aa76e6c71d790aa8396e563bde2783ff24077868318a880b0081123fd9f2e"
+        },
+        {
+          "path": "artifacts/basin-crash-21.1.248-prepared-server/basin-crash-evidence-4886233044470923690/journal/entry-c2ba9d502ec35be91361482b4762eeb057042abe9fff3608b42fd7853199f5ef-1.json",
+          "bytes": 2789,
+          "sha256": "bc52f9e21df7017dcfa8d79e9cdd3aafc96f466dae689a8ccd16a9d2bae8948e"
+        },
+        {
+          "path": "artifacts/basin-crash-21.1.248-prepared-server/basin-crash-evidence-4886233044470923690/journal/entry-c2ba9d502ec35be91361482b4762eeb057042abe9fff3608b42fd7853199f5ef-2.json",
+          "bytes": 2988,
+          "sha256": "fb35f4d168e5b0bb69ef16f218c556c6e446c96639a8f21a324218352c3764e2"
+        },
+        {
+          "path": "artifacts/basin-crash-21.1.248-prepared-server/basin-crash-evidence-4886233044470923690/journal/generation-cb51cab0-e727-4552-8b44-f1308604473d.json",
+          "bytes": 265,
+          "sha256": "5216b525e577f3d6bba79e0ef285f6b54a41c8788047bd2d8919e7a33da0163e"
+        }
+      ],
+      "team": {
+        "path": "artifacts/basin-crash-21.1.248-prepared-server/create-world/ftbquests/5faffead-9efa-456f-b5cb-890a84d51d38.snbt",
+        "bytes": 268,
+        "sha256": "a1a944e239a85d92a7f6d9e0d4ee25e422407c9ac3ed0e2d1f8563978c3579b3"
+      },
+      "providers": [
+        {
+          "path": "artifacts/basin-crash-21.1.248-prepared-server/mods/architectury-13.0.11-neoforge.jar",
+          "bytes": 584734,
+          "sha256": "9cc92f2c09533fc5482c60f993bd891c655a0e32b637037cdcb7c2b23adedeeb"
+        },
+        {
+          "path": "artifacts/basin-crash-21.1.248-prepared-server/mods/create.jar",
+          "bytes": 19138095,
+          "sha256": "5602a16796957cb5c7fb829c10c6b54bf9d228931c7680636710b6a60d92822e"
+        },
+        {
+          "path": "artifacts/basin-crash-21.1.248-prepared-server/mods/ftb-library-neoforge-2101.1.37.jar",
+          "bytes": 1439881,
+          "sha256": "624c2d2d1cbadb946d967e17757bd5b2d129d4d3ed71f2da0c70607d04476ac2"
+        },
+        {
+          "path": "artifacts/basin-crash-21.1.248-prepared-server/mods/ftb-quests-neoforge-2101.1.36.jar",
+          "bytes": 1609984,
+          "sha256": "6a39982c4b3afc00b1e788041a4f0d394e1659e3b3a6e5d078cd790bc36d0018"
+        },
+        {
+          "path": "artifacts/basin-crash-21.1.248-prepared-server/mods/ftb-teams-neoforge-2101.1.11.jar",
+          "bytes": 308236,
+          "sha256": "e6bcd670493624e6906df872a9c6af4a33fe6405cac57a32c59cd4cd5838c655"
+        },
+        {
+          "path": "artifacts/basin-crash-21.1.248-prepared-server/mods/kubejs-neoforge-2101.7.2-build.377.jar",
+          "bytes": 2294111,
+          "sha256": "df9a8458b1f83fed06ba54684977911795a5153a462b81a610895f5b1f2f0cbf"
+        },
+        {
+          "path": "artifacts/basin-crash-21.1.248-prepared-server/mods/rhino-2101.2.8-build.91.jar",
+          "bytes": 980936,
+          "sha256": "1d53d962aa4dac54bcbb4f998c1845980cf194318f1d6b1580ea6ac15cce5ef3"
+        }
+      ],
+      "scripts": [
+        {
+          "path": "artifacts/basin-crash-21.1.248-prepared-server/kubejs/server_scripts/citizens_basin_crash.js",
+          "bytes": 498,
+          "sha256": "1929adac77a5d403b583f1b54ceefd8f957e4d4ce5a19a6bf925854190d83571"
+        },
+        {
+          "path": "artifacts/basin-crash-21.1.248-prepared-server/kubejs/server_scripts/citizens_create_audit.js",
+          "bytes": 281,
+          "sha256": "07d53a2637f51d1a2e1b365a5e38daf3d89e62af7831fa9e9df56c85c1501e54"
+        }
+      ],
+      "auditBinary": {
+        "path": "artifacts/basin-crash-21.1.248-build/classes/java/dialogue/net/yuuniverse/interactions/BasinCrashRuntimeAudit.class",
+        "bytes": 34765,
+        "sha256": "de27b44a5faf62d50cb5d86a4626bd93ddd207c36446d8be19db9ea334597bd3"
+      }
+    },
+    {
+      "target": "21.1.248",
+      "stage": "confirmed",
+      "boundaryChecks": 3,
+      "recoveryChecks": 11,
+      "state": {
+        "actor": "3aa4eec8-c57c-46a3-91ef-381a9beefc9c",
+        "team": "3aa4eec8-c57c-46a3-91ef-381a9beefc9c",
+        "task": "2C4D69A07B1E6C2E",
+        "stage": "confirmed",
+        "maximum": 1,
+        "revision": "08f64f7c3ff1a8f6dd06ae3f37ab27f47b71d504f2dc85386f3bb1bbf6cf52c1",
+        "machine": "1370f5c7-2508-4b0e-9dbe-8f37c5b38342",
+        "evidenceDirectory": "basin-crash-evidence-11574217515055686533",
+        "savedStorage": {
+          "items": [
+            {
+              "id": "minecraft:snowball",
+              "count": 5
+            },
+            {
+              "id": "minecraft:flint",
+              "count": 2
+            },
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {}
+          ],
+          "fluids": [
+            {},
+            {},
+            {
+              "id": "minecraft:water",
+              "amount": 750
+            },
+            {}
+          ]
+        },
+        "entry": "bc5535a05ec11d819197ea24099a113358eee63a2892e61b6f29959b754307d2",
+        "entries": 1,
+        "run": "23ad8675671340c7a9b46a0a8847bfd9",
+        "evidence": {
+          "id": "484ebdb0-ed9c-4337-b117-d9e6f7bf91b9",
+          "source": "CREATE_MIXER",
+          "attribution": {
+            "machineId": "1370f5c7-2508-4b0e-9dbe-8f37c5b38342",
+            "beneficiaryId": "3aa4eec8-c57c-46a3-91ef-381a9beefc9c",
+            "operatorId": "3aa4eec8-c57c-46a3-91ef-381a9beefc9c",
+            "assignedAt": 1792684598049
+          },
+          "dimension": "minecraft:overworld",
+          "x": 4,
+          "y": -58,
+          "z": 10,
+          "serverTick": 1,
+          "recipeId": "citizens_audit:basin_crash",
+          "recipeRevision": "08f64f7c3ff1a8f6dd06ae3f37ab27f47b71d504f2dc85386f3bb1bbf6cf52c1",
+          "basin": {
+            "x": 4,
+            "y": -60,
+            "z": 10,
+            "consumedItems": [
+              {
+                "id": "minecraft:snowball",
+                "count": 2
+              },
+              {
+                "id": "minecraft:flint",
+                "count": 1
+              }
+            ],
+            "fluidOutputs": [
+              {
+                "id": "minecraft:lava",
+                "amount": 100
+              }
+            ],
+            "consumedFluids": [
+              {
+                "id": "minecraft:water",
+                "amount": 250
+              }
+            ],
+            "beforeFluids": [
+              {},
+              {},
+              {
+                "id": "minecraft:water",
+                "amount": 750
+              },
+              {}
+            ]
+          },
+          "recipeDefinition": {
+            "ingredients": [
+              {
+                "item": "minecraft:snowball"
+              },
+              {
+                "item": "minecraft:snowball"
+              },
+              {
+                "item": "minecraft:flint"
+              },
+              {
+                "amount": 250,
+                "fluid": "minecraft:water",
+                "type": "neoforge:single"
+              }
+            ],
+            "results": [
+              {
+                "components": {
+                  "minecraft:custom_name": "\"Basin crash output\""
+                },
+                "count": 2,
+                "id": "minecraft:paper"
+              },
+              {
+                "amount": 100,
+                "id": "minecraft:lava"
+              }
+            ],
+            "type": "create:mixing"
+          },
+          "processing": {
+            "process": "MIXING",
+            "recipeDuration": 0,
+            "heat": "none",
+            "heatTranslationKey": "recipe.heat_requirement.none",
+            "fluidInputs": [
+              {
+                "definition": {
+                  "amount": 250,
+                  "fluid": "minecraft:water"
+                },
+                "amount": 250,
+                "alternatives": [
+                  {
+                    "id": "minecraft:water",
+                    "amount": 250
+                  }
+                ]
+              }
+            ],
+            "itemResults": [
+              {
+                "stack": {
+                  "id": "minecraft:paper",
+                  "count": 2,
+                  "components": {
+                    "minecraft:custom_name": "\"Basin crash output\""
+                  }
+                },
+                "chancePerItem": 1.0
+              }
+            ],
+            "fluidResults": [
+              {
+                "id": "minecraft:lava",
+                "amount": 100
+              }
+            ],
+            "retainedItemSlots": []
+          },
+          "consumedInput": {
+            "id": "minecraft:snowball",
+            "count": 2
+          },
+          "remainingInput": {},
+          "nativeRemainder": {},
+          "beforeOutput": [
+            {
+              "id": "minecraft:snowball",
+              "count": 5
+            },
+            {
+              "id": "minecraft:flint",
+              "count": 2
+            },
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {}
+          ],
+          "rolledOutputs": [
+            {
+              "id": "minecraft:paper",
+              "count": 2,
+              "components": {
+                "minecraft:custom_name": "\"Basin crash output\""
+              }
+            }
+          ]
+        },
+        "liveStorage": {
+          "items": [
+            {
+              "id": "minecraft:snowball",
+              "count": 3
+            },
+            {
+              "id": "minecraft:flint",
+              "count": 1
+            },
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {
+              "id": "minecraft:paper",
+              "count": 2,
+              "components": {
+                "minecraft:custom_name": "\"Basin crash output\""
+              }
+            },
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {}
+          ],
+          "fluids": [
+            {
+              "id": "minecraft:lava",
+              "amount": 100
+            },
+            {},
+            {
+              "id": "minecraft:water",
+              "amount": 500
+            },
+            {}
+          ]
+        }
+      },
+      "logs": [
+        {
+          "path": "artifacts/basin-crash-21-1-248-confirmed-killed.log",
+          "bytes": 14821,
+          "sha256": "99e87341d621caeca900c353723ce92efe8565df1702f60589d16aba37454906"
+        },
+        {
+          "path": "artifacts/basin-crash-21-1-248-confirmed-killed-stderr.log",
+          "bytes": 517,
+          "sha256": "175de178f8b14245bec35f713f1dcc504daf89a4abecd52023a91dc0cb25044f"
+        },
+        {
+          "path": "artifacts/basin-crash-21-1-248-confirmed-recovered.log",
+          "bytes": 17321,
+          "sha256": "8b3e47737e27bea633457889ef2409415613494b9d3c41f2852eac10ee9eabe8"
+        }
+      ],
+      "termination": {
+        "path": "artifacts/basin-crash-21-1-248-confirmed-termination.json",
+        "bytes": 767,
+        "sha256": "f473cd78488b4b8d3ce1053e9566cb471730fc824eb9118b9e8f15489876e715"
+      },
+      "savedState": {
+        "path": "artifacts/basin-crash-21-1-248-confirmed-state.json",
+        "bytes": 2977,
+        "sha256": "6e5bc22d4f0736426c7181710a8e74866a99be9b1ab83f26f2d624cad583b00c"
+      },
+      "recovery": {
+        "path": "artifacts/basin-crash-21.1.248-confirmed-server/basin-crash-recovery.json",
+        "bytes": 6095,
+        "sha256": "db8d7b659f19229f50c4e11fe405610f2f4d824f99c166f4f7049504dc9ea6da"
+      },
+      "journal": [
+        {
+          "path": "artifacts/basin-crash-21.1.248-confirmed-server/basin-crash-evidence-11574217515055686533/bindings/2C4D69A07B1E6C2E.json",
+          "bytes": 350,
+          "sha256": "78d7d62b76765626f5520ed624e0ce5efa2eaefb66c6bc04210f6759daa3de28"
+        },
+        {
+          "path": "artifacts/basin-crash-21.1.248-confirmed-server/basin-crash-evidence-11574217515055686533/journal/entry-bc5535a05ec11d819197ea24099a113358eee63a2892e61b6f29959b754307d2-0.json",
+          "bytes": 2786,
+          "sha256": "f0c3b846eca43f01a9aa11764dad2338b0bad0efc012c99c39876887d6f5dfad"
+        },
+        {
+          "path": "artifacts/basin-crash-21.1.248-confirmed-server/basin-crash-evidence-11574217515055686533/journal/entry-bc5535a05ec11d819197ea24099a113358eee63a2892e61b6f29959b754307d2-1.json",
+          "bytes": 2793,
+          "sha256": "a420092ac3d31b51e16fcdb6819e09e797d46c8e9dbd4288dd5d69675bbb6b3f"
+        },
+        {
+          "path": "artifacts/basin-crash-21.1.248-confirmed-server/basin-crash-evidence-11574217515055686533/journal/entry-bc5535a05ec11d819197ea24099a113358eee63a2892e61b6f29959b754307d2-2.json",
+          "bytes": 2791,
+          "sha256": "3366417f805c248614edac442277ad7b9b4a2ee9cb4b81bc22d573a6a3059a54"
+        },
+        {
+          "path": "artifacts/basin-crash-21.1.248-confirmed-server/basin-crash-evidence-11574217515055686533/journal/generation-55b4c262-bf53-4372-85ca-a7f1019b8aeb.json",
+          "bytes": 265,
+          "sha256": "3f7a495465630df1cadce6a245d7790b735c179066c70b5744b4529f65237880"
+        }
+      ],
+      "team": {
+        "path": "artifacts/basin-crash-21.1.248-confirmed-server/create-world/ftbquests/3aa4eec8-c57c-46a3-91ef-381a9beefc9c.snbt",
+        "bytes": 622,
+        "sha256": "1d42a98f88c38dbdce4c0c0beff62ac7ee44076048ad506c00456ee1fe75500f"
+      },
+      "providers": [
+        {
+          "path": "artifacts/basin-crash-21.1.248-confirmed-server/mods/architectury-13.0.11-neoforge.jar",
+          "bytes": 584734,
+          "sha256": "9cc92f2c09533fc5482c60f993bd891c655a0e32b637037cdcb7c2b23adedeeb"
+        },
+        {
+          "path": "artifacts/basin-crash-21.1.248-confirmed-server/mods/create.jar",
+          "bytes": 19138095,
+          "sha256": "5602a16796957cb5c7fb829c10c6b54bf9d228931c7680636710b6a60d92822e"
+        },
+        {
+          "path": "artifacts/basin-crash-21.1.248-confirmed-server/mods/ftb-library-neoforge-2101.1.37.jar",
+          "bytes": 1439881,
+          "sha256": "624c2d2d1cbadb946d967e17757bd5b2d129d4d3ed71f2da0c70607d04476ac2"
+        },
+        {
+          "path": "artifacts/basin-crash-21.1.248-confirmed-server/mods/ftb-quests-neoforge-2101.1.36.jar",
+          "bytes": 1609984,
+          "sha256": "6a39982c4b3afc00b1e788041a4f0d394e1659e3b3a6e5d078cd790bc36d0018"
+        },
+        {
+          "path": "artifacts/basin-crash-21.1.248-confirmed-server/mods/ftb-teams-neoforge-2101.1.11.jar",
+          "bytes": 308236,
+          "sha256": "e6bcd670493624e6906df872a9c6af4a33fe6405cac57a32c59cd4cd5838c655"
+        },
+        {
+          "path": "artifacts/basin-crash-21.1.248-confirmed-server/mods/kubejs-neoforge-2101.7.2-build.377.jar",
+          "bytes": 2294111,
+          "sha256": "df9a8458b1f83fed06ba54684977911795a5153a462b81a610895f5b1f2f0cbf"
+        },
+        {
+          "path": "artifacts/basin-crash-21.1.248-confirmed-server/mods/rhino-2101.2.8-build.91.jar",
+          "bytes": 980936,
+          "sha256": "1d53d962aa4dac54bcbb4f998c1845980cf194318f1d6b1580ea6ac15cce5ef3"
+        }
+      ],
+      "scripts": [
+        {
+          "path": "artifacts/basin-crash-21.1.248-confirmed-server/kubejs/server_scripts/citizens_basin_crash.js",
+          "bytes": 498,
+          "sha256": "1929adac77a5d403b583f1b54ceefd8f957e4d4ce5a19a6bf925854190d83571"
+        },
+        {
+          "path": "artifacts/basin-crash-21.1.248-confirmed-server/kubejs/server_scripts/citizens_create_audit.js",
+          "bytes": 281,
+          "sha256": "07d53a2637f51d1a2e1b365a5e38daf3d89e62af7831fa9e9df56c85c1501e54"
+        }
+      ],
+      "auditBinary": {
+        "path": "artifacts/basin-crash-21.1.248-build/classes/java/dialogue/net/yuuniverse/interactions/BasinCrashRuntimeAudit.class",
+        "bytes": 34765,
+        "sha256": "de27b44a5faf62d50cb5d86a4626bd93ddd207c36446d8be19db9ea334597bd3"
+      }
+    },
+    {
+      "target": "21.1.248",
+      "stage": "applied",
+      "boundaryChecks": 4,
+      "recoveryChecks": 10,
+      "state": {
+        "actor": "efcdaa20-1431-422f-9601-9e8b1ea696a2",
+        "team": "efcdaa20-1431-422f-9601-9e8b1ea696a2",
+        "task": "7CE4D65A51BC71A7",
+        "stage": "applied",
+        "maximum": 1,
+        "revision": "08f64f7c3ff1a8f6dd06ae3f37ab27f47b71d504f2dc85386f3bb1bbf6cf52c1",
+        "machine": "fb6f9bc8-e994-4bb4-a864-d4558ff24de3",
+        "evidenceDirectory": "basin-crash-evidence-6323536936885741829",
+        "savedStorage": {
+          "items": [
+            {
+              "id": "minecraft:snowball",
+              "count": 5
+            },
+            {
+              "id": "minecraft:flint",
+              "count": 2
+            },
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {}
+          ],
+          "fluids": [
+            {},
+            {},
+            {
+              "id": "minecraft:water",
+              "amount": 750
+            },
+            {}
+          ]
+        },
+        "entry": "83f51cb3711a7cd4f3719ff5806fde04a246c101b60e82d31572f42a3c8d682d",
+        "entries": 1,
+        "run": "87c0f4bd449748138698175a01b64382",
+        "evidence": {
+          "id": "b5238e60-4e86-481e-b8da-ef0d3d429f0c",
+          "source": "CREATE_MIXER",
+          "attribution": {
+            "machineId": "fb6f9bc8-e994-4bb4-a864-d4558ff24de3",
+            "beneficiaryId": "efcdaa20-1431-422f-9601-9e8b1ea696a2",
+            "operatorId": "efcdaa20-1431-422f-9601-9e8b1ea696a2",
+            "assignedAt": 1792684704569
+          },
+          "dimension": "minecraft:overworld",
+          "x": 4,
+          "y": -58,
+          "z": 10,
+          "serverTick": 1,
+          "recipeId": "citizens_audit:basin_crash",
+          "recipeRevision": "08f64f7c3ff1a8f6dd06ae3f37ab27f47b71d504f2dc85386f3bb1bbf6cf52c1",
+          "basin": {
+            "x": 4,
+            "y": -60,
+            "z": 10,
+            "consumedItems": [
+              {
+                "id": "minecraft:snowball",
+                "count": 2
+              },
+              {
+                "id": "minecraft:flint",
+                "count": 1
+              }
+            ],
+            "beforeFluids": [
+              {},
+              {},
+              {
+                "id": "minecraft:water",
+                "amount": 750
+              },
+              {}
+            ],
+            "fluidOutputs": [
+              {
+                "id": "minecraft:lava",
+                "amount": 100
+              }
+            ],
+            "consumedFluids": [
+              {
+                "id": "minecraft:water",
+                "amount": 250
+              }
+            ]
+          },
+          "recipeDefinition": {
+            "ingredients": [
+              {
+                "item": "minecraft:snowball"
+              },
+              {
+                "item": "minecraft:snowball"
+              },
+              {
+                "item": "minecraft:flint"
+              },
+              {
+                "amount": 250,
+                "fluid": "minecraft:water",
+                "type": "neoforge:single"
+              }
+            ],
+            "results": [
+              {
+                "components": {
+                  "minecraft:custom_name": "\"Basin crash output\""
+                },
+                "count": 2,
+                "id": "minecraft:paper"
+              },
+              {
+                "amount": 100,
+                "id": "minecraft:lava"
+              }
+            ],
+            "type": "create:mixing"
+          },
+          "processing": {
+            "process": "MIXING",
+            "recipeDuration": 0,
+            "heat": "none",
+            "heatTranslationKey": "recipe.heat_requirement.none",
+            "fluidInputs": [
+              {
+                "definition": {
+                  "amount": 250,
+                  "fluid": "minecraft:water"
+                },
+                "amount": 250,
+                "alternatives": [
+                  {
+                    "id": "minecraft:water",
+                    "amount": 250
+                  }
+                ]
+              }
+            ],
+            "itemResults": [
+              {
+                "stack": {
+                  "id": "minecraft:paper",
+                  "count": 2,
+                  "components": {
+                    "minecraft:custom_name": "\"Basin crash output\""
+                  }
+                },
+                "chancePerItem": 1.0
+              }
+            ],
+            "fluidResults": [
+              {
+                "id": "minecraft:lava",
+                "amount": 100
+              }
+            ],
+            "retainedItemSlots": []
+          },
+          "consumedInput": {
+            "id": "minecraft:snowball",
+            "count": 2
+          },
+          "remainingInput": {},
+          "nativeRemainder": {},
+          "beforeOutput": [
+            {
+              "id": "minecraft:snowball",
+              "count": 5
+            },
+            {
+              "id": "minecraft:flint",
+              "count": 2
+            },
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {}
+          ],
+          "rolledOutputs": [
+            {
+              "id": "minecraft:paper",
+              "count": 2,
+              "components": {
+                "minecraft:custom_name": "\"Basin crash output\""
+              }
+            }
+          ]
+        },
+        "liveStorage": {
+          "items": [
+            {
+              "id": "minecraft:snowball",
+              "count": 3
+            },
+            {
+              "id": "minecraft:flint",
+              "count": 1
+            },
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {
+              "id": "minecraft:paper",
+              "count": 2,
+              "components": {
+                "minecraft:custom_name": "\"Basin crash output\""
+              }
+            },
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {}
+          ],
+          "fluids": [
+            {
+              "id": "minecraft:lava",
+              "amount": 100
+            },
+            {},
+            {
+              "id": "minecraft:water",
+              "amount": 500
+            },
+            {}
+          ]
+        }
+      },
+      "logs": [
+        {
+          "path": "artifacts/basin-crash-21-1-248-applied-killed.log",
+          "bytes": 15051,
+          "sha256": "29cf5b6b8f5a79f061be00aaef50a2264afca46763eb9a37c62d33ee45886611"
+        },
+        {
+          "path": "artifacts/basin-crash-21-1-248-applied-killed-stderr.log",
+          "bytes": 517,
+          "sha256": "5fa68577e3ce7c9214ba7d8f532b798e271a89e56fd0122e79d22b692732af34"
+        },
+        {
+          "path": "artifacts/basin-crash-21-1-248-applied-recovered.log",
+          "bytes": 24578,
+          "sha256": "6d5c56135e9b6d7e90b339508c5219d4e5b3a621916146077c719c44bb302519"
+        }
+      ],
+      "termination": {
+        "path": "artifacts/basin-crash-21-1-248-applied-termination.json",
+        "bytes": 763,
+        "sha256": "f512c0513e8271917cce5d41d2e773ffe7451f872d3c3326f90f2169e8abcc9b"
+      },
+      "savedState": {
+        "path": "artifacts/basin-crash-21-1-248-applied-state.json",
+        "bytes": 2974,
+        "sha256": "5f29a069a840d02f4f4e1c82aafff1290ab9ba7dd12dd59e66664b5dfa44de05"
+      },
+      "recovery": {
+        "path": "artifacts/basin-crash-21.1.248-applied-server/basin-crash-recovery.json",
+        "bytes": 6092,
+        "sha256": "663bc9c7e2b95090f8a585c6ab71b270ec07aac5f94aa7000b441526d1d53adc"
+      },
+      "journal": [
+        {
+          "path": "artifacts/basin-crash-21.1.248-applied-server/basin-crash-evidence-6323536936885741829/bindings/7CE4D65A51BC71A7.json",
+          "bytes": 350,
+          "sha256": "5160cf9e8ea5edef5e97f8d97dbcbfdcbd5109ea5777b76cb0d39411d7c28c19"
+        },
+        {
+          "path": "artifacts/basin-crash-21.1.248-applied-server/basin-crash-evidence-6323536936885741829/journal/entry-83f51cb3711a7cd4f3719ff5806fde04a246c101b60e82d31572f42a3c8d682d-0.json",
+          "bytes": 2786,
+          "sha256": "eb4de0c14f7953d9f25e0ccd3e667c7d962b803a26196d81a84f46d1c8032b85"
+        },
+        {
+          "path": "artifacts/basin-crash-21.1.248-applied-server/basin-crash-evidence-6323536936885741829/journal/entry-83f51cb3711a7cd4f3719ff5806fde04a246c101b60e82d31572f42a3c8d682d-1.json",
+          "bytes": 2793,
+          "sha256": "272fbeea292cd509a1707a2c57ba026cd06c72eccd6cab6367db67e506e8fbfc"
+        },
+        {
+          "path": "artifacts/basin-crash-21.1.248-applied-server/basin-crash-evidence-6323536936885741829/journal/entry-83f51cb3711a7cd4f3719ff5806fde04a246c101b60e82d31572f42a3c8d682d-2.json",
+          "bytes": 2791,
+          "sha256": "0119b198bb250f99348d98435e9a0f1b6f66a87bd139a1486a7b2ac739e34849"
+        },
+        {
+          "path": "artifacts/basin-crash-21.1.248-applied-server/basin-crash-evidence-6323536936885741829/journal/generation-f7211718-f7b2-4c5b-bbf9-6a2668174629.json",
+          "bytes": 265,
+          "sha256": "28d56e559e614209f9867a6f5c842a79bd2fd86f15b2357cb36a3d267d06444f"
+        }
+      ],
+      "team": {
+        "path": "artifacts/basin-crash-21.1.248-applied-server/create-world/ftbquests/efcdaa20-1431-422f-9601-9e8b1ea696a2.snbt",
+        "bytes": 268,
+        "sha256": "8f8b0b330c8c08b7f79477d5fe2b8466854d436cd3a69a5f1f3d942e81f91563"
+      },
+      "providers": [
+        {
+          "path": "artifacts/basin-crash-21.1.248-applied-server/mods/architectury-13.0.11-neoforge.jar",
+          "bytes": 584734,
+          "sha256": "9cc92f2c09533fc5482c60f993bd891c655a0e32b637037cdcb7c2b23adedeeb"
+        },
+        {
+          "path": "artifacts/basin-crash-21.1.248-applied-server/mods/create.jar",
+          "bytes": 19138095,
+          "sha256": "5602a16796957cb5c7fb829c10c6b54bf9d228931c7680636710b6a60d92822e"
+        },
+        {
+          "path": "artifacts/basin-crash-21.1.248-applied-server/mods/ftb-library-neoforge-2101.1.37.jar",
+          "bytes": 1439881,
+          "sha256": "624c2d2d1cbadb946d967e17757bd5b2d129d4d3ed71f2da0c70607d04476ac2"
+        },
+        {
+          "path": "artifacts/basin-crash-21.1.248-applied-server/mods/ftb-quests-neoforge-2101.1.36.jar",
+          "bytes": 1609984,
+          "sha256": "6a39982c4b3afc00b1e788041a4f0d394e1659e3b3a6e5d078cd790bc36d0018"
+        },
+        {
+          "path": "artifacts/basin-crash-21.1.248-applied-server/mods/ftb-teams-neoforge-2101.1.11.jar",
+          "bytes": 308236,
+          "sha256": "e6bcd670493624e6906df872a9c6af4a33fe6405cac57a32c59cd4cd5838c655"
+        },
+        {
+          "path": "artifacts/basin-crash-21.1.248-applied-server/mods/kubejs-neoforge-2101.7.2-build.377.jar",
+          "bytes": 2294111,
+          "sha256": "df9a8458b1f83fed06ba54684977911795a5153a462b81a610895f5b1f2f0cbf"
+        },
+        {
+          "path": "artifacts/basin-crash-21.1.248-applied-server/mods/rhino-2101.2.8-build.91.jar",
+          "bytes": 980936,
+          "sha256": "1d53d962aa4dac54bcbb4f998c1845980cf194318f1d6b1580ea6ac15cce5ef3"
+        }
+      ],
+      "scripts": [
+        {
+          "path": "artifacts/basin-crash-21.1.248-applied-server/kubejs/server_scripts/citizens_basin_crash.js",
+          "bytes": 498,
+          "sha256": "1929adac77a5d403b583f1b54ceefd8f957e4d4ce5a19a6bf925854190d83571"
+        },
+        {
+          "path": "artifacts/basin-crash-21.1.248-applied-server/kubejs/server_scripts/citizens_create_audit.js",
+          "bytes": 281,
+          "sha256": "07d53a2637f51d1a2e1b365a5e38daf3d89e62af7831fa9e9df56c85c1501e54"
+        }
+      ],
+      "auditBinary": {
+        "path": "artifacts/basin-crash-21.1.248-build/classes/java/dialogue/net/yuuniverse/interactions/BasinCrashRuntimeAudit.class",
+        "bytes": 34765,
+        "sha256": "de27b44a5faf62d50cb5d86a4626bd93ddd207c36446d8be19db9ea334597bd3"
+      }
+    },
+    {
+      "target": "21.1.233",
+      "stage": "prepared",
+      "boundaryChecks": 2,
+      "recoveryChecks": 11,
+      "state": {
+        "actor": "ac3e04be-14c4-44ca-8ff2-97315baa0065",
+        "team": "ac3e04be-14c4-44ca-8ff2-97315baa0065",
+        "task": "16698BC793A04654",
+        "stage": "prepared",
+        "maximum": 1,
+        "revision": "08f64f7c3ff1a8f6dd06ae3f37ab27f47b71d504f2dc85386f3bb1bbf6cf52c1",
+        "machine": "87f06878-94c5-4e7a-ad94-f04c0a06062a",
+        "evidenceDirectory": "basin-crash-evidence-1278810306660105279",
+        "savedStorage": {
+          "items": [
+            {
+              "id": "minecraft:snowball",
+              "count": 5
+            },
+            {
+              "id": "minecraft:flint",
+              "count": 2
+            },
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {}
+          ],
+          "fluids": [
+            {},
+            {},
+            {
+              "id": "minecraft:water",
+              "amount": 750
+            },
+            {}
+          ]
+        },
+        "entry": "976ff0fec746aab9f490c13de4d1b45f065a3dcb20d5fe85a54de63c659d8cc4",
+        "entries": 1,
+        "run": "ef2883377fc54e748648e8f8a5d2e192",
+        "evidence": {
+          "id": "b450b31e-c39b-4fd8-aa93-6c55b6a9c3d9",
+          "source": "CREATE_MIXER",
+          "attribution": {
+            "machineId": "87f06878-94c5-4e7a-ad94-f04c0a06062a",
+            "beneficiaryId": "ac3e04be-14c4-44ca-8ff2-97315baa0065",
+            "operatorId": "ac3e04be-14c4-44ca-8ff2-97315baa0065",
+            "assignedAt": 1792684832693
+          },
+          "dimension": "minecraft:overworld",
+          "x": 4,
+          "y": -58,
+          "z": 10,
+          "serverTick": 1,
+          "recipeId": "citizens_audit:basin_crash",
+          "recipeRevision": "08f64f7c3ff1a8f6dd06ae3f37ab27f47b71d504f2dc85386f3bb1bbf6cf52c1",
+          "basin": {
+            "x": 4,
+            "y": -60,
+            "z": 10,
+            "consumedItems": [
+              {
+                "id": "minecraft:snowball",
+                "count": 2
+              },
+              {
+                "id": "minecraft:flint",
+                "count": 1
+              }
+            ],
+            "fluidOutputs": [
+              {
+                "id": "minecraft:lava",
+                "amount": 100
+              }
+            ],
+            "consumedFluids": [
+              {
+                "id": "minecraft:water",
+                "amount": 250
+              }
+            ],
+            "beforeFluids": [
+              {},
+              {},
+              {
+                "id": "minecraft:water",
+                "amount": 750
+              },
+              {}
+            ]
+          },
+          "recipeDefinition": {
+            "ingredients": [
+              {
+                "item": "minecraft:snowball"
+              },
+              {
+                "item": "minecraft:snowball"
+              },
+              {
+                "item": "minecraft:flint"
+              },
+              {
+                "amount": 250,
+                "fluid": "minecraft:water",
+                "type": "neoforge:single"
+              }
+            ],
+            "results": [
+              {
+                "components": {
+                  "minecraft:custom_name": "\"Basin crash output\""
+                },
+                "count": 2,
+                "id": "minecraft:paper"
+              },
+              {
+                "amount": 100,
+                "id": "minecraft:lava"
+              }
+            ],
+            "type": "create:mixing"
+          },
+          "processing": {
+            "process": "MIXING",
+            "recipeDuration": 0,
+            "heat": "none",
+            "heatTranslationKey": "recipe.heat_requirement.none",
+            "fluidInputs": [
+              {
+                "definition": {
+                  "amount": 250,
+                  "fluid": "minecraft:water"
+                },
+                "amount": 250,
+                "alternatives": [
+                  {
+                    "id": "minecraft:water",
+                    "amount": 250
+                  }
+                ]
+              }
+            ],
+            "itemResults": [
+              {
+                "stack": {
+                  "id": "minecraft:paper",
+                  "count": 2,
+                  "components": {
+                    "minecraft:custom_name": "\"Basin crash output\""
+                  }
+                },
+                "chancePerItem": 1.0
+              }
+            ],
+            "fluidResults": [
+              {
+                "id": "minecraft:lava",
+                "amount": 100
+              }
+            ],
+            "retainedItemSlots": []
+          },
+          "consumedInput": {
+            "id": "minecraft:snowball",
+            "count": 2
+          },
+          "remainingInput": {},
+          "nativeRemainder": {},
+          "beforeOutput": [
+            {
+              "id": "minecraft:snowball",
+              "count": 5
+            },
+            {
+              "id": "minecraft:flint",
+              "count": 2
+            },
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {}
+          ],
+          "rolledOutputs": [
+            {
+              "id": "minecraft:paper",
+              "count": 2,
+              "components": {
+                "minecraft:custom_name": "\"Basin crash output\""
+              }
+            }
+          ]
+        },
+        "liveStorage": {
+          "items": [
+            {
+              "id": "minecraft:snowball",
+              "count": 5
+            },
+            {
+              "id": "minecraft:flint",
+              "count": 2
+            },
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {}
+          ],
+          "fluids": [
+            {},
+            {},
+            {
+              "id": "minecraft:water",
+              "amount": 750
+            },
+            {}
+          ]
+        }
+      },
+      "logs": [
+        {
+          "path": "artifacts/basin-crash-21-1-233-prepared-killed.log",
+          "bytes": 16922,
+          "sha256": "bd92b1845cdc174b2641f776c883d64dd4830df0e814e3827dbda2be3b195ec3"
+        },
+        {
+          "path": "artifacts/basin-crash-21-1-233-prepared-killed-stderr.log",
+          "bytes": 2327,
+          "sha256": "e1f7863a08429d0452fd4e74680cbb396193c0deb14b8280a2a86e7dd1e91e63"
+        },
+        {
+          "path": "artifacts/basin-crash-21-1-233-prepared-recovered.log",
+          "bytes": 24687,
+          "sha256": "7ca91c266a6e9e0bbfecb05fea15270f1ea147902a7047d6470bd5d36bc8127f"
+        }
+      ],
+      "termination": {
+        "path": "artifacts/basin-crash-21-1-233-prepared-termination.json",
+        "bytes": 765,
+        "sha256": "48c01405cdbee7c4d9e659b9cc5adbd62c90801d9822871171f594e51181beb2"
+      },
+      "savedState": {
+        "path": "artifacts/basin-crash-21-1-233-prepared-state.json",
+        "bytes": 2845,
+        "sha256": "182d6f9f830708437822449df36a74deabf83096893d5dd132868f679ebee2c3"
+      },
+      "recovery": {
+        "path": "artifacts/basin-crash-21.1.233-prepared-server/basin-crash-recovery.json",
+        "bytes": 6178,
+        "sha256": "2ff998244dcf576b3183188327f79e4d1c5933f27c58fb89924c887c92838d10"
+      },
+      "journal": [
+        {
+          "path": "artifacts/basin-crash-21.1.233-prepared-server/basin-crash-evidence-1278810306660105279/bindings/16698BC793A04654.json",
+          "bytes": 350,
+          "sha256": "a2c23d355dd18c0d7532eb39c64e6482135f98cd8e6c812140821162f45f0ed0"
+        },
+        {
+          "path": "artifacts/basin-crash-21.1.233-prepared-server/basin-crash-evidence-1278810306660105279/journal/entry-976ff0fec746aab9f490c13de4d1b45f065a3dcb20d5fe85a54de63c659d8cc4-0.json",
+          "bytes": 2786,
+          "sha256": "87c7c0860407155c3fbd31d8735b6150e4e1aa504551da3dcbdf35803da7e343"
+        },
+        {
+          "path": "artifacts/basin-crash-21.1.233-prepared-server/basin-crash-evidence-1278810306660105279/journal/entry-976ff0fec746aab9f490c13de4d1b45f065a3dcb20d5fe85a54de63c659d8cc4-1.json",
+          "bytes": 2789,
+          "sha256": "8447b51690b38266919ea981998f0a1fe81b0422c5bbcd545858826898103b16"
+        },
+        {
+          "path": "artifacts/basin-crash-21.1.233-prepared-server/basin-crash-evidence-1278810306660105279/journal/entry-976ff0fec746aab9f490c13de4d1b45f065a3dcb20d5fe85a54de63c659d8cc4-2.json",
+          "bytes": 2988,
+          "sha256": "39d0cee6781bbcbdac2ad1e257cdfca8f78a47254800f933857926f169459234"
+        },
+        {
+          "path": "artifacts/basin-crash-21.1.233-prepared-server/basin-crash-evidence-1278810306660105279/journal/generation-f9029e2e-c701-4dc2-9911-ded724f419dd.json",
+          "bytes": 265,
+          "sha256": "e478f9b4f812ee1352d598e8a2ad250240130b96f21ee66445ac994eec6adbb6"
+        }
+      ],
+      "team": {
+        "path": "artifacts/basin-crash-21.1.233-prepared-server/create-world/ftbquests/ac3e04be-14c4-44ca-8ff2-97315baa0065.snbt",
+        "bytes": 268,
+        "sha256": "f69a76e05f6808fe1e328084967968eeaed28623dc676494db6083643af07976"
+      },
+      "providers": [
+        {
+          "path": "artifacts/basin-crash-21.1.233-prepared-server/mods/architectury-13.0.11-neoforge.jar",
+          "bytes": 584734,
+          "sha256": "9cc92f2c09533fc5482c60f993bd891c655a0e32b637037cdcb7c2b23adedeeb"
+        },
+        {
+          "path": "artifacts/basin-crash-21.1.233-prepared-server/mods/create.jar",
+          "bytes": 19138095,
+          "sha256": "5602a16796957cb5c7fb829c10c6b54bf9d228931c7680636710b6a60d92822e"
+        },
+        {
+          "path": "artifacts/basin-crash-21.1.233-prepared-server/mods/ftb-library-neoforge-2101.1.37.jar",
+          "bytes": 1439881,
+          "sha256": "624c2d2d1cbadb946d967e17757bd5b2d129d4d3ed71f2da0c70607d04476ac2"
+        },
+        {
+          "path": "artifacts/basin-crash-21.1.233-prepared-server/mods/ftb-quests-neoforge-2101.1.36.jar",
+          "bytes": 1609984,
+          "sha256": "6a39982c4b3afc00b1e788041a4f0d394e1659e3b3a6e5d078cd790bc36d0018"
+        },
+        {
+          "path": "artifacts/basin-crash-21.1.233-prepared-server/mods/ftb-teams-neoforge-2101.1.11.jar",
+          "bytes": 308236,
+          "sha256": "e6bcd670493624e6906df872a9c6af4a33fe6405cac57a32c59cd4cd5838c655"
+        },
+        {
+          "path": "artifacts/basin-crash-21.1.233-prepared-server/mods/kubejs-neoforge-2101.7.2-build.377.jar",
+          "bytes": 2294111,
+          "sha256": "df9a8458b1f83fed06ba54684977911795a5153a462b81a610895f5b1f2f0cbf"
+        },
+        {
+          "path": "artifacts/basin-crash-21.1.233-prepared-server/mods/rhino-2101.2.8-build.91.jar",
+          "bytes": 980936,
+          "sha256": "1d53d962aa4dac54bcbb4f998c1845980cf194318f1d6b1580ea6ac15cce5ef3"
+        }
+      ],
+      "scripts": [
+        {
+          "path": "artifacts/basin-crash-21.1.233-prepared-server/kubejs/server_scripts/citizens_basin_crash.js",
+          "bytes": 498,
+          "sha256": "1929adac77a5d403b583f1b54ceefd8f957e4d4ce5a19a6bf925854190d83571"
+        },
+        {
+          "path": "artifacts/basin-crash-21.1.233-prepared-server/kubejs/server_scripts/citizens_create_audit.js",
+          "bytes": 281,
+          "sha256": "07d53a2637f51d1a2e1b365a5e38daf3d89e62af7831fa9e9df56c85c1501e54"
+        }
+      ],
+      "auditBinary": {
+        "path": "artifacts/basin-crash-21.1.233-build/classes/java/dialogue/net/yuuniverse/interactions/BasinCrashRuntimeAudit.class",
+        "bytes": 34765,
+        "sha256": "de27b44a5faf62d50cb5d86a4626bd93ddd207c36446d8be19db9ea334597bd3"
+      }
+    },
+    {
+      "target": "21.1.233",
+      "stage": "confirmed",
+      "boundaryChecks": 3,
+      "recoveryChecks": 11,
+      "state": {
+        "actor": "d1802c15-9ff9-4963-972c-7d496723f848",
+        "team": "d1802c15-9ff9-4963-972c-7d496723f848",
+        "task": "54C9813167E8D70B",
+        "stage": "confirmed",
+        "maximum": 1,
+        "revision": "08f64f7c3ff1a8f6dd06ae3f37ab27f47b71d504f2dc85386f3bb1bbf6cf52c1",
+        "machine": "63deec0b-e1c2-4d47-859d-a6c4e14cc8b3",
+        "evidenceDirectory": "basin-crash-evidence-685098907580766683",
+        "savedStorage": {
+          "items": [
+            {
+              "id": "minecraft:snowball",
+              "count": 5
+            },
+            {
+              "id": "minecraft:flint",
+              "count": 2
+            },
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {}
+          ],
+          "fluids": [
+            {},
+            {},
+            {
+              "id": "minecraft:water",
+              "amount": 750
+            },
+            {}
+          ]
+        },
+        "entry": "1a20da99d377db022cb6583d627b811c397808547cee21c94f06ea0391b64cd4",
+        "entries": 1,
+        "run": "ef5b280ee19d4e97bf921491faeee513",
+        "evidence": {
+          "id": "fd9f75d4-2baa-4738-93fc-c7e17435900b",
+          "source": "CREATE_MIXER",
+          "attribution": {
+            "machineId": "63deec0b-e1c2-4d47-859d-a6c4e14cc8b3",
+            "beneficiaryId": "d1802c15-9ff9-4963-972c-7d496723f848",
+            "operatorId": "d1802c15-9ff9-4963-972c-7d496723f848",
+            "assignedAt": 1792684939336
+          },
+          "dimension": "minecraft:overworld",
+          "x": 4,
+          "y": -58,
+          "z": 10,
+          "serverTick": 1,
+          "recipeId": "citizens_audit:basin_crash",
+          "recipeRevision": "08f64f7c3ff1a8f6dd06ae3f37ab27f47b71d504f2dc85386f3bb1bbf6cf52c1",
+          "basin": {
+            "x": 4,
+            "y": -60,
+            "z": 10,
+            "consumedItems": [
+              {
+                "id": "minecraft:snowball",
+                "count": 2
+              },
+              {
+                "id": "minecraft:flint",
+                "count": 1
+              }
+            ],
+            "consumedFluids": [
+              {
+                "id": "minecraft:water",
+                "amount": 250
+              }
+            ],
+            "fluidOutputs": [
+              {
+                "id": "minecraft:lava",
+                "amount": 100
+              }
+            ],
+            "beforeFluids": [
+              {},
+              {},
+              {
+                "id": "minecraft:water",
+                "amount": 750
+              },
+              {}
+            ]
+          },
+          "recipeDefinition": {
+            "ingredients": [
+              {
+                "item": "minecraft:snowball"
+              },
+              {
+                "item": "minecraft:snowball"
+              },
+              {
+                "item": "minecraft:flint"
+              },
+              {
+                "amount": 250,
+                "fluid": "minecraft:water",
+                "type": "neoforge:single"
+              }
+            ],
+            "results": [
+              {
+                "components": {
+                  "minecraft:custom_name": "\"Basin crash output\""
+                },
+                "count": 2,
+                "id": "minecraft:paper"
+              },
+              {
+                "amount": 100,
+                "id": "minecraft:lava"
+              }
+            ],
+            "type": "create:mixing"
+          },
+          "processing": {
+            "process": "MIXING",
+            "recipeDuration": 0,
+            "heat": "none",
+            "heatTranslationKey": "recipe.heat_requirement.none",
+            "fluidInputs": [
+              {
+                "definition": {
+                  "amount": 250,
+                  "fluid": "minecraft:water"
+                },
+                "amount": 250,
+                "alternatives": [
+                  {
+                    "id": "minecraft:water",
+                    "amount": 250
+                  }
+                ]
+              }
+            ],
+            "itemResults": [
+              {
+                "stack": {
+                  "id": "minecraft:paper",
+                  "count": 2,
+                  "components": {
+                    "minecraft:custom_name": "\"Basin crash output\""
+                  }
+                },
+                "chancePerItem": 1.0
+              }
+            ],
+            "fluidResults": [
+              {
+                "id": "minecraft:lava",
+                "amount": 100
+              }
+            ],
+            "retainedItemSlots": []
+          },
+          "consumedInput": {
+            "id": "minecraft:snowball",
+            "count": 2
+          },
+          "remainingInput": {},
+          "nativeRemainder": {},
+          "beforeOutput": [
+            {
+              "id": "minecraft:snowball",
+              "count": 5
+            },
+            {
+              "id": "minecraft:flint",
+              "count": 2
+            },
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {}
+          ],
+          "rolledOutputs": [
+            {
+              "id": "minecraft:paper",
+              "count": 2,
+              "components": {
+                "minecraft:custom_name": "\"Basin crash output\""
+              }
+            }
+          ]
+        },
+        "liveStorage": {
+          "items": [
+            {
+              "id": "minecraft:snowball",
+              "count": 3
+            },
+            {
+              "id": "minecraft:flint",
+              "count": 1
+            },
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {
+              "id": "minecraft:paper",
+              "count": 2,
+              "components": {
+                "minecraft:custom_name": "\"Basin crash output\""
+              }
+            },
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {}
+          ],
+          "fluids": [
+            {
+              "id": "minecraft:lava",
+              "amount": 100
+            },
+            {},
+            {
+              "id": "minecraft:water",
+              "amount": 500
+            },
+            {}
+          ]
+        }
+      },
+      "logs": [
+        {
+          "path": "artifacts/basin-crash-21-1-233-confirmed-killed.log",
+          "bytes": 14916,
+          "sha256": "5354228d52b93d32f54e6b694f85b6b98cbfc825639e7d0da93104230cc7d5b4"
+        },
+        {
+          "path": "artifacts/basin-crash-21-1-233-confirmed-killed-stderr.log",
+          "bytes": 517,
+          "sha256": "175de178f8b14245bec35f713f1dcc504daf89a4abecd52023a91dc0cb25044f"
+        },
+        {
+          "path": "artifacts/basin-crash-21-1-233-confirmed-recovered.log",
+          "bytes": 20902,
+          "sha256": "ca8d5f3fce84035f7a43cfe1df1b7254cc7f745dc6ade68a17476783fb7ccc45"
+        }
+      ],
+      "termination": {
+        "path": "artifacts/basin-crash-21-1-233-confirmed-termination.json",
+        "bytes": 767,
+        "sha256": "43a9d007b76eb91100422a3fe1d7dfd28853cde9201eca625912c24f3abe041b"
+      },
+      "savedState": {
+        "path": "artifacts/basin-crash-21-1-233-confirmed-state.json",
+        "bytes": 2975,
+        "sha256": "5cce4d18dd31ac0a430afd352c1f6bb4e49dafde392645d46cb0171f8d404d4c"
+      },
+      "recovery": {
+        "path": "artifacts/basin-crash-21.1.233-confirmed-server/basin-crash-recovery.json",
+        "bytes": 6093,
+        "sha256": "892f4bcffcdcff72bdaeec51a9ca62c4ba87e0056c881faddaaa1dd8f0d1133d"
+      },
+      "journal": [
+        {
+          "path": "artifacts/basin-crash-21.1.233-confirmed-server/basin-crash-evidence-685098907580766683/bindings/54C9813167E8D70B.json",
+          "bytes": 350,
+          "sha256": "4de96dcd18cb384bac0fc815d7ba26d3628b85664c5d6c60c757fd2ac6780f2c"
+        },
+        {
+          "path": "artifacts/basin-crash-21.1.233-confirmed-server/basin-crash-evidence-685098907580766683/journal/entry-1a20da99d377db022cb6583d627b811c397808547cee21c94f06ea0391b64cd4-0.json",
+          "bytes": 2786,
+          "sha256": "bc6ca9eef46dfaa631efbed4772e7cd241f4e3bc7378b6080e281dfbaf676bf0"
+        },
+        {
+          "path": "artifacts/basin-crash-21.1.233-confirmed-server/basin-crash-evidence-685098907580766683/journal/entry-1a20da99d377db022cb6583d627b811c397808547cee21c94f06ea0391b64cd4-1.json",
+          "bytes": 2793,
+          "sha256": "d3e134ba0bbc60bc30f8ae05c6d3875083ca3f01d27e22d1543c87390376e197"
+        },
+        {
+          "path": "artifacts/basin-crash-21.1.233-confirmed-server/basin-crash-evidence-685098907580766683/journal/entry-1a20da99d377db022cb6583d627b811c397808547cee21c94f06ea0391b64cd4-2.json",
+          "bytes": 2791,
+          "sha256": "55fcba2a74a24bf352b95a7d40fe73d0bc3faac59a7eef8631d2db417bc1f979"
+        },
+        {
+          "path": "artifacts/basin-crash-21.1.233-confirmed-server/basin-crash-evidence-685098907580766683/journal/generation-3b4c5013-6292-4df7-a190-d9f92c82eced.json",
+          "bytes": 265,
+          "sha256": "fb6c2b82ea650504266be32b9459ec0928327c7dc7f2052abba98fbce052266a"
+        }
+      ],
+      "team": {
+        "path": "artifacts/basin-crash-21.1.233-confirmed-server/create-world/ftbquests/d1802c15-9ff9-4963-972c-7d496723f848.snbt",
+        "bytes": 622,
+        "sha256": "4175e5f0264a27225ee548774456f9b6081e3df78bf10f04b41e0f2d0a71baee"
+      },
+      "providers": [
+        {
+          "path": "artifacts/basin-crash-21.1.233-confirmed-server/mods/architectury-13.0.11-neoforge.jar",
+          "bytes": 584734,
+          "sha256": "9cc92f2c09533fc5482c60f993bd891c655a0e32b637037cdcb7c2b23adedeeb"
+        },
+        {
+          "path": "artifacts/basin-crash-21.1.233-confirmed-server/mods/create.jar",
+          "bytes": 19138095,
+          "sha256": "5602a16796957cb5c7fb829c10c6b54bf9d228931c7680636710b6a60d92822e"
+        },
+        {
+          "path": "artifacts/basin-crash-21.1.233-confirmed-server/mods/ftb-library-neoforge-2101.1.37.jar",
+          "bytes": 1439881,
+          "sha256": "624c2d2d1cbadb946d967e17757bd5b2d129d4d3ed71f2da0c70607d04476ac2"
+        },
+        {
+          "path": "artifacts/basin-crash-21.1.233-confirmed-server/mods/ftb-quests-neoforge-2101.1.36.jar",
+          "bytes": 1609984,
+          "sha256": "6a39982c4b3afc00b1e788041a4f0d394e1659e3b3a6e5d078cd790bc36d0018"
+        },
+        {
+          "path": "artifacts/basin-crash-21.1.233-confirmed-server/mods/ftb-teams-neoforge-2101.1.11.jar",
+          "bytes": 308236,
+          "sha256": "e6bcd670493624e6906df872a9c6af4a33fe6405cac57a32c59cd4cd5838c655"
+        },
+        {
+          "path": "artifacts/basin-crash-21.1.233-confirmed-server/mods/kubejs-neoforge-2101.7.2-build.377.jar",
+          "bytes": 2294111,
+          "sha256": "df9a8458b1f83fed06ba54684977911795a5153a462b81a610895f5b1f2f0cbf"
+        },
+        {
+          "path": "artifacts/basin-crash-21.1.233-confirmed-server/mods/rhino-2101.2.8-build.91.jar",
+          "bytes": 980936,
+          "sha256": "1d53d962aa4dac54bcbb4f998c1845980cf194318f1d6b1580ea6ac15cce5ef3"
+        }
+      ],
+      "scripts": [
+        {
+          "path": "artifacts/basin-crash-21.1.233-confirmed-server/kubejs/server_scripts/citizens_basin_crash.js",
+          "bytes": 498,
+          "sha256": "1929adac77a5d403b583f1b54ceefd8f957e4d4ce5a19a6bf925854190d83571"
+        },
+        {
+          "path": "artifacts/basin-crash-21.1.233-confirmed-server/kubejs/server_scripts/citizens_create_audit.js",
+          "bytes": 281,
+          "sha256": "07d53a2637f51d1a2e1b365a5e38daf3d89e62af7831fa9e9df56c85c1501e54"
+        }
+      ],
+      "auditBinary": {
+        "path": "artifacts/basin-crash-21.1.233-build/classes/java/dialogue/net/yuuniverse/interactions/BasinCrashRuntimeAudit.class",
+        "bytes": 34765,
+        "sha256": "de27b44a5faf62d50cb5d86a4626bd93ddd207c36446d8be19db9ea334597bd3"
+      }
+    },
+    {
+      "target": "21.1.233",
+      "stage": "applied",
+      "boundaryChecks": 4,
+      "recoveryChecks": 10,
+      "state": {
+        "actor": "7da80f78-560c-4e8b-a203-28e6258656be",
+        "team": "7da80f78-560c-4e8b-a203-28e6258656be",
+        "task": "5754C3F2F324FF85",
+        "stage": "applied",
+        "maximum": 1,
+        "revision": "08f64f7c3ff1a8f6dd06ae3f37ab27f47b71d504f2dc85386f3bb1bbf6cf52c1",
+        "machine": "cd7f213d-e6db-4fbd-92b5-d875cf51b81f",
+        "evidenceDirectory": "basin-crash-evidence-4345838055174441072",
+        "savedStorage": {
+          "items": [
+            {
+              "id": "minecraft:snowball",
+              "count": 5
+            },
+            {
+              "id": "minecraft:flint",
+              "count": 2
+            },
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {}
+          ],
+          "fluids": [
+            {},
+            {},
+            {
+              "id": "minecraft:water",
+              "amount": 750
+            },
+            {}
+          ]
+        },
+        "entry": "7ac9d4b917e57189c1de41602eb7f27720b96de520c33fb873cd8a9082009c9f",
+        "entries": 1,
+        "run": "7d693233bf224b28acb4a50b8045b5b2",
+        "evidence": {
+          "id": "70bd823c-6129-459d-8608-48cd09c21935",
+          "source": "CREATE_MIXER",
+          "attribution": {
+            "machineId": "cd7f213d-e6db-4fbd-92b5-d875cf51b81f",
+            "beneficiaryId": "7da80f78-560c-4e8b-a203-28e6258656be",
+            "operatorId": "7da80f78-560c-4e8b-a203-28e6258656be",
+            "assignedAt": 1792685044640
+          },
+          "dimension": "minecraft:overworld",
+          "x": 4,
+          "y": -58,
+          "z": 10,
+          "serverTick": 1,
+          "recipeId": "citizens_audit:basin_crash",
+          "recipeRevision": "08f64f7c3ff1a8f6dd06ae3f37ab27f47b71d504f2dc85386f3bb1bbf6cf52c1",
+          "basin": {
+            "x": 4,
+            "y": -60,
+            "z": 10,
+            "consumedItems": [
+              {
+                "id": "minecraft:snowball",
+                "count": 2
+              },
+              {
+                "id": "minecraft:flint",
+                "count": 1
+              }
+            ],
+            "fluidOutputs": [
+              {
+                "id": "minecraft:lava",
+                "amount": 100
+              }
+            ],
+            "beforeFluids": [
+              {},
+              {},
+              {
+                "id": "minecraft:water",
+                "amount": 750
+              },
+              {}
+            ],
+            "consumedFluids": [
+              {
+                "id": "minecraft:water",
+                "amount": 250
+              }
+            ]
+          },
+          "recipeDefinition": {
+            "ingredients": [
+              {
+                "item": "minecraft:snowball"
+              },
+              {
+                "item": "minecraft:snowball"
+              },
+              {
+                "item": "minecraft:flint"
+              },
+              {
+                "amount": 250,
+                "fluid": "minecraft:water",
+                "type": "neoforge:single"
+              }
+            ],
+            "results": [
+              {
+                "components": {
+                  "minecraft:custom_name": "\"Basin crash output\""
+                },
+                "count": 2,
+                "id": "minecraft:paper"
+              },
+              {
+                "amount": 100,
+                "id": "minecraft:lava"
+              }
+            ],
+            "type": "create:mixing"
+          },
+          "processing": {
+            "process": "MIXING",
+            "recipeDuration": 0,
+            "heat": "none",
+            "heatTranslationKey": "recipe.heat_requirement.none",
+            "fluidInputs": [
+              {
+                "definition": {
+                  "amount": 250,
+                  "fluid": "minecraft:water"
+                },
+                "amount": 250,
+                "alternatives": [
+                  {
+                    "id": "minecraft:water",
+                    "amount": 250
+                  }
+                ]
+              }
+            ],
+            "itemResults": [
+              {
+                "stack": {
+                  "id": "minecraft:paper",
+                  "count": 2,
+                  "components": {
+                    "minecraft:custom_name": "\"Basin crash output\""
+                  }
+                },
+                "chancePerItem": 1.0
+              }
+            ],
+            "fluidResults": [
+              {
+                "id": "minecraft:lava",
+                "amount": 100
+              }
+            ],
+            "retainedItemSlots": []
+          },
+          "consumedInput": {
+            "id": "minecraft:snowball",
+            "count": 2
+          },
+          "remainingInput": {},
+          "nativeRemainder": {},
+          "beforeOutput": [
+            {
+              "id": "minecraft:snowball",
+              "count": 5
+            },
+            {
+              "id": "minecraft:flint",
+              "count": 2
+            },
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {}
+          ],
+          "rolledOutputs": [
+            {
+              "id": "minecraft:paper",
+              "count": 2,
+              "components": {
+                "minecraft:custom_name": "\"Basin crash output\""
+              }
+            }
+          ]
+        },
+        "liveStorage": {
+          "items": [
+            {
+              "id": "minecraft:snowball",
+              "count": 3
+            },
+            {
+              "id": "minecraft:flint",
+              "count": 1
+            },
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {
+              "id": "minecraft:paper",
+              "count": 2,
+              "components": {
+                "minecraft:custom_name": "\"Basin crash output\""
+              }
+            },
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {}
+          ],
+          "fluids": [
+            {
+              "id": "minecraft:lava",
+              "amount": 100
+            },
+            {},
+            {
+              "id": "minecraft:water",
+              "amount": 500
+            },
+            {}
+          ]
+        }
+      },
+      "logs": [
+        {
+          "path": "artifacts/basin-crash-21-1-233-applied-killed.log",
+          "bytes": 18382,
+          "sha256": "a67baffd51f55d0a2d405cf4d1f09d7da9da09c260f9c8035246abe280b7f6c8"
+        },
+        {
+          "path": "artifacts/basin-crash-21-1-233-applied-killed-stderr.log",
+          "bytes": 517,
+          "sha256": "0bae5da620002160615b84cb60e58fe3dabcff17e6ed38d4b6d1b0c4187a3300"
+        },
+        {
+          "path": "artifacts/basin-crash-21-1-233-applied-recovered.log",
+          "bytes": 28331,
+          "sha256": "11d46cd57f2f6ebeb58130e5abd07f596f5b6aafde0b1827a3e8c5bda3830dc3"
+        }
+      ],
+      "termination": {
+        "path": "artifacts/basin-crash-21-1-233-applied-termination.json",
+        "bytes": 763,
+        "sha256": "0c07b2acf0f9cbd3a7d4fb081680c0af524422997f3b9a00c251435ab6a5d4a9"
+      },
+      "savedState": {
+        "path": "artifacts/basin-crash-21-1-233-applied-state.json",
+        "bytes": 2974,
+        "sha256": "e2e2342e7aca9018511bc06fb1ac5301cfe4a8d8cfce24b1955d2848bf251899"
+      },
+      "recovery": {
+        "path": "artifacts/basin-crash-21.1.233-applied-server/basin-crash-recovery.json",
+        "bytes": 6092,
+        "sha256": "a2a97abf7752dc18b642c6d2b3cfba13cd20ed8be2ab910b4b3bcb968d4378a2"
+      },
+      "journal": [
+        {
+          "path": "artifacts/basin-crash-21.1.233-applied-server/basin-crash-evidence-4345838055174441072/bindings/5754C3F2F324FF85.json",
+          "bytes": 350,
+          "sha256": "980be026fcadf8e46ccb554dab210eee2686d48baa042d2fbfdabad97cf6cece"
+        },
+        {
+          "path": "artifacts/basin-crash-21.1.233-applied-server/basin-crash-evidence-4345838055174441072/journal/entry-7ac9d4b917e57189c1de41602eb7f27720b96de520c33fb873cd8a9082009c9f-0.json",
+          "bytes": 2786,
+          "sha256": "db7ecdc86e307f1a52df5b1179f5530a559e4929b0de9f39b122ba555b224011"
+        },
+        {
+          "path": "artifacts/basin-crash-21.1.233-applied-server/basin-crash-evidence-4345838055174441072/journal/entry-7ac9d4b917e57189c1de41602eb7f27720b96de520c33fb873cd8a9082009c9f-1.json",
+          "bytes": 2793,
+          "sha256": "59be90d88818153365f366597dc92111e5486781462960cc3d5d8423b08b1288"
+        },
+        {
+          "path": "artifacts/basin-crash-21.1.233-applied-server/basin-crash-evidence-4345838055174441072/journal/entry-7ac9d4b917e57189c1de41602eb7f27720b96de520c33fb873cd8a9082009c9f-2.json",
+          "bytes": 2791,
+          "sha256": "e07fc97b0f5e0687b773a65604545d181534ef92fe0c4ac320df7cf98f2cbdb1"
+        },
+        {
+          "path": "artifacts/basin-crash-21.1.233-applied-server/basin-crash-evidence-4345838055174441072/journal/generation-8cb21c27-df12-4589-bd9a-10107c84b7b8.json",
+          "bytes": 265,
+          "sha256": "40be8ff805b30e50d771f36de708f0947d9cd947d5bf785428e6fb5ef15c4bb4"
+        }
+      ],
+      "team": {
+        "path": "artifacts/basin-crash-21.1.233-applied-server/create-world/ftbquests/7da80f78-560c-4e8b-a203-28e6258656be.snbt",
+        "bytes": 268,
+        "sha256": "65900f08509f0b00e0102d3e7ee92730cc6665a311560e68732b637de48f8312"
+      },
+      "providers": [
+        {
+          "path": "artifacts/basin-crash-21.1.233-applied-server/mods/architectury-13.0.11-neoforge.jar",
+          "bytes": 584734,
+          "sha256": "9cc92f2c09533fc5482c60f993bd891c655a0e32b637037cdcb7c2b23adedeeb"
+        },
+        {
+          "path": "artifacts/basin-crash-21.1.233-applied-server/mods/create.jar",
+          "bytes": 19138095,
+          "sha256": "5602a16796957cb5c7fb829c10c6b54bf9d228931c7680636710b6a60d92822e"
+        },
+        {
+          "path": "artifacts/basin-crash-21.1.233-applied-server/mods/ftb-library-neoforge-2101.1.37.jar",
+          "bytes": 1439881,
+          "sha256": "624c2d2d1cbadb946d967e17757bd5b2d129d4d3ed71f2da0c70607d04476ac2"
+        },
+        {
+          "path": "artifacts/basin-crash-21.1.233-applied-server/mods/ftb-quests-neoforge-2101.1.36.jar",
+          "bytes": 1609984,
+          "sha256": "6a39982c4b3afc00b1e788041a4f0d394e1659e3b3a6e5d078cd790bc36d0018"
+        },
+        {
+          "path": "artifacts/basin-crash-21.1.233-applied-server/mods/ftb-teams-neoforge-2101.1.11.jar",
+          "bytes": 308236,
+          "sha256": "e6bcd670493624e6906df872a9c6af4a33fe6405cac57a32c59cd4cd5838c655"
+        },
+        {
+          "path": "artifacts/basin-crash-21.1.233-applied-server/mods/kubejs-neoforge-2101.7.2-build.377.jar",
+          "bytes": 2294111,
+          "sha256": "df9a8458b1f83fed06ba54684977911795a5153a462b81a610895f5b1f2f0cbf"
+        },
+        {
+          "path": "artifacts/basin-crash-21.1.233-applied-server/mods/rhino-2101.2.8-build.91.jar",
+          "bytes": 980936,
+          "sha256": "1d53d962aa4dac54bcbb4f998c1845980cf194318f1d6b1580ea6ac15cce5ef3"
+        }
+      ],
+      "scripts": [
+        {
+          "path": "artifacts/basin-crash-21.1.233-applied-server/kubejs/server_scripts/citizens_basin_crash.js",
+          "bytes": 498,
+          "sha256": "1929adac77a5d403b583f1b54ceefd8f957e4d4ce5a19a6bf925854190d83571"
+        },
+        {
+          "path": "artifacts/basin-crash-21.1.233-applied-server/kubejs/server_scripts/citizens_create_audit.js",
+          "bytes": 281,
+          "sha256": "07d53a2637f51d1a2e1b365a5e38daf3d89e62af7831fa9e9df56c85c1501e54"
+        }
+      ],
+      "auditBinary": {
+        "path": "artifacts/basin-crash-21.1.233-build/classes/java/dialogue/net/yuuniverse/interactions/BasinCrashRuntimeAudit.class",
+        "bytes": 34765,
+        "sha256": "de27b44a5faf62d50cb5d86a4626bd93ddd207c36446d8be19db9ea334597bd3"
+      }
+    }
+  ],
+  "actualJvmKills": 6,
+  "boundaryChecks": 18,
+  "recoveryChecks": 64,
+  "regression": {
+    "checks": 263,
+    "counts": {
+      "CREATEBATCHAUDIT": 23,
+      "CREATEPRESSAUDIT": 16,
+      "CREATETRANSPORTAUDIT": 21,
+      "CREATEBASINAUDIT": 23,
+      "CREATEFLUIDAUDIT": 28,
+      "CREATEDEPLOYERAUDIT": 26,
+      "CREATEFANAUDIT": 31,
+      "CREATEASSEMBLYAUDIT": 41,
+      "CREATEAUDIT": 54
+    },
+    "log": {
+      "path": "artifacts/basin-recovery-regression.log",
+      "bytes": 77452,
+      "sha256": "d9d13f97bf367cd003788cce6a3f54bf628e046b46e86e50ee436c0727537c0e"
+    }
+  },
+  "reusedOrdinaryEvidence": "docs/craft-binding-validation-2026-10-22.json",
+  "reusedOrdinaryTestsPerTarget": 825,
+  "reusedInteractionsTests": 100,
+  "productionSourcesUnchanged": true,
+  "packages": [
+    {
+      "path": "artifacts/craft-binding-ordinary-21.1.248-build/libs/citizens-2.0.43-neoforge-SNAPSHOT.jar",
+      "bytes": 4091667,
+      "sha256": "02437eda296f5b84055b1c11f87553cd297649ca6362a3eb53a385517a2f6f6f",
+      "matchingProductionClasses": 1020
+    },
+    {
+      "path": "artifacts/craft-binding-ordinary-21.1.248-build/libs/yuuniverse-interactions-2.0.43-neoforge-SNAPSHOT.jar",
+      "bytes": 204146,
+      "sha256": "77021e0135062bec5e78117e65845ce6c5b59022a8e59d6f3a9ca3305aedf635",
+      "matchingProductionClasses": 74
+    },
+    {
+      "path": "artifacts/craft-binding-ordinary-21.1.233-build/libs/citizens-2.0.43-neoforge-SNAPSHOT.jar",
+      "bytes": 4091667,
+      "sha256": "99e36a028499684d3fab2ebd24a1e59126e64c6f79981cf233346af01eb4425e",
+      "matchingProductionClasses": 1020
+    },
+    {
+      "path": "artifacts/craft-binding-ordinary-21.1.233-build/libs/yuuniverse-interactions-2.0.43-neoforge-SNAPSHOT.jar",
+      "bytes": 204146,
+      "sha256": "c788b0ea64f1db8cd4931e7fca11bc76cd94f5a32dbc036a7f287921a5893a52",
+      "matchingProductionClasses": 74
+    }
+  ],
+  "sources": [
+    {
+      "path": "tools/create-runtime-audit/net/yuuniverse/interactions/BasinCrashRuntimeAudit.java",
+      "bytes": 18691,
+      "sha256": "413a45a691e63b4f842415f22bf0f9431a2f963516b9a05a58793e7d5ab08103"
+    },
+    {
+      "path": "tools/create-runtime-audit/net/yuuniverse/interactions/CreateRuntimeAudit.java",
+      "bytes": 28375,
+      "sha256": "5127f9b93d9c3fdd8fc7bc51b4aedd4751b27bafb7542cf5a15ce6878fe1177d"
+    },
+    {
+      "path": "tools/prepare-create-audit.ps1",
+      "bytes": 5331,
+      "sha256": "69aa6ff6ad93a1e5e889b6c3981931e05edc7472299b3056a97e76cc04d72aad"
+    },
+    {
+      "path": "tools/run-machine-crash-audit.ps1",
+      "bytes": 6684,
+      "sha256": "323c82dd08234107e9ce6d0250b2121a228a1e1cf8811ea582ad3c76a599db5f"
+    },
+    {
+      "path": "tools/create-runtime-audit.gradle",
+      "bytes": 2342,
+      "sha256": "52b44bd53f61b2b7692dfc2692d8cbfed12eef2babadf11f146d997e0c0bbb8b"
+    },
+    {
+      "path": "tools/record-basin-crash-validation.py",
+      "bytes": 12706,
+      "sha256": "9caae99bc9bd81236be4abc9f2aa561fc183e778c0c689d585ea9dc3574724ab"
+    },
+    {
+      "path": "artifacts/run-basin-crash-matrix.ps1",
+      "bytes": 1051,
+      "sha256": "a28f71b5047136bf743c3ce1771220107b6962c927b7c0abd2c3603f00bac353"
+    },
+    {
+      "path": "artifacts/run-basin-regression.ps1",
+      "bytes": 1534,
+      "sha256": "583de0e1e7c20f81d412b1af09876a0113f76fd006d126b9592d26cf335fa511"
+    },
+    {
+      "path": "artifacts/check-basin-crash-stopped.ps1",
+      "bytes": 1341,
+      "sha256": "8d71d0166e572309f7548e37ebe17eef3187dd8c17873a85af23b00316a9053d"
+    }
+  ],
+  "stopped": {
+    "exclusiveStoppedWorldAndJournalOwnership": true,
+    "fixtures": [
+      "artifacts/basin-crash-21.1.248-prepared-server",
+      "artifacts/basin-crash-21.1.248-confirmed-server",
+      "artifacts/basin-crash-21.1.248-applied-server",
+      "artifacts/basin-crash-21.1.233-prepared-server",
+      "artifacts/basin-crash-21.1.233-confirmed-server",
+      "artifacts/basin-crash-21.1.233-applied-server",
+      "artifacts/basin-recovery-regression-server"
+    ],
+    "createdAt": "2026-10-23T00:06:38.2228214+08:00",
+    "timezone": "UTC+08:00",
+    "journals": [
+      "artifacts/basin-crash-21.1.248-prepared-server/basin-crash-evidence-4886233044470923690/journal/.journal.lock",
+      "artifacts/basin-crash-21.1.248-prepared-server/create-world/citizens/commerce-tasks/.journal.lock",
+      "artifacts/basin-crash-21.1.248-prepared-server/create-world/citizens/quest-deliveries/.journal.lock",
+      "artifacts/basin-crash-21.1.248-prepared-server/create-world/citizens/quest-evidence/journal/.journal.lock",
+      "artifacts/basin-crash-21.1.248-prepared-server/create-world/citizens/quest-rewards/.journal.lock",
+      "artifacts/basin-crash-21.1.248-confirmed-server/basin-crash-evidence-11574217515055686533/journal/.journal.lock",
+      "artifacts/basin-crash-21.1.248-confirmed-server/create-world/citizens/commerce-tasks/.journal.lock",
+      "artifacts/basin-crash-21.1.248-confirmed-server/create-world/citizens/quest-deliveries/.journal.lock",
+      "artifacts/basin-crash-21.1.248-confirmed-server/create-world/citizens/quest-evidence/journal/.journal.lock",
+      "artifacts/basin-crash-21.1.248-confirmed-server/create-world/citizens/quest-rewards/.journal.lock",
+      "artifacts/basin-crash-21.1.248-applied-server/basin-crash-evidence-6323536936885741829/journal/.journal.lock",
+      "artifacts/basin-crash-21.1.248-applied-server/create-world/citizens/commerce-tasks/.journal.lock",
+      "artifacts/basin-crash-21.1.248-applied-server/create-world/citizens/quest-deliveries/.journal.lock",
+      "artifacts/basin-crash-21.1.248-applied-server/create-world/citizens/quest-evidence/journal/.journal.lock",
+      "artifacts/basin-crash-21.1.248-applied-server/create-world/citizens/quest-rewards/.journal.lock",
+      "artifacts/basin-crash-21.1.233-prepared-server/basin-crash-evidence-1278810306660105279/journal/.journal.lock",
+      "artifacts/basin-crash-21.1.233-prepared-server/create-world/citizens/commerce-tasks/.journal.lock",
+      "artifacts/basin-crash-21.1.233-prepared-server/create-world/citizens/quest-deliveries/.journal.lock",
+      "artifacts/basin-crash-21.1.233-prepared-server/create-world/citizens/quest-evidence/journal/.journal.lock",
+      "artifacts/basin-crash-21.1.233-prepared-server/create-world/citizens/quest-rewards/.journal.lock",
+      "artifacts/basin-crash-21.1.233-confirmed-server/basin-crash-evidence-685098907580766683/journal/.journal.lock",
+      "artifacts/basin-crash-21.1.233-confirmed-server/create-world/citizens/commerce-tasks/.journal.lock",
+      "artifacts/basin-crash-21.1.233-confirmed-server/create-world/citizens/quest-deliveries/.journal.lock",
+      "artifacts/basin-crash-21.1.233-confirmed-server/create-world/citizens/quest-evidence/journal/.journal.lock",
+      "artifacts/basin-crash-21.1.233-confirmed-server/create-world/citizens/quest-rewards/.journal.lock",
+      "artifacts/basin-crash-21.1.233-applied-server/basin-crash-evidence-4345838055174441072/journal/.journal.lock",
+      "artifacts/basin-crash-21.1.233-applied-server/create-world/citizens/commerce-tasks/.journal.lock",
+      "artifacts/basin-crash-21.1.233-applied-server/create-world/citizens/quest-deliveries/.journal.lock",
+      "artifacts/basin-crash-21.1.233-applied-server/create-world/citizens/quest-evidence/journal/.journal.lock",
+      "artifacts/basin-crash-21.1.233-applied-server/create-world/citizens/quest-rewards/.journal.lock",
+      "artifacts/basin-recovery-regression-server/assembly-evidence-4424881926613926847/journal/.journal.lock",
+      "artifacts/basin-recovery-regression-server/basin-evidence-11619909099325735084/journal/.journal.lock",
+      "artifacts/basin-recovery-regression-server/batch-evidence-7062177460712275039/journal/.journal.lock",
+      "artifacts/basin-recovery-regression-server/create-world/citizens/commerce-tasks/.journal.lock",
+      "artifacts/basin-recovery-regression-server/create-world/citizens/quest-deliveries/.journal.lock",
+      "artifacts/basin-recovery-regression-server/create-world/citizens/quest-evidence/journal/.journal.lock",
+      "artifacts/basin-recovery-regression-server/create-world/citizens/quest-rewards/.journal.lock",
+      "artifacts/basin-recovery-regression-server/deployer-evidence-9007849076545275573/journal/.journal.lock",
+      "artifacts/basin-recovery-regression-server/fan-evidence-16173072303208521936/journal/.journal.lock",
+      "artifacts/basin-recovery-regression-server/fluid-evidence-4493108891892860998/journal/.journal.lock",
+      "artifacts/basin-recovery-regression-server/machine-evidence-9711732109495839070/journal/.journal.lock",
+      "artifacts/basin-recovery-regression-server/press-evidence-1177817326374136735/journal/.journal.lock",
+      "artifacts/basin-recovery-regression-server/transport-evidence-16621556371854747815/journal/.journal.lock"
+    ]
+  },
+  "stoppedEvidence": {
+    "path": "artifacts/basin-crash-stopped-2026-10-23.json",
+    "bytes": 5272,
+    "sha256": "b828e74c68b6b00c7e67f5e1962afe07105efb75da50aa7edb67e7b7d431d6c0"
+  },
+  "runnerGuards": {
+    "result": {
+      "createdAt": "2026-10-22T23:59:35.3602597+08:00",
+      "noRejectedPathCreated": true,
+      "cases": [
+        {
+          "case": "preparation_outside_artifacts",
+          "message": "Create fixture must be inside task artifacts",
+          "rejected": true
+        },
+        {
+          "case": "build_outside_artifacts",
+          "message": "Machine audit paths must be inside task artifacts",
+          "rejected": true
+        },
+        {
+          "case": "cache_inside_cleanable_output",
+          "message": "Project cache must remain outside the cleanable build directory",
+          "rejected": true
+        }
+      ]
+    },
+    "evidence": {
+      "path": "artifacts/basin-crash-runner-guards.json",
+      "bytes": 588,
+      "sha256": "8d4f0df4026f5a8a5eed1a8b9ef2fdf51c962b90c34cfc8b06c1c40f04bbd97b"
+    }
+  },
+  "limits": [
+    "Independent native world/FTB/evidence saves are not atomic",
+    "Other machine and storage-interior boundaries remain",
+    "No original migration, financial or physical-client completion",
+    "No production activation"
+  ]
+}

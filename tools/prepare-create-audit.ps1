@@ -1,10 +1,17 @@
 param(
     [Parameter(Mandatory = $true)][string]$CreateJar,
     [string]$ProviderDirectory = (Join-Path (Split-Path $PSScriptRoot -Parent) 'artifacts/selected-integrations-2026-10-12'),
-    [ValidateSet('depot','belt','deployer','spout')][string]$AssemblyCrashMachine
+    [ValidateSet('depot','belt','deployer','spout')][string]$AssemblyCrashMachine,
+    [switch]$BasinCrash,
+    [string]$Fixture
 )
 $ErrorActionPreference = 'Stop'
-$fixture = Join-Path (Split-Path $PSScriptRoot -Parent) 'artifacts/create-audit-server'
+$taskRoot = Split-Path $PSScriptRoot -Parent
+if ($AssemblyCrashMachine -and $BasinCrash) { throw 'Select one native machine family' }
+if (!$Fixture) { $Fixture = Join-Path $taskRoot 'artifacts/create-audit-server' }
+$fixture = [IO.Path]::GetFullPath($Fixture)
+$artifactRoot = [IO.Path]::GetFullPath((Join-Path $taskRoot 'artifacts')) + [IO.Path]::DirectorySeparatorChar
+if (!$fixture.StartsWith($artifactRoot,[StringComparison]::OrdinalIgnoreCase)) { throw 'Create fixture must be inside task artifacts' }
 New-Item -ItemType Directory -Force (Join-Path $fixture 'mods'), (Join-Path $fixture 'compile-libs'),
     (Join-Path $fixture 'kubejs/server_scripts') | Out-Null
 $provider = Get-Item -LiteralPath $CreateJar
@@ -47,4 +54,16 @@ if ($AssemblyCrashMachine) {
     $json = $recipe | ConvertTo-Json -Depth 10 -Compress
     "ServerEvents.recipes(event => { event.custom($json).id('citizens_audit:assembly_crash') })" | Set-Content -LiteralPath $assemblyScript -Encoding utf8
 } elseif (Test-Path -LiteralPath $assemblyScript) { Remove-Item -LiteralPath $assemblyScript }
+$basinScript = Join-Path $fixture 'kubejs/server_scripts/citizens_basin_crash.js'
+if ($BasinCrash) {
+@'
+ServerEvents.recipes(event => {
+    event.custom({ type: 'create:mixing', ingredients: [
+        { item: 'minecraft:snowball' }, { item: 'minecraft:snowball' }, { item: 'minecraft:flint' },
+        { type: 'neoforge:single', fluid: 'minecraft:water', amount: 250 }],
+        results: [{ id: 'minecraft:paper', count: 2, components: { 'minecraft:custom_name': '"Basin crash output"' } },
+            { id: 'minecraft:lava', amount: 100 }], processingTime: 20 }).id('citizens_audit:basin_crash')
+})
+'@ | Set-Content -LiteralPath $basinScript -Encoding utf8
+} elseif (Test-Path -LiteralPath $basinScript) { Remove-Item -LiteralPath $basinScript }
 Write-Output "Prepared $fixture"

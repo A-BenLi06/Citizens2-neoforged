@@ -3,17 +3,36 @@ param(
     [ValidateSet('prepared','confirmed','applied')][string]$Stage = 'prepared',
     [ValidateSet('21.1.233','21.1.248')][string]$NeoVersion = '21.1.248',
     [ValidateSet('depot','belt','deployer','spout')][string]$AssemblyMachine,
-    [ValidatePattern('^[a-zA-Z0-9_-]+$')][string]$LogPrefix
+    [ValidateSet('basin')][string]$ProcessingMachine,
+    [ValidatePattern('^[a-zA-Z0-9_-]+$')][string]$LogPrefix,
+    [string]$Fixture,
+    [string]$BuildDirectory,
+    [string]$ProjectCacheDirectory
 )
 $ErrorActionPreference = 'Stop'
 $taskRoot = Split-Path $PSScriptRoot -Parent
+if ($AssemblyMachine -and $ProcessingMachine) { throw 'Select one native machine family' }
+if (!$Fixture) { $Fixture = Join-Path $taskRoot 'artifacts/create-audit-server' }
+if (!$BuildDirectory) { $BuildDirectory = Join-Path $taskRoot 'artifacts/machine-crash-build' }
+if (!$ProjectCacheDirectory) { $ProjectCacheDirectory = Join-Path $taskRoot 'artifacts/machine-crash-gradle-cache' }
+$artifactRoot = [IO.Path]::GetFullPath((Join-Path $taskRoot 'artifacts')) + [IO.Path]::DirectorySeparatorChar
+foreach ($candidate in @($Fixture,$BuildDirectory,$ProjectCacheDirectory)) {
+    if (![IO.Path]::GetFullPath($candidate).StartsWith($artifactRoot,[StringComparison]::OrdinalIgnoreCase)) { throw 'Machine audit paths must be inside task artifacts' }
+}
+$Fixture = [IO.Path]::GetFullPath($Fixture)
+$buildDirectory = [IO.Path]::GetFullPath($BuildDirectory)
+$ProjectCacheDirectory = [IO.Path]::GetFullPath($ProjectCacheDirectory)
+if ($buildDirectory -eq $ProjectCacheDirectory -or $ProjectCacheDirectory.StartsWith($buildDirectory + [IO.Path]::DirectorySeparatorChar,[StringComparison]::OrdinalIgnoreCase)) {
+    throw 'Project cache must remain outside the cleanable build directory'
+}
+if ((Get-Content -LiteralPath (Join-Path $Fixture 'create-audit-fixture.txt') -Raw).Trim() -ne 'citizens-create-audit') { throw 'Unexpected fixture marker' }
+$auditType = if ($AssemblyMachine) { $AssemblyMachine } else { $ProcessingMachine }
 $env:JAVA_HOME = $JavaHome
 $runId = [Guid]::NewGuid().ToString('N')
-if (!$LogPrefix) { $LogPrefix = if ($AssemblyMachine) { "assembly-crash-$AssemblyMachine-$Stage-$NeoVersion" } else { "machine-crash-$Stage" } }
-$stateName = if ($AssemblyMachine) { 'assembly-crash-state.json' } else { 'machine-crash-state.json' }
-$buildDirectory = Join-Path $taskRoot 'artifacts/machine-crash-build'
-$gradleArguments = @('--project-cache-dir','../artifacts/machine-crash-gradle-cache','-I','../tools/create-runtime-audit.gradle',"-Pneo_version=$NeoVersion",'-PmachineAuditBuildDir=../artifacts/machine-crash-build',"-PmachineAuditRun=$runId")
-if ($AssemblyMachine) { $gradleArguments += "-PmachineAuditType=$AssemblyMachine" }
+if (!$LogPrefix) { $LogPrefix = if ($AssemblyMachine) { "assembly-crash-$AssemblyMachine-$Stage-$NeoVersion" } elseif ($ProcessingMachine) { "processing-crash-$ProcessingMachine-$Stage-$NeoVersion" } else { "machine-crash-$Stage" } }
+$stateName = if ($AssemblyMachine) { 'assembly-crash-state.json' } elseif ($ProcessingMachine) { 'basin-crash-state.json' } else { 'machine-crash-state.json' }
+$gradleArguments = @('--project-cache-dir',$ProjectCacheDirectory,'-I','../tools/create-runtime-audit.gradle',"-Pneo_version=$NeoVersion","-PmachineAuditBuildDir=$buildDirectory","-PmachineAuditFixture=$Fixture","-PmachineAuditRun=$runId")
+if ($auditType) { $gradleArguments += "-PmachineAuditType=$auditType" }
 $commitArguments = $gradleArguments + @("-PmachineAuditPhase=commit:$Stage",'runServer','--console=plain')
 $escapedArguments = $commitArguments | ForEach-Object { "'" + $_.Replace("'","''") + "'" }
 $info = [Diagnostics.ProcessStartInfo]::new()
@@ -28,7 +47,7 @@ $process = [Diagnostics.Process]::Start($info)
 $stdout = $process.StandardOutput.ReadToEndAsync()
 $stderr = $process.StandardError.ReadToEndAsync()
 $started = [DateTime]::UtcNow
-$log = Join-Path $taskRoot 'artifacts/create-audit-server/logs/latest.log'
+$log = Join-Path $Fixture 'logs/latest.log'
 try {
     $deadline = $started.AddMinutes(3)
     $killed = $false
@@ -46,8 +65,8 @@ try {
                 if ($fixtureProcess.Name -ne 'java.exe' -or $commandLine -notlike "*$argumentFile*" -or
                     $fixtureProcess.CreationDate.ToUniversalTime() -lt $started) { throw 'Kill marker does not identify this fresh isolated audit JVM' }
                 Stop-Process -Id $fixtureProcessId -Force
-                Copy-Item -LiteralPath (Join-Path $taskRoot "artifacts/create-audit-server/$stateName") -Destination (Join-Path $taskRoot "artifacts/$LogPrefix-state.json")
-                [ordered]@{run=$runId;stage=$Stage;neoForge=$NeoVersion;machine=$AssemblyMachine;pid=$fixtureProcessId;
+                Copy-Item -LiteralPath (Join-Path $Fixture $stateName) -Destination (Join-Path $taskRoot "artifacts/$LogPrefix-state.json")
+                [ordered]@{run=$runId;stage=$Stage;neoForge=$NeoVersion;machine=$auditType;pid=$fixtureProcessId;fixture=$Fixture;projectCache=$ProjectCacheDirectory;
                     processCreatedAt=$fixtureProcess.CreationDate.ToString('o');killedAt=[DateTimeOffset]::Now.ToString('o');
                     verifiedArgumentFile=$argumentFile;entry=$marker.Groups[2].Value;forcedTermination=$true} |
                     ConvertTo-Json | Set-Content -LiteralPath (Join-Path $taskRoot "artifacts/$LogPrefix-termination.json") -Encoding utf8

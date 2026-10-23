@@ -10,6 +10,13 @@ This review covers repository structure, native implementation boundaries, upstr
 
 ## Repository and implementation boundaries
 
+Update 2026-10-23, UTC+08:00: [basin mixing recovery](create-basin-recovery-2026-10-23.md)
+passes six verified JVM kills at PREPARED/CONFIRMED/APPLIED on both targets.
+Eighteen boundary and 64 restart assertions retain exact multi-item/fluid storage,
+original admissions, review/reconciliation and older-native-save credit fences.
+Fresh full Create regression passes 263 checks; unchanged ordinary/Interactions
+evidence is explicitly reused. Wider machine/recovery/migration/client gates remain.
+
 Update 2026-10-22, UTC+08:00: [craft binding validation](craft-binding-validation-2026-10-22.md)
 rejects coerced/duplicate binding data and validates companions under exclusive
 journal ownership before recovery publication. Eleven reproduced damage cases

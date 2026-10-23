@@ -8,6 +8,12 @@ Citizens retains NPC behavior and its existing native extension contracts. Yuuni
 
 ## Selected artifacts and sides
 
+Progress 2026-10-23, UTC+08:00: [basin mixing recovery](create-basin-recovery-2026-10-23.md)
+adds six actual kills on both native targets, with 18 boundary/64 restart checks
+for combined item/fluid storage and retained quest-credit fences. Fresh Create
+regression passes 263; unchanged ordinary/Interactions evidence is explicitly
+reused. Other machine/recovery, original migration and deferred client gates remain.
+
 Progress 2026-10-22, UTC+08:00: [craft binding validation](craft-binding-validation-2026-10-22.md)
 preserves binding field types and rejects damaged/incomplete companions before
 restart recovery writes, while retaining exclusive journal ownership. Fresh

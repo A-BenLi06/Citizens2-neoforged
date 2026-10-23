@@ -1,5 +1,10 @@
 # Create basin mixing and compacting evidence
 
+Follow-up 2026-10-23, UTC+08:00: [multi-item/fluid mixing recovery](create-basin-recovery-2026-10-23.md)
+passes six actual PREPARED/CONFIRMED/APPLIED kills across both native targets,
+with exact saved storage, retained payload and quest-credit fences. Other basin
+processes and storage-interior kill points remain separate acceptance gates.
+
 Date: 2026-10-19, UTC+08:00. Advances CRAFT-03–05 and ADAPT-05; the full port
 and integrated migration remain unfinished.
 

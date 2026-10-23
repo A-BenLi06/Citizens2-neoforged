@@ -42,7 +42,8 @@ public final class CreateRuntimeAudit {
         if (assemblyCrashType != null && System.getenv("CITIZENS_MACHINE_AUDIT_PHASE") != null) {
             ran = true; level.getChunkAt(new BlockPos(10,-58,2));
             level.setChunkForced(0,0,true);
-            AssemblyCrashRuntimeAudit.run(server, System.getenv("CITIZENS_MACHINE_AUDIT_PHASE"), assemblyCrashType);
+            if (assemblyCrashType.equals("basin")) BasinCrashRuntimeAudit.run(server, System.getenv("CITIZENS_MACHINE_AUDIT_PHASE"));
+            else AssemblyCrashRuntimeAudit.run(server, System.getenv("CITIZENS_MACHINE_AUDIT_PHASE"), assemblyCrashType);
             return;
         }
         level.setChunkForced(0,0,true);

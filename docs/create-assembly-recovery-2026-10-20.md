@@ -1,5 +1,10 @@
 # Create final assembly process-kill recovery
 
+Follow-up 2026-10-23, UTC+08:00: [basin mixing recovery](create-basin-recovery-2026-10-23.md)
+adds six actual multi-item/fluid mixing kills on both targets, with 18 boundary
+and 64 restart assertions. Other basin processes and machine-specific paths
+retain their separate gates; this does not widen the assembly cases below.
+
 Recovery evidence: 2026-10-20; final review: 2026-10-22, UTC+08:00.
 Advances CRAFT-04/05 and ADAPT-05/11.
 The full port and integrated release gates remain open.
