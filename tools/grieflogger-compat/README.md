@@ -1,5 +1,13 @@
 # GriefLogger SQLite packaging compatibility
 
+Follow-up 2026-10-23, UTC+08:00: [reader-blocked COMMIT recovery](../../docs/logging-reader-recovery-2026-10-23.md)
+repairs permanent queue suspension after an external reader releases its lock.
+Apply `reader-commit-recovery.patch` after `queued-write-recovery.patch` to build
+`.3`. Its typed DEFERRED SQLite BUSY/known-rollback exception preserves uncertain
+outcome fences. Acceptance: 53 actual-bytecode SQLite assertions and 111 fresh
+native/restart assertions across reader, writer and normal logging/commerce runs.
+The provider and deferred client fixtures from earlier batches remain retained.
+
 Follow-up 2026-10-23, UTC+08:00: [queued write recovery](../../docs/grieflogger-write-recovery-2026-10-23.md)
 repairs a reproduced transient SQLite write loss in the packaged provider. Apply
 `queued-write-recovery.patch` after the packaging patch below to build

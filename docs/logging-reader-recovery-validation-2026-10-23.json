@@ -1,0 +1,1848 @@
+{
+  "createdAt": "2026-10-23T12:48:00.758761+08:00",
+  "timezone": "UTC+08:00",
+  "baseRevision": "b6b84b7",
+  "provider": {
+    "path": "artifacts/grieflogger-reader-lock-source/neoforge/build/libs/grieflogger-1.2.10-1.21.1-yuuniverse.3-neoforge.jar",
+    "bytes": 18923357,
+    "sha256": "c364b690c2df88b1503d089c3b177aad7c45dd228825e3bdea9654ff2f223c7f"
+  },
+  "providerCommit": "5c3ed69d4bddfdc3b2451f9a7d1ef7e7b8d3b19b",
+  "providerBase": "ca00b1ac2baa71fc4baab035420d2e5bd21f0bb1",
+  "providerSource": [
+    {
+      "path": "artifacts/grieflogger-reader-lock-source/common/build.gradle",
+      "bytes": 1157,
+      "sha256": "c7254b54a028064bf34ae3c718e2b8c8c8fbec0e880283c73fa7cf3458c5341b"
+    },
+    {
+      "path": "artifacts/grieflogger-reader-lock-source/common/src/main/java/com/daqem/grieflogger/database/Database.java",
+      "bytes": 8717,
+      "sha256": "c688ccc5527e8edda3310cef3869932fd59b757c226cc9e33c8ad4d241f89818"
+    },
+    {
+      "path": "artifacts/grieflogger-reader-lock-source/fabric/build.gradle",
+      "bytes": 2333,
+      "sha256": "17e01e10283d7b74a8b8a10f7573638daedf303f10290f6cb289cc881860f776"
+    },
+    {
+      "path": "artifacts/grieflogger-reader-lock-source/gradle.properties",
+      "bytes": 748,
+      "sha256": "3c14e4a2ff9da4ce7eda2758774a32770e1ee3c0b9edc3c36563aafa58356993"
+    },
+    {
+      "path": "artifacts/grieflogger-reader-lock-source/neoforge/build.gradle",
+      "bytes": 2476,
+      "sha256": "d8d602a65fd5d7d684add17be1d0fa73861a4c9a471cac56351770a1ac6330f9"
+    },
+    {
+      "path": "artifacts/grieflogger-reader-lock-source/walkthrough.md",
+      "bytes": 3899,
+      "sha256": "97ecdd2d6d34a64d211d9ee75adcca4b1a34cbc99da3bb64e18e8f38f1aebdf6"
+    }
+  ],
+  "buildLog": {
+    "path": "artifacts/grieflogger-reader-lock-provider-build.log",
+    "bytes": 3396,
+    "sha256": "46741d0b1388033bfba8937ec9f23d81725b67b4c853d6f71fb081e003dcd7e2"
+  },
+  "unchangedNestedDriverFiles": 163,
+  "standalone": {
+    "createdAt": "2026-10-23T12:39:42.4807485+08:00",
+    "timezone": "UTC+08:00",
+    "checks": 53,
+    "actualProviderBytecode": true,
+    "minecraftBootstrapOwnerSubstitutedForStandaloneLogger": true,
+    "files": [
+      {
+        "path": "C:\\Users\\ben_l\\Documents\\Coding\\citizens2-neoforged\\artifacts\\grieflogger-reader-lock-source\\neoforge\\build\\libs\\grieflogger-1.2.10-1.21.1-yuuniverse.3-neoforge.jar",
+        "bytes": 18923357,
+        "sha256": "c364b690c2df88b1503d089c3b177aad7c45dd228825e3bdea9654ff2f223c7f"
+      },
+      {
+        "path": "C:\\Users\\ben_l\\.gradle\\caches\\modules-2\\files-2.1\\org.slf4j\\slf4j-api\\2.0.9\\7cf2726fdcfbc8610f9a71fb3ed639871f315340\\slf4j-api-2.0.9.jar",
+        "bytes": 64579,
+        "sha256": "0818930dc8d7debb403204611691da58e49d42c50b6ffcfdce02dadb7c3c2b6c"
+      },
+      {
+        "path": "C:\\Users\\ben_l\\Documents\\Coding\\citizens2-neoforged\\artifacts\\grieflogger-reader-lock-final\\sqlite.jar",
+        "bytes": 14268566,
+        "sha256": "539f5642fce68e38a0b6304262e472ccf6a96fb2cd988f60a03daaed3275fda0"
+      },
+      {
+        "path": "C:\\Users\\ben_l\\Documents\\Coding\\citizens2-neoforged\\artifacts\\grieflogger-reader-lock-final\\tests.log",
+        "bytes": 7250,
+        "sha256": "d2e202246f7103ef42af32caa5c34d16b336eca92c08ce900a695aa18c4d856f"
+      },
+      {
+        "path": "C:\\Users\\ben_l\\Documents\\Coding\\citizens2-neoforged\\tools\\grieflogger-compat\\run-storage-tests.ps1",
+        "bytes": 3411,
+        "sha256": "db250ec08a8defa01b60c4245d39b604826ed75aef2dbd2f4e3d00e2832bd6c3"
+      },
+      {
+        "path": "C:\\Users\\ben_l\\Documents\\Coding\\citizens2-neoforged\\tools\\grieflogger-compat\\storage-tests\\StorageRecoveryTest.java",
+        "bytes": 19023,
+        "sha256": "d06c705884a7dc92745f34f114fd164a47e93bd93b173414622928d3399e5ad6"
+      },
+      {
+        "path": "C:\\Users\\ben_l\\Documents\\Coding\\citizens2-neoforged\\tools\\grieflogger-compat\\storage-tests\\com\\daqem\\grieflogger\\GriefLogger.java",
+        "bytes": 1071,
+        "sha256": "1ba77f2b8051b6bd0869e5176650c8aa5d02cb1759566bdf3688c6b1540826fa"
+      }
+    ]
+  },
+  "baseline": {
+    "standaloneLog": {
+      "path": "artifacts/grieflogger-reader-lock-baseline/tests.log",
+      "bytes": 4819,
+      "sha256": "fc9dffa83b0bbb0a643162aef45b707431fa0fa48a499868a0f973d1578795e3"
+    },
+    "nativeLog": {
+      "path": "artifacts/logging-reader-before.log",
+      "bytes": 22063,
+      "sha256": "3d7e8aff2a0363ddfd43f8cb48b2a3bdc8517717adb3bef3776dcf40b162b46f"
+    },
+    "sources": [
+      {
+        "path": "artifacts/grieflogger-reader-lock-references/lang_transaction.html",
+        "bytes": 27068,
+        "sha256": "b65dc308fd9e0ce471844c97366a4f5ad3a1f42833a3b19486ad7d6555a8e24e"
+      },
+      {
+        "path": "artifacts/grieflogger-reader-lock-references/logging-runtime-audit.gradle",
+        "bytes": 3628,
+        "sha256": "78c43799752750ae4990ce762c5bbfdb47e80f019d75d3a805c0667bade4afe0"
+      },
+      {
+        "path": "artifacts/grieflogger-reader-lock-references/native-sources/net/yuuniverse/interactions/LoggingRuntimeAudit.java",
+        "bytes": 27306,
+        "sha256": "1f47c8ced258249a72e5918992d49b8eaeeb74d8b0ae94949e9d6ba267731a23"
+      },
+      {
+        "path": "artifacts/grieflogger-reader-lock-references/native-sources/net/yuuniverse/interactions/LoggingStorageRuntimeAudit.java",
+        "bytes": 17674,
+        "sha256": "f2bd41a3c68835db173b83fd1c7c74128081375bcc811926ed9b7715828af9ab"
+      },
+      {
+        "path": "artifacts/grieflogger-reader-lock-references/native-sources/README.md",
+        "bytes": 3339,
+        "sha256": "1f738150191c5b66070bb4d451f7b321142e04d34d7a899992dc9b94d5640be8"
+      },
+      {
+        "path": "artifacts/grieflogger-reader-lock-references/sources/com/daqem/grieflogger/GriefLogger.java",
+        "bytes": 1071,
+        "sha256": "1ba77f2b8051b6bd0869e5176650c8aa5d02cb1759566bdf3688c6b1540826fa"
+      },
+      {
+        "path": "artifacts/grieflogger-reader-lock-references/sources/StorageRecoveryTest.java",
+        "bytes": 19023,
+        "sha256": "d06c705884a7dc92745f34f114fd164a47e93bd93b173414622928d3399e5ad6"
+      },
+      {
+        "path": "artifacts/grieflogger-reader-lock-references/sqlite-connection-bytecode.txt",
+        "bytes": 48569,
+        "sha256": "181db38ce1285da7870e80866f4b014b4b27f659e1d1a3b5b9f0074d3eb1dca8"
+      }
+    ],
+    "databases": [
+      {
+        "path": "artifacts/logging-reader-before-server/database.db",
+        "bytes": 73728,
+        "sha256": "4e5877f26bd1d5812338cbfe488ced149a6004b9608b3a8ae68d294b16d449c7",
+        "quickCheck": "ok"
+      },
+      {
+        "path": "artifacts/logging-reader-before-server/logging-world/yuuniverse_economy/economy.db",
+        "bytes": 368640,
+        "sha256": "4a62fbba0b6c3519e231ed834e490566a05801d036090c28b06db1dd69db8a1b",
+        "quickCheck": "ok"
+      }
+    ]
+  },
+  "native": [
+    {
+      "mode": "reader",
+      "nativeChecks": 22,
+      "restartChecks": 11,
+      "state": {
+        "actor": "bb45a0da-3bec-4fdf-a15b-d944e597fcc5",
+        "lockMode": "reader",
+        "dropEntity": "1b4466e5-d5c9-48f5-be96-e95ee50d2afd",
+        "storage": {
+          "inventory": [
+            {
+              "id": "minecraft:paper",
+              "count": 7,
+              "components": {
+                "minecraft:custom_name": "\"Storage lock paper\""
+              }
+            },
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {
+              "id": "minecraft:oak_planks",
+              "count": 1
+            },
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {}
+          ],
+          "chest": [
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {}
+          ],
+          "blocks": [
+            {
+              "Name": "minecraft:stone"
+            },
+            {
+              "Properties": {
+                "waterlogged": "false",
+                "axis": "z"
+              },
+              "Name": "create:shaft"
+            },
+            {
+              "Properties": {
+                "waterlogged": "false",
+                "type": "single",
+                "facing": "north"
+              },
+              "Name": "minecraft:chest"
+            },
+            {
+              "Name": "minecraft:oak_planks"
+            }
+          ],
+          "dropEntity": "1b4466e5-d5c9-48f5-be96-e95ee50d2afd",
+          "dropNoGravity": true,
+          "dropStack": {
+            "id": "minecraft:snowball",
+            "count": 3,
+            "components": {
+              "minecraft:custom_name": "\"Storage lock drop\""
+            }
+          }
+        },
+        "lockedOrdinaryPending": 8,
+        "lockedBatchPending": 4,
+        "beforeLockRows": [
+          [
+            "blocks",
+            1792730462420,
+            7,
+            -60,
+            3,
+            "chest",
+            1,
+            0,
+            null
+          ]
+        ],
+        "committedRows": [
+          [
+            "blocks",
+            1792730462420,
+            7,
+            -60,
+            3,
+            "chest",
+            1,
+            0,
+            null
+          ],
+          [
+            "blocks",
+            1792730463633,
+            7,
+            -60,
+            3,
+            "chest",
+            2,
+            0,
+            null
+          ],
+          [
+            "blocks",
+            1792730463678,
+            3,
+            -60,
+            3,
+            "stone",
+            1,
+            0,
+            null
+          ],
+          [
+            "blocks",
+            1792730463691,
+            5,
+            -60,
+            3,
+            "create:shaft",
+            1,
+            0,
+            null
+          ],
+          [
+            "blocks",
+            1792730464127,
+            11,
+            -60,
+            3,
+            "oak_planks",
+            1,
+            0,
+            null
+          ],
+          [
+            "containers",
+            1792730463667,
+            7,
+            -60,
+            3,
+            "paper",
+            0,
+            7,
+            "01000508001253746F72616765206C6F636B207061706572"
+          ],
+          [
+            "items",
+            1792730463712,
+            5,
+            -60,
+            5,
+            "snowball",
+            2,
+            3,
+            "01000508001153746F72616765206C6F636B2064726F70"
+          ]
+        ],
+        "checks": 22
+      },
+      "recovered": {
+        "actor": "bb45a0da-3bec-4fdf-a15b-d944e597fcc5",
+        "lockMode": "reader",
+        "dropEntity": "1b4466e5-d5c9-48f5-be96-e95ee50d2afd",
+        "storage": {
+          "inventory": [
+            {
+              "id": "minecraft:paper",
+              "count": 7,
+              "components": {
+                "minecraft:custom_name": "\"Storage lock paper\""
+              }
+            },
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {
+              "id": "minecraft:oak_planks",
+              "count": 1
+            },
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {}
+          ],
+          "chest": [
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {}
+          ],
+          "blocks": [
+            {
+              "Name": "minecraft:stone"
+            },
+            {
+              "Properties": {
+                "waterlogged": "false",
+                "axis": "z"
+              },
+              "Name": "create:shaft"
+            },
+            {
+              "Properties": {
+                "waterlogged": "false",
+                "type": "single",
+                "facing": "north"
+              },
+              "Name": "minecraft:chest"
+            },
+            {
+              "Name": "minecraft:oak_planks"
+            }
+          ],
+          "dropEntity": "1b4466e5-d5c9-48f5-be96-e95ee50d2afd",
+          "dropNoGravity": true,
+          "dropStack": {
+            "id": "minecraft:snowball",
+            "count": 3,
+            "components": {
+              "minecraft:custom_name": "\"Storage lock drop\""
+            }
+          }
+        },
+        "lockedOrdinaryPending": 8,
+        "lockedBatchPending": 4,
+        "beforeLockRows": [
+          [
+            "blocks",
+            1792730462420,
+            7,
+            -60,
+            3,
+            "chest",
+            1,
+            0,
+            null
+          ]
+        ],
+        "committedRows": [
+          [
+            "blocks",
+            1792730462420,
+            7,
+            -60,
+            3,
+            "chest",
+            1,
+            0,
+            null
+          ],
+          [
+            "blocks",
+            1792730463633,
+            7,
+            -60,
+            3,
+            "chest",
+            2,
+            0,
+            null
+          ],
+          [
+            "blocks",
+            1792730463678,
+            3,
+            -60,
+            3,
+            "stone",
+            1,
+            0,
+            null
+          ],
+          [
+            "blocks",
+            1792730463691,
+            5,
+            -60,
+            3,
+            "create:shaft",
+            1,
+            0,
+            null
+          ],
+          [
+            "blocks",
+            1792730464127,
+            11,
+            -60,
+            3,
+            "oak_planks",
+            1,
+            0,
+            null
+          ],
+          [
+            "containers",
+            1792730463667,
+            7,
+            -60,
+            3,
+            "paper",
+            0,
+            7,
+            "01000508001253746F72616765206C6F636B207061706572"
+          ],
+          [
+            "items",
+            1792730463712,
+            5,
+            -60,
+            5,
+            "snowball",
+            2,
+            3,
+            "01000508001153746F72616765206C6F636B2064726F70"
+          ]
+        ],
+        "checks": 22,
+        "recoveredStorage": {
+          "inventory": [
+            {
+              "id": "minecraft:paper",
+              "count": 7,
+              "components": {
+                "minecraft:custom_name": "\"Storage lock paper\""
+              }
+            },
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {
+              "id": "minecraft:oak_planks",
+              "count": 1
+            },
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {}
+          ],
+          "chest": [
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {}
+          ],
+          "blocks": [
+            {
+              "Name": "minecraft:stone"
+            },
+            {
+              "Properties": {
+                "waterlogged": "false",
+                "axis": "z"
+              },
+              "Name": "create:shaft"
+            },
+            {
+              "Properties": {
+                "waterlogged": "false",
+                "type": "single",
+                "facing": "north"
+              },
+              "Name": "minecraft:chest"
+            },
+            {
+              "Name": "minecraft:oak_planks"
+            }
+          ],
+          "dropEntity": "1b4466e5-d5c9-48f5-be96-e95ee50d2afd",
+          "dropNoGravity": true,
+          "dropStack": {
+            "id": "minecraft:snowball",
+            "count": 3,
+            "components": {
+              "minecraft:custom_name": "\"Storage lock drop\""
+            }
+          }
+        },
+        "recoveredRows": [
+          [
+            "blocks",
+            1792730462420,
+            7,
+            -60,
+            3,
+            "chest",
+            1,
+            0,
+            null
+          ],
+          [
+            "blocks",
+            1792730463633,
+            7,
+            -60,
+            3,
+            "chest",
+            2,
+            0,
+            null
+          ],
+          [
+            "blocks",
+            1792730463678,
+            3,
+            -60,
+            3,
+            "stone",
+            1,
+            0,
+            null
+          ],
+          [
+            "blocks",
+            1792730463691,
+            5,
+            -60,
+            3,
+            "create:shaft",
+            1,
+            0,
+            null
+          ],
+          [
+            "blocks",
+            1792730464127,
+            11,
+            -60,
+            3,
+            "oak_planks",
+            1,
+            0,
+            null
+          ],
+          [
+            "containers",
+            1792730463667,
+            7,
+            -60,
+            3,
+            "paper",
+            0,
+            7,
+            "01000508001253746F72616765206C6F636B207061706572"
+          ],
+          [
+            "items",
+            1792730463712,
+            5,
+            -60,
+            5,
+            "snowball",
+            2,
+            3,
+            "01000508001153746F72616765206C6F636B2064726F70"
+          ]
+        ],
+        "recoveryChecks": 11
+      },
+      "stateEvidence": {
+        "path": "artifacts/logging-reader-recovery-server/logging-storage-state.json",
+        "bytes": 1525,
+        "sha256": "911c7dabc49baf281f6e343d4624bf181c356a0d4fc2042f7e389157e5bb714d"
+      },
+      "recoveryEvidence": {
+        "path": "artifacts/logging-reader-recovery-server/logging-storage-recovery.json",
+        "bytes": 2829,
+        "sha256": "9962f89142179c6ea6dcec1b741479d3a38e876e12d72084d0c7886ccdbfcfac"
+      },
+      "logs": [
+        {
+          "path": "artifacts/logging-reader-recovery-storage.log",
+          "bytes": 35474,
+          "sha256": "c063d1d6068380766f8aae7d885a10afb56d9c64ceef6fe50e10d8360f72b46a"
+        },
+        {
+          "path": "artifacts/logging-reader-recovery-storage-recover.log",
+          "bytes": 13918,
+          "sha256": "f4f43baa4b60f1c386377b7beef8e39807fb114fc501fa99bf3120429c5401e8"
+        }
+      ],
+      "providers": [
+        {
+          "path": "artifacts/logging-reader-recovery-server/mods/architectury-13.0.11-neoforge.jar",
+          "bytes": 584734,
+          "sha256": "9cc92f2c09533fc5482c60f993bd891c655a0e32b637037cdcb7c2b23adedeeb"
+        },
+        {
+          "path": "artifacts/logging-reader-recovery-server/mods/create.jar",
+          "bytes": 19138095,
+          "sha256": "5602a16796957cb5c7fb829c10c6b54bf9d228931c7680636710b6a60d92822e"
+        },
+        {
+          "path": "artifacts/logging-reader-recovery-server/mods/economy.jar",
+          "bytes": 14431850,
+          "sha256": "179115e5301ee6629acd3bdcbb6779d2549a35f7493821ab0fca79bcc43645f5"
+        },
+        {
+          "path": "artifacts/logging-reader-recovery-server/mods/grieflogger-1.2.10-1.21.1-yuuniverse.3-neoforge.jar",
+          "bytes": 18923357,
+          "sha256": "c364b690c2df88b1503d089c3b177aad7c45dd228825e3bdea9654ff2f223c7f"
+        },
+        {
+          "path": "artifacts/logging-reader-recovery-server/mods/neoprotect-1.0.4-mc1.21.1-neoforge.jar",
+          "bytes": 2614693,
+          "sha256": "2cbcec7aeef26ef3f5b54dae90fc16da353a1534462353b9f516d7d2e0a138ce"
+        },
+        {
+          "path": "artifacts/logging-reader-recovery-server/mods/supermartijn642configlib-1.1.8-neoforge-mc1.21.jar",
+          "bytes": 207514,
+          "sha256": "d2ba7b839a2268e4e223457e813d11aa2476c3bf708a7bba691d8fc851778a4b"
+        }
+      ],
+      "databases": [
+        {
+          "path": "artifacts/logging-reader-recovery-server/database.db",
+          "bytes": 73728,
+          "sha256": "21a2f09390fdd665addfb694548136fb66a8bb0cba495f2b8d0bf52d6dc091fc",
+          "quickCheck": "ok"
+        },
+        {
+          "path": "artifacts/logging-reader-recovery-server/logging-world/yuuniverse_economy/economy.db",
+          "bytes": 368640,
+          "sha256": "c61d47456e75f512eb292d54724920cc7cd2eb77fec599602145f0f4096193f3",
+          "quickCheck": "ok"
+        }
+      ],
+      "h2": {
+        "path": "artifacts/logging-reader-recovery-server/logging-world/neoprotect/neoprotect.mv.db",
+        "bytes": 36864,
+        "sha256": "409af5db43ebb05001d9910c57aab287984697c602fb562653c30a35b6083424"
+      }
+    },
+    {
+      "mode": "writer",
+      "nativeChecks": 22,
+      "restartChecks": 11,
+      "state": {
+        "actor": "6cfd8255-d908-43ca-a373-b3880f2e34fa",
+        "lockMode": "writer",
+        "dropEntity": "cc3bf27e-8fda-456e-b3f4-cfb1efb35101",
+        "storage": {
+          "inventory": [
+            {
+              "id": "minecraft:paper",
+              "count": 7,
+              "components": {
+                "minecraft:custom_name": "\"Storage lock paper\""
+              }
+            },
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {
+              "id": "minecraft:oak_planks",
+              "count": 1
+            },
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {}
+          ],
+          "chest": [
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {}
+          ],
+          "blocks": [
+            {
+              "Name": "minecraft:stone"
+            },
+            {
+              "Properties": {
+                "waterlogged": "false",
+                "axis": "z"
+              },
+              "Name": "create:shaft"
+            },
+            {
+              "Properties": {
+                "waterlogged": "false",
+                "type": "single",
+                "facing": "north"
+              },
+              "Name": "minecraft:chest"
+            },
+            {
+              "Name": "minecraft:oak_planks"
+            }
+          ],
+          "dropEntity": "cc3bf27e-8fda-456e-b3f4-cfb1efb35101",
+          "dropNoGravity": true,
+          "dropStack": {
+            "id": "minecraft:snowball",
+            "count": 3,
+            "components": {
+              "minecraft:custom_name": "\"Storage lock drop\""
+            }
+          }
+        },
+        "lockedOrdinaryPending": 8,
+        "lockedBatchPending": 4,
+        "beforeLockRows": [
+          [
+            "blocks",
+            1792730617482,
+            7,
+            -60,
+            3,
+            "chest",
+            1,
+            0,
+            null
+          ]
+        ],
+        "committedRows": [
+          [
+            "blocks",
+            1792730617482,
+            7,
+            -60,
+            3,
+            "chest",
+            1,
+            0,
+            null
+          ],
+          [
+            "blocks",
+            1792730618530,
+            7,
+            -60,
+            3,
+            "chest",
+            2,
+            0,
+            null
+          ],
+          [
+            "blocks",
+            1792730618588,
+            3,
+            -60,
+            3,
+            "stone",
+            1,
+            0,
+            null
+          ],
+          [
+            "blocks",
+            1792730618605,
+            5,
+            -60,
+            3,
+            "create:shaft",
+            1,
+            0,
+            null
+          ],
+          [
+            "blocks",
+            1792730619008,
+            11,
+            -60,
+            3,
+            "oak_planks",
+            1,
+            0,
+            null
+          ],
+          [
+            "containers",
+            1792730618571,
+            7,
+            -60,
+            3,
+            "paper",
+            0,
+            7,
+            "01000508001253746F72616765206C6F636B207061706572"
+          ],
+          [
+            "items",
+            1792730618633,
+            5,
+            -60,
+            5,
+            "snowball",
+            2,
+            3,
+            "01000508001153746F72616765206C6F636B2064726F70"
+          ]
+        ],
+        "checks": 22
+      },
+      "recovered": {
+        "actor": "6cfd8255-d908-43ca-a373-b3880f2e34fa",
+        "lockMode": "writer",
+        "dropEntity": "cc3bf27e-8fda-456e-b3f4-cfb1efb35101",
+        "storage": {
+          "inventory": [
+            {
+              "id": "minecraft:paper",
+              "count": 7,
+              "components": {
+                "minecraft:custom_name": "\"Storage lock paper\""
+              }
+            },
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {
+              "id": "minecraft:oak_planks",
+              "count": 1
+            },
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {}
+          ],
+          "chest": [
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {}
+          ],
+          "blocks": [
+            {
+              "Name": "minecraft:stone"
+            },
+            {
+              "Properties": {
+                "waterlogged": "false",
+                "axis": "z"
+              },
+              "Name": "create:shaft"
+            },
+            {
+              "Properties": {
+                "waterlogged": "false",
+                "type": "single",
+                "facing": "north"
+              },
+              "Name": "minecraft:chest"
+            },
+            {
+              "Name": "minecraft:oak_planks"
+            }
+          ],
+          "dropEntity": "cc3bf27e-8fda-456e-b3f4-cfb1efb35101",
+          "dropNoGravity": true,
+          "dropStack": {
+            "id": "minecraft:snowball",
+            "count": 3,
+            "components": {
+              "minecraft:custom_name": "\"Storage lock drop\""
+            }
+          }
+        },
+        "lockedOrdinaryPending": 8,
+        "lockedBatchPending": 4,
+        "beforeLockRows": [
+          [
+            "blocks",
+            1792730617482,
+            7,
+            -60,
+            3,
+            "chest",
+            1,
+            0,
+            null
+          ]
+        ],
+        "committedRows": [
+          [
+            "blocks",
+            1792730617482,
+            7,
+            -60,
+            3,
+            "chest",
+            1,
+            0,
+            null
+          ],
+          [
+            "blocks",
+            1792730618530,
+            7,
+            -60,
+            3,
+            "chest",
+            2,
+            0,
+            null
+          ],
+          [
+            "blocks",
+            1792730618588,
+            3,
+            -60,
+            3,
+            "stone",
+            1,
+            0,
+            null
+          ],
+          [
+            "blocks",
+            1792730618605,
+            5,
+            -60,
+            3,
+            "create:shaft",
+            1,
+            0,
+            null
+          ],
+          [
+            "blocks",
+            1792730619008,
+            11,
+            -60,
+            3,
+            "oak_planks",
+            1,
+            0,
+            null
+          ],
+          [
+            "containers",
+            1792730618571,
+            7,
+            -60,
+            3,
+            "paper",
+            0,
+            7,
+            "01000508001253746F72616765206C6F636B207061706572"
+          ],
+          [
+            "items",
+            1792730618633,
+            5,
+            -60,
+            5,
+            "snowball",
+            2,
+            3,
+            "01000508001153746F72616765206C6F636B2064726F70"
+          ]
+        ],
+        "checks": 22,
+        "recoveredStorage": {
+          "inventory": [
+            {
+              "id": "minecraft:paper",
+              "count": 7,
+              "components": {
+                "minecraft:custom_name": "\"Storage lock paper\""
+              }
+            },
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {
+              "id": "minecraft:oak_planks",
+              "count": 1
+            },
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {}
+          ],
+          "chest": [
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {}
+          ],
+          "blocks": [
+            {
+              "Name": "minecraft:stone"
+            },
+            {
+              "Properties": {
+                "waterlogged": "false",
+                "axis": "z"
+              },
+              "Name": "create:shaft"
+            },
+            {
+              "Properties": {
+                "waterlogged": "false",
+                "type": "single",
+                "facing": "north"
+              },
+              "Name": "minecraft:chest"
+            },
+            {
+              "Name": "minecraft:oak_planks"
+            }
+          ],
+          "dropEntity": "cc3bf27e-8fda-456e-b3f4-cfb1efb35101",
+          "dropNoGravity": true,
+          "dropStack": {
+            "id": "minecraft:snowball",
+            "count": 3,
+            "components": {
+              "minecraft:custom_name": "\"Storage lock drop\""
+            }
+          }
+        },
+        "recoveredRows": [
+          [
+            "blocks",
+            1792730617482,
+            7,
+            -60,
+            3,
+            "chest",
+            1,
+            0,
+            null
+          ],
+          [
+            "blocks",
+            1792730618530,
+            7,
+            -60,
+            3,
+            "chest",
+            2,
+            0,
+            null
+          ],
+          [
+            "blocks",
+            1792730618588,
+            3,
+            -60,
+            3,
+            "stone",
+            1,
+            0,
+            null
+          ],
+          [
+            "blocks",
+            1792730618605,
+            5,
+            -60,
+            3,
+            "create:shaft",
+            1,
+            0,
+            null
+          ],
+          [
+            "blocks",
+            1792730619008,
+            11,
+            -60,
+            3,
+            "oak_planks",
+            1,
+            0,
+            null
+          ],
+          [
+            "containers",
+            1792730618571,
+            7,
+            -60,
+            3,
+            "paper",
+            0,
+            7,
+            "01000508001253746F72616765206C6F636B207061706572"
+          ],
+          [
+            "items",
+            1792730618633,
+            5,
+            -60,
+            5,
+            "snowball",
+            2,
+            3,
+            "01000508001153746F72616765206C6F636B2064726F70"
+          ]
+        ],
+        "recoveryChecks": 11
+      },
+      "stateEvidence": {
+        "path": "artifacts/logging-reader-writer-regression-server/logging-storage-state.json",
+        "bytes": 1525,
+        "sha256": "ebdb7c62ea8d53c5aac27cbee06a2ecf719aab58795361ad3f62188385468348"
+      },
+      "recoveryEvidence": {
+        "path": "artifacts/logging-reader-writer-regression-server/logging-storage-recovery.json",
+        "bytes": 2829,
+        "sha256": "2c592aa4d066a5bf36698db80b2c236b47e81878d7688802e8dba5a719423f20"
+      },
+      "logs": [
+        {
+          "path": "artifacts/logging-reader-writer-regression-storage.log",
+          "bytes": 39941,
+          "sha256": "52e6c8bdea56207555d4c1fa5197cfb9c41a9b8707c6eb3707481a8f1ebcd847"
+        },
+        {
+          "path": "artifacts/logging-reader-writer-regression-storage-recover.log",
+          "bytes": 14059,
+          "sha256": "8d2d44a85266ccdf3326f9a956b101e777978bc46c80b5d71673cee5fa512e67"
+        }
+      ],
+      "providers": [
+        {
+          "path": "artifacts/logging-reader-writer-regression-server/mods/architectury-13.0.11-neoforge.jar",
+          "bytes": 584734,
+          "sha256": "9cc92f2c09533fc5482c60f993bd891c655a0e32b637037cdcb7c2b23adedeeb"
+        },
+        {
+          "path": "artifacts/logging-reader-writer-regression-server/mods/create.jar",
+          "bytes": 19138095,
+          "sha256": "5602a16796957cb5c7fb829c10c6b54bf9d228931c7680636710b6a60d92822e"
+        },
+        {
+          "path": "artifacts/logging-reader-writer-regression-server/mods/economy.jar",
+          "bytes": 14431850,
+          "sha256": "179115e5301ee6629acd3bdcbb6779d2549a35f7493821ab0fca79bcc43645f5"
+        },
+        {
+          "path": "artifacts/logging-reader-writer-regression-server/mods/grieflogger-1.2.10-1.21.1-yuuniverse.3-neoforge.jar",
+          "bytes": 18923357,
+          "sha256": "c364b690c2df88b1503d089c3b177aad7c45dd228825e3bdea9654ff2f223c7f"
+        },
+        {
+          "path": "artifacts/logging-reader-writer-regression-server/mods/neoprotect-1.0.4-mc1.21.1-neoforge.jar",
+          "bytes": 2614693,
+          "sha256": "2cbcec7aeef26ef3f5b54dae90fc16da353a1534462353b9f516d7d2e0a138ce"
+        },
+        {
+          "path": "artifacts/logging-reader-writer-regression-server/mods/supermartijn642configlib-1.1.8-neoforge-mc1.21.jar",
+          "bytes": 207514,
+          "sha256": "d2ba7b839a2268e4e223457e813d11aa2476c3bf708a7bba691d8fc851778a4b"
+        }
+      ],
+      "databases": [
+        {
+          "path": "artifacts/logging-reader-writer-regression-server/database.db",
+          "bytes": 73728,
+          "sha256": "742d7b8a1a5b416f243df5445219a9bebf664e74c1bc5f3cc8ce1608d6186f92",
+          "quickCheck": "ok"
+        },
+        {
+          "path": "artifacts/logging-reader-writer-regression-server/logging-world/yuuniverse_economy/economy.db",
+          "bytes": 368640,
+          "sha256": "67e0ba5a9dbfa4e1fb70b1070e33398316b07909bc6188889d5321e24c4ed8ee",
+          "quickCheck": "ok"
+        }
+      ],
+      "h2": {
+        "path": "artifacts/logging-reader-writer-regression-server/logging-world/neoprotect/neoprotect.mv.db",
+        "bytes": 36864,
+        "sha256": "827f592f1b4492e8f9e2142418f619a5099c141b4823d3d0057cb72a84f4cf70"
+      }
+    }
+  ],
+  "regression": {
+    "nativeChecks": 37,
+    "restartChecks": 8,
+    "state": {
+      "actor": "43d2261b-1919-4b6b-b70e-09d0b920cffd",
+      "currency": "8d6810f0-d3f7-4bfc-8598-68f54b96f834",
+      "balance": 980,
+      "operation": "8c35961b-fd3f-4447-be2f-78fb35c8379e",
+      "transaction": "65311f85-426e-4191-81f8-e052a4c832ad",
+      "shop": "coordinate:e5755ca2-9342-44bd-b57f-e5490c83dfe9",
+      "run": null
+    },
+    "logs": [
+      {
+        "path": "artifacts/logging-reader-normal-regression-native.log",
+        "bytes": 20646,
+        "sha256": "c875aae8c452048ad0dd4f9e2dda2ca66757a33b6c4a96610b4517352530927d"
+      },
+      {
+        "path": "artifacts/logging-reader-normal-regression-recover.log",
+        "bytes": 13479,
+        "sha256": "5319f7568270179d987e4e13569763d10ea303860625e377ca3bca37581d7d25"
+      }
+    ],
+    "databases": [
+      {
+        "path": "artifacts/logging-reader-normal-regression-server/database.db",
+        "bytes": 81920,
+        "sha256": "5b01fb24d8848d2c7d796b6de3b60de42fbefdd1abc5b486cd3305323a2ebf66",
+        "quickCheck": "ok"
+      },
+      {
+        "path": "artifacts/logging-reader-normal-regression-server/logging-world/yuuniverse_economy/economy.db",
+        "bytes": 368640,
+        "sha256": "b777be94eac5164a5837cbd1f0ac51a86e258590e57d6da7ce943854a497a482",
+        "quickCheck": "ok"
+      }
+    ],
+    "h2": {
+      "path": "artifacts/logging-reader-normal-regression-server/logging-world/neoprotect/neoprotect.mv.db",
+      "bytes": 98304,
+      "sha256": "9559fd8618c44d5b29b0389f08a41c23eb33db65afeee5de8edca8eea07058b1"
+    }
+  },
+  "stopped": {
+    "capturedAt": "2026-10-23T12:47:49.3543219+08:00",
+    "timezone": "UTC+08:00",
+    "exclusiveStoppedWorldAndDatabases": true,
+    "fixtures": [
+      {
+        "fixture": "logging-reader-before-server",
+        "world": "logging-world",
+        "exclusive": true,
+        "files": [
+          {
+            "path": "artifacts/logging-reader-before-server/logging-world/session.lock",
+            "bytes": 3,
+            "sha256": "51643361c79ecaef25a8de802de24f570ba25d9c2df1d22d94fade11b4f466cc"
+          },
+          {
+            "path": "artifacts/logging-reader-before-server/database.db",
+            "bytes": 73728,
+            "sha256": "4e5877f26bd1d5812338cbfe488ced149a6004b9608b3a8ae68d294b16d449c7"
+          },
+          {
+            "path": "artifacts/logging-reader-before-server/logging-world/neoprotect/neoprotect.mv.db",
+            "bytes": 36864,
+            "sha256": "ac27962c256751c89d6e415715c963211b88d5c7f6059433f4d51b80740c003b"
+          },
+          {
+            "path": "artifacts/logging-reader-before-server/logging-world/yuuniverse_economy/economy.db",
+            "bytes": 368640,
+            "sha256": "4a62fbba0b6c3519e231ed834e490566a05801d036090c28b06db1dd69db8a1b"
+          }
+        ]
+      },
+      {
+        "fixture": "logging-reader-recovery-server",
+        "world": "logging-world",
+        "exclusive": true,
+        "files": [
+          {
+            "path": "artifacts/logging-reader-recovery-server/logging-world/session.lock",
+            "bytes": 3,
+            "sha256": "51643361c79ecaef25a8de802de24f570ba25d9c2df1d22d94fade11b4f466cc"
+          },
+          {
+            "path": "artifacts/logging-reader-recovery-server/database.db",
+            "bytes": 73728,
+            "sha256": "21a2f09390fdd665addfb694548136fb66a8bb0cba495f2b8d0bf52d6dc091fc"
+          },
+          {
+            "path": "artifacts/logging-reader-recovery-server/logging-world/neoprotect/neoprotect.mv.db",
+            "bytes": 36864,
+            "sha256": "409af5db43ebb05001d9910c57aab287984697c602fb562653c30a35b6083424"
+          },
+          {
+            "path": "artifacts/logging-reader-recovery-server/logging-world/yuuniverse_economy/economy.db",
+            "bytes": 368640,
+            "sha256": "c61d47456e75f512eb292d54724920cc7cd2eb77fec599602145f0f4096193f3"
+          }
+        ]
+      },
+      {
+        "fixture": "logging-reader-writer-regression-server",
+        "world": "logging-world",
+        "exclusive": true,
+        "files": [
+          {
+            "path": "artifacts/logging-reader-writer-regression-server/logging-world/session.lock",
+            "bytes": 3,
+            "sha256": "51643361c79ecaef25a8de802de24f570ba25d9c2df1d22d94fade11b4f466cc"
+          },
+          {
+            "path": "artifacts/logging-reader-writer-regression-server/database.db",
+            "bytes": 73728,
+            "sha256": "742d7b8a1a5b416f243df5445219a9bebf664e74c1bc5f3cc8ce1608d6186f92"
+          },
+          {
+            "path": "artifacts/logging-reader-writer-regression-server/logging-world/neoprotect/neoprotect.mv.db",
+            "bytes": 36864,
+            "sha256": "827f592f1b4492e8f9e2142418f619a5099c141b4823d3d0057cb72a84f4cf70"
+          },
+          {
+            "path": "artifacts/logging-reader-writer-regression-server/logging-world/yuuniverse_economy/economy.db",
+            "bytes": 368640,
+            "sha256": "67e0ba5a9dbfa4e1fb70b1070e33398316b07909bc6188889d5321e24c4ed8ee"
+          }
+        ]
+      },
+      {
+        "fixture": "logging-reader-normal-regression-server",
+        "world": "logging-world",
+        "exclusive": true,
+        "files": [
+          {
+            "path": "artifacts/logging-reader-normal-regression-server/logging-world/session.lock",
+            "bytes": 3,
+            "sha256": "51643361c79ecaef25a8de802de24f570ba25d9c2df1d22d94fade11b4f466cc"
+          },
+          {
+            "path": "artifacts/logging-reader-normal-regression-server/database.db",
+            "bytes": 81920,
+            "sha256": "5b01fb24d8848d2c7d796b6de3b60de42fbefdd1abc5b486cd3305323a2ebf66"
+          },
+          {
+            "path": "artifacts/logging-reader-normal-regression-server/logging-world/neoprotect/neoprotect.mv.db",
+            "bytes": 98304,
+            "sha256": "9559fd8618c44d5b29b0389f08a41c23eb33db65afeee5de8edca8eea07058b1"
+          },
+          {
+            "path": "artifacts/logging-reader-normal-regression-server/logging-world/yuuniverse_economy/economy.db",
+            "bytes": 368640,
+            "sha256": "b777be94eac5164a5837cbd1f0ac51a86e258590e57d6da7ce943854a497a482"
+          }
+        ]
+      },
+      {
+        "fixture": "ordinary-client-acceptance-server",
+        "world": "acceptance-world",
+        "exclusive": true,
+        "files": [
+          {
+            "path": "artifacts/ordinary-client-acceptance-server/acceptance-world/session.lock",
+            "bytes": 3,
+            "sha256": "51643361c79ecaef25a8de802de24f570ba25d9c2df1d22d94fade11b4f466cc"
+          }
+        ]
+      }
+    ]
+  },
+  "stoppedEvidence": {
+    "path": "artifacts/logging-reader-all-stopped.json",
+    "bytes": 4935,
+    "sha256": "ddc92e61507ed27277f8b619ca9be4c5c052a05bb96b18fd0b3820d24f5d0ac3"
+  },
+  "stoppedVerifier": {
+    "path": "artifacts/confirm-logging-reader-stopped.ps1",
+    "bytes": 1876,
+    "sha256": "66ec527fd29d11f7b40cd3348742be1b643fbaeb28e03a545f69fb2c45316d27"
+  },
+  "invalidLock": {
+    "path": "artifacts/logging-reader-invalid-lock.log",
+    "bytes": 645,
+    "sha256": "68888d97bc7cd1fb3de2bb4ade43757a2d9392279c98781e1bdeaa2a6eca30af"
+  },
+  "unchangedPinnedClient": {
+    "path": "artifacts/logging-reader-pinned-client-before.json",
+    "bytes": 17435,
+    "sha256": "1f2f9f42f4f6584508d78b1ec677a9f28254184197e56ac8c202b235a739e1fa"
+  },
+  "sources": [
+    {
+      "path": "tools/logging-runtime-audit.gradle",
+      "bytes": 3628,
+      "sha256": "78c43799752750ae4990ce762c5bbfdb47e80f019d75d3a805c0667bade4afe0"
+    },
+    {
+      "path": "tools/logging-runtime-audit/net/yuuniverse/interactions/LoggingStorageRuntimeAudit.java",
+      "bytes": 17674,
+      "sha256": "f2bd41a3c68835db173b83fd1c7c74128081375bcc811926ed9b7715828af9ab"
+    },
+    {
+      "path": "tools/grieflogger-compat/run-storage-tests.ps1",
+      "bytes": 3411,
+      "sha256": "db250ec08a8defa01b60c4245d39b604826ed75aef2dbd2f4e3d00e2832bd6c3"
+    },
+    {
+      "path": "tools/grieflogger-compat/reader-commit-recovery.patch",
+      "bytes": 8816,
+      "sha256": "5decd626b322aa2e553d2bf3e8d7431747f8c39ab361ef612a2e729a8971a000"
+    },
+    {
+      "path": "tools/record-logging-reader-validation.py",
+      "bytes": 14985,
+      "sha256": "22cebc7ee70a55e440eb43fae707e138af84594d13f0f78752c7bb6f1da70181"
+    },
+    {
+      "path": "tools/grieflogger-compat/storage-tests/com/daqem/grieflogger/GriefLogger.java",
+      "bytes": 1071,
+      "sha256": "1ba77f2b8051b6bd0869e5176650c8aa5d02cb1759566bdf3688c6b1540826fa"
+    },
+    {
+      "path": "tools/grieflogger-compat/storage-tests/StorageRecoveryTest.java",
+      "bytes": 19023,
+      "sha256": "d06c705884a7dc92745f34f114fd164a47e93bd93b173414622928d3399e5ad6"
+    }
+  ],
+  "auditBinaries": [
+    {
+      "path": "artifacts/logging-reader-before-build/classes/java/dialogue/net/yuuniverse/interactions/LoggingStorageRuntimeAudit.class",
+      "bytes": 28014,
+      "sha256": "6038bc92b7cfdec4c298f008131884b1c08b21b4a576155c76ebbb3ddeff1e1d"
+    },
+    {
+      "path": "artifacts/logging-reader-recovery-build/classes/java/dialogue/net/yuuniverse/interactions/LoggingStorageRuntimeAudit.class",
+      "bytes": 28014,
+      "sha256": "6038bc92b7cfdec4c298f008131884b1c08b21b4a576155c76ebbb3ddeff1e1d"
+    },
+    {
+      "path": "artifacts/logging-reader-writer-regression-build/classes/java/dialogue/net/yuuniverse/interactions/LoggingStorageRuntimeAudit.class",
+      "bytes": 28014,
+      "sha256": "6038bc92b7cfdec4c298f008131884b1c08b21b4a576155c76ebbb3ddeff1e1d"
+    },
+    {
+      "path": "artifacts/logging-reader-normal-regression-build/classes/java/dialogue/net/yuuniverse/interactions/LoggingStorageRuntimeAudit.class",
+      "bytes": 28014,
+      "sha256": "6038bc92b7cfdec4c298f008131884b1c08b21b4a576155c76ebbb3ddeff1e1d"
+    }
+  ],
+  "packages": [
+    {
+      "path": "artifacts/craft-binding-ordinary-21.1.248-build/libs/citizens-2.0.43-neoforge-SNAPSHOT.jar",
+      "bytes": 4091667,
+      "sha256": "02437eda296f5b84055b1c11f87553cd297649ca6362a3eb53a385517a2f6f6f",
+      "matchingProductionClasses": 1020
+    },
+    {
+      "path": "artifacts/craft-binding-ordinary-21.1.248-build/libs/yuuniverse-interactions-2.0.43-neoforge-SNAPSHOT.jar",
+      "bytes": 204146,
+      "sha256": "77021e0135062bec5e78117e65845ce6c5b59022a8e59d6f3a9ca3305aedf635",
+      "matchingProductionClasses": 74
+    }
+  ],
+  "reusedOrdinaryTestsPerTarget": 825,
+  "reusedInteractionsTests": 100,
+  "reusedTestEvidence": {
+    "path": "docs/craft-binding-validation-2026-10-22.json",
+    "bytes": 959572,
+    "sha256": "26483824d437745191695754a3d2ad62fd6dbc96bb77d0c111f698808dd20abd"
+  },
+  "limits": [
+    "Known DEFERRED SQLite BUSY COMMIT plus successful rollback only",
+    "Other commit outcomes and driver/wrapper/mode cases remain fenced",
+    "Unflushed termination, full-device faults, administration, retention/load and MySQL remain",
+    "Migration and deferred physical-client gates remain",
+    "No production or pinned client changes"
+  ]
+}

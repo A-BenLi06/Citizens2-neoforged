@@ -8,6 +8,13 @@ Citizens retains NPC behavior and its existing native extension contracts. Yuuni
 
 ## Selected artifacts and sides
 
+Progress 2026-10-23, UTC+08:00: [reader-blocked COMMIT recovery](logging-reader-recovery-2026-10-23.md)
+repairs reproduced permanent queue suspension in GriefLogger `.2`. Provider `.3`
+adds a narrow typed DEFERRED SQLite BUSY/known-rollback retry; other uncertain
+outcomes remain fenced. Acceptance passes 53 standalone and 111 fresh native/
+restart checks across reader, writer and normal logging/commerce fixtures.
+Production stays unchanged; broader storage/retention, migration and client gates remain.
+
 Progress 2026-10-23, UTC+08:00: [native SQLite outage acceptance](native-logging-storage-2026-10-23.md)
 establishes real in-server ordinary/container/drop queue recovery and independent
 H2 logging across a writer lock, then exact native restart: 33 checks. Fresh normal

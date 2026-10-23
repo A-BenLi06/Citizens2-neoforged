@@ -21,9 +21,13 @@ public final class StorageRecoveryTest {
         public void close() throws SQLException { try { connection.rollback(); } finally { connection.close(); observer.close(); } }
     }
     private static Fixture fixture(String name) throws Exception {
+        return fixture(name, "DEFERRED");
+    }
+    private static Fixture fixture(String name, String mode) throws Exception {
         var path = root.resolve(name + ".db");
         if (Files.exists(path)) throw new IllegalStateException("Refusing existing test database");
-        var connection = DriverManager.getConnection("jdbc:sqlite:" + path);
+        var properties = new Properties(); properties.setProperty("transaction_mode", mode);
+        var connection = DriverManager.getConnection("jdbc:sqlite:" + path, properties);
         var observer = DriverManager.getConnection("jdbc:sqlite:" + path);
         connection.createStatement().execute("PRAGMA busy_timeout=20");
         connection.setAutoCommit(false);
@@ -93,6 +97,41 @@ public final class StorageRecoveryTest {
             fixture.database.batchQueue.execute(); check(count(fixture) == 2, "batch_retry_after_commit_is_noop");
         }
     }
+    private static void readerBlockedCommit(boolean batch) throws Exception {
+        String label = batch ? "reader_batch" : "reader_ordinary";
+        try (var fixture = fixture(label)) {
+            var queue = batch ? fixture.database.batchQueue : fixture.database.queue;
+            var original = write(fixture.database, 1, "reader-retained", new byte[]{6, 7});
+            if (batch) {
+                original.addBatch(); original.setInt(1, 2); original.setString(2, null);
+                original.setBytes(3, new byte[]{8, 9}); original.addBatch();
+            }
+            queue.add(original);
+            sql(fixture.observer, "BEGIN");
+            check(count(fixture) == 0, label + "_reader_holds_original_snapshot");
+            com.daqem.grieflogger.GriefLogger.lastFailure = null;
+            queue.execute();
+            var failure = com.daqem.grieflogger.GriefLogger.lastFailure;
+            check(failure instanceof org.sqlite.SQLiteException sqlite
+                    && sqlite.getResultCode() == org.sqlite.SQLiteErrorCode.SQLITE_BUSY,
+                    label + "_actual_sqlite_commit_busy");
+            check(queue.pendingCount() == 1 && count(fixture) == 0,
+                    label + "_failed_commit_retains_original_without_visible_rows");
+            sql(fixture.observer, "ROLLBACK");
+            queue.execute();
+            check(queue.pendingCount() == 0 && count(fixture) == (batch ? 2 : 1),
+                    label + "_unlocked_retry_drains_original_once");
+            try (var query = fixture.observer.createStatement(); var rows = query.executeQuery("SELECT id,value,data FROM observations ORDER BY id")) {
+                rows.next(); check(rows.getInt(1) == 1 && rows.getString(2).equals("reader-retained")
+                        && Arrays.equals(rows.getBytes(3), new byte[]{6,7}), label + "_exact_original_parameters");
+                if (batch) {
+                    rows.next(); check(rows.getInt(1) == 2 && rows.getString(2) == null
+                            && Arrays.equals(rows.getBytes(3), new byte[]{8,9}), label + "_exact_second_row");
+                }
+            }
+            queue.execute(); check(count(fixture) == (batch ? 2 : 1), label + "_repeat_is_noop");
+        }
+    }
     private static void ordinaryRollback() throws Exception {
         try (var fixture = fixture("prefix")) {
             sql(fixture.observer, "INSERT INTO observations VALUES (2,'existing',NULL)");
@@ -103,6 +142,40 @@ public final class StorageRecoveryTest {
             sql(fixture.observer, "DELETE FROM observations WHERE id=2");
             fixture.database.queue.execute();
             check(fixture.database.queue.pendingCount() == 0 && count(fixture) == 2, "ordinary_retry_replays_whole_rolled_back_prefix_once");
+        }
+    }
+    private static void conservativeCommitModes(String current, String next) throws Exception {
+        String label = "mode_" + current + "_" + next;
+        try (var fixture = fixture(label, current)) {
+            ((org.sqlite.SQLiteConnection)fixture.connection).getConnectionConfig()
+                    .setTransactionMode(org.sqlite.SQLiteConfig.TransactionMode.valueOf(next));
+            fixture.database.queue.add(write(fixture.database, 1, "fenced", null));
+            sql(fixture.observer, "BEGIN"); count(fixture);
+            fixture.database.queue.execute();
+            check(com.daqem.grieflogger.GriefLogger.lastFailure instanceof org.sqlite.SQLiteException error
+                    && error.getResultCode() == org.sqlite.SQLiteErrorCode.SQLITE_BUSY,
+                    label + "_real_commit_busy");
+            sql(fixture.observer, "ROLLBACK");
+            fixture.database.queue.execute();
+            check(count(fixture) == 0 && fixture.database.queue.pendingCount() == 1,
+                    label + "_remains_fenced_without_known_deferred_path");
+        }
+    }
+    private static void wrappedBusyAfterCommit() throws Exception {
+        try (var fixture = fixture("wrappedbusy")) {
+            var armed = new AtomicBoolean(true);
+            CONNECTION.set(fixture.database, proxy(fixture.connection, (owner, method, arguments) -> {
+                var result = invoke(fixture.connection, method, arguments);
+                if (method.getName().equals("commit") && armed.compareAndSet(true, false))
+                    throw new org.sqlite.SQLiteException("Injected BUSY after successful real commit", org.sqlite.SQLiteErrorCode.SQLITE_BUSY);
+                return result;
+            }));
+            fixture.database.queue.add(write(fixture.database, 1, "saved", null));
+            fixture.database.queue.execute();
+            fixture.database.queue.add(write(fixture.database, 2, "later", null));
+            fixture.database.queue.execute();
+            check(count(fixture) == 1 && fixture.database.queue.pendingCount() == 2,
+                    "wrapped_busy_after_successful_commit_cannot_replay_or_flush_later_writes");
         }
     }
     private static void ambiguousCommit() throws Exception {
@@ -193,6 +266,10 @@ public final class StorageRecoveryTest {
         root=Path.of(arguments[0]); Class.forName("org.sqlite.JDBC");
         System.out.println("PROVIDER " + Database.class.getProtectionDomain().getCodeSource().getLocation());
         transientLock(); batchRollback(); ordinaryRollback(); ambiguousCommit(); failedRollback(); legacyContracts(); concurrentProducers();
+        readerBlockedCommit(false); readerBlockedCommit(true);
+        conservativeCommitModes("IMMEDIATE", "IMMEDIATE");
+        conservativeCommitModes("DEFERRED", "IMMEDIATE");
+        conservativeCommitModes("IMMEDIATE", "DEFERRED"); wrappedBusyAfterCommit();
         System.out.println("[GRIEFSTORAGE] COMPLETE " + passed + " checks");
     }
 }

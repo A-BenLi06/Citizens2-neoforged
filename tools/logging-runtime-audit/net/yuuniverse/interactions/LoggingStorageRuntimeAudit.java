@@ -57,6 +57,7 @@ public final class LoggingStorageRuntimeAudit {
                 observer=DriverManager.getConnection("jdbc:sqlite:"+server.getServerDirectory().resolve("database.db").toAbsolutePath());
                 if(recovery) { dropped=UUID.fromString(state.get("dropEntity").getAsString()); recover(server); return; }
                 state.addProperty("actor",owner.toString());
+                state.addProperty("lockMode",System.getenv("CITIZENS_LOGGING_AUDIT_LOCK"));
                 place(CHEST,new ItemStack(Items.CHEST));
                 var paper=new ItemStack(Items.PAPER,7); paper.set(DataComponents.CUSTOM_NAME,Component.literal("Storage lock paper"));
                 ((Container)level.getBlockEntity(CHEST)).setItem(0,paper);
@@ -70,10 +71,16 @@ public final class LoggingStorageRuntimeAudit {
                 check(initialRows.size()>0,"native_join_and_seed_chest_history_commit_before_lock");
                 database.execute("PRAGMA busy_timeout=20",true);
                 blocker=DriverManager.getConnection("jdbc:sqlite:"+server.getServerDirectory().resolve("database.db").toAbsolutePath());
-                sql(blocker,"BEGIN IMMEDIATE"); locked=true;
+                if ("reader".equals(state.get("lockMode").getAsString())) {
+                    sql(blocker,"BEGIN");
+                    try(var query=blocker.createStatement(); var rows=query.executeQuery("SELECT COUNT(*) FROM blocks")) {
+                        if(!rows.next()) throw new AssertionError("Reader failed to acquire native database snapshot");
+                    }
+                } else sql(blocker,"BEGIN IMMEDIATE");
+                locked=true;
                 actor.setItemInHand(InteractionHand.MAIN_HAND,ItemStack.EMPTY);
                 var hit=new BlockHitResult(Vec3.atCenterOf(CHEST),Direction.UP,CHEST,false);
-                check(actor.gameMode.useItemOn(actor,level,ItemStack.EMPTY,InteractionHand.MAIN_HAND,hit).consumesAction(),"native_menu_opens_during_sqlite_write_lock");
+                check(actor.gameMode.useItemOn(actor,level,ItemStack.EMPTY,InteractionHand.MAIN_HAND,hit).consumesAction(),"native_menu_opens_during_sqlite_storage_lock");
                 actor.containerMenu.clicked(0,0,ClickType.PICKUP,actor); actor.closeContainer();
                 check(((Container)level.getBlockEntity(CHEST)).getItem(0).isEmpty()&&actor.getInventory().countItem(Items.PAPER)==7,"native_container_take_completes_with_logging_database_locked");
                 actor.getInventory().selected=8;

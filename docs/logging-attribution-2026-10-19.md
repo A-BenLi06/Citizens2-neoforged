@@ -100,3 +100,10 @@ producers, independent H2 logging and exact storage/history restart: 33 checks.
 A fresh normal regression passes another 45 checks. Launch guards now run even
 when preparation is skipped; four negative invocations preserve all native files.
 Unflushed termination and broader failure/retention/load/release gates stay open.
+
+The [reader-blocked COMMIT repair](logging-reader-recovery-2026-10-23.md) builds
+provider `.3` after reproducing permanent queue suspension in `.2` outside and
+inside Minecraft. Known DEFERRED SQLite BUSY plus successful rollback may retry;
+other uncertain outcomes stay fenced. Acceptance passes 53 standalone and 111
+native/restart assertions across reader, writer and normal logging/commerce runs.
+Pending work remains in memory and the broader gates above remain open.

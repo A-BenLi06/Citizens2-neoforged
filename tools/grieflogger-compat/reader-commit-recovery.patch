@@ -1,0 +1,132 @@
+diff --git a/common/build.gradle b/common/build.gradle
+index cdeffea..1464b09 100644
+--- a/common/build.gradle
++++ b/common/build.gradle
+@@ -7,6 +7,7 @@ loom {
+ }
+ 
+ dependencies {
++    compileOnly "org.xerial:sqlite-jdbc:${rootProject.sqlite_version}"
+     // We depend on fabric loader here to use the fabric @Environment annotations and get the mixin dependencies
+     // Do NOT use other classes from fabric loader
+     modImplementation "net.fabricmc:fabric-loader:${rootProject.fabric_loader_version}"
+diff --git a/common/src/main/java/com/daqem/grieflogger/database/Database.java b/common/src/main/java/com/daqem/grieflogger/database/Database.java
+index da5f309..f9197c1 100644
+--- a/common/src/main/java/com/daqem/grieflogger/database/Database.java
++++ b/common/src/main/java/com/daqem/grieflogger/database/Database.java
+@@ -9,6 +9,10 @@ import com.daqem.grieflogger.database.queue.QueuedStatement;
+ import com.daqem.grieflogger.database.queue.QueuedWrite;
+ import com.supermartijn642.configlib.ConfigLib;
+ import org.jetbrains.annotations.Nullable;
++import org.sqlite.SQLiteConfig;
++import org.sqlite.SQLiteConnection;
++import org.sqlite.SQLiteErrorCode;
++import org.sqlite.SQLiteException;
+ 
+ import java.nio.file.Path;
+ import java.sql.*;
+@@ -169,15 +173,16 @@ public class Database {
+             committing = true;
+             connection.commit();
+         } catch (SQLException | RuntimeException failure) {
++            boolean commitRejected = committing && isDeferredSqliteCommitBusy(failure);
+             boolean rolledBack = false;
+             try {
+                 if (connection != null) { connection.rollback(); rolledBack = true; }
+             } catch (SQLException rollbackFailure) {
+                 failure.addSuppressed(rollbackFailure);
+             }
+-            // A failed commit can have reached the database. Driver-owned legacy batches
++            // Other failed commits can have reached the database. Driver-owned legacy batches
+             // can also lose their parameters on executeBatch, even after a known rollback.
+-            writeOutcomeUncertain = committing || !rolledBack || writes.stream().anyMatch(write -> !write.canRetryAfterFailure());
++            writeOutcomeUncertain = (committing && !commitRejected) || !rolledBack || writes.stream().anyMatch(write -> !write.canRetryAfterFailure());
+             GriefLogger.LOGGER.error(writeOutcomeUncertain
+                     ? "Database write outcome requires review; queued writes retained and automatic flush stopped"
+                     : "Database writes rolled back; queued writes retained for retry", failure);
+@@ -189,4 +194,16 @@ public class Database {
+         }
+         return true;
+     }
++
++    private boolean isDeferredSqliteCommitBusy(Throwable failure) {
++        // SQLite leaves the transaction active when COMMIT returns SQLITE_BUSY.
++        // Xerial's commit() also starts the next transaction: BEGIN IMMEDIATE/EXCLUSIVE
++        // can fail AFTER a successful commit, so only its lock-free DEFERRED path is safe.
++        // Wrappers and other drivers retain the conservative uncertain-outcome fence.
++        return connection instanceof SQLiteConnection sqlite
++                && sqlite.getCurrentTransactionMode() == SQLiteConfig.TransactionMode.DEFERRED
++                && sqlite.getConnectionConfig().getTransactionMode() == SQLiteConfig.TransactionMode.DEFERRED
++                && failure instanceof SQLiteException error
++                && error.getResultCode() == SQLiteErrorCode.SQLITE_BUSY;
++    }
+ }
+diff --git a/fabric/build.gradle b/fabric/build.gradle
+index 3e2957d..6c8150b 100644
+--- a/fabric/build.gradle
++++ b/fabric/build.gradle
+@@ -34,8 +34,8 @@ dependencies {
+     common(project(path: ":common", configuration: "namedElements")) { transitive false }
+     shadowBundle project(path: ":common", configuration: "transformProductionFabric")
+ 
+-    implementation "org.xerial:sqlite-jdbc:3.47.2.0"
+-    shadowBundle "org.xerial:sqlite-jdbc:3.47.2.0"
++    implementation "org.xerial:sqlite-jdbc:${rootProject.sqlite_version}"
++    shadowBundle "org.xerial:sqlite-jdbc:${rootProject.sqlite_version}"
+ 
+     implementation "com.mysql:mysql-connector-j:8.4.0"
+     shadowBundle "com.mysql:mysql-connector-j:8.4.0"
+@@ -72,4 +72,4 @@ remapSourcesJar {
+     archiveClassifier = "fabric-sources"
+ }
+ 
+-apply from: rootProject.file("gradle/scripts/publishing.gradle")
+\ No newline at end of file
++apply from: rootProject.file("gradle/scripts/publishing.gradle")
+diff --git a/gradle.properties b/gradle.properties
+index b0177b5..cd1afb0 100644
+--- a/gradle.properties
++++ b/gradle.properties
+@@ -4,7 +4,8 @@ minecraft_version=1.21.1
+ enabled_platforms=fabric,neoforge
+ 
+ archives_base_name=grieflogger
+-mod_version=1.2.10-1.21.1-yuuniverse.2
++mod_version=1.2.10-1.21.1-yuuniverse.3
++sqlite_version=3.47.2.0
+ maven_group=com.daqem.grieflogger
+ mod_name=GriefLogger
+ 
+diff --git a/neoforge/build.gradle b/neoforge/build.gradle
+index 1290b62..5078c93 100644
+--- a/neoforge/build.gradle
++++ b/neoforge/build.gradle
+@@ -40,10 +40,10 @@ dependencies {
+     common(project(path: ':common', configuration: 'namedElements')) { transitive false }
+     shadowBundle project(path: ':common', configuration: 'transformProductionNeoForge')
+ 
+-    implementation "org.xerial:sqlite-jdbc:3.47.2.0"
++    implementation "org.xerial:sqlite-jdbc:${rootProject.sqlite_version}"
+     // Keep the JDBC driver as a NeoForge Jar-in-Jar dependency so the loader can
+     // select one compatible module alongside other SQLite consumers.
+-    include "org.xerial:sqlite-jdbc:3.47.2.0"
++    include "org.xerial:sqlite-jdbc:${rootProject.sqlite_version}"
+ 
+     implementation "com.mysql:mysql-connector-j:8.4.0"
+     shadowBundle "com.mysql:mysql-connector-j:8.4.0"
+diff --git a/walkthrough.md b/walkthrough.md
+index f9a3034..5422c2e 100644
+--- a/walkthrough.md
++++ b/walkthrough.md
+@@ -9,3 +9,11 @@ A real transient SQLite lock discarded a queued observation in the preceding pro
+ The rebuilt provider passes 27 actual-bytecode SQLite assertions (including 600 concurrent distinct rows), 37 native NeoForge 21.1.248 logging/rollback/commerce assertions and eight clean-restart assertions. Tests and exact source/artifact/fixture evidence are maintained in the parent Citizens repository under tools/grieflogger-compat and docs/grieflogger-write-recovery-validation-2026-10-23.json. The original failed artifact-only reproducer is retained there.
+ 
+ No production activation. Pending writes remain in memory; unflushed process termination, full-device failure, uncertain-outcome administration, retention/capacity/load and MySQL acceptance remain separate work. Native event payloads, SQL schemas, components and financial ownership are not rewritten to satisfy tests.
++
++## 2026-10-23T12:43:26.6697187+08:00 (UTC+08:00) - Recover known reader-blocked SQLite commits
++
++- Reproduced the .2 permanent queue suspension with actual provider bytecode and bundled SQLite: an explicit reader snapshot blocks COMMIT, rollback succeeds, but unlock/retry cannot drain. The same native failure reproduces through the real Minecraft background worker and native block/container/drop producers. Prior .2 source, JAR, worlds and logs remain retained.
++- Build .3 permits retry only when the direct Xerial connection reports typed SQLITE_BUSY, current and next transaction modes are DEFERRED, rollback succeeds and queued writes are reconstructable. Xerial commit() runs COMMIT followed by BEGIN; an IMMEDIATE/EXCLUSIVE next BEGIN can fail after successful commit. DEFERRED acquires no lock. Other commit/driver/wrapper/mode, failed rollback and legacy-batch outcomes retain the uncertainty fence. No SQL error-message matching or guessed durable outcome.
++- Added a compile-only SQLite dependency to common and shared the existing 3.47.2.0 version across platform declarations. NeoForge nested selectable driver packaging remains intact; no root SQLite classes. Minecraft/bootstrap/runtime storage code is not substituted in native runs.
++- Java 21 :neoforge:build succeeds. Expanded actual-provider standalone suite passes 53 assertions, including original writer/prefix/batch/concurrent/uncertain cases, exact ordinary/batch reader retry parameters, three current/next mode controls and wrapped BUSY after successful real commit. A fresh NeoForge 21.1.248 reader fixture passes 22 native and 11 clean-restart checks. Broader writer/normal acceptance is recorded by the consuming Citizens repository when complete.
++- Pending work remains in memory. Unflushed termination, full-device failures, uncertain-outcome administration, retention/load, MySQL and wider integration/client acceptance remain open. No production or deferred client fixture changes. Author and committer use A-BenLi06 <ben_li06@outlook.com>.

@@ -10,6 +10,13 @@ This review covers repository structure, native implementation boundaries, upstr
 
 ## Repository and implementation boundaries
 
+Update 2026-10-23, UTC+08:00: [reader-blocked COMMIT recovery](logging-reader-recovery-2026-10-23.md)
+repairs reproduced permanent GriefLogger queue suspension after reader unlock.
+Provider `.3` restricts recovery to typed DEFERRED SQLite BUSY plus known rollback,
+preserving ambiguous-outcome fences. Acceptance passes 53 standalone and 111
+native/restart checks across reader, writer and normal logging/commerce fixtures.
+Unflushed/storage/retention, migration and deferred client gates remain open.
+
 Update 2026-10-23, UTC+08:00: [native SQLite outage acceptance](native-logging-storage-2026-10-23.md)
 passes 33 actual-server/restart checks for ordinary, container and drop batches,
 including independent NeoProtect logging and exact native storage/original rows.

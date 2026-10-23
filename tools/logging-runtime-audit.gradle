@@ -7,6 +7,8 @@ allprojects {
         if (!fixture.toPath().toAbsolutePath().normalize().startsWith(p.file('../artifacts').toPath().toAbsolutePath().normalize()))
             throw new GradleException('Logging fixture must be inside task artifacts')
         def phase = p.findProperty('loggingAuditPhase') ?: 'native'
+        def storageLock = p.findProperty('loggingAuditLock') ?: 'writer'
+        if (!(storageLock in ['writer', 'reader'])) throw new GradleException('Unknown logging storage lock mode')
         if (!(phase in ['native', 'crash', 'recover', 'storage', 'storage-recover'])) throw new GradleException('Unknown logging audit phase')
         p.sourceSets.dialogue.java.srcDir(p.file('../tools/logging-runtime-audit'))
         p.sourceSets.dialogue.compileClasspath += p.files(p.fileTree(new File(fixture, 'mods')) { include '*.jar' },
@@ -33,6 +35,7 @@ allprojects {
         p.tasks.named('runServer') {
             doFirst { validateFixture() }
             environment 'CITIZENS_LOGGING_AUDIT_PHASE', phase
+            environment 'CITIZENS_LOGGING_AUDIT_LOCK', storageLock
             if (p.hasProperty('loggingAuditRun')) environment 'CITIZENS_LOGGING_AUDIT_RUN', p.property('loggingAuditRun')
             timeout = java.time.Duration.ofMinutes(3)
             doLast {
