@@ -1,0 +1,553 @@
+{
+  "createdAt": "2026-10-23T11:58:48.790139+08:00",
+  "timezone": "UTC+08:00",
+  "baseRevision": "98b5525",
+  "providerCommit": "ca00b1ac2baa71fc4baab035420d2e5bd21f0bb1",
+  "providerBase": "0017e15321badb496e4939c58ec7a60cf3821139",
+  "provider": {
+    "path": "artifacts/grieflogger-write-recovery-source/neoforge/build/libs/grieflogger-1.2.10-1.21.1-yuuniverse.2-neoforge.jar",
+    "bytes": 18922921,
+    "sha256": "07d0ab4bf1dec4283cf19b7c7c82481919f87080aaf1598b27d0adfbcacb3eee"
+  },
+  "originalProvider": {
+    "path": "artifacts/logging-audit-server/mods/grieflogger-1.2.10-1.21.1-yuuniverse.1-neoforge.jar",
+    "bytes": 18915537,
+    "sha256": "a897f22fca7705144b26749f7baa097b4e1cc0d16eed1ddeed3a9fed270806e0"
+  },
+  "providerSources": [
+    {
+      "path": "artifacts/grieflogger-write-recovery-source/common/src/main/java/com/daqem/grieflogger/GriefLogger.java",
+      "bytes": 5754,
+      "sha256": "57bfb6e00661bc1a559b70bc28da303c323ba061edb93a630fd222ff23d05fb1"
+    },
+    {
+      "path": "artifacts/grieflogger-write-recovery-source/common/src/main/java/com/daqem/grieflogger/database/Database.java",
+      "bytes": 7625,
+      "sha256": "8bcef605eb255049c9b8c7d62dd29126fd1577d932e78122f3b1effccae785f6"
+    },
+    {
+      "path": "artifacts/grieflogger-write-recovery-source/common/src/main/java/com/daqem/grieflogger/database/queue/IQueue.java",
+      "bytes": 270,
+      "sha256": "f094bc157e7819605211c1dc1198d093c608b6b69efff6a0d0ebea941675ae91"
+    },
+    {
+      "path": "artifacts/grieflogger-write-recovery-source/common/src/main/java/com/daqem/grieflogger/database/queue/Queue.java",
+      "bytes": 1613,
+      "sha256": "a90c5f3c2439dc918bb813b849a65c94d9ad9f4c214454a6644b80402b65c4bf"
+    },
+    {
+      "path": "artifacts/grieflogger-write-recovery-source/common/src/main/java/com/daqem/grieflogger/database/queue/QueuedStatement.java",
+      "bytes": 2422,
+      "sha256": "6b58bfe28b13003587b3ff6e9874c3c1d87bdefbd494bf45f1340b70dd26108c"
+    },
+    {
+      "path": "artifacts/grieflogger-write-recovery-source/common/src/main/java/com/daqem/grieflogger/database/queue/QueuedWrite.java",
+      "bytes": 1048,
+      "sha256": "47931798b66de2e578e3abbcae7f3d53b6ac4c253a037f356374ab46d4d40a0e"
+    },
+    {
+      "path": "artifacts/grieflogger-write-recovery-source/common/src/main/java/com/daqem/grieflogger/database/repository/BlockRepository.java",
+      "bytes": 15710,
+      "sha256": "954a900fefe49f1b602c099fc190def5c96e83f1758a8acac3f2753d1e02e95d"
+    },
+    {
+      "path": "artifacts/grieflogger-write-recovery-source/common/src/main/java/com/daqem/grieflogger/database/repository/ChatRepository.java",
+      "bytes": 3545,
+      "sha256": "29cfb03342437e8cd6b8814f7713edbaa93f348bbd29a74265ff405fad73486e"
+    },
+    {
+      "path": "artifacts/grieflogger-write-recovery-source/common/src/main/java/com/daqem/grieflogger/database/repository/CommandRepository.java",
+      "bytes": 3570,
+      "sha256": "1ef2f83a9c63860dac3ac212ef07ae8e615e1eab31cd5882d6baf6b058c27a28"
+    },
+    {
+      "path": "artifacts/grieflogger-write-recovery-source/common/src/main/java/com/daqem/grieflogger/database/repository/ContainerRepository.java",
+      "bytes": 19652,
+      "sha256": "6a313b1bba33e59051a69c52e867033e469a083349adffc2f6b36dc224b4a69f"
+    },
+    {
+      "path": "artifacts/grieflogger-write-recovery-source/common/src/main/java/com/daqem/grieflogger/database/repository/EntityRepository.java",
+      "bytes": 1751,
+      "sha256": "5b2ccc48499c9fc9b6b8638ae8f88a2fb7799323c010f39dee7144f8f9ea65d5"
+    },
+    {
+      "path": "artifacts/grieflogger-write-recovery-source/common/src/main/java/com/daqem/grieflogger/database/repository/ItemRepository.java",
+      "bytes": 12278,
+      "sha256": "a36a67fbf9ef074e305c39927ff6ae8c201cdd8c7f9c3f817157e4b3a8cb2412"
+    },
+    {
+      "path": "artifacts/grieflogger-write-recovery-source/common/src/main/java/com/daqem/grieflogger/database/repository/LevelRepository.java",
+      "bytes": 1729,
+      "sha256": "7c1b352c1521a09dbad9ff90d1fca67d145f0ae5414a73062e84dfb63f65d593"
+    },
+    {
+      "path": "artifacts/grieflogger-write-recovery-source/common/src/main/java/com/daqem/grieflogger/database/repository/MaterialRepository.java",
+      "bytes": 1758,
+      "sha256": "ab28a21bd9b90573b1eaae8ad19d53f169a59097a9783b01b2ac2cb9edab6773"
+    },
+    {
+      "path": "artifacts/grieflogger-write-recovery-source/common/src/main/java/com/daqem/grieflogger/database/repository/SessionRepository.java",
+      "bytes": 6615,
+      "sha256": "68cd5447fd2393f888e2b7d076e465f57284eb224b85d1fcf87629f19fabb771"
+    },
+    {
+      "path": "artifacts/grieflogger-write-recovery-source/common/src/main/java/com/daqem/grieflogger/database/repository/UserRepository.java",
+      "bytes": 3688,
+      "sha256": "60f4468b8574b4406aada7ae525360dcbb03010ae5d0c396d80a8c9901692cf2"
+    },
+    {
+      "path": "artifacts/grieflogger-write-recovery-source/common/src/main/java/com/daqem/grieflogger/database/repository/UsernameRepository.java",
+      "bytes": 2147,
+      "sha256": "4d1b01efd0aa6496944565dd0d607778d4324570e3c90618354f0ee977288e97"
+    },
+    {
+      "path": "artifacts/grieflogger-write-recovery-source/gradle.properties",
+      "bytes": 723,
+      "sha256": "e7d78d701ded2fb850321c27f3afcb8f50c4573f1a78ab3e54a6b70c8447100c"
+    },
+    {
+      "path": "artifacts/grieflogger-write-recovery-source/walkthrough.md",
+      "bytes": 1864,
+      "sha256": "2fc5d979a9e34745fdd1e794964a5381b0741bb77c6cb50ddc4792a35017303b"
+    }
+  ],
+  "patch": {
+    "path": "tools/grieflogger-compat/queued-write-recovery.patch",
+    "bytes": 29482,
+    "sha256": "02f08867c3d7b90ec3f5407f6a49d50c380a1a17de32c52222b557adf52e1e0b"
+  },
+  "sqliteDriverSha256": "548d6659c83e55050d707a676f92faf7715c2a4af6ae55750beb8d2575f7a878",
+  "originalSqliteDriverSha256": "b1864c68e168b015f813a37045f6d80cb4ecf4fe623dfa36a1f7378c1bb2cfbf",
+  "unchangedDriverContents": {
+    "META-INF/MANIFEST.MF": "8e2ba907ecfdff8184d59e433c49c6768ac662976e8456d2ae467a37ffb643e8",
+    "META-INF/architectury-loom-nesting-metadata.json": "381c1505f0d2929483154f28e7303536f76f030366e228e30e2a0bf7630b245f",
+    "META-INF/maven/org.xerial/sqlite-jdbc/LICENSE": "3ddf9be5c28fe27dad143a5dc76eea25222ad1dd68934a047064e56ed2fa40c5",
+    "META-INF/maven/org.xerial/sqlite-jdbc/LICENSE.zentus": "89167dab92289c7e5e2b65b044f0856b703d05e5d5e35c3548e73d9c7d2f5048",
+    "META-INF/maven/org.xerial/sqlite-jdbc/VERSION": "0b694c307123e6e322596b6462eca0915b2a303b53285cc03963ba8ba69b8762",
+    "META-INF/maven/org.xerial/sqlite-jdbc/pom.properties": "806a467d37e77913546b695f3ff2612c7c1d7579f2b50da21e2ad10766458761",
+    "META-INF/maven/org.xerial/sqlite-jdbc/pom.xml": "67a2c82726276925d21fe727dcafdfe309519e03ba619b5859af6ea6671f83b6",
+    "META-INF/native-image/org.xerial/sqlite-jdbc/native-image.properties": "3688dc753c97851fd6c613b92eebdf808969a628c9da76f7d2be57d93069aef1",
+    "META-INF/services/java.sql.Driver": "6f13d8db0c78f5b44c08720b0544d0a17718eb1b8fde920a4509e636bc9b8214",
+    "META-INF/versions/9/module-info.class": "e274968224c2c35bc0c65e7e3a2a7ae34d1e910c23adff843643d0f823d85a43",
+    "META-INF/versions/9/org/sqlite/nativeimage/SqliteJdbcFeature$1.class": "ef6c612c5398d366792e3ab5d33357e1bbb227210d6877bf14dc4e16dcf65478",
+    "META-INF/versions/9/org/sqlite/nativeimage/SqliteJdbcFeature$SqliteJdbcFeatureException.class": "e4c5f16f73d04dfa876fed4949cc2cf32a6e7e0cb38606fbaa49077c5232b7e0",
+    "META-INF/versions/9/org/sqlite/nativeimage/SqliteJdbcFeature.class": "0f967d485fe986859d962fcb1707ff96636ffc91e5ada7fc34d954952197179f",
+    "org/sqlite/BusyHandler.class": "7125637b6b653893502836634992dedb10d866c490f022efaba08fd9b61f861b",
+    "org/sqlite/Collation.class": "75a20390e9460a065d136b8bad53c75c5b7e9c707eebd460cbda43bb6b6bf34a",
+    "org/sqlite/ExtendedCommand$BackupCommand.class": "b87af143b3f673f73ab6727563df68a74fff613a7ba1aae4a1ddea41c9f1ee01",
+    "org/sqlite/ExtendedCommand$RestoreCommand.class": "83e4cce805f8c89cd7d76b893fd077a7e8e278ff64f2b1823ba590b7501d097e",
+    "org/sqlite/ExtendedCommand$SQLExtension.class": "fa50133749112142820e01ab06f02b087299ee9f517cc93a47f52bd8b2f0a63c",
+    "org/sqlite/ExtendedCommand.class": "50482373c1222358811d24836c754bc86dc4d4e21b3bb929178c5ce3a8d59575",
+    "org/sqlite/FileException.class": "219542d9856818cf93eb8e2a40755f6438187d79c40f0b224c107069375fc837",
+    "org/sqlite/Function$Aggregate.class": "faecff0ec4fbae0b0de40a1742b2283e7c7f2028481fafa9d572f97f09cab9b6",
+    "org/sqlite/Function$Window.class": "a6715a3aa9731570511631ad8f8d404ca8b0bdf39c5ac3f7c16ebb60ae403407",
+    "org/sqlite/Function.class": "63d1605d365bb469391d536dcc7cc1c4fa88e727f0ea174c69d82ae46c2d393d",
+    "org/sqlite/JDBC.class": "8f5a26a9d967cd0e91d8644f34d2ef35280c6dca623fa5de49bf025fe710bff3",
+    "org/sqlite/NativeLibraryNotFoundException.class": "9c21f5c230c92505ca89f811538ff85efe773e732f02ac93c1decfbaaac5ab86",
+    "org/sqlite/ProgressHandler.class": "c98c6882597f94e6f2f341945a03d8ccc420c441d19da8a89f14e9da6e1da7ce",
+    "org/sqlite/SQLiteCommitListener.class": "681d1f23cf0d22a151d48646cc737acbb6a85d9db5163f398b97fdca365caa21",
+    "org/sqlite/SQLiteConfig$DateClass.class": "f979f0bff37e394bbcfdddf99334a2a0bfbb58c34b246f3158c8a377e0d18e46",
+    "org/sqlite/SQLiteConfig$DatePrecision.class": "c4795bef7758ff1ae730ecbba33d549ae0e89dd52d6a7f1957fca2ade3429eca",
+    "org/sqlite/SQLiteConfig$Encoding.class": "249e61b53e2538f477b594893aca75f12f7de911549c096ea77283643995754c",
+    "org/sqlite/SQLiteConfig$HexKeyMode.class": "f42133f1c69a09436d5d56c351a1da212ff8c63b959fe9a54654976f2a899cdb",
+    "org/sqlite/SQLiteConfig$JournalMode.class": "64c9e2f40551822c9958ca9d7117475bd0eda344016fb2303d581ea040837bdc",
+    "org/sqlite/SQLiteConfig$LockingMode.class": "0f7f96c9cf68c3461557aacbb8ad9251f3d3f8d194c2caea927a346ec71e8ec7",
+    "org/sqlite/SQLiteConfig$OnOff.class": "44e12e22986c28b3bc92694a5c548b6a03a0961c927dcdde7994d9fe9cbc7eeb",
+    "org/sqlite/SQLiteConfig$Pragma.class": "6cc4ed3428167a07e0fb1d0d041d2489e9cc7b8785e18c6d3d01881077fd2238",
+    "org/sqlite/SQLiteConfig$PragmaValue.class": "0b9abaf688a1fc29635027e1d69b39e7606cf60fc7a9769dc904783f75bc1817",
+    "org/sqlite/SQLiteConfig$SynchronousMode.class": "9dfa659c99845b4845d4a0a47bec08b1c530fecdff14f86819569626ec1b7fc2",
+    "org/sqlite/SQLiteConfig$TempStore.class": "2778cde9b48bc7d498c71e290b2361f2914aebe01f99b43df9a28290407e9844",
+    "org/sqlite/SQLiteConfig$TransactionMode.class": "c1fc2588a04820beb69c1196dad7f4ee5eae3fa8de1149d4aeeb3d1cdd816ebc",
+    "org/sqlite/SQLiteConfig.class": "bbf528ab0cbe17fc2b74b2c08ce1ec2dfd3ac3addc721163e7edca53b2d9f459",
+    "org/sqlite/SQLiteConnection.class": "81c9e1a702ce135e9fbef461e12db943db9e5b757a2a5baca9260d574bfef690",
+    "org/sqlite/SQLiteConnectionConfig.class": "b507af3b10ae609b98f918cb8acefc57b2e3202372df2cc4830a7eeedb5d2287",
+    "org/sqlite/SQLiteDataSource.class": "c37e185e7ab8f991a1bf31f20075d237b550c3bf8fa0f3da1c2faa79e9a65eaa",
+    "org/sqlite/SQLiteErrorCode.class": "abb9c4efceba35170ccaf6eb026c93954d647e62a91eec3f2f9edcf4511e528a",
+    "org/sqlite/SQLiteException.class": "9d04de89cbc83489a42898ccf0cb489b50c569b8febf9a8855088fdba4862c45",
+    "org/sqlite/SQLiteJDBCLoader$VersionHolder.class": "781821a8f81801a939fc3e2b7d6fe1efbd711ee7f2bd58823bb6896d3829679d",
+    "org/sqlite/SQLiteJDBCLoader.class": "01406a18fd2f5a16f64f36e66d57a74a119172b914a5eef9032b3ed362201949",
+    "org/sqlite/SQLiteLimits.class": "1d6ec84d7261c1d6d066d6cbab4c22301a981537f5413a9d7061f2fa847a3579",
+    "org/sqlite/SQLiteOpenMode.class": "a01ab9e94462a26522483e5c5d79012d20ace394d316e747d8ef4446b84a5620",
+    "org/sqlite/SQLiteUpdateListener$Type.class": "fd4838e4132587bfc542d94c9e52d9813ff003a49032b0efbeeb84603462e851",
+    "org/sqlite/SQLiteUpdateListener.class": "73d111f6c2a847273349b69a561990841fb7e3a5d7dcb791b5a5f5ef494b821e",
+    "org/sqlite/core/Codes.class": "ccfdcdc75cbd8ddc6456d9083b7c2af46fcc9d8917998194197eb9a3b32d8df1",
+    "org/sqlite/core/CoreDatabaseMetaData.class": "5597cc2ca455ef4c5e82da1c8c9fabb6fdef81b1ae8c1462c8c0352f79cdf5ba",
+    "org/sqlite/core/CorePreparedStatement$1.class": "8ed15b5904cc044cc42f3a22eb87974f31b412ff457c471a0dd49154dd701ed2",
+    "org/sqlite/core/CorePreparedStatement.class": "11a15048430d07bdb966b59d6e7a2642b2d74f199e67e196637a8d5589578c0a",
+    "org/sqlite/core/CoreResultSet.class": "24fff33e0638213e85345709b93b04456f03418780bce32940b181b6775f097e",
+    "org/sqlite/core/CoreStatement.class": "1321a307a5862272258be09807431267ee4e54ee25279f33f4eaab76a57670ae",
+    "org/sqlite/core/DB$ProgressObserver.class": "ea1b63cab3cf76d8abe59eb64a396436faee7c6d924ea8eeb6f49a945cd6eb1f",
+    "org/sqlite/core/DB.class": "66990a1a44b2d01773c46454d7dbf3cd126ae6646d2a2fa45c5094abfb73f072",
+    "org/sqlite/core/NativeDB.class": "7bc736fb8ed9b06873f00230827f7faee14561f39ed7d7dce21a1e539e40fc55",
+    "org/sqlite/core/SafeStmtPtr$SafePtrConsumer.class": "34679a6e923747c673107919de8e5808c9b27a0e7f40fb63a452bd84a13b9120",
+    "org/sqlite/core/SafeStmtPtr$SafePtrDoubleFunction.class": "8c19b4ae942844f4abbc6ede459a23d61dd69936613fb598c7c6b15e1246aff3",
+    "org/sqlite/core/SafeStmtPtr$SafePtrFunction.class": "684df18f8172a18afd0bd8c65fd5aa5735e7c3e948beca09ba6a545dfa781448",
+    "org/sqlite/core/SafeStmtPtr$SafePtrIntFunction.class": "83a270a2942b65b1deb78bfd255cb06280b09f324b720ce99411d42fb9cf0fc0",
+    "org/sqlite/core/SafeStmtPtr$SafePtrLongFunction.class": "438f0c7714c01ac68c959654ff987c69116db81de7ba4eca3b7169cafd3bc56e",
+    "org/sqlite/core/SafeStmtPtr.class": "574c5fc77a667fb39e85ba03a71cfa8868dedc6af099d36d4205ee3ad2990f54",
+    "org/sqlite/date/DateFormatUtils.class": "0ef4aae41c03b190bfc9b779702418b3be4de86f81cc68384f72bd5e15e9e587",
+    "org/sqlite/date/DateParser.class": "63d1ab923157cfe4442da76a60020fcb8096542984dd4c80d0e4a3aa92294715",
+    "org/sqlite/date/DatePrinter.class": "1a3b3d5cf236a7c6ece70587804786d1e5af02be73c577bc9b7e850be31d210b",
+    "org/sqlite/date/ExceptionUtils.class": "a7ba37683c95cdf46a9e4f23eeb80bafc5757111a357fb978e46fb46e03a53b3",
+    "org/sqlite/date/FastDateFormat$1.class": "bb705eda12c4ce0a90a9cd2c67ce30e1188f53dab9835c5e243b24a74a8993c7",
+    "org/sqlite/date/FastDateFormat.class": "9d02c1744f8885838c101bc4952215cd2618d0af44db2fba89b42c3087115c91",
+    "org/sqlite/date/FastDateParser$1.class": "5d90847e858ab7a5f28b89f5c6332b9228d14a8a22f7139a86f7aec772a53a87",
+    "org/sqlite/date/FastDateParser$2.class": "df93fa2c6e13b9c126d540f5751a4a407407f2e0980166186496c71fac35bbbb",
+    "org/sqlite/date/FastDateParser$3.class": "16b3255af55e0da257910799331189e06e4621892f42666757e4fefb32fd8b42",
+    "org/sqlite/date/FastDateParser$4.class": "642defe6d71fad7716c55f1620405f42fe76aa8f73238ca54abd479d6f7a51cf",
+    "org/sqlite/date/FastDateParser$CaseInsensitiveTextStrategy.class": "e4a84b0952704d9cfb866c0a137a14af9cf31a7481f3ccbfa416a2bc0d7283fa",
+    "org/sqlite/date/FastDateParser$CopyQuotedStrategy.class": "a916439a2d0bb97892f099e9ec3b2b78fe9b88956739777f7b9b811fa6d5b6e4",
+    "org/sqlite/date/FastDateParser$ISO8601TimeZoneStrategy.class": "0275165ad148325bd28206c167060bc220f4d2ce79a79d0bc2e1b615fc8d8be4",
+    "org/sqlite/date/FastDateParser$NumberStrategy.class": "bb8611e20c10d3ae56dd0d401b46ced6bddcc6ccc1e16aea7ae72751702497ad",
+    "org/sqlite/date/FastDateParser$Strategy.class": "d094a4315b24996f2e31d1b3406794f4fd74cedbda6eb9fc990b31d9de052e2e",
+    "org/sqlite/date/FastDateParser$TimeZoneStrategy.class": "4abcfccb358e5fd0e69652497aa10fa795e69cb2037273c4b0dbf8838a323544",
+    "org/sqlite/date/FastDateParser.class": "32b9ffa554cfac78911f2cd9e61515ca4acbb8a52454c12bc9314be4efbe2364",
+    "org/sqlite/date/FastDatePrinter$CharacterLiteral.class": "b5ebab3f7640b3f526e66302664c098e4ca8209d71dd9ef86f0e19d3f3cd2481",
+    "org/sqlite/date/FastDatePrinter$Iso8601_Rule.class": "ad32e5de606e8d35009ebcda72d9068c51f942d42ba60ab43a5c5d1136caba6f",
+    "org/sqlite/date/FastDatePrinter$NumberRule.class": "e025c4e7221fdef0e4b19e75a1e11372d78a8fa81f282523351bc2033ac0a595",
+    "org/sqlite/date/FastDatePrinter$PaddedNumberField.class": "d9ed06e0616e16eb3850701ef597cd7e3d1ebf9e3eace8df86f02a4cc23556cc",
+    "org/sqlite/date/FastDatePrinter$Rule.class": "f91bfabfe62a3a734fe8ba5130e3b0a09b972da272bfd5e863aaf98a8c423421",
+    "org/sqlite/date/FastDatePrinter$StringLiteral.class": "dfedaab1f9f7b75f970e37b51204d9333eb3964ca5913907689986965d6b95d0",
+    "org/sqlite/date/FastDatePrinter$TextField.class": "2f664a6fe52d1e42d875be8d9ca345a0700ecaa560a525eb43ec5d8adb9d5488",
+    "org/sqlite/date/FastDatePrinter$TimeZoneDisplayKey.class": "e243000ca74664f78bc47f180b7c490a9701da6ec5caca8d2a6c48f9890fd30e",
+    "org/sqlite/date/FastDatePrinter$TimeZoneNameRule.class": "9d0c0aadd0ce45519fc216596504705a1d8b031df74f82e1afe92a119b08e36e",
+    "org/sqlite/date/FastDatePrinter$TimeZoneNumberRule.class": "c54d0619677f7582df7b4158678d4384f49dc50469a9d59233e6757167e1f221",
+    "org/sqlite/date/FastDatePrinter$TwelveHourField.class": "346b6b2e1482623a69f45f647a8f00a004c0aec81ab10993243ec9b1e336b79d",
+    "org/sqlite/date/FastDatePrinter$TwentyFourHourField.class": "50bda3ce128cade0c37669a4425828124c4f01b4e47af510f8ce54cc23dc5f97",
+    "org/sqlite/date/FastDatePrinter$TwoDigitMonthField.class": "89765d1dd034a0b0c17143ad42fd00a98700e27634f2b3d3ed72914607fbad42",
+    "org/sqlite/date/FastDatePrinter$TwoDigitNumberField.class": "74447bd810edcef6dfaa380cd6f9ffc637ab3ff57000c5df2b9e4f923576e6da",
+    "org/sqlite/date/FastDatePrinter$TwoDigitYearField.class": "a92241706fdbdcf1c26c5d1b1221148cb5a3a57a373119d5cc047e4416dba616",
+    "org/sqlite/date/FastDatePrinter$UnpaddedMonthField.class": "066f8a30341f145889d89150a92ce529baff3fab1dcc9b631c93f9504f99ddbc",
+    "org/sqlite/date/FastDatePrinter$UnpaddedNumberField.class": "a2bf5d4487985128fadc532282e3afe3373b611c9c93ec1a011e5d5572dd2111",
+    "org/sqlite/date/FastDatePrinter.class": "9d7a15ebb596541c3fa456f0146ef06e577a1e7d6918e7968fe77460d58de1ad",
+    "org/sqlite/date/FormatCache$MultipartKey.class": "5388751417cbc6e80fc4f699daf30a26a9bbe092a09a8ad586fb464b50b1bc99",
+    "org/sqlite/date/FormatCache.class": "1a4e83a2047be64b77b1c8db6d32876524d90947c9d192cabce904fd944c6a71",
+    "org/sqlite/date/package-info.class": "91a0dd92a3f71ef808e9c7b3d353ed8fe5db54bca082cfc4a8fa3fbe7bcd2b55",
+    "org/sqlite/javax/SQLiteConnectionPoolDataSource.class": "3545ebaf87d59dbac84386abfa6545c80fa9771c4eb676ac2dbebaee11c6d616",
+    "org/sqlite/javax/SQLitePooledConnection$1.class": "1bb0b94cffe8be9efc1cf7407c98aa4c22e23d4d91c4201a1d5026f6882c17e7",
+    "org/sqlite/javax/SQLitePooledConnection.class": "1845c4235e98703a95747d54bd67818d27b1c775d8413af09f32ac01589dae66",
+    "org/sqlite/javax/SQLitePooledConnectionHandle.class": "1539ac6773233e02a860dffec9ae707225b9a9bef7f92cc712224b19cbdc7738",
+    "org/sqlite/jdbc3/JDBC3Connection.class": "aee23b85bf774a1a74ec39eaa1567eb6d71d9ccd03eaf426693094216eedd13f",
+    "org/sqlite/jdbc3/JDBC3DatabaseMetaData$ImportedKeyFinder$ForeignKey.class": "3fb90b737fb4c397d914dd1d3ccc445bdec7efd42be0dde886017b1dd88b9083",
+    "org/sqlite/jdbc3/JDBC3DatabaseMetaData$ImportedKeyFinder.class": "fe1a9ea04ebbb29bfdbadcca1f0cfe235e5b2d0ae9e01ba91801e80202342630",
+    "org/sqlite/jdbc3/JDBC3DatabaseMetaData$LogHolder.class": "60d8d5074a074e3aa15c5c361769f6d8cfb99503dbe279cef313c01f8720e836",
+    "org/sqlite/jdbc3/JDBC3DatabaseMetaData$PrimaryKeyFinder.class": "6ef619852bd0c0f8dc5538ea8b766a75415ae9838d0ccc6a39fbbba39b65aace",
+    "org/sqlite/jdbc3/JDBC3DatabaseMetaData.class": "7f06eaf3916a396b6ebd7486e4679da9a6f32bf09bbedda547f6d904b5258364",
+    "org/sqlite/jdbc3/JDBC3PreparedStatement.class": "82cdf025b9159b10daf17a5b753c0809bfdebd0014ebb376003f499a4ac7d186",
+    "org/sqlite/jdbc3/JDBC3ResultSet.class": "1af0d4331c802d092e744df4ed83912b9550616a6b80403781577e4c23de6ecc",
+    "org/sqlite/jdbc3/JDBC3Savepoint.class": "d5228dae6523ed564f15cea9b011304182930b48231f3354b36b1e3b2e36584e",
+    "org/sqlite/jdbc3/JDBC3Statement$BackupObserver.class": "e0c79cb385382e13e07a70db9d2d5d85c0496ead9b1fcc13324ad24334c7e12a",
+    "org/sqlite/jdbc3/JDBC3Statement$SQLCallable.class": "618e56f2318f594e5739eb8b2fe4c5471301cba54f799c467b505c0d16ac5a65",
+    "org/sqlite/jdbc3/JDBC3Statement.class": "3abf2462092d9309228474a6d347f4a2b90c3e7624caec54792dd8b971b142e5",
+    "org/sqlite/jdbc4/JDBC4Connection.class": "c230ad92ce22f29194f8f465d6f76ba9d3e9c2e1c332a0e164766ca142b028db",
+    "org/sqlite/jdbc4/JDBC4DatabaseMetaData.class": "404328b1f9d93ffdd28669159c84771debae155473fdd12cba01ed937c33c2c3",
+    "org/sqlite/jdbc4/JDBC4PooledConnection.class": "d6c3e9ddd35efe5ab0cf09ba92439b26262f8f5906ee2abd78c3ca0653f7a7e8",
+    "org/sqlite/jdbc4/JDBC4PreparedStatement.class": "8b5f2de072ba2ce97daf49c73fda095f423e78c7efbaeb641a676c9c29ebce26",
+    "org/sqlite/jdbc4/JDBC4ResultSet$SqliteClob.class": "ecd6ccd8f9933ba42ecf1f48ed49220ac24fb59dae80a4ccf95d3b690fe4b2b0",
+    "org/sqlite/jdbc4/JDBC4ResultSet.class": "34a34c51397239908064e4baf2fe89d80b83a18d976a4c93ac2148573b962353",
+    "org/sqlite/jdbc4/JDBC4Statement.class": "7aa768fdbedd27ef6c9e456e32e52705a1bbef1e2a98052255adf469a83e9d17",
+    "org/sqlite/native/FreeBSD/aarch64/libsqlitejdbc.so": "46b8c1c44737754f1d0f62c280fb551d4c00b559ebcf34c822c6edecd7e84e59",
+    "org/sqlite/native/FreeBSD/x86/libsqlitejdbc.so": "e70fd6e747644cfeb373ba080c9e203e774bc874401936073f062dc6a7b289af",
+    "org/sqlite/native/FreeBSD/x86_64/libsqlitejdbc.so": "00ffebbdbf3beb15eb8f84f5e72f1cd8cb35aa31ca637b20f54ff4f2adf7f966",
+    "org/sqlite/native/Linux-Android/aarch64/libsqlitejdbc.so": "d792395cfd2ff3ced7e4bcf52644efb46cdbdd67f69a4814c771cee37f43bcb0",
+    "org/sqlite/native/Linux-Android/arm/libsqlitejdbc.so": "2a3d82145fc3499b49310b14e8c864d1925258c50881e634a62c493d849b49f4",
+    "org/sqlite/native/Linux-Android/x86/libsqlitejdbc.so": "b2c716908f0e624782fdd8008241cbfcd6a8922e86d0d5c350c750301256880a",
+    "org/sqlite/native/Linux-Android/x86_64/libsqlitejdbc.so": "11d4959b81adbb35b75986fb0a37b104b382c03c4d811ac1f1df809455d89a47",
+    "org/sqlite/native/Linux-Musl/aarch64/libsqlitejdbc.so": "9a0c67f854aa9e282704dc3be2d0e745a5832603b971eb8afb3ed38116c6b0d1",
+    "org/sqlite/native/Linux-Musl/x86/libsqlitejdbc.so": "8a7318a4ca7c284b6db9dd3e424ca40869b7a52258c909915b1fe5561f3bf8f3",
+    "org/sqlite/native/Linux-Musl/x86_64/libsqlitejdbc.so": "e4c15b33ddda3292e16796f04862c51b6e5638c9958df7d9d257fc1af97e0f6c",
+    "org/sqlite/native/Linux/aarch64/libsqlitejdbc.so": "afc963ee8e4a3f9ed01f3e84adaf5b94245c16cc8cd1bf65234e13a8e60477dd",
+    "org/sqlite/native/Linux/arm/libsqlitejdbc.so": "d39c19fd916c81fd5131858f5ec5356c4640cb6756d57181ae2d9fd4e8c46e9c",
+    "org/sqlite/native/Linux/armv6/libsqlitejdbc.so": "cc8cda3aad9bb493ea77e37a09bca594b749b9c27887cafb98e3ee19db95dbe1",
+    "org/sqlite/native/Linux/armv7/libsqlitejdbc.so": "8b81b8fcba28ef4dd3211b2887a07599bf8a3b6d77d01638219f0c00be987757",
+    "org/sqlite/native/Linux/ppc64/libsqlitejdbc.so": "f635456308a5ba0f1fd789868f53ae1f8f08c25d5c1ab30c47cb6a921293e3bc",
+    "org/sqlite/native/Linux/riscv64/libsqlitejdbc.so": "08c0de7b3e9278998e15beec19ef6293ae052446a3e0da11e7cf1570ecd2e90d",
+    "org/sqlite/native/Linux/x86/libsqlitejdbc.so": "0b793033cb05bd262949c96a817f871f8facaf25b1866aa408d2a94dd61f075f",
+    "org/sqlite/native/Linux/x86_64/libsqlitejdbc.so": "604ae9093b584a2593bf6fe6bf700a6a7be07d115798ee67b73c04c10193e107",
+    "org/sqlite/native/Mac/aarch64/libsqlitejdbc.dylib": "3d4a1d195fb7b4a4857d5f08340319bc698c573033a8e855fc8ecdc0f802e7e6",
+    "org/sqlite/native/Mac/x86_64/libsqlitejdbc.dylib": "89187880e66841cd19de796371d7b69f7600cd4d7aa8e2db519102e26096ff97",
+    "org/sqlite/native/Windows/aarch64/sqlitejdbc.dll": "b3ac17f9748a61e32bcbecafff1afe3f30b4cae7beee3aee7d316fd7fd902405",
+    "org/sqlite/native/Windows/armv7/sqlitejdbc.dll": "bdfd889b8cd9a48ab36e54a8e5ed1084d078c575eb4d1b3cf4c1bdf01f610e30",
+    "org/sqlite/native/Windows/x86/sqlitejdbc.dll": "ab467856c43dfcb5524f19765a75687aea2d38f18dd65fa2e36311d6d6e9970d",
+    "org/sqlite/native/Windows/x86_64/sqlitejdbc.dll": "f2a14542506714d78a5860d05a9295a7f0647b5c113e5baf5b10c73e269c71e6",
+    "org/sqlite/util/LibraryLoaderUtil.class": "de7261a3e5f23da0e831eb4f2fff87540629d9249a2ce4e141c4e70e4fea197a",
+    "org/sqlite/util/Logger.class": "17a508985c4a61f560ac82f6067f6817f33709e73d7226f4dc1fd7d97c2f04bb",
+    "org/sqlite/util/LoggerFactory$JDKLogger.class": "ae590028a8e4357faa5bfd9e1b3f61e4194741758e4e5528fd48e893c1a69a61",
+    "org/sqlite/util/LoggerFactory$SLF4JLogger.class": "466a183e5985f90a4a51a651457119858671a01bff9b4fd8c241ad7e6519ca80",
+    "org/sqlite/util/LoggerFactory.class": "1bc68d6f8baf988e07a9b841ae8164b468aecaa6fc0c0e9aee2dbff62ef46976",
+    "org/sqlite/util/OSInfo$LogHolder.class": "7505140f33c67042c6e398e35e087a780f5c6f7f1d90a6518a703bf85f277b1b",
+    "org/sqlite/util/OSInfo.class": "073373aa29b27def55734f7e9be52827de549f4a21aa3d9e449849f489f8e998",
+    "org/sqlite/util/ProcessRunner.class": "a9e0795c81f585af73df73c5b0829ab6b74bf614f76e3568f8566ab88c88f031",
+    "org/sqlite/util/QueryUtils.class": "480b2d0e44c49855887ae90e5b3c31f546feb0762d8ec23cfb79d01095c647bb",
+    "org/sqlite/util/ResourceFinder.class": "5434592a7f92c7c57fc1ad2c9672ebda92d6945880f1742596fb931c61671560",
+    "org/sqlite/util/StringUtils.class": "9c5bc064e459ae13b64d85a800a565c81b0c73abd7a7182a4b40ff0ca741dde6",
+    "sqlite-jdbc.properties": "c55664bcee46aa59aec44a016dfde6f8b3602765baea2c5939d716fe12e19505"
+  },
+  "baselineReproducer": [
+    {
+      "path": "artifacts/grieflogger-storage-diagnostic-2026-10-23/classes/com/daqem/grieflogger/GriefLogger.class",
+      "bytes": 2230,
+      "sha256": "88ced4f0e9e01f4cf186f455f1a48101b62ec8832fd5809f342894b4ffb51252"
+    },
+    {
+      "path": "artifacts/grieflogger-storage-diagnostic-2026-10-23/classes/QueueWriteFailureDiagnostic.class",
+      "bytes": 4336,
+      "sha256": "849e2a160bd42e973fd5cff65ca4875e64038c3914f8c38fdc07fe4d8798ee42"
+    },
+    {
+      "path": "artifacts/grieflogger-storage-diagnostic-2026-10-23/diagnostic.log",
+      "bytes": 512,
+      "sha256": "d220956d5cba282409f75d0eaa6a88611057ebd58251ca96d0cf1e4e103e43ff"
+    },
+    {
+      "path": "artifacts/grieflogger-storage-diagnostic-2026-10-23/locked-write.db",
+      "bytes": 8192,
+      "sha256": "5403967df161047346586a6f5d91c498f798b13617d61de9c2a6d774bc5688e9"
+    },
+    {
+      "path": "artifacts/grieflogger-storage-diagnostic-2026-10-23/NOTES.md",
+      "bytes": 2023,
+      "sha256": "5f776a5923f31a9ec08acc6ab7d4842470afe2388be41b0a5e789964a08c65c4"
+    },
+    {
+      "path": "artifacts/grieflogger-storage-diagnostic-2026-10-23/providers.json",
+      "bytes": 547,
+      "sha256": "13cfb2f622ca3ad754ce3d1ca59646b479dc62d9cf212e5775eff4d210bac6de"
+    },
+    {
+      "path": "artifacts/grieflogger-storage-diagnostic-2026-10-23/sqlite.jar",
+      "bytes": 14268566,
+      "sha256": "b1864c68e168b015f813a37045f6d80cb4ecf4fe623dfa36a1f7378c1bb2cfbf"
+    },
+    {
+      "path": "artifacts/grieflogger-storage-diagnostic-2026-10-23/src/com/daqem/grieflogger/GriefLogger.java",
+      "bytes": 603,
+      "sha256": "3d5acdcd3e9761050b7ffbf17f0cb61aefdc036e2f3fd052187c234f5b4a709d"
+    },
+    {
+      "path": "artifacts/grieflogger-storage-diagnostic-2026-10-23/src/QueueWriteFailureDiagnostic.java",
+      "bytes": 2322,
+      "sha256": "8c8ee874712f459ef8692de3c6d2e0fa0daa6b5ce1c638f70f77b613f3ece5d0"
+    }
+  ],
+  "standalone": {
+    "createdAt": "2026-10-23T11:46:06.7522555+08:00",
+    "timezone": "UTC+08:00",
+    "checks": 27,
+    "actualProviderBytecode": true,
+    "minecraftBootstrapOwnerSubstitutedForStandaloneLogger": true,
+    "files": [
+      {
+        "path": "C:\\Users\\ben_l\\Documents\\Coding\\citizens2-neoforged\\artifacts\\grieflogger-write-recovery-source\\neoforge\\build\\libs\\grieflogger-1.2.10-1.21.1-yuuniverse.2-neoforge.jar",
+        "bytes": 18922921,
+        "sha256": "07d0ab4bf1dec4283cf19b7c7c82481919f87080aaf1598b27d0adfbcacb3eee"
+      },
+      {
+        "path": "C:\\Users\\ben_l\\.gradle\\caches\\modules-2\\files-2.1\\org.slf4j\\slf4j-api\\2.0.9\\7cf2726fdcfbc8610f9a71fb3ed639871f315340\\slf4j-api-2.0.9.jar",
+        "bytes": 64579,
+        "sha256": "0818930dc8d7debb403204611691da58e49d42c50b6ffcfdce02dadb7c3c2b6c"
+      },
+      {
+        "path": "C:\\Users\\ben_l\\Documents\\Coding\\citizens2-neoforged\\artifacts\\grieflogger-storage-recovery-tests-final\\sqlite.jar",
+        "bytes": 14268566,
+        "sha256": "548d6659c83e55050d707a676f92faf7715c2a4af6ae55750beb8d2575f7a878"
+      },
+      {
+        "path": "C:\\Users\\ben_l\\Documents\\Coding\\citizens2-neoforged\\artifacts\\grieflogger-storage-recovery-tests-final\\tests.log",
+        "bytes": 3070,
+        "sha256": "829123a4de8d991a48b2007035c449b2a9e812ea96546d81d8ac777483151e95"
+      },
+      {
+        "path": "C:\\Users\\ben_l\\Documents\\Coding\\citizens2-neoforged\\tools\\grieflogger-compat\\run-storage-tests.ps1",
+        "bytes": 3411,
+        "sha256": "db250ec08a8defa01b60c4245d39b604826ed75aef2dbd2f4e3d00e2832bd6c3"
+      },
+      {
+        "path": "C:\\Users\\ben_l\\Documents\\Coding\\citizens2-neoforged\\tools\\grieflogger-compat\\storage-tests\\StorageRecoveryTest.java",
+        "bytes": 14103,
+        "sha256": "2db3aca642014e65be1a97620e07540cbcabc31439480108fb4d87ed112995c9"
+      },
+      {
+        "path": "C:\\Users\\ben_l\\Documents\\Coding\\citizens2-neoforged\\tools\\grieflogger-compat\\storage-tests\\com\\daqem\\grieflogger\\GriefLogger.java",
+        "bytes": 791,
+        "sha256": "378adb66680057dfac3b73d92055667f7d1c67950a4465ab6abad3a8f8740181"
+      }
+    ]
+  },
+  "standaloneEvidence": {
+    "path": "artifacts/grieflogger-storage-recovery-tests-final/validation.json",
+    "bytes": 2149,
+    "sha256": "5c0dc388178837431347923082d827ef19275a841ca9f5d168e950bcdc79e443"
+  },
+  "nativeChecks": 37,
+  "cleanRestartChecks": 8,
+  "build": {
+    "path": "artifacts/grieflogger-write-recovery-build.log",
+    "bytes": 3402,
+    "sha256": "308d71b83501325b4d768ed53d33988e5bace590042a7e445358389d60049fea"
+  },
+  "logs": [
+    {
+      "path": "artifacts/grieflogger-native-recovery.log",
+      "bytes": 21903,
+      "sha256": "0e078715c289b38090c151fa7c8fa42574f48aa4a82c2918bfbab02a1f523df7"
+    },
+    {
+      "path": "artifacts/grieflogger-native-recovery-restart.log",
+      "bytes": 13452,
+      "sha256": "1530fd157eb2402bebcefda8178777cba110bd72a8cb7a04241aa12f59a350cc"
+    }
+  ],
+  "providers": [
+    {
+      "path": "artifacts/grieflogger-write-recovery-server/mods/architectury-13.0.11-neoforge.jar",
+      "bytes": 584734,
+      "sha256": "9cc92f2c09533fc5482c60f993bd891c655a0e32b637037cdcb7c2b23adedeeb"
+    },
+    {
+      "path": "artifacts/grieflogger-write-recovery-server/mods/create.jar",
+      "bytes": 19138095,
+      "sha256": "5602a16796957cb5c7fb829c10c6b54bf9d228931c7680636710b6a60d92822e"
+    },
+    {
+      "path": "artifacts/grieflogger-write-recovery-server/mods/economy.jar",
+      "bytes": 14431850,
+      "sha256": "179115e5301ee6629acd3bdcbb6779d2549a35f7493821ab0fca79bcc43645f5"
+    },
+    {
+      "path": "artifacts/grieflogger-write-recovery-server/mods/grieflogger-1.2.10-1.21.1-yuuniverse.2-neoforge.jar",
+      "bytes": 18922921,
+      "sha256": "07d0ab4bf1dec4283cf19b7c7c82481919f87080aaf1598b27d0adfbcacb3eee"
+    },
+    {
+      "path": "artifacts/grieflogger-write-recovery-server/mods/neoprotect-1.0.4-mc1.21.1-neoforge.jar",
+      "bytes": 2614693,
+      "sha256": "2cbcec7aeef26ef3f5b54dae90fc16da353a1534462353b9f516d7d2e0a138ce"
+    },
+    {
+      "path": "artifacts/grieflogger-write-recovery-server/mods/supermartijn642configlib-1.1.8-neoforge-mc1.21.jar",
+      "bytes": 207514,
+      "sha256": "d2ba7b839a2268e4e223457e813d11aa2476c3bf708a7bba691d8fc851778a4b"
+    }
+  ],
+  "nativeState": {
+    "actor": "5d7cc338-320e-4b9d-b3ed-3cdbf2e47933",
+    "currency": "8d6810f0-d3f7-4bfc-8598-68f54b96f834",
+    "balance": 980,
+    "operation": "0190ed18-9f83-4423-9639-311694650b07",
+    "transaction": "59cda2d7-4b82-4b09-9a59-e197aa6fce37",
+    "shop": "coordinate:c67e23a3-25fd-43ea-9434-fbe5dcf34332",
+    "run": null
+  },
+  "nativeStateEvidence": {
+    "path": "artifacts/grieflogger-write-recovery-server/logging-restart-state.json",
+    "bytes": 284,
+    "sha256": "7d7399775015bb9362bada91ac4d16de5abcf0e523a870c93e5acd3cdd5cbbcf"
+  },
+  "databases": [
+    {
+      "path": "artifacts/grieflogger-write-recovery-server/database.db",
+      "bytes": 81920,
+      "sha256": "3e45fbefb4966273f88786f85c7fa2eee133bec9da389261306b6db5f0b48df6",
+      "quickCheck": "ok",
+      "originalActorRows": {
+        "blocks": 199,
+        "containers": 1,
+        "items": 0
+      }
+    },
+    {
+      "path": "artifacts/grieflogger-write-recovery-server/logging-world/yuuniverse_economy/economy.db",
+      "bytes": 368640,
+      "sha256": "0e5099b02e10874c8f539b6aba50d960dd577a32bd4f5780c3a4f8ff5064f71c",
+      "quickCheck": "ok",
+      "originalActorRows": [
+        [
+          "59cda2d7-4b82-4b09-9a59-e197aa6fce37",
+          "coordinate:c67e23a3-25fd-43ea-9434-fbe5dcf34332",
+          "8d6810f0-d3f7-4bfc-8598-68f54b96f834",
+          "player:5d7cc338-320e-4b9d-b3ed-3cdbf2e47933"
+        ]
+      ]
+    }
+  ],
+  "stopped": {
+    "timezone": "UTC+08:00",
+    "fixture": "C:\\Users\\ben_l\\Documents\\Coding\\citizens2-neoforged\\artifacts\\grieflogger-write-recovery-server",
+    "exclusiveStoppedWorldAndDatabases": true,
+    "createdAt": "2026-10-23T11:55:07.2291942+08:00",
+    "paths": [
+      "logging-world/session.lock",
+      "database.db",
+      "logging-world/neoprotect/neoprotect.mv.db",
+      "logging-world/yuuniverse_economy/economy.db"
+    ]
+  },
+  "stoppedEvidence": {
+    "path": "artifacts/grieflogger-storage-stopped.json",
+    "bytes": 428,
+    "sha256": "a9a89f68fa430592b9896127cdad4be3bfb791549e1daffe9989ef46065b8a76"
+  },
+  "h2": {
+    "path": "artifacts/grieflogger-write-recovery-server/logging-world/neoprotect/neoprotect.mv.db",
+    "bytes": 98304,
+    "sha256": "f674938b3b930d860c0441333a77822008a7662333bc577c7ceb6f3435822a32"
+  },
+  "packages": [
+    {
+      "path": "artifacts/craft-binding-ordinary-21.1.248-build/libs/citizens-2.0.43-neoforge-SNAPSHOT.jar",
+      "bytes": 4091667,
+      "sha256": "02437eda296f5b84055b1c11f87553cd297649ca6362a3eb53a385517a2f6f6f",
+      "matchingNativeProductionClasses": 1020
+    },
+    {
+      "path": "artifacts/craft-binding-ordinary-21.1.248-build/libs/yuuniverse-interactions-2.0.43-neoforge-SNAPSHOT.jar",
+      "bytes": 204146,
+      "sha256": "77021e0135062bec5e78117e65845ce6c5b59022a8e59d6f3a9ca3305aedf635",
+      "matchingNativeProductionClasses": 74
+    }
+  ],
+  "reusedOrdinaryTestsPerTarget": 825,
+  "reusedInteractionsTests": 100,
+  "reusedTestEvidence": "docs/craft-binding-validation-2026-10-22.json",
+  "sources": [
+    {
+      "path": "tools/grieflogger-compat/storage-tests/com/daqem/grieflogger/GriefLogger.java",
+      "bytes": 791,
+      "sha256": "378adb66680057dfac3b73d92055667f7d1c67950a4465ab6abad3a8f8740181"
+    },
+    {
+      "path": "tools/grieflogger-compat/storage-tests/StorageRecoveryTest.java",
+      "bytes": 14103,
+      "sha256": "2db3aca642014e65be1a97620e07540cbcabc31439480108fb4d87ed112995c9"
+    },
+    {
+      "path": "tools/grieflogger-compat/run-storage-tests.ps1",
+      "bytes": 3411,
+      "sha256": "db250ec08a8defa01b60c4245d39b604826ed75aef2dbd2f4e3d00e2832bd6c3"
+    },
+    {
+      "path": "tools/logging-runtime-audit.gradle",
+      "bytes": 2668,
+      "sha256": "1091861419c919df201b5e58dd9da6b24e3fb35a9b6dbc503431b74612f2a225"
+    },
+    {
+      "path": "tools/logging-runtime-audit/net/yuuniverse/interactions/LoggingRuntimeAudit.java",
+      "bytes": 27091,
+      "sha256": "e3209d4712594e590379a08721f4033d9584046f1e1a437195b99f9d0f2506a8"
+    },
+    {
+      "path": "tools/record-grieflogger-storage-validation.py",
+      "bytes": 10891,
+      "sha256": "14d8e17579e2cae87f74a32db3166fb4a44d5da66d81cadbd47d8476b97bec13"
+    }
+  ],
+  "limits": [
+    "Fault injection is actual provider bytecode and SQLite outside Minecraft with only bootstrap/logger substituted",
+    "Native regression uses ordinary/restart workflows, not in-server injected database faults",
+    "Pending writes remain in memory; unflushed JVM termination is not covered",
+    "Uncertain commit/rollback requires review, not blind replay",
+    "Capacity/retention/full-device/MySQL/load and migration/client gates remain",
+    "No production or pinned ordinary-client fixture changes"
+  ]
+}

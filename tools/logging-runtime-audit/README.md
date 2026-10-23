@@ -17,6 +17,14 @@ restart. Existing fixture histories are retained; assertions filter by actor UUI
 The fixture is `artifacts/logging-audit-server`, loopback port 25632, with an
 explicit marker. It contains NeoProtect 1.0.4, repaired GriefLogger 1.2.10,
 Architectury 13.0.11, Config Lib 1.1.8, Create performance-v6 and Economy 0.5.6.
+
+For a separate fresh acceptance world, pass `-PloggingAuditFixture=../artifacts/your-fixture`
+and isolated loggingAuditBuildDir/project-cache paths. The directory must remain
+under task artifacts and retain the same marker/port/world guards. The
+[2026-10-23 GriefLogger recovery batch](../../docs/grieflogger-write-recovery-2026-10-23.md)
+uses this path selection to validate provider `.2` without replacing historical
+or deferred client fixtures.
+
 Economy requires NeoForge 21.1.247+, so this combined fixture uses 21.1.248.
 The NeoForge 21.1.233 build and absent-provider regression remain separate.
 

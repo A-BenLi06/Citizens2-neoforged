@@ -3,7 +3,9 @@ allprojects {
     if (auditBuild != null) layout.buildDirectory.set(file(auditBuild))
     afterEvaluate { p ->
         if (p.extensions.findByName('neoForge') == null) return
-        def fixture = p.file('../artifacts/logging-audit-server')
+        def fixture = p.file(p.findProperty('loggingAuditFixture') ?: '../artifacts/logging-audit-server')
+        if (!fixture.toPath().toAbsolutePath().normalize().startsWith(p.file('../artifacts').toPath().toAbsolutePath().normalize()))
+            throw new GradleException('Logging fixture must be inside task artifacts')
         def phase = p.findProperty('loggingAuditPhase') ?: 'native'
         if (!(phase in ['native', 'crash', 'recover'])) throw new GradleException('Unknown logging audit phase')
         p.sourceSets.dialogue.java.srcDir(p.file('../tools/logging-runtime-audit'))

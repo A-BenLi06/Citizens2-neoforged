@@ -10,6 +10,13 @@ This review covers repository structure, native implementation boundaries, upstr
 
 ## Repository and implementation boundaries
 
+Update 2026-10-23, UTC+08:00: [GriefLogger write recovery](grieflogger-write-recovery-2026-10-23.md)
+repairs the actual loss of a queued observation after a temporary SQLite lock.
+Provider `.2` passes 27 actual-bytecode SQLite, 37 native and eight restart checks,
+including complete batch retry and concurrent producers. Unknown commit/rollback
+outcomes retain work and stop automatic replay. The tested JAR remains local;
+unflushed termination, broader storage/retention/load and client gates remain.
+
 Update 2026-10-23, UTC+08:00: [fan holder recovery](create-fan-recovery-2026-10-23.md)
 passes 18 actual JVM kills across world entities, depots and connected belts on
 both targets. Seventy-two boundary and 216 restart checks preserve original

@@ -8,6 +8,13 @@ Citizens retains NPC behavior and its existing native extension contracts. Yuuni
 
 ## Selected artifacts and sides
 
+Progress 2026-10-23, UTC+08:00: [GriefLogger write recovery](grieflogger-write-recovery-2026-10-23.md)
+fixes reproduced transient SQLite write loss with owned ordinary/batch parameters,
+complete known-rollback retry and uncertain-outcome fences. Provider `.2` passes
+27 actual-bytecode SQLite, 37 native and eight restart checks; source patch and
+artifact provenance are retained. Production is unchanged. Other storage,
+unflushed termination, retention/load, migration and deferred client gates remain.
+
 Progress 2026-10-23, UTC+08:00: [fan holder recovery](create-fan-recovery-2026-10-23.md)
 adds 18 verified JVM kills for native SPLASHING world/depot/belt storage on both
 targets. Seventy-two boundary/216 restart checks preserve original rolled outputs,

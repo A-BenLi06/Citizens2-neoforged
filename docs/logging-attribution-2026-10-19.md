@@ -84,3 +84,12 @@ Queue overflow, database failures, termination during writes, retention tooling,
 wider modded inventories/entities and environmental cause paths, production load,
 and integrated physical clients remain open. The combined provider fixture needs
 Economy's 21.1.247 floor; the Citizens 21.1.233 baseline is validated separately.
+
+The [2026-10-23 queued-write follow-up](grieflogger-write-recovery-2026-10-23.md)
+repairs an actual transient SQLite write loss in GriefLogger `.1`. Provider `.2`
+retains immutable ordinary/batch parameters until commit, retries complete known
+rollbacks and stops automatic replay for uncertain outcomes. Acceptance passes
+27 actual-bytecode SQLite, 37 native and eight restart checks. Unflushed JVM death,
+full-device failures, uncertain-outcome administration, retention/capacity/load,
+MySQL and integrated release acceptance remain open; production stays on its
+previous provider set.

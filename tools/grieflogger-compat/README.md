@@ -1,5 +1,19 @@
 # GriefLogger SQLite packaging compatibility
 
+Follow-up 2026-10-23, UTC+08:00: [queued write recovery](../../docs/grieflogger-write-recovery-2026-10-23.md)
+repairs a reproduced transient SQLite write loss in the packaged provider. Apply
+`queued-write-recovery.patch` after the packaging patch below to build
+`1.2.10-1.21.1-yuuniverse.2`. It adds owned ordinary/batch parameter snapshots,
+rollback/retry and uncertain-outcome fences; it does change provider database/queue
+source. The packaging-only history below describes version `.1`.
+
+The `.2` build passes 27 actual-bytecode SQLite assertions, 37 native logging
+checks and eight clean-restart checks. `run-storage-tests.ps1` requires JavaHome,
+ProviderJar, Slf4jJar and a fresh OutputDirectory under task artifacts. The driver
+is extracted from the provider's declared Jar-in-Jar path. See the linked report
+and manifest for exact source/artifact evidence, rebuild provenance and remaining
+in-memory durability/capacity/MySQL limits. No production activation is included.
+
 Target: GriefLogger 1.2.10 for Minecraft 1.21.1 / NeoForge, Java 21.
 Source: <https://github.com/DAQEM/GriefLogger>, commit `e913b78806a8f7646b7e3adc0d6721d1b386f29d` (the checked 1.21.1 branch). Use this exact source commit: the upstream `1.2.10-1.21.1` tag currently points at source configured for another Minecraft version.
 

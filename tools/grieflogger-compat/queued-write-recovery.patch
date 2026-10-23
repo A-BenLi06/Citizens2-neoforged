@@ -1,0 +1,534 @@
+diff --git a/common/src/main/java/com/daqem/grieflogger/GriefLogger.java b/common/src/main/java/com/daqem/grieflogger/GriefLogger.java
+index 6f0b4f8..ceb80f2 100644
+--- a/common/src/main/java/com/daqem/grieflogger/GriefLogger.java
++++ b/common/src/main/java/com/daqem/grieflogger/GriefLogger.java
+@@ -83,6 +83,8 @@ public class GriefLogger {
+             Services.SESSION.createIndexes();
+         }
+ 
++        if (!DATABASE.completeInitialization()) return false;
++
+         long end = System.currentTimeMillis();
+         LOGGER.info("Database prepared in {}ms.", end - start);
+         return true;
+diff --git a/common/src/main/java/com/daqem/grieflogger/database/Database.java b/common/src/main/java/com/daqem/grieflogger/database/Database.java
+index 9ed4c93..da5f309 100644
+--- a/common/src/main/java/com/daqem/grieflogger/database/Database.java
++++ b/common/src/main/java/com/daqem/grieflogger/database/Database.java
+@@ -5,6 +5,8 @@ import com.daqem.grieflogger.GriefLoggerExpectPlatform;
+ import com.daqem.grieflogger.config.GriefLoggerConfig;
+ import com.daqem.grieflogger.database.queue.IQueue;
+ import com.daqem.grieflogger.database.queue.Queue;
++import com.daqem.grieflogger.database.queue.QueuedStatement;
++import com.daqem.grieflogger.database.queue.QueuedWrite;
+ import com.supermartijn642.configlib.ConfigLib;
+ import org.jetbrains.annotations.Nullable;
+ 
+@@ -20,6 +22,7 @@ public class Database {
+     private Statement statement;
+     public final IQueue queue;
+     public final IQueue batchQueue;
++    private boolean writeOutcomeUncertain;
+ 
+     public Database() {
+         queue = new Queue(this, false);
+@@ -125,34 +128,65 @@ public class Database {
+         }
+     }
+ 
++    public QueuedStatement prepareQueuedStatement(String query) throws SQLException {
++        // Preserve native admission-time SQL validation without retaining a JDBC resource.
++        try (var validated = prepareStatement(query)) {
++            return new QueuedStatement(query);
++        }
++    }
++
++    public synchronized boolean completeInitialization() {
++        try {
++            if (connection == null) throw new SQLException("Connection is null");
++            connection.commit();
++            return true;
++        } catch (SQLException failure) {
++            writeOutcomeUncertain = true;
++            GriefLogger.LOGGER.error("Failed to commit database initialization", failure);
++            return false;
++        }
++    }
++
++    public synchronized void ping() {
++        try (var ping = prepareStatement("SELECT 1"); var result = ping.executeQuery()) {
++            if (!result.next()) throw new SQLException("Database ping returned no row");
++        } catch (SQLException failure) {
++            GriefLogger.LOGGER.error("Failed to send hello packet", failure);
++        }
++    }
++
+     public void executeStatements(List<PreparedStatement> statements, boolean isBatch) {
++        executeWrites(statements.stream().map(statement -> QueuedWrite.legacy(statement, isBatch)).toList());
++    }
++
++    public synchronized boolean executeWrites(List<QueuedWrite> writes) {
++        if (writeOutcomeUncertain) return false;
++        if (writes.isEmpty()) return true;
++        boolean committing = false;
+         try {
+-            for (PreparedStatement statement : statements) {
+-                if (statement == null) {
+-                    GriefLogger.LOGGER.error("Statement is null");
+-                    continue;
+-                }
+-
+-                if (statement.isClosed()) {
+-                    GriefLogger.LOGGER.error("Statement is closed");
+-                    continue;
+-                }
+-
+-                try (statement) {
+-                    if (isBatch) {
+-                        statement.executeBatch(); // Execute as a batch
+-                    } else {
+-                        statement.executeUpdate(); // Execute individually
+-                    }
+-                }
+-            }
+-            if (!statements.isEmpty()) {
+-                if (connection != null) {
+-                    connection.commit();
+-                }
++            if (connection == null || connection.getAutoCommit()) throw new SQLException("Queued writes require a manual-commit connection");
++            for (var write : writes) write.execute(connection);
++            committing = true;
++            connection.commit();
++        } catch (SQLException | RuntimeException failure) {
++            boolean rolledBack = false;
++            try {
++                if (connection != null) { connection.rollback(); rolledBack = true; }
++            } catch (SQLException rollbackFailure) {
++                failure.addSuppressed(rollbackFailure);
+             }
+-        } catch (SQLException e) {
+-            GriefLogger.LOGGER.error("Failed to execute statements", e);
++            // A failed commit can have reached the database. Driver-owned legacy batches
++            // can also lose their parameters on executeBatch, even after a known rollback.
++            writeOutcomeUncertain = committing || !rolledBack || writes.stream().anyMatch(write -> !write.canRetryAfterFailure());
++            GriefLogger.LOGGER.error(writeOutcomeUncertain
++                    ? "Database write outcome requires review; queued writes retained and automatic flush stopped"
++                    : "Database writes rolled back; queued writes retained for retry", failure);
++            return false;
++        }
++        for (var write : writes) {
++            try { write.closeAfterCommit(); }
++            catch (SQLException closeFailure) { GriefLogger.LOGGER.error("Failed to close committed statement", closeFailure); }
+         }
++        return true;
+     }
+ }
+diff --git a/common/src/main/java/com/daqem/grieflogger/database/queue/IQueue.java b/common/src/main/java/com/daqem/grieflogger/database/queue/IQueue.java
+index ff88421..91bb0a4 100644
+--- a/common/src/main/java/com/daqem/grieflogger/database/queue/IQueue.java
++++ b/common/src/main/java/com/daqem/grieflogger/database/queue/IQueue.java
+@@ -5,6 +5,8 @@ import java.sql.PreparedStatement;
+ public interface IQueue {
+ 
+     void add(PreparedStatement statement);
++    void add(QueuedStatement statement);
++    int pendingCount();
+     void execute();
+     void hello();
+ }
+diff --git a/common/src/main/java/com/daqem/grieflogger/database/queue/Queue.java b/common/src/main/java/com/daqem/grieflogger/database/queue/Queue.java
+index 2eb5525..6cbe2a0 100644
+--- a/common/src/main/java/com/daqem/grieflogger/database/queue/Queue.java
++++ b/common/src/main/java/com/daqem/grieflogger/database/queue/Queue.java
+@@ -1,17 +1,18 @@
+ package com.daqem.grieflogger.database.queue;
+ 
+-import com.daqem.grieflogger.GriefLogger;
+ import com.daqem.grieflogger.database.Database;
+ 
+ import java.sql.PreparedStatement;
+-import java.util.ArrayList;
+ import java.util.List;
++import java.util.concurrent.ConcurrentLinkedQueue;
++import java.util.concurrent.atomic.AtomicBoolean;
+ 
+ public class Queue implements IQueue {
+ 
+     private final Database database;
+     private final boolean isBatch;
+-    private final List<PreparedStatement> statements = new ArrayList<>();
++    private final ConcurrentLinkedQueue<QueuedWrite> statements = new ConcurrentLinkedQueue<>();
++    private final AtomicBoolean flushing = new AtomicBoolean();
+ 
+     public Queue(Database database, boolean isBatch) {
+         this.database = database;
+@@ -20,26 +21,29 @@ public class Queue implements IQueue {
+ 
+     @Override
+     public void add(PreparedStatement statement) {
+-        this.statements.add(statement);
++        this.statements.add(QueuedWrite.legacy(statement, isBatch));
+     }
+ 
++    @Override public void add(QueuedStatement statement) { statements.add(statement.freeze(isBatch)); }
++    @Override public int pendingCount() { return statements.size(); }
++
+     @Override
+     public void execute() {
+-        if (this.statements.isEmpty()) {
+-            return;
++        if (!flushing.compareAndSet(false, true)) return;
++        try {
++            var pending = List.copyOf(statements);
++            if (!pending.isEmpty() && database.executeWrites(pending)) {
++                for (var committed : pending) {
++                    if (statements.poll() != committed) throw new IllegalStateException("Committed write queue prefix changed");
++                }
++            }
++        } finally {
++            flushing.set(false);
+         }
+-        List<PreparedStatement> statements = new ArrayList<>(this.statements);
+-        this.statements.clear();
+-        this.database.executeStatements(statements, isBatch);
+     }
+ 
+     @Override
+     public void hello() {
+-        try {
+-            PreparedStatement statement = this.database.prepareStatement("SELECT 1");
+-            this.database.execute(statement.toString(), false);
+-        } catch (Exception e) {
+-            GriefLogger.LOGGER.error("Failed to send hello packet", e);
+-        }
++        database.ping();
+     }
+ }
+diff --git a/common/src/main/java/com/daqem/grieflogger/database/queue/QueuedStatement.java b/common/src/main/java/com/daqem/grieflogger/database/queue/QueuedStatement.java
+new file mode 100644
+index 0000000..0a34a3f
+--- /dev/null
++++ b/common/src/main/java/com/daqem/grieflogger/database/queue/QueuedStatement.java
+@@ -0,0 +1,46 @@
++package com.daqem.grieflogger.database.queue;
++
++import java.sql.*;
++import java.util.*;
++
++/** SQL and owned parameter values; no open JDBC resource waits in the native queue. */
++public final class QueuedStatement {
++    private record Parameter(int index, int type, Object value) { }
++    private final String sql;
++    private final Map<Integer, Parameter> parameters = new TreeMap<>();
++    private final List<List<Parameter>> batches = new ArrayList<>();
++    private boolean frozen;
++
++    public QueuedStatement(String sql) { this.sql = Objects.requireNonNull(sql); }
++    private void set(int index, int type, Object value) throws SQLException {
++        if (frozen || index < 1) throw new SQLException("Queued statement is frozen or parameter index is invalid");
++        parameters.put(index, new Parameter(index, type, value));
++    }
++    public void setString(int index, String value) throws SQLException { set(index, Types.VARCHAR, value); }
++    public void setLong(int index, long value) throws SQLException { set(index, Types.BIGINT, value); }
++    public void setInt(int index, int value) throws SQLException { set(index, Types.INTEGER, value); }
++    public void setBytes(int index, byte[] value) throws SQLException { set(index, Types.VARBINARY, value == null ? null : value.clone()); }
++    public void addBatch() throws SQLException {
++        if (frozen) throw new SQLException("Queued statement is frozen");
++        batches.add(List.copyOf(parameters.values()));
++    }
++    public QueuedWrite freeze(boolean batch) {
++        if (frozen) throw new IllegalStateException("Statement is already queued");
++        frozen = true;
++        var rows = batch ? List.copyOf(batches) : List.of(List.copyOf(parameters.values()));
++        return connection -> {
++            if (rows.isEmpty()) return;
++            try (var statement = connection.prepareStatement(sql)) {
++                for (var row : rows) {
++                    statement.clearParameters();
++                    for (var parameter : row) {
++                        if (parameter.value() == null) statement.setNull(parameter.index(), parameter.type());
++                        else statement.setObject(parameter.index(), parameter.value(), parameter.type());
++                    }
++                    if (batch) statement.addBatch(); else statement.executeUpdate();
++                }
++                if (batch) statement.executeBatch();
++            }
++        };
++    }
++}
+diff --git a/common/src/main/java/com/daqem/grieflogger/database/queue/QueuedWrite.java b/common/src/main/java/com/daqem/grieflogger/database/queue/QueuedWrite.java
+new file mode 100644
+index 0000000..f4617b1
+--- /dev/null
++++ b/common/src/main/java/com/daqem/grieflogger/database/queue/QueuedWrite.java
+@@ -0,0 +1,24 @@
++package com.daqem.grieflogger.database.queue;
++
++import java.sql.Connection;
++import java.sql.PreparedStatement;
++import java.sql.SQLException;
++
++/** One retained write that can recreate its driver state after a rolled-back attempt. */
++public interface QueuedWrite {
++    void execute(Connection connection) throws SQLException;
++    default boolean canRetryAfterFailure() { return true; }
++    default void closeAfterCommit() throws SQLException { }
++
++    static QueuedWrite legacy(PreparedStatement statement, boolean batch) {
++        java.util.Objects.requireNonNull(statement);
++        return new QueuedWrite() {
++            public void execute(Connection connection) throws SQLException {
++                if (batch) statement.executeBatch(); else statement.executeUpdate();
++            }
++            // JDBC drivers may discard their batch parameters even when execution fails.
++            public boolean canRetryAfterFailure() { return !batch; }
++            public void closeAfterCommit() throws SQLException { statement.close(); }
++        };
++    }
++}
+diff --git a/common/src/main/java/com/daqem/grieflogger/database/repository/BlockRepository.java b/common/src/main/java/com/daqem/grieflogger/database/repository/BlockRepository.java
+index cfa6f13..da83989 100644
+--- a/common/src/main/java/com/daqem/grieflogger/database/repository/BlockRepository.java
++++ b/common/src/main/java/com/daqem/grieflogger/database/repository/BlockRepository.java
+@@ -109,11 +109,11 @@ public class BlockRepository extends Repository {
+         }
+ 
+         try {
+-            PreparedStatement materialStatement = database.prepareStatement(materialQuery);
++            var materialStatement = database.prepareQueuedStatement(materialQuery);
+             materialStatement.setString(1, material);
+             database.queue.add(materialStatement);
+ 
+-            PreparedStatement blockStatement = database.prepareStatement(blockQuery);
++            var blockStatement = database.prepareQueuedStatement(blockQuery);
+             blockStatement.setLong(1, time);
+             blockStatement.setString(2, userUuid);
+             blockStatement.setString(3, levelName);
+@@ -167,8 +167,8 @@ public class BlockRepository extends Repository {
+ 
+ 
+         try {
+-            PreparedStatement materialStatement = database.prepareStatement(materialQuery);
+-            PreparedStatement blockStatement = database.prepareStatement(blockQuery);
++            var materialStatement = database.prepareQueuedStatement(materialQuery);
++            var blockStatement = database.prepareQueuedStatement(blockQuery);
+             materialStatement.setString(1, entity);
+             database.queue.add(materialStatement);
+ 
+@@ -271,7 +271,7 @@ public class BlockRepository extends Repository {
+                 """;
+ 
+         try {
+-            PreparedStatement preparedStatement = database.prepareStatement(query);
++            var preparedStatement = database.prepareQueuedStatement(query);
+             preparedStatement.setString(1, levelName);
+             preparedStatement.setInt(2, x);
+             preparedStatement.setInt(3, y);
+diff --git a/common/src/main/java/com/daqem/grieflogger/database/repository/ChatRepository.java b/common/src/main/java/com/daqem/grieflogger/database/repository/ChatRepository.java
+index 2915cd5..6f5066f 100644
+--- a/common/src/main/java/com/daqem/grieflogger/database/repository/ChatRepository.java
++++ b/common/src/main/java/com/daqem/grieflogger/database/repository/ChatRepository.java
+@@ -81,7 +81,7 @@ public class ChatRepository extends Repository {
+         }
+ 
+         try {
+-            PreparedStatement preparedStatement = database.prepareStatement(query);
++            var preparedStatement = database.prepareQueuedStatement(query);
+             preparedStatement.setLong(1, time);
+             preparedStatement.setString(2, userUuid);
+             preparedStatement.setString(3, levelName);
+diff --git a/common/src/main/java/com/daqem/grieflogger/database/repository/CommandRepository.java b/common/src/main/java/com/daqem/grieflogger/database/repository/CommandRepository.java
+index 1691ee1..325daa9 100644
+--- a/common/src/main/java/com/daqem/grieflogger/database/repository/CommandRepository.java
++++ b/common/src/main/java/com/daqem/grieflogger/database/repository/CommandRepository.java
+@@ -81,7 +81,7 @@ public class CommandRepository extends Repository {
+         }
+ 
+         try {
+-            PreparedStatement preparedStatement = database.prepareStatement(query);
++            var preparedStatement = database.prepareQueuedStatement(query);
+             preparedStatement.setLong(1, time);
+             preparedStatement.setString(2, userUuid);
+             preparedStatement.setString(3, levelName);
+diff --git a/common/src/main/java/com/daqem/grieflogger/database/repository/ContainerRepository.java b/common/src/main/java/com/daqem/grieflogger/database/repository/ContainerRepository.java
+index 47a6cfe..a56195c 100644
+--- a/common/src/main/java/com/daqem/grieflogger/database/repository/ContainerRepository.java
++++ b/common/src/main/java/com/daqem/grieflogger/database/repository/ContainerRepository.java
+@@ -115,8 +115,8 @@ public class ContainerRepository extends Repository {
+         ResourceLocation itemLocation = item.getItem().arch$registryName();
+         if (itemLocation != null) {
+             try {
+-                PreparedStatement itemStatement = database.prepareStatement(insertItemQuery);
+-                PreparedStatement materialStatement = database.prepareStatement(insertMaterialQuery);
++                var itemStatement = database.prepareQueuedStatement(insertItemQuery);
++                var materialStatement = database.prepareQueuedStatement(insertMaterialQuery);
+ 
+                 materialStatement.setString(1, itemLocation.toString().replace("minecraft:", ""));
+                 database.queue.add(materialStatement);
+@@ -163,8 +163,8 @@ public class ContainerRepository extends Repository {
+                 """;
+ 
+         try {
+-            PreparedStatement itemStatement = database.prepareStatement(insertItemQuery);
+-            PreparedStatement materialStatement = database.prepareStatement(insertMaterialQuery);
++            var itemStatement = database.prepareQueuedStatement(insertItemQuery);
++            var materialStatement = database.prepareQueuedStatement(insertMaterialQuery);
+ 
+             for (SimpleItemStack item : items) {
+                 if (item.isEmpty()) {
+@@ -220,8 +220,8 @@ public class ContainerRepository extends Repository {
+                 """;
+ 
+         try {
+-            PreparedStatement itemStatement = database.prepareStatement(insertItemQuery);
+-            PreparedStatement materialStatement = database.prepareStatement(insertMaterialQuery);
++            var itemStatement = database.prepareQueuedStatement(insertItemQuery);
++            var materialStatement = database.prepareQueuedStatement(insertMaterialQuery);
+ 
+             for (Map.Entry<ItemAction, List<SimpleItemStack>> entry : itemsMap.entrySet()) {
+                 for (SimpleItemStack item : entry.getValue()) {
+diff --git a/common/src/main/java/com/daqem/grieflogger/database/repository/EntityRepository.java b/common/src/main/java/com/daqem/grieflogger/database/repository/EntityRepository.java
+index a66b31d..c0be106 100644
+--- a/common/src/main/java/com/daqem/grieflogger/database/repository/EntityRepository.java
++++ b/common/src/main/java/com/daqem/grieflogger/database/repository/EntityRepository.java
+@@ -47,7 +47,7 @@ public class EntityRepository extends Repository {
+         }
+ 
+         try {
+-            PreparedStatement preparedStatement = database.prepareStatement(query);
++            var preparedStatement = database.prepareQueuedStatement(query);
+             preparedStatement.setString(1, name);
+             database.queue.add(preparedStatement);
+         } catch (SQLException exception) {
+diff --git a/common/src/main/java/com/daqem/grieflogger/database/repository/ItemRepository.java b/common/src/main/java/com/daqem/grieflogger/database/repository/ItemRepository.java
+index 0e5864c..9d98053 100644
+--- a/common/src/main/java/com/daqem/grieflogger/database/repository/ItemRepository.java
++++ b/common/src/main/java/com/daqem/grieflogger/database/repository/ItemRepository.java
+@@ -113,8 +113,8 @@ public class ItemRepository extends Repository {
+         ResourceLocation itemLocation = item.getItem().arch$registryName();
+         if (itemLocation != null) {
+             try {
+-                PreparedStatement preparedStatement = database.prepareStatement(itemQuery);
+-                PreparedStatement materialStatement = database.prepareStatement(materialQuery);
++                var preparedStatement = database.prepareQueuedStatement(itemQuery);
++                var materialStatement = database.prepareQueuedStatement(materialQuery);
+ 
+                 materialStatement.setString(1, itemLocation.toString().replace("minecraft:", ""));
+                 database.queue.add(materialStatement);
+@@ -161,8 +161,8 @@ public class ItemRepository extends Repository {
+                 """;
+ 
+         try {
+-            PreparedStatement itemStatement = database.prepareStatement(insertItemQuery);
+-            PreparedStatement materialStatement = database.prepareStatement(insertMaterialQuery);
++            var itemStatement = database.prepareQueuedStatement(insertItemQuery);
++            var materialStatement = database.prepareQueuedStatement(insertMaterialQuery);
+ 
+             for (Map.Entry<ItemAction, List<SimpleItemStack>> entry : itemsMap.entrySet()) {
+                 for (SimpleItemStack item : entry.getValue()) {
+diff --git a/common/src/main/java/com/daqem/grieflogger/database/repository/LevelRepository.java b/common/src/main/java/com/daqem/grieflogger/database/repository/LevelRepository.java
+index 9bfb1af..2468281 100644
+--- a/common/src/main/java/com/daqem/grieflogger/database/repository/LevelRepository.java
++++ b/common/src/main/java/com/daqem/grieflogger/database/repository/LevelRepository.java
+@@ -47,7 +47,7 @@ public class LevelRepository extends Repository {
+         }
+ 
+         try {
+-            PreparedStatement preparedStatement = database.prepareStatement(query);
++            var preparedStatement = database.prepareQueuedStatement(query);
+             preparedStatement.setString(1, name);
+             database.queue.add(preparedStatement);
+         } catch (SQLException exception) {
+diff --git a/common/src/main/java/com/daqem/grieflogger/database/repository/MaterialRepository.java b/common/src/main/java/com/daqem/grieflogger/database/repository/MaterialRepository.java
+index 6257a53..8c6b601 100644
+--- a/common/src/main/java/com/daqem/grieflogger/database/repository/MaterialRepository.java
++++ b/common/src/main/java/com/daqem/grieflogger/database/repository/MaterialRepository.java
+@@ -47,7 +47,7 @@ public class MaterialRepository extends Repository {
+         }
+ 
+         try {
+-            PreparedStatement preparedStatement = database.prepareStatement(query);
++            var preparedStatement = database.prepareQueuedStatement(query);
+             preparedStatement.setString(1, material);
+             database.queue.add(preparedStatement);
+         } catch (SQLException exception) {
+diff --git a/common/src/main/java/com/daqem/grieflogger/database/repository/SessionRepository.java b/common/src/main/java/com/daqem/grieflogger/database/repository/SessionRepository.java
+index ac07102..8afd25f 100644
+--- a/common/src/main/java/com/daqem/grieflogger/database/repository/SessionRepository.java
++++ b/common/src/main/java/com/daqem/grieflogger/database/repository/SessionRepository.java
+@@ -85,7 +85,7 @@ public class SessionRepository extends Repository {
+         }
+ 
+         try {
+-            PreparedStatement preparedStatement = database.prepareStatement(query);
++            var preparedStatement = database.prepareQueuedStatement(query);
+             preparedStatement.setLong(1, time);
+             preparedStatement.setString(2, userUuid);
+             preparedStatement.setString(3, levelName);
+diff --git a/common/src/main/java/com/daqem/grieflogger/database/repository/UserRepository.java b/common/src/main/java/com/daqem/grieflogger/database/repository/UserRepository.java
+index b17992c..5704f07 100644
+--- a/common/src/main/java/com/daqem/grieflogger/database/repository/UserRepository.java
++++ b/common/src/main/java/com/daqem/grieflogger/database/repository/UserRepository.java
+@@ -54,7 +54,7 @@ public class UserRepository extends Repository {
+         }
+ 
+         try {
+-            PreparedStatement preparedStatement = database.prepareStatement(query);
++            var preparedStatement = database.prepareQueuedStatement(query);
+             preparedStatement.setString(1, name);
+             preparedStatement.setString(2, uuid);
+             preparedStatement.setString(3, name);
+@@ -81,7 +81,7 @@ public class UserRepository extends Repository {
+         }
+ 
+         try {
+-            PreparedStatement preparedStatement = database.prepareStatement(query);
++            var preparedStatement = database.prepareQueuedStatement(query);
+             preparedStatement.setString(1, name);
+             database.queue.add(preparedStatement);
+         } catch (SQLException exception) {
+diff --git a/common/src/main/java/com/daqem/grieflogger/database/repository/UsernameRepository.java b/common/src/main/java/com/daqem/grieflogger/database/repository/UsernameRepository.java
+index d86b72c..2ea490d 100644
+--- a/common/src/main/java/com/daqem/grieflogger/database/repository/UsernameRepository.java
++++ b/common/src/main/java/com/daqem/grieflogger/database/repository/UsernameRepository.java
+@@ -53,7 +53,7 @@ public class UsernameRepository extends Repository {
+         }
+ 
+         try {
+-            PreparedStatement preparedStatement = database.prepareStatement(query);
++            var preparedStatement = database.prepareQueuedStatement(query);
+             preparedStatement.setLong(1, time);
+             preparedStatement.setString(2, uuid);
+             preparedStatement.setString(3, name);
+diff --git a/gradle.properties b/gradle.properties
+index 3d7d2fb..b0177b5 100644
+--- a/gradle.properties
++++ b/gradle.properties
+@@ -4,7 +4,7 @@ minecraft_version=1.21.1
+ enabled_platforms=fabric,neoforge
+ 
+ archives_base_name=grieflogger
+-mod_version=1.2.10-1.21.1-yuuniverse.1
++mod_version=1.2.10-1.21.1-yuuniverse.2
+ maven_group=com.daqem.grieflogger
+ mod_name=GriefLogger
+ 
+diff --git a/walkthrough.md b/walkthrough.md
+index 7c30fd1..f9a3034 100644
+--- a/walkthrough.md
++++ b/walkthrough.md
+@@ -1,5 +1,11 @@
+-## 2026-10-13T10:54:36+08:00 (UTC+08:00) — Fix NeoForge SQLite dependency packaging
++# GriefLogger Yuuniverse changes
+ 
+-Switched SQLite 3.47.2.0 from Shadow flattening to Loom include/Jar-in-Jar and marked version 1.2.10-1.21.1-yuuniverse.1. The official release fails Java module resolution when combined with Yuuniverse Economy's SQLite module. No gameplay/database Java code changed; the complete nested driver, native resources and JDBC service metadata remain present.
++## 2026-10-23T11:54:24.3154992+08:00 (UTC+08:00) - Retain queued SQL writes until confirmed commit
+ 
+-Validation: :neoforge:build succeeds (no upstream tests in this source set). Archive inspection confirms no root org/sqlite classes and a selectable nested driver. The combined 65-JAR NeoForge 21.1.248 fixture starts and exits 0, initializes GriefLogger and Economy, and both SQLite databases pass read-only quick_check. Source baseline e913b78806a8f7646b7e3adc0d6721d1b386f29d. Production data, gameplay/MySQL and physical-client acceptance are outside this fixture.
++Based on 0017e15321badb496e4939c58ec7a60cf3821139 (the existing SQLite packaging patch on upstream e913b78806a8f7646b7e3adc0d6721d1b386f29d). Version 1.2.10-1.21.1-yuuniverse.2 preserves the upstream Apache-2.0 license and existing selectable SQLite packaging.
++
++A real transient SQLite lock discarded a queued observation in the preceding provider. Native repositories now queue owned SQL/parameter snapshots, including every batch row and copied binary values. Flushes retain their queue prefix until commit, serialize database writes and roll back failed attempts. Concurrent producers append safely. A known rollback permits complete replay with newly created JDBC statements. Ambiguous commit, failed rollback or unreconstructable legacy driver batches stop automatic flush with retained work and an explicit error. Post-commit cleanup cannot cause replay. Startup commits schema before event registration; ping closes its JDBC resources.
++
++The rebuilt provider passes 27 actual-bytecode SQLite assertions (including 600 concurrent distinct rows), 37 native NeoForge 21.1.248 logging/rollback/commerce assertions and eight clean-restart assertions. Tests and exact source/artifact/fixture evidence are maintained in the parent Citizens repository under tools/grieflogger-compat and docs/grieflogger-write-recovery-validation-2026-10-23.json. The original failed artifact-only reproducer is retained there.
++
++No production activation. Pending writes remain in memory; unflushed process termination, full-device failure, uncertain-outcome administration, retention/capacity/load and MySQL acceptance remain separate work. Native event payloads, SQL schemas, components and financial ownership are not rewritten to satisfy tests.
