@@ -10,6 +10,13 @@ This review covers repository structure, native implementation boundaries, upstr
 
 ## Repository and implementation boundaries
 
+Update 2026-10-23, UTC+08:00: [shared craft recovery](ftb-craft-party-recovery-2026-10-23.md)
+verifies two native contributors, leave during consumption, offline original-party
+projection, personal progress/rejoin and two repeat resets across three processes
+per target. Ninety new checks plus 36 fresh original-recovery checks pass; stopped
+native NBT/SNBT agrees. Production code stays unchanged. Broader recovery, original
+migration inputs and deferred physical-client acceptance remain open.
+
 Update 2026-10-23, UTC+08:00: [craft admission indexes](craft-admission-indexes-2026-10-23.md)
 remove full retained-history snapshots/scans from craft admission, outcome lookup
 and projection. All 15,456 real immutable records remain unchanged; scoped reads

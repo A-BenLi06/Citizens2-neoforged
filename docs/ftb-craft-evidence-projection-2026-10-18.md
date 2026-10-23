@@ -1,5 +1,12 @@
 # Explicit FTB craft bindings and retained progress
 
+Update 2026-10-23, UTC+08:00: [shared craft recovery](ftb-craft-party-recovery-2026-10-23.md)
+verifies original-party attribution after leave during a native result take,
+offline two-contributor projection, personal/rejoined scopes and repeat cycles
+across actual native save/restart on both targets. CustomTask maximum remains its
+runtime owner's public initialization responsibility; a missing owner is fenced.
+These bounded cases do not close every party/backup/client recovery gate.
+
 Update 2026-10-22, UTC+08:00: [craft binding validation](craft-binding-validation-2026-10-22.md)
 preserves declared JSON field types and validates all bindings under the journal
 lock before missing-outcome recovery can publish. Invalid/incomplete companions

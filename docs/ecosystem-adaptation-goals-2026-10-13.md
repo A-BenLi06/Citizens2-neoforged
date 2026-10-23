@@ -8,6 +8,13 @@ Citizens retains NPC behavior and its existing native extension contracts. Yuuni
 
 ## Selected artifacts and sides
 
+Progress 2026-10-23, UTC+08:00: [shared craft recovery](ftb-craft-party-recovery-2026-10-23.md)
+adds two real native sessions, offline combined projection to the original party,
+personal/rejoined scopes, notification replay and two repeat resets through three
+processes on both targets. Ninety party and 36 original-recovery assertions pass;
+native stopped player/team saves agree. Broader recovery/retention, migration and
+deferred physical clients remain separate gates.
+
 Progress 2026-10-23, UTC+08:00: [craft admission indexes](craft-admission-indexes-2026-10-23.md)
 derive observation/generation/task reads from validated immutable evidence,
 preserving replay owners, REVIEW fences and query-time checked totals. The real

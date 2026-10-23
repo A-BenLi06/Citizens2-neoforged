@@ -6,21 +6,34 @@ allprojects {
         if (!fixture.toPath().toAbsolutePath().normalize().startsWith(p.file('../artifacts').toPath().toAbsolutePath().normalize()))
             throw new GradleException('Craft recovery fixture must be inside artifacts')
         def phase = p.property('craftRecoveryPhase')
-        if (!(phase in ['seed', 'recover', 'bindings'])) throw new GradleException('Unknown craft recovery phase')
+        if (!(phase in ['seed', 'recover', 'bindings', 'party-seed', 'party-recover', 'party-verify'])) throw new GradleException('Unknown craft recovery phase')
         p.sourceSets.main.java.srcDir(p.file('../tools/craft-recovery-runtime-audit'))
         p.sourceSets.main.compileClasspath += p.files(p.fileTree(new File(fixture, 'mods')) { include '*.jar' })
         p.neoForge.runs.named('server') { gameDirectory = fixture }
-        p.tasks.named('prepareServerRun') {
-            doLast {
+        def validateFixture = {
                 if (new File(fixture, 'craft-recovery-fixture.txt').getText('UTF-8').trim() != 'citizens-craft-recovery-audit')
                     throw new GradleException('Wrong craft recovery fixture')
                 def settings = new Properties()
                 new File(fixture, 'server.properties').withInputStream { settings.load(it) }
                 for (entry in ['server-ip':'127.0.0.1','server-port':'25646','level-name':'craft-world'])
                     if (settings.getProperty(entry.key) != entry.value) throw new GradleException('Wrong craft recovery server properties')
-            }
+                if (phase.startsWith('party-')) {
+                    def seeded = new File(fixture, 'craft-party-state.json').isFile()
+                    def recovered = new File(fixture, 'craft-party-recovered.json').isFile()
+                    def verified = new File(fixture, 'craft-party-final.json').isFile()
+                    if (phase == 'party-seed' && (seeded || recovered || verified || new File(fixture, 'craft-world').exists()))
+                        throw new GradleException('Party seed requires a fresh world')
+                    if (phase == 'party-recover' && (!seeded || recovered || verified || !new File(fixture, 'craft-party-definition.json').isFile()))
+                        throw new GradleException('Party recovery requires one completed seed')
+                    if (phase == 'party-verify' && (!seeded || !recovered || verified || !new File(fixture, 'craft-party-definition.json').isFile()))
+                        throw new GradleException('Party verification requires one completed recovery')
+                }
+        }
+        p.tasks.named('prepareServerRun') {
+            doLast { validateFixture() }
         }
         p.tasks.named('runServer') {
+            doFirst { validateFixture() }
             environment 'CITIZENS_CRAFT_RECOVERY_PHASE', phase
             if (phase == 'bindings') environment 'CITIZENS_CRAFT_BINDING_SOURCE', p.file(p.property('craftBindingSource')).absolutePath
             timeout = java.time.Duration.ofMinutes(4)

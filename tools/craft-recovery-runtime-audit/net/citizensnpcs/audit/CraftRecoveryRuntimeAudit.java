@@ -36,6 +36,7 @@ public final class CraftRecoveryRuntimeAudit {
                 case "seed" -> seed(server);
                 case "recover" -> recover(server);
                 case "bindings" -> checks = CraftBindingRuntimeAudit.run(server);
+                case "party-seed", "party-recover", "party-verify" -> checks = CraftPartyRuntimeAudit.run(server, System.getenv("CITIZENS_CRAFT_RECOVERY_PHASE"));
                 default -> throw new IllegalArgumentException("Unknown craft recovery phase");
             }
             log("COMPLETE " + checks + " phase=" + System.getenv("CITIZENS_CRAFT_RECOVERY_PHASE"));
@@ -132,13 +133,13 @@ public final class CraftRecoveryRuntimeAudit {
     private static boolean applied(CraftQuestEvidence service, net.minecraft.commands.CommandSourceStack source, CustomTask task) {
         return service.entries(source).stream().anyMatch(e -> e.admission().taskId().equals(task.getCodeString()) && e.state() == QuestEvidenceJournal.State.APPLIED);
     }
-    private static String inventory(ServerPlayer player) {
+    static String inventory(ServerPlayer player) {
         var values = new JsonArray(); var ops = player.registryAccess().createSerializationContext(com.mojang.serialization.JsonOps.INSTANCE);
         for (int slot = 0; slot < player.getInventory().getContainerSize(); slot++)
             values.add(ItemStack.OPTIONAL_CODEC.encodeStart(ops, player.getInventory().getItem(slot)).getOrThrow());
         return values.toString();
     }
-    private static io.netty.channel.embedded.EmbeddedChannel connect(ServerPlayer player) {
+    static io.netty.channel.embedded.EmbeddedChannel connect(ServerPlayer player) {
         var connection = new net.minecraft.network.Connection(net.minecraft.network.protocol.PacketFlow.SERVERBOUND);
         var channel = new io.netty.channel.embedded.EmbeddedChannel(new io.netty.channel.ChannelInitializer<io.netty.channel.Channel>() {
             @Override protected void initChannel(io.netty.channel.Channel channel) {
