@@ -1,5 +1,14 @@
 # GriefLogger SQLite packaging compatibility
 
+Follow-up 2026-10-23, UTC+08:00: [coordinate index repair](../../docs/logging-coordinate-indexes-2026-10-23.md)
+fixes the shared SQLite index name that silently left five history tables without
+their configured coordinate indexes. Apply `sqlite-coordinate-indexes.patch`
+after the `.6` player-quit patch to build `.7`. Existing blocks indexes and all
+history rows remain intact. Native enabled/disabled/re-enabled startup, repeated
+initialization and restart use 2,048 separately owned workload rows per table.
+Exact coordinate plans/results are checked independently. This does not add
+history expiry or establish production throughput; see the report and manifest.
+
 Follow-up 2026-10-23, UTC+08:00: [normal shutdown recovery](../../docs/logging-shutdown-recovery-2026-10-23.md)
 repairs two reproduced loss paths after the last tick: undrained SQL queues and
 the separate per-player item buffer. Apply `server-stop-drain.patch` after `.4`,

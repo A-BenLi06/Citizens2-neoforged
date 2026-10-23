@@ -1,0 +1,93 @@
+diff --git a/common/src/main/java/com/daqem/grieflogger/database/repository/ChatRepository.java b/common/src/main/java/com/daqem/grieflogger/database/repository/ChatRepository.java
+index 6f5066f..0406e73 100644
+--- a/common/src/main/java/com/daqem/grieflogger/database/repository/ChatRepository.java
++++ b/common/src/main/java/com/daqem/grieflogger/database/repository/ChatRepository.java
+@@ -49,7 +49,7 @@ public class ChatRepository extends Repository {
+ 
+     public void createIndexes() {
+         String sql = """
+-                CREATE INDEX IF NOT EXISTS coordinates ON chats (x, y, z);
++                CREATE INDEX IF NOT EXISTS chats_coordinates ON chats (x, y, z);
+                 """;
+         if (isMysql()) {
+             sql = """
+diff --git a/common/src/main/java/com/daqem/grieflogger/database/repository/CommandRepository.java b/common/src/main/java/com/daqem/grieflogger/database/repository/CommandRepository.java
+index 325daa9..c63d15b 100644
+--- a/common/src/main/java/com/daqem/grieflogger/database/repository/CommandRepository.java
++++ b/common/src/main/java/com/daqem/grieflogger/database/repository/CommandRepository.java
+@@ -49,7 +49,7 @@ public class CommandRepository extends Repository {
+ 
+     public void createIndexes() {
+         String sql = """
+-                CREATE INDEX IF NOT EXISTS coordinates ON commands (x, y, z);
++                CREATE INDEX IF NOT EXISTS commands_coordinates ON commands (x, y, z);
+                 """;
+         if (isMysql()) {
+             sql = """
+diff --git a/common/src/main/java/com/daqem/grieflogger/database/repository/ContainerRepository.java b/common/src/main/java/com/daqem/grieflogger/database/repository/ContainerRepository.java
+index a56195c..14df33f 100644
+--- a/common/src/main/java/com/daqem/grieflogger/database/repository/ContainerRepository.java
++++ b/common/src/main/java/com/daqem/grieflogger/database/repository/ContainerRepository.java
+@@ -74,7 +74,7 @@ public class ContainerRepository extends Repository {
+ 
+     public void createIndexes() {
+         String sql = """
+-                CREATE INDEX IF NOT EXISTS coordinates ON containers (x, y, z);
++                CREATE INDEX IF NOT EXISTS containers_coordinates ON containers (x, y, z);
+                 """;
+         if (isMysql()) {
+             sql = """
+diff --git a/common/src/main/java/com/daqem/grieflogger/database/repository/ItemRepository.java b/common/src/main/java/com/daqem/grieflogger/database/repository/ItemRepository.java
+index 9d98053..6cb26e9 100644
+--- a/common/src/main/java/com/daqem/grieflogger/database/repository/ItemRepository.java
++++ b/common/src/main/java/com/daqem/grieflogger/database/repository/ItemRepository.java
+@@ -73,7 +73,7 @@ public class ItemRepository extends Repository {
+ 
+     public void createIndexes() {
+         String sql = """
+-                CREATE INDEX IF NOT EXISTS coordinates ON items (x, y, z);
++                CREATE INDEX IF NOT EXISTS items_coordinates ON items (x, y, z);
+                 """;
+         if (isMysql()) {
+             sql = """
+diff --git a/common/src/main/java/com/daqem/grieflogger/database/repository/SessionRepository.java b/common/src/main/java/com/daqem/grieflogger/database/repository/SessionRepository.java
+index 8afd25f..cbe1c95 100644
+--- a/common/src/main/java/com/daqem/grieflogger/database/repository/SessionRepository.java
++++ b/common/src/main/java/com/daqem/grieflogger/database/repository/SessionRepository.java
+@@ -53,7 +53,7 @@ public class SessionRepository extends Repository {
+ 
+     public void createIndexes() {
+         String sql = """
+-                CREATE INDEX IF NOT EXISTS coordinates ON sessions (x, y, z);
++                CREATE INDEX IF NOT EXISTS sessions_coordinates ON sessions (x, y, z);
+                 """;
+         if (isMysql()) {
+             sql = """
+diff --git a/gradle.properties b/gradle.properties
+index e655914..25c45bb 100644
+--- a/gradle.properties
++++ b/gradle.properties
+@@ -4,7 +4,7 @@ minecraft_version=1.21.1
+ enabled_platforms=fabric,neoforge
+ 
+ archives_base_name=grieflogger
+-mod_version=1.2.10-1.21.1-yuuniverse.6
++mod_version=1.2.10-1.21.1-yuuniverse.7
+ sqlite_version=3.47.2.0
+ maven_group=com.daqem.grieflogger
+ mod_name=GriefLogger
+diff --git a/walkthrough.md b/walkthrough.md
+index a162975..c38a078 100644
+--- a/walkthrough.md
++++ b/walkthrough.md
+@@ -38,3 +38,10 @@ No production activation. Pending writes remain in memory; unflushed process ter
+ - Provider .6 exposes the mixin's original buffer-to-repository operation as griefLogger$flushItemQueue, delegates the tick to it, and invokes it on native PLAYER_QUIT before recording QUIT. SERVER_STOPPED then drains the final SQL queues using .5's blocking ownership. No replacement observation, manual audit flush, guessed actor or synthetic item grant repairs the history.
+ - Fresh Java 21 :neoforge:build succeeds. Actual-provider SQLite suite passes 109 assertions. Native final-after-last-tick shutdown passes eleven assertions and a separate clean JVM restart/second stop passes eight: all five block, one container and one item records persist once, original storage/components remain equal, and JOIN/QUIT advance once per session. Broader reader/writer/FULL/commerce regression evidence is recorded by the parent project when complete.
+ - SQL queues/database stay at mod lifetime; this does not establish integrated physical-client lifecycle, failed-final-drain durability, unflushed JVM death or device loss. No production activation or deferred client changes. Author and committer use A-BenLi06 <ben_li06@outlook.com>.
++
++## 2026-10-23T18:43:35.5331611+08:00 (UTC+08:00) - Create each SQLite history coordinate index
++
++- Provider .6 requests the database-wide SQLite index name coordinates for all six history tables. The first blocks index exists; five later CREATE INDEX IF NOT EXISTS statements silently skip their tables. Retained native schema/plans and a 2,048-row-per-table real-provider queued workload reproduce five full scans and the missing chat index assertion.
++- Provider .7 gives chats, commands, containers, items and sessions distinct table-specific SQLite index names. Existing blocks coordinates is retained. Indexed columns, data/schema payloads, lookup SQL/limits/order, MySQL statements and the useIndexes creation policy remain unchanged. No history deletion or inferred retention policy is introduced; disabling creation does not drop existing indexes.
++- Fresh Java 21 :neoforge:build succeeds in an isolated source/cache. The actual provider and embedded SQLite pass all 109 storage assertions across 24 databases. Native enabled-index acceptance passes 26 checks and a fresh-process restart passes 25: every original history/dictionary/identity row remains exact, all 12,288 independently owned workload history rows persist, six coordinate plans use their own indexes, results keep exact payload/order and repeated initialization adds no duplicate indexes. Configuration-disabled/enabling and normal/shutdown regressions are recorded separately by the consuming repository when complete.
++- Workload SQL has its own synthetic identity and is not claimed as native gameplay evidence or production throughput. Native fixture input is copied only from a stopped artifact-confined .6 world/database; originals remain retained. Retention/load, MySQL acceptance, broader recovery/migration and deferred clients remain open. No production activation. Author and committer use A-BenLi06 <ben_li06@outlook.com>.

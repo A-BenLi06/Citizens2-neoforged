@@ -10,6 +10,16 @@ This review covers repository structure, native implementation boundaries, upstr
 
 ## Repository and implementation boundaries
 
+Update 2026-10-23, UTC+08:00: [logging coordinate indexes](logging-coordinate-indexes-2026-10-23.md)
+repairs five missing SQLite history indexes caused by a shared name. Provider `.7`
+adds distinct names, preserves original rows and checks exact coordinate plans
+under bounded queued workload, configuration changes and restart. Retention,
+sustained load, wider recovery, migration and deferred physical clients remain.
+
+Index validation passes 109 actual SQLite and 164 native/restart checks, including
+fresh commerce and shutdown regressions, with original ordinary evidence reused
+for unchanged Citizens/Interactions production/test/build sources.
+
 Update 2026-10-23, UTC+08:00: [normal shutdown recovery](logging-shutdown-recovery-2026-10-23.md)
 repairs two proven loss paths: pending final SQL writes in `.4` and an item buffer
 waiting for a nonexistent next player tick in `.5`. Provider `.6` drains the player

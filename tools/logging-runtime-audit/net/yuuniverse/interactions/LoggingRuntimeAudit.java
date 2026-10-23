@@ -43,6 +43,10 @@ public final class LoggingRuntimeAudit {
     private static long burstNanos;
     @SubscribeEvent public static void tick(ServerTickEvent.Post event) {
         var phase = System.getenv("CITIZENS_LOGGING_AUDIT_PHASE");
+        if (phase != null && phase.startsWith("indexes")) {
+            LoggingIndexRuntimeAudit.tick(event);
+            return;
+        }
         if ("shutdown".equals(phase) || "shutdown-recover".equals(phase)) {
             LoggingShutdownRuntimeAudit.tick(event);
             return;

@@ -1,0 +1,3269 @@
+{
+  "createdAt": "2026-10-23T18:53:40.681407+08:00",
+  "timezone": "UTC+08:00",
+  "baseRevision": "aa68330",
+  "provider": {
+    "path": "artifacts/grieflogger-index-source/neoforge/build/libs/grieflogger-1.2.10-1.21.1-yuuniverse.7-neoforge.jar",
+    "bytes": 18925488,
+    "sha256": "5e6a11073ff0b7de70de79baf063450dc08395d618c5de6572220055570d34b4"
+  },
+  "providerCommit": "8081e20069641ee78f1c0fe622088b9a9ca2ae97",
+  "patch": {
+    "path": "tools/grieflogger-compat/sqlite-coordinate-indexes.patch",
+    "bytes": 7493,
+    "sha256": "30259a9e16335721757cf1fb620b2ea51a44e69bf8405c58395fac5ceb29af1a"
+  },
+  "providerSources": [
+    {
+      "path": "artifacts/grieflogger-index-source/common/src/main/java/com/daqem/grieflogger/database/repository/ChatRepository.java",
+      "bytes": 3454,
+      "sha256": "8ce5fbc5785fc117513d856d3e29a082e0b157f10f12c8302e65c3a5660f864a"
+    },
+    {
+      "path": "artifacts/grieflogger-index-source/common/src/main/java/com/daqem/grieflogger/database/repository/CommandRepository.java",
+      "bytes": 3483,
+      "sha256": "cf35bdb1a074b342e40aac23546cb942d8dd67ed823196466373ac213afc8433"
+    },
+    {
+      "path": "artifacts/grieflogger-index-source/common/src/main/java/com/daqem/grieflogger/database/repository/ContainerRepository.java",
+      "bytes": 19231,
+      "sha256": "19c64213e0ecd55e42c256cad035ce945a72d08823d1903b99d6df43980a445e"
+    },
+    {
+      "path": "artifacts/grieflogger-index-source/common/src/main/java/com/daqem/grieflogger/database/repository/ItemRepository.java",
+      "bytes": 12002,
+      "sha256": "fd746d2172e0d41b9295d43bae5920ee0b016756af43c310ae69e2acdba20773"
+    },
+    {
+      "path": "artifacts/grieflogger-index-source/common/src/main/java/com/daqem/grieflogger/database/repository/SessionRepository.java",
+      "bytes": 6461,
+      "sha256": "f7013b2aee01fd1f874d3a159b79ad9b577209f92986d734b2681c82e4426a04"
+    },
+    {
+      "path": "artifacts/grieflogger-index-source/gradle.properties",
+      "bytes": 718,
+      "sha256": "f7d1e1cac491b9713764f4b49e9b776d726785c84ae5e7347d8f836d8b23528e"
+    },
+    {
+      "path": "artifacts/grieflogger-index-source/walkthrough.md",
+      "bytes": 10589,
+      "sha256": "e48e556601cd3e84a0e3ee96958170c06f527ec49b1902f9acbe1b012f675ced"
+    }
+  ],
+  "providerBuild": {
+    "path": "artifacts/grieflogger-index-provider-build.log",
+    "bytes": 3384,
+    "sha256": "282df19bfd6ff795f14a1d72eecb3eca9ef79968584c36b7a39cd7d52e2fd098"
+  },
+  "unchangedDriverFiles": 163,
+  "standalone": {
+    "createdAt": "2026-10-23T18:35:30.0926770+08:00",
+    "timezone": "UTC+08:00",
+    "checks": 109,
+    "actualProviderBytecode": true,
+    "minecraftBootstrapOwnerSubstitutedForStandaloneLogger": true,
+    "files": [
+      {
+        "path": "C:\\Users\\ben_l\\Documents\\Coding\\citizens2-neoforged\\artifacts\\grieflogger-index-source\\neoforge\\build\\libs\\grieflogger-1.2.10-1.21.1-yuuniverse.7-neoforge.jar",
+        "bytes": 18925488,
+        "sha256": "5e6a11073ff0b7de70de79baf063450dc08395d618c5de6572220055570d34b4"
+      },
+      {
+        "path": "C:\\Users\\ben_l\\.gradle\\caches\\modules-2\\files-2.1\\org.slf4j\\slf4j-api\\2.0.9\\7cf2726fdcfbc8610f9a71fb3ed639871f315340\\slf4j-api-2.0.9.jar",
+        "bytes": 64579,
+        "sha256": "0818930dc8d7debb403204611691da58e49d42c50b6ffcfdce02dadb7c3c2b6c"
+      },
+      {
+        "path": "C:\\Users\\ben_l\\Documents\\Coding\\citizens2-neoforged\\artifacts\\grieflogger-index-final\\sqlite.jar",
+        "bytes": 14268566,
+        "sha256": "3935fe7c89fbdcdb4396774534b9c9a0ca8c14b621112bc5cd21d801ff497457"
+      },
+      {
+        "path": "C:\\Users\\ben_l\\Documents\\Coding\\citizens2-neoforged\\artifacts\\grieflogger-index-final\\tests.log",
+        "bytes": 14096,
+        "sha256": "a6cc26be52f811e52000c48a256bde8fb79d8084b1dca640aab06423e939979c"
+      },
+      {
+        "path": "C:\\Users\\ben_l\\Documents\\Coding\\citizens2-neoforged\\tools\\grieflogger-compat\\run-storage-tests.ps1",
+        "bytes": 3411,
+        "sha256": "db250ec08a8defa01b60c4245d39b604826ed75aef2dbd2f4e3d00e2832bd6c3"
+      },
+      {
+        "path": "C:\\Users\\ben_l\\Documents\\Coding\\citizens2-neoforged\\tools\\grieflogger-compat\\storage-tests\\StorageRecoveryTest.java",
+        "bytes": 32310,
+        "sha256": "702c023eb17b6c68f2d383250b94ab723a67ae01e1bc1e70de27af984fccf2d5"
+      },
+      {
+        "path": "C:\\Users\\ben_l\\Documents\\Coding\\citizens2-neoforged\\tools\\grieflogger-compat\\storage-tests\\com\\daqem\\grieflogger\\GriefLogger.java",
+        "bytes": 1071,
+        "sha256": "1ba77f2b8051b6bd0869e5176650c8aa5d02cb1759566bdf3688c6b1540826fa"
+      }
+    ]
+  },
+  "standaloneDatabases": [
+    {
+      "path": "artifacts/grieflogger-index-final/databases/batch.db",
+      "bytes": 8192,
+      "sha256": "baf8b97728677d02abd29e092f328c0ae935b7a7726b94dd24e39bc729ba335e",
+      "quickCheck": "ok"
+    },
+    {
+      "path": "artifacts/grieflogger-index-final/databases/commit.db",
+      "bytes": 8192,
+      "sha256": "bdbb7c9059487b8b3ece86128bbda58217d76386ef96b23cd8c396ccedce8c1a",
+      "quickCheck": "ok"
+    },
+    {
+      "path": "artifacts/grieflogger-index-final/databases/concurrent.db",
+      "bytes": 20480,
+      "sha256": "01cfe87a9e1414b1f3575571442a640d233212abd9c1f7eba152219862ae88af",
+      "quickCheck": "ok"
+    },
+    {
+      "path": "artifacts/grieflogger-index-final/databases/full_batch.db",
+      "bytes": 40960,
+      "sha256": "6e220b1793a9addc6e767150348ffde420187333719934fee388f4ab8ac5a581",
+      "quickCheck": "ok"
+    },
+    {
+      "path": "artifacts/grieflogger-index-final/databases/full_mode_DEFERRED_IMMEDIATE.db",
+      "bytes": 8192,
+      "sha256": "46dcfad3035e099720b902d1a907fcbc0e41263ca932e04126d766baa3a7dbfc",
+      "quickCheck": "ok"
+    },
+    {
+      "path": "artifacts/grieflogger-index-final/databases/full_mode_IMMEDIATE_DEFERRED.db",
+      "bytes": 8192,
+      "sha256": "46dcfad3035e099720b902d1a907fcbc0e41263ca932e04126d766baa3a7dbfc",
+      "quickCheck": "ok"
+    },
+    {
+      "path": "artifacts/grieflogger-index-final/databases/full_mode_IMMEDIATE_IMMEDIATE.db",
+      "bytes": 8192,
+      "sha256": "46dcfad3035e099720b902d1a907fcbc0e41263ca932e04126d766baa3a7dbfc",
+      "quickCheck": "ok"
+    },
+    {
+      "path": "artifacts/grieflogger-index-final/databases/full_ordinary.db",
+      "bytes": 40960,
+      "sha256": "6e220b1793a9addc6e767150348ffde420187333719934fee388f4ab8ac5a581",
+      "quickCheck": "ok"
+    },
+    {
+      "path": "artifacts/grieflogger-index-final/databases/fullaftercommit.db",
+      "bytes": 8192,
+      "sha256": "f6fd631a5fe058bfc1fdb781a56672174ecfedb8949177a046f2eed816a6973e",
+      "quickCheck": "ok"
+    },
+    {
+      "path": "artifacts/grieflogger-index-final/databases/legacy.db",
+      "bytes": 8192,
+      "sha256": "a32d7f45d70f744ac68e396c37a11d301a3041a3aa18a2070b82007a592a7785",
+      "quickCheck": "ok"
+    },
+    {
+      "path": "artifacts/grieflogger-index-final/databases/legacybatch.db",
+      "bytes": 8192,
+      "sha256": "d49cbcc404baea98d81b7f6fe146df94f47327b54c9fe42196e7eba44fcbb284",
+      "quickCheck": "ok"
+    },
+    {
+      "path": "artifacts/grieflogger-index-final/databases/legacyfull.db",
+      "bytes": 8192,
+      "sha256": "46dcfad3035e099720b902d1a907fcbc0e41263ca932e04126d766baa3a7dbfc",
+      "quickCheck": "ok"
+    },
+    {
+      "path": "artifacts/grieflogger-index-final/databases/locked.db",
+      "bytes": 8192,
+      "sha256": "4f4994ff1d9a84c419d752ea6962524af229d02787130e6a4577f4f92e8313c6",
+      "quickCheck": "ok"
+    },
+    {
+      "path": "artifacts/grieflogger-index-final/databases/mode_DEFERRED_IMMEDIATE.db",
+      "bytes": 8192,
+      "sha256": "46dcfad3035e099720b902d1a907fcbc0e41263ca932e04126d766baa3a7dbfc",
+      "quickCheck": "ok"
+    },
+    {
+      "path": "artifacts/grieflogger-index-final/databases/mode_IMMEDIATE_DEFERRED.db",
+      "bytes": 8192,
+      "sha256": "46dcfad3035e099720b902d1a907fcbc0e41263ca932e04126d766baa3a7dbfc",
+      "quickCheck": "ok"
+    },
+    {
+      "path": "artifacts/grieflogger-index-final/databases/mode_IMMEDIATE_IMMEDIATE.db",
+      "bytes": 8192,
+      "sha256": "46dcfad3035e099720b902d1a907fcbc0e41263ca932e04126d766baa3a7dbfc",
+      "quickCheck": "ok"
+    },
+    {
+      "path": "artifacts/grieflogger-index-final/databases/prefix.db",
+      "bytes": 8192,
+      "sha256": "94f9863160be9e963d4a90f53ac0be46a026e869d6e9a8a4b3400f6a83539625",
+      "quickCheck": "ok"
+    },
+    {
+      "path": "artifacts/grieflogger-index-final/databases/reader_batch.db",
+      "bytes": 8192,
+      "sha256": "334c45f0c7679aa994118e0b59c44f39567ccd6d4bb3239ce927e64d33ed115c",
+      "quickCheck": "ok"
+    },
+    {
+      "path": "artifacts/grieflogger-index-final/databases/reader_ordinary.db",
+      "bytes": 8192,
+      "sha256": "05798d83e725ea8bf17179b758056e6eae871ce591cfa612bac999fc6f24f971",
+      "quickCheck": "ok"
+    },
+    {
+      "path": "artifacts/grieflogger-index-final/databases/rollback.db",
+      "bytes": 8192,
+      "sha256": "b1e6abc15076858628c97611c52174db9893371c35fd502bfbcd324c3f1a4d59",
+      "quickCheck": "ok"
+    },
+    {
+      "path": "artifacts/grieflogger-index-final/databases/shutdown_locked.db",
+      "bytes": 8192,
+      "sha256": "2652c97b46e975db44e2d2c882f1033ecb7e79e91d3e33aa96e43ccfe337efda",
+      "quickCheck": "ok"
+    },
+    {
+      "path": "artifacts/grieflogger-index-final/databases/shutdown_race.db",
+      "bytes": 8192,
+      "sha256": "a55ecd83cf9256bca86a2580912a78c55ce310daec404bd476ccb8f739cb9fd9",
+      "quickCheck": "ok"
+    },
+    {
+      "path": "artifacts/grieflogger-index-final/databases/shutdown_reentry.db",
+      "bytes": 8192,
+      "sha256": "ffdd03d1327e1b91b9857c71ae9003ae55cc728223505a54cb6a23deea30388e",
+      "quickCheck": "ok"
+    },
+    {
+      "path": "artifacts/grieflogger-index-final/databases/wrappedbusy.db",
+      "bytes": 8192,
+      "sha256": "f6fd631a5fe058bfc1fdb781a56672174ecfedb8949177a046f2eed816a6973e",
+      "quickCheck": "ok"
+    }
+  ],
+  "indexAcceptance": [
+    {
+      "state": {
+        "path": "artifacts/logging-index-before-server/logging-index-state.json",
+        "bytes": 823418,
+        "sha256": "d00344ffa8bc5a203170b620d7ea2465f2150a03e3ca0a94c1ac5eb878ef373d"
+      },
+      "original": {
+        "path": "artifacts/logging-index-before-server/logging-index-original.json",
+        "bytes": 7920,
+        "sha256": "406027d085ba2c45325dec77592a23ff2e21fb4750535800e024a4f8887302ea"
+      },
+      "database": {
+        "path": "artifacts/logging-index-before-server/database.db",
+        "bytes": 634880,
+        "sha256": "de9ca9317f092427a913707b318ab29979aae72f6aac8c23f92fed4af5bcdbe5",
+        "quickCheck": "ok"
+      },
+      "rowsPerTable": 2048,
+      "totalNewHistoryRows": 12288,
+      "originalRows": {
+        "users": 1,
+        "usernames": 1,
+        "levels": 3,
+        "materials": 5,
+        "entities": 1,
+        "blocks": 199,
+        "chats": 0,
+        "commands": 0,
+        "containers": 1,
+        "items": 0,
+        "sessions": 4
+      },
+      "phases": [],
+      "queries": {
+        "blocks": {
+          "indexes": [
+            "coordinates"
+          ],
+          "plan": [
+            "SEARCH blocks USING INDEX coordinates (x=? AND y=? AND z=?)",
+            "USE TEMP B-TREE FOR ORDER BY"
+          ],
+          "rows": [
+            [
+              2247,
+              1792751829347,
+              2,
+              1,
+              7,
+              -60,
+              3,
+              5,
+              0
+            ],
+            [
+              200,
+              1792751827300,
+              2,
+              1,
+              7,
+              -60,
+              3,
+              5,
+              0
+            ]
+          ]
+        },
+        "chats": {
+          "indexes": [],
+          "plan": [
+            "SCAN chats",
+            "USE TEMP B-TREE FOR ORDER BY"
+          ],
+          "rows": [
+            [
+              2048,
+              1792751829347,
+              2,
+              1,
+              7,
+              -60,
+              3,
+              "Index payload '\" 2047"
+            ],
+            [
+              1,
+              1792751827300,
+              2,
+              1,
+              7,
+              -60,
+              3,
+              "Index payload '\" 0"
+            ]
+          ]
+        },
+        "commands": {
+          "indexes": [],
+          "plan": [
+            "SCAN commands",
+            "USE TEMP B-TREE FOR ORDER BY"
+          ],
+          "rows": [
+            [
+              2048,
+              1792751829347,
+              2,
+              1,
+              7,
+              -60,
+              3,
+              "Index payload '\" 2047"
+            ],
+            [
+              1,
+              1792751827300,
+              2,
+              1,
+              7,
+              -60,
+              3,
+              "Index payload '\" 0"
+            ]
+          ]
+        },
+        "containers": {
+          "indexes": [],
+          "plan": [
+            "SCAN containers",
+            "USE TEMP B-TREE FOR ORDER BY"
+          ],
+          "rows": [
+            [
+              2049,
+              1792751829347,
+              2,
+              1,
+              7,
+              -60,
+              3,
+              5,
+              {
+                "blob": "0100050800124c6f6767696e6720636f6d706f6e656e7473"
+              },
+              7,
+              0
+            ],
+            [
+              2,
+              1792751827300,
+              2,
+              1,
+              7,
+              -60,
+              3,
+              5,
+              {
+                "blob": "0100050800124c6f6767696e6720636f6d706f6e656e7473"
+              },
+              7,
+              0
+            ]
+          ]
+        },
+        "items": {
+          "indexes": [],
+          "plan": [
+            "SCAN items",
+            "USE TEMP B-TREE FOR ORDER BY"
+          ],
+          "rows": [
+            [
+              2048,
+              1792751829347,
+              2,
+              1,
+              7,
+              -60,
+              3,
+              5,
+              {
+                "blob": "0100050800124c6f6767696e6720636f6d706f6e656e7473"
+              },
+              7,
+              0
+            ],
+            [
+              1,
+              1792751827300,
+              2,
+              1,
+              7,
+              -60,
+              3,
+              5,
+              {
+                "blob": "0100050800124c6f6767696e6720636f6d706f6e656e7473"
+              },
+              7,
+              0
+            ]
+          ]
+        },
+        "sessions": {
+          "indexes": [],
+          "plan": [
+            "SCAN sessions",
+            "USE TEMP B-TREE FOR ORDER BY"
+          ],
+          "rows": [
+            [
+              2052,
+              1792751829347,
+              2,
+              1,
+              7,
+              -60,
+              3,
+              1
+            ],
+            [
+              5,
+              1792751827300,
+              2,
+              1,
+              7,
+              -60,
+              3,
+              0
+            ]
+          ]
+        }
+      },
+      "reproducedMissingIndexes": 5,
+      "logs": [
+        {
+          "path": "artifacts/logging-index-before-indexes.log",
+          "bytes": 19152,
+          "sha256": "697fe84e71ff3f7ce0d616a53fa05ac3bed4c40c72158e3e45e543f83e83f95c"
+        }
+      ],
+      "financial": {
+        "path": "artifacts/logging-index-before-server/logging-world/yuuniverse_economy/economy.db",
+        "bytes": 368640,
+        "sha256": "116a27b23742fb17e86e4af1706106484cb0eb8b15bb19eea2a0dcd972ff6966",
+        "quickCheck": "ok"
+      }
+    },
+    {
+      "state": {
+        "path": "artifacts/logging-index-final-server/logging-index-state.json",
+        "bytes": 823805,
+        "sha256": "3e3fc064cb6deca92befd647747286b6f8ff48001a184b7861f475792d5855bb"
+      },
+      "original": {
+        "path": "artifacts/logging-index-final-server/logging-index-original.json",
+        "bytes": 7920,
+        "sha256": "406027d085ba2c45325dec77592a23ff2e21fb4750535800e024a4f8887302ea"
+      },
+      "database": {
+        "path": "artifacts/logging-index-final-server/database.db",
+        "bytes": 819200,
+        "sha256": "2efdca1c502619674bf959244c512625997f890d1834ff6609a055e3c2aa2648",
+        "quickCheck": "ok"
+      },
+      "rowsPerTable": 2048,
+      "totalNewHistoryRows": 12288,
+      "originalRows": {
+        "users": 1,
+        "usernames": 1,
+        "levels": 3,
+        "materials": 5,
+        "entities": 1,
+        "blocks": 199,
+        "chats": 0,
+        "commands": 0,
+        "containers": 1,
+        "items": 0,
+        "sessions": 4
+      },
+      "phases": [
+        {
+          "phase": "indexes",
+          "checks": 26,
+          "result": {
+            "path": "artifacts/logging-index-final-server/logging-index-result.json",
+            "bytes": 2339,
+            "sha256": "7618c93fde4d7a023f5c1719b8b583dfc3266a1146320ee33be155eb22b605bc"
+          },
+          "database": {
+            "path": "artifacts/logging-index-final-stopped-indexes.db",
+            "bytes": 819200,
+            "sha256": "2efdca1c502619674bf959244c512625997f890d1834ff6609a055e3c2aa2648",
+            "quickCheck": "ok"
+          },
+          "queries": {
+            "blocks": {
+              "indexes": [
+                "coordinates"
+              ],
+              "plan": [
+                "SEARCH blocks USING INDEX coordinates (x=? AND y=? AND z=?)",
+                "USE TEMP B-TREE FOR ORDER BY"
+              ],
+              "rows": [
+                [
+                  2247,
+                  1792752027793,
+                  2,
+                  1,
+                  7,
+                  -60,
+                  3,
+                  5,
+                  0
+                ],
+                [
+                  200,
+                  1792752025746,
+                  2,
+                  1,
+                  7,
+                  -60,
+                  3,
+                  5,
+                  0
+                ]
+              ]
+            },
+            "chats": {
+              "indexes": [
+                "chats_coordinates"
+              ],
+              "plan": [
+                "SEARCH chats USING INDEX chats_coordinates (x=? AND y=? AND z=?)",
+                "USE TEMP B-TREE FOR ORDER BY"
+              ],
+              "rows": [
+                [
+                  2048,
+                  1792752027793,
+                  2,
+                  1,
+                  7,
+                  -60,
+                  3,
+                  "Index payload '\" 2047"
+                ],
+                [
+                  1,
+                  1792752025746,
+                  2,
+                  1,
+                  7,
+                  -60,
+                  3,
+                  "Index payload '\" 0"
+                ]
+              ]
+            },
+            "commands": {
+              "indexes": [
+                "commands_coordinates"
+              ],
+              "plan": [
+                "SEARCH commands USING INDEX commands_coordinates (x=? AND y=? AND z=?)",
+                "USE TEMP B-TREE FOR ORDER BY"
+              ],
+              "rows": [
+                [
+                  2048,
+                  1792752027793,
+                  2,
+                  1,
+                  7,
+                  -60,
+                  3,
+                  "Index payload '\" 2047"
+                ],
+                [
+                  1,
+                  1792752025746,
+                  2,
+                  1,
+                  7,
+                  -60,
+                  3,
+                  "Index payload '\" 0"
+                ]
+              ]
+            },
+            "containers": {
+              "indexes": [
+                "containers_coordinates"
+              ],
+              "plan": [
+                "SEARCH containers USING INDEX containers_coordinates (x=? AND y=? AND z=?)",
+                "USE TEMP B-TREE FOR ORDER BY"
+              ],
+              "rows": [
+                [
+                  2049,
+                  1792752027793,
+                  2,
+                  1,
+                  7,
+                  -60,
+                  3,
+                  5,
+                  {
+                    "blob": "0100050800124c6f6767696e6720636f6d706f6e656e7473"
+                  },
+                  7,
+                  0
+                ],
+                [
+                  2,
+                  1792752025746,
+                  2,
+                  1,
+                  7,
+                  -60,
+                  3,
+                  5,
+                  {
+                    "blob": "0100050800124c6f6767696e6720636f6d706f6e656e7473"
+                  },
+                  7,
+                  0
+                ]
+              ]
+            },
+            "items": {
+              "indexes": [
+                "items_coordinates"
+              ],
+              "plan": [
+                "SEARCH items USING INDEX items_coordinates (x=? AND y=? AND z=?)",
+                "USE TEMP B-TREE FOR ORDER BY"
+              ],
+              "rows": [
+                [
+                  2048,
+                  1792752027793,
+                  2,
+                  1,
+                  7,
+                  -60,
+                  3,
+                  5,
+                  {
+                    "blob": "0100050800124c6f6767696e6720636f6d706f6e656e7473"
+                  },
+                  7,
+                  0
+                ],
+                [
+                  1,
+                  1792752025746,
+                  2,
+                  1,
+                  7,
+                  -60,
+                  3,
+                  5,
+                  {
+                    "blob": "0100050800124c6f6767696e6720636f6d706f6e656e7473"
+                  },
+                  7,
+                  0
+                ]
+              ]
+            },
+            "sessions": {
+              "indexes": [
+                "sessions_coordinates"
+              ],
+              "plan": [
+                "SEARCH sessions USING INDEX sessions_coordinates (x=? AND y=? AND z=?)",
+                "USE TEMP B-TREE FOR ORDER BY"
+              ],
+              "rows": [
+                [
+                  2052,
+                  1792752027793,
+                  2,
+                  1,
+                  7,
+                  -60,
+                  3,
+                  1
+                ],
+                [
+                  5,
+                  1792752025746,
+                  2,
+                  1,
+                  7,
+                  -60,
+                  3,
+                  0
+                ]
+              ]
+            }
+          }
+        },
+        {
+          "phase": "indexes-recover",
+          "checks": 25,
+          "result": {
+            "path": "artifacts/logging-index-final-server/logging-index-recovery.json",
+            "bytes": 2347,
+            "sha256": "fe836ea5ffba29c63fe321bd11bd5014361beea9a87cf634a24adf39c5f06375"
+          },
+          "database": {
+            "path": "artifacts/logging-index-final-stopped-indexes-recover.db",
+            "bytes": 819200,
+            "sha256": "2efdca1c502619674bf959244c512625997f890d1834ff6609a055e3c2aa2648",
+            "quickCheck": "ok"
+          },
+          "queries": {
+            "blocks": {
+              "indexes": [
+                "coordinates"
+              ],
+              "plan": [
+                "SEARCH blocks USING INDEX coordinates (x=? AND y=? AND z=?)",
+                "USE TEMP B-TREE FOR ORDER BY"
+              ],
+              "rows": [
+                [
+                  2247,
+                  1792752027793,
+                  2,
+                  1,
+                  7,
+                  -60,
+                  3,
+                  5,
+                  0
+                ],
+                [
+                  200,
+                  1792752025746,
+                  2,
+                  1,
+                  7,
+                  -60,
+                  3,
+                  5,
+                  0
+                ]
+              ]
+            },
+            "chats": {
+              "indexes": [
+                "chats_coordinates"
+              ],
+              "plan": [
+                "SEARCH chats USING INDEX chats_coordinates (x=? AND y=? AND z=?)",
+                "USE TEMP B-TREE FOR ORDER BY"
+              ],
+              "rows": [
+                [
+                  2048,
+                  1792752027793,
+                  2,
+                  1,
+                  7,
+                  -60,
+                  3,
+                  "Index payload '\" 2047"
+                ],
+                [
+                  1,
+                  1792752025746,
+                  2,
+                  1,
+                  7,
+                  -60,
+                  3,
+                  "Index payload '\" 0"
+                ]
+              ]
+            },
+            "commands": {
+              "indexes": [
+                "commands_coordinates"
+              ],
+              "plan": [
+                "SEARCH commands USING INDEX commands_coordinates (x=? AND y=? AND z=?)",
+                "USE TEMP B-TREE FOR ORDER BY"
+              ],
+              "rows": [
+                [
+                  2048,
+                  1792752027793,
+                  2,
+                  1,
+                  7,
+                  -60,
+                  3,
+                  "Index payload '\" 2047"
+                ],
+                [
+                  1,
+                  1792752025746,
+                  2,
+                  1,
+                  7,
+                  -60,
+                  3,
+                  "Index payload '\" 0"
+                ]
+              ]
+            },
+            "containers": {
+              "indexes": [
+                "containers_coordinates"
+              ],
+              "plan": [
+                "SEARCH containers USING INDEX containers_coordinates (x=? AND y=? AND z=?)",
+                "USE TEMP B-TREE FOR ORDER BY"
+              ],
+              "rows": [
+                [
+                  2049,
+                  1792752027793,
+                  2,
+                  1,
+                  7,
+                  -60,
+                  3,
+                  5,
+                  {
+                    "blob": "0100050800124c6f6767696e6720636f6d706f6e656e7473"
+                  },
+                  7,
+                  0
+                ],
+                [
+                  2,
+                  1792752025746,
+                  2,
+                  1,
+                  7,
+                  -60,
+                  3,
+                  5,
+                  {
+                    "blob": "0100050800124c6f6767696e6720636f6d706f6e656e7473"
+                  },
+                  7,
+                  0
+                ]
+              ]
+            },
+            "items": {
+              "indexes": [
+                "items_coordinates"
+              ],
+              "plan": [
+                "SEARCH items USING INDEX items_coordinates (x=? AND y=? AND z=?)",
+                "USE TEMP B-TREE FOR ORDER BY"
+              ],
+              "rows": [
+                [
+                  2048,
+                  1792752027793,
+                  2,
+                  1,
+                  7,
+                  -60,
+                  3,
+                  5,
+                  {
+                    "blob": "0100050800124c6f6767696e6720636f6d706f6e656e7473"
+                  },
+                  7,
+                  0
+                ],
+                [
+                  1,
+                  1792752025746,
+                  2,
+                  1,
+                  7,
+                  -60,
+                  3,
+                  5,
+                  {
+                    "blob": "0100050800124c6f6767696e6720636f6d706f6e656e7473"
+                  },
+                  7,
+                  0
+                ]
+              ]
+            },
+            "sessions": {
+              "indexes": [
+                "sessions_coordinates"
+              ],
+              "plan": [
+                "SEARCH sessions USING INDEX sessions_coordinates (x=? AND y=? AND z=?)",
+                "USE TEMP B-TREE FOR ORDER BY"
+              ],
+              "rows": [
+                [
+                  2052,
+                  1792752027793,
+                  2,
+                  1,
+                  7,
+                  -60,
+                  3,
+                  1
+                ],
+                [
+                  5,
+                  1792752025746,
+                  2,
+                  1,
+                  7,
+                  -60,
+                  3,
+                  0
+                ]
+              ]
+            }
+          }
+        }
+      ],
+      "logs": [
+        {
+          "path": "artifacts/logging-index-final-indexes.log",
+          "bytes": 19315,
+          "sha256": "4d328afeea83799af66185fcd7d7a0dff77a769e9dcdbe51854c49a1f7686d70"
+        },
+        {
+          "path": "artifacts/logging-index-final-indexes-recover.log",
+          "bytes": 15617,
+          "sha256": "99d5bcbce57bff1b5266778b0985b80e4a61ced778e7d1b55f0642b49e0a1909"
+        }
+      ],
+      "financial": {
+        "path": "artifacts/logging-index-final-server/logging-world/yuuniverse_economy/economy.db",
+        "bytes": 368640,
+        "sha256": "dba9f83bc4a0ec908c892996f8cccce38618488fec6b759593031e57de8d6891",
+        "quickCheck": "ok"
+      }
+    },
+    {
+      "state": {
+        "path": "artifacts/logging-index-disabled-server/logging-index-state.json",
+        "bytes": 823357,
+        "sha256": "f78212dc62924943f46677717c7c0442a3b607c127d97b6b653c3a3242cf541a"
+      },
+      "original": {
+        "path": "artifacts/logging-index-disabled-server/logging-index-original.json",
+        "bytes": 7920,
+        "sha256": "406027d085ba2c45325dec77592a23ff2e21fb4750535800e024a4f8887302ea"
+      },
+      "database": {
+        "path": "artifacts/logging-index-disabled-server/database.db",
+        "bytes": 794624,
+        "sha256": "3e5730f28cc92a88d21e6748042f905c4ebfed83aee3a0bfee21124648f0d975",
+        "quickCheck": "ok"
+      },
+      "rowsPerTable": 2048,
+      "totalNewHistoryRows": 12288,
+      "originalRows": {
+        "users": 1,
+        "usernames": 1,
+        "levels": 3,
+        "materials": 5,
+        "entities": 1,
+        "blocks": 199,
+        "chats": 0,
+        "commands": 0,
+        "containers": 1,
+        "items": 0,
+        "sessions": 4
+      },
+      "phases": [
+        {
+          "phase": "indexes-disabled",
+          "checks": 24,
+          "result": {
+            "path": "artifacts/logging-index-disabled-server/logging-index-result.json",
+            "bytes": 1900,
+            "sha256": "feb96f77335037a93f0895924d771226b9ea951912270724dbc8ea8c641cabdd"
+          },
+          "database": {
+            "path": "artifacts/logging-index-disabled-stopped-indexes-disabled.db",
+            "bytes": 593920,
+            "sha256": "77d0713838ab88d755fa4743c578b5dc6da635380116900fbf2b43bc2c0cb1b1",
+            "quickCheck": "ok"
+          },
+          "queries": {
+            "blocks": {
+              "indexes": [],
+              "plan": [
+                "SCAN blocks",
+                "USE TEMP B-TREE FOR ORDER BY"
+              ],
+              "rows": [
+                [
+                  2247,
+                  1792752240379,
+                  2,
+                  1,
+                  7,
+                  -60,
+                  3,
+                  5,
+                  0
+                ],
+                [
+                  200,
+                  1792752238332,
+                  2,
+                  1,
+                  7,
+                  -60,
+                  3,
+                  5,
+                  0
+                ]
+              ]
+            },
+            "chats": {
+              "indexes": [],
+              "plan": [
+                "SCAN chats",
+                "USE TEMP B-TREE FOR ORDER BY"
+              ],
+              "rows": [
+                [
+                  2048,
+                  1792752240379,
+                  2,
+                  1,
+                  7,
+                  -60,
+                  3,
+                  "Index payload '\" 2047"
+                ],
+                [
+                  1,
+                  1792752238332,
+                  2,
+                  1,
+                  7,
+                  -60,
+                  3,
+                  "Index payload '\" 0"
+                ]
+              ]
+            },
+            "commands": {
+              "indexes": [],
+              "plan": [
+                "SCAN commands",
+                "USE TEMP B-TREE FOR ORDER BY"
+              ],
+              "rows": [
+                [
+                  2048,
+                  1792752240379,
+                  2,
+                  1,
+                  7,
+                  -60,
+                  3,
+                  "Index payload '\" 2047"
+                ],
+                [
+                  1,
+                  1792752238332,
+                  2,
+                  1,
+                  7,
+                  -60,
+                  3,
+                  "Index payload '\" 0"
+                ]
+              ]
+            },
+            "containers": {
+              "indexes": [],
+              "plan": [
+                "SCAN containers",
+                "USE TEMP B-TREE FOR ORDER BY"
+              ],
+              "rows": [
+                [
+                  2049,
+                  1792752240379,
+                  2,
+                  1,
+                  7,
+                  -60,
+                  3,
+                  5,
+                  {
+                    "blob": "0100050800124c6f6767696e6720636f6d706f6e656e7473"
+                  },
+                  7,
+                  0
+                ],
+                [
+                  2,
+                  1792752238332,
+                  2,
+                  1,
+                  7,
+                  -60,
+                  3,
+                  5,
+                  {
+                    "blob": "0100050800124c6f6767696e6720636f6d706f6e656e7473"
+                  },
+                  7,
+                  0
+                ]
+              ]
+            },
+            "items": {
+              "indexes": [],
+              "plan": [
+                "SCAN items",
+                "USE TEMP B-TREE FOR ORDER BY"
+              ],
+              "rows": [
+                [
+                  2048,
+                  1792752240379,
+                  2,
+                  1,
+                  7,
+                  -60,
+                  3,
+                  5,
+                  {
+                    "blob": "0100050800124c6f6767696e6720636f6d706f6e656e7473"
+                  },
+                  7,
+                  0
+                ],
+                [
+                  1,
+                  1792752238332,
+                  2,
+                  1,
+                  7,
+                  -60,
+                  3,
+                  5,
+                  {
+                    "blob": "0100050800124c6f6767696e6720636f6d706f6e656e7473"
+                  },
+                  7,
+                  0
+                ]
+              ]
+            },
+            "sessions": {
+              "indexes": [],
+              "plan": [
+                "SCAN sessions",
+                "USE TEMP B-TREE FOR ORDER BY"
+              ],
+              "rows": [
+                [
+                  2052,
+                  1792752240379,
+                  2,
+                  1,
+                  7,
+                  -60,
+                  3,
+                  1
+                ],
+                [
+                  5,
+                  1792752238332,
+                  2,
+                  1,
+                  7,
+                  -60,
+                  3,
+                  0
+                ]
+              ]
+            }
+          }
+        },
+        {
+          "phase": "indexes-recover",
+          "checks": 25,
+          "result": {
+            "path": "artifacts/logging-index-disabled-server/logging-index-recovery.json",
+            "bytes": 2347,
+            "sha256": "9c458d64391328398e0b87c2a478268dc0f54d72c07b87a31afacb594b7be466"
+          },
+          "database": {
+            "path": "artifacts/logging-index-disabled-stopped-indexes-recover.db",
+            "bytes": 794624,
+            "sha256": "3e5730f28cc92a88d21e6748042f905c4ebfed83aee3a0bfee21124648f0d975",
+            "quickCheck": "ok"
+          },
+          "queries": {
+            "blocks": {
+              "indexes": [
+                "coordinates"
+              ],
+              "plan": [
+                "SEARCH blocks USING INDEX coordinates (x=? AND y=? AND z=?)",
+                "USE TEMP B-TREE FOR ORDER BY"
+              ],
+              "rows": [
+                [
+                  2247,
+                  1792752240379,
+                  2,
+                  1,
+                  7,
+                  -60,
+                  3,
+                  5,
+                  0
+                ],
+                [
+                  200,
+                  1792752238332,
+                  2,
+                  1,
+                  7,
+                  -60,
+                  3,
+                  5,
+                  0
+                ]
+              ]
+            },
+            "chats": {
+              "indexes": [
+                "chats_coordinates"
+              ],
+              "plan": [
+                "SEARCH chats USING INDEX chats_coordinates (x=? AND y=? AND z=?)",
+                "USE TEMP B-TREE FOR ORDER BY"
+              ],
+              "rows": [
+                [
+                  2048,
+                  1792752240379,
+                  2,
+                  1,
+                  7,
+                  -60,
+                  3,
+                  "Index payload '\" 2047"
+                ],
+                [
+                  1,
+                  1792752238332,
+                  2,
+                  1,
+                  7,
+                  -60,
+                  3,
+                  "Index payload '\" 0"
+                ]
+              ]
+            },
+            "commands": {
+              "indexes": [
+                "commands_coordinates"
+              ],
+              "plan": [
+                "SEARCH commands USING INDEX commands_coordinates (x=? AND y=? AND z=?)",
+                "USE TEMP B-TREE FOR ORDER BY"
+              ],
+              "rows": [
+                [
+                  2048,
+                  1792752240379,
+                  2,
+                  1,
+                  7,
+                  -60,
+                  3,
+                  "Index payload '\" 2047"
+                ],
+                [
+                  1,
+                  1792752238332,
+                  2,
+                  1,
+                  7,
+                  -60,
+                  3,
+                  "Index payload '\" 0"
+                ]
+              ]
+            },
+            "containers": {
+              "indexes": [
+                "containers_coordinates"
+              ],
+              "plan": [
+                "SEARCH containers USING INDEX containers_coordinates (x=? AND y=? AND z=?)",
+                "USE TEMP B-TREE FOR ORDER BY"
+              ],
+              "rows": [
+                [
+                  2049,
+                  1792752240379,
+                  2,
+                  1,
+                  7,
+                  -60,
+                  3,
+                  5,
+                  {
+                    "blob": "0100050800124c6f6767696e6720636f6d706f6e656e7473"
+                  },
+                  7,
+                  0
+                ],
+                [
+                  2,
+                  1792752238332,
+                  2,
+                  1,
+                  7,
+                  -60,
+                  3,
+                  5,
+                  {
+                    "blob": "0100050800124c6f6767696e6720636f6d706f6e656e7473"
+                  },
+                  7,
+                  0
+                ]
+              ]
+            },
+            "items": {
+              "indexes": [
+                "items_coordinates"
+              ],
+              "plan": [
+                "SEARCH items USING INDEX items_coordinates (x=? AND y=? AND z=?)",
+                "USE TEMP B-TREE FOR ORDER BY"
+              ],
+              "rows": [
+                [
+                  2048,
+                  1792752240379,
+                  2,
+                  1,
+                  7,
+                  -60,
+                  3,
+                  5,
+                  {
+                    "blob": "0100050800124c6f6767696e6720636f6d706f6e656e7473"
+                  },
+                  7,
+                  0
+                ],
+                [
+                  1,
+                  1792752238332,
+                  2,
+                  1,
+                  7,
+                  -60,
+                  3,
+                  5,
+                  {
+                    "blob": "0100050800124c6f6767696e6720636f6d706f6e656e7473"
+                  },
+                  7,
+                  0
+                ]
+              ]
+            },
+            "sessions": {
+              "indexes": [
+                "sessions_coordinates"
+              ],
+              "plan": [
+                "SEARCH sessions USING INDEX sessions_coordinates (x=? AND y=? AND z=?)",
+                "USE TEMP B-TREE FOR ORDER BY"
+              ],
+              "rows": [
+                [
+                  2052,
+                  1792752240379,
+                  2,
+                  1,
+                  7,
+                  -60,
+                  3,
+                  1
+                ],
+                [
+                  5,
+                  1792752238332,
+                  2,
+                  1,
+                  7,
+                  -60,
+                  3,
+                  0
+                ]
+              ]
+            }
+          }
+        }
+      ],
+      "logs": [
+        {
+          "path": "artifacts/logging-index-disabled-indexes-disabled.log",
+          "bytes": 17804,
+          "sha256": "25ccce85907ac2c3936dc22676e48c850aa1ffb5c7b4811100b2be46cb801fa8"
+        },
+        {
+          "path": "artifacts/logging-index-disabled-indexes-recover.log",
+          "bytes": 15631,
+          "sha256": "63ef1daf6883aaa28d6e11d5ab2b5060444b1403520520ff5e0cf26f00b8d436"
+        }
+      ],
+      "financial": {
+        "path": "artifacts/logging-index-disabled-server/logging-world/yuuniverse_economy/economy.db",
+        "bytes": 368640,
+        "sha256": "138b651ba172abcfd5d2f9738614d30f9b9324d10aa9bc1bc0fc68cd8b0dedf3",
+        "quickCheck": "ok"
+      }
+    }
+  ],
+  "normal": {
+    "logs": [
+      {
+        "path": "artifacts/logging-index-normal-regression-native.log",
+        "bytes": 21017,
+        "sha256": "9bf4b94487a69a354974c70e968fbd5baafd9efc15caf2a1a405d1041bbd67a2"
+      },
+      {
+        "path": "artifacts/logging-index-normal-regression-recover.log",
+        "bytes": 13763,
+        "sha256": "0192ca60995857e246e76ebabc6db922b6b33dd4368724ac741eeb790739de08"
+      }
+    ],
+    "state": {
+      "actor": "9d4912ef-864d-4ccb-812c-44713d8e1f5a",
+      "currency": "8d6810f0-d3f7-4bfc-8598-68f54b96f834",
+      "balance": 980,
+      "operation": "1b689f47-86c6-4c86-9ef5-c47f653040b8",
+      "transaction": "f0c58a73-7230-4a5f-a74f-45c7f29da256",
+      "shop": "coordinate:aa9c5ffc-b2f4-43ef-8d39-35a218a53683",
+      "run": null
+    },
+    "databases": [
+      {
+        "path": "artifacts/logging-index-normal-regression-server/database.db",
+        "bytes": 102400,
+        "sha256": "293b8b6e411ec9ee2f8f59f0ceec450f34c352d6883538cf4e0b54051d941985",
+        "quickCheck": "ok"
+      },
+      {
+        "path": "artifacts/logging-index-normal-regression-server/logging-world/yuuniverse_economy/economy.db",
+        "bytes": 368640,
+        "sha256": "54aa9c78d9cac1226dba8000b222e5de2f518cf3c35bd9647df3c2ee966e8893",
+        "quickCheck": "ok"
+      }
+    ]
+  },
+  "shutdown": {
+    "state": {
+      "actor": "6e81a827-6814-4f76-b8a8-2e27dca72690",
+      "beforeRows": [
+        [
+          "blocks",
+          1792752665341,
+          7,
+          -60,
+          3,
+          "chest",
+          1,
+          0,
+          null
+        ]
+      ],
+      "dropEntity": "8cd864ea-da02-4b39-a638-aa4b9779c28d",
+      "storage": {
+        "inventory": [
+          {
+            "id": "minecraft:paper",
+            "count": 7,
+            "components": {
+              "minecraft:custom_name": "\"Shutdown paper\""
+            }
+          },
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {
+            "id": "minecraft:oak_planks",
+            "count": 1
+          },
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {}
+        ],
+        "chest": [
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {}
+        ],
+        "blocks": [
+          {
+            "Name": "minecraft:stone"
+          },
+          {
+            "Properties": {
+              "waterlogged": "false",
+              "axis": "z"
+            },
+            "Name": "create:shaft"
+          },
+          {
+            "Properties": {
+              "waterlogged": "false",
+              "type": "single",
+              "facing": "north"
+            },
+            "Name": "minecraft:chest"
+          },
+          {
+            "Name": "minecraft:oak_planks"
+          }
+        ],
+        "dropEntity": "8cd864ea-da02-4b39-a638-aa4b9779c28d",
+        "dropStack": {
+          "id": "minecraft:snowball",
+          "count": 3,
+          "components": {
+            "minecraft:custom_name": "\"Shutdown snow\""
+          }
+        },
+        "dropNoGravity": true
+      },
+      "ordinaryPendingAtStop": 8,
+      "batchPendingAtStop": 2,
+      "committedRows": [
+        [
+          "blocks",
+          1792752665341,
+          7,
+          -60,
+          3,
+          "chest",
+          1,
+          0,
+          null
+        ],
+        [
+          "blocks",
+          1792752665418,
+          7,
+          -60,
+          3,
+          "chest",
+          2,
+          0,
+          null
+        ],
+        [
+          "blocks",
+          1792752665486,
+          3,
+          -60,
+          3,
+          "stone",
+          1,
+          0,
+          null
+        ],
+        [
+          "blocks",
+          1792752665509,
+          5,
+          -60,
+          3,
+          "create:shaft",
+          1,
+          0,
+          null
+        ],
+        [
+          "blocks",
+          1792752665532,
+          11,
+          -60,
+          3,
+          "oak_planks",
+          1,
+          0,
+          null
+        ],
+        [
+          "containers",
+          1792752665467,
+          7,
+          -60,
+          3,
+          "paper",
+          0,
+          7,
+          "01000508000E53687574646F776E207061706572"
+        ],
+        [
+          "items",
+          1792752665697,
+          11,
+          -60,
+          5,
+          "snowball",
+          2,
+          3,
+          "01000508000D53687574646F776E20736E6F77"
+        ]
+      ],
+      "checks": 11
+    },
+    "recovered": {
+      "actor": "6e81a827-6814-4f76-b8a8-2e27dca72690",
+      "beforeRows": [
+        [
+          "blocks",
+          1792752665341,
+          7,
+          -60,
+          3,
+          "chest",
+          1,
+          0,
+          null
+        ]
+      ],
+      "dropEntity": "8cd864ea-da02-4b39-a638-aa4b9779c28d",
+      "storage": {
+        "inventory": [
+          {
+            "id": "minecraft:paper",
+            "count": 7,
+            "components": {
+              "minecraft:custom_name": "\"Shutdown paper\""
+            }
+          },
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {
+            "id": "minecraft:oak_planks",
+            "count": 1
+          },
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {}
+        ],
+        "chest": [
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {}
+        ],
+        "blocks": [
+          {
+            "Name": "minecraft:stone"
+          },
+          {
+            "Properties": {
+              "waterlogged": "false",
+              "axis": "z"
+            },
+            "Name": "create:shaft"
+          },
+          {
+            "Properties": {
+              "waterlogged": "false",
+              "type": "single",
+              "facing": "north"
+            },
+            "Name": "minecraft:chest"
+          },
+          {
+            "Name": "minecraft:oak_planks"
+          }
+        ],
+        "dropEntity": "8cd864ea-da02-4b39-a638-aa4b9779c28d",
+        "dropStack": {
+          "id": "minecraft:snowball",
+          "count": 3,
+          "components": {
+            "minecraft:custom_name": "\"Shutdown snow\""
+          }
+        },
+        "dropNoGravity": true
+      },
+      "ordinaryPendingAtStop": 8,
+      "batchPendingAtStop": 2,
+      "committedRows": [
+        [
+          "blocks",
+          1792752665341,
+          7,
+          -60,
+          3,
+          "chest",
+          1,
+          0,
+          null
+        ],
+        [
+          "blocks",
+          1792752665418,
+          7,
+          -60,
+          3,
+          "chest",
+          2,
+          0,
+          null
+        ],
+        [
+          "blocks",
+          1792752665486,
+          3,
+          -60,
+          3,
+          "stone",
+          1,
+          0,
+          null
+        ],
+        [
+          "blocks",
+          1792752665509,
+          5,
+          -60,
+          3,
+          "create:shaft",
+          1,
+          0,
+          null
+        ],
+        [
+          "blocks",
+          1792752665532,
+          11,
+          -60,
+          3,
+          "oak_planks",
+          1,
+          0,
+          null
+        ],
+        [
+          "containers",
+          1792752665467,
+          7,
+          -60,
+          3,
+          "paper",
+          0,
+          7,
+          "01000508000E53687574646F776E207061706572"
+        ],
+        [
+          "items",
+          1792752665697,
+          11,
+          -60,
+          5,
+          "snowball",
+          2,
+          3,
+          "01000508000D53687574646F776E20736E6F77"
+        ]
+      ],
+      "checks": 11,
+      "recoveryChecks": 8
+    },
+    "database": {
+      "path": "artifacts/logging-index-shutdown-regression-server/database.db",
+      "bytes": 94208,
+      "sha256": "a052c5ccb813baa31fba89055899bf287996c7bea0ba7580a2f31259e439eea6",
+      "quickCheck": "ok",
+      "gameplayRows": [
+        [
+          "blocks",
+          1792752665341,
+          7,
+          -60,
+          3,
+          "chest",
+          1,
+          0,
+          null
+        ],
+        [
+          "blocks",
+          1792752665418,
+          7,
+          -60,
+          3,
+          "chest",
+          2,
+          0,
+          null
+        ],
+        [
+          "blocks",
+          1792752665486,
+          3,
+          -60,
+          3,
+          "stone",
+          1,
+          0,
+          null
+        ],
+        [
+          "blocks",
+          1792752665509,
+          5,
+          -60,
+          3,
+          "create:shaft",
+          1,
+          0,
+          null
+        ],
+        [
+          "blocks",
+          1792752665532,
+          11,
+          -60,
+          3,
+          "oak_planks",
+          1,
+          0,
+          null
+        ],
+        [
+          "containers",
+          1792752665467,
+          7,
+          -60,
+          3,
+          "paper",
+          0,
+          7,
+          "01000508000E53687574646F776E207061706572"
+        ],
+        [
+          "items",
+          1792752665697,
+          11,
+          -60,
+          5,
+          "snowball",
+          2,
+          3,
+          "01000508000D53687574646F776E20736E6F77"
+        ]
+      ],
+      "sessions": {
+        "0": 2,
+        "1": 2
+      }
+    },
+    "nativeStorage": {
+      "player": {
+        "path": "artifacts/logging-index-shutdown-regression-server/logging-world/playerdata/6e81a827-6814-4f76-b8a8-2e27dca72690.dat",
+        "bytes": 1096,
+        "sha256": "64d7be83c385132577fdb4dae4c7c9200a2d18abb1d8e945f653ca7cdc8582f1"
+      },
+      "inventory": [
+        {
+          "count": 7,
+          "components": {
+            "minecraft:custom_name": "\"Shutdown paper\""
+          },
+          "id": "minecraft:paper"
+        },
+        {},
+        {},
+        {},
+        {},
+        {},
+        {},
+        {},
+        {
+          "count": 1,
+          "id": "minecraft:oak_planks"
+        },
+        {},
+        {},
+        {},
+        {},
+        {},
+        {},
+        {},
+        {},
+        {},
+        {},
+        {},
+        {},
+        {},
+        {},
+        {},
+        {},
+        {},
+        {},
+        {},
+        {},
+        {},
+        {},
+        {},
+        {},
+        {},
+        {},
+        {},
+        {},
+        {},
+        {},
+        {},
+        {}
+      ],
+      "originalDrop": {
+        "components": {
+          "minecraft:custom_name": "\"Shutdown snow\""
+        },
+        "count": 3,
+        "id": "minecraft:snowball"
+      },
+      "dropEntity": "8cd864ea-da02-4b39-a638-aa4b9779c28d",
+      "blocks": [
+        {
+          "Name": "minecraft:stone"
+        },
+        {
+          "Properties": {
+            "waterlogged": "false",
+            "axis": "z"
+          },
+          "Name": "create:shaft"
+        },
+        {
+          "Properties": {
+            "waterlogged": "false",
+            "facing": "north",
+            "type": "single"
+          },
+          "Name": "minecraft:chest"
+        },
+        {
+          "Name": "minecraft:oak_planks"
+        }
+      ],
+      "chestEmpty": true,
+      "entityFiles": [
+        {
+          "path": "artifacts/logging-index-shutdown-regression-server/logging-world/entities/r.-1.-1.mca",
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "path": "artifacts/logging-index-shutdown-regression-server/logging-world/entities/r.-1.0.mca",
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "path": "artifacts/logging-index-shutdown-regression-server/logging-world/entities/r.0.-1.mca",
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "path": "artifacts/logging-index-shutdown-regression-server/logging-world/entities/r.0.0.mca",
+          "bytes": 16384,
+          "sha256": "71b643d19832bbfd6b4c14cc1a918d59c4b6593f44aa4558126cc9183d6c28af"
+        }
+      ],
+      "regionFiles": [
+        {
+          "path": "artifacts/logging-index-shutdown-regression-server/logging-world/region/r.-1.-1.mca",
+          "bytes": 815104,
+          "sha256": "dc4d779a27082defed3d6ef22b2bb44974237eb93b9379fe6453e3571591ebff"
+        },
+        {
+          "path": "artifacts/logging-index-shutdown-regression-server/logging-world/region/r.-1.0.mca",
+          "bytes": 872448,
+          "sha256": "f8182f1ceecf3751a383aab99b4a8cd097e431171a8af1c640dcb505dd930b98"
+        },
+        {
+          "path": "artifacts/logging-index-shutdown-regression-server/logging-world/region/r.0.-1.mca",
+          "bytes": 872448,
+          "sha256": "f35aff4b953e6239c0cdbcf435a7db2cfceb1742d181a4a1f51f21a4db5bdd04"
+        },
+        {
+          "path": "artifacts/logging-index-shutdown-regression-server/logging-world/region/r.0.0.mca",
+          "bytes": 933888,
+          "sha256": "7275ca290bbf86dba2ec00c1a3a76a17d2ea465d1a70772e159efd279cce4d24"
+        }
+      ]
+    },
+    "phases": [
+      {
+        "log": {
+          "path": "artifacts/logging-index-shutdown-regression-shutdown.log",
+          "bytes": 16976,
+          "sha256": "f4e6e95d8c7629db2dfc5b1b112211fc7f5315e96e502a3df370c3bcd3f9b715"
+        },
+        "database": {
+          "path": "artifacts/logging-index-shutdown-regression-stopped-shutdown.db",
+          "bytes": 94208,
+          "sha256": "6e5d7374380176c19ad69411df52b4c92ea9b058478bb29e74d0ca218ecb123c",
+          "quickCheck": "ok",
+          "gameplayRows": [
+            [
+              "blocks",
+              1792752665341,
+              7,
+              -60,
+              3,
+              "chest",
+              1,
+              0,
+              null
+            ],
+            [
+              "blocks",
+              1792752665418,
+              7,
+              -60,
+              3,
+              "chest",
+              2,
+              0,
+              null
+            ],
+            [
+              "blocks",
+              1792752665486,
+              3,
+              -60,
+              3,
+              "stone",
+              1,
+              0,
+              null
+            ],
+            [
+              "blocks",
+              1792752665509,
+              5,
+              -60,
+              3,
+              "create:shaft",
+              1,
+              0,
+              null
+            ],
+            [
+              "blocks",
+              1792752665532,
+              11,
+              -60,
+              3,
+              "oak_planks",
+              1,
+              0,
+              null
+            ],
+            [
+              "containers",
+              1792752665467,
+              7,
+              -60,
+              3,
+              "paper",
+              0,
+              7,
+              "01000508000E53687574646F776E207061706572"
+            ],
+            [
+              "items",
+              1792752665697,
+              11,
+              -60,
+              5,
+              "snowball",
+              2,
+              3,
+              "01000508000D53687574646F776E20736E6F77"
+            ]
+          ],
+          "sessions": {
+            "0": 1,
+            "1": 1
+          }
+        },
+        "nativeStorage": {
+          "player": {
+            "path": "artifacts/logging-index-shutdown-regression-stopped-shutdown-world/playerdata/6e81a827-6814-4f76-b8a8-2e27dca72690.dat",
+            "bytes": 877,
+            "sha256": "ecf92235f06ee2e389581976534772d3a88a9d1fd3bee6b38dc57d0d6b1c8d2f"
+          },
+          "inventory": [
+            {
+              "count": 7,
+              "components": {
+                "minecraft:custom_name": "\"Shutdown paper\""
+              },
+              "id": "minecraft:paper"
+            },
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {
+              "count": 1,
+              "id": "minecraft:oak_planks"
+            },
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {}
+          ],
+          "originalDrop": {
+            "components": {
+              "minecraft:custom_name": "\"Shutdown snow\""
+            },
+            "count": 3,
+            "id": "minecraft:snowball"
+          },
+          "dropEntity": "8cd864ea-da02-4b39-a638-aa4b9779c28d",
+          "blocks": [
+            {
+              "Name": "minecraft:stone"
+            },
+            {
+              "Properties": {
+                "waterlogged": "false",
+                "axis": "z"
+              },
+              "Name": "create:shaft"
+            },
+            {
+              "Properties": {
+                "waterlogged": "false",
+                "facing": "north",
+                "type": "single"
+              },
+              "Name": "minecraft:chest"
+            },
+            {
+              "Name": "minecraft:oak_planks"
+            }
+          ],
+          "chestEmpty": true,
+          "entityFiles": [
+            {
+              "path": "artifacts/logging-index-shutdown-regression-stopped-shutdown-world/entities/r.-1.-1.mca",
+              "bytes": 0,
+              "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+            },
+            {
+              "path": "artifacts/logging-index-shutdown-regression-stopped-shutdown-world/entities/r.-1.0.mca",
+              "bytes": 0,
+              "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+            },
+            {
+              "path": "artifacts/logging-index-shutdown-regression-stopped-shutdown-world/entities/r.0.-1.mca",
+              "bytes": 0,
+              "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+            },
+            {
+              "path": "artifacts/logging-index-shutdown-regression-stopped-shutdown-world/entities/r.0.0.mca",
+              "bytes": 12288,
+              "sha256": "a7f65bc83915d4484ec223f3e58b6ca83803dc42e10c87ae7cb735523779a0f9"
+            }
+          ],
+          "regionFiles": [
+            {
+              "path": "artifacts/logging-index-shutdown-regression-stopped-shutdown-world/region/r.-1.-1.mca",
+              "bytes": 811008,
+              "sha256": "d8fecdad93a701980f1dec98b1dba4b947087bddee969580b79c289d0d28b421"
+            },
+            {
+              "path": "artifacts/logging-index-shutdown-regression-stopped-shutdown-world/region/r.-1.0.mca",
+              "bytes": 868352,
+              "sha256": "1c62a582693934784ab8aac68ab81d093341b4deaadf94530c36028f8d797079"
+            },
+            {
+              "path": "artifacts/logging-index-shutdown-regression-stopped-shutdown-world/region/r.0.-1.mca",
+              "bytes": 868352,
+              "sha256": "113a652d9b6ea086592b8980340d0d82b01ad12ebb9353462dcea7864ef7419c"
+            },
+            {
+              "path": "artifacts/logging-index-shutdown-regression-stopped-shutdown-world/region/r.0.0.mca",
+              "bytes": 929792,
+              "sha256": "ee56d49b69414cfb3a36bb2fafd16a48534a6c48ebf3dd022f5ad08b1b9a72b6"
+            }
+          ]
+        }
+      },
+      {
+        "log": {
+          "path": "artifacts/logging-index-shutdown-regression-shutdown-recover.log",
+          "bytes": 14122,
+          "sha256": "2608ba2ace89d81bf3b5390bd41232844c7781eb220c38e9569b2338381836b1"
+        },
+        "database": {
+          "path": "artifacts/logging-index-shutdown-regression-stopped-shutdown-recover.db",
+          "bytes": 94208,
+          "sha256": "a052c5ccb813baa31fba89055899bf287996c7bea0ba7580a2f31259e439eea6",
+          "quickCheck": "ok",
+          "gameplayRows": [
+            [
+              "blocks",
+              1792752665341,
+              7,
+              -60,
+              3,
+              "chest",
+              1,
+              0,
+              null
+            ],
+            [
+              "blocks",
+              1792752665418,
+              7,
+              -60,
+              3,
+              "chest",
+              2,
+              0,
+              null
+            ],
+            [
+              "blocks",
+              1792752665486,
+              3,
+              -60,
+              3,
+              "stone",
+              1,
+              0,
+              null
+            ],
+            [
+              "blocks",
+              1792752665509,
+              5,
+              -60,
+              3,
+              "create:shaft",
+              1,
+              0,
+              null
+            ],
+            [
+              "blocks",
+              1792752665532,
+              11,
+              -60,
+              3,
+              "oak_planks",
+              1,
+              0,
+              null
+            ],
+            [
+              "containers",
+              1792752665467,
+              7,
+              -60,
+              3,
+              "paper",
+              0,
+              7,
+              "01000508000E53687574646F776E207061706572"
+            ],
+            [
+              "items",
+              1792752665697,
+              11,
+              -60,
+              5,
+              "snowball",
+              2,
+              3,
+              "01000508000D53687574646F776E20736E6F77"
+            ]
+          ],
+          "sessions": {
+            "0": 2,
+            "1": 2
+          }
+        },
+        "nativeStorage": {
+          "player": {
+            "path": "artifacts/logging-index-shutdown-regression-stopped-shutdown-recover-world/playerdata/6e81a827-6814-4f76-b8a8-2e27dca72690.dat",
+            "bytes": 1096,
+            "sha256": "64d7be83c385132577fdb4dae4c7c9200a2d18abb1d8e945f653ca7cdc8582f1"
+          },
+          "inventory": [
+            {
+              "count": 7,
+              "components": {
+                "minecraft:custom_name": "\"Shutdown paper\""
+              },
+              "id": "minecraft:paper"
+            },
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {
+              "count": 1,
+              "id": "minecraft:oak_planks"
+            },
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {}
+          ],
+          "originalDrop": {
+            "components": {
+              "minecraft:custom_name": "\"Shutdown snow\""
+            },
+            "count": 3,
+            "id": "minecraft:snowball"
+          },
+          "dropEntity": "8cd864ea-da02-4b39-a638-aa4b9779c28d",
+          "blocks": [
+            {
+              "Name": "minecraft:stone"
+            },
+            {
+              "Properties": {
+                "waterlogged": "false",
+                "axis": "z"
+              },
+              "Name": "create:shaft"
+            },
+            {
+              "Properties": {
+                "waterlogged": "false",
+                "facing": "north",
+                "type": "single"
+              },
+              "Name": "minecraft:chest"
+            },
+            {
+              "Name": "minecraft:oak_planks"
+            }
+          ],
+          "chestEmpty": true,
+          "entityFiles": [
+            {
+              "path": "artifacts/logging-index-shutdown-regression-stopped-shutdown-recover-world/entities/r.-1.-1.mca",
+              "bytes": 0,
+              "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+            },
+            {
+              "path": "artifacts/logging-index-shutdown-regression-stopped-shutdown-recover-world/entities/r.-1.0.mca",
+              "bytes": 0,
+              "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+            },
+            {
+              "path": "artifacts/logging-index-shutdown-regression-stopped-shutdown-recover-world/entities/r.0.-1.mca",
+              "bytes": 0,
+              "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+            },
+            {
+              "path": "artifacts/logging-index-shutdown-regression-stopped-shutdown-recover-world/entities/r.0.0.mca",
+              "bytes": 16384,
+              "sha256": "71b643d19832bbfd6b4c14cc1a918d59c4b6593f44aa4558126cc9183d6c28af"
+            }
+          ],
+          "regionFiles": [
+            {
+              "path": "artifacts/logging-index-shutdown-regression-stopped-shutdown-recover-world/region/r.-1.-1.mca",
+              "bytes": 815104,
+              "sha256": "dc4d779a27082defed3d6ef22b2bb44974237eb93b9379fe6453e3571591ebff"
+            },
+            {
+              "path": "artifacts/logging-index-shutdown-regression-stopped-shutdown-recover-world/region/r.-1.0.mca",
+              "bytes": 872448,
+              "sha256": "f8182f1ceecf3751a383aab99b4a8cd097e431171a8af1c640dcb505dd930b98"
+            },
+            {
+              "path": "artifacts/logging-index-shutdown-regression-stopped-shutdown-recover-world/region/r.0.-1.mca",
+              "bytes": 872448,
+              "sha256": "f35aff4b953e6239c0cdbcf435a7db2cfceb1742d181a4a1f51f21a4db5bdd04"
+            },
+            {
+              "path": "artifacts/logging-index-shutdown-regression-stopped-shutdown-recover-world/region/r.0.0.mca",
+              "bytes": 933888,
+              "sha256": "7275ca290bbf86dba2ec00c1a3a76a17d2ea465d1a70772e159efd279cce4d24"
+            }
+          ]
+        }
+      }
+    ]
+  },
+  "nativeChecks": 164,
+  "sources": [
+    {
+      "path": "tools/logging-runtime-audit.gradle",
+      "bytes": 5154,
+      "sha256": "6dfc4b4b0eb6d9f14d4795280b85249e3df3b9a17807d6321685e33441492343"
+    },
+    {
+      "path": "tools/prepare-logging-index-audit.ps1",
+      "bytes": 3570,
+      "sha256": "4b3d101106216d68bd1acd2090b8d5df84cbe082b98d97426d6ef9de07097910"
+    },
+    {
+      "path": "tools/grieflogger-compat/run-storage-tests.ps1",
+      "bytes": 3411,
+      "sha256": "db250ec08a8defa01b60c4245d39b604826ed75aef2dbd2f4e3d00e2832bd6c3"
+    },
+    {
+      "path": "tools/logging-runtime-audit/net/yuuniverse/interactions/LoggingIndexRuntimeAudit.java",
+      "bytes": 11375,
+      "sha256": "bdf710bd9a4e75bbfc8ecaa8a486579c5efc75620074c9f4e05e17a7b450d87a"
+    },
+    {
+      "path": "tools/logging-runtime-audit/net/yuuniverse/interactions/LoggingRuntimeAudit.java",
+      "bytes": 27605,
+      "sha256": "473e29d64b06c058eaf4b7f759953f11a2d0b912db82f931a1269adaddd71b0e"
+    },
+    {
+      "path": "tools/logging-runtime-audit/net/yuuniverse/interactions/LoggingShutdownRuntimeAudit.java",
+      "bytes": 13333,
+      "sha256": "60a921d50b647df5d821991502744d8a3d08c9a3a8e4f2d17bc751458b696126"
+    },
+    {
+      "path": "tools/logging-runtime-audit/net/yuuniverse/interactions/LoggingStorageRuntimeAudit.java",
+      "bytes": 21179,
+      "sha256": "ae14aaf824d1e41ebf84b94c821e0d4c5b29e96413cd759affbe3360eb99be77"
+    },
+    {
+      "path": "tools/grieflogger-compat/storage-tests/com/daqem/grieflogger/GriefLogger.java",
+      "bytes": 1071,
+      "sha256": "1ba77f2b8051b6bd0869e5176650c8aa5d02cb1759566bdf3688c6b1540826fa"
+    },
+    {
+      "path": "tools/grieflogger-compat/storage-tests/StorageRecoveryTest.java",
+      "bytes": 32310,
+      "sha256": "702c023eb17b6c68f2d383250b94ab723a67ae01e1bc1e70de27af984fccf2d5"
+    },
+    {
+      "path": "tools/record-logging-index-validation.py",
+      "bytes": 19674,
+      "sha256": "be0fa3c6cc869750b60ae61a4edbbb9b5a7d6127dec5edc7610e0fd5b3e3b481"
+    },
+    {
+      "path": "tools/record-logging-shutdown-validation.py",
+      "bytes": 19768,
+      "sha256": "88063b0be24a5eece8722f04ca1208f8398a92770a46a0bc8c3c31e8bfb9dac6"
+    },
+    {
+      "path": "tools/record-logging-full-validation.py",
+      "bytes": 17628,
+      "sha256": "6c37c0227a89b19c153d1e1d521ee319c2e9b86712e7616e4a0f0a0ef011dd87"
+    }
+  ],
+  "runner": {
+    "path": "artifacts/run-logging-index-audit.ps1",
+    "bytes": 1928,
+    "sha256": "e1816c9e1e2323c4c9afb7d3c020d29f57049f2216ea27359cec137d23373e91"
+  },
+  "matrixRunner": {
+    "path": "artifacts/run-logging-index-matrix.ps1",
+    "bytes": 621,
+    "sha256": "bcff7fde86dccb26ac54f91ba3b392d6a61c7178baa9f497d3d251015918ce20"
+  },
+  "auditBinaries": [
+    {
+      "path": "artifacts/logging-index-before-build/classes/java/dialogue/net/yuuniverse/interactions/LoggingIndexRuntimeAudit.class",
+      "bytes": 21259,
+      "sha256": "f1b2c1284a35966930e03b799f9aa68051f954af2217cf3eb241bf08fbad5900"
+    },
+    {
+      "path": "artifacts/logging-index-final-build/classes/java/dialogue/net/yuuniverse/interactions/LoggingIndexRuntimeAudit.class",
+      "bytes": 21259,
+      "sha256": "f1b2c1284a35966930e03b799f9aa68051f954af2217cf3eb241bf08fbad5900"
+    },
+    {
+      "path": "artifacts/logging-index-disabled-build/classes/java/dialogue/net/yuuniverse/interactions/LoggingIndexRuntimeAudit.class",
+      "bytes": 21259,
+      "sha256": "f1b2c1284a35966930e03b799f9aa68051f954af2217cf3eb241bf08fbad5900"
+    },
+    {
+      "path": "artifacts/logging-index-normal-regression-build/classes/java/dialogue/net/yuuniverse/interactions/LoggingIndexRuntimeAudit.class",
+      "bytes": 21259,
+      "sha256": "f1b2c1284a35966930e03b799f9aa68051f954af2217cf3eb241bf08fbad5900"
+    },
+    {
+      "path": "artifacts/logging-index-shutdown-regression-build/classes/java/dialogue/net/yuuniverse/interactions/LoggingIndexRuntimeAudit.class",
+      "bytes": 21259,
+      "sha256": "f1b2c1284a35966930e03b799f9aa68051f954af2217cf3eb241bf08fbad5900"
+    }
+  ],
+  "packages": [
+    {
+      "path": "artifacts/craft-index-ordinary-21.1.248-build/libs/citizens-2.0.43-neoforge-SNAPSHOT-sources.jar",
+      "bytes": 1129013,
+      "sha256": "2bd54a9502d6b43dc9b3f4cb7eaad5e2e80fd5945c0915fd76b2e1cf8a13c452",
+      "matchingProductionClasses": 0
+    },
+    {
+      "path": "artifacts/craft-index-ordinary-21.1.248-build/libs/citizens-2.0.43-neoforge-SNAPSHOT.jar",
+      "bytes": 4095780,
+      "sha256": "c080231255136cab12e906a8bfa8030e2d47c84929a4fc1460c4279d09f6aaed",
+      "matchingProductionClasses": 1023
+    },
+    {
+      "path": "artifacts/craft-index-ordinary-21.1.248-build/libs/yuuniverse-interactions-2.0.43-neoforge-SNAPSHOT.jar",
+      "bytes": 204146,
+      "sha256": "11a8a64c321d0117fa28ea38b4ad954ac74201dffd9996789d5bcfd13b3b7ae6",
+      "matchingProductionClasses": 74
+    },
+    {
+      "path": "artifacts/craft-index-ordinary-21.1.233-build/libs/citizens-2.0.43-neoforge-SNAPSHOT-sources.jar",
+      "bytes": 1129013,
+      "sha256": "426af016db7662837f17451757e345e759748c7598d065f3aa19d286f1a4c99d",
+      "matchingProductionClasses": 0
+    },
+    {
+      "path": "artifacts/craft-index-ordinary-21.1.233-build/libs/citizens-2.0.43-neoforge-SNAPSHOT.jar",
+      "bytes": 4095780,
+      "sha256": "e1d7753acbd0e7ba9adf4e5e373523e0e74d8f3d2a2e0fa057cdab4e5f112b30",
+      "matchingProductionClasses": 1023
+    },
+    {
+      "path": "artifacts/craft-index-ordinary-21.1.233-build/libs/yuuniverse-interactions-2.0.43-neoforge-SNAPSHOT.jar",
+      "bytes": 204146,
+      "sha256": "46c704a7528f785f2d70bfbcbf8b0baf78764ac68f4f813886cd87adc60edbb6",
+      "matchingProductionClasses": 74
+    }
+  ],
+  "reusedOrdinaryPerTarget": 828,
+  "reusedInteractions": 100,
+  "unchangedPinnedClient": {
+    "path": "artifacts/logging-reader-pinned-client-before.json",
+    "bytes": 17435,
+    "sha256": "1f2f9f42f4f6584508d78b1ec677a9f28254184197e56ac8c202b235a739e1fa"
+  },
+  "stopped": {
+    "createdAt": "2026-10-23T18:53:27.2868756+08:00",
+    "timezone": "UTC+08:00",
+    "exclusiveStoppedWorldAndDatabases": true,
+    "fixtures": [
+      {
+        "fixture": "logging-index-before-server",
+        "world": "logging-world",
+        "exclusive": true,
+        "files": [
+          {
+            "path": "artifacts/logging-index-before-server/logging-world/session.lock",
+            "bytes": 3,
+            "sha256": "51643361c79ecaef25a8de802de24f570ba25d9c2df1d22d94fade11b4f466cc"
+          },
+          {
+            "path": "artifacts/logging-index-before-server/database.db",
+            "bytes": 634880,
+            "sha256": "de9ca9317f092427a913707b318ab29979aae72f6aac8c23f92fed4af5bcdbe5"
+          },
+          {
+            "path": "artifacts/logging-index-before-server/logging-world/neoprotect/neoprotect.mv.db",
+            "bytes": 106496,
+            "sha256": "2dd18615fd0bea59770f320ff0085f583221b955c27ad04f3c1b8cc329ec8a8a"
+          },
+          {
+            "path": "artifacts/logging-index-before-server/logging-world/yuuniverse_economy/economy.db",
+            "bytes": 368640,
+            "sha256": "116a27b23742fb17e86e4af1706106484cb0eb8b15bb19eea2a0dcd972ff6966"
+          }
+        ]
+      },
+      {
+        "fixture": "logging-index-final-server",
+        "world": "logging-world",
+        "exclusive": true,
+        "files": [
+          {
+            "path": "artifacts/logging-index-final-server/logging-world/session.lock",
+            "bytes": 3,
+            "sha256": "51643361c79ecaef25a8de802de24f570ba25d9c2df1d22d94fade11b4f466cc"
+          },
+          {
+            "path": "artifacts/logging-index-final-server/database.db",
+            "bytes": 819200,
+            "sha256": "2efdca1c502619674bf959244c512625997f890d1834ff6609a055e3c2aa2648"
+          },
+          {
+            "path": "artifacts/logging-index-final-server/logging-world/neoprotect/neoprotect.mv.db",
+            "bytes": 102400,
+            "sha256": "0eeaa36e1aa41f5bb843f1e2474d2f113dd14f9e98454f191bb89f37005675a5"
+          },
+          {
+            "path": "artifacts/logging-index-final-server/logging-world/yuuniverse_economy/economy.db",
+            "bytes": 368640,
+            "sha256": "dba9f83bc4a0ec908c892996f8cccce38618488fec6b759593031e57de8d6891"
+          }
+        ]
+      },
+      {
+        "fixture": "logging-index-disabled-server",
+        "world": "logging-world",
+        "exclusive": true,
+        "files": [
+          {
+            "path": "artifacts/logging-index-disabled-server/logging-world/session.lock",
+            "bytes": 3,
+            "sha256": "51643361c79ecaef25a8de802de24f570ba25d9c2df1d22d94fade11b4f466cc"
+          },
+          {
+            "path": "artifacts/logging-index-disabled-server/database.db",
+            "bytes": 794624,
+            "sha256": "3e5730f28cc92a88d21e6748042f905c4ebfed83aee3a0bfee21124648f0d975"
+          },
+          {
+            "path": "artifacts/logging-index-disabled-server/logging-world/neoprotect/neoprotect.mv.db",
+            "bytes": 102400,
+            "sha256": "60d88e79d0b74bd9d33f85a6a8b6da6858091c3d53eba2465690ad0941d1bb5e"
+          },
+          {
+            "path": "artifacts/logging-index-disabled-server/logging-world/yuuniverse_economy/economy.db",
+            "bytes": 368640,
+            "sha256": "138b651ba172abcfd5d2f9738614d30f9b9324d10aa9bc1bc0fc68cd8b0dedf3"
+          }
+        ]
+      },
+      {
+        "fixture": "logging-index-normal-regression-server",
+        "world": "logging-world",
+        "exclusive": true,
+        "files": [
+          {
+            "path": "artifacts/logging-index-normal-regression-server/logging-world/session.lock",
+            "bytes": 3,
+            "sha256": "51643361c79ecaef25a8de802de24f570ba25d9c2df1d22d94fade11b4f466cc"
+          },
+          {
+            "path": "artifacts/logging-index-normal-regression-server/database.db",
+            "bytes": 102400,
+            "sha256": "293b8b6e411ec9ee2f8f59f0ceec450f34c352d6883538cf4e0b54051d941985"
+          },
+          {
+            "path": "artifacts/logging-index-normal-regression-server/logging-world/neoprotect/neoprotect.mv.db",
+            "bytes": 102400,
+            "sha256": "c0cd012affed05bb04aab2e1c522ce2a477a6c94b956eb66b5be3b299b42268d"
+          },
+          {
+            "path": "artifacts/logging-index-normal-regression-server/logging-world/yuuniverse_economy/economy.db",
+            "bytes": 368640,
+            "sha256": "54aa9c78d9cac1226dba8000b222e5de2f518cf3c35bd9647df3c2ee966e8893"
+          }
+        ]
+      },
+      {
+        "fixture": "logging-index-shutdown-regression-server",
+        "world": "logging-world",
+        "exclusive": true,
+        "files": [
+          {
+            "path": "artifacts/logging-index-shutdown-regression-server/logging-world/session.lock",
+            "bytes": 3,
+            "sha256": "51643361c79ecaef25a8de802de24f570ba25d9c2df1d22d94fade11b4f466cc"
+          },
+          {
+            "path": "artifacts/logging-index-shutdown-regression-server/database.db",
+            "bytes": 94208,
+            "sha256": "a052c5ccb813baa31fba89055899bf287996c7bea0ba7580a2f31259e439eea6"
+          },
+          {
+            "path": "artifacts/logging-index-shutdown-regression-server/logging-world/neoprotect/neoprotect.mv.db",
+            "bytes": 32768,
+            "sha256": "77dfd7cd92e328ef737eed2f969b91587346d11f712335c477f68c1f90184680"
+          },
+          {
+            "path": "artifacts/logging-index-shutdown-regression-server/logging-world/yuuniverse_economy/economy.db",
+            "bytes": 368640,
+            "sha256": "b9a9e8684a3f76378a04ef54ffc7c3e45fbe52f43d27441863cfda963bbd0ee8"
+          }
+        ]
+      },
+      {
+        "fixture": "logging-shutdown-normal-regression-server",
+        "world": "logging-world",
+        "exclusive": true,
+        "files": [
+          {
+            "path": "artifacts/logging-shutdown-normal-regression-server/logging-world/session.lock",
+            "bytes": 3,
+            "sha256": "51643361c79ecaef25a8de802de24f570ba25d9c2df1d22d94fade11b4f466cc"
+          },
+          {
+            "path": "artifacts/logging-shutdown-normal-regression-server/database.db",
+            "bytes": 81920,
+            "sha256": "a5d3310c9d66a1dcaf7e0dac2ac13e025c7ec0df9c250ced65c7b97ffc46dbe6"
+          },
+          {
+            "path": "artifacts/logging-shutdown-normal-regression-server/logging-world/neoprotect/neoprotect.mv.db",
+            "bytes": 106496,
+            "sha256": "6b2bbf523fb4221e41baf1927b72723dc93a45c63659e4eb0e678742bcaed0e7"
+          },
+          {
+            "path": "artifacts/logging-shutdown-normal-regression-server/logging-world/yuuniverse_economy/economy.db",
+            "bytes": 368640,
+            "sha256": "0f4f09ea10ff11ae3e68b2248e8cebae956f36ca95bc22d40c3a55279f1f62d2"
+          }
+        ]
+      },
+      {
+        "fixture": "ordinary-client-acceptance-server",
+        "world": "acceptance-world",
+        "exclusive": true,
+        "files": [
+          {
+            "path": "artifacts/ordinary-client-acceptance-server/acceptance-world/session.lock",
+            "bytes": 3,
+            "sha256": "51643361c79ecaef25a8de802de24f570ba25d9c2df1d22d94fade11b4f466cc"
+          }
+        ]
+      }
+    ],
+    "snapshots": [
+      {
+        "fixture": "logging-index-shutdown-regression-stopped-shutdown",
+        "world": "logging-index-shutdown-regression-stopped-shutdown-world",
+        "exclusive": true,
+        "files": [
+          {
+            "path": "artifacts/logging-index-shutdown-regression-stopped-shutdown-world/session.lock",
+            "bytes": 3,
+            "sha256": "51643361c79ecaef25a8de802de24f570ba25d9c2df1d22d94fade11b4f466cc"
+          },
+          {
+            "path": "artifacts/logging-index-shutdown-regression-stopped-shutdown.db",
+            "bytes": 94208,
+            "sha256": "6e5d7374380176c19ad69411df52b4c92ea9b058478bb29e74d0ca218ecb123c"
+          },
+          {
+            "path": "artifacts/logging-index-shutdown-regression-stopped-shutdown-world/neoprotect/neoprotect.mv.db",
+            "bytes": 36864,
+            "sha256": "b8f66f98ac956931aa7d634f5998ed51d32b522e50de8ca38f6f0c118b85149e"
+          },
+          {
+            "path": "artifacts/logging-index-shutdown-regression-stopped-shutdown-world/yuuniverse_economy/economy.db",
+            "bytes": 368640,
+            "sha256": "2594b06f73558d5e0c10b4d6b8b8ddcf66e5b0dbd19c015f8fd997e553931008"
+          }
+        ]
+      },
+      {
+        "fixture": "logging-index-shutdown-regression-stopped-shutdown-recover",
+        "world": "logging-index-shutdown-regression-stopped-shutdown-recover-world",
+        "exclusive": true,
+        "files": [
+          {
+            "path": "artifacts/logging-index-shutdown-regression-stopped-shutdown-recover-world/session.lock",
+            "bytes": 3,
+            "sha256": "51643361c79ecaef25a8de802de24f570ba25d9c2df1d22d94fade11b4f466cc"
+          },
+          {
+            "path": "artifacts/logging-index-shutdown-regression-stopped-shutdown-recover.db",
+            "bytes": 94208,
+            "sha256": "a052c5ccb813baa31fba89055899bf287996c7bea0ba7580a2f31259e439eea6"
+          },
+          {
+            "path": "artifacts/logging-index-shutdown-regression-stopped-shutdown-recover-world/neoprotect/neoprotect.mv.db",
+            "bytes": 32768,
+            "sha256": "77dfd7cd92e328ef737eed2f969b91587346d11f712335c477f68c1f90184680"
+          },
+          {
+            "path": "artifacts/logging-index-shutdown-regression-stopped-shutdown-recover-world/yuuniverse_economy/economy.db",
+            "bytes": 368640,
+            "sha256": "b9a9e8684a3f76378a04ef54ffc7c3e45fbe52f43d27441863cfda963bbd0ee8"
+          }
+        ]
+      }
+    ]
+  },
+  "guards": {
+    "createdAt": "2026-10-23T18:45:30.0245458+08:00",
+    "timezone": "UTC+08:00",
+    "before": {
+      "artifacts/logging-index-final-server/banned-ips.json": "4F53CDA18C2BAA0C0354BB5F9A3ECBE5ED12AB4D8E11BA873C2F11161202B945",
+      "artifacts/logging-index-final-server/banned-players.json": "4F53CDA18C2BAA0C0354BB5F9A3ECBE5ED12AB4D8E11BA873C2F11161202B945",
+      "artifacts/logging-index-final-server/database.db": "2EFDCA1C502619674BF959244C512625997F890D1834FF6609A055E3C2AA2648",
+      "artifacts/logging-index-final-server/eula.txt": "E4DB182AA77B5E31657F4B83F8973C79A8C65217A4383200F9F59F7C94752FAD",
+      "artifacts/logging-index-final-server/logging-audit-fixture.txt": "6E1C484A75BCE37F311736D0078828C7E0B7B77D18765730A66612A1F2903E25",
+      "artifacts/logging-index-final-server/logging-index-original.json": "406027D085BA2C45325DEC77592A23FF2E21FB4750535800E024A4F8887302EA",
+      "artifacts/logging-index-final-server/logging-index-recovery.json": "FE836EA5FFBA29C63FE321BD11BD5014361BEEA9A87CF634A24ADF39C5F06375",
+      "artifacts/logging-index-final-server/logging-index-result.json": "7618C93FDE4D7A023F5C1719B8B583DFC3266A1146320EE33BE155EB22B605BC",
+      "artifacts/logging-index-final-server/logging-index-state.json": "3E3FC064CB6DECA92BEFD647747286B6F8FF48001A184B7861F475792D5855BB",
+      "artifacts/logging-index-final-server/logging-restart-state.json": "32C374FB90B90C7693D9CBA7D72497213CEC57F95BF6D3C931797E97A6F61790",
+      "artifacts/logging-index-final-server/ops.json": "4F53CDA18C2BAA0C0354BB5F9A3ECBE5ED12AB4D8E11BA873C2F11161202B945",
+      "artifacts/logging-index-final-server/server.properties": "3447D81A648073F1C37BB7A706945876BB9C6C4A3F003DB1C403BC05D92AEFA9",
+      "artifacts/logging-index-final-server/usercache.json": "74A8358796984EDC42CD4E89F5ED0E28F1A185E31D111C8ED854A34CDE6E84D5",
+      "artifacts/logging-index-final-server/usernamecache.json": "9E74C5ED8D5AD47531A0EC3A5B6CE57A76CF71BF311815210D4D49A436140943",
+      "artifacts/logging-index-final-server/whitelist.json": "4F53CDA18C2BAA0C0354BB5F9A3ECBE5ED12AB4D8E11BA873C2F11161202B945",
+      "artifacts/logging-index-final-server/compile-libs/flywheel-neoforge-1.21.1-1.0.6.jar": "31DDA15C205EB596D3B3449EF03F6AF7363A6CD35B3DA4BFE916B304F9E5337E",
+      "artifacts/logging-index-final-server/compile-libs/ponder-neoforge-1.0.82+mc1.21.1.jar": "0CF4611AD853042B689AC386184C5BBE02950EFCFFDDB49E5F604E82BADDB0DC",
+      "artifacts/logging-index-final-server/compile-libs/Registrate-MC1.21-1.3.0+67.jar": "510F4041C41739F1D8EA8850AB8364D3E3A5FADA8529BEED5D9F479E2523DB52",
+      "artifacts/logging-index-final-server/compile-libs/sqlite-jdbc-3.46.1.3.jar": "4A4832720A65EAF7F4D6FD7EDE52087B994DC5633C076F9E994DC0C8B4B0B4FA",
+      "artifacts/logging-index-final-server/config/create-common.toml": "2E77B1D93B40CE3F381AD7EB2A9E6D7148DE917518BE5C2616939A4369C4B140",
+      "artifacts/logging-index-final-server/config/create-server.toml": "36216A05F3ED63106BA587C8C24ED6315385829E7F3DAE695DCF545ABA41A270",
+      "artifacts/logging-index-final-server/config/fml.toml": "CC59FB1039726FDA3AB1EB69B06D9B9AEBB7496604EA579CFB735BC5377E7825",
+      "artifacts/logging-index-final-server/config/neoforge-common.toml": "FE878A2717A145CD890621EAC5B3BE1E1FD656F7FF9ABC6E8D53F670D37474C4",
+      "artifacts/logging-index-final-server/config/neoforge-server.toml": "B1E3B38D612295F8D9DFA0FBDB538A992B7A1A3B7A766C491B4E9FDF3823396F",
+      "artifacts/logging-index-final-server/config/neoprotect-common.toml": "1374DE2BCE4AD3EC90DCE240B591547725E39B0323852DA4DE4F78615F243B86",
+      "artifacts/logging-index-final-server/config/citizens/config.yml": "D984C66165A21417D0395B4F1722CFCE3B4BBC63A15C2748853BF3759EC69EA7",
+      "artifacts/logging-index-final-server/config/citizens/saves.yml": "46E4D40FFDD512FD4D5D0900AE1B3FAE9915DB1819083E6B156E62CF2B9AF8CE",
+      "artifacts/logging-index-final-server/config/citizens/shops.yml": "9A53356607AF9F24F31513AA42C1F2E095A5BB6E830C8051589C6790085453F5",
+      "artifacts/logging-index-final-server/config/citizens/zh.json": "51AC8FFF3010F394067267DB5FA808AA8ADBFF01B68A72199D373CA9E8059A7F",
+      "artifacts/logging-index-final-server/config/citizens/templates/citizens/templates.yml": "99CB30C00C72551BEA71600F28BD7BE3B43405547762D08D72B3D6917594F88C",
+      "artifacts/logging-index-final-server/config/grieflogger/grieflogger.toml": "D8CB84FA45F76DA836CA2D735C1AC9CC2AB5966B2E34FB966F3CD5870E01BF97",
+      "artifacts/logging-index-final-server/config/interactions/command-aliases.yml": "F88AFE5B3794892F5C8FF04B335CB375A706D26CB03D423E21327B19581503DC",
+      "artifacts/logging-index-final-server/config/interactions/item-aliases.yml": "75B7DF7AE612D948C2E84E52A3C5F13178FC92BD9F3C5FB4DD98FDF2843C98BA",
+      "artifacts/logging-index-final-server/config/interactions/world-aliases.yml": "874F80BF380B82C771085278C699595895A114BF2E1D49ABB52BB1C130F97A5B",
+      "artifacts/logging-index-final-server/config/yuuniverse_economy/currencies.json": "1C16BF3D8C41D4A28516A8E4A27BBD3D2B05BC9EB535CF52888D400F3E6E354A",
+      "artifacts/logging-index-final-server/config/yuuniverse_economy/quickshop.json": "375C4EB5E3A4ADCF1280B084278C6978E6C55E9273F3BB38F0DB423C2C5747F1",
+      "artifacts/logging-index-final-server/logging-world/level.dat": "2AB5372DD8F6DA299CD9BEA519FC63DA6D52D99360915F3B0B6CA090BD08DF22",
+      "artifacts/logging-index-final-server/logging-world/level.dat_old": "2FECDF1F5427F8E8047EEEAA1912099244A6844F2546A8754F8E310BAFAD67D9",
+      "artifacts/logging-index-final-server/logging-world/session.lock": "51643361C79ECAEF25A8DE802DE24F570BA25D9C2DF1D22D94FADE11B4F466CC",
+      "artifacts/logging-index-final-server/logging-world/advancements/dbda5e85-8e71-4400-a63c-00555eb44fe2.json": "804B07BB9CC37675BB433B053CE0F29FC3357B4CFC3A760B05F0E8EEBF7DE263",
+      "artifacts/logging-index-final-server/logging-world/citizens/commerce-tasks/.journal.lock": "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855",
+      "artifacts/logging-index-final-server/logging-world/citizens/quest-deliveries/.journal.lock": "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855",
+      "artifacts/logging-index-final-server/logging-world/citizens/quest-evidence/journal/.journal.lock": "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855",
+      "artifacts/logging-index-final-server/logging-world/citizens/quest-rewards/.journal.lock": "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855",
+      "artifacts/logging-index-final-server/logging-world/data/neoforge_data_attachments.dat": "95486BD4CBD73D4D98F343E42A5792EF5315214015ACCA508842844D73247562",
+      "artifacts/logging-index-final-server/logging-world/data/raids.dat": "DD704DEF6AECD521A1D58C60A270143169DFC787ABC824F8E96A12A3482A37D5",
+      "artifacts/logging-index-final-server/logging-world/data/random_sequences.dat": "5380B7BDA06E8304B4C379D13B0DDB85D8469D8BD93C438F950F1889E9571306",
+      "artifacts/logging-index-final-server/logging-world/DIM-1/data/neoforge_data_attachments.dat": "95486BD4CBD73D4D98F343E42A5792EF5315214015ACCA508842844D73247562",
+      "artifacts/logging-index-final-server/logging-world/DIM-1/data/raids.dat": "DD704DEF6AECD521A1D58C60A270143169DFC787ABC824F8E96A12A3482A37D5",
+      "artifacts/logging-index-final-server/logging-world/DIM1/data/neoforge_data_attachments.dat": "95486BD4CBD73D4D98F343E42A5792EF5315214015ACCA508842844D73247562",
+      "artifacts/logging-index-final-server/logging-world/DIM1/data/raids_end.dat": "DD704DEF6AECD521A1D58C60A270143169DFC787ABC824F8E96A12A3482A37D5",
+      "artifacts/logging-index-final-server/logging-world/entities/r.-1.-1.mca": "B6E64689795DDEDB95BD8B30457CA82E5DD9680A4F3AD50F456C8D95CFA4E7C9",
+      "artifacts/logging-index-final-server/logging-world/entities/r.-1.0.mca": "13C24463E5B0A959D7DD6AC066E7E097211A143C88D7C1C34C21D604790A14B0",
+      "artifacts/logging-index-final-server/logging-world/entities/r.0.-1.mca": "F26A7FED8D043722FD7F63F29F489163B5CB81CFECD20E768276BC010FB498A7",
+      "artifacts/logging-index-final-server/logging-world/entities/r.0.0.mca": "C535D3D9D58B3C29EAEB0F2F001B21B468F8AC8556C0C2F8F79C6FE156D03B0E",
+      "artifacts/logging-index-final-server/logging-world/neoprotect/neoprotect.mv.db": "0EEAA36E1AA41F5BB843F1E2474D2F113DD14F9E98454F191BB89F37005675A5",
+      "artifacts/logging-index-final-server/logging-world/playerdata/dbda5e85-8e71-4400-a63c-00555eb44fe2.dat": "EB35B962235AB2B4766605407CC2989233E231CDD39480785745A5A90AAB7903",
+      "artifacts/logging-index-final-server/logging-world/playerdata/dbda5e85-8e71-4400-a63c-00555eb44fe2.dat_old": "4CB2D7431234EA36CA592784BB4CBCC4DAD4AE8EBC69A0486A2783FE66B36843",
+      "artifacts/logging-index-final-server/logging-world/poi/r.-1.-1.mca": "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855",
+      "artifacts/logging-index-final-server/logging-world/poi/r.-1.0.mca": "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855",
+      "artifacts/logging-index-final-server/logging-world/poi/r.0.-1.mca": "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855",
+      "artifacts/logging-index-final-server/logging-world/poi/r.0.0.mca": "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855",
+      "artifacts/logging-index-final-server/logging-world/region/r.-1.-1.mca": "4C7C1F5AD0E7CCA989E7CD3F9830CDCF9203E32D3A2DDAC7E7ADF195FA9F2518",
+      "artifacts/logging-index-final-server/logging-world/region/r.-1.0.mca": "A0B2279CE9B86C39B35BC3A6F9786C1F8630571E1AA5B2D57DA59ACF86DCC4AE",
+      "artifacts/logging-index-final-server/logging-world/region/r.0.-1.mca": "86EB7CD324E9ADB1626D2E07A33BBEDC78B325530BD0DCA88A23FE04A0227BEE",
+      "artifacts/logging-index-final-server/logging-world/region/r.0.0.mca": "EE0CFAE8E14EDDAA72F2E5322609A96B8C33753CC46AC466E5C232E59CB89B35",
+      "artifacts/logging-index-final-server/logging-world/serverconfig/readme.txt": "B1022AB932F8F0EA0CF78D9F312E95B85A4F96F59CA430E63F9A435E512D1186",
+      "artifacts/logging-index-final-server/logging-world/stats/dbda5e85-8e71-4400-a63c-00555eb44fe2.json": "AFCB40C73D0C4839F777653DBDAB0F98D75A60316D44B6649E8195AFEB4B8549",
+      "artifacts/logging-index-final-server/logging-world/yuuniverse_economy/economy.db": "DBA9F83BC4A0EC908C892996F8CCCCE38618488FEC6B759593031E57DE8D6891",
+      "artifacts/logging-index-final-server/mods/architectury-13.0.11-neoforge.jar": "9CC92F2C09533FC5482C60F993BD891C655A0E32B637037CDCB7C2B23ADEDEEB",
+      "artifacts/logging-index-final-server/mods/create.jar": "5602A16796957CB5C7FB829C10C6B54BF9D228931C7680636710B6A60D92822E",
+      "artifacts/logging-index-final-server/mods/economy.jar": "179115E5301EE6629ACD3BDCBB6779D2549A35F7493821AB0FCA79BCC43645F5",
+      "artifacts/logging-index-final-server/mods/grieflogger-1.2.10-1.21.1-yuuniverse.7-neoforge.jar": "5E6A11073FF0B7DE70DE79BAF063450DC08395D618C5DE6572220055570D34B4",
+      "artifacts/logging-index-final-server/mods/neoprotect-1.0.4-mc1.21.1-neoforge.jar": "2CBCEC7AEEF26EF3F5B54DAE90FC16DA353A1534462353B9F516D7D2E0A138CE",
+      "artifacts/logging-index-final-server/mods/supermartijn642configlib-1.1.8-neoforge-mc1.21.jar": "D2BA7B839A2268E4E223457E813D11AA2476C3BF708A7BBA691D8FC851778A4B"
+    },
+    "after": {
+      "artifacts/logging-index-final-server/banned-ips.json": "4F53CDA18C2BAA0C0354BB5F9A3ECBE5ED12AB4D8E11BA873C2F11161202B945",
+      "artifacts/logging-index-final-server/banned-players.json": "4F53CDA18C2BAA0C0354BB5F9A3ECBE5ED12AB4D8E11BA873C2F11161202B945",
+      "artifacts/logging-index-final-server/database.db": "2EFDCA1C502619674BF959244C512625997F890D1834FF6609A055E3C2AA2648",
+      "artifacts/logging-index-final-server/eula.txt": "E4DB182AA77B5E31657F4B83F8973C79A8C65217A4383200F9F59F7C94752FAD",
+      "artifacts/logging-index-final-server/logging-audit-fixture.txt": "6E1C484A75BCE37F311736D0078828C7E0B7B77D18765730A66612A1F2903E25",
+      "artifacts/logging-index-final-server/logging-index-original.json": "406027D085BA2C45325DEC77592A23FF2E21FB4750535800E024A4F8887302EA",
+      "artifacts/logging-index-final-server/logging-index-recovery.json": "FE836EA5FFBA29C63FE321BD11BD5014361BEEA9A87CF634A24ADF39C5F06375",
+      "artifacts/logging-index-final-server/logging-index-result.json": "7618C93FDE4D7A023F5C1719B8B583DFC3266A1146320EE33BE155EB22B605BC",
+      "artifacts/logging-index-final-server/logging-index-state.json": "3E3FC064CB6DECA92BEFD647747286B6F8FF48001A184B7861F475792D5855BB",
+      "artifacts/logging-index-final-server/logging-restart-state.json": "32C374FB90B90C7693D9CBA7D72497213CEC57F95BF6D3C931797E97A6F61790",
+      "artifacts/logging-index-final-server/ops.json": "4F53CDA18C2BAA0C0354BB5F9A3ECBE5ED12AB4D8E11BA873C2F11161202B945",
+      "artifacts/logging-index-final-server/server.properties": "3447D81A648073F1C37BB7A706945876BB9C6C4A3F003DB1C403BC05D92AEFA9",
+      "artifacts/logging-index-final-server/usercache.json": "74A8358796984EDC42CD4E89F5ED0E28F1A185E31D111C8ED854A34CDE6E84D5",
+      "artifacts/logging-index-final-server/usernamecache.json": "9E74C5ED8D5AD47531A0EC3A5B6CE57A76CF71BF311815210D4D49A436140943",
+      "artifacts/logging-index-final-server/whitelist.json": "4F53CDA18C2BAA0C0354BB5F9A3ECBE5ED12AB4D8E11BA873C2F11161202B945",
+      "artifacts/logging-index-final-server/compile-libs/flywheel-neoforge-1.21.1-1.0.6.jar": "31DDA15C205EB596D3B3449EF03F6AF7363A6CD35B3DA4BFE916B304F9E5337E",
+      "artifacts/logging-index-final-server/compile-libs/ponder-neoforge-1.0.82+mc1.21.1.jar": "0CF4611AD853042B689AC386184C5BBE02950EFCFFDDB49E5F604E82BADDB0DC",
+      "artifacts/logging-index-final-server/compile-libs/Registrate-MC1.21-1.3.0+67.jar": "510F4041C41739F1D8EA8850AB8364D3E3A5FADA8529BEED5D9F479E2523DB52",
+      "artifacts/logging-index-final-server/compile-libs/sqlite-jdbc-3.46.1.3.jar": "4A4832720A65EAF7F4D6FD7EDE52087B994DC5633C076F9E994DC0C8B4B0B4FA",
+      "artifacts/logging-index-final-server/config/create-common.toml": "2E77B1D93B40CE3F381AD7EB2A9E6D7148DE917518BE5C2616939A4369C4B140",
+      "artifacts/logging-index-final-server/config/create-server.toml": "36216A05F3ED63106BA587C8C24ED6315385829E7F3DAE695DCF545ABA41A270",
+      "artifacts/logging-index-final-server/config/fml.toml": "CC59FB1039726FDA3AB1EB69B06D9B9AEBB7496604EA579CFB735BC5377E7825",
+      "artifacts/logging-index-final-server/config/neoforge-common.toml": "FE878A2717A145CD890621EAC5B3BE1E1FD656F7FF9ABC6E8D53F670D37474C4",
+      "artifacts/logging-index-final-server/config/neoforge-server.toml": "B1E3B38D612295F8D9DFA0FBDB538A992B7A1A3B7A766C491B4E9FDF3823396F",
+      "artifacts/logging-index-final-server/config/neoprotect-common.toml": "1374DE2BCE4AD3EC90DCE240B591547725E39B0323852DA4DE4F78615F243B86",
+      "artifacts/logging-index-final-server/config/citizens/config.yml": "D984C66165A21417D0395B4F1722CFCE3B4BBC63A15C2748853BF3759EC69EA7",
+      "artifacts/logging-index-final-server/config/citizens/saves.yml": "46E4D40FFDD512FD4D5D0900AE1B3FAE9915DB1819083E6B156E62CF2B9AF8CE",
+      "artifacts/logging-index-final-server/config/citizens/shops.yml": "9A53356607AF9F24F31513AA42C1F2E095A5BB6E830C8051589C6790085453F5",
+      "artifacts/logging-index-final-server/config/citizens/zh.json": "51AC8FFF3010F394067267DB5FA808AA8ADBFF01B68A72199D373CA9E8059A7F",
+      "artifacts/logging-index-final-server/config/citizens/templates/citizens/templates.yml": "99CB30C00C72551BEA71600F28BD7BE3B43405547762D08D72B3D6917594F88C",
+      "artifacts/logging-index-final-server/config/grieflogger/grieflogger.toml": "D8CB84FA45F76DA836CA2D735C1AC9CC2AB5966B2E34FB966F3CD5870E01BF97",
+      "artifacts/logging-index-final-server/config/interactions/command-aliases.yml": "F88AFE5B3794892F5C8FF04B335CB375A706D26CB03D423E21327B19581503DC",
+      "artifacts/logging-index-final-server/config/interactions/item-aliases.yml": "75B7DF7AE612D948C2E84E52A3C5F13178FC92BD9F3C5FB4DD98FDF2843C98BA",
+      "artifacts/logging-index-final-server/config/interactions/world-aliases.yml": "874F80BF380B82C771085278C699595895A114BF2E1D49ABB52BB1C130F97A5B",
+      "artifacts/logging-index-final-server/config/yuuniverse_economy/currencies.json": "1C16BF3D8C41D4A28516A8E4A27BBD3D2B05BC9EB535CF52888D400F3E6E354A",
+      "artifacts/logging-index-final-server/config/yuuniverse_economy/quickshop.json": "375C4EB5E3A4ADCF1280B084278C6978E6C55E9273F3BB38F0DB423C2C5747F1",
+      "artifacts/logging-index-final-server/logging-world/level.dat": "2AB5372DD8F6DA299CD9BEA519FC63DA6D52D99360915F3B0B6CA090BD08DF22",
+      "artifacts/logging-index-final-server/logging-world/level.dat_old": "2FECDF1F5427F8E8047EEEAA1912099244A6844F2546A8754F8E310BAFAD67D9",
+      "artifacts/logging-index-final-server/logging-world/session.lock": "51643361C79ECAEF25A8DE802DE24F570BA25D9C2DF1D22D94FADE11B4F466CC",
+      "artifacts/logging-index-final-server/logging-world/advancements/dbda5e85-8e71-4400-a63c-00555eb44fe2.json": "804B07BB9CC37675BB433B053CE0F29FC3357B4CFC3A760B05F0E8EEBF7DE263",
+      "artifacts/logging-index-final-server/logging-world/citizens/commerce-tasks/.journal.lock": "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855",
+      "artifacts/logging-index-final-server/logging-world/citizens/quest-deliveries/.journal.lock": "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855",
+      "artifacts/logging-index-final-server/logging-world/citizens/quest-evidence/journal/.journal.lock": "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855",
+      "artifacts/logging-index-final-server/logging-world/citizens/quest-rewards/.journal.lock": "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855",
+      "artifacts/logging-index-final-server/logging-world/data/neoforge_data_attachments.dat": "95486BD4CBD73D4D98F343E42A5792EF5315214015ACCA508842844D73247562",
+      "artifacts/logging-index-final-server/logging-world/data/raids.dat": "DD704DEF6AECD521A1D58C60A270143169DFC787ABC824F8E96A12A3482A37D5",
+      "artifacts/logging-index-final-server/logging-world/data/random_sequences.dat": "5380B7BDA06E8304B4C379D13B0DDB85D8469D8BD93C438F950F1889E9571306",
+      "artifacts/logging-index-final-server/logging-world/DIM-1/data/neoforge_data_attachments.dat": "95486BD4CBD73D4D98F343E42A5792EF5315214015ACCA508842844D73247562",
+      "artifacts/logging-index-final-server/logging-world/DIM-1/data/raids.dat": "DD704DEF6AECD521A1D58C60A270143169DFC787ABC824F8E96A12A3482A37D5",
+      "artifacts/logging-index-final-server/logging-world/DIM1/data/neoforge_data_attachments.dat": "95486BD4CBD73D4D98F343E42A5792EF5315214015ACCA508842844D73247562",
+      "artifacts/logging-index-final-server/logging-world/DIM1/data/raids_end.dat": "DD704DEF6AECD521A1D58C60A270143169DFC787ABC824F8E96A12A3482A37D5",
+      "artifacts/logging-index-final-server/logging-world/entities/r.-1.-1.mca": "B6E64689795DDEDB95BD8B30457CA82E5DD9680A4F3AD50F456C8D95CFA4E7C9",
+      "artifacts/logging-index-final-server/logging-world/entities/r.-1.0.mca": "13C24463E5B0A959D7DD6AC066E7E097211A143C88D7C1C34C21D604790A14B0",
+      "artifacts/logging-index-final-server/logging-world/entities/r.0.-1.mca": "F26A7FED8D043722FD7F63F29F489163B5CB81CFECD20E768276BC010FB498A7",
+      "artifacts/logging-index-final-server/logging-world/entities/r.0.0.mca": "C535D3D9D58B3C29EAEB0F2F001B21B468F8AC8556C0C2F8F79C6FE156D03B0E",
+      "artifacts/logging-index-final-server/logging-world/neoprotect/neoprotect.mv.db": "0EEAA36E1AA41F5BB843F1E2474D2F113DD14F9E98454F191BB89F37005675A5",
+      "artifacts/logging-index-final-server/logging-world/playerdata/dbda5e85-8e71-4400-a63c-00555eb44fe2.dat": "EB35B962235AB2B4766605407CC2989233E231CDD39480785745A5A90AAB7903",
+      "artifacts/logging-index-final-server/logging-world/playerdata/dbda5e85-8e71-4400-a63c-00555eb44fe2.dat_old": "4CB2D7431234EA36CA592784BB4CBCC4DAD4AE8EBC69A0486A2783FE66B36843",
+      "artifacts/logging-index-final-server/logging-world/poi/r.-1.-1.mca": "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855",
+      "artifacts/logging-index-final-server/logging-world/poi/r.-1.0.mca": "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855",
+      "artifacts/logging-index-final-server/logging-world/poi/r.0.-1.mca": "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855",
+      "artifacts/logging-index-final-server/logging-world/poi/r.0.0.mca": "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855",
+      "artifacts/logging-index-final-server/logging-world/region/r.-1.-1.mca": "4C7C1F5AD0E7CCA989E7CD3F9830CDCF9203E32D3A2DDAC7E7ADF195FA9F2518",
+      "artifacts/logging-index-final-server/logging-world/region/r.-1.0.mca": "A0B2279CE9B86C39B35BC3A6F9786C1F8630571E1AA5B2D57DA59ACF86DCC4AE",
+      "artifacts/logging-index-final-server/logging-world/region/r.0.-1.mca": "86EB7CD324E9ADB1626D2E07A33BBEDC78B325530BD0DCA88A23FE04A0227BEE",
+      "artifacts/logging-index-final-server/logging-world/region/r.0.0.mca": "EE0CFAE8E14EDDAA72F2E5322609A96B8C33753CC46AC466E5C232E59CB89B35",
+      "artifacts/logging-index-final-server/logging-world/serverconfig/readme.txt": "B1022AB932F8F0EA0CF78D9F312E95B85A4F96F59CA430E63F9A435E512D1186",
+      "artifacts/logging-index-final-server/logging-world/stats/dbda5e85-8e71-4400-a63c-00555eb44fe2.json": "AFCB40C73D0C4839F777653DBDAB0F98D75A60316D44B6649E8195AFEB4B8549",
+      "artifacts/logging-index-final-server/logging-world/yuuniverse_economy/economy.db": "DBA9F83BC4A0EC908C892996F8CCCCE38618488FEC6B759593031E57DE8D6891",
+      "artifacts/logging-index-final-server/mods/architectury-13.0.11-neoforge.jar": "9CC92F2C09533FC5482C60F993BD891C655A0E32B637037CDCB7C2B23ADEDEEB",
+      "artifacts/logging-index-final-server/mods/create.jar": "5602A16796957CB5C7FB829C10C6B54BF9D228931C7680636710B6A60D92822E",
+      "artifacts/logging-index-final-server/mods/economy.jar": "179115E5301EE6629ACD3BDCBB6779D2549A35F7493821AB0FCA79BCC43645F5",
+      "artifacts/logging-index-final-server/mods/grieflogger-1.2.10-1.21.1-yuuniverse.7-neoforge.jar": "5E6A11073FF0B7DE70DE79BAF063450DC08395D618C5DE6572220055570D34B4",
+      "artifacts/logging-index-final-server/mods/neoprotect-1.0.4-mc1.21.1-neoforge.jar": "2CBCEC7AEEF26EF3F5B54DAE90FC16DA353A1534462353B9F516D7D2E0A138CE",
+      "artifacts/logging-index-final-server/mods/supermartijn642configlib-1.1.8-neoforge-mc1.21.jar": "D2BA7B839A2268E4E223457E813D11AA2476C3BF708A7BBA691D8FC851778A4B"
+    },
+    "checks": [
+      {
+        "phase": "indexes",
+        "skippedPreparation": false,
+        "exitCode": 1,
+        "expected": "Index acceptance requires a fresh fixture",
+        "log": "artifacts/logging-index-reject-indexes-False.log"
+      },
+      {
+        "phase": "indexes",
+        "skippedPreparation": true,
+        "exitCode": 1,
+        "expected": "Index acceptance requires a fresh fixture",
+        "log": "artifacts/logging-index-reject-indexes-True.log"
+      },
+      {
+        "phase": "indexes-recover",
+        "skippedPreparation": false,
+        "exitCode": 1,
+        "expected": "Index recovery has already completed; preserve its fixture",
+        "log": "artifacts/logging-index-reject-indexes-recover-False.log"
+      },
+      {
+        "phase": "indexes-recover",
+        "skippedPreparation": true,
+        "exitCode": 1,
+        "expected": "Index recovery has already completed; preserve its fixture",
+        "log": "artifacts/logging-index-reject-indexes-recover-True.log"
+      }
+    ]
+  },
+  "preparation": {
+    "createdAt": "2026-10-23T18:50:52.7978169+08:00",
+    "timezone": "UTC+08:00",
+    "outsidePathAbsent": true,
+    "checks": [
+      {
+        "path": "C:\\Users\\ben_l\\Documents\\Coding\\citizens2-neoforged\\artifacts\\logging-index-final-server",
+        "expected": "Index acceptance requires a fresh fixture directory",
+        "message": "Index acceptance requires a fresh fixture directory"
+      },
+      {
+        "path": "C:\\Users\\ben_l\\Documents\\Coding\\logging-index-outside-rejection",
+        "expected": "Index audit paths must be inside task artifacts",
+        "message": "Index audit paths must be inside task artifacts"
+      },
+      {
+        "path": "C:\\Users\\ben_l\\Documents\\Coding\\citizens2-neoforged\\artifacts\\logging-shutdown-normal-regression-server\\index-copy-rejection",
+        "expected": "Index fixture must not be inside its source fixture",
+        "message": "Index fixture must not be inside its source fixture"
+      }
+    ]
+  },
+  "stoppedVerifier": {
+    "path": "artifacts/confirm-logging-index-stopped.ps1",
+    "bytes": 2286,
+    "sha256": "1f9494dbbfa718b006227a6e5ebd7341a45d3827584800fe9489ba2a5bee9866"
+  },
+  "guardVerifier": {
+    "path": "artifacts/check-logging-index-guards.ps1",
+    "bytes": 2394,
+    "sha256": "f2a219efec6df18ce143ce051227aff3a2291a2700e4cd5bdfe34eac3e8fddcd"
+  },
+  "preparationVerifier": {
+    "path": "artifacts/check-logging-index-preparation.ps1",
+    "bytes": 1709,
+    "sha256": "c2ff60a58b18f81ae0dbcbdf414349e1350771270f3caa44c4dd7854c15ad3d9"
+  },
+  "fixtureCreationSource": {
+    "path": "artifacts/logging-index-references/prepare-at-fixture-creation.ps1",
+    "bytes": 3397,
+    "sha256": "76851a10b40f3eeee4819f09254a8b94ba78867612544fad9de543cbb19dd398"
+  },
+  "limits": [
+    "Bounded fixture SQL workload and coordinate plans; no production service-rate claim",
+    "Exact coordinate queries match the provider index contract; radius sorting and public lookup limits remain",
+    "Workload rows have their own synthetic identity; they are not native gameplay observations",
+    "No history expiry, dictionary pruning, retention tooling or crash spool added",
+    "MySQL behavior unchanged; MySQL acceptance, retention/load, wider recovery, migration and deferred clients remain",
+    "No production or deferred client activation"
+  ]
+}

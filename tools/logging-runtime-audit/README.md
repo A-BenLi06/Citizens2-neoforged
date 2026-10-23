@@ -71,6 +71,18 @@ normal stop. Completed phases reject even with preparation skipped. Retain both
 stopped world/database images and the original `.4`/`.5` failed fixtures. See the
 [shutdown recovery report](../../docs/logging-shutdown-recovery-2026-10-23.md).
 
+For coordinate indexes, prepare a fresh copied stopped fixture with
+`tools/prepare-logging-index-audit.ps1 -FixtureDirectory <artifact-path> -ProviderJar <provider-.7>`.
+Run `indexes` then `indexes-recover`. Setup records every original row; the audit
+commits 2,048 fixture-owned SQL rows per history table through the real provider
+and checks exact coordinate plans, ordered payloads, idempotence and restart.
+This workload is separate from native gameplay observations. The configuration
+case uses `-DisableIndexes`, `indexes-disabled`, then enables useIndexes before
+`indexes-recover`. Only the copied fixture's legacy index is removed in disabled
+setup. Fresh/completed-phase guards run directly before launch too. Keep separate
+build/cache directories and preserve all stopped images and original fixtures.
+See the [index report](../../docs/logging-coordinate-indexes-2026-10-23.md).
+
 For an actual forced termination after observed native histories and saved
 player/world state:
 

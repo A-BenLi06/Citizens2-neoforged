@@ -9,7 +9,7 @@ allprojects {
         def phase = p.findProperty('loggingAuditPhase') ?: 'native'
         def storageLock = p.findProperty('loggingAuditLock') ?: 'writer'
         if (!(storageLock in ['writer', 'reader', 'full'])) throw new GradleException('Unknown logging storage lock mode')
-        if (!(phase in ['native', 'crash', 'recover', 'storage', 'storage-recover', 'shutdown', 'shutdown-recover'])) throw new GradleException('Unknown logging audit phase')
+        if (!(phase in ['native', 'crash', 'recover', 'storage', 'storage-recover', 'shutdown', 'shutdown-recover', 'indexes', 'indexes-disabled', 'indexes-recover'])) throw new GradleException('Unknown logging audit phase')
         p.sourceSets.dialogue.java.srcDir(p.file('../tools/logging-runtime-audit'))
         p.sourceSets.dialogue.compileClasspath += p.files(p.fileTree(new File(fixture, 'mods')) { include '*.jar' },
                 p.fileTree(new File(fixture, 'compile-libs')) { include '*.jar' })
@@ -18,6 +18,14 @@ allprojects {
             def marker = new File(fixture, 'logging-audit-fixture.txt')
             if (!marker.isFile() || marker.getText('UTF-8').trim() != 'citizens-logging-audit')
                 throw new GradleException('Missing or incorrect logging fixture marker')
+            if (phase.startsWith('indexes') && !new File(fixture, 'logging-index-original.json').isFile())
+                throw new GradleException('Index acceptance requires the original stopped database snapshot')
+            if (phase in ['indexes', 'indexes-disabled'] && new File(fixture, 'logging-index-state.json').exists())
+                throw new GradleException('Index acceptance requires a fresh fixture')
+            if (phase == 'indexes-recover' && !new File(fixture, 'logging-index-result.json').isFile())
+                throw new GradleException('Complete index acceptance before recovery')
+            if (phase == 'indexes-recover' && new File(fixture, 'logging-index-recovery.json').exists())
+                throw new GradleException('Index recovery has already completed; preserve its fixture')
             if (phase == 'recover' && !new File(fixture, 'logging-restart-state.json').isFile())
                 throw new GradleException('Run the native logging phase before recovery')
             if (phase == 'storage-recover' && !new File(fixture, 'logging-storage-state.json').isFile())

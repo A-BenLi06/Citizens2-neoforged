@@ -125,3 +125,10 @@ periodic attempts remain nonblocking and uncertainty fences remain intact. A
 failed final drain reports memory-only pending work. Dedicated normal-stop/restart
 acceptance does not establish crash spooling, integrated-client lifecycle or an
 atomic world/log/financial backup.
+
+The [coordinate index repair](logging-coordinate-indexes-2026-10-23.md) fixes
+five silently missing SQLite history indexes in `.6`. Provider `.7` uses separate
+names while retaining the working blocks index. Bounded native queued workload,
+enabled/disabled/re-enabled creation and restart preserve all original rows and
+exact query results. Coordinate search plans improve; retention expiry, sustained
+load and production throughput remain separate acceptance.

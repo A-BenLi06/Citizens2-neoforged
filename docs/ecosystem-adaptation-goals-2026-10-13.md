@@ -8,6 +8,16 @@ Citizens retains NPC behavior and its existing native extension contracts. Yuuni
 
 ## Selected artifacts and sides
 
+Progress 2026-10-23, UTC+08:00: [logging coordinate indexes](logging-coordinate-indexes-2026-10-23.md)
+repairs a database-wide SQLite name collision that left five configured history
+indexes missing. Provider `.7` adds distinct names without rewriting history.
+Bounded queued workload and enabled/disabled/re-enabled restart checks verify
+coordinate search plans and exact original rows. Retention, sustained load,
+migration and deferred physical-client gates remain open.
+
+The index batch passes 109 actual SQLite and 164 native/restart checks, including
+fresh normal logging/commerce and final-after-last-tick shutdown regressions.
+
 Progress 2026-10-23, UTC+08:00: [normal shutdown recovery](logging-shutdown-recovery-2026-10-23.md)
 repairs reproduced final SQL-queue loss in GriefLogger `.4` and per-player item
 buffer loss in `.5`. Provider `.6` transfers original item actions on quit and
