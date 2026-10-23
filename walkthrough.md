@@ -3540,3 +3540,10 @@ Full goal stays active. Fan/deployer/filling/emptying/sequenced assembly and bro
 - Existing isolated GriefLogger draft build completed successfully but is unvalidated and not adopted/deployed. Its already-running original-provider reproduction is allowed to stop safely; no fixed follow-up will be launched. Ordinary-client test remains deferred, production untouched, unrelated _nul and tools/__pycache__/ preserved.
 - Validation: inspected the scope links and git diff; documentation-only change.
 
+## 2026-10-24T00:43:55+08:00 (UTC+08:00) - Persist template event commands across restart
+
+- Continued the narrowed Citizens 1.21.1 core scope. NPC-applied template event command subscriptions previously existed only in memory and were lost after a full restart.
+- NPC snapshots now store supported template keys and event command lists. Loading validates the whole record before listener publication; it does not rerun `on_template_apply`, trait replacement, or YAML replacement. Explicit reapplication still adopts edited definitions. Runtime-only callbacks remain provider-owned.
+- Shutdown closes new event admission first, saves NPC bindings while ownership is available, then retires event listeners. Registry replacement and rollback preserve listener ownership and prevent duplicate restoration.
+- Focused isolated NeoForge 21.1.248 validation passes all five `TemplateEventPersistenceTest` cases. Build output is under `artifacts/journal-decode-ordinary-21.1.248-build`; project cache is under `artifacts/core-template-event-cache`.
+- Updated the core scope, current checklist and progress entry. Full Citizens core completion remains unestablished; ordinary-client acceptance remains deferred. No third-party provider work is included in this batch.

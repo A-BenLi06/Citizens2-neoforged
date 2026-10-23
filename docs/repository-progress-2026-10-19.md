@@ -279,6 +279,12 @@ The fresh declaration scan finds 192 upstream alias/modifier pairs and 201 nativ
 
 ## Current functional progress
 
+Citizens core follow-up, 2026-10-24 (UTC+08:00): applied template event command
+bindings now save with NPCs and restore without rerunning application commands.
+Five focused tests pass on NeoForge 21.1.248. See
+[template event persistence](template-event-persistence-2026-10-24.md). This does
+not establish full core or physical-client completion.
+
 | Workstream | Implemented and verified slices | Remaining acceptance |
 |---|---|---|
 | Citizens core | Creation, selection, removal/undo, skins/equipment, navigation/HPA, waypoints, follow/mount/pose, packet NPCs, holograms, shops, annotated commands, templates and behavior trees. Extensive ordinary/packet lifecycle, callback, persistence and reload fixtures. | Required provider combinations, external texture services, physical rendering/interpolation and integrated server/client acceptance. |

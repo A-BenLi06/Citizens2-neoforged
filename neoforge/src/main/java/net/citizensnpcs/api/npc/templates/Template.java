@@ -146,33 +146,14 @@ public class Template {
                 } else commands.add(command);
             }
             if (!valid) continue;
-            switch (sub.name()) {
-                case "on_spawn":
-                    template.addAction(new CommandEventAction(NPCSpawnEvent.class, new CommandListExecutor(commands)));
-                    break;
-                case "on_death":
-                    template.addAction(new CommandEventAction(NPCDeathEvent.class, new CommandListExecutor(commands)));
-                    break;
-                case "on_damage":
-                    template.addAction(new CommandEventAction(NPCDamageEvent.class, new CommandListExecutor(commands)));
-                    break;
-                case "on_left_click":
-                    template.addAction(
-                            new CommandEventAction(NPCLeftClickEvent.class, new CommandListExecutor(commands)));
-                    break;
-                case "on_right_click":
-                    template.addAction(
-                            new CommandEventAction(NPCRightClickEvent.class, new CommandListExecutor(commands)));
-                    break;
-                case "on_template_apply":
-                    // the only one that is not an event hook: it runs once, at apply time
-                    CommandListExecutor cle = new CommandListExecutor(commands);
-                    template.addAction(cle::accept);
-                    break;
-                default:
-                    errors.addError(sub.getPath() + ": Unknown template command event " + sub.name());
-                    break;
-            }
+            var eventType = TemplateEventBindings.EVENT_TYPES.get(sub.name());
+            if (eventType != null) {
+                template.addAction(new CommandEventAction(eventType, new CommandListExecutor(commands)));
+            } else if (sub.name().equals("on_template_apply")) {
+                // The only one that is not an event hook: it runs once, at apply time.
+                CommandListExecutor cle = new CommandListExecutor(commands);
+                template.addAction(cle::accept);
+            } else errors.addError(sub.getPath() + ": Unknown template command event " + sub.name());
         }
     }
 }

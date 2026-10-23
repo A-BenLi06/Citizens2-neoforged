@@ -91,7 +91,7 @@ Recent follow-ups cover [`powered`, `name` and `home` options](command-options-h
 
 - [Confirmed tpto completion](tpto-completion-2026-10-06.md) sends success only after NPC/native-player teleport completion, suppresses canceled-transfer feedback and preserves live source identity. Native relocation coverage includes named-registry NPCs, packet transport and player cross-world transfers; physical-client/provider acceptance remains separate.
 
-- [Template event reapplication](template-event-reapplication-2026-10-06.md) replaces the same template's old event bindings on the reapplied NPC, preserves other subscriptions and rolls back failed registration. Candidate registry publication respects explicit reapplication. File reload alone does not reapply templates or persist application records across restart.
+- [Template event reapplication](template-event-reapplication-2026-10-06.md) replaces the same template's old event bindings on the reapplied NPC, preserves other subscriptions and rolls back failed registration. Candidate registry publication respects explicit reapplication. Applied command bindings now persist across restart without replaying `on_template_apply`; see [template event persistence](template-event-persistence-2026-10-24.md). Runtime-only callbacks remain provider-owned.
 
 - [Registry-scoped template events](template-event-registry-2026-10-06.md) isolate identical UUIDs across registries and transfer subscriptions through reload/default-store replacement with preparation rollback. Definition reapplication is covered by the follow-up above; persistent application records remain separate work.
 

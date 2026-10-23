@@ -26,6 +26,10 @@ public class CommandListExecutor implements Consumer<NPC> {
         this.commands = List.copyOf(commands);
     }
 
+    List<String> getCommands() {
+        return commands;
+    }
+
     @Override
     public void accept(NPC npc) {
         MinecraftServer server = ServerLifecycleHooks.getCurrentServer();

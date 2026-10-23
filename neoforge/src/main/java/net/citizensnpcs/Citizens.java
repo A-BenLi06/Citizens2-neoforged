@@ -419,7 +419,7 @@ public class Citizens implements CitizensPlugin {
         if (stopping) return;
         stopping = true;
         enabled = false;
-        shutdownStep("template event commands", net.citizensnpcs.api.npc.templates.CommandEventAction::shutdown);
+        shutdownStep("template event admission", net.citizensnpcs.api.npc.templates.CommandEventAction::beginShutdown);
         // Cleanup/provider callbacks may remove registry names; ownership at shutdown entry still must be retired.
         Iterable<NPCRegistry> retiring = getNPCRegistries();
         shutdownStep("editors", Editor::shutdown);
@@ -427,6 +427,7 @@ public class Citizens implements CitizensPlugin {
         if (shops != null) shutdownStep("shop sessions", shops::closeSessions);
         // Saving must not prevent disposal. Keep providers/API available until traits have finished cleanup.
         if (npcRegistry != null && saveOnDisable) shutdownStep("NPC and shop save", this::storeNPCsInternal);
+        shutdownStep("template event commands", net.citizensnpcs.api.npc.templates.CommandEventAction::shutdown);
         for (NPCRegistry registry : retiring) {
             shutdownStep("registry " + registry.getName(), () -> ((CitizensNPCRegistry) registry).retire());
         }

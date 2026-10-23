@@ -332,6 +332,8 @@ public abstract class AbstractNPC implements NPC {
 
     @Override
     public void load(final DataKey root) {
+        var templateEvents = net.citizensnpcs.api.npc.templates.TemplateEventBindings.prepareLoad(
+                root.getRelative("template-events"));
         setNameInternal(root.getString("name"));
         storedItems.clear();
         hasStoredItemProvider = root.keyExists("itemprovider");
@@ -359,6 +361,7 @@ public abstract class AbstractNPC implements NPC {
         for (DataKey key : Iterables.transform(loading, traits::getRelative)) {
             loadTraitFromKey(key);
         }
+        templateEvents.accept(this);
     }
 
     private boolean restoringSnapshot;
@@ -480,6 +483,7 @@ public abstract class AbstractNPC implements NPC {
     /** A strict snapshot must succeed before a destructive operation can rely on it. */
     protected void saveState(DataKey root, boolean strict) {
         Set<String> pendingRemoval = Sets.newHashSet(clearSaveData);
+        net.citizensnpcs.api.npc.templates.TemplateEventBindings.save(this, root.getRelative("template-events"));
         metadata.saveTo(root.getRelative("metadata"));
         root.setString("name", name);
         root.setString("uuid", uuid.toString());

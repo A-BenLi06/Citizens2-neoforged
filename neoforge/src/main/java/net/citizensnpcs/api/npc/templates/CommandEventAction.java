@@ -33,6 +33,8 @@ public class CommandEventAction implements Consumer<NPC>, AutoCloseable {
     private boolean registered;
     private boolean closed;
     private net.minecraft.resources.ResourceLocation templateKey;
+    private final Class<? extends NPCEvent> eventClass;
+    private final java.util.List<String> savedCommands;
 
     public <T extends NPCEvent> CommandEventAction(Class<T> clazz, Consumer<NPC> commands) {
         this(clazz, commands, (type, listener) -> NeoForge.EVENT_BUS.addListener(type, listener),
@@ -46,6 +48,8 @@ public class CommandEventAction implements Consumer<NPC>, AutoCloseable {
 
     <T extends NPCEvent> CommandEventAction(Class<T> clazz, Consumer<NPC> commands,
             BiConsumer<Class<T>, Consumer<T>> registrar, Consumer<Consumer<T>> unregistrar) {
+        eventClass = clazz;
+        savedCommands = commands instanceof CommandListExecutor executor ? executor.getCommands() : null;
         Consumer<T> listener = event -> {
             // exact class only, so a subclass event does not trigger its parent's template commands as well
             if (event.getClass() != clazz)
@@ -76,6 +80,10 @@ public class CommandEventAction implements Consumer<NPC>, AutoCloseable {
     }
 
     private synchronized boolean accepts(NPC npc) {
+        return accepting && hasTarget(npc);
+    }
+
+    private synchronized boolean hasTarget(NPC npc) {
         Set<UUID> uuids = targets.get(npc.getOwningRegistry());
         return !closed && uuids != null && uuids.contains(npc.getUniqueId());
     }
@@ -89,13 +97,22 @@ public class CommandEventAction implements Consumer<NPC>, AutoCloseable {
     /** Publish event bindings only after the template's other actions have succeeded. */
     static void replaceSubscriptions(net.minecraft.resources.ResourceLocation key, NPC npc,
             java.util.List<CommandEventAction> replacements) {
+        replaceSubscriptions(java.util.Map.of(key, replacements), npc);
+    }
+
+    /** Register the complete replacement before retiring any previous template bindings. */
+    static void replaceSubscriptions(
+            java.util.Map<net.minecraft.resources.ResourceLocation, java.util.List<CommandEventAction>> replacements,
+            NPC npc) {
         var previous = new java.util.ArrayList<CommandEventAction>();
         for (CommandEventAction action : liveActions()) {
-            if (key.equals(action.templateKey) && action.accepts(npc)) previous.add(action);
+            if (action.templateKey != null && replacements.containsKey(action.templateKey) && action.accepts(npc))
+                previous.add(action);
         }
+        var replacementActions = replacements.values().stream().flatMap(java.util.Collection::stream).toList();
         var added = new java.util.ArrayList<CommandEventAction>();
         try {
-            for (CommandEventAction action : replacements) {
+            for (CommandEventAction action : replacementActions) {
                 boolean alreadyApplied = action.accepts(npc);
                 action.accept(npc);
                 if (!alreadyApplied) added.add(action);
@@ -109,11 +126,12 @@ public class CommandEventAction implements Consumer<NPC>, AutoCloseable {
         }
         synchronized (LIVE) {
             RegistryTransfer transfer = TRANSFERS.get(npc.getOwningRegistry());
-            if (transfer != null) transfer.reapplied.add(new TemplateTarget(key, npc.getUniqueId()));
+            if (transfer != null) replacements.keySet().forEach(key ->
+                    transfer.reapplied.add(new TemplateTarget(key, npc.getUniqueId())));
         }
         Throwable failure = null;
         for (CommandEventAction action : previous) {
-            if (replacements.contains(action)) continue;
+            if (replacementActions.contains(action)) continue;
             try { action.removeTarget(npc); }
             catch (RuntimeException | Error cleanup) {
                 if (failure == null) failure = cleanup;
@@ -122,6 +140,22 @@ public class CommandEventAction implements Consumer<NPC>, AutoCloseable {
         }
         if (failure instanceof RuntimeException ex) throw ex;
         if (failure instanceof Error ex) throw ex;
+    }
+
+    static java.util.Map<net.minecraft.resources.ResourceLocation, java.util.Map<String, java.util.List<String>>>
+            snapshotSubscriptions(NPC npc) {
+        var result = new java.util.TreeMap<net.minecraft.resources.ResourceLocation,
+                java.util.Map<String, java.util.List<String>>>();
+        for (CommandEventAction action : liveActions()) {
+            synchronized (action) {
+                String event = TemplateEventBindings.eventName(action.eventClass);
+                if (action.templateKey == null || action.savedCommands == null || event == null || !action.hasTarget(npc))
+                    continue;
+                var commands = result.computeIfAbsent(action.templateKey, unused -> new java.util.TreeMap<>());
+                commands.computeIfAbsent(event, unused -> new java.util.ArrayList<>()).addAll(action.savedCommands);
+            }
+        }
+        return result;
     }
 
     private synchronized void removeTarget(NPC npc) {
@@ -166,6 +200,11 @@ public class CommandEventAction implements Consumer<NPC>, AutoCloseable {
         }
         if (failure instanceof RuntimeException ex) throw ex;
         if (failure instanceof Error ex) throw ex;
+    }
+
+    /** Stop command dispatch and new subscriptions while keeping applied definitions available for the shutdown save. */
+    public static void beginShutdown() {
+        accepting = false;
     }
 
     /** Begin a new server lifetime; old action objects remain closed. */

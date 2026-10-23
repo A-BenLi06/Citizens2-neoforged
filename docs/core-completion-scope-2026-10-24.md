@@ -16,11 +16,14 @@ The ordinary-client acceptance run remains explicitly deferred by the user;
 do not restart its fixture or treat it as passed. Production activation and
 release publication have not occurred as part of this scope change.
 
-Current core review starts with template event persistence. Applied event
-subscriptions currently exist only in memory. A restart must restore the event
-commands without rerunning template-application commands or destructive trait
-replacement. Definition edits should take effect through explicit reapplication,
-preserving the established file-reload contract.
+Template event persistence has now been implemented and passed five focused
+NeoForge 21.1.248 tests. Applied command subscriptions restore from the NPC
+snapshot without replaying template-application commands or destructive trait
+replacement. Definition edits still take effect through explicit reapplication.
+See [the focused acceptance record](template-event-persistence-2026-10-24.md).
+
+Continue the core review against remaining Citizens-owned behavior and API
+contracts; this focused fix does not establish overall completion.
 
 The interrupted GriefLogger lookup experiment is superseded draft work. Its
 already-started isolated reproduction and source build may finish safely; no
