@@ -42,6 +42,11 @@ public final class LoggingRuntimeAudit {
     private static final int BURST_PLACEMENTS=96;
     private static long burstNanos;
     @SubscribeEvent public static void tick(ServerTickEvent.Post event) {
+        var phase = System.getenv("CITIZENS_LOGGING_AUDIT_PHASE");
+        if ("storage".equals(phase) || "storage-recover".equals(phase)) {
+            LoggingStorageRuntimeAudit.tick(event);
+            return;
+        }
         var server=event.getServer(); var level=server.overworld();
         if(stage==99) return;
         level.setChunkForced(0,0,true);
@@ -234,7 +239,7 @@ public final class LoggingRuntimeAudit {
     }
     private static void finish(net.minecraft.server.MinecraftServer server){stage=99;if(actor!=null&&actor.connection!=null)server.getPlayerList().remove(actor);if(channel!=null)channel.finishAndReleaseAll();server.halt(false);}
     private static void check(boolean value,String name){if(!value)throw new AssertionError(name);passed++;org.slf4j.LoggerFactory.getLogger("interactions").info("[LOGGINGAUDIT] PASS {}",name);}
-    private static io.netty.channel.embedded.EmbeddedChannel connect(ServerPlayer player) {
+    static io.netty.channel.embedded.EmbeddedChannel connect(ServerPlayer player) {
         var connection=new net.minecraft.network.Connection(net.minecraft.network.protocol.PacketFlow.SERVERBOUND);
         var channel=new io.netty.channel.embedded.EmbeddedChannel(new io.netty.channel.ChannelInitializer<io.netty.channel.Channel>() {
             @Override protected void initChannel(io.netty.channel.Channel channel) {

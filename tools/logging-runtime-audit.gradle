@@ -7,25 +7,31 @@ allprojects {
         if (!fixture.toPath().toAbsolutePath().normalize().startsWith(p.file('../artifacts').toPath().toAbsolutePath().normalize()))
             throw new GradleException('Logging fixture must be inside task artifacts')
         def phase = p.findProperty('loggingAuditPhase') ?: 'native'
-        if (!(phase in ['native', 'crash', 'recover'])) throw new GradleException('Unknown logging audit phase')
+        if (!(phase in ['native', 'crash', 'recover', 'storage', 'storage-recover'])) throw new GradleException('Unknown logging audit phase')
         p.sourceSets.dialogue.java.srcDir(p.file('../tools/logging-runtime-audit'))
         p.sourceSets.dialogue.compileClasspath += p.files(p.fileTree(new File(fixture, 'mods')) { include '*.jar' },
                 p.fileTree(new File(fixture, 'compile-libs')) { include '*.jar' })
         p.neoForge.runs.named('server') { gameDirectory = fixture }
-        p.tasks.named('prepareServerRun') {
-            doLast {
-                def marker = new File(fixture, 'logging-audit-fixture.txt')
-                if (!marker.isFile() || marker.getText('UTF-8').trim() != 'citizens-logging-audit')
-                    throw new GradleException('Missing or incorrect logging fixture marker')
-                if (phase == 'recover' && !new File(fixture, 'logging-restart-state.json').isFile())
-                    throw new GradleException('Run the native logging phase before recovery')
-                def properties = new Properties()
-                new File(fixture, 'server.properties').withInputStream { properties.load(it) }
-                for (entry in ['server-ip':'127.0.0.1', 'server-port':'25632', 'level-name':'logging-world'])
-                    if (properties.getProperty(entry.key) != entry.value) throw new GradleException('Unexpected logging fixture properties')
-            }
+        def validateFixture = {
+            def marker = new File(fixture, 'logging-audit-fixture.txt')
+            if (!marker.isFile() || marker.getText('UTF-8').trim() != 'citizens-logging-audit')
+                throw new GradleException('Missing or incorrect logging fixture marker')
+            if (phase == 'recover' && !new File(fixture, 'logging-restart-state.json').isFile())
+                throw new GradleException('Run the native logging phase before recovery')
+            if (phase == 'storage-recover' && !new File(fixture, 'logging-storage-state.json').isFile())
+                throw new GradleException('Run the native storage phase before recovery')
+            if (phase == 'storage' && new File(fixture, 'logging-storage-state.json').exists())
+                throw new GradleException('Storage acceptance requires a fresh fixture')
+            if (phase == 'storage-recover' && new File(fixture, 'logging-storage-recovery.json').exists())
+                throw new GradleException('Storage recovery has already completed; preserve its fixture')
+            def properties = new Properties()
+            new File(fixture, 'server.properties').withInputStream { properties.load(it) }
+            for (entry in ['server-ip':'127.0.0.1', 'server-port':'25632', 'level-name':'logging-world'])
+                if (properties.getProperty(entry.key) != entry.value) throw new GradleException('Unexpected logging fixture properties')
         }
+        p.tasks.named('prepareServerRun') { doLast { validateFixture() } }
         p.tasks.named('runServer') {
+            doFirst { validateFixture() }
             environment 'CITIZENS_LOGGING_AUDIT_PHASE', phase
             if (p.hasProperty('loggingAuditRun')) environment 'CITIZENS_LOGGING_AUDIT_RUN', p.property('loggingAuditRun')
             timeout = java.time.Duration.ofMinutes(3)

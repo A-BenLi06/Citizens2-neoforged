@@ -54,6 +54,12 @@ Interactions tests are explicitly reused for unchanged Citizens production,
 dialogue, tests and build configuration; their retained logs/reports/packages are
 hash-verified, without claiming fresh ordinary runs.
 
+The subsequent [native SQLite outage follow-up](native-logging-storage-2026-10-23.md)
+now injects an actual writer lock into a fresh running server. Native ordinary,
+container and drop batches pass 22 recovery checks and 11 restart checks without
+substituting the provider bootstrap/logger. A separate normal regression passes
+37 + 8 checks; broader failure and durability limits remain as recorded below.
+
 Use [the test runner](../tools/grieflogger-compat/run-storage-tests.ps1) with JDK 21,
 the rebuilt provider JAR, an SLF4J API JAR and a fresh output directory under
 artifacts. The runner extracts the driver through its actual Jar-in-Jar metadata.

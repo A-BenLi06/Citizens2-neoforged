@@ -14,6 +14,11 @@ is extracted from the provider's declared Jar-in-Jar path. See the linked report
 and manifest for exact source/artifact evidence, rebuild provenance and remaining
 in-memory durability/capacity/MySQL limits. No production activation is included.
 
+The [native outage follow-up](../../docs/native-logging-storage-2026-10-23.md)
+also validates `.2` with a real running-server SQLite writer lock, native ordinary/
+container/drop queues and independent H2 logs: 22 outage + 11 restart assertions.
+Its fresh normal 37 + 8 regression passes with the same unchanged provider JAR.
+
 Target: GriefLogger 1.2.10 for Minecraft 1.21.1 / NeoForge, Java 21.
 Source: <https://github.com/DAQEM/GriefLogger>, commit `e913b78806a8f7646b7e3adc0d6721d1b386f29d` (the checked 1.21.1 branch). Use this exact source commit: the upstream `1.2.10-1.21.1` tag currently points at source configured for another Minecraft version.
 

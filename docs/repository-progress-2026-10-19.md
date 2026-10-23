@@ -10,6 +10,13 @@ This review covers repository structure, native implementation boundaries, upstr
 
 ## Repository and implementation boundaries
 
+Update 2026-10-23, UTC+08:00: [native SQLite outage acceptance](native-logging-storage-2026-10-23.md)
+passes 33 actual-server/restart checks for ordinary, container and drop batches,
+including independent NeoProtect logging and exact native storage/original rows.
+Fresh normal regression passes another 45 checks. Cached/skipped preparation can
+no longer bypass launch guards; four negative invocations preserve native files.
+Broader failure, unflushed termination, retention/load and client gates remain.
+
 Update 2026-10-23, UTC+08:00: [GriefLogger write recovery](grieflogger-write-recovery-2026-10-23.md)
 repairs the actual loss of a queued observation after a temporary SQLite lock.
 Provider `.2` passes 27 actual-bytecode SQLite, 37 native and eight restart checks,

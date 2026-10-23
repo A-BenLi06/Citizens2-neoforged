@@ -1,0 +1,935 @@
+{
+  "createdAt": "2026-10-23T12:23:04.123656+08:00",
+  "timezone": "UTC+08:00",
+  "baseRevision": "296bb81",
+  "nativeChecks": 22,
+  "restartChecks": 11,
+  "state": {
+    "actor": "094f4078-020a-4d39-8a7c-a6e97c01723a",
+    "dropEntity": "522d7f15-337e-49bd-84fb-a81b1663145e",
+    "storage": {
+      "inventory": [
+        {
+          "id": "minecraft:paper",
+          "count": 7,
+          "components": {
+            "minecraft:custom_name": "\"Storage lock paper\""
+          }
+        },
+        {},
+        {},
+        {},
+        {},
+        {},
+        {},
+        {},
+        {
+          "id": "minecraft:oak_planks",
+          "count": 1
+        },
+        {},
+        {},
+        {},
+        {},
+        {},
+        {},
+        {},
+        {},
+        {},
+        {},
+        {},
+        {},
+        {},
+        {},
+        {},
+        {},
+        {},
+        {},
+        {},
+        {},
+        {},
+        {},
+        {},
+        {},
+        {},
+        {},
+        {},
+        {},
+        {},
+        {},
+        {},
+        {}
+      ],
+      "chest": [
+        {},
+        {},
+        {},
+        {},
+        {},
+        {},
+        {},
+        {},
+        {},
+        {},
+        {},
+        {},
+        {},
+        {},
+        {},
+        {},
+        {},
+        {},
+        {},
+        {},
+        {},
+        {},
+        {},
+        {},
+        {},
+        {},
+        {}
+      ],
+      "blocks": [
+        {
+          "Name": "minecraft:stone"
+        },
+        {
+          "Properties": {
+            "waterlogged": "false",
+            "axis": "z"
+          },
+          "Name": "create:shaft"
+        },
+        {
+          "Properties": {
+            "waterlogged": "false",
+            "type": "single",
+            "facing": "north"
+          },
+          "Name": "minecraft:chest"
+        },
+        {
+          "Name": "minecraft:oak_planks"
+        }
+      ],
+      "dropEntity": "522d7f15-337e-49bd-84fb-a81b1663145e",
+      "dropNoGravity": true,
+      "dropStack": {
+        "id": "minecraft:snowball",
+        "count": 3,
+        "components": {
+          "minecraft:custom_name": "\"Storage lock drop\""
+        }
+      }
+    },
+    "lockedOrdinaryPending": 8,
+    "lockedBatchPending": 4,
+    "beforeLockRows": [
+      [
+        "blocks",
+        1792728685981,
+        7,
+        -60,
+        3,
+        "chest",
+        1,
+        0,
+        null
+      ]
+    ],
+    "committedRows": [
+      [
+        "blocks",
+        1792728685981,
+        7,
+        -60,
+        3,
+        "chest",
+        1,
+        0,
+        null
+      ],
+      [
+        "blocks",
+        1792728687170,
+        7,
+        -60,
+        3,
+        "chest",
+        2,
+        0,
+        null
+      ],
+      [
+        "blocks",
+        1792728687225,
+        3,
+        -60,
+        3,
+        "stone",
+        1,
+        0,
+        null
+      ],
+      [
+        "blocks",
+        1792728687240,
+        5,
+        -60,
+        3,
+        "create:shaft",
+        1,
+        0,
+        null
+      ],
+      [
+        "blocks",
+        1792728687631,
+        11,
+        -60,
+        3,
+        "oak_planks",
+        1,
+        0,
+        null
+      ],
+      [
+        "containers",
+        1792728687209,
+        7,
+        -60,
+        3,
+        "paper",
+        0,
+        7,
+        "01000508001253746F72616765206C6F636B207061706572"
+      ],
+      [
+        "items",
+        1792728687265,
+        5,
+        -60,
+        5,
+        "snowball",
+        2,
+        3,
+        "01000508001153746F72616765206C6F636B2064726F70"
+      ]
+    ],
+    "checks": 22
+  },
+  "recovered": {
+    "actor": "094f4078-020a-4d39-8a7c-a6e97c01723a",
+    "dropEntity": "522d7f15-337e-49bd-84fb-a81b1663145e",
+    "storage": {
+      "inventory": [
+        {
+          "id": "minecraft:paper",
+          "count": 7,
+          "components": {
+            "minecraft:custom_name": "\"Storage lock paper\""
+          }
+        },
+        {},
+        {},
+        {},
+        {},
+        {},
+        {},
+        {},
+        {
+          "id": "minecraft:oak_planks",
+          "count": 1
+        },
+        {},
+        {},
+        {},
+        {},
+        {},
+        {},
+        {},
+        {},
+        {},
+        {},
+        {},
+        {},
+        {},
+        {},
+        {},
+        {},
+        {},
+        {},
+        {},
+        {},
+        {},
+        {},
+        {},
+        {},
+        {},
+        {},
+        {},
+        {},
+        {},
+        {},
+        {},
+        {}
+      ],
+      "chest": [
+        {},
+        {},
+        {},
+        {},
+        {},
+        {},
+        {},
+        {},
+        {},
+        {},
+        {},
+        {},
+        {},
+        {},
+        {},
+        {},
+        {},
+        {},
+        {},
+        {},
+        {},
+        {},
+        {},
+        {},
+        {},
+        {},
+        {}
+      ],
+      "blocks": [
+        {
+          "Name": "minecraft:stone"
+        },
+        {
+          "Properties": {
+            "waterlogged": "false",
+            "axis": "z"
+          },
+          "Name": "create:shaft"
+        },
+        {
+          "Properties": {
+            "waterlogged": "false",
+            "type": "single",
+            "facing": "north"
+          },
+          "Name": "minecraft:chest"
+        },
+        {
+          "Name": "minecraft:oak_planks"
+        }
+      ],
+      "dropEntity": "522d7f15-337e-49bd-84fb-a81b1663145e",
+      "dropNoGravity": true,
+      "dropStack": {
+        "id": "minecraft:snowball",
+        "count": 3,
+        "components": {
+          "minecraft:custom_name": "\"Storage lock drop\""
+        }
+      }
+    },
+    "lockedOrdinaryPending": 8,
+    "lockedBatchPending": 4,
+    "beforeLockRows": [
+      [
+        "blocks",
+        1792728685981,
+        7,
+        -60,
+        3,
+        "chest",
+        1,
+        0,
+        null
+      ]
+    ],
+    "committedRows": [
+      [
+        "blocks",
+        1792728685981,
+        7,
+        -60,
+        3,
+        "chest",
+        1,
+        0,
+        null
+      ],
+      [
+        "blocks",
+        1792728687170,
+        7,
+        -60,
+        3,
+        "chest",
+        2,
+        0,
+        null
+      ],
+      [
+        "blocks",
+        1792728687225,
+        3,
+        -60,
+        3,
+        "stone",
+        1,
+        0,
+        null
+      ],
+      [
+        "blocks",
+        1792728687240,
+        5,
+        -60,
+        3,
+        "create:shaft",
+        1,
+        0,
+        null
+      ],
+      [
+        "blocks",
+        1792728687631,
+        11,
+        -60,
+        3,
+        "oak_planks",
+        1,
+        0,
+        null
+      ],
+      [
+        "containers",
+        1792728687209,
+        7,
+        -60,
+        3,
+        "paper",
+        0,
+        7,
+        "01000508001253746F72616765206C6F636B207061706572"
+      ],
+      [
+        "items",
+        1792728687265,
+        5,
+        -60,
+        5,
+        "snowball",
+        2,
+        3,
+        "01000508001153746F72616765206C6F636B2064726F70"
+      ]
+    ],
+    "checks": 22,
+    "recoveredStorage": {
+      "inventory": [
+        {
+          "id": "minecraft:paper",
+          "count": 7,
+          "components": {
+            "minecraft:custom_name": "\"Storage lock paper\""
+          }
+        },
+        {},
+        {},
+        {},
+        {},
+        {},
+        {},
+        {},
+        {
+          "id": "minecraft:oak_planks",
+          "count": 1
+        },
+        {},
+        {},
+        {},
+        {},
+        {},
+        {},
+        {},
+        {},
+        {},
+        {},
+        {},
+        {},
+        {},
+        {},
+        {},
+        {},
+        {},
+        {},
+        {},
+        {},
+        {},
+        {},
+        {},
+        {},
+        {},
+        {},
+        {},
+        {},
+        {},
+        {},
+        {},
+        {}
+      ],
+      "chest": [
+        {},
+        {},
+        {},
+        {},
+        {},
+        {},
+        {},
+        {},
+        {},
+        {},
+        {},
+        {},
+        {},
+        {},
+        {},
+        {},
+        {},
+        {},
+        {},
+        {},
+        {},
+        {},
+        {},
+        {},
+        {},
+        {},
+        {}
+      ],
+      "blocks": [
+        {
+          "Name": "minecraft:stone"
+        },
+        {
+          "Properties": {
+            "waterlogged": "false",
+            "axis": "z"
+          },
+          "Name": "create:shaft"
+        },
+        {
+          "Properties": {
+            "waterlogged": "false",
+            "type": "single",
+            "facing": "north"
+          },
+          "Name": "minecraft:chest"
+        },
+        {
+          "Name": "minecraft:oak_planks"
+        }
+      ],
+      "dropEntity": "522d7f15-337e-49bd-84fb-a81b1663145e",
+      "dropNoGravity": true,
+      "dropStack": {
+        "id": "minecraft:snowball",
+        "count": 3,
+        "components": {
+          "minecraft:custom_name": "\"Storage lock drop\""
+        }
+      }
+    },
+    "recoveredRows": [
+      [
+        "blocks",
+        1792728685981,
+        7,
+        -60,
+        3,
+        "chest",
+        1,
+        0,
+        null
+      ],
+      [
+        "blocks",
+        1792728687170,
+        7,
+        -60,
+        3,
+        "chest",
+        2,
+        0,
+        null
+      ],
+      [
+        "blocks",
+        1792728687225,
+        3,
+        -60,
+        3,
+        "stone",
+        1,
+        0,
+        null
+      ],
+      [
+        "blocks",
+        1792728687240,
+        5,
+        -60,
+        3,
+        "create:shaft",
+        1,
+        0,
+        null
+      ],
+      [
+        "blocks",
+        1792728687631,
+        11,
+        -60,
+        3,
+        "oak_planks",
+        1,
+        0,
+        null
+      ],
+      [
+        "containers",
+        1792728687209,
+        7,
+        -60,
+        3,
+        "paper",
+        0,
+        7,
+        "01000508001253746F72616765206C6F636B207061706572"
+      ],
+      [
+        "items",
+        1792728687265,
+        5,
+        -60,
+        5,
+        "snowball",
+        2,
+        3,
+        "01000508001153746F72616765206C6F636B2064726F70"
+      ]
+    ],
+    "recoveryChecks": 11
+  },
+  "stateEvidence": {
+    "path": "artifacts/logging-native-lock-server/logging-storage-state.json",
+    "bytes": 1505,
+    "sha256": "d0513c13b851b20e0895992c8830311ff51de0871927a118fd1d00b68b11558f"
+  },
+  "recoveryEvidence": {
+    "path": "artifacts/logging-native-lock-server/logging-storage-recovery.json",
+    "bytes": 2809,
+    "sha256": "a16a9b1d006da20e6ae0a442b0d720af361d432a1281d5d18baa12c5798cd1e1"
+  },
+  "logs": [
+    {
+      "path": "artifacts/logging-native-lock.log",
+      "bytes": 41128,
+      "sha256": "31cc3959838f3c0fc641307e7bb3807526c0b9e90743969d8e237fdd24764ab5"
+    },
+    {
+      "path": "artifacts/logging-native-lock-restart.log",
+      "bytes": 13992,
+      "sha256": "b30b37b284b4719b45f978d6e17d1016583e69c830d5b92b13b25850bc2346d5"
+    }
+  ],
+  "providers": [
+    {
+      "path": "artifacts/logging-native-lock-server/mods/architectury-13.0.11-neoforge.jar",
+      "bytes": 584734,
+      "sha256": "9cc92f2c09533fc5482c60f993bd891c655a0e32b637037cdcb7c2b23adedeeb"
+    },
+    {
+      "path": "artifacts/logging-native-lock-server/mods/create.jar",
+      "bytes": 19138095,
+      "sha256": "5602a16796957cb5c7fb829c10c6b54bf9d228931c7680636710b6a60d92822e"
+    },
+    {
+      "path": "artifacts/logging-native-lock-server/mods/economy.jar",
+      "bytes": 14431850,
+      "sha256": "179115e5301ee6629acd3bdcbb6779d2549a35f7493821ab0fca79bcc43645f5"
+    },
+    {
+      "path": "artifacts/logging-native-lock-server/mods/grieflogger-1.2.10-1.21.1-yuuniverse.2-neoforge.jar",
+      "bytes": 18922921,
+      "sha256": "07d0ab4bf1dec4283cf19b7c7c82481919f87080aaf1598b27d0adfbcacb3eee"
+    },
+    {
+      "path": "artifacts/logging-native-lock-server/mods/neoprotect-1.0.4-mc1.21.1-neoforge.jar",
+      "bytes": 2614693,
+      "sha256": "2cbcec7aeef26ef3f5b54dae90fc16da353a1534462353b9f516d7d2e0a138ce"
+    },
+    {
+      "path": "artifacts/logging-native-lock-server/mods/supermartijn642configlib-1.1.8-neoforge-mc1.21.jar",
+      "bytes": 207514,
+      "sha256": "d2ba7b839a2268e4e223457e813d11aa2476c3bf708a7bba691d8fc851778a4b"
+    }
+  ],
+  "providerAcceptance": {
+    "path": "docs/grieflogger-write-recovery-validation-2026-10-23.json",
+    "bytes": 37018,
+    "sha256": "cce8d66d74d828d0985f5ec3c4792022b81378aa40478973298ff7a702d2164c"
+  },
+  "databases": [
+    {
+      "path": "artifacts/logging-native-lock-server/database.db",
+      "bytes": 73728,
+      "sha256": "23137755ecbdeb76d6b23634449fcef6874f5bb828efd8086c247baa9564f3fd",
+      "quickCheck": "ok"
+    },
+    {
+      "path": "artifacts/logging-native-lock-server/logging-world/yuuniverse_economy/economy.db",
+      "bytes": 368640,
+      "sha256": "33bddc9bdad91b363b965c9cd9271cc6ac09d310a9f474d20e9b3d820804894f",
+      "quickCheck": "ok"
+    },
+    {
+      "path": "artifacts/logging-native-lock-regression-server/database.db",
+      "bytes": 81920,
+      "sha256": "6c76843d0eff0d6417a545065c9841c081e402eedbc61c4b2f37781ac6b0bfd6",
+      "quickCheck": "ok"
+    },
+    {
+      "path": "artifacts/logging-native-lock-regression-server/logging-world/yuuniverse_economy/economy.db",
+      "bytes": 368640,
+      "sha256": "8c1fcfe1a92fa832ef873639264b99e9ce15a28f7d83bd19ec320ba44758bbc2",
+      "quickCheck": "ok"
+    }
+  ],
+  "h2": {
+    "path": "artifacts/logging-native-lock-server/logging-world/neoprotect/neoprotect.mv.db",
+    "bytes": 32768,
+    "sha256": "8f7538ec3bef351dcf5477ed9b51671be4336367edcee88c2d9e47b025f37f9f"
+  },
+  "stopped": {
+    "paths": [
+      "logging-world/session.lock",
+      "database.db",
+      "logging-world/neoprotect/neoprotect.mv.db",
+      "logging-world/yuuniverse_economy/economy.db"
+    ],
+    "exclusiveStoppedWorldAndDatabases": true,
+    "fixture": "C:\\Users\\ben_l\\Documents\\Coding\\citizens2-neoforged\\artifacts\\logging-native-lock-server",
+    "createdAt": "2026-10-23T12:14:30.8554801+08:00",
+    "timezone": "UTC+08:00"
+  },
+  "stoppedEvidence": {
+    "path": "artifacts/logging-native-lock-stopped.json",
+    "bytes": 421,
+    "sha256": "71f43c59bee56ffc646dc6ce991fc29c59c1b76ee32e478fd0fd3b227694069b"
+  },
+  "regression": {
+    "nativeChecks": 37,
+    "restartChecks": 8,
+    "logs": [
+      {
+        "path": "artifacts/logging-native-lock-regression-native.log",
+        "bytes": 20630,
+        "sha256": "bf76fdc98381e34d295b8a42da15af1bd5a94b1e2f5682708dbe7852f03c4637"
+      },
+      {
+        "path": "artifacts/logging-native-lock-regression-recover.log",
+        "bytes": 13379,
+        "sha256": "164a60a5edbe7f7de8537843ad67b3060217406cda3ab794be0c08f107633dcb"
+      }
+    ],
+    "state": {
+      "actor": "85d69bd3-ab5b-4803-8525-7783f2cb358a",
+      "currency": "8d6810f0-d3f7-4bfc-8598-68f54b96f834",
+      "balance": 980,
+      "operation": "58f3f74c-9a7b-49d4-9d2c-db55dff4bb52",
+      "transaction": "84252758-ca33-431e-9db4-a7cb9c60a15d",
+      "shop": "coordinate:b21fdb2f-4f9e-4307-8834-8db5b0e310b4",
+      "run": null
+    },
+    "stateEvidence": {
+      "path": "artifacts/logging-native-lock-regression-server/logging-restart-state.json",
+      "bytes": 284,
+      "sha256": "6f5191ca54bbabb399ce156a3d8eb05b0fae72092e6497de3f5a6e8bcab029b7"
+    },
+    "h2": {
+      "path": "artifacts/logging-native-lock-regression-server/logging-world/neoprotect/neoprotect.mv.db",
+      "bytes": 98304,
+      "sha256": "3b52c2063d7c8602b7275f29bdfbaa8a1e024540bddef13c062d713487cce659"
+    }
+  },
+  "repeatGuards": {
+    "after": [
+      "D0513C13B851B20E0895992C8830311FF51DE0871927A118FD1D00B68B11558F",
+      "A16A9B1D006DA20E6AE0A442B0D720AF361D432A1281D5D18BAA12C5798CD1E1",
+      "51643361C79ECAEF25A8DE802DE24F570BA25D9C2DF1D22D94FADE11B4F466CC",
+      "23137755ECBDEB76D6B23634449FCEF6874F5BB828EFD8086C247BAA9564F3FD",
+      "8F7538EC3BEF351DCF5477ED9B51671BE4336367EDCEE88C2D9E47B025F37F9F",
+      "33BDDC9BDAD91B363B965C9CD9271CC6AC09D310A9F474D20E9B3D820804894F",
+      "B4CF8DA71EEDAD5BE7D6761994513AC7AECF8B2040352F25D74BB35B27ECDB9F"
+    ],
+    "timezone": "UTC+08:00",
+    "checks": [
+      {
+        "expected": "Storage acceptance requires a fresh fixture",
+        "exitCode": 1,
+        "phase": "storage",
+        "log": "C:\\Users\\ben_l\\Documents\\Coding\\citizens2-neoforged\\artifacts\\logging-native-lock-repeat-storage-rejected.log"
+      },
+      {
+        "expected": "Storage recovery has already completed; preserve its fixture",
+        "exitCode": 1,
+        "phase": "storage-recover",
+        "log": "C:\\Users\\ben_l\\Documents\\Coding\\citizens2-neoforged\\artifacts\\logging-native-lock-repeat-storage-recover-rejected.log"
+      },
+      {
+        "exitCode": 1,
+        "log": "C:\\Users\\ben_l\\Documents\\Coding\\citizens2-neoforged\\artifacts\\logging-native-lock-launch-storage-rejected.log",
+        "prepareTaskSkipped": true,
+        "expected": "Storage acceptance requires a fresh fixture",
+        "phase": "storage"
+      },
+      {
+        "exitCode": 1,
+        "log": "C:\\Users\\ben_l\\Documents\\Coding\\citizens2-neoforged\\artifacts\\logging-native-lock-launch-storage-recover-rejected.log",
+        "prepareTaskSkipped": true,
+        "expected": "Storage recovery has already completed; preserve its fixture",
+        "phase": "storage-recover"
+      }
+    ],
+    "protected": [
+      "C:\\Users\\ben_l\\Documents\\Coding\\citizens2-neoforged\\artifacts\\logging-native-lock-server\\logging-storage-state.json",
+      "C:\\Users\\ben_l\\Documents\\Coding\\citizens2-neoforged\\artifacts\\logging-native-lock-server\\logging-storage-recovery.json",
+      "C:\\Users\\ben_l\\Documents\\Coding\\citizens2-neoforged\\artifacts\\logging-native-lock-server\\logging-world\\session.lock",
+      "C:\\Users\\ben_l\\Documents\\Coding\\citizens2-neoforged\\artifacts\\logging-native-lock-server\\database.db",
+      "C:\\Users\\ben_l\\Documents\\Coding\\citizens2-neoforged\\artifacts\\logging-native-lock-server\\logging-world\\neoprotect\\neoprotect.mv.db",
+      "C:\\Users\\ben_l\\Documents\\Coding\\citizens2-neoforged\\artifacts\\logging-native-lock-server\\logging-world\\yuuniverse_economy\\economy.db",
+      "C:\\Users\\ben_l\\Documents\\Coding\\citizens2-neoforged\\artifacts\\logging-native-lock-server\\logs\\latest.log"
+    ],
+    "before": [
+      "D0513C13B851B20E0895992C8830311FF51DE0871927A118FD1D00B68B11558F",
+      "A16A9B1D006DA20E6AE0A442B0D720AF361D432A1281D5D18BAA12C5798CD1E1",
+      "51643361C79ECAEF25A8DE802DE24F570BA25D9C2DF1D22D94FADE11B4F466CC",
+      "23137755ECBDEB76D6B23634449FCEF6874F5BB828EFD8086C247BAA9564F3FD",
+      "8F7538EC3BEF351DCF5477ED9B51671BE4336367EDCEE88C2D9E47B025F37F9F",
+      "33BDDC9BDAD91B363B965C9CD9271CC6AC09D310A9F474D20E9B3D820804894F",
+      "B4CF8DA71EEDAD5BE7D6761994513AC7AECF8B2040352F25D74BB35B27ECDB9F"
+    ],
+    "createdAt": "2026-10-23T12:18:36.3214787+08:00",
+    "unchanged": true,
+    "launchGuardProtected": true
+  },
+  "repeatGuardEvidence": {
+    "path": "artifacts/logging-native-lock-repeat-guards.json",
+    "bytes": 3372,
+    "sha256": "9b9685b1ad72572d43778599e66213279b306b07074bf14357fdc1a21df2c72b"
+  },
+  "repeatGuardLogs": [
+    {
+      "path": "artifacts/logging-native-lock-repeat-storage-rejected.log",
+      "bytes": 953,
+      "sha256": "dfbf3e7e139622a86553e1dab0f716d29a971a3a86dc54f7a5e8ce39000eb898"
+    },
+    {
+      "path": "artifacts/logging-native-lock-repeat-storage-recover-rejected.log",
+      "bytes": 970,
+      "sha256": "9fbf01fed3a31e6f9d5fa7c9d423e662826d2ef19e8d4d0d0d051b05d818964a"
+    },
+    {
+      "path": "artifacts/logging-native-lock-launch-storage-rejected.log",
+      "bytes": 857,
+      "sha256": "bbae6021535838baab59dc69ab80af96f510ea982c9192fc48b2cb0e83654b34"
+    },
+    {
+      "path": "artifacts/logging-native-lock-launch-storage-recover-rejected.log",
+      "bytes": 874,
+      "sha256": "dd712187bc1355bb82cc3f7de549ed7bad0135e08a284af1a739e1b95fd7a5b4"
+    }
+  ],
+  "allStopped": {
+    "createdAt": "2026-10-23T12:23:00.1851046+08:00",
+    "exclusiveStoppedWorldAndDatabases": true,
+    "fixtures": [
+      "artifacts/logging-native-lock-server",
+      "artifacts/logging-native-lock-regression-server"
+    ],
+    "timezone": "UTC+08:00",
+    "files": [
+      "C:\\Users\\ben_l\\Documents\\Coding\\citizens2-neoforged\\artifacts\\logging-native-lock-server\\logging-world\\session.lock",
+      "C:\\Users\\ben_l\\Documents\\Coding\\citizens2-neoforged\\artifacts\\logging-native-lock-server\\database.db",
+      "C:\\Users\\ben_l\\Documents\\Coding\\citizens2-neoforged\\artifacts\\logging-native-lock-server\\logging-world\\neoprotect\\neoprotect.mv.db",
+      "C:\\Users\\ben_l\\Documents\\Coding\\citizens2-neoforged\\artifacts\\logging-native-lock-server\\logging-world\\yuuniverse_economy\\economy.db",
+      "C:\\Users\\ben_l\\Documents\\Coding\\citizens2-neoforged\\artifacts\\logging-native-lock-regression-server\\logging-world\\session.lock",
+      "C:\\Users\\ben_l\\Documents\\Coding\\citizens2-neoforged\\artifacts\\logging-native-lock-regression-server\\database.db",
+      "C:\\Users\\ben_l\\Documents\\Coding\\citizens2-neoforged\\artifacts\\logging-native-lock-regression-server\\logging-world\\neoprotect\\neoprotect.mv.db",
+      "C:\\Users\\ben_l\\Documents\\Coding\\citizens2-neoforged\\artifacts\\logging-native-lock-regression-server\\logging-world\\yuuniverse_economy\\economy.db"
+    ]
+  },
+  "allStoppedEvidence": {
+    "path": "artifacts/logging-native-lock-all-stopped.json",
+    "bytes": 1418,
+    "sha256": "85e907289be56e5085bdc4645a14ed05846e4f21a1625f4d3e97749c52e152b8"
+  },
+  "sources": [
+    {
+      "path": "tools/logging-runtime-audit.gradle",
+      "bytes": 3370,
+      "sha256": "67d5a3794b061ed0f5f36003a0255e45667f319de3924f476d840cc4d061fe7c"
+    },
+    {
+      "path": "tools/logging-runtime-audit/net/yuuniverse/interactions/LoggingRuntimeAudit.java",
+      "bytes": 27306,
+      "sha256": "1f47c8ced258249a72e5918992d49b8eaeeb74d8b0ae94949e9d6ba267731a23"
+    },
+    {
+      "path": "tools/logging-runtime-audit/net/yuuniverse/interactions/LoggingStorageRuntimeAudit.java",
+      "bytes": 17174,
+      "sha256": "5beb69e650dc4823461217d8f65fdabbb97a48722c6dd86b481006b1a54db523"
+    },
+    {
+      "path": "tools/record-native-logging-storage-validation.py",
+      "bytes": 12419,
+      "sha256": "6874ee7dd16b270c0d9caa0fa25b6cbf69ce3917680e5bd4a7dd4e5377015938"
+    }
+  ],
+  "auditBinary": {
+    "path": "artifacts/logging-native-lock-build/classes/java/dialogue/net/yuuniverse/interactions/LoggingStorageRuntimeAudit.class",
+    "bytes": 27447,
+    "sha256": "c73241fbb897a0229f13783d053282fdfff65557cb8dc8b56561ac9bced2eed2"
+  },
+  "packages": [
+    {
+      "path": "artifacts/craft-binding-ordinary-21.1.248-build/libs/citizens-2.0.43-neoforge-SNAPSHOT.jar",
+      "bytes": 4091667,
+      "sha256": "02437eda296f5b84055b1c11f87553cd297649ca6362a3eb53a385517a2f6f6f",
+      "matchingProductionClasses": 1020
+    },
+    {
+      "path": "artifacts/craft-binding-ordinary-21.1.248-build/libs/yuuniverse-interactions-2.0.43-neoforge-SNAPSHOT.jar",
+      "bytes": 204146,
+      "sha256": "77021e0135062bec5e78117e65845ce6c5b59022a8e59d6f3a9ca3305aedf635",
+      "matchingProductionClasses": 74
+    }
+  ],
+  "reusedOrdinaryTestsPerTarget": 825,
+  "reusedInteractionsTests": 100,
+  "reusedTestEvidence": "docs/craft-binding-validation-2026-10-22.json",
+  "limits": [
+    "Actual in-server SQLite writer lock with ordinary, container and dropped-item native producers",
+    "Known rollback/retry followed by clean restart, not unflushed process-kill durability",
+    "Other failures, uncertain-outcome administration, retention/capacity/load and MySQL remain",
+    "Migration/provider and deferred physical-client gates remain",
+    "No production or pinned client fixture changes"
+  ]
+}

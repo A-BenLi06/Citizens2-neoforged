@@ -93,3 +93,10 @@ rollbacks and stops automatic replay for uncertain outcomes. Acceptance passes
 full-device failures, uncertain-outcome administration, retention/capacity/load,
 MySQL and integrated release acceptance remain open; production stays on its
 previous provider set.
+
+The [native SQLite outage follow-up](native-logging-storage-2026-10-23.md) extends
+that repair with real in-server locked writes, worker retries, later native
+producers, independent H2 logging and exact storage/history restart: 33 checks.
+A fresh normal regression passes another 45 checks. Launch guards now run even
+when preparation is skipped; four negative invocations preserve all native files.
+Unflushed termination and broader failure/retention/load/release gates stay open.

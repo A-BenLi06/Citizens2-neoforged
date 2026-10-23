@@ -32,6 +32,15 @@ The init script adds the probe only to the dialogue source set. Run a standard
 `clean test build` afterward and inspect release JARs to exclude the probe and
 provider classes. Logs and synthetic databases stay under ignored `artifacts/`.
 
+For actual in-server SQLite lock/retry acceptance with the rebuilt GriefLogger `.2`,
+use a fresh loggingAuditFixture and the phases `storage` then `storage-recover`.
+The [native storage report](../../docs/native-logging-storage-2026-10-23.md) records
+22 + 11 checks for native block/container/drop producers and independent H2 logging.
+Completed phases reject before launch, including when prepareServerRun is skipped.
+The shared marker/port/world/state guards execute directly on runServer as well
+as preparation. Keep build outputs and project caches separate; retain completed
+fixture histories.
+
 For an actual forced termination after observed native histories and saved
 player/world state:
 
