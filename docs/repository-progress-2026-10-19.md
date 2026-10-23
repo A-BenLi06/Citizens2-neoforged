@@ -1,5 +1,14 @@
 # Repository progress review
 
+Update 2026-10-24, UTC+08:00: the [private Paradigm reader repair](paradigm-hologram-repair-2026-10-23.md)
+passes 82 checks, including actual provider-owned text-display entities, live
+reload and native restart with 121 resolved providers. Independent SQL/NBT and
+file checks preserve financial histories and 294 inherited journal/team/player
+files per process; completed-phase guards preserve 13,897 files. Only the owner
+loader method and its JAR entry change. Original Paradigm remains defective;
+distribution, supported inbound evaluation and earlier migration/recovery/client
+gates remain open. The ordinary-client test stays explicitly deferred.
+
 Update 2026-10-23, UTC+08:00: [packaged provider acceptance](integrated-provider-acceptance-2026-10-23.md)
 passes 286 checks in four actual processes with current Citizens/Interactions,
 Economy 0.5.9, GriefLogger `.10` and the selected archive set. Independent checks

@@ -1,0 +1,18 @@
+allprojects {
+    def output = gradle.startParameter.projectProperties.get('paradigmHologramBuildDir')
+    if (output == null) throw new GradleException('Pass an isolated paradigmHologramBuildDir')
+    def artifacts = file('../artifacts').canonicalFile.toPath()
+    if (!file(output).canonicalFile.toPath().startsWith(artifacts))
+        throw new GradleException('Use an artifact-confined build')
+    layout.buildDirectory.set(file(output))
+    afterEvaluate { p ->
+        if (p.extensions.findByName('neoForge') == null) return
+        def fixture = p.file(p.property('paradigmHologramFixture'))
+        if (!fixture.canonicalFile.toPath().startsWith(artifacts)) throw new GradleException('Use an artifact-confined fixture')
+        if (!new File(fixture, 'paradigm-hologram-fixture.json').isFile()) throw new GradleException('Missing fixture marker')
+        p.sourceSets.create('paradigmHologramProbe') {
+            java.srcDir(p.file('../tools/paradigm-hologram-runtime-audit'))
+            compileClasspath += p.sourceSets.main.output + p.sourceSets.main.compileClasspath + p.files(p.fileTree(new File(fixture, 'mods')) { include '*.jar' })
+        }
+    }
+}

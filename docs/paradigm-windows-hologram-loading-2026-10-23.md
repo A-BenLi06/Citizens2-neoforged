@@ -3,6 +3,14 @@
 Observed 2026-10-23, UTC+08:00, with pinned unmodified Paradigm 2.5.0,
 Java 21.0.11 and Windows 10. This is an open provider defect.
 
+Follow-up 2026-10-24, UTC+08:00: a [private owner repair](paradigm-hologram-repair-2026-10-23.md)
+passes 38 standalone and 44 full-pack native/restart checks with the same probe
+bytecode used to reproduce the original failure. It changes only the owning
+loader method and one JAR entry, closes the reader before persistence and
+preserves actual write-failure safety. This acceptance applies to that private
+candidate; the unmodified provider described below remains defective. No modified
+provider is distributed or activated in production or the deferred client fixture.
+
 A fresh combined-server start creates `config/paradigm/holograms.json` with
 `enabled: true`. The next process logs `Failed to save holograms.json`, caused by
 `AccessDeniedException` replacing the existing file with `holograms.json.tmp`.

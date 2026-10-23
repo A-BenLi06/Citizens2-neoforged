@@ -1,5 +1,14 @@
 # Adopted NeoForge integrations and porting goals
 
+Update 2026-10-24, UTC+08:00: [private Paradigm reader repair](paradigm-hologram-repair-2026-10-23.md)
+passes 38 storage and 44 full-pack native/restart checks. The owner closes its
+configuration reader before replacement; exact definitions/settings, actual
+text-display entities, live reload and shutdown cleanup are verified with 121
+resolved providers. Original financial/journal/team/player evidence is retained.
+The unmodified provider still has the Windows defect. This private adaptation
+does not resolve distribution, supported inbound evaluation, original migration,
+wider recovery/load or deferred physical-client gates; ADAPT-07/11 remain open.
+
 Update 2026-10-23, UTC+08:00: [packaged provider acceptance](integrated-provider-acceptance-2026-10-23.md)
 combines the selected 64 archives with current Citizens/Interactions, Economy
 0.5.9 and GriefLogger `.10`. Four native processes pass 286 checks with 121
