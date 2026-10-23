@@ -116,3 +116,12 @@ outcome and legacy-batch fences. Acceptance passes 93 standalone and 149 native/
 restart checks with direct page caps and reader/writer/commerce regressions.
 Physical device/IOERR/COMMIT-FULL, unflushed termination, administration,
 retention/load, MySQL, migration and deferred clients remain separate gates.
+
+The [normal shutdown repair](logging-shutdown-recovery-2026-10-23.md) reproduces
+lost final history in `.4` and a separate per-player drop-buffer loss in `.5`.
+Provider `.6` transfers the original item buffer on native quit, then drains SQL
+after native shutdown producers finish. Final drain waits for an active consumer;
+periodic attempts remain nonblocking and uncertainty fences remain intact. A
+failed final drain reports memory-only pending work. Dedicated normal-stop/restart
+acceptance does not establish crash spooling, integrated-client lifecycle or an
+atomic world/log/financial backup.

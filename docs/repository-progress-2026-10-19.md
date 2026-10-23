@@ -10,6 +10,15 @@ This review covers repository structure, native implementation boundaries, upstr
 
 ## Repository and implementation boundaries
 
+Update 2026-10-23, UTC+08:00: [normal shutdown recovery](logging-shutdown-recovery-2026-10-23.md)
+repairs two proven loss paths: pending final SQL writes in `.4` and an item buffer
+waiting for a nonexistent next player tick in `.5`. Provider `.6` drains the player
+buffer on quit and SQL after native shutdown producers. Final-after-last-tick
+gameplay and fresh-process storage/history acceptance pass: 109 actual SQLite and
+168 native/restart checks, including fresh storage/commerce regressions. Failed-drain memory
+loss, integrated lifecycle, broader recovery/load, migration and deferred clients
+remain open.
+
 Update 2026-10-23, UTC+08:00: [SQLite FULL recovery](logging-full-recovery-2026-10-23.md)
 reproduces automatic-rollback queue suspension in provider `.3` outside and
 inside Minecraft. Provider `.4` restores only proven aborted DEFERRED writes,

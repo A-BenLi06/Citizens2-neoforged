@@ -297,6 +297,8 @@ public final class StorageRecoveryTest {
             fixture.database.queue.add(write(fixture.database, 2, "later", null));
             fixture.database.queue.execute(); fixture.database.batchQueue.execute();
             check(count(fixture) == 1 && fixture.database.queue.pendingCount() == 2, "ambiguous_commit_stops_replay_and_later_writes");
+            check(!fixture.database.flushPendingWrites() && count(fixture) == 1
+                    && fixture.database.queue.pendingCount() == 2, "shutdown_drain_preserves_uncertain_commit_fence");
         }
     }
     private static void failedRollback() throws Exception {
@@ -367,6 +369,74 @@ public final class StorageRecoveryTest {
             } finally { done.set(true); pool.shutdownNow(); pool.awaitTermination(5,TimeUnit.SECONDS); }
         }
     }
+    private static void shutdownWaitsForWorker() throws Exception {
+        try (var fixture = fixture("shutdown_race")) {
+            var entered = new CountDownLatch(1); var release = new CountDownLatch(1); var waiterStarted = new CountDownLatch(1);
+            var real = fixture.database.prepareStatement("INSERT INTO observations VALUES(1,'active-worker',NULL)");
+            var first = (PreparedStatement)Proxy.newProxyInstance(StorageRecoveryTest.class.getClassLoader(), new Class<?>[]{PreparedStatement.class}, (owner, method, arguments) -> {
+                if (method.getName().equals("executeUpdate")) {
+                    entered.countDown();
+                    if (!release.await(5, TimeUnit.SECONDS)) throw new SQLException("Timed out waiting for test release");
+                }
+                return invoke(real, method, arguments);
+            });
+            fixture.database.queue.add(first);
+            var pool = Executors.newFixedThreadPool(3);
+            try {
+                var worker = pool.submit(() -> fixture.database.queue.execute());
+                check(entered.await(5,TimeUnit.SECONDS), "shutdown_worker_is_executing_actual_legacy_statement");
+                fixture.database.queue.add(write(fixture.database,2,"later-ordinary",new byte[]{5}));
+                var batch=write(fixture.database,3,null,new byte[]{6}); batch.addBatch();
+                batch.setInt(1,4); batch.setString(2,"later-batch"); batch.setBytes(3,new byte[]{7}); batch.addBatch();
+                fixture.database.batchQueue.add(batch);
+                var waiter=pool.submit(() -> {waiterStarted.countDown();return fixture.database.flushPendingWrites();});
+                check(waiterStarted.await(5,TimeUnit.SECONDS),"shutdown_drain_started_while_periodic_worker_is_active");
+                try {waiter.get(100,TimeUnit.MILLISECONDS);throw new AssertionError("Shutdown drain returned before active worker");}
+                catch(TimeoutException expected) {check(true,"shutdown_drain_waits_instead_of_skipping_busy_queue");}
+                pool.submit(() -> fixture.database.queue.execute()).get(2,TimeUnit.SECONDS);
+                check(true,"periodic_flush_remains_nonblocking_while_queue_is_active");
+                release.countDown(); worker.get(5,TimeUnit.SECONDS);
+                check(waiter.get(5,TimeUnit.SECONDS)&&count(fixture)==4&&fixture.database.queue.pendingCount()==0
+                        &&fixture.database.batchQueue.pendingCount()==0,"shutdown_drain_waits_then_commits_later_ordinary_and_batch_prefixes_once");
+                try(var query=fixture.observer.createStatement();var rows=query.executeQuery("SELECT id,value,hex(data) FROM observations ORDER BY id")) {
+                    var actual=new ArrayList<String>();while(rows.next())actual.add(rows.getInt(1)+":"+rows.getString(2)+":"+rows.getString(3));
+                    check(actual.equals(List.of("1:active-worker:","2:later-ordinary:05","3:null:06","4:later-batch:07")),"shutdown_drain_preserves_exact_worker_and_later_parameters");
+                }
+                check(fixture.database.flushPendingWrites()&&count(fixture)==4,"repeated_shutdown_drain_is_idempotent");
+            } finally {release.countDown();pool.shutdownNow();pool.awaitTermination(5,TimeUnit.SECONDS);}
+        }
+    }
+    private static void shutdownLocked() throws Exception {
+        try(var fixture=fixture("shutdown_locked")) {
+            fixture.database.queue.add(write(fixture.database,1,"ordinary",null));
+            var batch=write(fixture.database,2,"batch",null);batch.addBatch();fixture.database.batchQueue.add(batch);
+            sql(fixture.observer,"BEGIN IMMEDIATE");
+            check(!fixture.database.flushPendingWrites()&&count(fixture)==0&&fixture.database.queue.pendingCount()==1
+                    &&fixture.database.batchQueue.pendingCount()==1,"failed_shutdown_drain_reports_original_uncommitted_work");
+            sql(fixture.observer,"ROLLBACK");
+            check(fixture.database.flushPendingWrites()&&count(fixture)==2,"shutdown_drain_can_retry_after_known_rollback_and_unlock");
+            fixture.database.queue.add(write(fixture.database,3,"next-server-session",null));
+            check(fixture.database.flushPendingWrites()&&count(fixture)==3,
+                    "same_process_database_and_queues_accept_next_server_session_after_clean_drain");
+        }
+    }
+    private static void shutdownReentry() throws Exception {
+        try(var fixture=fixture("shutdown_reentry")) {
+            var rejected=new AtomicBoolean();
+            var real=fixture.database.prepareStatement("INSERT INTO observations VALUES(1,'recursive',NULL)");
+            var statement=(PreparedStatement)Proxy.newProxyInstance(StorageRecoveryTest.class.getClassLoader(),new Class<?>[]{PreparedStatement.class},(owner,method,arguments)-> {
+                if(method.getName().equals("executeUpdate")) {
+                    fixture.database.queue.execute();
+                    try {fixture.database.flushPendingWrites();throw new AssertionError("Recursive blocking drain succeeded");}
+                    catch(IllegalStateException expected) {rejected.set(true);}
+                }
+                return invoke(real,method,arguments);
+            });
+            fixture.database.queue.add(statement);
+            check(fixture.database.flushPendingWrites()&&rejected.get(),"blocking_drain_rejects_own_callback_reentry_without_deadlock");
+            check(count(fixture)==1&&fixture.database.queue.pendingCount()==0&&real.isClosed(),"periodic_callback_reentry_cannot_repeat_or_drop_original_write");
+        }
+    }
     public static void main(String[] arguments) throws Exception {
         root=Path.of(arguments[0]); Class.forName("org.sqlite.JDBC");
         System.out.println("PROVIDER " + Database.class.getProtectionDomain().getCodeSource().getLocation());
@@ -378,6 +448,7 @@ public final class StorageRecoveryTest {
         fullDatabase(false); fullDatabase(true);
         fullModeFence("IMMEDIATE", "IMMEDIATE"); fullModeFence("DEFERRED", "IMMEDIATE");
         fullModeFence("IMMEDIATE", "DEFERRED"); fullAfterCommit(); legacyFull();
+        shutdownWaitsForWorker(); shutdownLocked(); shutdownReentry();
         System.out.println("[GRIEFSTORAGE] COMPLETE " + passed + " checks");
     }
 }

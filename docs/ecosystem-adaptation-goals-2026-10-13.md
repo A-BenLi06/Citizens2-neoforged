@@ -8,6 +8,16 @@ Citizens retains NPC behavior and its existing native extension contracts. Yuuni
 
 ## Selected artifacts and sides
 
+Progress 2026-10-23, UTC+08:00: [normal shutdown recovery](logging-shutdown-recovery-2026-10-23.md)
+repairs reproduced final SQL-queue loss in GriefLogger `.4` and per-player item
+buffer loss in `.5`. Provider `.6` transfers original item actions on quit and
+drains SQL after shutdown producers finish. Actual native final-after-last-tick
+actions and a fresh-process restart retain every original record once. Acceptance
+passes 109 actual SQLite and 168 native/restart checks across shutdown and fresh
+FULL/reader/writer/commerce regressions. Broader
+storage failure, integrated-client lifecycle, migration and deferred clients
+remain separate gates; failed final drains still leave memory-only pending work.
+
 Progress 2026-10-23, UTC+08:00: [SQLite FULL recovery](logging-full-recovery-2026-10-23.md)
 repairs reproduced GriefLogger `.3` queue suspension after native automatic
 rollback. Provider `.4` requires pre-commit typed FULL, native rollback proof,

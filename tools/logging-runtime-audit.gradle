@@ -9,7 +9,7 @@ allprojects {
         def phase = p.findProperty('loggingAuditPhase') ?: 'native'
         def storageLock = p.findProperty('loggingAuditLock') ?: 'writer'
         if (!(storageLock in ['writer', 'reader', 'full'])) throw new GradleException('Unknown logging storage lock mode')
-        if (!(phase in ['native', 'crash', 'recover', 'storage', 'storage-recover'])) throw new GradleException('Unknown logging audit phase')
+        if (!(phase in ['native', 'crash', 'recover', 'storage', 'storage-recover', 'shutdown', 'shutdown-recover'])) throw new GradleException('Unknown logging audit phase')
         p.sourceSets.dialogue.java.srcDir(p.file('../tools/logging-runtime-audit'))
         p.sourceSets.dialogue.compileClasspath += p.files(p.fileTree(new File(fixture, 'mods')) { include '*.jar' },
                 p.fileTree(new File(fixture, 'compile-libs')) { include '*.jar' })
@@ -26,6 +26,12 @@ allprojects {
                 throw new GradleException('Storage acceptance requires a fresh fixture')
             if (phase == 'storage-recover' && new File(fixture, 'logging-storage-recovery.json').exists())
                 throw new GradleException('Storage recovery has already completed; preserve its fixture')
+            if (phase == 'shutdown' && new File(fixture, 'logging-shutdown-state.json').exists())
+                throw new GradleException('Shutdown acceptance requires a fresh fixture')
+            if (phase == 'shutdown-recover' && !new File(fixture, 'logging-shutdown-result.json').isFile())
+                throw new GradleException('Complete shutdown acceptance before recovery')
+            if (phase == 'shutdown-recover' && new File(fixture, 'logging-shutdown-recovery.json').exists())
+                throw new GradleException('Shutdown recovery has already completed; preserve its fixture')
             def properties = new Properties()
             new File(fixture, 'server.properties').withInputStream { properties.load(it) }
             for (entry in ['server-ip':'127.0.0.1', 'server-port':'25632', 'level-name':'logging-world'])

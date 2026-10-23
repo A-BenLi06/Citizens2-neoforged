@@ -1,0 +1,102 @@
+diff --git a/common/src/main/java/com/daqem/grieflogger/event/PlayerQuitEvent.java b/common/src/main/java/com/daqem/grieflogger/event/PlayerQuitEvent.java
+index 007d340..3580efe 100644
+--- a/common/src/main/java/com/daqem/grieflogger/event/PlayerQuitEvent.java
++++ b/common/src/main/java/com/daqem/grieflogger/event/PlayerQuitEvent.java
+@@ -2,16 +2,19 @@ package com.daqem.grieflogger.event;
+ 
+ import com.daqem.grieflogger.database.service.Services;
+ import com.daqem.grieflogger.model.action.SessionAction;
++import com.daqem.grieflogger.player.GriefLoggerServerPlayer;
+ import dev.architectury.event.events.common.PlayerEvent;
+ 
+ public class PlayerQuitEvent {
+ 
+     public static void registerEvent() {
+-        PlayerEvent.PLAYER_QUIT.register(player ->
++        PlayerEvent.PLAYER_QUIT.register(player -> {
++                if (player instanceof GriefLoggerServerPlayer loggerPlayer) loggerPlayer.griefLogger$flushItemQueue();
+                 Services.SESSION.insert(
+                         player.getUUID(),
+                         player.level(),
+                         player.getOnPos(),
+-                        SessionAction.QUIT));
++                        SessionAction.QUIT);
++        });
+     }
+ }
+diff --git a/common/src/main/java/com/daqem/grieflogger/mixin/MixinServerPlayer.java b/common/src/main/java/com/daqem/grieflogger/mixin/MixinServerPlayer.java
+index 352a524..f0ab6e4 100644
+--- a/common/src/main/java/com/daqem/grieflogger/mixin/MixinServerPlayer.java
++++ b/common/src/main/java/com/daqem/grieflogger/mixin/MixinServerPlayer.java
+@@ -118,14 +118,20 @@ public abstract class MixinServerPlayer extends Player implements GriefLoggerSer
+     @Inject(at = @At("HEAD"), method = "tick")
+     public void grieflogger$tick(CallbackInfo ci) {
+         EnvExecutor.getInEnv(EnvType.SERVER, () -> () -> {
+-            if (!grieflogger$itemQueue.isEmpty()) {
+-                Services.ITEM.insertMap(getUUID(), level(), blockPosition(), new HashMap<>(grieflogger$itemQueue));
+-                grieflogger$itemQueue.clear();
+-            }
++            griefLogger$flushItemQueue();
+             return null;
+         });
+     }
+ 
++    @Override
++    @Unique
++    public void griefLogger$flushItemQueue() {
++        if (!grieflogger$itemQueue.isEmpty()) {
++            Services.ITEM.insertMap(getUUID(), level(), blockPosition(), new HashMap<>(grieflogger$itemQueue));
++            grieflogger$itemQueue.clear();
++        }
++    }
++
+     @Inject(method = "drop(Lnet/minecraft/world/item/ItemStack;ZZ)Lnet/minecraft/world/entity/item/ItemEntity;", at = @At("RETURN"))
+     private void drop(ItemStack itemStack, boolean bl, boolean bl2, CallbackInfoReturnable<ItemEntity> cir) {
+         EnvExecutor.getInEnv(EnvType.SERVER, () -> () -> {
+@@ -147,4 +153,4 @@ public abstract class MixinServerPlayer extends Player implements GriefLoggerSer
+         }
+         grieflogger$itemQueue.computeIfAbsent(action, k -> new ArrayList<>()).add(itemStack);
+     }
+-}
+\ No newline at end of file
++}
+diff --git a/common/src/main/java/com/daqem/grieflogger/player/GriefLoggerServerPlayer.java b/common/src/main/java/com/daqem/grieflogger/player/GriefLoggerServerPlayer.java
+index 881e649..ef11f81 100644
+--- a/common/src/main/java/com/daqem/grieflogger/player/GriefLoggerServerPlayer.java
++++ b/common/src/main/java/com/daqem/grieflogger/player/GriefLoggerServerPlayer.java
+@@ -16,6 +16,7 @@ public interface GriefLoggerServerPlayer extends GriefLoggerPlayer {
+     void grieflogger$setInspecting(boolean inspecting);
+     void grieflogger$sendInspectMessage(List<IHistory> history);
+     void griefLogger$addItemToQueue(ItemAction action, SimpleItemStack itemStack);
++    void griefLogger$flushItemQueue();
+     ServerPlayer grieflogger$asServerPlayer();
+     List<Page> grieflogger$getPages();
+     void grieflogger$setPages(List<Page> pages);
+diff --git a/gradle.properties b/gradle.properties
+index 71a8fdc..e655914 100644
+--- a/gradle.properties
++++ b/gradle.properties
+@@ -4,7 +4,7 @@ minecraft_version=1.21.1
+ enabled_platforms=fabric,neoforge
+ 
+ archives_base_name=grieflogger
+-mod_version=1.2.10-1.21.1-yuuniverse.5
++mod_version=1.2.10-1.21.1-yuuniverse.6
+ sqlite_version=3.47.2.0
+ maven_group=com.daqem.grieflogger
+ mod_name=GriefLogger
+diff --git a/walkthrough.md b/walkthrough.md
+index 8ad98d0..a162975 100644
+--- a/walkthrough.md
++++ b/walkthrough.md
+@@ -31,3 +31,10 @@ No production activation. Pending writes remain in memory; unflushed process ter
+ - Provider .5 registers a synchronous final drain on Architectury SERVER_STOPPED, after native stopping/player-quit producers. Queue flush ownership now uses a lock: periodic attempts remain nonblocking and reject same-thread reentry, while the final drain waits for an active worker and drains the remaining original prefix. Database monitor acquisition follows the existing queue-to-database ordering, avoiding waiting for a queue while holding that monitor. Failed/uncertain writes retain existing conservative retry/review behavior and an explicit shutdown error reports uncommitted counts.
+ - Database/queue lifetime stays with the mod, allowing later server sessions in the same process. This does not introduce a crash spool, promise persistence after a failed final drain, or close/recreate repositories and JDBC state at each world stop. Process-kill/device-loss and MySQL remain separate acceptance.
+ - Fresh :neoforge:build succeeds with Java 21 in a separate artifact checkout/cache. Actual provider/SQLite suite passes 109 checks, including the prior 93, active-worker/final-drain waiting, late ordinary/batch entries, exact parameters, nonblocking periodic attempts, idempotent repeated drain, locked/uncertain outcomes, same-process later admission and callback reentry. Native restart/regression evidence is recorded separately by the parent project. No production activation is included.
++
++## 2026-10-23T18:09:31.0074193+08:00 (UTC+08:00) - Drain the original player item buffer on native quit
++
++- Provider .5 successfully drained final SQL queues but the identical native stop audit still lost its original three named snowballs: the per-player item buffer normally transfers on a later player tick. The failed .5 world, source, artifact and log remain preserved in the consuming project.
++- Provider .6 exposes the mixin's original buffer-to-repository operation as griefLogger$flushItemQueue, delegates the tick to it, and invokes it on native PLAYER_QUIT before recording QUIT. SERVER_STOPPED then drains the final SQL queues using .5's blocking ownership. No replacement observation, manual audit flush, guessed actor or synthetic item grant repairs the history.
++- Fresh Java 21 :neoforge:build succeeds. Actual-provider SQLite suite passes 109 assertions. Native final-after-last-tick shutdown passes eleven assertions and a separate clean JVM restart/second stop passes eight: all five block, one container and one item records persist once, original storage/components remain equal, and JOIN/QUIT advance once per session. Broader reader/writer/FULL/commerce regression evidence is recorded by the parent project when complete.
++- SQL queues/database stay at mod lifetime; this does not establish integrated physical-client lifecycle, failed-final-drain durability, unflushed JVM death or device loss. No production activation or deferred client changes. Author and committer use A-BenLi06 <ben_li06@outlook.com>.

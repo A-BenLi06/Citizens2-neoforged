@@ -61,6 +61,16 @@ actor and counted separately. The physical device is not filled. The
 reader/writer/normal commerce regressions. Keep outputs/caches separate and
 preserve historical fixtures and completed-phase launch guards.
 
+For final native actions after the last tick, use provider `.6` in another fresh
+fixture and configure its queueFrequency to 100. Run `shutdown` then
+`shutdown-recover`. ServerStoppingEvent creates native actions before disconnect;
+ServerStoppedEvent verifies SQL queues, all seven gameplay records and final QUIT.
+No manual final item-buffer/SQL flush is performed by the audit. The fresh process
+restores original native storage and verifies each record once through a second
+normal stop. Completed phases reject even with preparation skipped. Retain both
+stopped world/database images and the original `.4`/`.5` failed fixtures. See the
+[shutdown recovery report](../../docs/logging-shutdown-recovery-2026-10-23.md).
+
 For an actual forced termination after observed native histories and saved
 player/world state:
 

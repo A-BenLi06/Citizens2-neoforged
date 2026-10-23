@@ -1,0 +1,147 @@
+diff --git a/common/src/main/java/com/daqem/grieflogger/database/Database.java b/common/src/main/java/com/daqem/grieflogger/database/Database.java
+index ae9cd1a..6cbe30e 100644
+--- a/common/src/main/java/com/daqem/grieflogger/database/Database.java
++++ b/common/src/main/java/com/daqem/grieflogger/database/Database.java
+@@ -164,6 +164,15 @@ public class Database {
+         executeWrites(statements.stream().map(statement -> QueuedWrite.legacy(statement, isBatch)).toList());
+     }
+ 
++    /** Called after native shutdown producers finish, without holding the database monitor. */
++    public boolean flushPendingWrites() {
++        queue.executeBlocking();
++        batchQueue.executeBlocking();
++        synchronized (this) {
++            return !writeOutcomeUncertain && queue.pendingCount() == 0 && batchQueue.pendingCount() == 0;
++        }
++    }
++
+     public synchronized boolean executeWrites(List<QueuedWrite> writes) {
+         if (writeOutcomeUncertain) return false;
+         if (writes.isEmpty()) return true;
+diff --git a/common/src/main/java/com/daqem/grieflogger/database/queue/IQueue.java b/common/src/main/java/com/daqem/grieflogger/database/queue/IQueue.java
+index 91bb0a4..fb07575 100644
+--- a/common/src/main/java/com/daqem/grieflogger/database/queue/IQueue.java
++++ b/common/src/main/java/com/daqem/grieflogger/database/queue/IQueue.java
+@@ -8,5 +8,6 @@ public interface IQueue {
+     void add(QueuedStatement statement);
+     int pendingCount();
+     void execute();
++    void executeBlocking();
+     void hello();
+ }
+diff --git a/common/src/main/java/com/daqem/grieflogger/database/queue/Queue.java b/common/src/main/java/com/daqem/grieflogger/database/queue/Queue.java
+index 6cbe2a0..1f6f31c 100644
+--- a/common/src/main/java/com/daqem/grieflogger/database/queue/Queue.java
++++ b/common/src/main/java/com/daqem/grieflogger/database/queue/Queue.java
+@@ -5,14 +5,14 @@ import com.daqem.grieflogger.database.Database;
+ import java.sql.PreparedStatement;
+ import java.util.List;
+ import java.util.concurrent.ConcurrentLinkedQueue;
+-import java.util.concurrent.atomic.AtomicBoolean;
++import java.util.concurrent.locks.ReentrantLock;
+ 
+ public class Queue implements IQueue {
+ 
+     private final Database database;
+     private final boolean isBatch;
+     private final ConcurrentLinkedQueue<QueuedWrite> statements = new ConcurrentLinkedQueue<>();
+-    private final AtomicBoolean flushing = new AtomicBoolean();
++    private final ReentrantLock flushing = new ReentrantLock();
+ 
+     public Queue(Database database, boolean isBatch) {
+         this.database = database;
+@@ -29,16 +29,28 @@ public class Queue implements IQueue {
+ 
+     @Override
+     public void execute() {
+-        if (!flushing.compareAndSet(false, true)) return;
++        if (flushing.isHeldByCurrentThread() || !flushing.tryLock()) return;
+         try {
+-            var pending = List.copyOf(statements);
+-            if (!pending.isEmpty() && database.executeWrites(pending)) {
+-                for (var committed : pending) {
+-                    if (statements.poll() != committed) throw new IllegalStateException("Committed write queue prefix changed");
+-                }
+-            }
++            flush();
+         } finally {
+-            flushing.set(false);
++            flushing.unlock();
++        }
++    }
++
++    @Override
++    public void executeBlocking() {
++        if (flushing.isHeldByCurrentThread()) throw new IllegalStateException("Cannot drain a queue from its own active write callback");
++        flushing.lock();
++        try { flush(); }
++        finally { flushing.unlock(); }
++    }
++
++    private void flush() {
++        var pending = List.copyOf(statements);
++        if (!pending.isEmpty() && database.executeWrites(pending)) {
++            for (var committed : pending) {
++                if (statements.poll() != committed) throw new IllegalStateException("Committed write queue prefix changed");
++            }
+         }
+     }
+ 
+diff --git a/common/src/main/java/com/daqem/grieflogger/event/TickEvents.java b/common/src/main/java/com/daqem/grieflogger/event/TickEvents.java
+index 1aedb5d..2e29f38 100644
+--- a/common/src/main/java/com/daqem/grieflogger/event/TickEvents.java
++++ b/common/src/main/java/com/daqem/grieflogger/event/TickEvents.java
+@@ -5,6 +5,7 @@ import com.daqem.grieflogger.config.GriefLoggerConfig;
+ import com.daqem.grieflogger.database.Database;
+ import com.daqem.grieflogger.thread.ThreadManager;
+ import dev.architectury.event.events.common.TickEvent;
++import dev.architectury.event.events.common.LifecycleEvent;
+ 
+ import java.util.concurrent.ExecutionException;
+ 
+@@ -13,6 +14,17 @@ public class TickEvents {
+     private static long lastTick = 0;
+ 
+     public static void registerEvents() {
++        LifecycleEvent.SERVER_STOPPED.register(server -> {
++            Database database = GriefLogger.getDatabase();
++            try {
++                if (!database.flushPendingWrites()) {
++                    GriefLogger.LOGGER.error("Server stopped with {} ordinary and {} batch database writes not committed",
++                            database.queue.pendingCount(), database.batchQueue.pendingCount());
++                }
++            } catch (RuntimeException failure) {
++                GriefLogger.LOGGER.error("Failed to drain database writes after server stop", failure);
++            }
++        });
+         TickEvent.SERVER_POST.register(server -> {
+             ThreadManager.getAndRemoveCompleted().forEach(
+                     (future, onComplete) -> {
+diff --git a/gradle.properties b/gradle.properties
+index d4b6034..71a8fdc 100644
+--- a/gradle.properties
++++ b/gradle.properties
+@@ -4,7 +4,7 @@ minecraft_version=1.21.1
+ enabled_platforms=fabric,neoforge
+ 
+ archives_base_name=grieflogger
+-mod_version=1.2.10-1.21.1-yuuniverse.4
++mod_version=1.2.10-1.21.1-yuuniverse.5
+ sqlite_version=3.47.2.0
+ maven_group=com.daqem.grieflogger
+ mod_name=GriefLogger
+diff --git a/walkthrough.md b/walkthrough.md
+index eceee34..8ad98d0 100644
+--- a/walkthrough.md
++++ b/walkthrough.md
+@@ -24,3 +24,10 @@ No production activation. Pending writes remain in memory; unflushed process ter
+ - Provider .4 observes native SQLite rollback/commit hooks only during each serialized flush. A pre-commit typed SQLITE_FULL with observed rollback, no commit callback, and current/next DEFERRED mode may reopen a native DEFERRED transaction before retry. Failed transaction restart, other drivers/wrappers/modes, uncertain commits and unreconstructable legacy batches preserve the existing fence. No error-message matching or queue replacement is used; listeners are removed in finally.
+ - Fresh :neoforge:build succeeds with Java 21 in a separate artifact checkout/cache. Actual-provider standalone suite passes 93 assertions, including repeated ordinary/batch FULL aborts, exact original prefix/null/owned 32KiB binary/later write recovery, mode fences, typed FULL after real commit, legacy batches and the preceding lock/concurrency regressions. Native validation is recorded separately by the parent project. The physical drive is not filled and no production files are activated.
+ 
++
++## 2026-10-23T17:52:51.5508369+08:00 (UTC+08:00) - Drain native logging after normal server shutdown
++
++- Actual .4 NeoForge normal-stop reproduction retains native world/player actions but loses six final gameplay observations and the final quit. Both ordinary and batch queues are pending after the last tick; no subsequent periodic flush occurs. Retained parent-project logs/world/database establish the failure.
++- Provider .5 registers a synchronous final drain on Architectury SERVER_STOPPED, after native stopping/player-quit producers. Queue flush ownership now uses a lock: periodic attempts remain nonblocking and reject same-thread reentry, while the final drain waits for an active worker and drains the remaining original prefix. Database monitor acquisition follows the existing queue-to-database ordering, avoiding waiting for a queue while holding that monitor. Failed/uncertain writes retain existing conservative retry/review behavior and an explicit shutdown error reports uncommitted counts.
++- Database/queue lifetime stays with the mod, allowing later server sessions in the same process. This does not introduce a crash spool, promise persistence after a failed final drain, or close/recreate repositories and JDBC state at each world stop. Process-kill/device-loss and MySQL remain separate acceptance.
++- Fresh :neoforge:build succeeds with Java 21 in a separate artifact checkout/cache. Actual provider/SQLite suite passes 109 checks, including the prior 93, active-worker/final-drain waiting, late ordinary/batch entries, exact parameters, nonblocking periodic attempts, idempotent repeated drain, locked/uncertain outcomes, same-process later admission and callback reentry. Native restart/regression evidence is recorded separately by the parent project. No production activation is included.

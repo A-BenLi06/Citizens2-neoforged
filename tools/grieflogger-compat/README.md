@@ -1,5 +1,15 @@
 # GriefLogger SQLite packaging compatibility
 
+Follow-up 2026-10-23, UTC+08:00: [normal shutdown recovery](../../docs/logging-shutdown-recovery-2026-10-23.md)
+repairs two reproduced loss paths after the last tick: undrained SQL queues and
+the separate per-player item buffer. Apply `server-stop-drain.patch` after `.4`,
+then `player-quit-item-drain.patch`, to build `.6`. Native quit transfers the
+original item buffer; SERVER_STOPPED waits for active SQL consumers and drains
+both queues. Periodic attempts stay nonblocking and uncertain outcomes stay
+fenced. A failed final drain reports uncommitted memory-only work. See the report
+and manifest for actual-provider, normal-stop/restart and storage regressions.
+This does not introduce crash spooling or accept integrated physical clients.
+
 Follow-up 2026-10-23, UTC+08:00: [SQLite FULL recovery](../../docs/logging-full-recovery-2026-10-23.md)
 repairs automatic-rollback queue suspension in `.3`. Apply
 `sqlite-full-recovery.patch` after `reader-commit-recovery.patch` to build `.4`.
