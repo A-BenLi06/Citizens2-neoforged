@@ -1,5 +1,10 @@
 # Adopted NeoForge integrations and porting goals
 
+Scope update 2026-10-24, UTC+08:00: [Citizens core completion](core-completion-scope-2026-10-24.md)
+supersedes the individual provider implementation and full-acceptance requirements
+below. Retain existing integration code and stable native extension interfaces;
+prioritize Citizens itself on Minecraft 1.21.1.
+
 Update 2026-10-24, UTC+08:00: [private Paradigm reader repair](paradigm-hologram-repair-2026-10-23.md)
 passes 38 storage and 44 full-pack native/restart checks. The owner closes its
 configuration reader before replacement; exact definitions/settings, actual

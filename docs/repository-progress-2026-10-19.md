@@ -1,5 +1,10 @@
 # Repository progress review
 
+Scope update 2026-10-24, UTC+08:00: the user's [current instruction](core-completion-scope-2026-10-24.md)
+prioritizes Citizens core on 1.21.1 and stable native extension interfaces.
+Individual provider implementations and full acceptance are no longer completion
+gates. Historical evidence below remains bounded to its recorded inputs.
+
 Update 2026-10-24, UTC+08:00: the [private Paradigm reader repair](paradigm-hologram-repair-2026-10-23.md)
 passes 82 checks, including actual provider-owned text-display entities, live
 reload and native restart with 121 resolved providers. Independent SQL/NBT and

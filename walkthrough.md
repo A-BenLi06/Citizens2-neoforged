@@ -3532,3 +3532,11 @@ Full goal stays active. Fan/deployer/filling/emptying/sequenced assembly and bro
 - Preserve the independent verifier LF/CRLF assumption failure and restart preflight rejecting only vanilla properties date-comment changes. Correct preflight permits comment-only changes, retains exact settings lines and captures launch/runtime hashes; rejected preflight launched no Java.
 - Disk preflight briefly showed about 130 MB free on C:. Verified an 8,005-file, 3,400,064,366-byte task-cache copy on E:. C: subsequently recovered about 92 GB free; original cache was neither moved nor removed. Automatic approval review rejected deleting only that temporary E: copy with blocked by policy; it remains at E:/citizens2-neoforged-task-cache-20261023/gradle-contained-caches. Copy manifest and rejection record are retained. No cleanup retry or workaround.
 - Private source acceptance documentation committed as 7268118 with user author/committer. Updated focused report, original defect follow-up, audit workflow, adopted goals and repository progress. Full goal remains active: supported inbound API/distribution, missing original migration content, broader recovery/load/retention and deferred physical clients/proxy/camera remain gates. No production activation or external messaging.
+
+## 2026-10-24T00:36:58.9930507+08:00 (UTC+08:00) - Prioritize Citizens core completion
+
+- Applied the user's revised scope: preserve existing integrations and require stable native extension interfaces, without individual provider implementation/full acceptance gates. Updated the remaining-work, adopted-goals and repository-progress entry points to the authoritative core scope.
+- Reviewed the latest related session and actual template implementation. In-memory event subscriptions do not survive full restart; investigate persistence without replaying application commands or destructive actions. No core fix is claimed in this documentation commit.
+- Existing isolated GriefLogger draft build completed successfully but is unvalidated and not adopted/deployed. Its already-running original-provider reproduction is allowed to stop safely; no fixed follow-up will be launched. Ordinary-client test remains deferred, production untouched, unrelated _nul and tools/__pycache__/ preserved.
+- Validation: inspected the scope links and git diff; documentation-only change.
+

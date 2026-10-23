@@ -1,5 +1,12 @@
 # Remaining Citizens work
 
+2026-10-24, UTC+08:00: [current core completion scope](core-completion-scope-2026-10-24.md)
+supersedes older individual third-party implementation/acceptance gates below.
+Preserve existing integrations and provide stable native extension interfaces;
+prioritize Citizens itself on Minecraft 1.21.1. The physical ordinary-client run
+remains deferred by the user. Earlier pending clauses are historical unless
+consistent with this scope and later implementation evidence.
+
 2026-10-18, UTC+08:00: [coordinated reload publication](reload-publication-2026-10-18.md)
 now publishes all built-in runtime participants before previous-session callbacks.
 The native regression passes 61 checks on both supported NeoForge test targets.
