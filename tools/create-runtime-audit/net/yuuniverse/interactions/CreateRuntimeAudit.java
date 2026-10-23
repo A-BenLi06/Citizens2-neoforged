@@ -40,6 +40,13 @@ public final class CreateRuntimeAudit {
         var server=event.getServer(); var level=server.overworld();
         var assemblyCrashType = System.getenv("CITIZENS_MACHINE_AUDIT_TYPE");
         if (assemblyCrashType != null && System.getenv("CITIZENS_MACHINE_AUDIT_PHASE") != null) {
+            if (assemblyCrashType.startsWith("fan-")) {
+                level.setChunkForced(0,0,true);
+                if(server.getTickCount()<20 || !level.isPositionEntityTicking(new BlockPos(6,-58,7))) return;
+                ran = true;
+                FanCrashRuntimeAudit.run(server, System.getenv("CITIZENS_MACHINE_AUDIT_PHASE"), assemblyCrashType.substring(4));
+                return;
+            }
             ran = true; level.getChunkAt(new BlockPos(10,-58,2));
             level.setChunkForced(0,0,true);
             if (assemblyCrashType.equals("basin")) BasinCrashRuntimeAudit.run(server, System.getenv("CITIZENS_MACHINE_AUDIT_PHASE"));

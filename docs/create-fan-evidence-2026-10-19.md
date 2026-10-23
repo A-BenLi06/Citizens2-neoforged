@@ -1,5 +1,11 @@
 # Native Create fan evidence
 
+Follow-up 2026-10-23, UTC+08:00: [fan holder process-kill recovery](create-fan-recovery-2026-10-23.md)
+passes 18 actual kills and 72 boundary/216 restart assertions across both targets.
+The SPLASHING world/depot/belt cases preserve original six-roll evidence, exact
+native storage, entity identity and quest-credit fences. Full Create regression
+passes 263 checks. Other modes and storage-interior boundaries remain separate.
+
 Date: 2026-10-19, UTC+08:00. Advances CRAFT-03–05 and ADAPT-05.
 Full port, recovery and integrated acceptance remain unfinished.
 

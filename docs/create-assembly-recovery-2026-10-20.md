@@ -1,5 +1,10 @@
 # Create final assembly process-kill recovery
 
+Follow-up 2026-10-23, UTC+08:00: [fan holder recovery](create-fan-recovery-2026-10-23.md)
+adds 18 verified SPLASHING world/depot/belt kills across both targets, with 72
+boundary and 216 restart checks. These holder paths keep their own original
+output/entity/credit evidence and do not widen the assembly cases below.
+
 Follow-up 2026-10-23, UTC+08:00: [basin mixing recovery](create-basin-recovery-2026-10-23.md)
 adds six actual multi-item/fluid mixing kills on both targets, with 18 boundary
 and 64 restart assertions. Other basin processes and machine-specific paths

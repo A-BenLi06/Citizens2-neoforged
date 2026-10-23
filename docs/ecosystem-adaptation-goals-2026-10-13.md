@@ -8,6 +8,13 @@ Citizens retains NPC behavior and its existing native extension contracts. Yuuni
 
 ## Selected artifacts and sides
 
+Progress 2026-10-23, UTC+08:00: [fan holder recovery](create-fan-recovery-2026-10-23.md)
+adds 18 verified JVM kills for native SPLASHING world/depot/belt storage on both
+targets. Seventy-two boundary/216 restart checks preserve original rolled outputs,
+entity/holder identity and credit fences. Fresh Create regression passes 263;
+unchanged ordinary/Interactions evidence is explicitly reused. Other modes,
+storage-interior, financial, migration and deferred client gates remain open.
+
 Progress 2026-10-23, UTC+08:00: [basin mixing recovery](create-basin-recovery-2026-10-23.md)
 adds six actual kills on both native targets, with 18 boundary/64 restart checks
 for combined item/fluid storage and retained quest-credit fences. Fresh Create

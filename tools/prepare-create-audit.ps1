@@ -3,11 +3,12 @@ param(
     [string]$ProviderDirectory = (Join-Path (Split-Path $PSScriptRoot -Parent) 'artifacts/selected-integrations-2026-10-12'),
     [ValidateSet('depot','belt','deployer','spout')][string]$AssemblyCrashMachine,
     [switch]$BasinCrash,
+    [ValidateSet('world','depot','belt')][string]$FanCrash,
     [string]$Fixture
 )
 $ErrorActionPreference = 'Stop'
 $taskRoot = Split-Path $PSScriptRoot -Parent
-if ($AssemblyCrashMachine -and $BasinCrash) { throw 'Select one native machine family' }
+if ((@($AssemblyCrashMachine, $BasinCrash.IsPresent, $FanCrash) | Where-Object { $_ }).Count -gt 1) { throw 'Select one native machine family' }
 if (!$Fixture) { $Fixture = Join-Path $taskRoot 'artifacts/create-audit-server' }
 $fixture = [IO.Path]::GetFullPath($Fixture)
 $artifactRoot = [IO.Path]::GetFullPath((Join-Path $taskRoot 'artifacts')) + [IO.Path]::DirectorySeparatorChar
@@ -66,4 +67,14 @@ ServerEvents.recipes(event => {
 })
 '@ | Set-Content -LiteralPath $basinScript -Encoding utf8
 } elseif (Test-Path -LiteralPath $basinScript) { Remove-Item -LiteralPath $basinScript }
+$fanScript = Join-Path $fixture 'kubejs/server_scripts/citizens_fan_crash.js'
+if ($FanCrash) {
+@'
+ServerEvents.recipes(event => {
+    event.custom({ type: 'create:splashing', ingredients: [{ item: 'minecraft:snowball' }],
+        results: [{ id: 'minecraft:paper', count: 2, components: { 'minecraft:custom_name': '"Fan crash output"' } },
+            { id: 'minecraft:diamond', count: 1 }] }).id('citizens_audit:fan_crash')
+})
+'@ | Set-Content -LiteralPath $fanScript -Encoding utf8
+} elseif (Test-Path -LiteralPath $fanScript) { Remove-Item -LiteralPath $fanScript }
 Write-Output "Prepared $fixture"

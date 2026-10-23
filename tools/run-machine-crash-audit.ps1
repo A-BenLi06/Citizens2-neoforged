@@ -3,7 +3,7 @@ param(
     [ValidateSet('prepared','confirmed','applied')][string]$Stage = 'prepared',
     [ValidateSet('21.1.233','21.1.248')][string]$NeoVersion = '21.1.248',
     [ValidateSet('depot','belt','deployer','spout')][string]$AssemblyMachine,
-    [ValidateSet('basin')][string]$ProcessingMachine,
+    [ValidateSet('basin','fan-world','fan-depot','fan-belt')][string]$ProcessingMachine,
     [ValidatePattern('^[a-zA-Z0-9_-]+$')][string]$LogPrefix,
     [string]$Fixture,
     [string]$BuildDirectory,
@@ -30,7 +30,7 @@ $auditType = if ($AssemblyMachine) { $AssemblyMachine } else { $ProcessingMachin
 $env:JAVA_HOME = $JavaHome
 $runId = [Guid]::NewGuid().ToString('N')
 if (!$LogPrefix) { $LogPrefix = if ($AssemblyMachine) { "assembly-crash-$AssemblyMachine-$Stage-$NeoVersion" } elseif ($ProcessingMachine) { "processing-crash-$ProcessingMachine-$Stage-$NeoVersion" } else { "machine-crash-$Stage" } }
-$stateName = if ($AssemblyMachine) { 'assembly-crash-state.json' } elseif ($ProcessingMachine) { 'basin-crash-state.json' } else { 'machine-crash-state.json' }
+$stateName = if ($AssemblyMachine) { 'assembly-crash-state.json' } elseif ($ProcessingMachine -like 'fan-*') { 'fan-crash-state.json' } elseif ($ProcessingMachine) { 'basin-crash-state.json' } else { 'machine-crash-state.json' }
 $gradleArguments = @('--project-cache-dir',$ProjectCacheDirectory,'-I','../tools/create-runtime-audit.gradle',"-Pneo_version=$NeoVersion","-PmachineAuditBuildDir=$buildDirectory","-PmachineAuditFixture=$Fixture","-PmachineAuditRun=$runId")
 if ($auditType) { $gradleArguments += "-PmachineAuditType=$auditType" }
 $commitArguments = $gradleArguments + @("-PmachineAuditPhase=commit:$Stage",'runServer','--console=plain')

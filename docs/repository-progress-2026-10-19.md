@@ -10,6 +10,13 @@ This review covers repository structure, native implementation boundaries, upstr
 
 ## Repository and implementation boundaries
 
+Update 2026-10-23, UTC+08:00: [fan holder recovery](create-fan-recovery-2026-10-23.md)
+passes 18 actual JVM kills across world entities, depots and connected belts on
+both targets. Seventy-two boundary and 216 restart checks preserve original
+component-sensitive bulk outputs, holder/entity identity and quest-credit fences.
+Fresh full Create regression passes 263; unchanged ordinary/Interactions evidence
+is explicitly reused. Wider recovery, migration and deferred client gates remain.
+
 Update 2026-10-23, UTC+08:00: [basin mixing recovery](create-basin-recovery-2026-10-23.md)
 passes six verified JVM kills at PREPARED/CONFIRMED/APPLIED on both targets.
 Eighteen boundary and 64 restart assertions retain exact multi-item/fluid storage,
