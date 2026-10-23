@@ -42,6 +42,8 @@ public final class LoggingRuntimeAudit {
     private static final int BURST_PLACEMENTS=96;
     private static long burstNanos;
     @SubscribeEvent public static void tick(ServerTickEvent.Post event) {
+        var integratedPhase=System.getenv("CITIZENS_INTEGRATED_AUDIT_PHASE");
+        if(integratedPhase!=null&&!integratedPhase.equals("logging")&&!integratedPhase.equals("logging-recover")) return;
         var phase = System.getenv("CITIZENS_LOGGING_AUDIT_PHASE");
         if ("entities-reject".equals(phase)) {
             LoggingEntityRejectionRuntimeAudit.tick(event);

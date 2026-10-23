@@ -1,5 +1,15 @@
 # Repository progress review
 
+Update 2026-10-23, UTC+08:00: [packaged provider acceptance](integrated-provider-acceptance-2026-10-23.md)
+passes 286 checks in four actual processes with current Citizens/Interactions,
+Economy 0.5.9, GriefLogger `.10` and the selected archive set. Independent checks
+resolve 121 providers, preserve original financial records, 229 journals and
+11 native team/player files, and corroborate saved item/container components and
+stopped storage. Two earlier probe-assumption failures are preserved/excluded.
+The unmodified Paradigm also has a reproduced Windows existing-file hologram
+load/reload failure. That defect and previous migration/client/recovery/load
+gates remain open; physical-client testing stays explicitly deferred.
+
 Update 2026-10-23, UTC+08:00: [entity history registry repair](logging-entity-registry-2026-10-23.md)
 fixes `.9` silently discarding native MySQL deaths when entity IDs have no
 material counterpart. Provider `.10` uses action-selected generated references,

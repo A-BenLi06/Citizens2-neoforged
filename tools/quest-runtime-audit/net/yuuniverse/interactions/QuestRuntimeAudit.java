@@ -78,6 +78,8 @@ public final class QuestRuntimeAudit {
         if (recordingCrafts) lastCraft=event;
     }
     @SubscribeEvent public static void tick(ServerTickEvent.Post event) {
+        var integratedPhase=System.getenv("CITIZENS_INTEGRATED_AUDIT_PHASE");
+        if(integratedPhase!=null&&!integratedPhase.equals("quest")) return;
         if (ran) return;
         var server = event.getServer(); var level = server.overworld();
         level.setChunkForced(0,0,true);
@@ -124,19 +126,26 @@ public final class QuestRuntimeAudit {
             String id = task.getCodeString();
             var absentReward=new dev.ftb.mods.ftbquests.quest.reward.CustomReward(0x10119L,quest); absentReward.onCreated();
             var rewardService=net.citizensnpcs.util.FtbMonetaryRewards.current(server);
+            var absentBindings=rewardService.bindings(actor.createCommandSourceStack().withPermission(2));
             int absentClaims=rewardService.claims(actor.createCommandSourceStack().withPermission(2)).size();
             try { rewardService.bind(actor.createCommandSourceStack().withPermission(2),absentReward.getCodeString(),"absent",java.math.BigDecimal.ONE);
                 throw new AssertionError("Absent Economy reward bound"); }
-            catch(IllegalStateException expected) { check(rewardService.bindings(actor.createCommandSourceStack().withPermission(2)).isEmpty()
+            catch(IllegalStateException | IllegalArgumentException expected) { check(rewardService.bindings(actor.createCommandSourceStack().withPermission(2)).equals(absentBindings)
                     && rewardService.claims(actor.createCommandSourceStack().withPermission(2)).size()==absentClaims,
-                    "absent_economy_reward_binding_rejects_before_durable_or_native_mutation"); }
+                    "unavailable_economy_reward_binding_rejects_before_durable_or_native_mutation"); }
             var commerceService=net.citizensnpcs.util.CommerceQuestTasks.current(server);
             var absentSource=actor.createCommandSourceStack().withPermission(2);
+            var commerceBindings=commerceService.bindings(absentSource);
+            var commerceEntries=commerceService.entries(absentSource);
             try { commerceService.bind(absentSource,custom.getCodeString(),net.citizensnpcs.util.CommerceTaskJournal.Shop.SYSTEM,"absent","offer",
                     net.citizensnpcs.util.CommerceTaskJournal.Action.BUY_FROM_SHOP,net.citizensnpcs.util.CommerceTaskJournal.Measure.ITEMS,null,true);
                 throw new AssertionError("Absent Economy commerce task bound"); }
-            catch(IllegalStateException expected) { check(commerceService.bindings(absentSource).isEmpty() && commerceService.entries(absentSource).isEmpty(),
-                    "absent_economy_commerce_binding_rejects_without_native_or_durable_mutation"); }
+            catch(RuntimeException expected) {
+                boolean missingShop=expected.getClass().getName().equals("net.yuuniverse.economy.api.ShopApiException")
+                        && expected.getClass().getMethod("reason").invoke(expected).toString().equals("NOT_FOUND");
+                if (!(expected instanceof IllegalStateException) && !(expected instanceof IllegalArgumentException) && !missingShop) throw expected;
+                check(commerceService.bindings(absentSource).equals(commerceBindings) && commerceService.entries(absentSource).equals(commerceEntries),
+                    "unavailable_economy_commerce_binding_rejects_without_native_or_durable_mutation"); }
             actor.getInventory().setItem(0,new ItemStack(Items.STONE,5));
             var before = FtbQuestTasks.query(actor,id);
             check(before.teamId().equals(team.getTeamId()) && before.progress()==0 && before.maximum()==3,
@@ -144,9 +153,11 @@ public final class QuestRuntimeAudit {
             check(net.citizensnpcs.api.integration.CitizensScripts.task(actor,id).equals(before),
                     "public_script_facade_uses_native_task_without_xmod_provider");
             var beforeAbsentMenu=actor.containerMenu;
+            boolean economyPresent=net.neoforged.fml.ModList.get().isLoaded("yuuniverse_economy");
             try { net.citizensnpcs.api.integration.CitizensScripts.validateEconomyMenu(actor,List.of("browser","0"));
-                throw new AssertionError("Absent Economy script menu accepted"); }
-            catch(IllegalStateException expected) { check(actor.containerMenu==beforeAbsentMenu,
+                check(economyPresent && actor.containerMenu==beforeAbsentMenu,
+                        "public_script_installed_economy_preflight_does_not_change_menu"); }
+            catch(IllegalStateException expected) { check(!economyPresent && actor.containerMenu==beforeAbsentMenu,
                     "public_script_absent_economy_rejects_without_changing_menu"); }
             FtbQuestTasks.submit(actor,id,true);
             check(actor.getInventory().countItem(Items.STONE)==5 && team.getProgress(task)==0,

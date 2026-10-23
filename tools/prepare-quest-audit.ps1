@@ -3,10 +3,17 @@ param(
     [string]$ParadigmJar = (Join-Path (Split-Path $PSScriptRoot -Parent) 'artifacts/ecosystem-2026-10-13/server-smoke/mods/Paradigm-neoforge-1.21.1-2.5.0.jar'),
     [string]$ArchitecturyJar = (Join-Path (Split-Path $PSScriptRoot -Parent) 'artifacts/ecosystem-2026-10-13/server-smoke/mods/architectury-13.0.11-neoforge.jar'),
     [string]$OriginalItemFixtureDirectory,
+    [string]$FixtureDirectory,
     [switch]$WithKubeJS
 )
 $ErrorActionPreference = 'Stop'
 $fixture = Join-Path (Split-Path $PSScriptRoot -Parent) 'artifacts/quest-audit-server'
+if ($FixtureDirectory) {
+    $fixture = [IO.Path]::GetFullPath($FixtureDirectory)
+    $artifacts = [IO.Path]::GetFullPath((Join-Path (Split-Path $PSScriptRoot -Parent) 'artifacts')) + [IO.Path]::DirectorySeparatorChar
+    if (!$fixture.StartsWith($artifacts,[StringComparison]::OrdinalIgnoreCase)) { throw 'Quest fixture must be inside task artifacts' }
+    if (Test-Path -LiteralPath $fixture) { throw 'Explicit quest fixture requires a fresh directory' }
+}
 New-Item -ItemType Directory -Force (Join-Path $fixture 'mods') | Out-Null
 foreach ($name in @('ftb-library-neoforge-2101.1.37.jar','ftb-quests-neoforge-2101.1.36.jar','ftb-teams-neoforge-2101.1.11.jar','rsitemeditor-1.0.1.jar','kotlinforforge-5.12.0-all.jar')) {
     Copy-Item -LiteralPath (Join-Path $ProviderDirectory $name) -Destination (Join-Path $fixture 'mods')

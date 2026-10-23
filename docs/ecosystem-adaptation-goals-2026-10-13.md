@@ -1,5 +1,14 @@
 # Adopted NeoForge integrations and porting goals
 
+Update 2026-10-23, UTC+08:00: [packaged provider acceptance](integrated-provider-acceptance-2026-10-23.md)
+combines the selected 64 archives with current Citizens/Interactions, Economy
+0.5.9 and GriefLogger `.10`. Four native processes pass 286 checks with 121
+resolved providers, exact original financial/journal/team/player persistence,
+independent SQL/NBT checks and replay guards. Two probe-assumption failures remain
+excluded. This also exposes [Paradigm's Windows hologram reload defect](paradigm-windows-hologram-loading-2026-10-23.md);
+it is open alongside inbound evaluation, original migration, wider recovery/load
+and deferred physical-client acceptance. This is bounded server acceptance.
+
 Update 2026-10-23, UTC+08:00: [entity history registry repair](logging-entity-registry-2026-10-23.md)
 reproduces `.9` losing actual MySQL deaths despite successful flush. Provider
 `.10` adds correct action-selected references and safe known-schema migrations,

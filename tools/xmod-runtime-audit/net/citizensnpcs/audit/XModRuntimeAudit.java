@@ -38,6 +38,8 @@ public final class XModRuntimeAudit {
         LoggerFactory.getLogger("citizens").info("[XMODAUDIT] script {} {} {} {}",kind,objectId,playerId,value);
     }
     @SubscribeEvent public static void tick(ServerTickEvent.Post event) {
+        var integratedPhase=System.getenv("CITIZENS_INTEGRATED_AUDIT_PHASE");
+        if(integratedPhase!=null&&!integratedPhase.equals("xmod")) return;
         if(ran) return;
         var server=event.getServer(); var level=server.overworld(); level.setChunkForced(0,0,true);
         if(server.getTickCount()<20 || !level.isPositionEntityTicking(new BlockPos(1,-60,1))) return;
