@@ -1,5 +1,15 @@
 # NeoProtect / GriefLogger native audit
 
+Follow-up 2026-10-23, UTC+08:00: [entity registry acceptance](../../docs/logging-entity-registry-2026-10-23.md)
+adds `entities` / `entities-recover`, `entities-migrate` /
+`entities-migrate-recover` and `entities-reject`. Fresh cases require no prior
+entity attempt; migration/rejection cases require their original snapshot;
+completed phases refuse relaunch even with skipped preparation. Fresh native
+kills precede material admission. Rejection checks the owning JDBC connection
+for uncommitted optional index DDL, in addition to independent original rows and
+schema. The validator independently checks generated references and full stored
+histories; index/read snapshots project the original fields explicitly.
+
 Use PowerShell 7 and Java 21. Prepare the pinned providers with
 `tools/prepare-logging-audit.ps1`, then run from the repository root:
 

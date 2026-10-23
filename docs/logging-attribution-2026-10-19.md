@@ -1,5 +1,14 @@
 # NeoProtect / GriefLogger attribution and rollback
 
+Update 2026-10-23, UTC+08:00: [entity registry references](logging-entity-registry-2026-10-23.md)
+repair loss of native MySQL entity history caused by validating entity IDs
+against materials. Provider `.10` preserves original history fields, selects the
+actual registry through generated columns and stops later index DDL after schema
+failure. Final actual-provider/native acceptance checks empty-material kills,
+original migrations, rejection, restart, lookup/rollback/components and commerce.
+It does not recover previously discarded deaths or establish wider load/client
+acceptance. SQLite native foreign-key configuration is unchanged.
+
 2026-10-19, UTC+08:00. ADAPT-09 follow-up for the selected NeoProtect 1.0.4,
 GriefLogger 1.2.10-1.21.1-yuuniverse.1 and Economy 0.5.6 providers.
 

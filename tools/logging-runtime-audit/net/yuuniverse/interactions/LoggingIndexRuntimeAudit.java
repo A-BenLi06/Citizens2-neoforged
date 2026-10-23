@@ -110,7 +110,8 @@ public final class LoggingIndexRuntimeAudit {
         }
     }
     private static int scalar(Connection db,String sql) throws SQLException {try(var query=db.createStatement();var rows=query.executeQuery(sql)){if(!rows.next())throw new SQLException("Missing scalar");return rows.getInt(1);}}
-    private static JsonObject snapshot(Connection db) throws SQLException {var value=new JsonObject();for(String table:TABLES)try(var query=db.createStatement();var rows=query.executeQuery("SELECT rowid,* FROM "+table+" ORDER BY rowid")){value.add(table,rows(rows));}return value;}
+    private static String projection(String table) {return table.equals("blocks")?"rowid,time,user,level,x,y,z,type,action":"rowid,*";}
+    private static JsonObject snapshot(Connection db) throws SQLException {var value=new JsonObject();for(String table:TABLES)try(var query=db.createStatement();var rows=query.executeQuery("SELECT "+projection(table)+" FROM "+table+" ORDER BY rowid")){value.add(table,rows(rows));}return value;}
     private static JsonArray rows(ResultSet rows) throws SQLException {
         var values=new JsonArray();
         while(rows.next()) {var row=new JsonArray();for(int i=1;i<=rows.getMetaData().getColumnCount();i++){var value=rows.getObject(i);if(value instanceof byte[] bytes){var blob=new JsonObject();blob.addProperty("blob",HexFormat.of().formatHex(bytes));row.add(blob);}else row.add(new Gson().toJsonTree(value));}values.add(row);}return values;
@@ -129,7 +130,7 @@ public final class LoggingIndexRuntimeAudit {
     private static JsonObject queries(Connection db,int user) throws SQLException {
         var value=new JsonObject();
         for(String table:HISTORY) {
-            String sql="SELECT rowid,* FROM "+table+" WHERE user=? AND x=? AND y=? AND z=? ORDER BY time DESC";
+            String sql="SELECT "+projection(table)+" FROM "+table+" WHERE user=? AND x=? AND y=? AND z=? ORDER BY time DESC";
             var item=new JsonObject();item.addProperty("sql",sql);var plan=new JsonArray();
             try(var query=db.prepareStatement("EXPLAIN QUERY PLAN "+sql)){bind(query,user);try(var rows=query.executeQuery()){while(rows.next())plan.add(rows.getString("detail"));}}
             item.add("plan",plan);

@@ -1,5 +1,12 @@
 # Adopted NeoForge integrations and porting goals
 
+Update 2026-10-23, UTC+08:00: [entity history registry repair](logging-entity-registry-2026-10-23.md)
+reproduces `.9` losing actual MySQL deaths despite successful flush. Provider
+`.10` adds correct action-selected references and safe known-schema migrations,
+retaining original history fields and fencing optional DDL after rejection.
+Final artifact acceptance records 248 standalone and 336 native/restart checks;
+full migration/load/recovery and deferred physical clients remain unaccepted.
+
 Decision: 2026-10-13, UTC+08:00. Target: Minecraft 1.21.1, Java 21, deployed NeoForge 21.1.248; Citizens' existing 21.1.233 baseline remains separate.
 
 The user selected **Yuuniverse Economy GUI to replace EconomyShopGUI Premium and QuickShop**, and selected **FTB Quests, RSItemEditor, Paradigm's placeholder API, Guard Villagers, NeoProtect, GriefLogger, Vivecraft NeoForge, KubeJS and FTB XMod Compat** for adaptation. These are now the chosen integration targets, superseding the optional-candidate wording in the [October 12 review](citizens-next-work-2026-10-12.md) and [September ecosystem report](neoforge-ecosystem-replacements-2026-09-22.md).

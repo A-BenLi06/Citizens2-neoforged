@@ -1,4 +1,14 @@
 # GriefLogger SQLite packaging compatibility
+
+Follow-up 2026-10-23, UTC+08:00: [entity registry references](../../docs/logging-entity-registry-2026-10-23.md)
+repairs silently discarded MySQL entity deaths. Apply `entity-registry-references.patch`
+after `.9` to build `.10`. Generated material/entity references preserve the
+original history fields and known-schema migrations preserve original data.
+Unsupported schemas fence later startup DDL as well as logging admission.
+The manifest records 248 standalone and 336 native/restart assertions on the
+final completed artifact. Prototype/intermediate fixtures are excluded. SQLite
+native foreign-key configuration is unchanged. No production activation or
+deferred client acceptance is included.
 Follow-up 2026-10-23, UTC+08:00: [complete MySQL command storage](../../docs/logging-mysql-command-storage-2026-10-23.md)
 repairs native command truncation by widening known legacy MySQL columns to
 MEDIUMTEXT and removing command INSERT IGNORE. Apply `mysql-command-capacity.patch`

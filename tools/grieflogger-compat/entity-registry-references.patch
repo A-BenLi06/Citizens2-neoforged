@@ -1,0 +1,280 @@
+diff --git a/common/src/main/java/com/daqem/grieflogger/database/Database.java b/common/src/main/java/com/daqem/grieflogger/database/Database.java
+index ed617c9..6299d75 100644
+--- a/common/src/main/java/com/daqem/grieflogger/database/Database.java
++++ b/common/src/main/java/com/daqem/grieflogger/database/Database.java
+@@ -129,7 +129,8 @@ public class Database {
+         });
+     }
+ 
+-    public void execute(String sql, boolean logError) {
++    public synchronized void execute(String sql, boolean logError) {
++        if (writeOutcomeUncertain) return;
+         try {
+             if (statement != null) {
+                 statement.execute(sql);
+diff --git a/common/src/main/java/com/daqem/grieflogger/database/repository/BlockRepository.java b/common/src/main/java/com/daqem/grieflogger/database/repository/BlockRepository.java
+index 4ffccfc..029a0be 100644
+--- a/common/src/main/java/com/daqem/grieflogger/database/repository/BlockRepository.java
++++ b/common/src/main/java/com/daqem/grieflogger/database/repository/BlockRepository.java
+@@ -22,40 +22,7 @@ public class BlockRepository extends Repository {
+     }
+ 
+     public void createTable() {
+-        String sql = """
+-                CREATE TABLE IF NOT EXISTS blocks (
+-                	time integer NOT NULL,
+-                	user integer NOT NULL,
+-                	level integer NOT NULL,
+-                	x integer NOT NULL,
+-                	y integer NOT NULL,
+-                	z integer NOT NULL,
+-                	type integer NOT NULL,
+-                	action integer NOT NULL,
+-                	FOREIGN KEY(user) REFERENCES users(id),
+-                	FOREIGN KEY(level) REFERENCES levels(id),
+-                	FOREIGN KEY(type) REFERENCES materials(id)
+-                );
+-                """;
+-        if (isMysql()) {
+-            sql = """
+-                    CREATE TABLE IF NOT EXISTS blocks (
+-                    	time bigint NOT NULL,
+-                    	user int NOT NULL,
+-                    	level int NOT NULL,
+-                    	x int NOT NULL,
+-                    	y int NOT NULL,
+-                    	z int NOT NULL,
+-                    	type int NOT NULL,
+-                    	action int NOT NULL,
+-                    	FOREIGN KEY(user) REFERENCES users(id),
+-                    	FOREIGN KEY(level) REFERENCES levels(id),
+-                    	FOREIGN KEY(type) REFERENCES materials(id)
+-                    )
+-                    ENGINE=InnoDB DEFAULT CHARACTER SET utf8mb4;
+-                    """;
+-        }
+-        database.createTable(sql);
++        com.daqem.grieflogger.database.schema.BlockSchema.initialize(database, isMysql());
+     }
+ 
+     public void createIndexes() {
+@@ -96,7 +63,7 @@ public class BlockRepository extends Repository {
+ 
+         if (isMysql()) {
+             blockQuery = """
+-                    INSERT IGNORE INTO blocks(time, user, level, x, y, z, type, action)
++                    INSERT INTO blocks(time, user, level, x, y, z, type, action)
+                     VALUES(?, (
+                         SELECT id FROM users WHERE uuid = ?
+                     ), (
+@@ -153,7 +120,7 @@ public class BlockRepository extends Repository {
+ 
+         if (isMysql()) {
+             blockQuery = """
+-                    INSERT IGNORE INTO blocks(time, user, level, x, y, z, type, action)
++                    INSERT INTO blocks(time, user, level, x, y, z, type, action)
+                     VALUES(?, (
+                         SELECT id FROM users WHERE uuid = ?
+                     ), (
+diff --git a/common/src/main/java/com/daqem/grieflogger/database/schema/BlockSchema.java b/common/src/main/java/com/daqem/grieflogger/database/schema/BlockSchema.java
+new file mode 100644
+index 0000000..1cbb92b
+--- /dev/null
++++ b/common/src/main/java/com/daqem/grieflogger/database/schema/BlockSchema.java
+@@ -0,0 +1,166 @@
++package com.daqem.grieflogger.database.schema;
++
++import com.daqem.grieflogger.database.Database;
++import java.sql.*;
++import java.util.*;
++
++/** The historical type ID belongs to the registry selected by the action. */
++public final class BlockSchema {
++    private static final List<String> BASE = List.of("time", "user", "level", "x", "y", "z", "type", "action");
++    private static final String MATERIAL = "CASE WHEN action = 3 THEN NULL ELSE type END";
++    private static final String ENTITY = "CASE WHEN action = 3 THEN type ELSE NULL END";
++    private static final String LEGACY_SQLITE = """
++            CREATE TABLE IF NOT EXISTS blocks (
++                time integer NOT NULL, user integer NOT NULL, level integer NOT NULL,
++                x integer NOT NULL, y integer NOT NULL, z integer NOT NULL,
++                type integer NOT NULL, action integer NOT NULL,
++                FOREIGN KEY(user) REFERENCES users(id),
++                FOREIGN KEY(level) REFERENCES levels(id),
++                FOREIGN KEY(type) REFERENCES materials(id)
++            );
++            """;
++    private static final String SQLITE = """
++            CREATE TABLE IF NOT EXISTS blocks (
++                time integer NOT NULL, user integer NOT NULL, level integer NOT NULL,
++                x integer NOT NULL, y integer NOT NULL, z integer NOT NULL,
++                type integer NOT NULL, action integer NOT NULL,
++                material_type integer GENERATED ALWAYS AS (%s) VIRTUAL,
++                entity_type integer GENERATED ALWAYS AS (%s) VIRTUAL,
++                FOREIGN KEY(user) REFERENCES users(id),
++                FOREIGN KEY(level) REFERENCES levels(id),
++                FOREIGN KEY(material_type) REFERENCES materials(id),
++                FOREIGN KEY(entity_type) REFERENCES entities(id)
++            );
++            """.formatted(MATERIAL, ENTITY);
++    private static final String MYSQL = """
++            CREATE TABLE IF NOT EXISTS blocks (
++                time bigint NOT NULL, user int NOT NULL, level int NOT NULL,
++                x int NOT NULL, y int NOT NULL, z int NOT NULL,
++                type int NOT NULL, action int NOT NULL,
++                material_type int GENERATED ALWAYS AS (%s) STORED,
++                entity_type int GENERATED ALWAYS AS (%s) STORED,
++                FOREIGN KEY(user) REFERENCES users(id),
++                FOREIGN KEY(level) REFERENCES levels(id),
++                CONSTRAINT blocks_material_type_fk FOREIGN KEY(material_type) REFERENCES materials(id),
++                CONSTRAINT blocks_entity_type_fk FOREIGN KEY(entity_type) REFERENCES entities(id)
++            ) ENGINE=InnoDB DEFAULT CHARACTER SET utf8mb4;
++            """.formatted(MATERIAL, ENTITY);
++
++    private BlockSchema() { }
++
++    public static void initialize(Database database, boolean mysql) {
++        database.initializeSchema(connection -> {
++            execute(connection, mysql ? MYSQL : SQLITE);
++            if (mysql) migrateMysql(connection); else migrateSqlite(connection);
++        });
++    }
++
++    private static void execute(Connection connection, String sql) throws SQLException {
++        try (var statement = connection.createStatement()) { statement.execute(sql); }
++    }
++
++    private static String normalize(String sql) {
++        return sql.toLowerCase(Locale.ROOT).replaceAll("[\\s;`\"()]", "").replace("ifnotexists", "");
++    }
++
++    private static void migrateSqlite(Connection connection) throws SQLException {
++        String sql;
++        try (var statement = connection.createStatement(); var rows = statement.executeQuery("SELECT sql FROM sqlite_master WHERE type='table' AND name='blocks'")) {
++            if (!rows.next()) throw new SQLException("Missing blocks schema");
++            sql = rows.getString(1);
++        }
++        if (!normalize(sql).equals(normalize(SQLITE))) {
++            if (!normalize(sql).equals(normalize(LEGACY_SQLITE))) throw new SQLException("Unsupported blocks schema; review registry references before logging");
++            // Keep rowids and all original index/trigger definitions in the same transaction.
++            List<String> dependents = new ArrayList<>();
++            try (var statement = connection.createStatement(); var rows = statement.executeQuery("SELECT sql FROM sqlite_master WHERE tbl_name='blocks' AND type IN ('index','trigger') AND sql IS NOT NULL ORDER BY type,name")) {
++                while (rows.next()) dependents.add(rows.getString(1));
++            }
++            try (var statement = connection.createStatement(); var rows = statement.executeQuery("SELECT name FROM sqlite_master WHERE name='blocks_grieflogger_migration'")) {
++                if (rows.next()) throw new SQLException("Block schema migration table already exists; review unfinished schema work");
++            }
++            List<String> tables = new ArrayList<>();
++            try (var statement = connection.createStatement(); var rows = statement.executeQuery("SELECT name FROM sqlite_master WHERE type='table' AND name<>'blocks'")) {
++                while (rows.next()) tables.add(rows.getString(1));
++            }
++            for (String table : tables) {
++                try (var statement = connection.createStatement(); var rows = statement.executeQuery("PRAGMA foreign_key_list(\"" + table.replace("\"", "\"\"") + "\")")) {
++                    while (rows.next()) if ("blocks".equals(rows.getString("table"))) throw new SQLException("External foreign key references blocks; review migration before logging");
++                }
++            }
++            execute(connection, SQLITE.replace("IF NOT EXISTS blocks", "blocks_grieflogger_migration"));
++            execute(connection, "INSERT INTO blocks_grieflogger_migration(rowid,time,user,level,x,y,z,type,action) SELECT rowid,time,user,level,x,y,z,type,action FROM blocks");
++            execute(connection, "DROP TABLE blocks");
++            execute(connection, "ALTER TABLE blocks_grieflogger_migration RENAME TO blocks");
++            for (String dependent : dependents) execute(connection, dependent);
++        }
++        try (var statement = connection.createStatement(); var rows = statement.executeQuery("PRAGMA foreign_key_check(blocks)")) {
++            if (rows.next()) throw new SQLException("Block history contains unresolved registry/actor/level references; logging admission disabled");
++        }
++    }
++
++    private record Column(String type, String nullable, String extra, String expression, String defaultValue) { }
++    private record Reference(String name, String target, String column) { }
++
++    private static void migrateMysql(Connection connection) throws SQLException {
++        try (var statement = connection.createStatement(); var rows = statement.executeQuery("SELECT @@foreign_key_checks")) {
++            if (!rows.next() || rows.getInt(1) != 1) throw new SQLException("MySQL foreign key checks must be enabled for block schema initialization");
++        }
++        Map<String, Column> columns = new LinkedHashMap<>();
++        try (var statement = connection.createStatement(); var rows = statement.executeQuery("""
++                SELECT COLUMN_NAME,DATA_TYPE,IS_NULLABLE,EXTRA,GENERATION_EXPRESSION,COLUMN_DEFAULT
++                FROM information_schema.columns WHERE table_schema=DATABASE() AND table_name='blocks' ORDER BY ORDINAL_POSITION
++                """)) {
++            while (rows.next()) columns.put(rows.getString(1), new Column(rows.getString(2), rows.getString(3), rows.getString(4), rows.getString(5), rows.getString(6)));
++        }
++        List<String> names = new ArrayList<>(columns.keySet());
++        boolean legacy = names.equals(BASE);
++        List<String> expected = new ArrayList<>(BASE); expected.addAll(List.of("material_type", "entity_type"));
++        if (!legacy && !names.equals(expected)) throw new SQLException("Unsupported blocks columns; review registry references before logging");
++        for (String name : BASE) {
++            Column column = columns.get(name);
++            if (!column.type.equals(name.equals("time") ? "bigint" : "int") || !"NO".equals(column.nullable)
++                    || !"".equals(column.extra) || !"".equals(column.expression) || column.defaultValue != null)
++                throw new SQLException("Unsupported blocks column semantics: " + name);
++        }
++        Map<String, Reference> references = new HashMap<>();
++        try (var statement = connection.createStatement(); var rows = statement.executeQuery("""
++                SELECT k.COLUMN_NAME,k.CONSTRAINT_NAME,k.REFERENCED_TABLE_NAME,k.REFERENCED_COLUMN_NAME,
++                       k.REFERENCED_TABLE_SCHEMA,r.UPDATE_RULE,r.DELETE_RULE
++                FROM information_schema.key_column_usage k
++                JOIN information_schema.referential_constraints r ON r.CONSTRAINT_SCHEMA=k.CONSTRAINT_SCHEMA AND r.CONSTRAINT_NAME=k.CONSTRAINT_NAME
++                WHERE k.TABLE_SCHEMA=DATABASE() AND k.TABLE_NAME='blocks' AND k.REFERENCED_TABLE_NAME IS NOT NULL
++                """)) {
++            while (rows.next()) {
++                String field = rows.getString(1);
++                if (!connection.getCatalog().equals(rows.getString(5)) || !Set.of("RESTRICT", "NO ACTION").contains(rows.getString(6))
++                        || !Set.of("RESTRICT", "NO ACTION").contains(rows.getString(7))
++                        || references.put(field, new Reference(rows.getString(2), rows.getString(3), rows.getString(4))) != null)
++                    throw new SQLException("Unsupported blocks foreign key semantics");
++            }
++        }
++        Map<String, String> targets = legacy ? Map.of("user", "users", "level", "levels", "type", "materials")
++                : Map.of("user", "users", "level", "levels", "material_type", "materials", "entity_type", "entities");
++        if (!references.keySet().equals(targets.keySet())) throw new SQLException("Unsupported blocks foreign key structure");
++        for (var target : targets.entrySet()) {
++            Reference reference = references.get(target.getKey());
++            if (!reference.target.equals(target.getValue()) || !reference.column.equals("id")) throw new SQLException("Unsupported blocks registry foreign key");
++        }
++        if (legacy) {
++            String foreignKey = references.get("type").name.replace("`", "``");
++            // One atomic ALTER validates every existing row against its actual registry.
++            execute(connection, "ALTER TABLE blocks DROP FOREIGN KEY `" + foreignKey + "`, "
++                    + "ADD COLUMN material_type int GENERATED ALWAYS AS (" + MATERIAL + ") STORED, "
++                    + "ADD COLUMN entity_type int GENERATED ALWAYS AS (" + ENTITY + ") STORED, "
++                    + "ADD CONSTRAINT blocks_material_type_fk FOREIGN KEY(material_type) REFERENCES materials(id), "
++                    + "ADD CONSTRAINT blocks_entity_type_fk FOREIGN KEY(entity_type) REFERENCES entities(id)");
++        } else {
++            for (var generated : Map.of("material_type", MATERIAL, "entity_type", ENTITY).entrySet()) {
++                Column column = columns.get(generated.getKey());
++                if (!"int".equals(column.type) || !"YES".equals(column.nullable) || !"STORED GENERATED".equals(column.extra)
++                        || column.defaultValue != null || !normalize(column.expression).equals(normalize(generated.getValue())))
++                    throw new SQLException("Unsupported generated block registry reference: " + generated.getKey());
++            }
++        }
++    }
++}
+diff --git a/gradle.properties b/gradle.properties
+index f9b8383..c5264eb 100644
+--- a/gradle.properties
++++ b/gradle.properties
+@@ -4,7 +4,7 @@ minecraft_version=1.21.1
+ enabled_platforms=fabric,neoforge
+ 
+ archives_base_name=grieflogger
+-mod_version=1.2.10-1.21.1-yuuniverse.9
++mod_version=1.2.10-1.21.1-yuuniverse.10
+ sqlite_version=3.47.2.0
+ maven_group=com.daqem.grieflogger
+ mod_name=GriefLogger
+diff --git a/walkthrough.md b/walkthrough.md
+index ccf6697..b4ecbbf 100644
+--- a/walkthrough.md
++++ b/walkthrough.md
+@@ -62,3 +62,12 @@ No production activation. Pending writes remain in memory; unflushed process ter
+ - Java 21 NeoForge build succeeds. Actual provider/SQLite storage suite passes 156 assertions across 32 databases. Actual provider/Connector-J 8.4.0/MySQL suite passes 38 lock, batch constraint, owned binary/UTF-8, actual-commit/injected-reply-loss and public read-isolation assertions. Only the standalone Minecraft bootstrap/logger owner is substituted.
+ - Fresh native MySQL command/schema/restart checks pass 76 assertions, and normal logging/rollback/commerce/restart adds 45. Four command cases cover new schema, legacy VARCHAR, legacy TEXT and preserved larger LONGTEXT/custom comment; narrow custom schema rejection preserves original input. Root project records independent SQL dumps, same-container restart and additional SQLite/native regressions separately.
+ - No production deployment, physical client acceptance, all-backend equivalence, sustained load/retention, forced database crash, real network loss or unavailable migration completion is claimed. Preserve the original failure and all fixture evidence. Author and committer: A-BenLi06 <ben_li06@outlook.com>.
++
++## 2026-10-23T21:13:58.3021026+08:00 (UTC+08:00) - Use the actual registry for entity histories
++
++- Reproduced version .9 reporting a successful native MySQL flush with zero pending writes while all three pig/cow/sheep deaths disappeared. The blocks.type foreign key always referenced materials although action 3 stores an entity ID. Preserve the failing fixture and observations in the root project; no missing history is invented.
++- Version .10 preserves the original eight history fields and adds computed material_type/entity_type references selected by the persisted action. MySQL uses one atomic ALTER with STORED columns and proper restrictive foreign keys. SQLite rebuilds only the known original table transactionally, retaining original rowids/indexes/triggers and VIRTUAL references. Unsupported semantics, unresolved references and unsafe SQLite rebuild conditions reject visibly. Native block and entity INSERTs now propagate SQL errors instead of INSERT IGNORE loss.
++- Optional startup execute calls now own the database monitor and stop after schema failure, preventing later index DDL from changing a rejected database. Public read/write readiness remains fenced.
++- Java 21 NeoForge build succeeds. Final actual-provider standalone acceptance passes 156 SQLite storage, 28 SQLite schema, 26 MySQL schema and 38 MySQL storage assertions. Schema tests cover independent empty-material entity IDs, restrictive references, original data/metadata, idempotence, failed-migration rollback and later index fencing. The only standalone replacement is the Minecraft bootstrap/logger owner.
++- Prototype native fresh histories and original-history migrations pass on both backends, with fresh-process recovery. Final native regression/guard evidence is recorded separately in the root repository after the last fence change; this source entry does not claim those pending runs completed.
++- SQLite native foreign-key configuration is unchanged; startup foreign_key_check validates retained references. No disabled integrity check, placeholder material, production activation, physical client acceptance, recovered lost events or full backend/load equivalence is claimed. Author and committer: A-BenLi06 <ben_li06@outlook.com>.

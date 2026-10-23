@@ -43,6 +43,18 @@ public final class LoggingRuntimeAudit {
     private static long burstNanos;
     @SubscribeEvent public static void tick(ServerTickEvent.Post event) {
         var phase = System.getenv("CITIZENS_LOGGING_AUDIT_PHASE");
+        if ("entities-reject".equals(phase)) {
+            LoggingEntityRejectionRuntimeAudit.tick(event);
+            return;
+        }
+        if ("entities-migrate".equals(phase) || "entities-migrate-recover".equals(phase)) {
+            LoggingEntityMigrationRuntimeAudit.tick(event);
+            return;
+        }
+        if ("entities".equals(phase) || "entities-recover".equals(phase)) {
+            LoggingEntityRuntimeAudit.tick(event);
+            return;
+        }
         if ("mysql-commands".equals(phase) || "mysql-commands-recover".equals(phase) || "mysql-schema-reject".equals(phase)) {
             LoggingMysqlCommandRuntimeAudit.tick(event);
             return;

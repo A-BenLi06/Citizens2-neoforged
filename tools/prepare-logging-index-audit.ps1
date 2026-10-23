@@ -46,7 +46,7 @@ with sqlite3.connect(path) as db:
         # Only the copied fixture: emulate data predating all optional indexes.
         assert db.execute("SELECT tbl_name,sql FROM sqlite_master WHERE name='coordinates'").fetchall()==[('blocks','CREATE INDEX coordinates ON blocks (x, y, z)')]
         db.execute('DROP INDEX coordinates');db.commit()
-    snapshot={table:[[{'blob':v.hex()} if isinstance(v,bytes) else v for v in row] for row in db.execute('SELECT rowid,* FROM '+table+' ORDER BY rowid')] for table in tables}
+    snapshot={table:[[{'blob':v.hex()} if isinstance(v,bytes) else v for v in row] for row in db.execute('SELECT '+('rowid,time,user,level,x,y,z,type,action' if table=='blocks' else 'rowid,*')+' FROM '+table+' ORDER BY rowid')] for table in tables}
 with (fixture/'logging-index-original.json').open('x',encoding='utf-8') as out:
     json.dump(snapshot,out,ensure_ascii=False,separators=(',',':'))
 '@ | python -B - $fixture $disabled

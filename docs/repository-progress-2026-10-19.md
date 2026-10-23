@@ -1,5 +1,15 @@
 # Repository progress review
 
+Update 2026-10-23, UTC+08:00: [entity history registry repair](logging-entity-registry-2026-10-23.md)
+fixes `.9` silently discarding native MySQL deaths when entity IDs have no
+material counterpart. Provider `.10` uses action-selected generated references,
+preserves known original histories/metadata and fences subsequent startup DDL
+after rejected schema. Final acceptance adds 248 standalone and 336 native/
+restart checks with exact SQL and financial evidence. Prototype/intermediate
+artifacts are excluded. The earlier MySQL raw-file retention boundary has a
+supplementary brief-restart correction; original SQL snapshots remain pinned.
+Physical clients, broader recovery/load and original migration gates remain open.
+
 Reviewed: 2026-10-19T14:08:19+08:00 (UTC+08:00).
 Gameplay baseline: `55396e644450a4f10ae2a3938c669c13fa25fbff` on `neoforge-port`.
 Target: Minecraft 1.21.1, Java 21; NeoForge 21.1.233 core baseline and 21.1.248 selected ecosystem.

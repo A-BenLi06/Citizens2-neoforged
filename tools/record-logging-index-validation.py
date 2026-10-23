@@ -30,7 +30,7 @@ read, raw, evidence, files, git = base.read, base.raw, base.evidence, base.files
 
 def rows(db, table):
     return [[{"blob": value.hex()} if isinstance(value, bytes) else value for value in row]
-            for row in db.execute("SELECT rowid,* FROM " + table + " ORDER BY rowid")]
+            for row in db.execute("SELECT " + ("rowid,time,user,level,x,y,z,type,action" if table == "blocks" else "rowid,*") + " FROM " + table + " ORDER BY rowid")]
 
 
 def snapshot(path):
@@ -75,7 +75,8 @@ def verify_queries(path, state, queries, enabled):
         for table in HISTORY:
             is_enabled = enabled[table] if isinstance(enabled, dict) else enabled
             query = queries[table]
-            assert query["sql"] == f"SELECT rowid,* FROM {table} WHERE user=? AND x=? AND y=? AND z=? ORDER BY time DESC"
+            projection = "rowid,time,user,level,x,y,z,type,action" if table == "blocks" else "rowid,*"
+            assert query["sql"] == f"SELECT {projection} FROM {table} WHERE user=? AND x=? AND y=? AND z=? ORDER BY time DESC"
             expected = sorted([row for row in state["tables"][table]
                                if row[2] == state["user"] and row[4:7] == [7, -60, 3]], key=lambda row: row[1], reverse=True)
             assert len(expected) == 2 and query["rows"] == expected
