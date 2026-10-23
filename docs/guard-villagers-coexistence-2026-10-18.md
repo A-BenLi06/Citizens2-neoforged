@@ -1,5 +1,13 @@
 # Guard Villagers ownership and native workflows
 
+Follow-up 2026-10-23, UTC+08:00: [native restart acceptance](guard-restart-2026-10-23.md)
+now verifies the saved world/player/Citizens-store boundary on both targets.
+Each passes 12 seed + 31 recovery checks; the original 41-check coexistence audit
+also passes again on each target. Original recruited guards, full component-bearing
+inventories, owner reconnect, follow/patrol movement and NPC AI/backends survive.
+The NBT-only limitation described in the original batch below is now supplemented
+by this actual restart evidence. Physical-client and integrated gates remain open.
+
 The optional adapter targets Guard Villagers 2.4.12 for Minecraft 1.21.1, pinned
 by `docs/ecosystem-mods-1.21.1.lock.json`. Citizens NPCs keep their identity when
 players sneak-click eligible villagers with a recruitment weapon. The adapter

@@ -8,6 +8,13 @@ Citizens retains NPC behavior and its existing native extension contracts. Yuuni
 
 ## Selected artifacts and sides
 
+Progress 2026-10-23, UTC+08:00: [Guard native restart acceptance](guard-restart-2026-10-23.md)
+adds actual world/player/Citizens-store restart for the two original recruited
+guards and five ordinary/native-AI/packet NPCs on both targets. Seed/recovery and
+fresh coexistence runs pass 168 checks; stopped native NBT and NPC YAML agree.
+Owner reconnect, complete equipment and actual native follow/patrol movement
+are verified. Combined pack, migration and deferred physical-client gates remain.
+
 Progress 2026-10-23, UTC+08:00: [reader-blocked COMMIT recovery](logging-reader-recovery-2026-10-23.md)
 repairs reproduced permanent queue suspension in GriefLogger `.2`. Provider `.3`
 adds a narrow typed DEFERRED SQLite BUSY/known-rollback retry; other uncertain

@@ -10,6 +10,13 @@ This review covers repository structure, native implementation boundaries, upstr
 
 ## Repository and implementation boundaries
 
+Update 2026-10-23, UTC+08:00: [Guard native restart acceptance](guard-restart-2026-10-23.md)
+passes 12 seed + 31 recovery checks on each target, plus fresh 41-check coexistence
+regressions on each: 168 assertions. Native guard identities/inventories/modes,
+owner reconnect, actual goal movement and five NPC identity/AI/backends survive.
+Stopped entity NBT/NPC YAML corroborate storage. Production code stays unchanged;
+combined pack, migration and deferred physical-client acceptance remain open.
+
 Update 2026-10-23, UTC+08:00: [reader-blocked COMMIT recovery](logging-reader-recovery-2026-10-23.md)
 repairs reproduced permanent GriefLogger queue suspension after reader unlock.
 Provider `.3` restricts recovery to typed DEFERRED SQLite BUSY plus known rollback,

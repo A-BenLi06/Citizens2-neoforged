@@ -1,0 +1,1688 @@
+{
+  "createdAt": "2026-10-23T13:07:57.522601+08:00",
+  "timezone": "UTC+08:00",
+  "baseRevision": "1add232",
+  "cases": [
+    {
+      "target": "21.1.248",
+      "seedChecks": 12,
+      "recoveryChecks": 31,
+      "state": {
+        "actor": "dd50eebb-7e62-4730-b7d3-515c77a6c2f0",
+        "profession": "minecraft:none",
+        "weapon": {
+          "id": "minecraft:wooden_sword",
+          "count": 1,
+          "components": {
+            "minecraft:custom_name": "\"Restart recruitment weapon\""
+          }
+        },
+        "npcs": [
+          {
+            "id": 0,
+            "uuid": "7350b4d4-4357-4e30-955e-080d1ac7f53e",
+            "entityUuid": "7350b4d4-4357-4e30-955e-080d1ac7f53e",
+            "type": "minecraft:villager",
+            "nativeAI": false,
+            "packet": false,
+            "profession": "minecraft:none"
+          },
+          {
+            "id": 1,
+            "uuid": "cc11fd20-dc10-4d7d-8ad5-c65b649e1dbe",
+            "entityUuid": "cc11fd20-dc10-4d7d-8ad5-c65b649e1dbe",
+            "type": "minecraft:villager",
+            "nativeAI": true,
+            "packet": false,
+            "profession": "minecraft:none"
+          },
+          {
+            "id": 2,
+            "uuid": "fd5adf6f-d56f-413e-837c-4c7e9c0456e6",
+            "entityUuid": "fd5adf6f-d56f-413e-837c-4c7e9c0456e6",
+            "type": "minecraft:villager",
+            "nativeAI": false,
+            "packet": true,
+            "profession": "minecraft:none"
+          },
+          {
+            "id": 3,
+            "uuid": "24823506-d78f-4c1a-b656-6c04c7be25d2",
+            "entityUuid": "24823506-d78f-4c1a-b656-6c04c7be25d2",
+            "type": "minecraft:iron_golem",
+            "nativeAI": false,
+            "packet": false
+          },
+          {
+            "id": 4,
+            "uuid": "f41ad0dc-208e-4dd6-ba28-938ba81a25b2",
+            "entityUuid": "f41ad0dc-208e-4dd6-ba28-938ba81a25b2",
+            "type": "minecraft:iron_golem",
+            "nativeAI": true,
+            "packet": false
+          }
+        ],
+        "follower": {
+          "uuid": "5699d6ed-8c24-4098-9793-7f719cbb875f",
+          "owner": "dd50eebb-7e62-4730-b7d3-515c77a6c2f0",
+          "name": "Restart follower",
+          "following": true,
+          "patrolling": false,
+          "anchor": null,
+          "inventory": [
+            {},
+            {
+              "id": "minecraft:iron_chestplate",
+              "count": 1,
+              "components": {
+                "minecraft:custom_name": "\"Restart guard armour\"",
+                "minecraft:damage": 9
+              }
+            },
+            {},
+            {},
+            {
+              "id": "minecraft:shield",
+              "count": 1,
+              "components": {
+                "minecraft:custom_name": "\"Restart guard shield\""
+              }
+            },
+            {
+              "id": "minecraft:wooden_sword",
+              "count": 1,
+              "components": {
+                "minecraft:custom_name": "\"Restart recruitment weapon\""
+              }
+            }
+          ]
+        },
+        "patroller": {
+          "uuid": "f7b27441-394c-4c9f-9b9d-cd818fd9829f",
+          "owner": "dd50eebb-7e62-4730-b7d3-515c77a6c2f0",
+          "name": "Restart patroller",
+          "following": false,
+          "patrolling": true,
+          "anchor": [
+            11,
+            -60,
+            8
+          ],
+          "inventory": [
+            {},
+            {
+              "id": "minecraft:iron_chestplate",
+              "count": 1,
+              "components": {
+                "minecraft:custom_name": "\"Restart guard armour\"",
+                "minecraft:damage": 9
+              }
+            },
+            {},
+            {},
+            {
+              "id": "minecraft:shield",
+              "count": 1,
+              "components": {
+                "minecraft:custom_name": "\"Restart guard shield\""
+              }
+            },
+            {
+              "id": "minecraft:wooden_sword",
+              "count": 1,
+              "components": {
+                "minecraft:custom_name": "\"Restart recruitment weapon\""
+              }
+            }
+          ]
+        },
+        "seedChecks": 12
+      },
+      "recovered": {
+        "actor": "dd50eebb-7e62-4730-b7d3-515c77a6c2f0",
+        "profession": "minecraft:none",
+        "weapon": {
+          "id": "minecraft:wooden_sword",
+          "count": 1,
+          "components": {
+            "minecraft:custom_name": "\"Restart recruitment weapon\""
+          }
+        },
+        "npcs": [
+          {
+            "id": 0,
+            "uuid": "7350b4d4-4357-4e30-955e-080d1ac7f53e",
+            "entityUuid": "7350b4d4-4357-4e30-955e-080d1ac7f53e",
+            "type": "minecraft:villager",
+            "nativeAI": false,
+            "packet": false,
+            "profession": "minecraft:none"
+          },
+          {
+            "id": 1,
+            "uuid": "cc11fd20-dc10-4d7d-8ad5-c65b649e1dbe",
+            "entityUuid": "cc11fd20-dc10-4d7d-8ad5-c65b649e1dbe",
+            "type": "minecraft:villager",
+            "nativeAI": true,
+            "packet": false,
+            "profession": "minecraft:none"
+          },
+          {
+            "id": 2,
+            "uuid": "fd5adf6f-d56f-413e-837c-4c7e9c0456e6",
+            "entityUuid": "fd5adf6f-d56f-413e-837c-4c7e9c0456e6",
+            "type": "minecraft:villager",
+            "nativeAI": false,
+            "packet": true,
+            "profession": "minecraft:none"
+          },
+          {
+            "id": 3,
+            "uuid": "24823506-d78f-4c1a-b656-6c04c7be25d2",
+            "entityUuid": "24823506-d78f-4c1a-b656-6c04c7be25d2",
+            "type": "minecraft:iron_golem",
+            "nativeAI": false,
+            "packet": false
+          },
+          {
+            "id": 4,
+            "uuid": "f41ad0dc-208e-4dd6-ba28-938ba81a25b2",
+            "entityUuid": "f41ad0dc-208e-4dd6-ba28-938ba81a25b2",
+            "type": "minecraft:iron_golem",
+            "nativeAI": true,
+            "packet": false
+          }
+        ],
+        "follower": {
+          "uuid": "5699d6ed-8c24-4098-9793-7f719cbb875f",
+          "owner": "dd50eebb-7e62-4730-b7d3-515c77a6c2f0",
+          "name": "Restart follower",
+          "following": true,
+          "patrolling": false,
+          "anchor": null,
+          "inventory": [
+            {},
+            {
+              "id": "minecraft:iron_chestplate",
+              "count": 1,
+              "components": {
+                "minecraft:custom_name": "\"Restart guard armour\"",
+                "minecraft:damage": 9
+              }
+            },
+            {},
+            {},
+            {
+              "id": "minecraft:shield",
+              "count": 1,
+              "components": {
+                "minecraft:custom_name": "\"Restart guard shield\""
+              }
+            },
+            {
+              "id": "minecraft:wooden_sword",
+              "count": 1,
+              "components": {
+                "minecraft:custom_name": "\"Restart recruitment weapon\""
+              }
+            }
+          ]
+        },
+        "patroller": {
+          "uuid": "f7b27441-394c-4c9f-9b9d-cd818fd9829f",
+          "owner": "dd50eebb-7e62-4730-b7d3-515c77a6c2f0",
+          "name": "Restart patroller",
+          "following": false,
+          "patrolling": true,
+          "anchor": [
+            11,
+            -60,
+            8
+          ],
+          "inventory": [
+            {},
+            {
+              "id": "minecraft:iron_chestplate",
+              "count": 1,
+              "components": {
+                "minecraft:custom_name": "\"Restart guard armour\"",
+                "minecraft:damage": 9
+              }
+            },
+            {},
+            {},
+            {
+              "id": "minecraft:shield",
+              "count": 1,
+              "components": {
+                "minecraft:custom_name": "\"Restart guard shield\""
+              }
+            },
+            {
+              "id": "minecraft:wooden_sword",
+              "count": 1,
+              "components": {
+                "minecraft:custom_name": "\"Restart recruitment weapon\""
+              }
+            }
+          ]
+        },
+        "seedChecks": 12,
+        "restoredFollower": {
+          "uuid": "5699d6ed-8c24-4098-9793-7f719cbb875f",
+          "owner": "dd50eebb-7e62-4730-b7d3-515c77a6c2f0",
+          "name": "Restart follower",
+          "following": true,
+          "patrolling": false,
+          "anchor": null,
+          "inventory": [
+            {},
+            {
+              "id": "minecraft:iron_chestplate",
+              "count": 1,
+              "components": {
+                "minecraft:damage": 9,
+                "minecraft:custom_name": "\"Restart guard armour\""
+              }
+            },
+            {},
+            {},
+            {
+              "id": "minecraft:shield",
+              "count": 1,
+              "components": {
+                "minecraft:custom_name": "\"Restart guard shield\""
+              }
+            },
+            {
+              "id": "minecraft:wooden_sword",
+              "count": 1,
+              "components": {
+                "minecraft:custom_name": "\"Restart recruitment weapon\""
+              }
+            }
+          ]
+        },
+        "restoredPatroller": {
+          "uuid": "f7b27441-394c-4c9f-9b9d-cd818fd9829f",
+          "owner": "dd50eebb-7e62-4730-b7d3-515c77a6c2f0",
+          "name": "Restart patroller",
+          "following": false,
+          "patrolling": true,
+          "anchor": [
+            11,
+            -60,
+            8
+          ],
+          "inventory": [
+            {},
+            {
+              "id": "minecraft:iron_chestplate",
+              "count": 1,
+              "components": {
+                "minecraft:damage": 9,
+                "minecraft:custom_name": "\"Restart guard armour\""
+              }
+            },
+            {},
+            {},
+            {
+              "id": "minecraft:shield",
+              "count": 1,
+              "components": {
+                "minecraft:custom_name": "\"Restart guard shield\""
+              }
+            },
+            {
+              "id": "minecraft:wooden_sword",
+              "count": 1,
+              "components": {
+                "minecraft:custom_name": "\"Restart recruitment weapon\""
+              }
+            }
+          ]
+        },
+        "finalFollower": {
+          "uuid": "5699d6ed-8c24-4098-9793-7f719cbb875f",
+          "owner": "dd50eebb-7e62-4730-b7d3-515c77a6c2f0",
+          "name": "Restart follower",
+          "following": false,
+          "patrolling": false,
+          "anchor": null,
+          "inventory": [
+            {},
+            {
+              "id": "minecraft:iron_chestplate",
+              "count": 1,
+              "components": {
+                "minecraft:damage": 9,
+                "minecraft:custom_name": "\"Restart guard armour\""
+              }
+            },
+            {},
+            {},
+            {
+              "id": "minecraft:shield",
+              "count": 1,
+              "components": {
+                "minecraft:custom_name": "\"Restart guard shield\""
+              }
+            },
+            {
+              "id": "minecraft:wooden_sword",
+              "count": 1,
+              "components": {
+                "minecraft:custom_name": "\"Restart recruitment weapon\""
+              }
+            }
+          ]
+        },
+        "finalPatroller": {
+          "uuid": "f7b27441-394c-4c9f-9b9d-cd818fd9829f",
+          "owner": "dd50eebb-7e62-4730-b7d3-515c77a6c2f0",
+          "name": "Restart patroller",
+          "following": false,
+          "patrolling": false,
+          "anchor": null,
+          "inventory": [
+            {},
+            {
+              "id": "minecraft:iron_chestplate",
+              "count": 1,
+              "components": {
+                "minecraft:damage": 9,
+                "minecraft:custom_name": "\"Restart guard armour\""
+              }
+            },
+            {},
+            {},
+            {
+              "id": "minecraft:shield",
+              "count": 1,
+              "components": {
+                "minecraft:custom_name": "\"Restart guard shield\""
+              }
+            },
+            {
+              "id": "minecraft:wooden_sword",
+              "count": 1,
+              "components": {
+                "minecraft:custom_name": "\"Restart recruitment weapon\""
+              }
+            }
+          ]
+        },
+        "recoveryChecks": 31
+      },
+      "stateEvidence": {
+        "path": "artifacts/guard-restart-248-server/guard-restart-state.json",
+        "bytes": 2266,
+        "sha256": "2e2dda08b9cab7ceda706c710889c23b908ec57848e80786648f08871ae657cc"
+      },
+      "recoveryEvidence": {
+        "path": "artifacts/guard-restart-248-server/guard-restart-recovery.json",
+        "bytes": 4536,
+        "sha256": "3d6f215322d11267b6c1f4d965868d1ccae73d3cd0ec066843aa82bc352f579d"
+      },
+      "logs": [
+        {
+          "path": "artifacts/guard-restart-248-seed.log",
+          "bytes": 18896,
+          "sha256": "e6b02d9850d658d29436b412b6e8b5fd97e8877599f9af8643ad11f751cf01e4"
+        },
+        {
+          "path": "artifacts/guard-restart-248-recover.log",
+          "bytes": 19440,
+          "sha256": "125fdb07466d36740e65e951632509d8f4b38aeca4589e8896f511bcf89f5a18"
+        }
+      ],
+      "provider": {
+        "path": "artifacts/guard-restart-248-server/mods/guardvillagers.jar",
+        "bytes": 283407,
+        "sha256": "aab03d59216bd931a05434b2527e0d5b7641793bd0178a9958100579c4f11407"
+      },
+      "nativeGuards": [
+        {
+          "uuid": "f7b27441-394c-4c9f-9b9d-cd818fd9829f",
+          "owner": "dd50eebb-7e62-4730-b7d3-515c77a6c2f0",
+          "name": "Restart patroller",
+          "following": false,
+          "patrolling": false,
+          "inventory": [
+            {},
+            {
+              "count": 1,
+              "components": {
+                "minecraft:damage": 9,
+                "minecraft:custom_name": "\"Restart guard armour\""
+              },
+              "id": "minecraft:iron_chestplate"
+            },
+            {},
+            {},
+            {
+              "count": 1,
+              "components": {
+                "minecraft:custom_name": "\"Restart guard shield\""
+              },
+              "id": "minecraft:shield"
+            },
+            {
+              "count": 1,
+              "components": {
+                "minecraft:custom_name": "\"Restart recruitment weapon\""
+              },
+              "id": "minecraft:wooden_sword"
+            }
+          ],
+          "anchor": null
+        },
+        {
+          "uuid": "5699d6ed-8c24-4098-9793-7f719cbb875f",
+          "owner": "dd50eebb-7e62-4730-b7d3-515c77a6c2f0",
+          "name": "Restart follower",
+          "following": false,
+          "patrolling": false,
+          "inventory": [
+            {},
+            {
+              "count": 1,
+              "components": {
+                "minecraft:damage": 9,
+                "minecraft:custom_name": "\"Restart guard armour\""
+              },
+              "id": "minecraft:iron_chestplate"
+            },
+            {},
+            {},
+            {
+              "count": 1,
+              "components": {
+                "minecraft:custom_name": "\"Restart guard shield\""
+              },
+              "id": "minecraft:shield"
+            },
+            {
+              "count": 1,
+              "components": {
+                "minecraft:custom_name": "\"Restart recruitment weapon\""
+              },
+              "id": "minecraft:wooden_sword"
+            }
+          ],
+          "anchor": null
+        }
+      ],
+      "nativeEntityRegions": [
+        {
+          "path": "artifacts/guard-restart-248-server/guard-world/entities/r.-1.-1.mca",
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "path": "artifacts/guard-restart-248-server/guard-world/entities/r.-1.0.mca",
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "path": "artifacts/guard-restart-248-server/guard-world/entities/r.0.-1.mca",
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "path": "artifacts/guard-restart-248-server/guard-world/entities/r.0.0.mca",
+          "bytes": 16384,
+          "sha256": "d99d1e1f8e5193a2b32dd75ce849d51c088de9e39646b722dd247d7bcbf7df6b"
+        }
+      ],
+      "nativePlayerFiles": [
+        {
+          "path": "artifacts/guard-restart-248-server/guard-world/playerdata/dd50eebb-7e62-4730-b7d3-515c77a6c2f0.dat",
+          "bytes": 961,
+          "sha256": "e11d9bf24087973c858307cbfd65eac7dc559963173ea63e0bddc6712134f6ee"
+        },
+        {
+          "path": "artifacts/guard-restart-248-server/guard-world/playerdata/dd50eebb-7e62-4730-b7d3-515c77a6c2f0.dat_old",
+          "bytes": 961,
+          "sha256": "e11d9bf24087973c858307cbfd65eac7dc559963173ea63e0bddc6712134f6ee"
+        }
+      ],
+      "npcFile": {
+        "path": "artifacts/guard-restart-248-server/config/citizens/saves.yml",
+        "bytes": 2312,
+        "sha256": "2dbae46f5340b077f5f4619e8071f4b9ac61a5e0307eebd8d9ea17ae8c1e100b"
+      }
+    },
+    {
+      "target": "21.1.233",
+      "seedChecks": 12,
+      "recoveryChecks": 31,
+      "state": {
+        "actor": "c3476cd2-175c-4f3b-9875-7a6c7623b2e7",
+        "profession": "minecraft:none",
+        "weapon": {
+          "id": "minecraft:wooden_sword",
+          "count": 1,
+          "components": {
+            "minecraft:custom_name": "\"Restart recruitment weapon\""
+          }
+        },
+        "npcs": [
+          {
+            "id": 0,
+            "uuid": "b39339f4-0e98-4698-9aa2-df13db065658",
+            "entityUuid": "b39339f4-0e98-4698-9aa2-df13db065658",
+            "type": "minecraft:villager",
+            "nativeAI": false,
+            "packet": false,
+            "profession": "minecraft:none"
+          },
+          {
+            "id": 1,
+            "uuid": "6f2ced0e-a6cf-43bf-9c81-27a6afd71421",
+            "entityUuid": "6f2ced0e-a6cf-43bf-9c81-27a6afd71421",
+            "type": "minecraft:villager",
+            "nativeAI": true,
+            "packet": false,
+            "profession": "minecraft:none"
+          },
+          {
+            "id": 2,
+            "uuid": "ca3eceae-3654-4e58-bc44-169aedf4d8f6",
+            "entityUuid": "ca3eceae-3654-4e58-bc44-169aedf4d8f6",
+            "type": "minecraft:villager",
+            "nativeAI": false,
+            "packet": true,
+            "profession": "minecraft:none"
+          },
+          {
+            "id": 3,
+            "uuid": "147d4d0b-2ecb-481a-b149-e794a7b2bb35",
+            "entityUuid": "147d4d0b-2ecb-481a-b149-e794a7b2bb35",
+            "type": "minecraft:iron_golem",
+            "nativeAI": false,
+            "packet": false
+          },
+          {
+            "id": 4,
+            "uuid": "269df8bc-b93c-48d0-975c-6fe988c7bfee",
+            "entityUuid": "269df8bc-b93c-48d0-975c-6fe988c7bfee",
+            "type": "minecraft:iron_golem",
+            "nativeAI": true,
+            "packet": false
+          }
+        ],
+        "follower": {
+          "uuid": "59da36a3-c3d0-4ace-80fc-8efa600edcc4",
+          "owner": "c3476cd2-175c-4f3b-9875-7a6c7623b2e7",
+          "name": "Restart follower",
+          "following": true,
+          "patrolling": false,
+          "anchor": null,
+          "inventory": [
+            {},
+            {
+              "id": "minecraft:iron_chestplate",
+              "count": 1,
+              "components": {
+                "minecraft:custom_name": "\"Restart guard armour\"",
+                "minecraft:damage": 9
+              }
+            },
+            {},
+            {},
+            {
+              "id": "minecraft:shield",
+              "count": 1,
+              "components": {
+                "minecraft:custom_name": "\"Restart guard shield\""
+              }
+            },
+            {
+              "id": "minecraft:wooden_sword",
+              "count": 1,
+              "components": {
+                "minecraft:custom_name": "\"Restart recruitment weapon\""
+              }
+            }
+          ]
+        },
+        "patroller": {
+          "uuid": "77033aed-65dc-4f5f-a6c3-dc1e39047489",
+          "owner": "c3476cd2-175c-4f3b-9875-7a6c7623b2e7",
+          "name": "Restart patroller",
+          "following": false,
+          "patrolling": true,
+          "anchor": [
+            11,
+            -60,
+            8
+          ],
+          "inventory": [
+            {},
+            {
+              "id": "minecraft:iron_chestplate",
+              "count": 1,
+              "components": {
+                "minecraft:custom_name": "\"Restart guard armour\"",
+                "minecraft:damage": 9
+              }
+            },
+            {},
+            {},
+            {
+              "id": "minecraft:shield",
+              "count": 1,
+              "components": {
+                "minecraft:custom_name": "\"Restart guard shield\""
+              }
+            },
+            {
+              "id": "minecraft:wooden_sword",
+              "count": 1,
+              "components": {
+                "minecraft:custom_name": "\"Restart recruitment weapon\""
+              }
+            }
+          ]
+        },
+        "seedChecks": 12
+      },
+      "recovered": {
+        "actor": "c3476cd2-175c-4f3b-9875-7a6c7623b2e7",
+        "profession": "minecraft:none",
+        "weapon": {
+          "id": "minecraft:wooden_sword",
+          "count": 1,
+          "components": {
+            "minecraft:custom_name": "\"Restart recruitment weapon\""
+          }
+        },
+        "npcs": [
+          {
+            "id": 0,
+            "uuid": "b39339f4-0e98-4698-9aa2-df13db065658",
+            "entityUuid": "b39339f4-0e98-4698-9aa2-df13db065658",
+            "type": "minecraft:villager",
+            "nativeAI": false,
+            "packet": false,
+            "profession": "minecraft:none"
+          },
+          {
+            "id": 1,
+            "uuid": "6f2ced0e-a6cf-43bf-9c81-27a6afd71421",
+            "entityUuid": "6f2ced0e-a6cf-43bf-9c81-27a6afd71421",
+            "type": "minecraft:villager",
+            "nativeAI": true,
+            "packet": false,
+            "profession": "minecraft:none"
+          },
+          {
+            "id": 2,
+            "uuid": "ca3eceae-3654-4e58-bc44-169aedf4d8f6",
+            "entityUuid": "ca3eceae-3654-4e58-bc44-169aedf4d8f6",
+            "type": "minecraft:villager",
+            "nativeAI": false,
+            "packet": true,
+            "profession": "minecraft:none"
+          },
+          {
+            "id": 3,
+            "uuid": "147d4d0b-2ecb-481a-b149-e794a7b2bb35",
+            "entityUuid": "147d4d0b-2ecb-481a-b149-e794a7b2bb35",
+            "type": "minecraft:iron_golem",
+            "nativeAI": false,
+            "packet": false
+          },
+          {
+            "id": 4,
+            "uuid": "269df8bc-b93c-48d0-975c-6fe988c7bfee",
+            "entityUuid": "269df8bc-b93c-48d0-975c-6fe988c7bfee",
+            "type": "minecraft:iron_golem",
+            "nativeAI": true,
+            "packet": false
+          }
+        ],
+        "follower": {
+          "uuid": "59da36a3-c3d0-4ace-80fc-8efa600edcc4",
+          "owner": "c3476cd2-175c-4f3b-9875-7a6c7623b2e7",
+          "name": "Restart follower",
+          "following": true,
+          "patrolling": false,
+          "anchor": null,
+          "inventory": [
+            {},
+            {
+              "id": "minecraft:iron_chestplate",
+              "count": 1,
+              "components": {
+                "minecraft:custom_name": "\"Restart guard armour\"",
+                "minecraft:damage": 9
+              }
+            },
+            {},
+            {},
+            {
+              "id": "minecraft:shield",
+              "count": 1,
+              "components": {
+                "minecraft:custom_name": "\"Restart guard shield\""
+              }
+            },
+            {
+              "id": "minecraft:wooden_sword",
+              "count": 1,
+              "components": {
+                "minecraft:custom_name": "\"Restart recruitment weapon\""
+              }
+            }
+          ]
+        },
+        "patroller": {
+          "uuid": "77033aed-65dc-4f5f-a6c3-dc1e39047489",
+          "owner": "c3476cd2-175c-4f3b-9875-7a6c7623b2e7",
+          "name": "Restart patroller",
+          "following": false,
+          "patrolling": true,
+          "anchor": [
+            11,
+            -60,
+            8
+          ],
+          "inventory": [
+            {},
+            {
+              "id": "minecraft:iron_chestplate",
+              "count": 1,
+              "components": {
+                "minecraft:custom_name": "\"Restart guard armour\"",
+                "minecraft:damage": 9
+              }
+            },
+            {},
+            {},
+            {
+              "id": "minecraft:shield",
+              "count": 1,
+              "components": {
+                "minecraft:custom_name": "\"Restart guard shield\""
+              }
+            },
+            {
+              "id": "minecraft:wooden_sword",
+              "count": 1,
+              "components": {
+                "minecraft:custom_name": "\"Restart recruitment weapon\""
+              }
+            }
+          ]
+        },
+        "seedChecks": 12,
+        "restoredFollower": {
+          "uuid": "59da36a3-c3d0-4ace-80fc-8efa600edcc4",
+          "owner": "c3476cd2-175c-4f3b-9875-7a6c7623b2e7",
+          "name": "Restart follower",
+          "following": true,
+          "patrolling": false,
+          "anchor": null,
+          "inventory": [
+            {},
+            {
+              "id": "minecraft:iron_chestplate",
+              "count": 1,
+              "components": {
+                "minecraft:damage": 9,
+                "minecraft:custom_name": "\"Restart guard armour\""
+              }
+            },
+            {},
+            {},
+            {
+              "id": "minecraft:shield",
+              "count": 1,
+              "components": {
+                "minecraft:custom_name": "\"Restart guard shield\""
+              }
+            },
+            {
+              "id": "minecraft:wooden_sword",
+              "count": 1,
+              "components": {
+                "minecraft:custom_name": "\"Restart recruitment weapon\""
+              }
+            }
+          ]
+        },
+        "restoredPatroller": {
+          "uuid": "77033aed-65dc-4f5f-a6c3-dc1e39047489",
+          "owner": "c3476cd2-175c-4f3b-9875-7a6c7623b2e7",
+          "name": "Restart patroller",
+          "following": false,
+          "patrolling": true,
+          "anchor": [
+            11,
+            -60,
+            8
+          ],
+          "inventory": [
+            {},
+            {
+              "id": "minecraft:iron_chestplate",
+              "count": 1,
+              "components": {
+                "minecraft:damage": 9,
+                "minecraft:custom_name": "\"Restart guard armour\""
+              }
+            },
+            {},
+            {},
+            {
+              "id": "minecraft:shield",
+              "count": 1,
+              "components": {
+                "minecraft:custom_name": "\"Restart guard shield\""
+              }
+            },
+            {
+              "id": "minecraft:wooden_sword",
+              "count": 1,
+              "components": {
+                "minecraft:custom_name": "\"Restart recruitment weapon\""
+              }
+            }
+          ]
+        },
+        "finalFollower": {
+          "uuid": "59da36a3-c3d0-4ace-80fc-8efa600edcc4",
+          "owner": "c3476cd2-175c-4f3b-9875-7a6c7623b2e7",
+          "name": "Restart follower",
+          "following": false,
+          "patrolling": false,
+          "anchor": null,
+          "inventory": [
+            {},
+            {
+              "id": "minecraft:iron_chestplate",
+              "count": 1,
+              "components": {
+                "minecraft:damage": 9,
+                "minecraft:custom_name": "\"Restart guard armour\""
+              }
+            },
+            {},
+            {},
+            {
+              "id": "minecraft:shield",
+              "count": 1,
+              "components": {
+                "minecraft:custom_name": "\"Restart guard shield\""
+              }
+            },
+            {
+              "id": "minecraft:wooden_sword",
+              "count": 1,
+              "components": {
+                "minecraft:custom_name": "\"Restart recruitment weapon\""
+              }
+            }
+          ]
+        },
+        "finalPatroller": {
+          "uuid": "77033aed-65dc-4f5f-a6c3-dc1e39047489",
+          "owner": "c3476cd2-175c-4f3b-9875-7a6c7623b2e7",
+          "name": "Restart patroller",
+          "following": false,
+          "patrolling": false,
+          "anchor": null,
+          "inventory": [
+            {},
+            {
+              "id": "minecraft:iron_chestplate",
+              "count": 1,
+              "components": {
+                "minecraft:damage": 9,
+                "minecraft:custom_name": "\"Restart guard armour\""
+              }
+            },
+            {},
+            {},
+            {
+              "id": "minecraft:shield",
+              "count": 1,
+              "components": {
+                "minecraft:custom_name": "\"Restart guard shield\""
+              }
+            },
+            {
+              "id": "minecraft:wooden_sword",
+              "count": 1,
+              "components": {
+                "minecraft:custom_name": "\"Restart recruitment weapon\""
+              }
+            }
+          ]
+        },
+        "recoveryChecks": 31
+      },
+      "stateEvidence": {
+        "path": "artifacts/guard-restart-233-server/guard-restart-state.json",
+        "bytes": 2266,
+        "sha256": "4974093c671120e0b0b8198004a8501baee036ce0d74770ae8e3ced7f09b3e4d"
+      },
+      "recoveryEvidence": {
+        "path": "artifacts/guard-restart-233-server/guard-restart-recovery.json",
+        "bytes": 4536,
+        "sha256": "551a48aadd69ddd48a700ffbf066dd17ba6eaa1ddd7a60386478f65b2343c3eb"
+      },
+      "logs": [
+        {
+          "path": "artifacts/guard-restart-233-restart-seed.log",
+          "bytes": 20745,
+          "sha256": "0b9de2dfb99e7103c8fc210933ac9d84d978dbd146c5b90b14c04a3105287889"
+        },
+        {
+          "path": "artifacts/guard-restart-233-restart-recover.log",
+          "bytes": 19442,
+          "sha256": "9d1e70f17b9009242b83a36f2f765359a77a2b503478c6d66310373dd95a3d18"
+        }
+      ],
+      "provider": {
+        "path": "artifacts/guard-restart-233-server/mods/guardvillagers.jar",
+        "bytes": 283407,
+        "sha256": "aab03d59216bd931a05434b2527e0d5b7641793bd0178a9958100579c4f11407"
+      },
+      "nativeGuards": [
+        {
+          "uuid": "77033aed-65dc-4f5f-a6c3-dc1e39047489",
+          "owner": "c3476cd2-175c-4f3b-9875-7a6c7623b2e7",
+          "name": "Restart patroller",
+          "following": false,
+          "patrolling": false,
+          "inventory": [
+            {},
+            {
+              "count": 1,
+              "components": {
+                "minecraft:damage": 9,
+                "minecraft:custom_name": "\"Restart guard armour\""
+              },
+              "id": "minecraft:iron_chestplate"
+            },
+            {},
+            {},
+            {
+              "count": 1,
+              "components": {
+                "minecraft:custom_name": "\"Restart guard shield\""
+              },
+              "id": "minecraft:shield"
+            },
+            {
+              "count": 1,
+              "components": {
+                "minecraft:custom_name": "\"Restart recruitment weapon\""
+              },
+              "id": "minecraft:wooden_sword"
+            }
+          ],
+          "anchor": null
+        },
+        {
+          "uuid": "59da36a3-c3d0-4ace-80fc-8efa600edcc4",
+          "owner": "c3476cd2-175c-4f3b-9875-7a6c7623b2e7",
+          "name": "Restart follower",
+          "following": false,
+          "patrolling": false,
+          "inventory": [
+            {},
+            {
+              "count": 1,
+              "components": {
+                "minecraft:damage": 9,
+                "minecraft:custom_name": "\"Restart guard armour\""
+              },
+              "id": "minecraft:iron_chestplate"
+            },
+            {},
+            {},
+            {
+              "count": 1,
+              "components": {
+                "minecraft:custom_name": "\"Restart guard shield\""
+              },
+              "id": "minecraft:shield"
+            },
+            {
+              "count": 1,
+              "components": {
+                "minecraft:custom_name": "\"Restart recruitment weapon\""
+              },
+              "id": "minecraft:wooden_sword"
+            }
+          ],
+          "anchor": null
+        }
+      ],
+      "nativeEntityRegions": [
+        {
+          "path": "artifacts/guard-restart-233-server/guard-world/entities/r.-1.-1.mca",
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "path": "artifacts/guard-restart-233-server/guard-world/entities/r.-1.0.mca",
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "path": "artifacts/guard-restart-233-server/guard-world/entities/r.0.-1.mca",
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "path": "artifacts/guard-restart-233-server/guard-world/entities/r.0.0.mca",
+          "bytes": 20480,
+          "sha256": "a26c28f03069275ff03e9e915a65c9890a1b6f0f496cbfb6da61f88eab78e658"
+        }
+      ],
+      "nativePlayerFiles": [
+        {
+          "path": "artifacts/guard-restart-233-server/guard-world/playerdata/c3476cd2-175c-4f3b-9875-7a6c7623b2e7.dat",
+          "bytes": 935,
+          "sha256": "6aaa13d0dfcc1b697d5bd532997e4c40c8ac83047eb0399df19b4e22175ce72c"
+        },
+        {
+          "path": "artifacts/guard-restart-233-server/guard-world/playerdata/c3476cd2-175c-4f3b-9875-7a6c7623b2e7.dat_old",
+          "bytes": 935,
+          "sha256": "6aaa13d0dfcc1b697d5bd532997e4c40c8ac83047eb0399df19b4e22175ce72c"
+        }
+      ],
+      "npcFile": {
+        "path": "artifacts/guard-restart-233-server/config/citizens/saves.yml",
+        "bytes": 2310,
+        "sha256": "c38650757cde8c16d8659aa9e156024e31a027bda31e1c255ff4f94e5b0c3386"
+      },
+      "stoppedSeed": {
+        "guards": [
+          {
+            "uuid": "59da36a3-c3d0-4ace-80fc-8efa600edcc4",
+            "owner": "c3476cd2-175c-4f3b-9875-7a6c7623b2e7",
+            "name": "Restart follower",
+            "following": true,
+            "patrolling": false,
+            "inventory": [
+              {},
+              {
+                "count": 1,
+                "components": {
+                  "minecraft:damage": 9,
+                  "minecraft:custom_name": "\"Restart guard armour\""
+                },
+                "id": "minecraft:iron_chestplate"
+              },
+              {},
+              {},
+              {
+                "count": 1,
+                "components": {
+                  "minecraft:custom_name": "\"Restart guard shield\""
+                },
+                "id": "minecraft:shield"
+              },
+              {
+                "count": 1,
+                "components": {
+                  "minecraft:custom_name": "\"Restart recruitment weapon\""
+                },
+                "id": "minecraft:wooden_sword"
+              }
+            ],
+            "anchor": null
+          },
+          {
+            "uuid": "77033aed-65dc-4f5f-a6c3-dc1e39047489",
+            "owner": "c3476cd2-175c-4f3b-9875-7a6c7623b2e7",
+            "name": "Restart patroller",
+            "following": false,
+            "patrolling": true,
+            "inventory": [
+              {},
+              {
+                "count": 1,
+                "components": {
+                  "minecraft:damage": 9,
+                  "minecraft:custom_name": "\"Restart guard armour\""
+                },
+                "id": "minecraft:iron_chestplate"
+              },
+              {},
+              {},
+              {
+                "count": 1,
+                "components": {
+                  "minecraft:custom_name": "\"Restart guard shield\""
+                },
+                "id": "minecraft:shield"
+              },
+              {
+                "count": 1,
+                "components": {
+                  "minecraft:custom_name": "\"Restart recruitment weapon\""
+                },
+                "id": "minecraft:wooden_sword"
+              }
+            ],
+            "anchor": [
+              11,
+              -60,
+              8
+            ]
+          }
+        ],
+        "files": [
+          {
+            "path": "artifacts/guard-restart-233-stopped-seed-world/advancements/c3476cd2-175c-4f3b-9875-7a6c7623b2e7.json",
+            "bytes": 169,
+            "sha256": "010655ba77c3ef60a55b97900cb61f4e488aa8ef768d23c798ee65c2e1afc58a"
+          },
+          {
+            "path": "artifacts/guard-restart-233-stopped-seed-world/citizens/commerce-tasks/.journal.lock",
+            "bytes": 0,
+            "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          {
+            "path": "artifacts/guard-restart-233-stopped-seed-world/citizens/quest-deliveries/.journal.lock",
+            "bytes": 0,
+            "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          {
+            "path": "artifacts/guard-restart-233-stopped-seed-world/citizens/quest-evidence/journal/.journal.lock",
+            "bytes": 0,
+            "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          {
+            "path": "artifacts/guard-restart-233-stopped-seed-world/citizens/quest-rewards/.journal.lock",
+            "bytes": 0,
+            "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          {
+            "path": "artifacts/guard-restart-233-stopped-seed-world/data/neoforge_data_attachments.dat",
+            "bytes": 48,
+            "sha256": "95486bd4cbd73d4d98f343e42a5792ef5315214015acca508842844d73247562"
+          },
+          {
+            "path": "artifacts/guard-restart-233-stopped-seed-world/data/raids.dat",
+            "bytes": 89,
+            "sha256": "15243a3a21844a268ff29e499bccf11bb6ea796ddaa657add0f96e267df290f4"
+          },
+          {
+            "path": "artifacts/guard-restart-233-stopped-seed-world/DIM-1/data/neoforge_data_attachments.dat",
+            "bytes": 48,
+            "sha256": "95486bd4cbd73d4d98f343e42a5792ef5315214015acca508842844d73247562"
+          },
+          {
+            "path": "artifacts/guard-restart-233-stopped-seed-world/DIM-1/data/raids.dat",
+            "bytes": 89,
+            "sha256": "15243a3a21844a268ff29e499bccf11bb6ea796ddaa657add0f96e267df290f4"
+          },
+          {
+            "path": "artifacts/guard-restart-233-stopped-seed-world/DIM1/data/neoforge_data_attachments.dat",
+            "bytes": 48,
+            "sha256": "95486bd4cbd73d4d98f343e42a5792ef5315214015acca508842844d73247562"
+          },
+          {
+            "path": "artifacts/guard-restart-233-stopped-seed-world/DIM1/data/raids_end.dat",
+            "bytes": 89,
+            "sha256": "15243a3a21844a268ff29e499bccf11bb6ea796ddaa657add0f96e267df290f4"
+          },
+          {
+            "path": "artifacts/guard-restart-233-stopped-seed-world/entities/r.-1.-1.mca",
+            "bytes": 0,
+            "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          {
+            "path": "artifacts/guard-restart-233-stopped-seed-world/entities/r.-1.0.mca",
+            "bytes": 0,
+            "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          {
+            "path": "artifacts/guard-restart-233-stopped-seed-world/entities/r.0.-1.mca",
+            "bytes": 0,
+            "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          {
+            "path": "artifacts/guard-restart-233-stopped-seed-world/entities/r.0.0.mca",
+            "bytes": 16384,
+            "sha256": "d0a0de878c9266ea19f0167ed7b4880598b94f6383b46b70cb0ff95e6c475159"
+          },
+          {
+            "path": "artifacts/guard-restart-233-stopped-seed-world/level.dat",
+            "bytes": 1766,
+            "sha256": "cffac04782a16c836028c3d1b4dfcfbcc8def3ca89cb793535af7ba9d36c5136"
+          },
+          {
+            "path": "artifacts/guard-restart-233-stopped-seed-world/level.dat_old",
+            "bytes": 1765,
+            "sha256": "528069cae52830a854e3099480243d9e5ead552f2a8345be63bd8bfde6153e05"
+          },
+          {
+            "path": "artifacts/guard-restart-233-stopped-seed-world/playerdata/c3476cd2-175c-4f3b-9875-7a6c7623b2e7.dat",
+            "bytes": 835,
+            "sha256": "dbd6d9247c40f7f689193d0048b18d40dea4d05d0067dc264986767d092bcd10"
+          },
+          {
+            "path": "artifacts/guard-restart-233-stopped-seed-world/playerdata/c3476cd2-175c-4f3b-9875-7a6c7623b2e7.dat_old",
+            "bytes": 835,
+            "sha256": "dbd6d9247c40f7f689193d0048b18d40dea4d05d0067dc264986767d092bcd10"
+          },
+          {
+            "path": "artifacts/guard-restart-233-stopped-seed-world/region/r.-1.-1.mca",
+            "bytes": 811008,
+            "sha256": "76fa9bd006a9781eeb9196b95d29b4efb7a0e971c9c34e869f0199f43e3f31cb"
+          },
+          {
+            "path": "artifacts/guard-restart-233-stopped-seed-world/region/r.-1.0.mca",
+            "bytes": 868352,
+            "sha256": "bceb64fec09f640579813208b2d12cc9624547683dfc8618a6998d13d9edb2a1"
+          },
+          {
+            "path": "artifacts/guard-restart-233-stopped-seed-world/region/r.0.-1.mca",
+            "bytes": 868352,
+            "sha256": "e2c034f6e0bd26266e98df831506e0216f715df48fb15afe5af4f8bfd4eb026f"
+          },
+          {
+            "path": "artifacts/guard-restart-233-stopped-seed-world/region/r.0.0.mca",
+            "bytes": 929792,
+            "sha256": "8dd05618db5afab073b84aab95d1971ee7f16402df0a9cacad78954e2347a0f6"
+          },
+          {
+            "path": "artifacts/guard-restart-233-stopped-seed-world/serverconfig/readme.txt",
+            "bytes": 469,
+            "sha256": "b1022ab932f8f0ea0cf78d9f312e95b85a4f96f59ca430e63f9a435e512d1186"
+          },
+          {
+            "path": "artifacts/guard-restart-233-stopped-seed-world/session.lock",
+            "bytes": 3,
+            "sha256": "51643361c79ecaef25a8de802de24f570ba25d9c2df1d22d94fade11b4f466cc"
+          },
+          {
+            "path": "artifacts/guard-restart-233-stopped-seed-world/stats/c3476cd2-175c-4f3b-9875-7a6c7623b2e7.json",
+            "bytes": 107,
+            "sha256": "a4141351a3ddc46ac536d23dec90560ba36f8e30d8eb3a19c8facb7923a05136"
+          }
+        ],
+        "npcFile": {
+          "path": "artifacts/guard-restart-233-stopped-seed-npcs.yml",
+          "bytes": 2367,
+          "sha256": "b81451331a955a0e4ed25b0485c679a74d2677c02adace74d430813777b4ded2"
+        }
+      }
+    }
+  ],
+  "regression": [
+    {
+      "target": "21.1.248",
+      "checks": 41,
+      "log": {
+        "path": "artifacts/guard-restart-regression-248-coexist.log",
+        "bytes": 22285,
+        "sha256": "6030e773547fd642ddc63b210c7d5934ba30cb64ba30ffc51d35682513544c18"
+      }
+    },
+    {
+      "target": "21.1.233",
+      "checks": 41,
+      "log": {
+        "path": "artifacts/guard-restart-regression-233-coexist.log",
+        "bytes": 22377,
+        "sha256": "fa2219adfbe2902cd3423e723234a77ce9d7e2c3fe849e1f62c07cef2e492bbd"
+      }
+    }
+  ],
+  "nativeChecks": 168,
+  "guards": {
+    "capturedAt": "2026-10-23T13:04:12.0142532+08:00",
+    "protected": [
+      "C:\\Users\\ben_l\\Documents\\Coding\\citizens2-neoforged\\artifacts\\guard-restart-248-server\\guard-restart-state.json",
+      "C:\\Users\\ben_l\\Documents\\Coding\\citizens2-neoforged\\artifacts\\guard-restart-248-server\\guard-restart-recovery.json",
+      "C:\\Users\\ben_l\\Documents\\Coding\\citizens2-neoforged\\artifacts\\guard-restart-248-server\\config\\citizens\\saves.yml",
+      "C:\\Users\\ben_l\\Documents\\Coding\\citizens2-neoforged\\artifacts\\guard-restart-248-server\\guard-world\\level.dat",
+      "C:\\Users\\ben_l\\Documents\\Coding\\citizens2-neoforged\\artifacts\\guard-restart-248-server\\guard-world\\entities\\r.0.0.mca",
+      "C:\\Users\\ben_l\\Documents\\Coding\\citizens2-neoforged\\artifacts\\guard-restart-248-server\\logs\\latest.log",
+      "C:\\Users\\ben_l\\Documents\\Coding\\citizens2-neoforged\\artifacts\\guard-restart-248-server\\server.properties"
+    ],
+    "before": [
+      "2E2DDA08B9CAB7CEDA706C710889C23B908EC57848E80786648F08871AE657CC",
+      "3D6F215322D11267B6C1F4D965868D1CCAE73D3CD0EC066843AA82BC352F579D",
+      "2DBAE46F5340B077F5F4619E8071F4B9AC61A5E0307EEBD8D9EA17AE8C1E100B",
+      "CF7C1D6B44403B33F73F054165C876F9CFF7F999738DBA69708C133433DEA045",
+      "D99D1E1F8E5193A2B32DD75CE849D51C088DE9E39646B722DD247D7BCBF7DF6B",
+      "AC32FBC88AC6FB7FC2B50696915EDD52C900CF8CB7EAD964B173315FAD34B0D8",
+      "DBC22D8C3DB57E925BE4E7095000BB062A47E41CA5CBA57A028E4919A421AB05"
+    ],
+    "after": [
+      "2E2DDA08B9CAB7CEDA706C710889C23B908EC57848E80786648F08871AE657CC",
+      "3D6F215322D11267B6C1F4D965868D1CCAE73D3CD0EC066843AA82BC352F579D",
+      "2DBAE46F5340B077F5F4619E8071F4B9AC61A5E0307EEBD8D9EA17AE8C1E100B",
+      "CF7C1D6B44403B33F73F054165C876F9CFF7F999738DBA69708C133433DEA045",
+      "D99D1E1F8E5193A2B32DD75CE849D51C088DE9E39646B722DD247D7BCBF7DF6B",
+      "AC32FBC88AC6FB7FC2B50696915EDD52C900CF8CB7EAD964B173315FAD34B0D8",
+      "DBC22D8C3DB57E925BE4E7095000BB062A47E41CA5CBA57A028E4919A421AB05"
+    ],
+    "unchanged": true,
+    "checks": [
+      {
+        "phase": "restart-seed",
+        "log": "artifacts/guard-restart-launch-restart-seed-rejected.log",
+        "exitCode": 1,
+        "expected": "Guard restart seed requires a fresh fixture",
+        "preparationSkipped": false
+      },
+      {
+        "phase": "restart-recover",
+        "log": "artifacts/guard-restart-launch-restart-recover-rejected.log",
+        "exitCode": 1,
+        "expected": "Guard restart recovery has completed; preserve its fixture",
+        "preparationSkipped": true
+      },
+      {
+        "phase": "coexist",
+        "log": "artifacts/guard-restart-launch-coexist-rejected.log",
+        "exitCode": 1,
+        "expected": "Coexistence must not overwrite a Guard restart fixture",
+        "preparationSkipped": true
+      },
+      {
+        "phase": "invalid",
+        "log": "artifacts/guard-restart-launch-invalid-rejected.log",
+        "exitCode": 1,
+        "expected": "Unknown Guard audit phase",
+        "preparationSkipped": false
+      }
+    ]
+  },
+  "guardEvidence": {
+    "path": "artifacts/guard-restart-launch-rejections.json",
+    "bytes": 3046,
+    "sha256": "4064db69da7ba2f2da42358bd7aea8b55cce1469e9883ed90f3f1e2b7ebffb45"
+  },
+  "guardLogs": [
+    {
+      "path": "artifacts/guard-restart-launch-restart-seed-rejected.log",
+      "bytes": 1096,
+      "sha256": "48cf0478a964d85f0d00c29996198f0748a40fd7d3b276ec5c99a4937597718f"
+    },
+    {
+      "path": "artifacts/guard-restart-launch-restart-recover-rejected.log",
+      "bytes": 870,
+      "sha256": "6257b067599507ca6a86f22f59604f5d4116f0f70a141a97cb8c9802e3793969"
+    },
+    {
+      "path": "artifacts/guard-restart-launch-coexist-rejected.log",
+      "bytes": 866,
+      "sha256": "dddbbe4ac6a3629b38954c3773c8e86e3bd0fd78512222666f43c95262636901"
+    },
+    {
+      "path": "artifacts/guard-restart-launch-invalid-rejected.log",
+      "bytes": 527,
+      "sha256": "1c2468248e077bc11f4379961b316a2191e4a343c3bf92aa3c22bb4db4e2e871"
+    }
+  ],
+  "prepareRejections": [
+    {
+      "case": "outside",
+      "rejected": true,
+      "reason": "Guard fixture must be inside task artifacts"
+    },
+    {
+      "case": "completed",
+      "rejected": true,
+      "reason": "Preserve the completed Guard restart fixture"
+    }
+  ],
+  "prepareRejectionEvidence": {
+    "path": "artifacts/guard-restart-prepare-rejections.json",
+    "bytes": 246,
+    "sha256": "63da635d88e178229d7b5f8efb4bd39e33695bf6aa7376fa45b9de093c2f09bc"
+  },
+  "stopped": {
+    "capturedAt": "2026-10-23T13:05:14.9030539+08:00",
+    "timezone": "UTC+08:00",
+    "exclusiveStoppedWorldOwnership": true,
+    "worlds": [
+      {
+        "fixture": "guard-restart-248-server",
+        "world": "guard-world",
+        "lock": {
+          "path": "artifacts/guard-restart-248-server/guard-world/session.lock",
+          "bytes": 3,
+          "sha256": "51643361c79ecaef25a8de802de24f570ba25d9c2df1d22d94fade11b4f466cc"
+        }
+      },
+      {
+        "fixture": "guard-restart-233-server",
+        "world": "guard-world",
+        "lock": {
+          "path": "artifacts/guard-restart-233-server/guard-world/session.lock",
+          "bytes": 3,
+          "sha256": "51643361c79ecaef25a8de802de24f570ba25d9c2df1d22d94fade11b4f466cc"
+        }
+      },
+      {
+        "fixture": "guard-restart-regression-248-server",
+        "world": "guard-world",
+        "lock": {
+          "path": "artifacts/guard-restart-regression-248-server/guard-world/session.lock",
+          "bytes": 3,
+          "sha256": "51643361c79ecaef25a8de802de24f570ba25d9c2df1d22d94fade11b4f466cc"
+        }
+      },
+      {
+        "fixture": "guard-restart-regression-233-server",
+        "world": "guard-world",
+        "lock": {
+          "path": "artifacts/guard-restart-regression-233-server/guard-world/session.lock",
+          "bytes": 3,
+          "sha256": "51643361c79ecaef25a8de802de24f570ba25d9c2df1d22d94fade11b4f466cc"
+        }
+      },
+      {
+        "fixture": "ordinary-client-acceptance-server",
+        "world": "acceptance-world",
+        "lock": {
+          "path": "artifacts/ordinary-client-acceptance-server/acceptance-world/session.lock",
+          "bytes": 3,
+          "sha256": "51643361c79ecaef25a8de802de24f570ba25d9c2df1d22d94fade11b4f466cc"
+        }
+      }
+    ]
+  },
+  "stoppedEvidence": {
+    "path": "artifacts/guard-restart-stopped.json",
+    "bytes": 1747,
+    "sha256": "d455c6ea3c91e2057595f45c3cd3b65a91c876b0ee8228ac12ad2dc9b3886bb1"
+  },
+  "stoppedVerifier": {
+    "path": "artifacts/confirm-guard-restart-stopped.ps1",
+    "bytes": 1356,
+    "sha256": "399c5e222160f476285a50d62f21d67afd8caaf865f4482f28a04bdf145998fa"
+  },
+  "unchangedPinnedClient": {
+    "path": "artifacts/logging-reader-pinned-client-before.json",
+    "bytes": 17435,
+    "sha256": "1f2f9f42f4f6584508d78b1ec677a9f28254184197e56ac8c202b235a739e1fa"
+  },
+  "sources": [
+    {
+      "path": "tools/guard-runtime-audit/net/citizensnpcs/audit/GuardRestartRuntimeAudit.java",
+      "bytes": 18747,
+      "sha256": "14c22376cc8fbd6381276999d8ac20b1790d4966cdeab963fff65733fa9c1b3a"
+    },
+    {
+      "path": "tools/guard-runtime-audit/net/citizensnpcs/audit/GuardRuntimeAudit.java",
+      "bytes": 23082,
+      "sha256": "9b285a5212469449229910f706d27f39e5642c0e14e534b26ae713924fbbca97"
+    },
+    {
+      "path": "tools/guard-runtime-audit/README.md",
+      "bytes": 1755,
+      "sha256": "24f33fdfb7f7b46b08c3c9b8d7a829d4e2be41a47510aca4291f25d560b98039"
+    },
+    {
+      "path": "tools/guard-runtime-audit.gradle",
+      "bytes": 3752,
+      "sha256": "62e733adac121922e7eb5c907414910e23fa758198b9f158fd63736f158c7bba"
+    },
+    {
+      "path": "tools/prepare-guard-audit.ps1",
+      "bytes": 2546,
+      "sha256": "a82fc95b7fa9e00df1816f76ffb303e06c1fe743a6a69a7c91c293857b3c4986"
+    },
+    {
+      "path": "tools/record-guard-restart-validation.py",
+      "bytes": 15367,
+      "sha256": "207eaf9d9854560651d9ad79b0de5e5e7a932367eed9fd6180339642e4631249"
+    }
+  ],
+  "auditBinaries": [
+    {
+      "path": "artifacts/guard-restart-248-build/classes/java/main/net/citizensnpcs/audit/GuardRestartRuntimeAudit$1.class",
+      "bytes": 1140,
+      "sha256": "8ea76d1edb28282c50216f9547496458a23dc90b7dc34cde48aa6b56ce4aee32"
+    },
+    {
+      "path": "artifacts/guard-restart-248-build/classes/java/main/net/citizensnpcs/audit/GuardRestartRuntimeAudit.class",
+      "bytes": 28955,
+      "sha256": "9c14bd637ef41f3e7e9e925f05ba58345dfb5b3d3b7b4bb65b3c73eedfde0dba"
+    },
+    {
+      "path": "artifacts/guard-restart-248-build/classes/java/main/net/citizensnpcs/audit/GuardRuntimeAudit$1.class",
+      "bytes": 1256,
+      "sha256": "305e359cefd379d6a1ec0566c5b9ee6a04e42836fce7341acc7c943d27fc23c2"
+    },
+    {
+      "path": "artifacts/guard-restart-248-build/classes/java/main/net/citizensnpcs/audit/GuardRuntimeAudit$2.class",
+      "bytes": 1400,
+      "sha256": "e4cfad83f736c11df0c07855570a00fa4288297d5678ce5ebe8192186d03bb0f"
+    },
+    {
+      "path": "artifacts/guard-restart-248-build/classes/java/main/net/citizensnpcs/audit/GuardRuntimeAudit.class",
+      "bytes": 33875,
+      "sha256": "7983310eb8b277d505861827db084a37e6a8ed4de462beac8debdda4c5cad3c0"
+    },
+    {
+      "path": "artifacts/guard-restart-233-build/classes/java/main/net/citizensnpcs/audit/GuardRestartRuntimeAudit$1.class",
+      "bytes": 1140,
+      "sha256": "8ea76d1edb28282c50216f9547496458a23dc90b7dc34cde48aa6b56ce4aee32"
+    },
+    {
+      "path": "artifacts/guard-restart-233-build/classes/java/main/net/citizensnpcs/audit/GuardRestartRuntimeAudit.class",
+      "bytes": 28955,
+      "sha256": "9c14bd637ef41f3e7e9e925f05ba58345dfb5b3d3b7b4bb65b3c73eedfde0dba"
+    },
+    {
+      "path": "artifacts/guard-restart-233-build/classes/java/main/net/citizensnpcs/audit/GuardRuntimeAudit$1.class",
+      "bytes": 1256,
+      "sha256": "305e359cefd379d6a1ec0566c5b9ee6a04e42836fce7341acc7c943d27fc23c2"
+    },
+    {
+      "path": "artifacts/guard-restart-233-build/classes/java/main/net/citizensnpcs/audit/GuardRuntimeAudit$2.class",
+      "bytes": 1400,
+      "sha256": "e4cfad83f736c11df0c07855570a00fa4288297d5678ce5ebe8192186d03bb0f"
+    },
+    {
+      "path": "artifacts/guard-restart-233-build/classes/java/main/net/citizensnpcs/audit/GuardRuntimeAudit.class",
+      "bytes": 33875,
+      "sha256": "7983310eb8b277d505861827db084a37e6a8ed4de462beac8debdda4c5cad3c0"
+    },
+    {
+      "path": "artifacts/guard-restart-regression-248-build/classes/java/main/net/citizensnpcs/audit/GuardRestartRuntimeAudit$1.class",
+      "bytes": 1140,
+      "sha256": "8ea76d1edb28282c50216f9547496458a23dc90b7dc34cde48aa6b56ce4aee32"
+    },
+    {
+      "path": "artifacts/guard-restart-regression-248-build/classes/java/main/net/citizensnpcs/audit/GuardRestartRuntimeAudit.class",
+      "bytes": 28955,
+      "sha256": "9c14bd637ef41f3e7e9e925f05ba58345dfb5b3d3b7b4bb65b3c73eedfde0dba"
+    },
+    {
+      "path": "artifacts/guard-restart-regression-248-build/classes/java/main/net/citizensnpcs/audit/GuardRuntimeAudit$1.class",
+      "bytes": 1256,
+      "sha256": "305e359cefd379d6a1ec0566c5b9ee6a04e42836fce7341acc7c943d27fc23c2"
+    },
+    {
+      "path": "artifacts/guard-restart-regression-248-build/classes/java/main/net/citizensnpcs/audit/GuardRuntimeAudit$2.class",
+      "bytes": 1400,
+      "sha256": "e4cfad83f736c11df0c07855570a00fa4288297d5678ce5ebe8192186d03bb0f"
+    },
+    {
+      "path": "artifacts/guard-restart-regression-248-build/classes/java/main/net/citizensnpcs/audit/GuardRuntimeAudit.class",
+      "bytes": 33875,
+      "sha256": "7983310eb8b277d505861827db084a37e6a8ed4de462beac8debdda4c5cad3c0"
+    },
+    {
+      "path": "artifacts/guard-restart-regression-233-build/classes/java/main/net/citizensnpcs/audit/GuardRestartRuntimeAudit$1.class",
+      "bytes": 1140,
+      "sha256": "8ea76d1edb28282c50216f9547496458a23dc90b7dc34cde48aa6b56ce4aee32"
+    },
+    {
+      "path": "artifacts/guard-restart-regression-233-build/classes/java/main/net/citizensnpcs/audit/GuardRestartRuntimeAudit.class",
+      "bytes": 28955,
+      "sha256": "9c14bd637ef41f3e7e9e925f05ba58345dfb5b3d3b7b4bb65b3c73eedfde0dba"
+    },
+    {
+      "path": "artifacts/guard-restart-regression-233-build/classes/java/main/net/citizensnpcs/audit/GuardRuntimeAudit$1.class",
+      "bytes": 1256,
+      "sha256": "305e359cefd379d6a1ec0566c5b9ee6a04e42836fce7341acc7c943d27fc23c2"
+    },
+    {
+      "path": "artifacts/guard-restart-regression-233-build/classes/java/main/net/citizensnpcs/audit/GuardRuntimeAudit$2.class",
+      "bytes": 1400,
+      "sha256": "e4cfad83f736c11df0c07855570a00fa4288297d5678ce5ebe8192186d03bb0f"
+    },
+    {
+      "path": "artifacts/guard-restart-regression-233-build/classes/java/main/net/citizensnpcs/audit/GuardRuntimeAudit.class",
+      "bytes": 33875,
+      "sha256": "7983310eb8b277d505861827db084a37e6a8ed4de462beac8debdda4c5cad3c0"
+    }
+  ],
+  "packages": [
+    {
+      "path": "artifacts/craft-binding-ordinary-21.1.248-build/libs/citizens-2.0.43-neoforge-SNAPSHOT.jar",
+      "bytes": 4091667,
+      "sha256": "02437eda296f5b84055b1c11f87553cd297649ca6362a3eb53a385517a2f6f6f",
+      "matchingProductionClasses": 1020
+    },
+    {
+      "path": "artifacts/craft-binding-ordinary-21.1.248-build/libs/yuuniverse-interactions-2.0.43-neoforge-SNAPSHOT.jar",
+      "bytes": 204146,
+      "sha256": "77021e0135062bec5e78117e65845ce6c5b59022a8e59d6f3a9ca3305aedf635",
+      "matchingProductionClasses": 74
+    },
+    {
+      "path": "artifacts/craft-binding-ordinary-21.1.233-build/libs/citizens-2.0.43-neoforge-SNAPSHOT.jar",
+      "bytes": 4091667,
+      "sha256": "99e36a028499684d3fab2ebd24a1e59126e64c6f79981cf233346af01eb4425e",
+      "matchingProductionClasses": 1020
+    },
+    {
+      "path": "artifacts/craft-binding-ordinary-21.1.233-build/libs/yuuniverse-interactions-2.0.43-neoforge-SNAPSHOT.jar",
+      "bytes": 204146,
+      "sha256": "c788b0ea64f1db8cd4931e7fca11bc76cd94f5a32dbc036a7f287921a5893a52",
+      "matchingProductionClasses": 74
+    }
+  ],
+  "reusedOrdinaryTestsPerTarget": 825,
+  "reusedInteractionsTests": 100,
+  "reusedEvidence": {
+    "path": "docs/craft-binding-validation-2026-10-22.json",
+    "bytes": 959572,
+    "sha256": "26483824d437745191695754a3d2ad62fd6dbc96bb77d0c111f698808dd20abd"
+  },
+  "limits": [
+    "Clean native world/player and Citizens store restart on both targets",
+    "Native synthetic player reconnect/payloads, not physical client input/rendering",
+    "Combined pack, arbitrary AI overrides, unflushed kill and integrated migration/release gates remain",
+    "No production or deferred client changes"
+  ]
+}

@@ -49,6 +49,8 @@ public final class GuardRuntimeAudit {
     private static boolean patrolPhase;
     private static BlockPos patrolAnchor;
     @SubscribeEvent public static void tick(ServerTickEvent.Post event) {
+        var phase = System.getenv("CITIZENS_GUARD_AUDIT_PHASE");
+        if (phase != null && phase.startsWith("restart-")) { GuardRestartRuntimeAudit.tick(event); return; }
         var server=event.getServer(); var level=server.overworld(); level.setChunkForced(0,0,true);
         if(ran) {
             if(movingGuard!=null) movement(server,level);
@@ -239,7 +241,7 @@ public final class GuardRuntimeAudit {
             LoggerFactory.getLogger("citizens").error("[GUARDAUDIT] FAILED",failure); movingGuard=null; cleanup(server,level);
         }
     }
-    private static void follow(ServerPlayer actor,Guard guard) {
+    static void follow(ServerPlayer actor,Guard guard) {
         var payload=new tallestegg.guardvillagers.networking.GuardFollowPacket(guard.getId());
         var buffer=new net.minecraft.network.FriendlyByteBuf(io.netty.buffer.Unpooled.buffer());
         try {
@@ -249,7 +251,7 @@ public final class GuardRuntimeAudit {
                     new net.neoforged.neoforge.network.handling.ServerPayloadContext(actor.connection,payload.type().id()));
         } finally { buffer.release(); }
     }
-    private static void patrol(ServerPlayer actor,Guard guard,boolean pressed) {
+    static void patrol(ServerPlayer actor,Guard guard,boolean pressed) {
         var payload=new tallestegg.guardvillagers.networking.GuardSetPatrolPosPacket(guard.getId(),pressed);
         var buffer=new net.minecraft.network.FriendlyByteBuf(io.netty.buffer.Unpooled.buffer());
         try {
@@ -264,9 +266,9 @@ public final class GuardRuntimeAudit {
         for(var guard:guards(level)) guard.discard();
         server.getPlayerList().remove(actorState); channelState.finishAndReleaseAll(); server.halt(false);
     }
-    private static void interact(ServerPlayer actor,Entity target) { NeoForge.EVENT_BUS.post(new PlayerInteractEvent.EntityInteract(actor,InteractionHand.MAIN_HAND,target)); }
+    static void interact(ServerPlayer actor,Entity target) { NeoForge.EVENT_BUS.post(new PlayerInteractEvent.EntityInteract(actor,InteractionHand.MAIN_HAND,target)); }
     private static List<Guard> guards(ServerLevel level) { return level.getEntitiesOfClass(Guard.class,new net.minecraft.world.phys.AABB(-16,-80,-16,16,80,16)); }
-    private static EmbeddedChannel connect(ServerPlayer player) {
+    static EmbeddedChannel connect(ServerPlayer player) {
         var connection=new Connection(PacketFlow.SERVERBOUND);
         var channel=new EmbeddedChannel(new ChannelInitializer<Channel>() {
             @Override protected void initChannel(Channel channel) {
