@@ -1,4 +1,15 @@
 # GriefLogger SQLite packaging compatibility
+Follow-up 2026-10-23, UTC+08:00: [complete MySQL command storage](../../docs/logging-mysql-command-storage-2026-10-23.md)
+repairs native command truncation by widening known legacy MySQL columns to
+MEDIUMTEXT and removing command INSERT IGNORE. Apply `mysql-command-capacity.patch`
+after `.8` to build `.9`. Actual charset/collation and sufficient larger columns
+are preserved; unsupported narrow custom schemas disable logging admission.
+The report records 156 SQLite and 38 real MySQL storage assertions plus 308 fresh
+native/restart checks. Bounded MySQL 8.4.13 acceptance includes complete Unicode
+commands, real locks/constraints/reads and a graceful same-container restart.
+Sustained load, all backend combinations, wider recovery and deferred clients
+remain separate gates. No production activation is included.
+
 Follow-up 2026-10-23, UTC+08:00: [repository read isolation](../../docs/logging-read-isolation-2026-10-23.md)
 repairs public lookups exposing uncommitted rows which later roll back. Apply
 `repository-read-isolation.patch` after `.7` to build `.8`. All nine repository

@@ -1,0 +1,147 @@
+diff --git a/common/src/main/java/com/daqem/grieflogger/database/Database.java b/common/src/main/java/com/daqem/grieflogger/database/Database.java
+index 818fc17..ed617c9 100644
+--- a/common/src/main/java/com/daqem/grieflogger/database/Database.java
++++ b/common/src/main/java/com/daqem/grieflogger/database/Database.java
+@@ -104,16 +104,31 @@ public class Database {
+         return connection != null;
+     }
+ 
+-    public void createTable(String sql) {
++    @FunctionalInterface
++    public interface SchemaInitializer {
++        void initialize(Connection connection) throws SQLException;
++    }
++
++    /** Startup schema work must succeed before event producers can register. */
++    public synchronized void initializeSchema(SchemaInitializer initializer) {
++        if (writeOutcomeUncertain) return;
+         try {
+-            if (statement != null) {
+-                statement.execute(sql);
+-            }
+-        } catch (SQLException e) {
+-            GriefLogger.LOGGER.error("Failed to create table", e);
++            if (connection == null) throw new SQLException("Connection is null");
++            initializer.initialize(connection);
++        } catch (SQLException | RuntimeException failure) {
++            writeOutcomeUncertain = true;
++            try { if (connection != null) connection.rollback(); }
++            catch (SQLException rollbackFailure) { failure.addSuppressed(rollbackFailure); }
++            GriefLogger.LOGGER.error("Failed to initialize database schema; logging admission disabled", failure);
+         }
+     }
+ 
++    public void createTable(String sql) {
++        initializeSchema(connection -> {
++            try (var table = connection.createStatement()) { table.execute(sql); }
++        });
++    }
++
+     public void execute(String sql, boolean logError) {
+         try {
+             if (statement != null) {
+@@ -156,6 +171,7 @@ public class Database {
+     }
+ 
+     public synchronized boolean completeInitialization() {
++        if (writeOutcomeUncertain) return false;
+         try {
+             if (connection == null) throw new SQLException("Connection is null");
+             connection.commit();
+diff --git a/common/src/main/java/com/daqem/grieflogger/database/repository/CommandRepository.java b/common/src/main/java/com/daqem/grieflogger/database/repository/CommandRepository.java
+index c63d15b..81ca3da 100644
+--- a/common/src/main/java/com/daqem/grieflogger/database/repository/CommandRepository.java
++++ b/common/src/main/java/com/daqem/grieflogger/database/repository/CommandRepository.java
+@@ -3,7 +3,7 @@ package com.daqem.grieflogger.database.repository;
+ import com.daqem.grieflogger.GriefLogger;
+ import com.daqem.grieflogger.database.Database;
+ 
+-import java.sql.PreparedStatement;
++import java.sql.Connection;
+ import java.sql.SQLException;
+ 
+ public class CommandRepository extends Repository {
+@@ -37,7 +37,7 @@ public class CommandRepository extends Repository {
+                         x int NOT NULL,
+                         y int NOT NULL,
+                         z int NOT NULL,
+-                        command varchar(256) NOT NULL,
++                        command mediumtext NOT NULL,
+                         FOREIGN KEY(user) REFERENCES users(id),
+                         FOREIGN KEY(level) REFERENCES levels(id)
+                     )
+@@ -45,6 +45,35 @@ public class CommandRepository extends Repository {
+                     """;
+         }
+         database.createTable(sql);
++        if (isMysql()) database.initializeSchema(CommandRepository::ensureMysqlCommandCapacity);
++    }
++
++    private static void ensureMysqlCommandCapacity(Connection connection) throws SQLException {
++        String type, charset, collation, nullable, defaultValue, extra, comment;
++        try (var query = connection.prepareStatement("""
++                SELECT DATA_TYPE, CHARACTER_SET_NAME, COLLATION_NAME, IS_NULLABLE,
++                       COLUMN_DEFAULT, EXTRA, COLUMN_COMMENT
++                FROM information_schema.columns
++                WHERE table_schema = DATABASE() AND table_name = 'commands' AND column_name = 'command'
++                """); var column = query.executeQuery()) {
++            if (!column.next()) throw new SQLException("Missing commands.command column");
++            type = column.getString(1); charset = column.getString(2); collation = column.getString(3);
++            nullable = column.getString(4); defaultValue = column.getString(5);
++            extra = column.getString(6); comment = column.getString(7);
++        }
++        // Never narrow a database which already has sufficient text capacity.
++        if ("mediumtext".equals(type) || "longtext".equals(type)) return;
++        // Widen the known legacy schema without guessing custom column semantics.
++        if (!("varchar".equals(type) || "text".equals(type)) || !"NO".equals(nullable)
++                || defaultValue != null || !"".equals(extra) || !"".equals(comment)
++                || charset == null || !charset.matches("[A-Za-z0-9_]+")
++                || collation == null || !collation.matches("[A-Za-z0-9_]+")) {
++            throw new SQLException("Unsupported commands.command schema; review its text capacity and attributes before logging");
++        }
++        try (var migration = connection.createStatement()) {
++            migration.execute("ALTER TABLE commands MODIFY COLUMN command MEDIUMTEXT CHARACTER SET "
++                    + charset + " COLLATE " + collation + " NOT NULL");
++        }
+     }
+ 
+     public void createIndexes() {
+@@ -71,7 +100,7 @@ public class CommandRepository extends Repository {
+ 
+         if (isMysql()) {
+             query = """
+-                    INSERT IGNORE INTO commands(time, user, level, x, y, z, command)
++                    INSERT INTO commands(time, user, level, x, y, z, command)
+                     VALUES(?, (
+                         SELECT id FROM users WHERE uuid = ?
+                     ), (
+diff --git a/gradle.properties b/gradle.properties
+index 1766b7f..f9b8383 100644
+--- a/gradle.properties
++++ b/gradle.properties
+@@ -4,7 +4,7 @@ minecraft_version=1.21.1
+ enabled_platforms=fabric,neoforge
+ 
+ archives_base_name=grieflogger
+-mod_version=1.2.10-1.21.1-yuuniverse.8
++mod_version=1.2.10-1.21.1-yuuniverse.9
+ sqlite_version=3.47.2.0
+ maven_group=com.daqem.grieflogger
+ mod_name=GriefLogger
+diff --git a/walkthrough.md b/walkthrough.md
+index b5e65a8..ccf6697 100644
+--- a/walkthrough.md
++++ b/walkthrough.md
+@@ -53,3 +53,12 @@ No production activation. Pending writes remain in memory; unflushed process ter
+ - Reject same-thread read reentry during an active write and reads after an uncertain write outcome with SQLException, preserving repository error logging/fallback behavior. Successful detached values still reflect committed data. Queued-write recovery and transaction ownership stay with executeWrites.
+ - Bump the isolated provider to .8. Java 21 :neoforge:build succeeds; the actual-provider/embedded SQLite suite passes 143 assertions, including all 109 previous storage checks, rollback/commit lookup barriers, open-cursor writer blocking, statement/cursor cleanup, failure propagation, other-thread progress and uncertainty/reentry fences.
+ - Native all-nine-repository and restart acceptance is maintained in the owning project. This change does not establish MySQL or sustained load acceptance, add a read-only connection pool, or provide crash spooling. No production/deferred client activation occurs.
++
++## 2026-10-23T20:19:34.9088008+08:00 (UTC+08:00) - Preserve complete MySQL command history
++
++- Reproduced native command truncation on real MySQL 8.4.13: VARCHAR(256) plus INSERT IGNORE commits shortened text and leaves no pending work. Actual inputs are 23, 1,032 and 69,025 UTF-8 bytes, each within the native UTF-16 packet bound. The unchanged provider fails the same final audit bytecode retained for before/after review.
++- Version .9 creates MEDIUMTEXT and widens known legacy VARCHAR/TEXT command columns while preserving actual charset/collation. Existing MEDIUMTEXT/LONGTEXT remains intact; unsupported narrow custom attributes reject visibly. Command inserts use plain INSERT. No lost suffix is invented and SQLite command SQL is unchanged.
++- Schema initialization now owns/closes statements, fences SQL/runtime failures, attempts rollback and cannot report ready afterward. MySQL implicit DDL commits remain a documented boundary; the fence cannot undo earlier successful DDL.
++- Java 21 NeoForge build succeeds. Actual provider/SQLite storage suite passes 156 assertions across 32 databases. Actual provider/Connector-J 8.4.0/MySQL suite passes 38 lock, batch constraint, owned binary/UTF-8, actual-commit/injected-reply-loss and public read-isolation assertions. Only the standalone Minecraft bootstrap/logger owner is substituted.
++- Fresh native MySQL command/schema/restart checks pass 76 assertions, and normal logging/rollback/commerce/restart adds 45. Four command cases cover new schema, legacy VARCHAR, legacy TEXT and preserved larger LONGTEXT/custom comment; narrow custom schema rejection preserves original input. Root project records independent SQL dumps, same-container restart and additional SQLite/native regressions separately.
++- No production deployment, physical client acceptance, all-backend equivalence, sustained load/retention, forced database crash, real network loss or unavailable migration completion is claimed. Preserve the original failure and all fixture evidence. Author and committer: A-BenLi06 <ben_li06@outlook.com>.

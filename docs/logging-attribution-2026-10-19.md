@@ -140,3 +140,12 @@ closure. Same-thread read reentry during a write and uncertain write outcomes
 reject with the existing logged lookup failure behavior. Exact commit/rollback
 results, components and fresh-process restart pass; single-connection contention,
 sustained load, MySQL and broader release gates remain separate acceptance.
+
+The [MySQL command repair](logging-mysql-command-storage-2026-10-23.md) then fixes
+silently truncated commands with provider `.9`. Real MySQL 8.4.13 checks cover
+complete native Unicode commands, known schema widening, preserved larger
+columns, explicit unsupported-schema rejection, actual lock/constraint/read
+outcomes and exact graceful-restart persistence. Fresh SQLite regressions retain
+normal commerce, shutdown, indexes and public lookups. This bounded acceptance
+does not close all MySQL gameplay, external-writer isolation, retention/load,
+broader recovery, migration or deferred physical-client release gates.

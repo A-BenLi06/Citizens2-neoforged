@@ -532,6 +532,28 @@ public final class StorageRecoveryTest {
             check(count(fixture)==2,"lookup_fence_keeps_uncommitted_prefix_invisible_to_independent_reader");
         }
     }
+    private static void schemaInitialization() throws Exception {
+        try(var fixture=fixture("schema_success")) {
+            fixture.database.createTable("CREATE TABLE initialized(id INTEGER PRIMARY KEY,value TEXT)");
+            check(fixture.database.completeInitialization(),"schema_helper_commits_valid_table_before_admission");
+            try(var query=fixture.observer.createStatement();var rows=query.executeQuery("SELECT COUNT(*) FROM initialized")) {
+                check(rows.next()&&rows.getInt(1)==0,"schema_helper_created_actual_independently_visible_table");
+            }
+        }
+        for(boolean runtime:new boolean[]{false,true})try(var fixture=fixture("schema_failure_"+runtime)) {
+            fixture.database.initializeSchema(connection->{sql(connection,"INSERT INTO observations VALUES(1,'uncommitted-schema-work',NULL)");
+                if(runtime)throw new IllegalStateException("Expected schema callback failure");throw new SQLException("Expected schema SQL failure");});
+            check(!fixture.database.completeInitialization()&&count(fixture)==0,"schema_failure_rolls_back_prefix_and_prevents_false_initialization_"+runtime);
+            fixture.database.queue.add(write(fixture.database,2,"fenced",null));fixture.database.queue.execute();
+            check(count(fixture)==0&&fixture.database.queue.pendingCount()==1,"schema_failure_prevents_later_producer_writes_"+runtime);
+            try {fixture.database.read("SELECT * FROM observations",query->{throw new AssertionError("Fenced schema allowed read");});throw new AssertionError("Schema read accepted");}
+            catch(SQLException expected){check(true,"schema_failure_rejects_reads_"+runtime);}
+        }
+        try(var fixture=fixture("schema_invalid_sql")) {
+            fixture.database.createTable("CREATE TABLE invalid_sql (");
+            check(!fixture.database.completeInitialization(),"invalid_create_table_cannot_report_database_ready");
+        }
+    }
     public static void main(String[] arguments) throws Exception {
         root=Path.of(arguments[0]); Class.forName("org.sqlite.JDBC");
         System.out.println("PROVIDER " + Database.class.getProtectionDomain().getCodeSource().getLocation());
@@ -545,6 +567,7 @@ public final class StorageRecoveryTest {
         fullModeFence("IMMEDIATE", "DEFERRED"); fullAfterCommit(); legacyFull();
         shutdownWaitsForWorker(); shutdownLocked(); shutdownReentry();
         repositoryReadIsolation(false); repositoryReadIsolation(true); cursorOwnsMonitor(); readFailures();
+        schemaInitialization();
         System.out.println("[GRIEFSTORAGE] COMPLETE " + passed + " checks");
     }
 }

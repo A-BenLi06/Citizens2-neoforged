@@ -8,6 +8,14 @@ Citizens retains NPC behavior and its existing native extension contracts. Yuuni
 
 ## Selected artifacts and sides
 
+Progress 2026-10-23, UTC+08:00: [complete MySQL command storage](logging-mysql-command-storage-2026-10-23.md)
+repairs silent truncation of native GriefLogger command history. Provider `.9`
+preserves full Unicode commands and safe existing column semantics, rejects
+unsupported schema initialization, and passes 156 SQLite/38 real MySQL storage
+assertions plus 308 native/restart checks. Exact tables/schema/indexes survive
+a graceful MySQL restart. ADAPT-09/11 remain open for all backend combinations,
+load/retention, wider recovery/migration and deferred ordinary/VR clients.
+
 Progress 2026-10-23, UTC+08:00: [repository read isolation](logging-read-isolation-2026-10-23.md)
 repairs GriefLogger lookup results containing records that later rolled back.
 Provider `.8` serializes all nine public repository reads with write transactions

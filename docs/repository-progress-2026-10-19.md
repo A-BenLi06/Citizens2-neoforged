@@ -10,6 +10,15 @@ This review covers repository structure, native implementation boundaries, upstr
 
 ## Repository and implementation boundaries
 
+Update 2026-10-23, UTC+08:00: [complete MySQL commands](logging-mysql-command-storage-2026-10-23.md)
+repairs silently truncated native command history in GriefLogger `.8`. Provider
+`.9` widens known schemas while preserving charset/collation, retains larger
+columns, and disables logging admission after unsupported schema failure.
+Acceptance adds 156 SQLite/38 real MySQL storage assertions and 308 native/restart
+checks, including independent exact SQL persistence across a graceful MySQL
+restart. These are bounded backend checks; full MySQL equivalence, load/retention,
+broader recovery/migration and deferred physical clients remain open.
+
 Update 2026-10-23, UTC+08:00: [repository read isolation](logging-read-isolation-2026-10-23.md)
 repairs actual GriefLogger lookups publishing uncommitted rows before rollback.
 Provider `.8` protects all nine repository read paths through cursor closure and

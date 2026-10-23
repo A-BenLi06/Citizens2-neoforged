@@ -91,6 +91,21 @@ retain the same results in a new process. The fixture SQL workload has its own
 identity and does not replace gameplay observations. Completed phases reject
 even with preparation skipped. See the [read report](../../docs/logging-read-isolation-2026-10-23.md).
 
+For native MySQL command storage, use provider `.9` with a fresh isolated MySQL
+database and logging fixture. Configure the provider's ordinary MySQL settings;
+keep credentials outside tracked evidence. Run `mysql-commands`, then
+`mysql-commands-recover`. The audit posts actual Minecraft commands through a
+synthetic connected player and checks exact UTF-8 strings, ownership, prior rows,
+column attributes and restart. It retains observed failures before asserting,
+so truncated pre-fix results remain reviewable. `mysql-schema-reject` requires
+`logging-mysql-schema-original.json` containing original `column` and
+`allCommands` observations; it verifies explicit initialization rejection and
+unchanged data/attributes. Completed phases reject even with preparation skipped.
+Use `tools/capture-logging-mysql-fixture.py` only for this task's identified Docker
+fixture to retain independent SQL snapshots and dumps. See the
+[MySQL report](../../docs/logging-mysql-command-storage-2026-10-23.md) and its
+manifest for exact runners, local fixture paths and bounded acceptance.
+
 For an actual forced termination after observed native histories and saved
 player/world state:
 
