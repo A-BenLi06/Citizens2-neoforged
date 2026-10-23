@@ -183,13 +183,127 @@ class QuestEvidenceJournalTest {
     }
 
     @Test void totalsUseCheckedArithmetic() throws Exception {
+        UUID generationId;
         try (var journal=QuestEvidenceJournal.open(directory)) {
-            var generation=journal.generation(scope,0);
+            var generation=journal.generation(scope,0); generationId = generation.id();
             for(long units:new long[]{Long.MAX_VALUE,1}) {
-                var entry=journal.admit(admission(generation,UUID.randomUUID(),units)); journal.outcome(entry.id(),Outcome.RETURNED);
+                var entry=journal.admit(admission(generation,UUID.randomUUID(),units)); journal.outcome(entry.id(),Outcome.RETURNED); journal.applied(entry.id());
             }
             assertThrows(ArithmeticException.class,()->journal.confirmedTotal(generation.id(),"10403"));
+            assertThrows(ArithmeticException.class,()->journal.appliedTotal(generation.id(),"10403"));
         }
+        try (var journal=QuestEvidenceJournal.open(directory)) {
+            assertThrows(ArithmeticException.class,()->journal.confirmedTotal(generationId,"10403"));
+            assertThrows(ArithmeticException.class,()->journal.appliedTotal(generationId,"10403"));
+            assertTrue(journal.confirmed(generationId,"10403").isEmpty());
+        }
+    }
+
+    @Test void scopedReadsMatchIndependentHistoryAcrossTransitionsAndRecovery() throws Exception {
+        UUID observation = UUID.randomUUID();
+        try (var journal = QuestEvidenceJournal.open(directory)) {
+            for (int cycle = 0; cycle < 3; cycle++) {
+                var generation = journal.generation(scope, cycle);
+                var unrelated = journal.generation(new Scope(scope.epoch(), UUID.randomUUID(), scope.questId()), cycle);
+                for (int i = 0; i < 12; i++) {
+                    var admitted = admission(i % 2 == 0 ? generation : unrelated, i < 2 || i == 11 ? observation : UUID.randomUUID(), i + 1);
+                    if (i == 11) admitted = new Admission(admitted.observationId(), admitted.generationId(), "10404", admitted.actorId(),
+                            admitted.recipeId(), admitted.recipeRevision(), admitted.units(), admitted.evidence());
+                    var entry = journal.admit(admitted);
+                    assertScopedReads(journal);
+                    if (i % 5 == 0) continue; // Restart must rebuild this observation's REVIEW fence.
+                    journal.outcome(entry.id(), i % 3 == 0 ? Outcome.INTERRUPTED : Outcome.RETURNED);
+                    assertScopedReads(journal);
+                    if (i % 3 == 0) journal.resolve(entry.id(), actor, "Verified original native outcome", i % 2 == 0);
+                    if (i % 3 != 0 && i % 2 == 0) journal.applied(entry.id());
+                    assertScopedReads(journal);
+                }
+            }
+        }
+        for (int pass = 0; pass < 2; pass++) try (var journal = QuestEvidenceJournal.open(directory)) {
+            assertScopedReads(journal);
+            for (var entry : journal.entries()) {
+                if (entry.state() == State.REVIEW) journal.resolve(entry.id(), actor, "Independent retained evidence reviewed", pass == 0);
+                if (entry.state() == State.CONFIRMED) journal.applied(entry.id());
+                assertScopedReads(journal);
+            }
+            assertThrows(IllegalStateException.class, () -> journal.generation(scope, 1));
+            assertEquals(2, journal.generation(scope, 2).nativeCycle());
+        }
+    }
+
+    @Test void earliestObservationUsesTimestampThenIdRatherThanGenerationOrLoadOrder() throws Exception {
+        UUID observation = UUID.randomUUID();
+        try (var journal = QuestEvidenceJournal.open(directory)) {
+            for (int cycle = 0; cycle < 3; cycle++) {
+                var entry = journal.admit(admission(journal.generation(scope, cycle), observation, cycle + 1));
+                journal.outcome(entry.id(), Outcome.RETURNED);
+            }
+        }
+        // Valid histories may have equal or nonmonotonic wall-clock timestamps.
+        var codec = new com.google.gson.GsonBuilder().serializeNulls().create();
+        try (var paths = Files.list(directory)) {
+            for (var path : paths.filter(p -> p.getFileName().toString().startsWith("entry-")).toList()) {
+                var document = com.google.gson.JsonParser.parseString(Files.readString(path)).getAsJsonObject();
+                var payload = document.getAsJsonObject("payload");
+                payload.addProperty("createdAt", 100);
+                Files.writeString(path, codec.toJson(document));
+            }
+        }
+        try (var journal = QuestEvidenceJournal.open(directory)) {
+            assertScopedReads(journal);
+            var earliest = journal.entries().getFirst();
+            assertEquals(earliest, journal.previous(observation, "10403").orElseThrow());
+            journal.applied(earliest.id());
+            assertEquals(State.APPLIED, journal.previous(observation, "10403").orElseThrow().state());
+            for (var entry : journal.entries()) if (entry.state() == State.CONFIRMED) journal.applied(entry.id());
+            assertScopedReads(journal);
+        }
+    }
+
+    @Test void failedRevisionRetiresAllScopedReadsAndPreservesOriginalAdmission() throws Exception {
+        try (var journal = QuestEvidenceJournal.open(directory)) {
+            var generation = journal.generation(scope, 0);
+            var entry = journal.admit(admission(generation, UUID.randomUUID(), 3));
+            var original = recordImages();
+            Path collision = directory.resolve("entry-" + entry.id() + "-1.json");
+            Files.writeString(collision, "retained conflicting revision");
+            assertThrows(IOException.class, () -> journal.outcome(entry.id(), Outcome.RETURNED));
+            assertEquals(original.get("entry-" + entry.id() + "-0.json"), Files.readString(directory.resolve("entry-" + entry.id() + "-0.json")));
+            assertEquals("retained conflicting revision", Files.readString(collision));
+            assertThrows(IllegalStateException.class, () -> journal.previous(entry.admission().observationId(), "10403"));
+            assertThrows(IllegalStateException.class, () -> journal.observation(entry.admission().observationId()));
+            assertThrows(IllegalStateException.class, () -> journal.generation(generation.id()));
+            assertThrows(IllegalStateException.class, () -> journal.hasReview(generation.id(), "10403"));
+            assertThrows(IllegalStateException.class, () -> journal.confirmed(generation.id(), "10403"));
+        }
+    }
+
+    private void assertScopedReads(QuestEvidenceJournal journal) {
+        var all = journal.entries();
+        for (var generation : journal.generations()) {
+            assertEquals(generation, journal.generation(generation.id()).orElseThrow());
+            for (String task : java.util.List.of("10403", "10404")) {
+                var relevant = all.stream().filter(e -> e.admission().generationId().equals(generation.id()) && e.admission().taskId().equals("00000000000" + task)).toList();
+                assertEquals(relevant.stream().anyMatch(e -> e.state() == State.REVIEW), journal.hasReview(generation.id(), task));
+                assertEquals(relevant.stream().filter(e -> e.state() == State.CONFIRMED).toList(), journal.confirmed(generation.id(), task));
+                assertEquals(relevant.stream().filter(e -> e.state() == State.CONFIRMED || e.state() == State.APPLIED).mapToLong(e -> e.admission().units()).sum(), journal.confirmedTotal(generation.id(), task));
+                assertEquals(relevant.stream().filter(e -> e.state() == State.APPLIED).mapToLong(e -> e.admission().units()).sum(), journal.appliedTotal(generation.id(), task));
+                assertThrows(UnsupportedOperationException.class, () -> journal.confirmed(generation.id(), task).add(null));
+            }
+        }
+        for (var entry : all) {
+            var observed = all.stream().filter(e -> e.admission().observationId().equals(entry.admission().observationId())).toList();
+            assertEquals(observed, journal.observation(entry.admission().observationId()));
+            assertEquals(observed.stream().filter(e -> e.admission().taskId().equals(entry.admission().taskId())).findFirst(), journal.previous(entry.admission().observationId(), entry.admission().taskId()));
+            assertThrows(UnsupportedOperationException.class, () -> journal.observation(entry.admission().observationId()).clear());
+        }
+        UUID missing = UUID.randomUUID();
+        assertTrue(journal.previous(missing, "10403").isEmpty());
+        assertTrue(journal.observation(missing).isEmpty());
+        assertTrue(journal.generation(missing).isEmpty());
+        assertFalse(journal.hasReview(missing, "10403"));
+        assertTrue(journal.confirmed(missing, "10403").isEmpty());
     }
 
     @Test void aGapInImmutableHistoryIsRejectedWithoutDiscardingRecords() throws Exception {

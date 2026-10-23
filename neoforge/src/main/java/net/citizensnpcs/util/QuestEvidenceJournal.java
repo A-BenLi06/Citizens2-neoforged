@@ -1,6 +1,7 @@
 package net.citizensnpcs.util;
 
 import java.io.IOException;
+import java.math.BigInteger;
 import java.nio.ByteBuffer;
 import java.nio.channels.FileChannel;
 import java.nio.channels.FileLock;
@@ -16,6 +17,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 
@@ -33,11 +35,34 @@ public final class QuestEvidenceJournal implements AutoCloseable {
     private final FileLock lock;
     private final Map<UUID, Generation> generations = new LinkedHashMap<>();
     private final Map<String, Entry> entries = new LinkedHashMap<>();
+    private static final java.util.Comparator<Entry> ENTRY_ORDER = java.util.Comparator.comparingLong(Entry::createdAt).thenComparing(Entry::id);
+    private final Map<Scope, Generation> latestGeneration = new HashMap<>();
+    private final Map<ObservationTask, Entry> firstObservation = new HashMap<>();
+    private final Map<UUID, Map<String, Entry>> observations = new HashMap<>();
+    private final Map<GenerationTask, TaskIndex> tasks = new HashMap<>();
     private boolean closed;
     private boolean failed;
 
     public enum State { PREPARED, CONFIRMED, REVIEW, REJECTED, APPLIED }
     public enum Outcome { RETURNED, INTERRUPTED, UNCONFIRMED, MISSING }
+
+    private record ObservationTask(UUID observation, String task) { }
+    private record GenerationTask(UUID generation, String task) { }
+    private static final class TaskIndex {
+        // Preserve query-time overflow: even an overflowing history remains admissible and recoverable.
+        BigInteger confirmedTotal = BigInteger.ZERO, appliedTotal = BigInteger.ZERO;
+        final java.util.NavigableSet<Entry> confirmed = new java.util.TreeSet<>(ENTRY_ORDER);
+        final java.util.Set<String> review = new java.util.HashSet<>();
+        void update(Entry entry, boolean add) {
+            if (entry == null) return;
+            BigInteger units = BigInteger.valueOf(entry.admission().units());
+            if (!add) units = units.negate();
+            if (entry.state() == State.CONFIRMED || entry.state() == State.APPLIED) confirmedTotal = confirmedTotal.add(units);
+            if (entry.state() == State.APPLIED) appliedTotal = appliedTotal.add(units);
+            if (entry.state() == State.CONFIRMED) { if (add) confirmed.add(entry); else confirmed.remove(entry); }
+            if (entry.state() == State.REVIEW) { if (add) review.add(entry.id()); else review.remove(entry.id()); }
+        }
+    }
 
     /** Epoch is an explicitly owned binding/migration identity, never inferred from a title. */
     public record Scope(UUID epoch, UUID teamId, String questId) {
@@ -95,6 +120,8 @@ public final class QuestEvidenceJournal implements AutoCloseable {
             lock = acquired;
             load();
             validation.validate();
+            for (Generation generation : generations.values()) index(generation);
+            for (Entry entry : entries.values()) index(null, entry);
             // No old process can deliver its native return after this lock is acquired.
             for (Entry entry : List.copyOf(entries.values())) if (entry.state() == State.PREPARED)
                 replace(new Entry(entry.id(), entry.revision()+1, entry.admission(), State.REVIEW, Outcome.MISSING, null, entry.createdAt(), now()));
@@ -109,15 +136,15 @@ public final class QuestEvidenceJournal implements AutoCloseable {
     public Generation generation(Scope scope, int nativeCycle) throws IOException {
         active(); Objects.requireNonNull(scope);
         if (nativeCycle < 0) throw new IllegalArgumentException("Invalid native cycle");
-        Generation found = null;
-        for (Generation generation : generations.values()) if (generation.scope().equals(scope)) {
-            if (generation.nativeCycle() > nativeCycle) throw new IllegalStateException("Native cycle regressed; evidence reconciliation is required");
-            if (generation.nativeCycle() == nativeCycle) found = generation;
+        Generation found = latestGeneration.get(scope);
+        if (found != null) {
+            if (found.nativeCycle() > nativeCycle) throw new IllegalStateException("Native cycle regressed; evidence reconciliation is required");
+            if (found.nativeCycle() == nativeCycle) return found;
         }
-        if (found != null) return found;
         var generation = new Generation(UUID.randomUUID(), scope, nativeCycle, now());
         write("generation-" + generation.id() + ".json", "generation", generation);
         generations.put(generation.id(), generation);
+        try { index(generation); } catch (RuntimeException | Error failure) { failed = true; throw failure; }
         return generation;
     }
 
@@ -167,21 +194,34 @@ public final class QuestEvidenceJournal implements AutoCloseable {
     }
 
     public long confirmedTotal(UUID generation, String taskId) {
-        active(); String task = objectId(taskId); long total = 0;
-        for (Entry entry : entries.values()) if (entry.admission().generationId().equals(generation) && entry.admission().taskId().equals(task)
-                && (entry.state() == State.CONFIRMED || entry.state() == State.APPLIED)) total = Math.addExact(total, entry.admission().units());
-        return total;
+        active(); var task = tasks.get(new GenerationTask(generation, objectId(taskId)));
+        return task == null ? 0 : task.confirmedTotal.longValueExact();
     }
 
     public long appliedTotal(UUID generation, String taskId) {
-        active(); String task = objectId(taskId); long total = 0;
-        for (Entry entry : entries.values()) if (entry.admission().generationId().equals(generation)
-                && entry.admission().taskId().equals(task) && entry.state() == State.APPLIED)
-            total = Math.addExact(total, entry.admission().units());
-        return total;
+        active(); var task = tasks.get(new GenerationTask(generation, objectId(taskId)));
+        return task == null ? 0 : task.appliedTotal.longValueExact();
     }
 
-    public List<Entry> entries() { active(); return entries.values().stream().sorted(java.util.Comparator.comparingLong(Entry::createdAt).thenComparing(Entry::id)).toList(); }
+    /** Earliest retained admission across generations, using the administrative snapshot's stable ordering. */
+    public Optional<Entry> previous(UUID observation, String taskId) {
+        active(); return Optional.ofNullable(firstObservation.get(new ObservationTask(Objects.requireNonNull(observation), objectId(taskId))));
+    }
+    public Optional<Generation> generation(UUID id) { active(); return Optional.ofNullable(generations.get(Objects.requireNonNull(id))); }
+    public List<Entry> observation(UUID id) {
+        active(); var found = observations.get(Objects.requireNonNull(id));
+        return found == null ? List.of() : found.values().stream().sorted(ENTRY_ORDER).toList();
+    }
+    public boolean hasReview(UUID generation, String taskId) {
+        active(); var task = tasks.get(new GenerationTask(generation, objectId(taskId)));
+        return task != null && !task.review.isEmpty();
+    }
+    /** Snapshot only work awaiting projection; APPLIED history does not grow this read. */
+    public List<Entry> confirmed(UUID generation, String taskId) {
+        active(); var task = tasks.get(new GenerationTask(generation, objectId(taskId)));
+        return task == null ? List.of() : List.copyOf(task.confirmed);
+    }
+    public List<Entry> entries() { active(); return entries.values().stream().sorted(ENTRY_ORDER).toList(); }
     public List<Generation> generations() { active(); return generations.values().stream().sorted(java.util.Comparator.comparingLong(Generation::createdAt).thenComparing(Generation::id)).toList(); }
 
     @Override public void close() throws IOException {
@@ -200,9 +240,23 @@ public final class QuestEvidenceJournal implements AutoCloseable {
         return entry;
     }
     private void replace(Entry entry) throws IOException {
-        follows(entries.get(entry.id()),entry);
+        Entry previous = entries.get(entry.id());
+        follows(previous,entry);
         write("entry-" + entry.id() + "-" + entry.revision() + ".json", "entry", entry);
         entries.put(entry.id(), entry);
+        try { index(previous, entry); } catch (RuntimeException | Error failure) { failed = true; throw failure; }
+    }
+    private void index(Generation generation) {
+        latestGeneration.merge(generation.scope(), generation, (left, right) -> left.nativeCycle() > right.nativeCycle() ? left : right);
+    }
+    private void index(Entry previous, Entry entry) {
+        var admission = entry.admission();
+        observations.computeIfAbsent(admission.observationId(), ignored -> new HashMap<>()).put(entry.id(), entry);
+        firstObservation.merge(new ObservationTask(admission.observationId(), admission.taskId()), entry,
+                (left, right) -> ENTRY_ORDER.compare(left, right) < 0 ? left : right);
+        var task = tasks.computeIfAbsent(new GenerationTask(admission.generationId(), admission.taskId()), ignored -> new TaskIndex());
+        task.update(previous, false);
+        task.update(entry, true);
     }
     private void write(String filename, String kind, Object payload) throws IOException {
         var document = new JsonObject(); document.addProperty("schema", 1); document.addProperty("kind", kind); document.add("payload", JSON.toJsonTree(payload));

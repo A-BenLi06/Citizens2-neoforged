@@ -165,8 +165,7 @@ public final class CraftQuestEvidence implements AutoCloseable {
             try {
                 // Observation identity survives team and native repeat-generation changes. Replaying an old
                 // provider notification must never admit the same output to the beneficiary's new scope.
-                var previous = journal.entries().stream().filter(entry -> entry.admission().observationId().equals(observationId)
-                        && entry.admission().taskId().equals(binding.taskId())).findFirst().orElse(null);
+                var previous = journal.previous(observationId, binding.taskId()).orElse(null);
                 if (previous != null) {
                     var admitted = previous.admission();
                     if (!admitted.actorId().equals(actor.getUUID()) || admitted.units() != units
@@ -180,8 +179,7 @@ public final class CraftQuestEvidence implements AutoCloseable {
                 var generation = journal.generation(new QuestEvidenceJournal.Scope(binding.epoch(), target.state().teamId(), binding.questId()), target.cycle());
                 long applied = Math.min(binding.maximum(), journal.appliedTotal(generation.id(), binding.taskId()));
                 if (target.state().progress() != applied) throw new IllegalStateException("Native progress needs evidence reconciliation");
-                if (journal.entries().stream().anyMatch(entry -> entry.admission().generationId().equals(generation.id())
-                        && entry.admission().taskId().equals(binding.taskId()) && entry.state() == QuestEvidenceJournal.State.REVIEW))
+                if (journal.hasReview(generation.id(), binding.taskId()))
                     throw new IllegalStateException("Uncertain craft evidence must be reviewed first");
                 journal.admit(new QuestEvidenceJournal.Admission(observationId, generation.id(), binding.taskId(), actor.getUUID(),
                         binding.recipeId(), binding.recipeRevision(), units, evidence));
@@ -205,7 +203,7 @@ public final class CraftQuestEvidence implements AutoCloseable {
         if (closed) return;
         List<QuestEvidenceJournal.Entry> candidates;
         try {
-            active(); candidates = journal.entries();
+            active(); candidates = journal.observation(observationId);
         } catch (RuntimeException failure) {
             LOGGER.error("Craft evidence journal is unavailable for {}", observationId, failure); return;
         }
@@ -272,7 +270,7 @@ public final class CraftQuestEvidence implements AutoCloseable {
     private void project(UUID generationId, String taskId) throws IOException {
         Binding binding = bindings.get(taskId);
         if (binding == null) throw new IllegalStateException("Admitted binding is unavailable");
-        var generation = journal.generations().stream().filter(value -> value.id().equals(generationId)).findFirst().orElseThrow();
+        var generation = journal.generation(generationId).orElseThrow();
         if (!generation.scope().epoch().equals(binding.epoch()) || !generation.scope().questId().equals(binding.questId()))
             throw new IllegalStateException("Evidence generation belongs to a different binding");
         var target = FtbQuestTasks.evidenceTarget(server, generation.scope().teamId(), taskId);
@@ -285,8 +283,7 @@ public final class CraftQuestEvidence implements AutoCloseable {
             throw new IllegalStateException("Native progress differs from admitted totals; reconciliation is required");
         FtbQuestTasks.projectEvidence(server, generation.scope().teamId(), taskId, binding.questId(), generation.nativeCycle(),
                 binding.maximum(), target.state().progress(), absolute);
-        for (var entry : journal.entries()) if (entry.admission().generationId().equals(generationId)
-                && entry.admission().taskId().equals(taskId) && entry.state() == QuestEvidenceJournal.State.CONFIRMED) journal.applied(entry.id());
+        for (var entry : journal.confirmed(generationId, taskId)) journal.applied(entry.id());
     }
 
     private static void validate(Binding binding, FtbQuestTasks.EvidenceTarget target) {

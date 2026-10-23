@@ -1,0 +1,2526 @@
+{
+  "createdAt": "2026-10-23T13:35:00.277179+08:00",
+  "timezone": "UTC+08:00",
+  "baseRevision": "6dc7eb6",
+  "storage": {
+    "scan": {
+      "createdAt": "2026-10-23T13:15:20.956003400+08:00",
+      "mode": "scan",
+      "java": "21.0.11+10-LTS",
+      "scope": "Warm local journal reads; indexed reflection dispatch included; excludes native state and forced-write latency",
+      "samples": [
+        {
+          "entries": 256,
+          "appendAndForceMillis": 4505.7487,
+          "warmOpenMillis": 544.3592,
+          "readIterations": 2000,
+          "readsNanosPerCall": 378742.75,
+          "readsAllocatedBytesPerCall": 18011.828
+        },
+        {
+          "entries": 1024,
+          "appendAndForceMillis": 12458.7921,
+          "warmOpenMillis": 1307.1357,
+          "readIterations": 2000,
+          "readsNanosPerCall": 1628132.15,
+          "readsAllocatedBytesPerCall": 53808.084
+        },
+        {
+          "entries": 4096,
+          "appendAndForceMillis": 51907.738,
+          "warmOpenMillis": 3522.0186,
+          "readIterations": 2000,
+          "readsNanosPerCall": 8044716.05,
+          "readsAllocatedBytesPerCall": 205612.664
+        }
+      ]
+    },
+    "indexed": {
+      "createdAt": "2026-10-23T13:17:36.552165400+08:00",
+      "mode": "indexed",
+      "java": "21.0.11+10-LTS",
+      "scope": "Warm local journal reads; indexed reflection dispatch included; excludes native state and forced-write latency",
+      "samples": [
+        {
+          "entries": 256,
+          "warmOpenMillis": 939.7615,
+          "readIterations": 2000,
+          "readsNanosPerCall": 82044.75,
+          "readsAllocatedBytesPerCall": 10099.956
+        },
+        {
+          "entries": 1024,
+          "warmOpenMillis": 1259.7381,
+          "readIterations": 2000,
+          "readsNanosPerCall": 36576.65,
+          "readsAllocatedBytesPerCall": 9577.276
+        },
+        {
+          "entries": 4096,
+          "warmOpenMillis": 3461.4674,
+          "readIterations": 2000,
+          "readsNanosPerCall": 21163.95,
+          "readsAllocatedBytesPerCall": 9575.948
+        }
+      ]
+    },
+    "unchangedImmutableFiles": 15456,
+    "images": {
+      "path": "artifacts/craft-storage-before-images.json",
+      "bytes": 2548165,
+      "sha256": "162bc3afa406ac4f73ecf651c4b98c9128daf58fd91df47e039fef82383b5f86"
+    },
+    "evidence": [
+      {
+        "path": "artifacts/craft-storage-2026-10-23/scan-result.json",
+        "bytes": 927,
+        "sha256": "974e78e8756f0e13c847df56c1a8dd0fb7218451e3f35cd84d082693098c76b5"
+      },
+      {
+        "path": "artifacts/craft-storage-2026-10-23/indexed-result.json",
+        "bytes": 798,
+        "sha256": "d4554b34fa0a7b7405939eedae585a90f92fcf6e112b477d7951df3f4292f641"
+      }
+    ],
+    "builds": [
+      {
+        "path": "artifacts/craft-storage-scan-build/classes/net/citizensnpcs/audit/CraftStorageAudit.class",
+        "bytes": 12288,
+        "sha256": "a145eff80754f0fc0fca77773e032638d800021fb7af14794d95d31b01c70737"
+      },
+      {
+        "path": "artifacts/craft-storage-scan-build/classes/net/citizensnpcs/util/JournalJson$1.class",
+        "bytes": 1495,
+        "sha256": "a71be9e574703fc08a7042ec3fd892c20a468d7cb5ec27a59a83e0cd44a185f1"
+      },
+      {
+        "path": "artifacts/craft-storage-scan-build/classes/net/citizensnpcs/util/JournalJson$2.class",
+        "bytes": 1125,
+        "sha256": "28db2c585fad650e814fb7c8c04d057fb6191180adae6387f76ddee9aad478be"
+      },
+      {
+        "path": "artifacts/craft-storage-scan-build/classes/net/citizensnpcs/util/JournalJson$3.class",
+        "bytes": 912,
+        "sha256": "ea8d7c8a39e31697c2166c6a563da49c229d2c5624aed0180ce30f82cb6fdea3"
+      },
+      {
+        "path": "artifacts/craft-storage-scan-build/classes/net/citizensnpcs/util/JournalJson.class",
+        "bytes": 7566,
+        "sha256": "cd4621b767ff58fd2d685944b00c24410e968b913912ce403f372767909ebb6d"
+      },
+      {
+        "path": "artifacts/craft-storage-scan-build/classes/net/citizensnpcs/util/QuestEvidenceJournal$Admission.class",
+        "bytes": 3016,
+        "sha256": "586d119624cf1ec99cbda41a52c7b09f574b9a4b288300be18d217750646afe0"
+      },
+      {
+        "path": "artifacts/craft-storage-scan-build/classes/net/citizensnpcs/util/QuestEvidenceJournal$Entry.class",
+        "bytes": 3909,
+        "sha256": "d679c10fe35a59301054706e97c1929dd0d3b68849bcb8132c627c938cf483b4"
+      },
+      {
+        "path": "artifacts/craft-storage-scan-build/classes/net/citizensnpcs/util/QuestEvidenceJournal$Generation.class",
+        "bytes": 2236,
+        "sha256": "958e5067ca55715886621e7e8d1f44465c68be864642802e77ae967f9af7da42"
+      },
+      {
+        "path": "artifacts/craft-storage-scan-build/classes/net/citizensnpcs/util/QuestEvidenceJournal$OpenValidation.class",
+        "bytes": 420,
+        "sha256": "b17943eba3d52364eeafdee50795458f7dc9fa42488f93b0d8c643c30736f6ad"
+      },
+      {
+        "path": "artifacts/craft-storage-scan-build/classes/net/citizensnpcs/util/QuestEvidenceJournal$Outcome.class",
+        "bytes": 1353,
+        "sha256": "7f174e4f06a798259fbcebc8842e76017f97649d69630ebe7586633cf1b3e59b"
+      },
+      {
+        "path": "artifacts/craft-storage-scan-build/classes/net/citizensnpcs/util/QuestEvidenceJournal$Resolution.class",
+        "bytes": 2131,
+        "sha256": "4669deb8fff9998b805a4a85c201079e74a049a8cf6db36960220eb30bedfaf8"
+      },
+      {
+        "path": "artifacts/craft-storage-scan-build/classes/net/citizensnpcs/util/QuestEvidenceJournal$Scope.class",
+        "bytes": 1802,
+        "sha256": "d199dbeb8a707047fcd26e8a92041243144e3d339857a3f88eb7238d409fdb9f"
+      },
+      {
+        "path": "artifacts/craft-storage-scan-build/classes/net/citizensnpcs/util/QuestEvidenceJournal$State.class",
+        "bytes": 1383,
+        "sha256": "7db3d8e2e219df357fea8d87fb6882f989e08314fc3e5331a88a378333d59591"
+      },
+      {
+        "path": "artifacts/craft-storage-scan-build/classes/net/citizensnpcs/util/QuestEvidenceJournal.class",
+        "bytes": 18477,
+        "sha256": "8c0313b87d3adb7ea390a1bf3bbc065300fe428c3947493bab51a2482834623a"
+      },
+      {
+        "path": "artifacts/craft-storage-scan-build/CraftStorageAudit.java",
+        "bytes": 7009,
+        "sha256": "0378ccdaa3b28351e4a8bdc159d5fe7297ab3bdc9593559c9fd812ccb2c56172"
+      },
+      {
+        "path": "artifacts/craft-storage-scan-build/JournalJson.java",
+        "bytes": 7003,
+        "sha256": "73b69be31a0a01ea7f0af33a5bd792259e00909b94e84d263dcea9679e1f696f"
+      },
+      {
+        "path": "artifacts/craft-storage-scan-build/QuestEvidenceJournal.java",
+        "bytes": 18447,
+        "sha256": "9aa01c0c43b699a293b6ef5954e8339ac26fdbaa41d75cb565897dd0c2ae65c9"
+      },
+      {
+        "path": "artifacts/craft-storage-indexed-build/classes/net/citizensnpcs/audit/CraftStorageAudit.class",
+        "bytes": 12288,
+        "sha256": "a145eff80754f0fc0fca77773e032638d800021fb7af14794d95d31b01c70737"
+      },
+      {
+        "path": "artifacts/craft-storage-indexed-build/classes/net/citizensnpcs/util/JournalJson$1.class",
+        "bytes": 1495,
+        "sha256": "a71be9e574703fc08a7042ec3fd892c20a468d7cb5ec27a59a83e0cd44a185f1"
+      },
+      {
+        "path": "artifacts/craft-storage-indexed-build/classes/net/citizensnpcs/util/JournalJson$2.class",
+        "bytes": 1125,
+        "sha256": "28db2c585fad650e814fb7c8c04d057fb6191180adae6387f76ddee9aad478be"
+      },
+      {
+        "path": "artifacts/craft-storage-indexed-build/classes/net/citizensnpcs/util/JournalJson$3.class",
+        "bytes": 912,
+        "sha256": "ea8d7c8a39e31697c2166c6a563da49c229d2c5624aed0180ce30f82cb6fdea3"
+      },
+      {
+        "path": "artifacts/craft-storage-indexed-build/classes/net/citizensnpcs/util/JournalJson.class",
+        "bytes": 7566,
+        "sha256": "cd4621b767ff58fd2d685944b00c24410e968b913912ce403f372767909ebb6d"
+      },
+      {
+        "path": "artifacts/craft-storage-indexed-build/classes/net/citizensnpcs/util/QuestEvidenceJournal$Admission.class",
+        "bytes": 3016,
+        "sha256": "c3952165d80128045ffd9b3ab9da11da699776e18ed5a3a882ea09f8531b0493"
+      },
+      {
+        "path": "artifacts/craft-storage-indexed-build/classes/net/citizensnpcs/util/QuestEvidenceJournal$Entry.class",
+        "bytes": 3909,
+        "sha256": "dc2d440acf65170dabe5a6b1d48dec3fc4e0ba9853b71389f2c60a5e549e91a3"
+      },
+      {
+        "path": "artifacts/craft-storage-indexed-build/classes/net/citizensnpcs/util/QuestEvidenceJournal$Generation.class",
+        "bytes": 2236,
+        "sha256": "14a793ea14e06443736d16f7395d6b9fd24001a3d012176ffe24485019a8cdb0"
+      },
+      {
+        "path": "artifacts/craft-storage-indexed-build/classes/net/citizensnpcs/util/QuestEvidenceJournal$GenerationTask.class",
+        "bytes": 1569,
+        "sha256": "6015b56f3726e81d081df657020a04ad939b18e959f7f98f13a6aec84a46982e"
+      },
+      {
+        "path": "artifacts/craft-storage-indexed-build/classes/net/citizensnpcs/util/QuestEvidenceJournal$ObservationTask.class",
+        "bytes": 1576,
+        "sha256": "da2474b78252e12b58dc2fe51819116a247dae010f99ecea9beca012e1ee9610"
+      },
+      {
+        "path": "artifacts/craft-storage-indexed-build/classes/net/citizensnpcs/util/QuestEvidenceJournal$OpenValidation.class",
+        "bytes": 420,
+        "sha256": "b17943eba3d52364eeafdee50795458f7dc9fa42488f93b0d8c643c30736f6ad"
+      },
+      {
+        "path": "artifacts/craft-storage-indexed-build/classes/net/citizensnpcs/util/QuestEvidenceJournal$Outcome.class",
+        "bytes": 1353,
+        "sha256": "24b32de0f253ddb62ee0da77c5c2f69e837c6c0b2f04242ef1e79152fe172589"
+      },
+      {
+        "path": "artifacts/craft-storage-indexed-build/classes/net/citizensnpcs/util/QuestEvidenceJournal$Resolution.class",
+        "bytes": 2131,
+        "sha256": "e99a52eee82601b3984dda9bdd43ebb25cfa9f09540068da3958caa5d2e00805"
+      },
+      {
+        "path": "artifacts/craft-storage-indexed-build/classes/net/citizensnpcs/util/QuestEvidenceJournal$Scope.class",
+        "bytes": 1802,
+        "sha256": "656c16b0564c899a5163e7079722c38d3a578cdbaee57ba1d41bdd13ae63fe59"
+      },
+      {
+        "path": "artifacts/craft-storage-indexed-build/classes/net/citizensnpcs/util/QuestEvidenceJournal$State.class",
+        "bytes": 1383,
+        "sha256": "3f9557ed16816fc45f0c9453c73097e12187259079a986ba412c1c4173b21874"
+      },
+      {
+        "path": "artifacts/craft-storage-indexed-build/classes/net/citizensnpcs/util/QuestEvidenceJournal$TaskIndex.class",
+        "bytes": 2079,
+        "sha256": "83214b16bceb720ce9ef80a7cbea54c2968d91283d31f33cdbbddf948be0f774"
+      },
+      {
+        "path": "artifacts/craft-storage-indexed-build/classes/net/citizensnpcs/util/QuestEvidenceJournal.class",
+        "bytes": 22610,
+        "sha256": "79d6504e3825e1e7afb4d036008694a3a95df19179d440a3e100d8f2413dee7b"
+      },
+      {
+        "path": "artifacts/craft-storage-indexed-build/CraftStorageAudit.java",
+        "bytes": 7009,
+        "sha256": "0378ccdaa3b28351e4a8bdc159d5fe7297ab3bdc9593559c9fd812ccb2c56172"
+      },
+      {
+        "path": "artifacts/craft-storage-indexed-build/JournalJson.java",
+        "bytes": 7003,
+        "sha256": "73b69be31a0a01ea7f0af33a5bd792259e00909b94e84d263dcea9679e1f696f"
+      },
+      {
+        "path": "artifacts/craft-storage-indexed-build/QuestEvidenceJournal.java",
+        "bytes": 22110,
+        "sha256": "fc8b8d99ab296cc68f869f89334493b697eecfc005b3ef210f95830175679655"
+      }
+    ],
+    "logs": [
+      {
+        "path": "artifacts/craft-storage-scan.log",
+        "bytes": 569,
+        "sha256": "b78da102395758bf2113ae745ce2bca0737c8d63109fe35073e9561efc3f9088"
+      },
+      {
+        "path": "artifacts/craft-storage-indexed.log",
+        "bytes": 461,
+        "sha256": "254fc93f98bed9fc0b74bee54d3a780f9d1edd97d0f6ee05cddab3cf3fe2c560"
+      }
+    ]
+  },
+  "ordinary": [
+    {
+      "target": "21.1.248",
+      "results": {
+        "tests": 828,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "log": {
+        "path": "artifacts/craft-index-ordinary-248.log",
+        "bytes": 73538,
+        "sha256": "c371711fd18aa8d7cd4b34e0fcbb0377d8a7a101c3d7eeb9c390be7fdff4af73"
+      },
+      "reports": [
+        {
+          "path": "artifacts/craft-index-ordinary-21.1.248-build/test-results/test/TEST-net.citizensnpcs.api.ai.BehaviorRemovalTest.xml",
+          "bytes": 1174,
+          "sha256": "58e4a02da32bddb7d51b579f3adb1bcfb755ff0558764f6d12e2e2e9cafd66ac"
+        },
+        {
+          "path": "artifacts/craft-index-ordinary-21.1.248-build/test-results/test/TEST-net.citizensnpcs.api.ai.CoalescedBehaviorTest.xml",
+          "bytes": 1061,
+          "sha256": "209a5772e1bffd580c6eab7688f1c83216cd95d1eefb79f3d3aedbd4d28737de"
+        },
+        {
+          "path": "artifacts/craft-index-ordinary-21.1.248-build/test-results/test/TEST-net.citizensnpcs.api.ai.IfElseResetTest.xml",
+          "bytes": 482,
+          "sha256": "b36aa3a3f57eae9abcfd8c21cf936b27eb787eaaf409f26fd2270fdb40a31d6d"
+        },
+        {
+          "path": "artifacts/craft-index-ordinary-21.1.248-build/test-results/test/TEST-net.citizensnpcs.api.ai.ParallelBehaviorLifecycleTest.xml",
+          "bytes": 961,
+          "sha256": "7dd9ef093d652ad7ee0c821004d13aaeffb1c60d996f8aeaa2c6f0078b020aad"
+        },
+        {
+          "path": "artifacts/craft-index-ordinary-21.1.248-build/test-results/test/TEST-net.citizensnpcs.api.ai.ParallelCompositeTest.xml",
+          "bytes": 908,
+          "sha256": "d2b32e228698ca752800b1d88225afa01839b72f68f8e724683843fc49e70eb4"
+        },
+        {
+          "path": "artifacts/craft-index-ordinary-21.1.248-build/test-results/test/TEST-net.citizensnpcs.api.ai.SelectorTerminalResetTest.xml",
+          "bytes": 651,
+          "sha256": "f8a56ce402233e049c5be057e08c0b229b1878b26edf42904029aef64597e9f7"
+        },
+        {
+          "path": "artifacts/craft-index-ordinary-21.1.248-build/test-results/test/TEST-net.citizensnpcs.api.ai.SequenceRemovalTest.xml",
+          "bytes": 900,
+          "sha256": "0bd78233f572e415ac9e146e065d5c33e7ede84b97182d4c777dd7f572c202e5"
+        },
+        {
+          "path": "artifacts/craft-index-ordinary-21.1.248-build/test-results/test/TEST-net.citizensnpcs.api.ai.SequenceResetCallbackTest.xml",
+          "bytes": 654,
+          "sha256": "058ab63000da5415a426b7b67cf705ddb0c072ec29cafd88856ae95870a5ffd5"
+        },
+        {
+          "path": "artifacts/craft-index-ordinary-21.1.248-build/test-results/test/TEST-net.citizensnpcs.api.ai.TimeoutDecoratorTest.xml",
+          "bytes": 2037,
+          "sha256": "ce3872997f2184498587a99619e7eea1e2ba5af049fdb28b851f170a07aaba3f"
+        },
+        {
+          "path": "artifacts/craft-index-ordinary-21.1.248-build/test-results/test/TEST-net.citizensnpcs.api.ai.tree.BehaviorContextTest.xml",
+          "bytes": 1390,
+          "sha256": "f3afab159d6ea58175f1f17053cdf47f436d554db7cd3e92f9389ea8f3f0a175"
+        },
+        {
+          "path": "artifacts/craft-index-ordinary-21.1.248-build/test-results/test/TEST-net.citizensnpcs.api.ai.tree.BehaviorSignalsTest.xml",
+          "bytes": 1253,
+          "sha256": "3d0f6d44fc56faaacd6d9bea6ff24377776ba28140f0aa6d23868d6fa6bc8c97"
+        },
+        {
+          "path": "artifacts/craft-index-ordinary-21.1.248-build/test-results/test/TEST-net.citizensnpcs.api.ai.tree.BlockBehaviorInputTest.xml",
+          "bytes": 815,
+          "sha256": "a1aaefc66c6b9037c69cc7dc7d7baea3d14ba81a883dba00f73a63986c3dd4a6"
+        },
+        {
+          "path": "artifacts/craft-index-ordinary-21.1.248-build/test-results/test/TEST-net.citizensnpcs.api.ai.tree.CooldownBehaviorTest.xml",
+          "bytes": 781,
+          "sha256": "6817a6c03449df33238df99a7fda1d1a89bad57603a6ca43472908d6051edb5c"
+        },
+        {
+          "path": "artifacts/craft-index-ordinary-21.1.248-build/test-results/test/TEST-net.citizensnpcs.api.ai.tree.DecoratorTest.xml",
+          "bytes": 935,
+          "sha256": "af340bf01e1494f67040f15c23891c90530cbb2eb522b4bb65172878036a8aea"
+        },
+        {
+          "path": "artifacts/craft-index-ordinary-21.1.248-build/test-results/test/TEST-net.citizensnpcs.api.ai.tree.IfElseLifecycleTest.xml",
+          "bytes": 908,
+          "sha256": "d27e130e4e4ba0edc1898eb68fac2916328f8b9a5436db7c75ab299622bf7d0c"
+        },
+        {
+          "path": "artifacts/craft-index-ordinary-21.1.248-build/test-results/test/TEST-net.citizensnpcs.api.ai.tree.LoopTest.xml",
+          "bytes": 1305,
+          "sha256": "414afe661b008a35479f2d1f992309832a13ae9d05e5aa7d94cdda43e70c96cf"
+        },
+        {
+          "path": "artifacts/craft-index-ordinary-21.1.248-build/test-results/test/TEST-net.citizensnpcs.api.ai.tree.RepeatTest.xml",
+          "bytes": 1592,
+          "sha256": "a34dcce79e13f919a8e4c5f9df6744d3aaa5f8db664fe29c88dc414259b0052e"
+        },
+        {
+          "path": "artifacts/craft-index-ordinary-21.1.248-build/test-results/test/TEST-net.citizensnpcs.api.ai.tree.RetryDecoratorTest.xml",
+          "bytes": 1974,
+          "sha256": "61d01127bd89de077a02994ef77b307b0008d2501cff7bb9b44634f342105ee9"
+        },
+        {
+          "path": "artifacts/craft-index-ordinary-21.1.248-build/test-results/test/TEST-net.citizensnpcs.api.ai.tree.SignalTargetIdTest.xml",
+          "bytes": 788,
+          "sha256": "150887c3ecda0c8781d93437b577581b6185e1ccd48d7ef660aa4b64d9970e18"
+        },
+        {
+          "path": "artifacts/craft-index-ordinary-21.1.248-build/test-results/test/TEST-net.citizensnpcs.api.ai.tree.StatusMapperTest.xml",
+          "bytes": 800,
+          "sha256": "720078bd035982c24b041ea30a8c790af67469d87bc1e325710467f65cf2fccc"
+        },
+        {
+          "path": "artifacts/craft-index-ordinary-21.1.248-build/test-results/test/TEST-net.citizensnpcs.api.ai.tree.TimerDecoratorTest.xml",
+          "bytes": 1878,
+          "sha256": "b3a89995f3c25c64dc47ed786bb8668686d6888a5c9203a83958bfc2fc9ca592"
+        },
+        {
+          "path": "artifacts/craft-index-ordinary-21.1.248-build/test-results/test/TEST-net.citizensnpcs.api.ai.tree.WaitBehaviorTest.xml",
+          "bytes": 1333,
+          "sha256": "b5ad704f4e742008ca19a89327f7adcac15686656b834364bffebc4653c35882"
+        },
+        {
+          "path": "artifacts/craft-index-ordinary-21.1.248-build/test-results/test/TEST-net.citizensnpcs.api.ai.tree.WaitForSignalTest.xml",
+          "bytes": 940,
+          "sha256": "cf4ddf1cd09cd14eb26f690dbd77d0f724c5b474cf035049f03a997716781b70"
+        },
+        {
+          "path": "artifacts/craft-index-ordinary-21.1.248-build/test-results/test/TEST-net.citizensnpcs.api.ai.tree.WaitUntilBehaviorTest.xml",
+          "bytes": 1547,
+          "sha256": "be49c6ed2761e689674be24ca953232b748f7f19fce20541a7b102952e64f74b"
+        },
+        {
+          "path": "artifacts/craft-index-ordinary-21.1.248-build/test-results/test/TEST-net.citizensnpcs.api.ai.tree.WalkToValidationTest.xml",
+          "bytes": 796,
+          "sha256": "207248282aeceb30e0302c7b4225e87e0a16e5c1feb6a0acc2668c05b96d7f90"
+        },
+        {
+          "path": "artifacts/craft-index-ordinary-21.1.248-build/test-results/test/TEST-net.citizensnpcs.api.ai.tree.WanderBehaviorTest.xml",
+          "bytes": 635,
+          "sha256": "f64b9a25f6c5b50087ddc08d50d6be00f4e578bc339b158256ee14e2f48d1b94"
+        },
+        {
+          "path": "artifacts/craft-index-ordinary-21.1.248-build/test-results/test/TEST-net.citizensnpcs.api.command.CommandContextQuotingTest.xml",
+          "bytes": 670,
+          "sha256": "3db062ddcb17911cb0bb660b11cc26b3d93478d340d459b6c2a69ea8cdb62c79"
+        },
+        {
+          "path": "artifacts/craft-index-ordinary-21.1.248-build/test-results/test/TEST-net.citizensnpcs.api.command.CommandLocationTest.xml",
+          "bytes": 1194,
+          "sha256": "6f61fc1878ca76b5cf352af622b8339b20d2c71ad3b325e01a48388a665561d8"
+        },
+        {
+          "path": "artifacts/craft-index-ordinary-21.1.248-build/test-results/test/TEST-net.citizensnpcs.api.command.NPCCommandTargetTest.xml",
+          "bytes": 1121,
+          "sha256": "8bae78ea0c75e5f72ec7061c762ad9e1b34c12a1b7fb10685a4f2967b2254c69"
+        },
+        {
+          "path": "artifacts/craft-index-ordinary-21.1.248-build/test-results/test/TEST-net.citizensnpcs.api.command.StrictCommandArgumentsTest.xml",
+          "bytes": 630,
+          "sha256": "ec5469c2bc29c4f13663f43ed534ec98fc0da9363d4062bd153dccaaf76ab07f"
+        },
+        {
+          "path": "artifacts/craft-index-ordinary-21.1.248-build/test-results/test/TEST-net.citizensnpcs.api.expr.ExpressionRegistryTest.xml",
+          "bytes": 11674,
+          "sha256": "feb84495abee6bc6ea1e3d6c8fef294ec13ca4de4f2a502a7564c601bb7ad243"
+        },
+        {
+          "path": "artifacts/craft-index-ordinary-21.1.248-build/test-results/test/TEST-net.citizensnpcs.api.expr.ExpressionScopeTest.xml",
+          "bytes": 2214,
+          "sha256": "8c5d07bef937e3d84e356315e35fc07455a6c01bfed76f821018d7562ff53c60"
+        },
+        {
+          "path": "artifacts/craft-index-ordinary-21.1.248-build/test-results/test/TEST-net.citizensnpcs.api.expr.MemoryCharacterTest.xml",
+          "bytes": 648,
+          "sha256": "2dfb6958705567690e793f98481cc47c4bda8ffbdca43d48b6f337a031bebe6b"
+        },
+        {
+          "path": "artifacts/craft-index-ordinary-21.1.248-build/test-results/test/TEST-net.citizensnpcs.api.expr.MemoryKeyIdentityTest.xml",
+          "bytes": 794,
+          "sha256": "08bb413119f480c595832469e86083d29695b559ddedaa7cd6c0b74c34d86437"
+        },
+        {
+          "path": "artifacts/craft-index-ordinary-21.1.248-build/test-results/test/TEST-net.citizensnpcs.api.expr.MemoryKeysTest.xml",
+          "bytes": 920,
+          "sha256": "baba152d3132d975d347923de1a024e71cb7c92feea9b635f6a08be9ec30edec"
+        },
+        {
+          "path": "artifacts/craft-index-ordinary-21.1.248-build/test-results/test/TEST-net.citizensnpcs.api.expr.MemoryListPersistenceTest.xml",
+          "bytes": 1111,
+          "sha256": "fcb4500ec9d1266e4baaf43b32e744521813507d24b92697742ea4cedf01b716"
+        },
+        {
+          "path": "artifacts/craft-index-ordinary-21.1.248-build/test-results/test/TEST-net.citizensnpcs.api.expr.MemoryListQueriesTest.xml",
+          "bytes": 779,
+          "sha256": "ce8d7391d5b4e1f5c37f1f8763d8d79d44a6bee8e84a200a181423e563fe7d72"
+        },
+        {
+          "path": "artifacts/craft-index-ordinary-21.1.248-build/test-results/test/TEST-net.citizensnpcs.api.gui.InventoryMenuTest.xml",
+          "bytes": 1974,
+          "sha256": "1d05c4114960efe119ae02447495ff269d530eda459cb1f4f21fa93376734cd6"
+        },
+        {
+          "path": "artifacts/craft-index-ordinary-21.1.248-build/test-results/test/TEST-net.citizensnpcs.api.hpastar.HPAGraphTest.xml",
+          "bytes": 2641,
+          "sha256": "8a336f3ae3727ff0784ce77c0d31fbf47c537ddee55acc552a5cd47c044f9c18"
+        },
+        {
+          "path": "artifacts/craft-index-ordinary-21.1.248-build/test-results/test/TEST-net.citizensnpcs.api.npc.NPCDataStoreTest.xml",
+          "bytes": 4318,
+          "sha256": "50cf90e275b31a8fd0da04b2e2b2b382e6b18fdda23863ea2925b9412094b11f"
+        },
+        {
+          "path": "artifacts/craft-index-ordinary-21.1.248-build/test-results/test/TEST-net.citizensnpcs.api.npc.templates.CommandEventRegistrationTest.xml",
+          "bytes": 1536,
+          "sha256": "b67b8b236ca4fc70fda667ca23bf47d868e25e7e21a5c3eac009d1e404effc97"
+        },
+        {
+          "path": "artifacts/craft-index-ordinary-21.1.248-build/test-results/test/TEST-net.citizensnpcs.api.npc.templates.TemplateApplicationLifecycleTest.xml",
+          "bytes": 2534,
+          "sha256": "8a469b6ae99709e4c221c8f9a924974ec17c7aa70f96d80fea592efabfc0d24f"
+        },
+        {
+          "path": "artifacts/craft-index-ordinary-21.1.248-build/test-results/test/TEST-net.citizensnpcs.api.npc.templates.TemplateEventReplacementTest.xml",
+          "bytes": 1043,
+          "sha256": "20a5b8a59bcffddf22d6d97b62689892c5eba1990ebc3f3a76a31cd43ba5c819"
+        },
+        {
+          "path": "artifacts/craft-index-ordinary-21.1.248-build/test-results/test/TEST-net.citizensnpcs.api.npc.templates.TemplateGenerationTest.xml",
+          "bytes": 2363,
+          "sha256": "a1192e42019f8bf3b9a13c16e38a639b258cdc5bd97d6127feaa181ba9e47ca0"
+        },
+        {
+          "path": "artifacts/craft-index-ordinary-21.1.248-build/test-results/test/TEST-net.citizensnpcs.api.npc.templates.TemplateMigrationTest.xml",
+          "bytes": 3415,
+          "sha256": "d640f27766f525706cd7f545acb535a5cedc5abe4bccbd7fcdf55216f560860b"
+        },
+        {
+          "path": "artifacts/craft-index-ordinary-21.1.248-build/test-results/test/TEST-net.citizensnpcs.api.npc.templates.TemplateRegistryReloadTest.xml",
+          "bytes": 45016,
+          "sha256": "a3052ed7222f169995b77440a7068a2222b37affac60fd68355f338dbe1f48e1"
+        },
+        {
+          "path": "artifacts/craft-index-ordinary-21.1.248-build/test-results/test/TEST-net.citizensnpcs.api.npc.templates.TemplateWorkspaceTest.xml",
+          "bytes": 798,
+          "sha256": "26fb46f96463be1a881a6d9cdd16eca645db8ee6f92bc980c747f464123daa80"
+        },
+        {
+          "path": "artifacts/craft-index-ordinary-21.1.248-build/test-results/test/TEST-net.citizensnpcs.api.npc.templates.TraitTemplateFormTest.xml",
+          "bytes": 1664,
+          "sha256": "99c88014135407ee2ca48dd3d85eb6bb266d4df08cfbbe282d7712c99657c9f5"
+        },
+        {
+          "path": "artifacts/craft-index-ordinary-21.1.248-build/test-results/test/TEST-net.citizensnpcs.api.npc.templates.YamlReplacementActionTest.xml",
+          "bytes": 1934,
+          "sha256": "395c6b54addd43446dd1bb3ed24a1ab515e19b295c408929edaaa46b2aa290bf"
+        },
+        {
+          "path": "artifacts/craft-index-ordinary-21.1.248-build/test-results/test/TEST-net.citizensnpcs.api.npc.templates.YamlReplacementValidationTest.xml",
+          "bytes": 827,
+          "sha256": "d9d923a48439298188c222644f8be3387fed382418bce0b6043cf834ecd0a1b5"
+        },
+        {
+          "path": "artifacts/craft-index-ordinary-21.1.248-build/test-results/test/TEST-net.citizensnpcs.api.persistence.LocationWorldNameTest.xml",
+          "bytes": 928,
+          "sha256": "a10403d349a6e94947cd216da5709a11664f21d576ca457fc4a2c4adc6c0e7ab"
+        },
+        {
+          "path": "artifacts/craft-index-ordinary-21.1.248-build/test-results/test/TEST-net.citizensnpcs.api.persistence.PersistenceDelegateFailureTest.xml",
+          "bytes": 869,
+          "sha256": "d8a4d05e9cdb05100074003ab4648c6c398722f83117887b690613b4933e790e"
+        },
+        {
+          "path": "artifacts/craft-index-ordinary-21.1.248-build/test-results/test/TEST-net.citizensnpcs.api.persistence.PersistenceLoaderLegacyValuesTest.xml",
+          "bytes": 11000,
+          "sha256": "ed5f31f70e12034247cba7f88a97064c6e73d4b7410c29a475547821884c3ac3"
+        },
+        {
+          "path": "artifacts/craft-index-ordinary-21.1.248-build/test-results/test/TEST-net.citizensnpcs.api.persistence.PersistenceMapKeysTest.xml",
+          "bytes": 819,
+          "sha256": "b37396fca33ad880bc1c13e01c71c4d3ee66622a321ccaae860f86911fb1f8ca"
+        },
+        {
+          "path": "artifacts/craft-index-ordinary-21.1.248-build/test-results/test/TEST-net.citizensnpcs.api.persistence.StrictPersistenceTest.xml",
+          "bytes": 513,
+          "sha256": "9b3a96171ca3620827d7c9a34ebab6db9a1739ac26f2a4f58ba16af4c83efb91"
+        },
+        {
+          "path": "artifacts/craft-index-ordinary-21.1.248-build/test-results/test/TEST-net.citizensnpcs.api.util.DurationConversionTest.xml",
+          "bytes": 766,
+          "sha256": "d2ae8e2fd242c41494b38e5ead507c76f7ce3c787e63fd01c3bac86fc317428d"
+        },
+        {
+          "path": "artifacts/craft-index-ordinary-21.1.248-build/test-results/test/TEST-net.citizensnpcs.api.util.DurationParsingTest.xml",
+          "bytes": 894,
+          "sha256": "ab286b448f74d06db1e0b395ba666ce64d49864a45ddaae0cb8ca99df2f9db86"
+        },
+        {
+          "path": "artifacts/craft-index-ordinary-21.1.248-build/test-results/test/TEST-net.citizensnpcs.api.util.ItemStorageTest.xml",
+          "bytes": 3196,
+          "sha256": "3929f28f5e453b08d0cb54a86726497e605ae305132a00c2d055a505623d6fff"
+        },
+        {
+          "path": "artifacts/craft-index-ordinary-21.1.248-build/test-results/test/TEST-net.citizensnpcs.api.util.LegacyBukkitMetaTest.xml",
+          "bytes": 3376,
+          "sha256": "58d597f3bf7b6bed12a01156caa91051daa697cd8d15a3c5e1827baa5f52c724"
+        },
+        {
+          "path": "artifacts/craft-index-ordinary-21.1.248-build/test-results/test/TEST-net.citizensnpcs.api.util.LegacyBukkitMetaTypesTest.xml",
+          "bytes": 3701,
+          "sha256": "a93d5b3ca2e430264de40428afe0e098252eeaee0aad5166de8abcfc668d4b61"
+        },
+        {
+          "path": "artifacts/craft-index-ordinary-21.1.248-build/test-results/test/TEST-net.citizensnpcs.api.util.LegacyFireworksTest.xml",
+          "bytes": 4312,
+          "sha256": "e422ad4657a3445361d786f17eed30aba970107d13396a05634abef835f37c3d"
+        },
+        {
+          "path": "artifacts/craft-index-ordinary-21.1.248-build/test-results/test/TEST-net.citizensnpcs.api.util.LegacyStructuredItemsTest.xml",
+          "bytes": 5172,
+          "sha256": "081fea6bc88a44394c4e4ef66180b4ab6c23f792f9338f2546a9a15cdc751a52"
+        },
+        {
+          "path": "artifacts/craft-index-ordinary-21.1.248-build/test-results/test/TEST-net.citizensnpcs.api.util.MemoryDataKeyCopyTest.xml",
+          "bytes": 660,
+          "sha256": "b6a41a3cff79726c51e48d52471122724b08e658bbb11e0e7814576524c28dda"
+        },
+        {
+          "path": "artifacts/craft-index-ordinary-21.1.248-build/test-results/test/TEST-net.citizensnpcs.api.util.MemoryDataKeyTransactionTest.xml",
+          "bytes": 2181,
+          "sha256": "88633c0a27dde56f72852402f558baa0f584307304fbc252cd026c9768fa4a97"
+        },
+        {
+          "path": "artifacts/craft-index-ordinary-21.1.248-build/test-results/test/TEST-net.citizensnpcs.api.util.NPCCommandFormatTest.xml",
+          "bytes": 1461,
+          "sha256": "f32bfa89e004fe762bac3dc6681836693bbec669ecd23db6f711ac78d87cfb4f"
+        },
+        {
+          "path": "artifacts/craft-index-ordinary-21.1.248-build/test-results/test/TEST-net.citizensnpcs.api.util.PermissionDefaultsTest.xml",
+          "bytes": 1109,
+          "sha256": "990282ca9237f126e3869eb24f7b60a1c7fa899d43215569e2c82b9cb601025a"
+        },
+        {
+          "path": "artifacts/craft-index-ordinary-21.1.248-build/test-results/test/TEST-net.citizensnpcs.api.util.schedulers.adapter.NeoForgeSchedulerTest.xml",
+          "bytes": 1013,
+          "sha256": "5a4dc0a0c441f55896fc9f1abc953e2e9d986d4f0d86d100efc72a43edb54e90"
+        },
+        {
+          "path": "artifacts/craft-index-ordinary-21.1.248-build/test-results/test/TEST-net.citizensnpcs.api.util.StoredItemListTest.xml",
+          "bytes": 2729,
+          "sha256": "cf280787a3c1e3f6771395b7928c14b1271e32c33bb96d8b3616f71cb6823543"
+        },
+        {
+          "path": "artifacts/craft-index-ordinary-21.1.248-build/test-results/test/TEST-net.citizensnpcs.api.util.StoredItemsTest.xml",
+          "bytes": 2991,
+          "sha256": "417c248afac84aee29cdcc84ae29284a4a83c0bb9e21318ffa6a5c05ec14318e"
+        },
+        {
+          "path": "artifacts/craft-index-ordinary-21.1.248-build/test-results/test/TEST-net.citizensnpcs.api.util.TextParserTest.xml",
+          "bytes": 3410,
+          "sha256": "e2633b63f2881de574ae84afbd4d02323a9c404a8a2819fa235c79f11a54be49"
+        },
+        {
+          "path": "artifacts/craft-index-ordinary-21.1.248-build/test-results/test/TEST-net.citizensnpcs.api.util.TranslatorFormatTest.xml",
+          "bytes": 841,
+          "sha256": "9d9b40d503d63853882266a869c6aa61bf7134e9d33e218d067a6d6f40074ab0"
+        },
+        {
+          "path": "artifacts/craft-index-ordinary-21.1.248-build/test-results/test/TEST-net.citizensnpcs.api.util.TriggerAddInputTest.xml",
+          "bytes": 765,
+          "sha256": "48193af48e580d663cfadb2451aeecb39102f5720936f47e16d2b255b85da2b9"
+        },
+        {
+          "path": "artifacts/craft-index-ordinary-21.1.248-build/test-results/test/TEST-net.citizensnpcs.api.util.YamlStorageRoundTripTest.xml",
+          "bytes": 59912,
+          "sha256": "55c7c06af94b6756ef71c6e66b118df454a090bcdb4d317465d2358854aac70f"
+        },
+        {
+          "path": "artifacts/craft-index-ordinary-21.1.248-build/test-results/test/TEST-net.citizensnpcs.api.util.YamlStorageWriteTest.xml",
+          "bytes": 4031,
+          "sha256": "fd350dc281928ec5d4b872ef6089b75b004bd83cd1c397258e750228789e5cc9"
+        },
+        {
+          "path": "artifacts/craft-index-ordinary-21.1.248-build/test-results/test/TEST-net.citizensnpcs.commands.EntityCommandParsingTest.xml",
+          "bytes": 666,
+          "sha256": "fbb42938d242f7c401b55a96486cfd7602b429b2df5a805c5912d232c6d0aa0a"
+        },
+        {
+          "path": "artifacts/craft-index-ordinary-21.1.248-build/test-results/test/TEST-net.citizensnpcs.commands.history.CommandHistoryTest.xml",
+          "bytes": 1277,
+          "sha256": "2a578d4f670bb19254c33acdca143cf1a42a9fb1365ce981abbe526eb9de3c75"
+        },
+        {
+          "path": "artifacts/craft-index-ordinary-21.1.248-build/test-results/test/TEST-net.citizensnpcs.commands.PresentationCommandParsingTest.xml",
+          "bytes": 1001,
+          "sha256": "41937a9c9d7786c269d001174e8edabc4baf75a3ca0946573ea4ffa439ef8711"
+        },
+        {
+          "path": "artifacts/craft-index-ordinary-21.1.248-build/test-results/test/TEST-net.citizensnpcs.commands.TemplateCommandValidationTest.xml",
+          "bytes": 510,
+          "sha256": "b7e1d24d7ebabd94f9a3878d99a5bb6a18128848399d8318b6227f3be158210b"
+        },
+        {
+          "path": "artifacts/craft-index-ordinary-21.1.248-build/test-results/test/TEST-net.citizensnpcs.npc.ai.tree.BehaviorCommandFlagsTest.xml",
+          "bytes": 792,
+          "sha256": "3f2bc57dfdccac0a169e22366fefd80bfdd7f26fc335259f0f001333e2596ae6"
+        },
+        {
+          "path": "artifacts/craft-index-ordinary-21.1.248-build/test-results/test/TEST-net.citizensnpcs.npc.ai.tree.BehaviorTreeParserTest.xml",
+          "bytes": 9169,
+          "sha256": "ef4859b40b09d04227ae06b1dfa757c6d741ca5a8615dbfd61b59c15067c34ec"
+        },
+        {
+          "path": "artifacts/craft-index-ordinary-21.1.248-build/test-results/test/TEST-net.citizensnpcs.npc.ai.tree.MolangMemoryBindingTest.xml",
+          "bytes": 1451,
+          "sha256": "1ba0def983f4b9f01fa02dd48582ea3316266289c82b99075e8260e1f752cd38"
+        },
+        {
+          "path": "artifacts/craft-index-ordinary-21.1.248-build/test-results/test/TEST-net.citizensnpcs.npc.ai.tree.MolangScopeIsolationTest.xml",
+          "bytes": 12098,
+          "sha256": "1da4fd3fb06f75cdde1588e1b3ccffce8cbc82bcd28d16a61240a37398de8049"
+        },
+        {
+          "path": "artifacts/craft-index-ordinary-21.1.248-build/test-results/test/TEST-net.citizensnpcs.npc.skin.SkinCacheReloadTest.xml",
+          "bytes": 1194,
+          "sha256": "503bed5073540bcdcee625d043f62e0aaf2968ec019b03bf74706596765e24b6"
+        },
+        {
+          "path": "artifacts/craft-index-ordinary-21.1.248-build/test-results/test/TEST-net.citizensnpcs.SettingsTest.xml",
+          "bytes": 35771,
+          "sha256": "47b14860424d83362cd5ae2c4e47c87720c5c4026c9ef43758923b4777621c28"
+        },
+        {
+          "path": "artifacts/craft-index-ordinary-21.1.248-build/test-results/test/TEST-net.citizensnpcs.trait.HologramItemTest.xml",
+          "bytes": 896,
+          "sha256": "1cecc3853aaa43cdec1ac0e8c7620bfed640ebdb5899b82fd4159021e6fed796"
+        },
+        {
+          "path": "artifacts/craft-index-ordinary-21.1.248-build/test-results/test/TEST-net.citizensnpcs.trait.SentinelTargetMatchingTest.xml",
+          "bytes": 1142,
+          "sha256": "7dfaa288459c9c438d0eaf7f8c0877d3ac1df690920646215361ce508d8c284b"
+        },
+        {
+          "path": "artifacts/craft-index-ordinary-21.1.248-build/test-results/test/TEST-net.citizensnpcs.trait.shop.ExperienceArithmeticTest.xml",
+          "bytes": 773,
+          "sha256": "dba5184c3edc587b152314a6a4ca4e68ce89e86f8819fe28ace821c82c730248"
+        },
+        {
+          "path": "artifacts/craft-index-ordinary-21.1.248-build/test-results/test/TEST-net.citizensnpcs.trait.shop.InventoryPublicationRecoveryTest.xml",
+          "bytes": 1504,
+          "sha256": "de155d9439b73ed4d2e371bb58ac9b15bfb21ce5de420f697f7a57bc552ee92a"
+        },
+        {
+          "path": "artifacts/craft-index-ordinary-21.1.248-build/test-results/test/TEST-net.citizensnpcs.trait.shop.InventoryTransactionIsolationTest.xml",
+          "bytes": 1199,
+          "sha256": "be7abd34983324ecd9168a26402d24ce94218a20ddf006f2a57c2a257d434390"
+        },
+        {
+          "path": "artifacts/craft-index-ordinary-21.1.248-build/test-results/test/TEST-net.citizensnpcs.trait.shop.ItemActionTest.xml",
+          "bytes": 1581,
+          "sha256": "4d60ef0d50800beea70749b0e7cc57c587a5ce29d36923fdf33509012ae54421"
+        },
+        {
+          "path": "artifacts/craft-index-ordinary-21.1.248-build/test-results/test/TEST-net.citizensnpcs.trait.shop.ItemQuantityTest.xml",
+          "bytes": 1435,
+          "sha256": "03bfd19957407dddddbde0666e8b40b54c8cda19859beb34e022f411adad4ca8"
+        },
+        {
+          "path": "artifacts/craft-index-ordinary-21.1.248-build/test-results/test/TEST-net.citizensnpcs.trait.shop.ItemReceiptTest.xml",
+          "bytes": 1208,
+          "sha256": "ad10952152848da709501193435b7a9b83ffae4da3afa804e969650cf2017ab1"
+        },
+        {
+          "path": "artifacts/craft-index-ordinary-21.1.248-build/test-results/test/TEST-net.citizensnpcs.trait.shop.MoneyArithmeticTest.xml",
+          "bytes": 900,
+          "sha256": "84e3591539c7b8dd0401e20bcc8459971f990a97d0ae9cb2b845fb2f66eb66e2"
+        },
+        {
+          "path": "artifacts/craft-index-ordinary-21.1.248-build/test-results/test/TEST-net.citizensnpcs.trait.shop.NPCShopTest.xml",
+          "bytes": 1600,
+          "sha256": "7ab09e8a85d780677cb5c27ec3100f692144c2debbba0fc6248df4b8a86c05f8"
+        },
+        {
+          "path": "artifacts/craft-index-ordinary-21.1.248-build/test-results/test/TEST-net.citizensnpcs.trait.shop.ShopSessionOwnerTest.xml",
+          "bytes": 662,
+          "sha256": "22f8a9741006d717eff0d788b4ede5358ad6bcdf03e94457cd63f00b3bbf1c08"
+        },
+        {
+          "path": "artifacts/craft-index-ordinary-21.1.248-build/test-results/test/TEST-net.citizensnpcs.trait.shop.ShopTransactionTest.xml",
+          "bytes": 1067,
+          "sha256": "598cd1b18dab49d57ba90b8e254848e04a1a10523af0c209b7869959e76aaf9b"
+        },
+        {
+          "path": "artifacts/craft-index-ordinary-21.1.248-build/test-results/test/TEST-net.citizensnpcs.trait.shop.StoredShopsTest.xml",
+          "bytes": 2717,
+          "sha256": "8bf1fd10348ca02582511f7b9a27704ab8c52d78c0676a0412ccc4b78d78db4b"
+        },
+        {
+          "path": "artifacts/craft-index-ordinary-21.1.248-build/test-results/test/TEST-net.citizensnpcs.trait.text.TextEditorInputTest.xml",
+          "bytes": 769,
+          "sha256": "0dbdc5ed1192c2253c68bf84038bf789297cffcf302f756035ad2452f8990bec"
+        },
+        {
+          "path": "artifacts/craft-index-ordinary-21.1.248-build/test-results/test/TEST-net.citizensnpcs.trait.TraitNameMappingTest.xml",
+          "bytes": 1066,
+          "sha256": "2b26afed2d4f45df052e6dde41493e8b5aba362388464e9aee67ddf45fb3ba0b"
+        },
+        {
+          "path": "artifacts/craft-index-ordinary-21.1.248-build/test-results/test/TEST-net.citizensnpcs.trait.waypoint.triggers.NumericTriggerInputTest.xml",
+          "bytes": 869,
+          "sha256": "2bf3f8007f2318e7d3dbafd646cbed4a72de6aad07c1f258788dd272a1456e18"
+        },
+        {
+          "path": "artifacts/craft-index-ordinary-21.1.248-build/test-results/test/TEST-net.citizensnpcs.trait.waypoint.triggers.TeleportTriggerInputTest.xml",
+          "bytes": 853,
+          "sha256": "75bf8614ce4d17df5ac3d2965799fd363880e9d57638f18b5929b46311903bad"
+        },
+        {
+          "path": "artifacts/craft-index-ordinary-21.1.248-build/test-results/test/TEST-net.citizensnpcs.trait.waypoint.triggers.WaypointTriggerSaveTest.xml",
+          "bytes": 1023,
+          "sha256": "75294f9b612cb16bd654254029b8d67d349b9488481ffeb416cf9434e10c4d5c"
+        },
+        {
+          "path": "artifacts/craft-index-ordinary-21.1.248-build/test-results/test/TEST-net.citizensnpcs.util.CommerceTaskJournalTest.xml",
+          "bytes": 2373,
+          "sha256": "f85924ac11399ce37d23bce367957ce73f991f09bae094aa58db2e79635d54e7"
+        },
+        {
+          "path": "artifacts/craft-index-ordinary-21.1.248-build/test-results/test/TEST-net.citizensnpcs.util.DimensionLookupTest.xml",
+          "bytes": 748,
+          "sha256": "4a6bae833a616eb804f95a5b68503aa597427408ad3bf2ed954c074a5ae648ac"
+        },
+        {
+          "path": "artifacts/craft-index-ordinary-21.1.248-build/test-results/test/TEST-net.citizensnpcs.util.EconomyShopMenusTest.xml",
+          "bytes": 607,
+          "sha256": "eb2d9e262de964bdd7713afa4195fc1cb7771041c56d95738793da9808577d4c"
+        },
+        {
+          "path": "artifacts/craft-index-ordinary-21.1.248-build/test-results/test/TEST-net.citizensnpcs.util.JournalRecordDecodingTest.xml",
+          "bytes": 5325,
+          "sha256": "11a6853dc6c3aea391e4e59a3650e562590aeba70051f8de3f5dfc98f09da1fe"
+        },
+        {
+          "path": "artifacts/craft-index-ordinary-21.1.248-build/test-results/test/TEST-net.citizensnpcs.util.LuckPermsGroupsTest.xml",
+          "bytes": 609,
+          "sha256": "9db4545efab3c920d09e1df75170da5e3f85800bbbe5b4045774e0fa718baaec"
+        },
+        {
+          "path": "artifacts/craft-index-ordinary-21.1.248-build/test-results/test/TEST-net.citizensnpcs.util.ParadigmGroupsTest.xml",
+          "bytes": 1205,
+          "sha256": "64199480ebe2b0395ba8cacd5eccd24916b55a68561e641fd1b6145a0086196e"
+        },
+        {
+          "path": "artifacts/craft-index-ordinary-21.1.248-build/test-results/test/TEST-net.citizensnpcs.util.ParadigmPermissionWriterTest.xml",
+          "bytes": 2858,
+          "sha256": "20b3b75625426bf71101e11ad830535f821073d9480a71fb2e87a51cc37dce7a"
+        },
+        {
+          "path": "artifacts/craft-index-ordinary-21.1.248-build/test-results/test/TEST-net.citizensnpcs.util.ProviderPlaceholderExportsTest.xml",
+          "bytes": 1091,
+          "sha256": "f85b9c971a5bf604479613de5ddedc1b7998f96cb78e710cbd5cb31bbd233b0b"
+        },
+        {
+          "path": "artifacts/craft-index-ordinary-21.1.248-build/test-results/test/TEST-net.citizensnpcs.util.QuestDeliveryJournalTest.xml",
+          "bytes": 1864,
+          "sha256": "f66c3f9763a4d98040c9cbcfc6668fc134c1375a978a73a1e93c21200bb356ab"
+        },
+        {
+          "path": "artifacts/craft-index-ordinary-21.1.248-build/test-results/test/TEST-net.citizensnpcs.util.QuestDeliveryStorageTest.xml",
+          "bytes": 1137,
+          "sha256": "bfacf64efeae4621a923655486ca00ac96dfeff703052b883546c66d63fc1905"
+        },
+        {
+          "path": "artifacts/craft-index-ordinary-21.1.248-build/test-results/test/TEST-net.citizensnpcs.util.QuestEvidenceJournalTest.xml",
+          "bytes": 2812,
+          "sha256": "e0812e863e53569d934de2c8900d72005a762fe29ea2e0134937f1b2015aa9ee"
+        },
+        {
+          "path": "artifacts/craft-index-ordinary-21.1.248-build/test-results/test/TEST-net.citizensnpcs.util.QuestRewardJournalTest.xml",
+          "bytes": 1536,
+          "sha256": "ccfa8f40e7ac9c3f7bb25993e27acc1f0ed5b712c8b2f12fca25a59c4f3b8c4e"
+        },
+        {
+          "path": "artifacts/craft-index-ordinary-21.1.248-build/test-results/test/TEST-net.citizensnpcs.util.YuuniverseEconomyTest.xml",
+          "bytes": 1500,
+          "sha256": "44cf0c5db42c40063b46419abd8bd73e45d44c80ff8a912107fed1b5c783188f"
+        }
+      ]
+    },
+    {
+      "target": "21.1.233",
+      "results": {
+        "tests": 828,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "log": {
+        "path": "artifacts/craft-index-ordinary-233.log",
+        "bytes": 73655,
+        "sha256": "c8133b2f16353eb76293eaf512f09101db80131f735b897a2e03bcaade5acd71"
+      },
+      "reports": [
+        {
+          "path": "artifacts/craft-index-ordinary-21.1.233-build/test-results/test/TEST-net.citizensnpcs.api.ai.BehaviorRemovalTest.xml",
+          "bytes": 1174,
+          "sha256": "de25886cec5318bd7c90e0cde29a0cabc40f75416c8bb5118637df409afb7b4c"
+        },
+        {
+          "path": "artifacts/craft-index-ordinary-21.1.233-build/test-results/test/TEST-net.citizensnpcs.api.ai.CoalescedBehaviorTest.xml",
+          "bytes": 1061,
+          "sha256": "bab9678b32c13700fd7e5902d876a4c0c5e537ef42c73fa790674194db89fb5e"
+        },
+        {
+          "path": "artifacts/craft-index-ordinary-21.1.233-build/test-results/test/TEST-net.citizensnpcs.api.ai.IfElseResetTest.xml",
+          "bytes": 482,
+          "sha256": "d69dd17b4393a29d373c72b469f9524165c79f3e16dcca2b3b9c3cf620cf9d29"
+        },
+        {
+          "path": "artifacts/craft-index-ordinary-21.1.233-build/test-results/test/TEST-net.citizensnpcs.api.ai.ParallelBehaviorLifecycleTest.xml",
+          "bytes": 959,
+          "sha256": "c7ab7771573e63c950f12f8f8aa9d6ab49ccf9f8a7737c8c9e7eb6d44a1ba225"
+        },
+        {
+          "path": "artifacts/craft-index-ordinary-21.1.233-build/test-results/test/TEST-net.citizensnpcs.api.ai.ParallelCompositeTest.xml",
+          "bytes": 908,
+          "sha256": "59e8be08f819d0bb7813b809c61fcedb8237d50a30c744f0acb7c71119926467"
+        },
+        {
+          "path": "artifacts/craft-index-ordinary-21.1.233-build/test-results/test/TEST-net.citizensnpcs.api.ai.SelectorTerminalResetTest.xml",
+          "bytes": 651,
+          "sha256": "d800e4c40341207a395de7df5940cee5671baccb0640fe6a35d2021f95ce5edd"
+        },
+        {
+          "path": "artifacts/craft-index-ordinary-21.1.233-build/test-results/test/TEST-net.citizensnpcs.api.ai.SequenceRemovalTest.xml",
+          "bytes": 902,
+          "sha256": "54e9775e728fbefbd820938d9117bce82167990a14462575923f90c88dce825d"
+        },
+        {
+          "path": "artifacts/craft-index-ordinary-21.1.233-build/test-results/test/TEST-net.citizensnpcs.api.ai.SequenceResetCallbackTest.xml",
+          "bytes": 656,
+          "sha256": "763bcd8315bf5218182efa77e94173aa0d5c6f39cdea46de9051d5b2f7ae5f0f"
+        },
+        {
+          "path": "artifacts/craft-index-ordinary-21.1.233-build/test-results/test/TEST-net.citizensnpcs.api.ai.TimeoutDecoratorTest.xml",
+          "bytes": 2033,
+          "sha256": "b53c64a682910b6febc972d87ae00974ee82e590bcdc1ba3a406a2e045cfeacf"
+        },
+        {
+          "path": "artifacts/craft-index-ordinary-21.1.233-build/test-results/test/TEST-net.citizensnpcs.api.ai.tree.BehaviorContextTest.xml",
+          "bytes": 1390,
+          "sha256": "d369c73e27ef00295009d8424c977a7fe37f6ce02fa8357d036af7ec9a4d18e6"
+        },
+        {
+          "path": "artifacts/craft-index-ordinary-21.1.233-build/test-results/test/TEST-net.citizensnpcs.api.ai.tree.BehaviorSignalsTest.xml",
+          "bytes": 1253,
+          "sha256": "d4dc42be884f3082853b3f4a86164d65b631beb4e581ddd920eb71cdb4038c51"
+        },
+        {
+          "path": "artifacts/craft-index-ordinary-21.1.233-build/test-results/test/TEST-net.citizensnpcs.api.ai.tree.BlockBehaviorInputTest.xml",
+          "bytes": 813,
+          "sha256": "bf9b1921b1dc01d573f843ba66e84038e11a87722696b4cd114e7e1ceb05f53a"
+        },
+        {
+          "path": "artifacts/craft-index-ordinary-21.1.233-build/test-results/test/TEST-net.citizensnpcs.api.ai.tree.CooldownBehaviorTest.xml",
+          "bytes": 779,
+          "sha256": "bec06006f8454b13c600a43c64db2eeeee882777d13a328d0289e7e35eea4a2a"
+        },
+        {
+          "path": "artifacts/craft-index-ordinary-21.1.233-build/test-results/test/TEST-net.citizensnpcs.api.ai.tree.DecoratorTest.xml",
+          "bytes": 935,
+          "sha256": "5b204d500695453b87530b91e539eff3649e13063eb32adc5f7d64e145aab837"
+        },
+        {
+          "path": "artifacts/craft-index-ordinary-21.1.233-build/test-results/test/TEST-net.citizensnpcs.api.ai.tree.IfElseLifecycleTest.xml",
+          "bytes": 907,
+          "sha256": "bcf2c2d31fe9df830141330a07f9dca54b54fc9fce341089107e071ecac106d3"
+        },
+        {
+          "path": "artifacts/craft-index-ordinary-21.1.233-build/test-results/test/TEST-net.citizensnpcs.api.ai.tree.LoopTest.xml",
+          "bytes": 1301,
+          "sha256": "6cf087b9c98d561f5e71bff63e17f5b214adf4155efb85badacfecc504a44669"
+        },
+        {
+          "path": "artifacts/craft-index-ordinary-21.1.233-build/test-results/test/TEST-net.citizensnpcs.api.ai.tree.RepeatTest.xml",
+          "bytes": 1592,
+          "sha256": "564e29d1f06e21352e92d53ea8df0d703f723a124cb75c8d6e615b1429d3de8c"
+        },
+        {
+          "path": "artifacts/craft-index-ordinary-21.1.233-build/test-results/test/TEST-net.citizensnpcs.api.ai.tree.RetryDecoratorTest.xml",
+          "bytes": 1979,
+          "sha256": "f6598645b832a1db18e936c16a626cd964ce106f9242311a05f591d4772e6f2e"
+        },
+        {
+          "path": "artifacts/craft-index-ordinary-21.1.233-build/test-results/test/TEST-net.citizensnpcs.api.ai.tree.SignalTargetIdTest.xml",
+          "bytes": 788,
+          "sha256": "f5965bb75083718d4f6b233ad2c2bc96fa275715e42b9dd1f70760d53d66a9bf"
+        },
+        {
+          "path": "artifacts/craft-index-ordinary-21.1.233-build/test-results/test/TEST-net.citizensnpcs.api.ai.tree.StatusMapperTest.xml",
+          "bytes": 801,
+          "sha256": "93f2bea2a7c0305b2dfca925ed416e19164312be06dd4c9c109c23757577c1e5"
+        },
+        {
+          "path": "artifacts/craft-index-ordinary-21.1.233-build/test-results/test/TEST-net.citizensnpcs.api.ai.tree.TimerDecoratorTest.xml",
+          "bytes": 1880,
+          "sha256": "06002732965098bef00df9cfa65488a51e88739e31809d58356685083daf93c9"
+        },
+        {
+          "path": "artifacts/craft-index-ordinary-21.1.233-build/test-results/test/TEST-net.citizensnpcs.api.ai.tree.WaitBehaviorTest.xml",
+          "bytes": 1333,
+          "sha256": "043f9a5437ff240696ba2edd27ed0f0f540b1c300aca54f1d680dfe56dbed38c"
+        },
+        {
+          "path": "artifacts/craft-index-ordinary-21.1.233-build/test-results/test/TEST-net.citizensnpcs.api.ai.tree.WaitForSignalTest.xml",
+          "bytes": 940,
+          "sha256": "f4efe4c9a759043d59fb03c89d9b0c930e01cd9ccc72183f0688a8e6a43816ef"
+        },
+        {
+          "path": "artifacts/craft-index-ordinary-21.1.233-build/test-results/test/TEST-net.citizensnpcs.api.ai.tree.WaitUntilBehaviorTest.xml",
+          "bytes": 1547,
+          "sha256": "f5d5893e796dbe10582709b52b469a8c93954fb95a923f901979ab6064b515c9"
+        },
+        {
+          "path": "artifacts/craft-index-ordinary-21.1.233-build/test-results/test/TEST-net.citizensnpcs.api.ai.tree.WalkToValidationTest.xml",
+          "bytes": 797,
+          "sha256": "e1dddad00ec8a09b8830b4469ce38a4d4db6250164908d316480bf7a0b68ac72"
+        },
+        {
+          "path": "artifacts/craft-index-ordinary-21.1.233-build/test-results/test/TEST-net.citizensnpcs.api.ai.tree.WanderBehaviorTest.xml",
+          "bytes": 635,
+          "sha256": "65973c7abdeb293ee7b52bf3ac7a317218e1eb94a69ad320c8ab7ab85ce1ba1a"
+        },
+        {
+          "path": "artifacts/craft-index-ordinary-21.1.233-build/test-results/test/TEST-net.citizensnpcs.api.command.CommandContextQuotingTest.xml",
+          "bytes": 672,
+          "sha256": "2d998c1e9a5e9f857f37b9d9763b94dc054a956f9e32956291602c2f98eb195f"
+        },
+        {
+          "path": "artifacts/craft-index-ordinary-21.1.233-build/test-results/test/TEST-net.citizensnpcs.api.command.CommandLocationTest.xml",
+          "bytes": 1196,
+          "sha256": "7e9b49a9b2581ebd1f459849c5af98a27ba426a6b3e9b65962bc3bec1310acc2"
+        },
+        {
+          "path": "artifacts/craft-index-ordinary-21.1.233-build/test-results/test/TEST-net.citizensnpcs.api.command.NPCCommandTargetTest.xml",
+          "bytes": 1121,
+          "sha256": "45de14543d1a6af8b3e427863d17f736c07bc8262f819e5a253eba24c08d5c4e"
+        },
+        {
+          "path": "artifacts/craft-index-ordinary-21.1.233-build/test-results/test/TEST-net.citizensnpcs.api.command.StrictCommandArgumentsTest.xml",
+          "bytes": 630,
+          "sha256": "97a60c9a5bd69450e72c8f3fc249f808899ce35bf9cb27ce7554e91db96ca937"
+        },
+        {
+          "path": "artifacts/craft-index-ordinary-21.1.233-build/test-results/test/TEST-net.citizensnpcs.api.expr.ExpressionRegistryTest.xml",
+          "bytes": 11672,
+          "sha256": "a29fe1f74680f20e66658b2756d317cac0084c16264deab13094cf81538572d3"
+        },
+        {
+          "path": "artifacts/craft-index-ordinary-21.1.233-build/test-results/test/TEST-net.citizensnpcs.api.expr.ExpressionScopeTest.xml",
+          "bytes": 2212,
+          "sha256": "51d015b657998b45831273767295c092a735766db4ca1bc76681ef8f91eb080c"
+        },
+        {
+          "path": "artifacts/craft-index-ordinary-21.1.233-build/test-results/test/TEST-net.citizensnpcs.api.expr.MemoryCharacterTest.xml",
+          "bytes": 647,
+          "sha256": "da6191fa9176a6d64ab52242d4039befee1a751f07feded645b78a8f60ee8f9a"
+        },
+        {
+          "path": "artifacts/craft-index-ordinary-21.1.233-build/test-results/test/TEST-net.citizensnpcs.api.expr.MemoryKeyIdentityTest.xml",
+          "bytes": 796,
+          "sha256": "3ff1e445b66efe56de98a639c37eb0829c5c0cba0ea14526a3a0bcdbceb71baa"
+        },
+        {
+          "path": "artifacts/craft-index-ordinary-21.1.233-build/test-results/test/TEST-net.citizensnpcs.api.expr.MemoryKeysTest.xml",
+          "bytes": 921,
+          "sha256": "be120a5b02d2839d71f7f5b7347bd0a4f789ba50fb371f5c321ffb7aa8e3dfaa"
+        },
+        {
+          "path": "artifacts/craft-index-ordinary-21.1.233-build/test-results/test/TEST-net.citizensnpcs.api.expr.MemoryListPersistenceTest.xml",
+          "bytes": 1110,
+          "sha256": "30d71cb5712a9619d7fa26745a5050480473cbbc18d3598916a9ab6c988f7a5d"
+        },
+        {
+          "path": "artifacts/craft-index-ordinary-21.1.233-build/test-results/test/TEST-net.citizensnpcs.api.expr.MemoryListQueriesTest.xml",
+          "bytes": 779,
+          "sha256": "dcbb3f2be64f21531d39f0e57ad583357f3f91e3328c20d6142e048a0d2ebe25"
+        },
+        {
+          "path": "artifacts/craft-index-ordinary-21.1.233-build/test-results/test/TEST-net.citizensnpcs.api.gui.InventoryMenuTest.xml",
+          "bytes": 1973,
+          "sha256": "d4c3afe73f837c720613fbdc04a1a6bb2fa5e3fae13e9ee3783e21ee8f9c76b8"
+        },
+        {
+          "path": "artifacts/craft-index-ordinary-21.1.233-build/test-results/test/TEST-net.citizensnpcs.api.hpastar.HPAGraphTest.xml",
+          "bytes": 2641,
+          "sha256": "7d989bcb4590bbf808dba5f2e998427feb41e820f9de8fb3b178c4c32fe98359"
+        },
+        {
+          "path": "artifacts/craft-index-ordinary-21.1.233-build/test-results/test/TEST-net.citizensnpcs.api.npc.NPCDataStoreTest.xml",
+          "bytes": 4315,
+          "sha256": "bd4dc8f3a45560272792c90711a17ce3c44ba0d2b164ee0177ac1a228f4e0ce9"
+        },
+        {
+          "path": "artifacts/craft-index-ordinary-21.1.233-build/test-results/test/TEST-net.citizensnpcs.api.npc.templates.CommandEventRegistrationTest.xml",
+          "bytes": 1536,
+          "sha256": "3fad46170b8c0ece4b57d5b4dc117c4ea59f073a7cc0d37fd2dbbdcff7fa02f4"
+        },
+        {
+          "path": "artifacts/craft-index-ordinary-21.1.233-build/test-results/test/TEST-net.citizensnpcs.api.npc.templates.TemplateApplicationLifecycleTest.xml",
+          "bytes": 2530,
+          "sha256": "e5a79dbe7253a9766abfed1866754a36426b4f1419392537ef98d2d766dca72e"
+        },
+        {
+          "path": "artifacts/craft-index-ordinary-21.1.233-build/test-results/test/TEST-net.citizensnpcs.api.npc.templates.TemplateEventReplacementTest.xml",
+          "bytes": 1043,
+          "sha256": "7a65b8ece2ba334d9bf987242f2d6aa10bda7e7cf0005666886228f62af9c67f"
+        },
+        {
+          "path": "artifacts/craft-index-ordinary-21.1.233-build/test-results/test/TEST-net.citizensnpcs.api.npc.templates.TemplateGenerationTest.xml",
+          "bytes": 2365,
+          "sha256": "4128395d369dbc6b9f9d88368a7b393d7ed5579a0c654594959197ced672a33f"
+        },
+        {
+          "path": "artifacts/craft-index-ordinary-21.1.233-build/test-results/test/TEST-net.citizensnpcs.api.npc.templates.TemplateMigrationTest.xml",
+          "bytes": 3416,
+          "sha256": "4b4fd395454b0a7adea8f02bcb684103929ae4dbbac9b847565c7c6b6ad5c014"
+        },
+        {
+          "path": "artifacts/craft-index-ordinary-21.1.233-build/test-results/test/TEST-net.citizensnpcs.api.npc.templates.TemplateRegistryReloadTest.xml",
+          "bytes": 45010,
+          "sha256": "980851f08384ead3db3c37fdaf4d76e902f792f0999f33fdbb2e26e0c8984f92"
+        },
+        {
+          "path": "artifacts/craft-index-ordinary-21.1.233-build/test-results/test/TEST-net.citizensnpcs.api.npc.templates.TemplateWorkspaceTest.xml",
+          "bytes": 798,
+          "sha256": "7c49f4c22b09f696f38f11253c32ca61fe4e8a3ef143f13c35d18d6032ca564f"
+        },
+        {
+          "path": "artifacts/craft-index-ordinary-21.1.233-build/test-results/test/TEST-net.citizensnpcs.api.npc.templates.TraitTemplateFormTest.xml",
+          "bytes": 1660,
+          "sha256": "63e716f20011a7a00b9deaaefbee7c2ea1194ba27a0f8e76b46a4d22ede5f3ac"
+        },
+        {
+          "path": "artifacts/craft-index-ordinary-21.1.233-build/test-results/test/TEST-net.citizensnpcs.api.npc.templates.YamlReplacementActionTest.xml",
+          "bytes": 1938,
+          "sha256": "5c3e8a12ccbc7e974a87cf25f74d809278981b8506465fff345ecefa5bcccaef"
+        },
+        {
+          "path": "artifacts/craft-index-ordinary-21.1.233-build/test-results/test/TEST-net.citizensnpcs.api.npc.templates.YamlReplacementValidationTest.xml",
+          "bytes": 827,
+          "sha256": "5a5b7abb18169cea27364747109eaf3653ce61ccbca5c746941072fa66511e11"
+        },
+        {
+          "path": "artifacts/craft-index-ordinary-21.1.233-build/test-results/test/TEST-net.citizensnpcs.api.persistence.LocationWorldNameTest.xml",
+          "bytes": 930,
+          "sha256": "b8e70a0e96e9c704eb9a35a0cda34aeba0c6f20f3b017bf576d090fe972e766d"
+        },
+        {
+          "path": "artifacts/craft-index-ordinary-21.1.233-build/test-results/test/TEST-net.citizensnpcs.api.persistence.PersistenceDelegateFailureTest.xml",
+          "bytes": 869,
+          "sha256": "03d74af1ce05096f78b91c395ac2553b9fb686d861cff10df1f2f22070c28852"
+        },
+        {
+          "path": "artifacts/craft-index-ordinary-21.1.233-build/test-results/test/TEST-net.citizensnpcs.api.persistence.PersistenceLoaderLegacyValuesTest.xml",
+          "bytes": 10998,
+          "sha256": "221d47e924a54d44e0aa73bc8ee0529fc777c71679b4e11d7b27e777da12a7b6"
+        },
+        {
+          "path": "artifacts/craft-index-ordinary-21.1.233-build/test-results/test/TEST-net.citizensnpcs.api.persistence.PersistenceMapKeysTest.xml",
+          "bytes": 817,
+          "sha256": "1d939882c6d8014a16239b6b24d6c275d4fa6579cc3f2d84d4ba57830d2f070a"
+        },
+        {
+          "path": "artifacts/craft-index-ordinary-21.1.233-build/test-results/test/TEST-net.citizensnpcs.api.persistence.StrictPersistenceTest.xml",
+          "bytes": 513,
+          "sha256": "94f7a9961079d85218bcb021539477382c9331b8f668243f0b857df7bcefd139"
+        },
+        {
+          "path": "artifacts/craft-index-ordinary-21.1.233-build/test-results/test/TEST-net.citizensnpcs.api.util.DurationConversionTest.xml",
+          "bytes": 766,
+          "sha256": "f87b7afd436ee4d3bf76faa36f0c15cf2b1ba0c6ea9a2dc866c0d4dc8f1580e2"
+        },
+        {
+          "path": "artifacts/craft-index-ordinary-21.1.233-build/test-results/test/TEST-net.citizensnpcs.api.util.DurationParsingTest.xml",
+          "bytes": 892,
+          "sha256": "9c5ab4c20598182d7647697e3f60369643ba7e7eb2bb19a9cefb7ca6ecaecef8"
+        },
+        {
+          "path": "artifacts/craft-index-ordinary-21.1.233-build/test-results/test/TEST-net.citizensnpcs.api.util.ItemStorageTest.xml",
+          "bytes": 3196,
+          "sha256": "4f1ba9feb7cceb2810ac0f3753cf1f5e050ac5d21795eaffd26d1d8243125dbe"
+        },
+        {
+          "path": "artifacts/craft-index-ordinary-21.1.233-build/test-results/test/TEST-net.citizensnpcs.api.util.LegacyBukkitMetaTest.xml",
+          "bytes": 3375,
+          "sha256": "ed87d12df6504fd99a75a3d4443c767e24f401d5148b8a2b6cc7d4bf75d11a2c"
+        },
+        {
+          "path": "artifacts/craft-index-ordinary-21.1.233-build/test-results/test/TEST-net.citizensnpcs.api.util.LegacyBukkitMetaTypesTest.xml",
+          "bytes": 3700,
+          "sha256": "6a2bd27009e37d824eec4234586a24a498aa5e79a36ac04d734b1c84b8370eff"
+        },
+        {
+          "path": "artifacts/craft-index-ordinary-21.1.233-build/test-results/test/TEST-net.citizensnpcs.api.util.LegacyFireworksTest.xml",
+          "bytes": 4313,
+          "sha256": "da8d327509a606d37333750b9590b771e042d83f4c08b9e5e0a262d09e727e3d"
+        },
+        {
+          "path": "artifacts/craft-index-ordinary-21.1.233-build/test-results/test/TEST-net.citizensnpcs.api.util.LegacyStructuredItemsTest.xml",
+          "bytes": 5172,
+          "sha256": "485152e33d28f5bb90f72f72e7de77a49ced1fe09fed1b2aa21a6d186a10a66e"
+        },
+        {
+          "path": "artifacts/craft-index-ordinary-21.1.233-build/test-results/test/TEST-net.citizensnpcs.api.util.MemoryDataKeyCopyTest.xml",
+          "bytes": 660,
+          "sha256": "f16b766a1e5a406b71b8e2bb4b40df6f1fecb5a139b55ff0a7e263ebb12cbd3c"
+        },
+        {
+          "path": "artifacts/craft-index-ordinary-21.1.233-build/test-results/test/TEST-net.citizensnpcs.api.util.MemoryDataKeyTransactionTest.xml",
+          "bytes": 2180,
+          "sha256": "c7dfb5445af904071ae5b512c5126444b64d429a19ffb937cf135e0eaad83e66"
+        },
+        {
+          "path": "artifacts/craft-index-ordinary-21.1.233-build/test-results/test/TEST-net.citizensnpcs.api.util.NPCCommandFormatTest.xml",
+          "bytes": 1461,
+          "sha256": "f65d9b323de0b66943cb781cb7f9abe7894c85cadae5a558257c94f680686267"
+        },
+        {
+          "path": "artifacts/craft-index-ordinary-21.1.233-build/test-results/test/TEST-net.citizensnpcs.api.util.PermissionDefaultsTest.xml",
+          "bytes": 1108,
+          "sha256": "77d3f10a3069ec8d9bdac5561bf727fc852604ad735462ed9dba569514948343"
+        },
+        {
+          "path": "artifacts/craft-index-ordinary-21.1.233-build/test-results/test/TEST-net.citizensnpcs.api.util.schedulers.adapter.NeoForgeSchedulerTest.xml",
+          "bytes": 1013,
+          "sha256": "fe70ca430677408e5e9f5251aba07aa489df0079d0ed08cfc8e1d000fa871957"
+        },
+        {
+          "path": "artifacts/craft-index-ordinary-21.1.233-build/test-results/test/TEST-net.citizensnpcs.api.util.StoredItemListTest.xml",
+          "bytes": 2730,
+          "sha256": "2cd0492e9263f5afb4037f29571e185610d8dc9abe15fdd9852e81ba192468f9"
+        },
+        {
+          "path": "artifacts/craft-index-ordinary-21.1.233-build/test-results/test/TEST-net.citizensnpcs.api.util.StoredItemsTest.xml",
+          "bytes": 2990,
+          "sha256": "170e6f74921e42b2107621da7df35dab75c9b3ce943839af0532feaffbe51e91"
+        },
+        {
+          "path": "artifacts/craft-index-ordinary-21.1.233-build/test-results/test/TEST-net.citizensnpcs.api.util.TextParserTest.xml",
+          "bytes": 3409,
+          "sha256": "c68763f74b52693d183cc0a3fb542c2b7922d879f7389674e136f9bb39a57bdf"
+        },
+        {
+          "path": "artifacts/craft-index-ordinary-21.1.233-build/test-results/test/TEST-net.citizensnpcs.api.util.TranslatorFormatTest.xml",
+          "bytes": 840,
+          "sha256": "904a853400b530238b8e388d527bc249bee534e70781ece138676fcc892da4c9"
+        },
+        {
+          "path": "artifacts/craft-index-ordinary-21.1.233-build/test-results/test/TEST-net.citizensnpcs.api.util.TriggerAddInputTest.xml",
+          "bytes": 765,
+          "sha256": "c0da979dcb89571557130c1d8458d2f7453efb1bfc1dd6bede52c34258cbd040"
+        },
+        {
+          "path": "artifacts/craft-index-ordinary-21.1.233-build/test-results/test/TEST-net.citizensnpcs.api.util.YamlStorageRoundTripTest.xml",
+          "bytes": 59912,
+          "sha256": "fd240c6255d5e1229d7bd2ff9317f1f99e66a2e99f7a6a6c950024ceb1fe2f96"
+        },
+        {
+          "path": "artifacts/craft-index-ordinary-21.1.233-build/test-results/test/TEST-net.citizensnpcs.api.util.YamlStorageWriteTest.xml",
+          "bytes": 4033,
+          "sha256": "e9afa0a8e9f338064cc7b39860ef59b977b34e319c09859fc273918a6473773d"
+        },
+        {
+          "path": "artifacts/craft-index-ordinary-21.1.233-build/test-results/test/TEST-net.citizensnpcs.commands.EntityCommandParsingTest.xml",
+          "bytes": 666,
+          "sha256": "36c701e61ee486997c342ed8f20e18df2bbdbb4681964527278d4b61085079c8"
+        },
+        {
+          "path": "artifacts/craft-index-ordinary-21.1.233-build/test-results/test/TEST-net.citizensnpcs.commands.history.CommandHistoryTest.xml",
+          "bytes": 1277,
+          "sha256": "9dc6708b25b087d6816fdec6b648cd39e8f2147c2064eedeb393e91fc7393304"
+        },
+        {
+          "path": "artifacts/craft-index-ordinary-21.1.233-build/test-results/test/TEST-net.citizensnpcs.commands.PresentationCommandParsingTest.xml",
+          "bytes": 1002,
+          "sha256": "940da542bf982c13fa85714ca96e054c947a41f2cbfb2e1334f32dff865fc837"
+        },
+        {
+          "path": "artifacts/craft-index-ordinary-21.1.233-build/test-results/test/TEST-net.citizensnpcs.commands.TemplateCommandValidationTest.xml",
+          "bytes": 508,
+          "sha256": "de1bff2861d247a707ca9be1333d4f165a93e4c86f755e8e7e6595cdcc5d98f5"
+        },
+        {
+          "path": "artifacts/craft-index-ordinary-21.1.233-build/test-results/test/TEST-net.citizensnpcs.npc.ai.tree.BehaviorCommandFlagsTest.xml",
+          "bytes": 790,
+          "sha256": "bd3ac966afe867c1e260879127ee4b77807e6301542c0fd9fd47af5beb9ecd3e"
+        },
+        {
+          "path": "artifacts/craft-index-ordinary-21.1.233-build/test-results/test/TEST-net.citizensnpcs.npc.ai.tree.BehaviorTreeParserTest.xml",
+          "bytes": 9173,
+          "sha256": "c82e2eabfb3a94a3a824fae3f03067d3cea4f8675fdcb4a23585e71721928538"
+        },
+        {
+          "path": "artifacts/craft-index-ordinary-21.1.233-build/test-results/test/TEST-net.citizensnpcs.npc.ai.tree.MolangMemoryBindingTest.xml",
+          "bytes": 1451,
+          "sha256": "6e585708b3612f0e35caa2e4ef434305468bb0285b3cb521fe561980a7950da4"
+        },
+        {
+          "path": "artifacts/craft-index-ordinary-21.1.233-build/test-results/test/TEST-net.citizensnpcs.npc.ai.tree.MolangScopeIsolationTest.xml",
+          "bytes": 12098,
+          "sha256": "c9ee04dfa9f113904a9ae5d8172870d3cb7da538db5847d0e20c7a7c530bd1e1"
+        },
+        {
+          "path": "artifacts/craft-index-ordinary-21.1.233-build/test-results/test/TEST-net.citizensnpcs.npc.skin.SkinCacheReloadTest.xml",
+          "bytes": 1200,
+          "sha256": "5e2ef58d746d1b6e533363447f16d29d2f9a2bd5fecc1b62955f809df3e10ec5"
+        },
+        {
+          "path": "artifacts/craft-index-ordinary-21.1.233-build/test-results/test/TEST-net.citizensnpcs.SettingsTest.xml",
+          "bytes": 35772,
+          "sha256": "d2be5e0fe153e2958ced46204115faec8e565abd89e37cf165092d0d469a075b"
+        },
+        {
+          "path": "artifacts/craft-index-ordinary-21.1.233-build/test-results/test/TEST-net.citizensnpcs.trait.HologramItemTest.xml",
+          "bytes": 897,
+          "sha256": "fef2b6c6073669b54db21c17422b488f44c98afc7fca30922cbb7c3900cd7449"
+        },
+        {
+          "path": "artifacts/craft-index-ordinary-21.1.233-build/test-results/test/TEST-net.citizensnpcs.trait.SentinelTargetMatchingTest.xml",
+          "bytes": 1140,
+          "sha256": "9b849aaa4c7ab815f9c90cfa07f24ccbb3e3eb2ec3f8b9b08e4a6748daf085a2"
+        },
+        {
+          "path": "artifacts/craft-index-ordinary-21.1.233-build/test-results/test/TEST-net.citizensnpcs.trait.shop.ExperienceArithmeticTest.xml",
+          "bytes": 771,
+          "sha256": "36859bb2400505ba51c47c3c20e6365f0543d26ad69bf4b7dbefaaad45dd6385"
+        },
+        {
+          "path": "artifacts/craft-index-ordinary-21.1.233-build/test-results/test/TEST-net.citizensnpcs.trait.shop.InventoryPublicationRecoveryTest.xml",
+          "bytes": 1503,
+          "sha256": "19694696c239a67f6ab6e761ee611188d336872c75b24ac465383c2a6a3f382c"
+        },
+        {
+          "path": "artifacts/craft-index-ordinary-21.1.233-build/test-results/test/TEST-net.citizensnpcs.trait.shop.InventoryTransactionIsolationTest.xml",
+          "bytes": 1197,
+          "sha256": "c1a4d7631f25b16c09255f65a2cf0e31e12ce1cc0bd03a5113df178f5b9c1739"
+        },
+        {
+          "path": "artifacts/craft-index-ordinary-21.1.233-build/test-results/test/TEST-net.citizensnpcs.trait.shop.ItemActionTest.xml",
+          "bytes": 1583,
+          "sha256": "b6628e4912d960d9929faaa6a8da276e72616ae87b481166cf1ffaef281f38f4"
+        },
+        {
+          "path": "artifacts/craft-index-ordinary-21.1.233-build/test-results/test/TEST-net.citizensnpcs.trait.shop.ItemQuantityTest.xml",
+          "bytes": 1433,
+          "sha256": "84f66695e321f5c3f8de64b5264100c89dcd033a0be2c54cd2d20761e3f86c5e"
+        },
+        {
+          "path": "artifacts/craft-index-ordinary-21.1.233-build/test-results/test/TEST-net.citizensnpcs.trait.shop.ItemReceiptTest.xml",
+          "bytes": 1208,
+          "sha256": "870747576b183860972300ab6cd00ed4f28dd48483fa239570d2ff3c3cf602a1"
+        },
+        {
+          "path": "artifacts/craft-index-ordinary-21.1.233-build/test-results/test/TEST-net.citizensnpcs.trait.shop.MoneyArithmeticTest.xml",
+          "bytes": 896,
+          "sha256": "495e43c4b771d9d30b4f78afafa331db27727b8130445d191d88a59dfa30609e"
+        },
+        {
+          "path": "artifacts/craft-index-ordinary-21.1.233-build/test-results/test/TEST-net.citizensnpcs.trait.shop.NPCShopTest.xml",
+          "bytes": 1596,
+          "sha256": "6948ee3dee6f9139ab6db5e6ed4589dda03cefafdc3bb0d22733ab213fb370b3"
+        },
+        {
+          "path": "artifacts/craft-index-ordinary-21.1.233-build/test-results/test/TEST-net.citizensnpcs.trait.shop.ShopSessionOwnerTest.xml",
+          "bytes": 662,
+          "sha256": "b29745f327732340bb90935a8c4dc2d718ac9dfddea9ea875414b7c62be0d553"
+        },
+        {
+          "path": "artifacts/craft-index-ordinary-21.1.233-build/test-results/test/TEST-net.citizensnpcs.trait.shop.ShopTransactionTest.xml",
+          "bytes": 1067,
+          "sha256": "d14e7928c1b292722abef408832ae441ac141fec0a42f03c6075ce321f6083aa"
+        },
+        {
+          "path": "artifacts/craft-index-ordinary-21.1.233-build/test-results/test/TEST-net.citizensnpcs.trait.shop.StoredShopsTest.xml",
+          "bytes": 2715,
+          "sha256": "feb5daf805f1bc54648278a93f8fcfb2cb269e9a043fd5f0ed3135a0646c00ad"
+        },
+        {
+          "path": "artifacts/craft-index-ordinary-21.1.233-build/test-results/test/TEST-net.citizensnpcs.trait.text.TextEditorInputTest.xml",
+          "bytes": 771,
+          "sha256": "bc7ac06017cdca29f3cd8b26f2552b4c02c6ef39a2ded3f9690efc947b15fdf1"
+        },
+        {
+          "path": "artifacts/craft-index-ordinary-21.1.233-build/test-results/test/TEST-net.citizensnpcs.trait.TraitNameMappingTest.xml",
+          "bytes": 1067,
+          "sha256": "b6ae832b3a77952e8e8e02f6305fc43c3d653ad888f4ecfa28c761afe78944ae"
+        },
+        {
+          "path": "artifacts/craft-index-ordinary-21.1.233-build/test-results/test/TEST-net.citizensnpcs.trait.waypoint.triggers.NumericTriggerInputTest.xml",
+          "bytes": 865,
+          "sha256": "9c823fd9441e5961927b07dd1dcbdfb6fad3425c5a50d034fe9b180b303971ae"
+        },
+        {
+          "path": "artifacts/craft-index-ordinary-21.1.233-build/test-results/test/TEST-net.citizensnpcs.trait.waypoint.triggers.TeleportTriggerInputTest.xml",
+          "bytes": 851,
+          "sha256": "bc421490c53f4a0cce4db21c3fc79b6b536be2ede4fd1060407ee4961e640abd"
+        },
+        {
+          "path": "artifacts/craft-index-ordinary-21.1.233-build/test-results/test/TEST-net.citizensnpcs.trait.waypoint.triggers.WaypointTriggerSaveTest.xml",
+          "bytes": 1022,
+          "sha256": "d50c7ca6d197db5a841d9424c9e6f54904a3374ec2462d2502152c3bf2d76a31"
+        },
+        {
+          "path": "artifacts/craft-index-ordinary-21.1.233-build/test-results/test/TEST-net.citizensnpcs.util.CommerceTaskJournalTest.xml",
+          "bytes": 2371,
+          "sha256": "62b3cf61cdcf5bbd5bd116749b65754ede214e14f5f997dae36759e795eef7ff"
+        },
+        {
+          "path": "artifacts/craft-index-ordinary-21.1.233-build/test-results/test/TEST-net.citizensnpcs.util.DimensionLookupTest.xml",
+          "bytes": 746,
+          "sha256": "3479b50b588adfd5e18989a1b6d3629bb5c62e780db5ae08d614a9082938ff6d"
+        },
+        {
+          "path": "artifacts/craft-index-ordinary-21.1.233-build/test-results/test/TEST-net.citizensnpcs.util.EconomyShopMenusTest.xml",
+          "bytes": 607,
+          "sha256": "5e20f856149e8f25057969097540a0aa0d4ed458123953fd25b1fd3ca1e1810f"
+        },
+        {
+          "path": "artifacts/craft-index-ordinary-21.1.233-build/test-results/test/TEST-net.citizensnpcs.util.JournalRecordDecodingTest.xml",
+          "bytes": 5328,
+          "sha256": "2e9bf9901df8ba03304e19df11413e95d5977342598c6927b8df32eed8743852"
+        },
+        {
+          "path": "artifacts/craft-index-ordinary-21.1.233-build/test-results/test/TEST-net.citizensnpcs.util.LuckPermsGroupsTest.xml",
+          "bytes": 609,
+          "sha256": "489a3f35b0994064d606fbf50c772296036fb2cbe4271d771d7f896354c9ba87"
+        },
+        {
+          "path": "artifacts/craft-index-ordinary-21.1.233-build/test-results/test/TEST-net.citizensnpcs.util.ParadigmGroupsTest.xml",
+          "bytes": 1205,
+          "sha256": "58c342c19e3ea14f823a2166d112b0498381e17f6059aa52439c77ba56b40bc4"
+        },
+        {
+          "path": "artifacts/craft-index-ordinary-21.1.233-build/test-results/test/TEST-net.citizensnpcs.util.ParadigmPermissionWriterTest.xml",
+          "bytes": 2861,
+          "sha256": "243133e9e6920fea1142fb1b5e6ef43b5a0c5dbc439e086c27a2985e0cc293bf"
+        },
+        {
+          "path": "artifacts/craft-index-ordinary-21.1.233-build/test-results/test/TEST-net.citizensnpcs.util.ProviderPlaceholderExportsTest.xml",
+          "bytes": 1093,
+          "sha256": "8807f18dd8e5d3a3b324b097fae36049f3a111bfad058dd8b20e714861d4951b"
+        },
+        {
+          "path": "artifacts/craft-index-ordinary-21.1.233-build/test-results/test/TEST-net.citizensnpcs.util.QuestDeliveryJournalTest.xml",
+          "bytes": 1864,
+          "sha256": "1e0f4632eb5b86ad8bbcfa4d260455374d8f6e5171a8e6b8f957e1192ac4d73f"
+        },
+        {
+          "path": "artifacts/craft-index-ordinary-21.1.233-build/test-results/test/TEST-net.citizensnpcs.util.QuestDeliveryStorageTest.xml",
+          "bytes": 1137,
+          "sha256": "177ab93487a177c4426890832b3347acb27ec231197c597c77f32ea9ab3beac1"
+        },
+        {
+          "path": "artifacts/craft-index-ordinary-21.1.233-build/test-results/test/TEST-net.citizensnpcs.util.QuestEvidenceJournalTest.xml",
+          "bytes": 2814,
+          "sha256": "5fcff9d180bbff6e98e5b1bb393a4ce1c55d0ee365d1ab6f7bc4d9e9e38d2f0c"
+        },
+        {
+          "path": "artifacts/craft-index-ordinary-21.1.233-build/test-results/test/TEST-net.citizensnpcs.util.QuestRewardJournalTest.xml",
+          "bytes": 1537,
+          "sha256": "de26f08fab5da9172592d0ddbaad692365fba20c76d4af26415569b805520a4d"
+        },
+        {
+          "path": "artifacts/craft-index-ordinary-21.1.233-build/test-results/test/TEST-net.citizensnpcs.util.YuuniverseEconomyTest.xml",
+          "bytes": 1500,
+          "sha256": "c94882571e506a21c214b0bff21ff190980d683991a3079aed55be76fadb88a3"
+        }
+      ]
+    }
+  ],
+  "native": [
+    {
+      "target": "21.1.248",
+      "state": {
+        "actor": "b5e8c182-24e2-4264-afa8-b7ba20f385a3",
+        "team": "b5e8c182-24e2-4264-afa8-b7ba20f385a3",
+        "tasks": [
+          "033B16C85A6064CC",
+          "1A93C7F2AE8B6F7B",
+          "039608BD30ACDF21"
+        ],
+        "entries": [
+          {
+            "id": "4dfcf3b26fc115b08a6f1d00eb9ded2f091cf22771da38f3b0bab9409d42ac98",
+            "revision": 1,
+            "admission": {
+              "observationId": "507f0a7b-7726-4080-871e-844f9937b1cb",
+              "generationId": "e7f5a06d-0e90-4e79-85bf-4b21e65aa55a",
+              "taskId": "033B16C85A6064CC",
+              "actorId": "b5e8c182-24e2-4264-afa8-b7ba20f385a3",
+              "recipeId": "minecraft:oak_planks",
+              "recipeRevision": "3aefaa3f38d0da98e939feaa4d77a81574881fdee49979d732552999c6e633f8",
+              "units": 4,
+              "evidence": "{\"id\":\"507f0a7b-7726-4080-871e-844f9937b1cb\",\"actorId\":\"b5e8c182-24e2-4264-afa8-b7ba20f385a3\",\"dimension\":\"minecraft:overworld\",\"serverTick\":20,\"menuId\":91,\"source\":\"CRAFTING_TABLE\",\"width\":3,\"height\":3,\"inputs\":[{\"id\":\"minecraft:oak_log\",\"count\":1},null,null,null,null,null,null,null,null],\"output\":{\"id\":\"minecraft:oak_planks\",\"count\":4},\"recipe\":{\"id\":\"minecraft:oak_planks\",\"type\":\"minecraft:crafting\",\"serializer\":\"minecraft:crafting_shapeless\",\"kind\":\"SHAPELESS\",\"workstation\":\"minecraft:crafting_table\",\"width\":0,\"height\":0,\"revision\":\"3aefaa3f38d0da98e939feaa4d77a81574881fdee49979d732552999c6e633f8\",\"definition\":{\"category\":\"building\",\"group\":\"planks\",\"ingredients\":[{\"tag\":\"minecraft:oak_logs\"}],\"result\":{\"count\":4,\"id\":\"minecraft:oak_planks\"},\"type\":\"minecraft:crafting_shapeless\"},\"inputs\":[{\"definition\":{\"tag\":\"minecraft:oak_logs\"},\"custom\":false,\"alternatives\":[{\"id\":\"minecraft:oak_log\",\"count\":1},{\"id\":\"minecraft:oak_wood\",\"count\":1},{\"id\":\"minecraft:stripped_oak_log\",\"count\":1},{\"id\":\"minecraft:stripped_oak_wood\",\"count\":1}]}]}}"
+            },
+            "state": "CONFIRMED",
+            "outcome": "RETURNED",
+            "resolution": null,
+            "createdAt": 1792733050691,
+            "updatedAt": 1792733050716
+          },
+          {
+            "id": "b0668cf80945063216ad4e897fef15e35a2aac21127bd659d1d6dff7a4068547",
+            "revision": 1,
+            "admission": {
+              "observationId": "d291ecde-ea6c-45aa-9f03-e4c0e2f38cfd",
+              "generationId": "1d27d5ec-f810-4552-9402-5d1fa09c8b44",
+              "taskId": "1A93C7F2AE8B6F7B",
+              "actorId": "b5e8c182-24e2-4264-afa8-b7ba20f385a3",
+              "recipeId": "minecraft:birch_planks",
+              "recipeRevision": "9191c03f411f2c9a769c1894dcdb92a0ab94d9cfdf38e9a90b5473f7df13f257",
+              "units": 4,
+              "evidence": "{\"id\":\"d291ecde-ea6c-45aa-9f03-e4c0e2f38cfd\",\"actorId\":\"b5e8c182-24e2-4264-afa8-b7ba20f385a3\",\"dimension\":\"minecraft:overworld\",\"serverTick\":20,\"menuId\":91,\"source\":\"CRAFTING_TABLE\",\"width\":3,\"height\":3,\"inputs\":[{\"id\":\"minecraft:birch_log\",\"count\":1},null,null,null,null,null,null,null,null],\"output\":{\"id\":\"minecraft:birch_planks\",\"count\":4},\"recipe\":{\"id\":\"minecraft:birch_planks\",\"type\":\"minecraft:crafting\",\"serializer\":\"minecraft:crafting_shapeless\",\"kind\":\"SHAPELESS\",\"workstation\":\"minecraft:crafting_table\",\"width\":0,\"height\":0,\"revision\":\"9191c03f411f2c9a769c1894dcdb92a0ab94d9cfdf38e9a90b5473f7df13f257\",\"definition\":{\"category\":\"building\",\"group\":\"planks\",\"ingredients\":[{\"tag\":\"minecraft:birch_logs\"}],\"result\":{\"count\":4,\"id\":\"minecraft:birch_planks\"},\"type\":\"minecraft:crafting_shapeless\"},\"inputs\":[{\"definition\":{\"tag\":\"minecraft:birch_logs\"},\"custom\":false,\"alternatives\":[{\"id\":\"minecraft:birch_log\",\"count\":1},{\"id\":\"minecraft:birch_wood\",\"count\":1},{\"id\":\"minecraft:stripped_birch_log\",\"count\":1},{\"id\":\"minecraft:stripped_birch_wood\",\"count\":1}]}]}}"
+            },
+            "state": "CONFIRMED",
+            "outcome": "RETURNED",
+            "resolution": null,
+            "createdAt": 1792733050758,
+            "updatedAt": 1792733050773
+          },
+          {
+            "id": "c71c4ca50f2dc9cf328cd5e482156fe1f1f46861623e8b14393c90bd3ced9417",
+            "revision": 1,
+            "admission": {
+              "observationId": "7b45e465-9cc3-469a-b6a4-4d48456d1728",
+              "generationId": "5014dc1e-9586-40ed-a505-384fca5c6446",
+              "taskId": "039608BD30ACDF21",
+              "actorId": "b5e8c182-24e2-4264-afa8-b7ba20f385a3",
+              "recipeId": "minecraft:spruce_planks",
+              "recipeRevision": "e4e91da7110e5a88918f1fe6d039b6c202d978026389b618a7d0badded39d09e",
+              "units": 4,
+              "evidence": "{\"id\":\"7b45e465-9cc3-469a-b6a4-4d48456d1728\",\"actorId\":\"b5e8c182-24e2-4264-afa8-b7ba20f385a3\",\"dimension\":\"minecraft:overworld\",\"serverTick\":20,\"menuId\":91,\"source\":\"CRAFTING_TABLE\",\"width\":3,\"height\":3,\"inputs\":[{\"id\":\"minecraft:spruce_log\",\"count\":1},null,null,null,null,null,null,null,null],\"output\":{\"id\":\"minecraft:spruce_planks\",\"count\":4},\"recipe\":{\"id\":\"minecraft:spruce_planks\",\"type\":\"minecraft:crafting\",\"serializer\":\"minecraft:crafting_shapeless\",\"kind\":\"SHAPELESS\",\"workstation\":\"minecraft:crafting_table\",\"width\":0,\"height\":0,\"revision\":\"e4e91da7110e5a88918f1fe6d039b6c202d978026389b618a7d0badded39d09e\",\"definition\":{\"category\":\"building\",\"group\":\"planks\",\"ingredients\":[{\"tag\":\"minecraft:spruce_logs\"}],\"result\":{\"count\":4,\"id\":\"minecraft:spruce_planks\"},\"type\":\"minecraft:crafting_shapeless\"},\"inputs\":[{\"definition\":{\"tag\":\"minecraft:spruce_logs\"},\"custom\":false,\"alternatives\":[{\"id\":\"minecraft:spruce_log\",\"count\":1},{\"id\":\"minecraft:spruce_wood\",\"count\":1},{\"id\":\"minecraft:stripped_spruce_log\",\"count\":1},{\"id\":\"minecraft:stripped_spruce_wood\",\"count\":1}]}]}}"
+            },
+            "state": "CONFIRMED",
+            "outcome": "RETURNED",
+            "resolution": null,
+            "createdAt": 1792733050793,
+            "updatedAt": 1792733050799
+          }
+        ],
+        "inventory": "[{\"id\":\"minecraft:oak_planks\",\"count\":4},{\"id\":\"minecraft:birch_planks\",\"count\":4},{\"id\":\"minecraft:spruce_planks\",\"count\":4},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{}]"
+      },
+      "observation": {
+        "reported": true,
+        "progress": [
+          0,
+          0,
+          1
+        ],
+        "entries": [
+          {
+            "id": "4dfcf3b26fc115b08a6f1d00eb9ded2f091cf22771da38f3b0bab9409d42ac98",
+            "revision": 1,
+            "admission": {
+              "observationId": "507f0a7b-7726-4080-871e-844f9937b1cb",
+              "generationId": "e7f5a06d-0e90-4e79-85bf-4b21e65aa55a",
+              "taskId": "033B16C85A6064CC",
+              "actorId": "b5e8c182-24e2-4264-afa8-b7ba20f385a3",
+              "recipeId": "minecraft:oak_planks",
+              "recipeRevision": "3aefaa3f38d0da98e939feaa4d77a81574881fdee49979d732552999c6e633f8",
+              "units": 4,
+              "evidence": "{\"id\":\"507f0a7b-7726-4080-871e-844f9937b1cb\",\"actorId\":\"b5e8c182-24e2-4264-afa8-b7ba20f385a3\",\"dimension\":\"minecraft:overworld\",\"serverTick\":20,\"menuId\":91,\"source\":\"CRAFTING_TABLE\",\"width\":3,\"height\":3,\"inputs\":[{\"id\":\"minecraft:oak_log\",\"count\":1},null,null,null,null,null,null,null,null],\"output\":{\"id\":\"minecraft:oak_planks\",\"count\":4},\"recipe\":{\"id\":\"minecraft:oak_planks\",\"type\":\"minecraft:crafting\",\"serializer\":\"minecraft:crafting_shapeless\",\"kind\":\"SHAPELESS\",\"workstation\":\"minecraft:crafting_table\",\"width\":0,\"height\":0,\"revision\":\"3aefaa3f38d0da98e939feaa4d77a81574881fdee49979d732552999c6e633f8\",\"definition\":{\"category\":\"building\",\"group\":\"planks\",\"ingredients\":[{\"tag\":\"minecraft:oak_logs\"}],\"result\":{\"count\":4,\"id\":\"minecraft:oak_planks\"},\"type\":\"minecraft:crafting_shapeless\"},\"inputs\":[{\"definition\":{\"tag\":\"minecraft:oak_logs\"},\"custom\":false,\"alternatives\":[{\"id\":\"minecraft:oak_log\",\"count\":1},{\"id\":\"minecraft:oak_wood\",\"count\":1},{\"id\":\"minecraft:stripped_oak_log\",\"count\":1},{\"id\":\"minecraft:stripped_oak_wood\",\"count\":1}]}]}}"
+            },
+            "state": "CONFIRMED",
+            "outcome": "RETURNED",
+            "resolution": null,
+            "createdAt": 1792733050691,
+            "updatedAt": 1792733050716
+          },
+          {
+            "id": "b0668cf80945063216ad4e897fef15e35a2aac21127bd659d1d6dff7a4068547",
+            "revision": 1,
+            "admission": {
+              "observationId": "d291ecde-ea6c-45aa-9f03-e4c0e2f38cfd",
+              "generationId": "1d27d5ec-f810-4552-9402-5d1fa09c8b44",
+              "taskId": "1A93C7F2AE8B6F7B",
+              "actorId": "b5e8c182-24e2-4264-afa8-b7ba20f385a3",
+              "recipeId": "minecraft:birch_planks",
+              "recipeRevision": "9191c03f411f2c9a769c1894dcdb92a0ab94d9cfdf38e9a90b5473f7df13f257",
+              "units": 4,
+              "evidence": "{\"id\":\"d291ecde-ea6c-45aa-9f03-e4c0e2f38cfd\",\"actorId\":\"b5e8c182-24e2-4264-afa8-b7ba20f385a3\",\"dimension\":\"minecraft:overworld\",\"serverTick\":20,\"menuId\":91,\"source\":\"CRAFTING_TABLE\",\"width\":3,\"height\":3,\"inputs\":[{\"id\":\"minecraft:birch_log\",\"count\":1},null,null,null,null,null,null,null,null],\"output\":{\"id\":\"minecraft:birch_planks\",\"count\":4},\"recipe\":{\"id\":\"minecraft:birch_planks\",\"type\":\"minecraft:crafting\",\"serializer\":\"minecraft:crafting_shapeless\",\"kind\":\"SHAPELESS\",\"workstation\":\"minecraft:crafting_table\",\"width\":0,\"height\":0,\"revision\":\"9191c03f411f2c9a769c1894dcdb92a0ab94d9cfdf38e9a90b5473f7df13f257\",\"definition\":{\"category\":\"building\",\"group\":\"planks\",\"ingredients\":[{\"tag\":\"minecraft:birch_logs\"}],\"result\":{\"count\":4,\"id\":\"minecraft:birch_planks\"},\"type\":\"minecraft:crafting_shapeless\"},\"inputs\":[{\"definition\":{\"tag\":\"minecraft:birch_logs\"},\"custom\":false,\"alternatives\":[{\"id\":\"minecraft:birch_log\",\"count\":1},{\"id\":\"minecraft:birch_wood\",\"count\":1},{\"id\":\"minecraft:stripped_birch_log\",\"count\":1},{\"id\":\"minecraft:stripped_birch_wood\",\"count\":1}]}]}}"
+            },
+            "state": "CONFIRMED",
+            "outcome": "RETURNED",
+            "resolution": null,
+            "createdAt": 1792733050758,
+            "updatedAt": 1792733050773
+          },
+          {
+            "id": "c71c4ca50f2dc9cf328cd5e482156fe1f1f46861623e8b14393c90bd3ced9417",
+            "revision": 2,
+            "admission": {
+              "observationId": "7b45e465-9cc3-469a-b6a4-4d48456d1728",
+              "generationId": "5014dc1e-9586-40ed-a505-384fca5c6446",
+              "taskId": "039608BD30ACDF21",
+              "actorId": "b5e8c182-24e2-4264-afa8-b7ba20f385a3",
+              "recipeId": "minecraft:spruce_planks",
+              "recipeRevision": "e4e91da7110e5a88918f1fe6d039b6c202d978026389b618a7d0badded39d09e",
+              "units": 4,
+              "evidence": "{\"id\":\"7b45e465-9cc3-469a-b6a4-4d48456d1728\",\"actorId\":\"b5e8c182-24e2-4264-afa8-b7ba20f385a3\",\"dimension\":\"minecraft:overworld\",\"serverTick\":20,\"menuId\":91,\"source\":\"CRAFTING_TABLE\",\"width\":3,\"height\":3,\"inputs\":[{\"id\":\"minecraft:spruce_log\",\"count\":1},null,null,null,null,null,null,null,null],\"output\":{\"id\":\"minecraft:spruce_planks\",\"count\":4},\"recipe\":{\"id\":\"minecraft:spruce_planks\",\"type\":\"minecraft:crafting\",\"serializer\":\"minecraft:crafting_shapeless\",\"kind\":\"SHAPELESS\",\"workstation\":\"minecraft:crafting_table\",\"width\":0,\"height\":0,\"revision\":\"e4e91da7110e5a88918f1fe6d039b6c202d978026389b618a7d0badded39d09e\",\"definition\":{\"category\":\"building\",\"group\":\"planks\",\"ingredients\":[{\"tag\":\"minecraft:spruce_logs\"}],\"result\":{\"count\":4,\"id\":\"minecraft:spruce_planks\"},\"type\":\"minecraft:crafting_shapeless\"},\"inputs\":[{\"definition\":{\"tag\":\"minecraft:spruce_logs\"},\"custom\":false,\"alternatives\":[{\"id\":\"minecraft:spruce_log\",\"count\":1},{\"id\":\"minecraft:spruce_wood\",\"count\":1},{\"id\":\"minecraft:stripped_spruce_log\",\"count\":1},{\"id\":\"minecraft:stripped_spruce_wood\",\"count\":1}]}]}}"
+            },
+            "state": "APPLIED",
+            "outcome": "RETURNED",
+            "resolution": null,
+            "createdAt": 1792733050793,
+            "updatedAt": 1792733129788
+          }
+        ],
+        "message": "Craft projection remains pending for task 033B16C85A6064CC, team b5e8c182-24e2-4264-afa8-b7ba20f385a3, cycle 0, generation e7f5a06d-0e90-4e79-85bf-4b21e65aa55a",
+        "recovered": true,
+        "finalEntries": [
+          {
+            "id": "4dfcf3b26fc115b08a6f1d00eb9ded2f091cf22771da38f3b0bab9409d42ac98",
+            "revision": 2,
+            "admission": {
+              "observationId": "507f0a7b-7726-4080-871e-844f9937b1cb",
+              "generationId": "e7f5a06d-0e90-4e79-85bf-4b21e65aa55a",
+              "taskId": "033B16C85A6064CC",
+              "actorId": "b5e8c182-24e2-4264-afa8-b7ba20f385a3",
+              "recipeId": "minecraft:oak_planks",
+              "recipeRevision": "3aefaa3f38d0da98e939feaa4d77a81574881fdee49979d732552999c6e633f8",
+              "units": 4,
+              "evidence": "{\"id\":\"507f0a7b-7726-4080-871e-844f9937b1cb\",\"actorId\":\"b5e8c182-24e2-4264-afa8-b7ba20f385a3\",\"dimension\":\"minecraft:overworld\",\"serverTick\":20,\"menuId\":91,\"source\":\"CRAFTING_TABLE\",\"width\":3,\"height\":3,\"inputs\":[{\"id\":\"minecraft:oak_log\",\"count\":1},null,null,null,null,null,null,null,null],\"output\":{\"id\":\"minecraft:oak_planks\",\"count\":4},\"recipe\":{\"id\":\"minecraft:oak_planks\",\"type\":\"minecraft:crafting\",\"serializer\":\"minecraft:crafting_shapeless\",\"kind\":\"SHAPELESS\",\"workstation\":\"minecraft:crafting_table\",\"width\":0,\"height\":0,\"revision\":\"3aefaa3f38d0da98e939feaa4d77a81574881fdee49979d732552999c6e633f8\",\"definition\":{\"category\":\"building\",\"group\":\"planks\",\"ingredients\":[{\"tag\":\"minecraft:oak_logs\"}],\"result\":{\"count\":4,\"id\":\"minecraft:oak_planks\"},\"type\":\"minecraft:crafting_shapeless\"},\"inputs\":[{\"definition\":{\"tag\":\"minecraft:oak_logs\"},\"custom\":false,\"alternatives\":[{\"id\":\"minecraft:oak_log\",\"count\":1},{\"id\":\"minecraft:oak_wood\",\"count\":1},{\"id\":\"minecraft:stripped_oak_log\",\"count\":1},{\"id\":\"minecraft:stripped_oak_wood\",\"count\":1}]}]}}"
+            },
+            "state": "APPLIED",
+            "outcome": "RETURNED",
+            "resolution": null,
+            "createdAt": 1792733050691,
+            "updatedAt": 1792733129809
+          },
+          {
+            "id": "b0668cf80945063216ad4e897fef15e35a2aac21127bd659d1d6dff7a4068547",
+            "revision": 2,
+            "admission": {
+              "observationId": "d291ecde-ea6c-45aa-9f03-e4c0e2f38cfd",
+              "generationId": "1d27d5ec-f810-4552-9402-5d1fa09c8b44",
+              "taskId": "1A93C7F2AE8B6F7B",
+              "actorId": "b5e8c182-24e2-4264-afa8-b7ba20f385a3",
+              "recipeId": "minecraft:birch_planks",
+              "recipeRevision": "9191c03f411f2c9a769c1894dcdb92a0ab94d9cfdf38e9a90b5473f7df13f257",
+              "units": 4,
+              "evidence": "{\"id\":\"d291ecde-ea6c-45aa-9f03-e4c0e2f38cfd\",\"actorId\":\"b5e8c182-24e2-4264-afa8-b7ba20f385a3\",\"dimension\":\"minecraft:overworld\",\"serverTick\":20,\"menuId\":91,\"source\":\"CRAFTING_TABLE\",\"width\":3,\"height\":3,\"inputs\":[{\"id\":\"minecraft:birch_log\",\"count\":1},null,null,null,null,null,null,null,null],\"output\":{\"id\":\"minecraft:birch_planks\",\"count\":4},\"recipe\":{\"id\":\"minecraft:birch_planks\",\"type\":\"minecraft:crafting\",\"serializer\":\"minecraft:crafting_shapeless\",\"kind\":\"SHAPELESS\",\"workstation\":\"minecraft:crafting_table\",\"width\":0,\"height\":0,\"revision\":\"9191c03f411f2c9a769c1894dcdb92a0ab94d9cfdf38e9a90b5473f7df13f257\",\"definition\":{\"category\":\"building\",\"group\":\"planks\",\"ingredients\":[{\"tag\":\"minecraft:birch_logs\"}],\"result\":{\"count\":4,\"id\":\"minecraft:birch_planks\"},\"type\":\"minecraft:crafting_shapeless\"},\"inputs\":[{\"definition\":{\"tag\":\"minecraft:birch_logs\"},\"custom\":false,\"alternatives\":[{\"id\":\"minecraft:birch_log\",\"count\":1},{\"id\":\"minecraft:birch_wood\",\"count\":1},{\"id\":\"minecraft:stripped_birch_log\",\"count\":1},{\"id\":\"minecraft:stripped_birch_wood\",\"count\":1}]}]}}"
+            },
+            "state": "APPLIED",
+            "outcome": "RETURNED",
+            "resolution": null,
+            "createdAt": 1792733050758,
+            "updatedAt": 1792733129819
+          },
+          {
+            "id": "c71c4ca50f2dc9cf328cd5e482156fe1f1f46861623e8b14393c90bd3ced9417",
+            "revision": 2,
+            "admission": {
+              "observationId": "7b45e465-9cc3-469a-b6a4-4d48456d1728",
+              "generationId": "5014dc1e-9586-40ed-a505-384fca5c6446",
+              "taskId": "039608BD30ACDF21",
+              "actorId": "b5e8c182-24e2-4264-afa8-b7ba20f385a3",
+              "recipeId": "minecraft:spruce_planks",
+              "recipeRevision": "e4e91da7110e5a88918f1fe6d039b6c202d978026389b618a7d0badded39d09e",
+              "units": 4,
+              "evidence": "{\"id\":\"7b45e465-9cc3-469a-b6a4-4d48456d1728\",\"actorId\":\"b5e8c182-24e2-4264-afa8-b7ba20f385a3\",\"dimension\":\"minecraft:overworld\",\"serverTick\":20,\"menuId\":91,\"source\":\"CRAFTING_TABLE\",\"width\":3,\"height\":3,\"inputs\":[{\"id\":\"minecraft:spruce_log\",\"count\":1},null,null,null,null,null,null,null,null],\"output\":{\"id\":\"minecraft:spruce_planks\",\"count\":4},\"recipe\":{\"id\":\"minecraft:spruce_planks\",\"type\":\"minecraft:crafting\",\"serializer\":\"minecraft:crafting_shapeless\",\"kind\":\"SHAPELESS\",\"workstation\":\"minecraft:crafting_table\",\"width\":0,\"height\":0,\"revision\":\"e4e91da7110e5a88918f1fe6d039b6c202d978026389b618a7d0badded39d09e\",\"definition\":{\"category\":\"building\",\"group\":\"planks\",\"ingredients\":[{\"tag\":\"minecraft:spruce_logs\"}],\"result\":{\"count\":4,\"id\":\"minecraft:spruce_planks\"},\"type\":\"minecraft:crafting_shapeless\"},\"inputs\":[{\"definition\":{\"tag\":\"minecraft:spruce_logs\"},\"custom\":false,\"alternatives\":[{\"id\":\"minecraft:spruce_log\",\"count\":1},{\"id\":\"minecraft:spruce_wood\",\"count\":1},{\"id\":\"minecraft:stripped_spruce_log\",\"count\":1},{\"id\":\"minecraft:stripped_spruce_wood\",\"count\":1}]}]}}"
+            },
+            "state": "APPLIED",
+            "outcome": "RETURNED",
+            "resolution": null,
+            "createdAt": 1792733050793,
+            "updatedAt": 1792733129788
+          }
+        ]
+      },
+      "histories": [
+        {
+          "path": "artifacts/craft-index-248-server/craft-world/citizens/quest-evidence/bindings/033B16C85A6064CC.json",
+          "bytes": 344,
+          "sha256": "b677e6037dd3faf2134f258fe4950f22a40d89f4a74bafead56fe964119e06be"
+        },
+        {
+          "path": "artifacts/craft-index-248-server/craft-world/citizens/quest-evidence/bindings/039608BD30ACDF21.json",
+          "bytes": 347,
+          "sha256": "f9ede498dfdcaeec80ae1dbafa3b506fdfa9e411404df6f7e9650c7d1176a6a8"
+        },
+        {
+          "path": "artifacts/craft-index-248-server/craft-world/citizens/quest-evidence/bindings/1A93C7F2AE8B6F7B.json",
+          "bytes": 346,
+          "sha256": "b12555b7c26bdf8f7284a099d2550352bc593a7bcd61d4bb120913a2dc1144f7"
+        },
+        {
+          "path": "artifacts/craft-index-248-server/craft-world/citizens/quest-evidence/journal/.journal.lock",
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "path": "artifacts/craft-index-248-server/craft-world/citizens/quest-evidence/journal/entry-4dfcf3b26fc115b08a6f1d00eb9ded2f091cf22771da38f3b0bab9409d42ac98-0.json",
+          "bytes": 1756,
+          "sha256": "9d874d1827c492c1c25299dd58ea39233e65456ef5e07f90531d70e62b8214da"
+        },
+        {
+          "path": "artifacts/craft-index-248-server/craft-world/citizens/quest-evidence/journal/entry-4dfcf3b26fc115b08a6f1d00eb9ded2f091cf22771da38f3b0bab9409d42ac98-1.json",
+          "bytes": 1763,
+          "sha256": "d1b014231e540acddc1553084a794b9c2bf13387c8b4830f2bdb85c6459cbf64"
+        },
+        {
+          "path": "artifacts/craft-index-248-server/craft-world/citizens/quest-evidence/journal/entry-4dfcf3b26fc115b08a6f1d00eb9ded2f091cf22771da38f3b0bab9409d42ac98-2.json",
+          "bytes": 1761,
+          "sha256": "835e598c1e7c75b005c254a5f7a81e77fc21d7ad1b72df9445d20d442310334b"
+        },
+        {
+          "path": "artifacts/craft-index-248-server/craft-world/citizens/quest-evidence/journal/entry-b0668cf80945063216ad4e897fef15e35a2aac21127bd659d1d6dff7a4068547-0.json",
+          "bytes": 1778,
+          "sha256": "8f9dc7652ebd44a8dd9adc365245b6e178dcfc7eaccc6be8195382e329f73d01"
+        },
+        {
+          "path": "artifacts/craft-index-248-server/craft-world/citizens/quest-evidence/journal/entry-b0668cf80945063216ad4e897fef15e35a2aac21127bd659d1d6dff7a4068547-1.json",
+          "bytes": 1785,
+          "sha256": "dea9e68bdb969e6a975ca2a054a3b1e27c828b784a99efdef5d331dc767e0b0f"
+        },
+        {
+          "path": "artifacts/craft-index-248-server/craft-world/citizens/quest-evidence/journal/entry-b0668cf80945063216ad4e897fef15e35a2aac21127bd659d1d6dff7a4068547-2.json",
+          "bytes": 1783,
+          "sha256": "c227b733e2de0488422b2adc92e47d5b8913a5afff1f3e075dfc06f05c9ac637"
+        },
+        {
+          "path": "artifacts/craft-index-248-server/craft-world/citizens/quest-evidence/journal/entry-c71c4ca50f2dc9cf328cd5e482156fe1f1f46861623e8b14393c90bd3ced9417-0.json",
+          "bytes": 1789,
+          "sha256": "fb25c073b48a7a2032a4878d252cb7e2e6ba7da78fd2e4da19384c0faa73cf6b"
+        },
+        {
+          "path": "artifacts/craft-index-248-server/craft-world/citizens/quest-evidence/journal/entry-c71c4ca50f2dc9cf328cd5e482156fe1f1f46861623e8b14393c90bd3ced9417-1.json",
+          "bytes": 1796,
+          "sha256": "5893fec035e8ba198adf5ecea964dd81285bb404369077da8f791d48fc5bdf6e"
+        },
+        {
+          "path": "artifacts/craft-index-248-server/craft-world/citizens/quest-evidence/journal/entry-c71c4ca50f2dc9cf328cd5e482156fe1f1f46861623e8b14393c90bd3ced9417-2.json",
+          "bytes": 1794,
+          "sha256": "37764c8fd94a02f871105ef5ed127d7052bdc7a26ed9f3b4aba387f631bdcfd6"
+        },
+        {
+          "path": "artifacts/craft-index-248-server/craft-world/citizens/quest-evidence/journal/generation-1d27d5ec-f810-4552-9402-5d1fa09c8b44.json",
+          "bytes": 265,
+          "sha256": "c590eb2b56b5a432167972e25aaf88dc68e24e639bf8d7382acedf24de47e89b"
+        },
+        {
+          "path": "artifacts/craft-index-248-server/craft-world/citizens/quest-evidence/journal/generation-5014dc1e-9586-40ed-a505-384fca5c6446.json",
+          "bytes": 265,
+          "sha256": "2a34148c74d9caa57656efb9e07a8746ebbf1f1f6019792ab4aa6246ff0e11e4"
+        },
+        {
+          "path": "artifacts/craft-index-248-server/craft-world/citizens/quest-evidence/journal/generation-e7f5a06d-0e90-4e79-85bf-4b21e65aa55a.json",
+          "bytes": 265,
+          "sha256": "14e489090585485b154d32e6e7c11c54bb94ca42948a0e1cc5c3e05d04755d83"
+        }
+      ],
+      "nativeProgress": {
+        "1A93C7F2AE8B6F7B": "1",
+        "033B16C85A6064CC": "1",
+        "039608BD30ACDF21": "1"
+      },
+      "nativeSaves": [
+        {
+          "path": "artifacts/craft-index-248-server/craft-world/ftbquests/b5e8c182-24e2-4264-afa8-b7ba20f385a3.snbt",
+          "bytes": 889,
+          "sha256": "0621d07a186a63bddc561f5dc69569a12967d5530c967adfe15438b235836e3c"
+        },
+        {
+          "path": "artifacts/craft-index-248-server/craft-world/ftbteams/ftbteams.snbt",
+          "bytes": 87,
+          "sha256": "80ff24de842d29b706008a3c7fdcf86e8b02fa333353d85e096e1c1b488af2d2"
+        },
+        {
+          "path": "artifacts/craft-index-248-server/craft-world/ftbteams/player/b5e8c182-24e2-4264-afa8-b7ba20f385a3.snbt",
+          "bytes": 460,
+          "sha256": "a48c07ac9476909cf7683b4730530a4e254928d631678d02f4c9d8b9e8e91667"
+        },
+        {
+          "path": "artifacts/craft-index-248-server/craft-world/playerdata/b5e8c182-24e2-4264-afa8-b7ba20f385a3.dat",
+          "bytes": 1043,
+          "sha256": "dd3d8a1ea14dbcc119b2312901f41cc70b21b4d0a86994d044b9ffaf1dad6ec1"
+        },
+        {
+          "path": "artifacts/craft-index-248-server/craft-world/playerdata/b5e8c182-24e2-4264-afa8-b7ba20f385a3.dat_old",
+          "bytes": 818,
+          "sha256": "9493ecd2d5382967528ed9844ceb50e1feb9f10d23c4a288fc2fe6a81187641c"
+        }
+      ],
+      "providers": [
+        {
+          "path": "artifacts/craft-index-248-server/mods/architectury-13.0.11-neoforge.jar",
+          "bytes": 584734,
+          "sha256": "9cc92f2c09533fc5482c60f993bd891c655a0e32b637037cdcb7c2b23adedeeb"
+        },
+        {
+          "path": "artifacts/craft-index-248-server/mods/ftb-library-neoforge-2101.1.37.jar",
+          "bytes": 1439881,
+          "sha256": "624c2d2d1cbadb946d967e17757bd5b2d129d4d3ed71f2da0c70607d04476ac2"
+        },
+        {
+          "path": "artifacts/craft-index-248-server/mods/ftb-quests-neoforge-2101.1.36.jar",
+          "bytes": 1609984,
+          "sha256": "6a39982c4b3afc00b1e788041a4f0d394e1659e3b3a6e5d078cd790bc36d0018"
+        },
+        {
+          "path": "artifacts/craft-index-248-server/mods/ftb-teams-neoforge-2101.1.11.jar",
+          "bytes": 308236,
+          "sha256": "e6bcd670493624e6906df872a9c6af4a33fe6405cac57a32c59cd4cd5838c655"
+        }
+      ],
+      "logs": [
+        {
+          "path": "artifacts/craft-index-native-248-seed.log",
+          "bytes": 32445,
+          "sha256": "dfb4d13cb2b88c725729a4b2fac9607e151cd1e7bee3c4af6f4fe396439c7eb4"
+        },
+        {
+          "path": "artifacts/craft-index-native-248-recover.log",
+          "bytes": 16459,
+          "sha256": "9b6c8f1f473e15929ce2b9c033e58bac468823a55f5bb17d9771de3b3243a471"
+        }
+      ]
+    },
+    {
+      "target": "21.1.233",
+      "state": {
+        "actor": "b5166bf0-d0bd-4e3d-b19e-8bbc2c896e9f",
+        "team": "b5166bf0-d0bd-4e3d-b19e-8bbc2c896e9f",
+        "tasks": [
+          "1F520FF72A097206",
+          "560DE1BFEBFB0401",
+          "387078ECEEB0E76B"
+        ],
+        "entries": [
+          {
+            "id": "3817e958db21a60ce291343a505c8e373a78345a1e45d95a86bdda3c98ced02d",
+            "revision": 1,
+            "admission": {
+              "observationId": "91ce0f4c-b19e-4022-a9ff-3714bec71c0f",
+              "generationId": "f8a510ed-7f52-4141-84ef-51b0ba254ffb",
+              "taskId": "1F520FF72A097206",
+              "actorId": "b5166bf0-d0bd-4e3d-b19e-8bbc2c896e9f",
+              "recipeId": "minecraft:oak_planks",
+              "recipeRevision": "3aefaa3f38d0da98e939feaa4d77a81574881fdee49979d732552999c6e633f8",
+              "units": 4,
+              "evidence": "{\"id\":\"91ce0f4c-b19e-4022-a9ff-3714bec71c0f\",\"actorId\":\"b5166bf0-d0bd-4e3d-b19e-8bbc2c896e9f\",\"dimension\":\"minecraft:overworld\",\"serverTick\":20,\"menuId\":91,\"source\":\"CRAFTING_TABLE\",\"width\":3,\"height\":3,\"inputs\":[{\"id\":\"minecraft:oak_log\",\"count\":1},null,null,null,null,null,null,null,null],\"output\":{\"id\":\"minecraft:oak_planks\",\"count\":4},\"recipe\":{\"id\":\"minecraft:oak_planks\",\"type\":\"minecraft:crafting\",\"serializer\":\"minecraft:crafting_shapeless\",\"kind\":\"SHAPELESS\",\"workstation\":\"minecraft:crafting_table\",\"width\":0,\"height\":0,\"revision\":\"3aefaa3f38d0da98e939feaa4d77a81574881fdee49979d732552999c6e633f8\",\"definition\":{\"category\":\"building\",\"group\":\"planks\",\"ingredients\":[{\"tag\":\"minecraft:oak_logs\"}],\"result\":{\"count\":4,\"id\":\"minecraft:oak_planks\"},\"type\":\"minecraft:crafting_shapeless\"},\"inputs\":[{\"definition\":{\"tag\":\"minecraft:oak_logs\"},\"custom\":false,\"alternatives\":[{\"id\":\"minecraft:oak_log\",\"count\":1},{\"id\":\"minecraft:oak_wood\",\"count\":1},{\"id\":\"minecraft:stripped_oak_log\",\"count\":1},{\"id\":\"minecraft:stripped_oak_wood\",\"count\":1}]}]}}"
+            },
+            "state": "CONFIRMED",
+            "outcome": "RETURNED",
+            "resolution": null,
+            "createdAt": 1792733232516,
+            "updatedAt": 1792733232543
+          },
+          {
+            "id": "72cb53fff730e2499894d711c799a79fd74f114691e6a313028409fb60711331",
+            "revision": 1,
+            "admission": {
+              "observationId": "0f834461-0a11-4568-9cf3-5c365c4b1c46",
+              "generationId": "e7b00c65-1ef3-4081-b59b-47e75b622d56",
+              "taskId": "560DE1BFEBFB0401",
+              "actorId": "b5166bf0-d0bd-4e3d-b19e-8bbc2c896e9f",
+              "recipeId": "minecraft:birch_planks",
+              "recipeRevision": "9191c03f411f2c9a769c1894dcdb92a0ab94d9cfdf38e9a90b5473f7df13f257",
+              "units": 4,
+              "evidence": "{\"id\":\"0f834461-0a11-4568-9cf3-5c365c4b1c46\",\"actorId\":\"b5166bf0-d0bd-4e3d-b19e-8bbc2c896e9f\",\"dimension\":\"minecraft:overworld\",\"serverTick\":20,\"menuId\":91,\"source\":\"CRAFTING_TABLE\",\"width\":3,\"height\":3,\"inputs\":[{\"id\":\"minecraft:birch_log\",\"count\":1},null,null,null,null,null,null,null,null],\"output\":{\"id\":\"minecraft:birch_planks\",\"count\":4},\"recipe\":{\"id\":\"minecraft:birch_planks\",\"type\":\"minecraft:crafting\",\"serializer\":\"minecraft:crafting_shapeless\",\"kind\":\"SHAPELESS\",\"workstation\":\"minecraft:crafting_table\",\"width\":0,\"height\":0,\"revision\":\"9191c03f411f2c9a769c1894dcdb92a0ab94d9cfdf38e9a90b5473f7df13f257\",\"definition\":{\"category\":\"building\",\"group\":\"planks\",\"ingredients\":[{\"tag\":\"minecraft:birch_logs\"}],\"result\":{\"count\":4,\"id\":\"minecraft:birch_planks\"},\"type\":\"minecraft:crafting_shapeless\"},\"inputs\":[{\"definition\":{\"tag\":\"minecraft:birch_logs\"},\"custom\":false,\"alternatives\":[{\"id\":\"minecraft:birch_log\",\"count\":1},{\"id\":\"minecraft:birch_wood\",\"count\":1},{\"id\":\"minecraft:stripped_birch_log\",\"count\":1},{\"id\":\"minecraft:stripped_birch_wood\",\"count\":1}]}]}}"
+            },
+            "state": "CONFIRMED",
+            "outcome": "RETURNED",
+            "resolution": null,
+            "createdAt": 1792733232578,
+            "updatedAt": 1792733232587
+          },
+          {
+            "id": "4bbdec5ae4c3451035b1c6009dccc3742f3295ce1c3965f917f859798f519bdf",
+            "revision": 1,
+            "admission": {
+              "observationId": "2de2666d-dc5e-4d86-b91e-845f1186ba02",
+              "generationId": "8d39b14d-7cf2-495b-acfc-a8bbbef96dc1",
+              "taskId": "387078ECEEB0E76B",
+              "actorId": "b5166bf0-d0bd-4e3d-b19e-8bbc2c896e9f",
+              "recipeId": "minecraft:spruce_planks",
+              "recipeRevision": "e4e91da7110e5a88918f1fe6d039b6c202d978026389b618a7d0badded39d09e",
+              "units": 4,
+              "evidence": "{\"id\":\"2de2666d-dc5e-4d86-b91e-845f1186ba02\",\"actorId\":\"b5166bf0-d0bd-4e3d-b19e-8bbc2c896e9f\",\"dimension\":\"minecraft:overworld\",\"serverTick\":20,\"menuId\":91,\"source\":\"CRAFTING_TABLE\",\"width\":3,\"height\":3,\"inputs\":[{\"id\":\"minecraft:spruce_log\",\"count\":1},null,null,null,null,null,null,null,null],\"output\":{\"id\":\"minecraft:spruce_planks\",\"count\":4},\"recipe\":{\"id\":\"minecraft:spruce_planks\",\"type\":\"minecraft:crafting\",\"serializer\":\"minecraft:crafting_shapeless\",\"kind\":\"SHAPELESS\",\"workstation\":\"minecraft:crafting_table\",\"width\":0,\"height\":0,\"revision\":\"e4e91da7110e5a88918f1fe6d039b6c202d978026389b618a7d0badded39d09e\",\"definition\":{\"category\":\"building\",\"group\":\"planks\",\"ingredients\":[{\"tag\":\"minecraft:spruce_logs\"}],\"result\":{\"count\":4,\"id\":\"minecraft:spruce_planks\"},\"type\":\"minecraft:crafting_shapeless\"},\"inputs\":[{\"definition\":{\"tag\":\"minecraft:spruce_logs\"},\"custom\":false,\"alternatives\":[{\"id\":\"minecraft:spruce_log\",\"count\":1},{\"id\":\"minecraft:spruce_wood\",\"count\":1},{\"id\":\"minecraft:stripped_spruce_log\",\"count\":1},{\"id\":\"minecraft:stripped_spruce_wood\",\"count\":1}]}]}}"
+            },
+            "state": "CONFIRMED",
+            "outcome": "RETURNED",
+            "resolution": null,
+            "createdAt": 1792733232613,
+            "updatedAt": 1792733232624
+          }
+        ],
+        "inventory": "[{\"id\":\"minecraft:oak_planks\",\"count\":4},{\"id\":\"minecraft:birch_planks\",\"count\":4},{\"id\":\"minecraft:spruce_planks\",\"count\":4},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{}]"
+      },
+      "observation": {
+        "reported": true,
+        "progress": [
+          0,
+          0,
+          1
+        ],
+        "entries": [
+          {
+            "id": "3817e958db21a60ce291343a505c8e373a78345a1e45d95a86bdda3c98ced02d",
+            "revision": 1,
+            "admission": {
+              "observationId": "91ce0f4c-b19e-4022-a9ff-3714bec71c0f",
+              "generationId": "f8a510ed-7f52-4141-84ef-51b0ba254ffb",
+              "taskId": "1F520FF72A097206",
+              "actorId": "b5166bf0-d0bd-4e3d-b19e-8bbc2c896e9f",
+              "recipeId": "minecraft:oak_planks",
+              "recipeRevision": "3aefaa3f38d0da98e939feaa4d77a81574881fdee49979d732552999c6e633f8",
+              "units": 4,
+              "evidence": "{\"id\":\"91ce0f4c-b19e-4022-a9ff-3714bec71c0f\",\"actorId\":\"b5166bf0-d0bd-4e3d-b19e-8bbc2c896e9f\",\"dimension\":\"minecraft:overworld\",\"serverTick\":20,\"menuId\":91,\"source\":\"CRAFTING_TABLE\",\"width\":3,\"height\":3,\"inputs\":[{\"id\":\"minecraft:oak_log\",\"count\":1},null,null,null,null,null,null,null,null],\"output\":{\"id\":\"minecraft:oak_planks\",\"count\":4},\"recipe\":{\"id\":\"minecraft:oak_planks\",\"type\":\"minecraft:crafting\",\"serializer\":\"minecraft:crafting_shapeless\",\"kind\":\"SHAPELESS\",\"workstation\":\"minecraft:crafting_table\",\"width\":0,\"height\":0,\"revision\":\"3aefaa3f38d0da98e939feaa4d77a81574881fdee49979d732552999c6e633f8\",\"definition\":{\"category\":\"building\",\"group\":\"planks\",\"ingredients\":[{\"tag\":\"minecraft:oak_logs\"}],\"result\":{\"count\":4,\"id\":\"minecraft:oak_planks\"},\"type\":\"minecraft:crafting_shapeless\"},\"inputs\":[{\"definition\":{\"tag\":\"minecraft:oak_logs\"},\"custom\":false,\"alternatives\":[{\"id\":\"minecraft:oak_log\",\"count\":1},{\"id\":\"minecraft:oak_wood\",\"count\":1},{\"id\":\"minecraft:stripped_oak_log\",\"count\":1},{\"id\":\"minecraft:stripped_oak_wood\",\"count\":1}]}]}}"
+            },
+            "state": "CONFIRMED",
+            "outcome": "RETURNED",
+            "resolution": null,
+            "createdAt": 1792733232516,
+            "updatedAt": 1792733232543
+          },
+          {
+            "id": "72cb53fff730e2499894d711c799a79fd74f114691e6a313028409fb60711331",
+            "revision": 1,
+            "admission": {
+              "observationId": "0f834461-0a11-4568-9cf3-5c365c4b1c46",
+              "generationId": "e7b00c65-1ef3-4081-b59b-47e75b622d56",
+              "taskId": "560DE1BFEBFB0401",
+              "actorId": "b5166bf0-d0bd-4e3d-b19e-8bbc2c896e9f",
+              "recipeId": "minecraft:birch_planks",
+              "recipeRevision": "9191c03f411f2c9a769c1894dcdb92a0ab94d9cfdf38e9a90b5473f7df13f257",
+              "units": 4,
+              "evidence": "{\"id\":\"0f834461-0a11-4568-9cf3-5c365c4b1c46\",\"actorId\":\"b5166bf0-d0bd-4e3d-b19e-8bbc2c896e9f\",\"dimension\":\"minecraft:overworld\",\"serverTick\":20,\"menuId\":91,\"source\":\"CRAFTING_TABLE\",\"width\":3,\"height\":3,\"inputs\":[{\"id\":\"minecraft:birch_log\",\"count\":1},null,null,null,null,null,null,null,null],\"output\":{\"id\":\"minecraft:birch_planks\",\"count\":4},\"recipe\":{\"id\":\"minecraft:birch_planks\",\"type\":\"minecraft:crafting\",\"serializer\":\"minecraft:crafting_shapeless\",\"kind\":\"SHAPELESS\",\"workstation\":\"minecraft:crafting_table\",\"width\":0,\"height\":0,\"revision\":\"9191c03f411f2c9a769c1894dcdb92a0ab94d9cfdf38e9a90b5473f7df13f257\",\"definition\":{\"category\":\"building\",\"group\":\"planks\",\"ingredients\":[{\"tag\":\"minecraft:birch_logs\"}],\"result\":{\"count\":4,\"id\":\"minecraft:birch_planks\"},\"type\":\"minecraft:crafting_shapeless\"},\"inputs\":[{\"definition\":{\"tag\":\"minecraft:birch_logs\"},\"custom\":false,\"alternatives\":[{\"id\":\"minecraft:birch_log\",\"count\":1},{\"id\":\"minecraft:birch_wood\",\"count\":1},{\"id\":\"minecraft:stripped_birch_log\",\"count\":1},{\"id\":\"minecraft:stripped_birch_wood\",\"count\":1}]}]}}"
+            },
+            "state": "CONFIRMED",
+            "outcome": "RETURNED",
+            "resolution": null,
+            "createdAt": 1792733232578,
+            "updatedAt": 1792733232587
+          },
+          {
+            "id": "4bbdec5ae4c3451035b1c6009dccc3742f3295ce1c3965f917f859798f519bdf",
+            "revision": 2,
+            "admission": {
+              "observationId": "2de2666d-dc5e-4d86-b91e-845f1186ba02",
+              "generationId": "8d39b14d-7cf2-495b-acfc-a8bbbef96dc1",
+              "taskId": "387078ECEEB0E76B",
+              "actorId": "b5166bf0-d0bd-4e3d-b19e-8bbc2c896e9f",
+              "recipeId": "minecraft:spruce_planks",
+              "recipeRevision": "e4e91da7110e5a88918f1fe6d039b6c202d978026389b618a7d0badded39d09e",
+              "units": 4,
+              "evidence": "{\"id\":\"2de2666d-dc5e-4d86-b91e-845f1186ba02\",\"actorId\":\"b5166bf0-d0bd-4e3d-b19e-8bbc2c896e9f\",\"dimension\":\"minecraft:overworld\",\"serverTick\":20,\"menuId\":91,\"source\":\"CRAFTING_TABLE\",\"width\":3,\"height\":3,\"inputs\":[{\"id\":\"minecraft:spruce_log\",\"count\":1},null,null,null,null,null,null,null,null],\"output\":{\"id\":\"minecraft:spruce_planks\",\"count\":4},\"recipe\":{\"id\":\"minecraft:spruce_planks\",\"type\":\"minecraft:crafting\",\"serializer\":\"minecraft:crafting_shapeless\",\"kind\":\"SHAPELESS\",\"workstation\":\"minecraft:crafting_table\",\"width\":0,\"height\":0,\"revision\":\"e4e91da7110e5a88918f1fe6d039b6c202d978026389b618a7d0badded39d09e\",\"definition\":{\"category\":\"building\",\"group\":\"planks\",\"ingredients\":[{\"tag\":\"minecraft:spruce_logs\"}],\"result\":{\"count\":4,\"id\":\"minecraft:spruce_planks\"},\"type\":\"minecraft:crafting_shapeless\"},\"inputs\":[{\"definition\":{\"tag\":\"minecraft:spruce_logs\"},\"custom\":false,\"alternatives\":[{\"id\":\"minecraft:spruce_log\",\"count\":1},{\"id\":\"minecraft:spruce_wood\",\"count\":1},{\"id\":\"minecraft:stripped_spruce_log\",\"count\":1},{\"id\":\"minecraft:stripped_spruce_wood\",\"count\":1}]}]}}"
+            },
+            "state": "APPLIED",
+            "outcome": "RETURNED",
+            "resolution": null,
+            "createdAt": 1792733232613,
+            "updatedAt": 1792733277908
+          }
+        ],
+        "message": "Craft projection remains pending for task 1F520FF72A097206, team b5166bf0-d0bd-4e3d-b19e-8bbc2c896e9f, cycle 0, generation f8a510ed-7f52-4141-84ef-51b0ba254ffb",
+        "recovered": true,
+        "finalEntries": [
+          {
+            "id": "3817e958db21a60ce291343a505c8e373a78345a1e45d95a86bdda3c98ced02d",
+            "revision": 2,
+            "admission": {
+              "observationId": "91ce0f4c-b19e-4022-a9ff-3714bec71c0f",
+              "generationId": "f8a510ed-7f52-4141-84ef-51b0ba254ffb",
+              "taskId": "1F520FF72A097206",
+              "actorId": "b5166bf0-d0bd-4e3d-b19e-8bbc2c896e9f",
+              "recipeId": "minecraft:oak_planks",
+              "recipeRevision": "3aefaa3f38d0da98e939feaa4d77a81574881fdee49979d732552999c6e633f8",
+              "units": 4,
+              "evidence": "{\"id\":\"91ce0f4c-b19e-4022-a9ff-3714bec71c0f\",\"actorId\":\"b5166bf0-d0bd-4e3d-b19e-8bbc2c896e9f\",\"dimension\":\"minecraft:overworld\",\"serverTick\":20,\"menuId\":91,\"source\":\"CRAFTING_TABLE\",\"width\":3,\"height\":3,\"inputs\":[{\"id\":\"minecraft:oak_log\",\"count\":1},null,null,null,null,null,null,null,null],\"output\":{\"id\":\"minecraft:oak_planks\",\"count\":4},\"recipe\":{\"id\":\"minecraft:oak_planks\",\"type\":\"minecraft:crafting\",\"serializer\":\"minecraft:crafting_shapeless\",\"kind\":\"SHAPELESS\",\"workstation\":\"minecraft:crafting_table\",\"width\":0,\"height\":0,\"revision\":\"3aefaa3f38d0da98e939feaa4d77a81574881fdee49979d732552999c6e633f8\",\"definition\":{\"category\":\"building\",\"group\":\"planks\",\"ingredients\":[{\"tag\":\"minecraft:oak_logs\"}],\"result\":{\"count\":4,\"id\":\"minecraft:oak_planks\"},\"type\":\"minecraft:crafting_shapeless\"},\"inputs\":[{\"definition\":{\"tag\":\"minecraft:oak_logs\"},\"custom\":false,\"alternatives\":[{\"id\":\"minecraft:oak_log\",\"count\":1},{\"id\":\"minecraft:oak_wood\",\"count\":1},{\"id\":\"minecraft:stripped_oak_log\",\"count\":1},{\"id\":\"minecraft:stripped_oak_wood\",\"count\":1}]}]}}"
+            },
+            "state": "APPLIED",
+            "outcome": "RETURNED",
+            "resolution": null,
+            "createdAt": 1792733232516,
+            "updatedAt": 1792733277925
+          },
+          {
+            "id": "72cb53fff730e2499894d711c799a79fd74f114691e6a313028409fb60711331",
+            "revision": 2,
+            "admission": {
+              "observationId": "0f834461-0a11-4568-9cf3-5c365c4b1c46",
+              "generationId": "e7b00c65-1ef3-4081-b59b-47e75b622d56",
+              "taskId": "560DE1BFEBFB0401",
+              "actorId": "b5166bf0-d0bd-4e3d-b19e-8bbc2c896e9f",
+              "recipeId": "minecraft:birch_planks",
+              "recipeRevision": "9191c03f411f2c9a769c1894dcdb92a0ab94d9cfdf38e9a90b5473f7df13f257",
+              "units": 4,
+              "evidence": "{\"id\":\"0f834461-0a11-4568-9cf3-5c365c4b1c46\",\"actorId\":\"b5166bf0-d0bd-4e3d-b19e-8bbc2c896e9f\",\"dimension\":\"minecraft:overworld\",\"serverTick\":20,\"menuId\":91,\"source\":\"CRAFTING_TABLE\",\"width\":3,\"height\":3,\"inputs\":[{\"id\":\"minecraft:birch_log\",\"count\":1},null,null,null,null,null,null,null,null],\"output\":{\"id\":\"minecraft:birch_planks\",\"count\":4},\"recipe\":{\"id\":\"minecraft:birch_planks\",\"type\":\"minecraft:crafting\",\"serializer\":\"minecraft:crafting_shapeless\",\"kind\":\"SHAPELESS\",\"workstation\":\"minecraft:crafting_table\",\"width\":0,\"height\":0,\"revision\":\"9191c03f411f2c9a769c1894dcdb92a0ab94d9cfdf38e9a90b5473f7df13f257\",\"definition\":{\"category\":\"building\",\"group\":\"planks\",\"ingredients\":[{\"tag\":\"minecraft:birch_logs\"}],\"result\":{\"count\":4,\"id\":\"minecraft:birch_planks\"},\"type\":\"minecraft:crafting_shapeless\"},\"inputs\":[{\"definition\":{\"tag\":\"minecraft:birch_logs\"},\"custom\":false,\"alternatives\":[{\"id\":\"minecraft:birch_log\",\"count\":1},{\"id\":\"minecraft:birch_wood\",\"count\":1},{\"id\":\"minecraft:stripped_birch_log\",\"count\":1},{\"id\":\"minecraft:stripped_birch_wood\",\"count\":1}]}]}}"
+            },
+            "state": "APPLIED",
+            "outcome": "RETURNED",
+            "resolution": null,
+            "createdAt": 1792733232578,
+            "updatedAt": 1792733277935
+          },
+          {
+            "id": "4bbdec5ae4c3451035b1c6009dccc3742f3295ce1c3965f917f859798f519bdf",
+            "revision": 2,
+            "admission": {
+              "observationId": "2de2666d-dc5e-4d86-b91e-845f1186ba02",
+              "generationId": "8d39b14d-7cf2-495b-acfc-a8bbbef96dc1",
+              "taskId": "387078ECEEB0E76B",
+              "actorId": "b5166bf0-d0bd-4e3d-b19e-8bbc2c896e9f",
+              "recipeId": "minecraft:spruce_planks",
+              "recipeRevision": "e4e91da7110e5a88918f1fe6d039b6c202d978026389b618a7d0badded39d09e",
+              "units": 4,
+              "evidence": "{\"id\":\"2de2666d-dc5e-4d86-b91e-845f1186ba02\",\"actorId\":\"b5166bf0-d0bd-4e3d-b19e-8bbc2c896e9f\",\"dimension\":\"minecraft:overworld\",\"serverTick\":20,\"menuId\":91,\"source\":\"CRAFTING_TABLE\",\"width\":3,\"height\":3,\"inputs\":[{\"id\":\"minecraft:spruce_log\",\"count\":1},null,null,null,null,null,null,null,null],\"output\":{\"id\":\"minecraft:spruce_planks\",\"count\":4},\"recipe\":{\"id\":\"minecraft:spruce_planks\",\"type\":\"minecraft:crafting\",\"serializer\":\"minecraft:crafting_shapeless\",\"kind\":\"SHAPELESS\",\"workstation\":\"minecraft:crafting_table\",\"width\":0,\"height\":0,\"revision\":\"e4e91da7110e5a88918f1fe6d039b6c202d978026389b618a7d0badded39d09e\",\"definition\":{\"category\":\"building\",\"group\":\"planks\",\"ingredients\":[{\"tag\":\"minecraft:spruce_logs\"}],\"result\":{\"count\":4,\"id\":\"minecraft:spruce_planks\"},\"type\":\"minecraft:crafting_shapeless\"},\"inputs\":[{\"definition\":{\"tag\":\"minecraft:spruce_logs\"},\"custom\":false,\"alternatives\":[{\"id\":\"minecraft:spruce_log\",\"count\":1},{\"id\":\"minecraft:spruce_wood\",\"count\":1},{\"id\":\"minecraft:stripped_spruce_log\",\"count\":1},{\"id\":\"minecraft:stripped_spruce_wood\",\"count\":1}]}]}}"
+            },
+            "state": "APPLIED",
+            "outcome": "RETURNED",
+            "resolution": null,
+            "createdAt": 1792733232613,
+            "updatedAt": 1792733277908
+          }
+        ]
+      },
+      "histories": [
+        {
+          "path": "artifacts/craft-index-233-server/craft-world/citizens/quest-evidence/bindings/1F520FF72A097206.json",
+          "bytes": 344,
+          "sha256": "78508f46fae1d2ba3b846f5e79a71b8e4b7cbc4753081c0ce3e3c0b558243fe1"
+        },
+        {
+          "path": "artifacts/craft-index-233-server/craft-world/citizens/quest-evidence/bindings/387078ECEEB0E76B.json",
+          "bytes": 347,
+          "sha256": "28a5d6f064c9f78fddb6c18ae65c41f1bc09508cd7a7a79f2ea4c3ffc781f057"
+        },
+        {
+          "path": "artifacts/craft-index-233-server/craft-world/citizens/quest-evidence/bindings/560DE1BFEBFB0401.json",
+          "bytes": 346,
+          "sha256": "c64da124cd11774cb5a366f6c91fe0c12e30dd5af89d88aba9b9ea10b03816cc"
+        },
+        {
+          "path": "artifacts/craft-index-233-server/craft-world/citizens/quest-evidence/journal/.journal.lock",
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "path": "artifacts/craft-index-233-server/craft-world/citizens/quest-evidence/journal/entry-3817e958db21a60ce291343a505c8e373a78345a1e45d95a86bdda3c98ced02d-0.json",
+          "bytes": 1756,
+          "sha256": "7bcb880cc9a60d45429a8ff8bad41ef677405a25bcbae04ba85d7500d904c109"
+        },
+        {
+          "path": "artifacts/craft-index-233-server/craft-world/citizens/quest-evidence/journal/entry-3817e958db21a60ce291343a505c8e373a78345a1e45d95a86bdda3c98ced02d-1.json",
+          "bytes": 1763,
+          "sha256": "61b3a3de7f57d1ea815873716a3118b497fb0a7374bbfe495b77136aa244ab75"
+        },
+        {
+          "path": "artifacts/craft-index-233-server/craft-world/citizens/quest-evidence/journal/entry-3817e958db21a60ce291343a505c8e373a78345a1e45d95a86bdda3c98ced02d-2.json",
+          "bytes": 1761,
+          "sha256": "749bd3ca175614c4e66df80e96adbb83e3d15603107923c1c200d44f3736c6e2"
+        },
+        {
+          "path": "artifacts/craft-index-233-server/craft-world/citizens/quest-evidence/journal/entry-4bbdec5ae4c3451035b1c6009dccc3742f3295ce1c3965f917f859798f519bdf-0.json",
+          "bytes": 1789,
+          "sha256": "3253c25d862207c68a9e22ea7e02a1eda6519ed50e1568f0f2376f5b52dbfa32"
+        },
+        {
+          "path": "artifacts/craft-index-233-server/craft-world/citizens/quest-evidence/journal/entry-4bbdec5ae4c3451035b1c6009dccc3742f3295ce1c3965f917f859798f519bdf-1.json",
+          "bytes": 1796,
+          "sha256": "741b45892f644228b65b3389e5e49608d7b09356ecffa1048b2eefd73b14fecc"
+        },
+        {
+          "path": "artifacts/craft-index-233-server/craft-world/citizens/quest-evidence/journal/entry-4bbdec5ae4c3451035b1c6009dccc3742f3295ce1c3965f917f859798f519bdf-2.json",
+          "bytes": 1794,
+          "sha256": "863a3e578110957e530edc2543371b9bdf543a0fcc779ecf6ccef0e854958c22"
+        },
+        {
+          "path": "artifacts/craft-index-233-server/craft-world/citizens/quest-evidence/journal/entry-72cb53fff730e2499894d711c799a79fd74f114691e6a313028409fb60711331-0.json",
+          "bytes": 1778,
+          "sha256": "5bd41abf24b78e0848b6c1338c4345a5a5d5b55b656ac79fdf10b9bee61de60e"
+        },
+        {
+          "path": "artifacts/craft-index-233-server/craft-world/citizens/quest-evidence/journal/entry-72cb53fff730e2499894d711c799a79fd74f114691e6a313028409fb60711331-1.json",
+          "bytes": 1785,
+          "sha256": "b13e66641f01ec0bc393a31e7d5499af0fbae66b3d3f4c31ceb3ec9b72055336"
+        },
+        {
+          "path": "artifacts/craft-index-233-server/craft-world/citizens/quest-evidence/journal/entry-72cb53fff730e2499894d711c799a79fd74f114691e6a313028409fb60711331-2.json",
+          "bytes": 1783,
+          "sha256": "a71fd1ecd2833cdd53b2e7f1c7030e2595a1ef8d55e75d1c21ebf9c4bdcd7a8b"
+        },
+        {
+          "path": "artifacts/craft-index-233-server/craft-world/citizens/quest-evidence/journal/generation-8d39b14d-7cf2-495b-acfc-a8bbbef96dc1.json",
+          "bytes": 265,
+          "sha256": "1659effc8e9d6c185d3127137b68bb30dde241cb7c4c3dae061cca78c3c41955"
+        },
+        {
+          "path": "artifacts/craft-index-233-server/craft-world/citizens/quest-evidence/journal/generation-e7b00c65-1ef3-4081-b59b-47e75b622d56.json",
+          "bytes": 265,
+          "sha256": "63c5fa1525fe47f966ba857a0572be7144eb759cc7e369da032933272307a8b9"
+        },
+        {
+          "path": "artifacts/craft-index-233-server/craft-world/citizens/quest-evidence/journal/generation-f8a510ed-7f52-4141-84ef-51b0ba254ffb.json",
+          "bytes": 265,
+          "sha256": "07973983c67895750bb2049ac835ba1031a5e186a2b488367df179a649556ebf"
+        }
+      ],
+      "nativeProgress": {
+        "1F520FF72A097206": "1",
+        "387078ECEEB0E76B": "1",
+        "560DE1BFEBFB0401": "1"
+      },
+      "nativeSaves": [
+        {
+          "path": "artifacts/craft-index-233-server/craft-world/ftbquests/b5166bf0-d0bd-4e3d-b19e-8bbc2c896e9f.snbt",
+          "bytes": 889,
+          "sha256": "f76cc8fd4b184438461849daa7b11f7fd4f59b33e46a74ce8f225ff7cae1e8b6"
+        },
+        {
+          "path": "artifacts/craft-index-233-server/craft-world/ftbteams/ftbteams.snbt",
+          "bytes": 87,
+          "sha256": "e49430876365dfd23819f1ba47a4ff8ee941647ecaf3ddb48f8e16e2259c862c"
+        },
+        {
+          "path": "artifacts/craft-index-233-server/craft-world/ftbteams/player/b5166bf0-d0bd-4e3d-b19e-8bbc2c896e9f.snbt",
+          "bytes": 460,
+          "sha256": "c4da0b3aa44048f512cf8e3d676b9cded6fe8a193343dd5543669a2414dfef47"
+        },
+        {
+          "path": "artifacts/craft-index-233-server/craft-world/playerdata/b5166bf0-d0bd-4e3d-b19e-8bbc2c896e9f.dat",
+          "bytes": 1042,
+          "sha256": "69c4b79c001d6b9fd64ad89c1129a36deae9d35ce45f27dbc0d688a33f28f758"
+        },
+        {
+          "path": "artifacts/craft-index-233-server/craft-world/playerdata/b5166bf0-d0bd-4e3d-b19e-8bbc2c896e9f.dat_old",
+          "bytes": 814,
+          "sha256": "b3bb9f91b5d5ce7ed5e28223e8b48f4fd0f06818ce53b19ca65cf4e657355474"
+        }
+      ],
+      "providers": [
+        {
+          "path": "artifacts/craft-index-233-server/mods/architectury-13.0.11-neoforge.jar",
+          "bytes": 584734,
+          "sha256": "9cc92f2c09533fc5482c60f993bd891c655a0e32b637037cdcb7c2b23adedeeb"
+        },
+        {
+          "path": "artifacts/craft-index-233-server/mods/ftb-library-neoforge-2101.1.37.jar",
+          "bytes": 1439881,
+          "sha256": "624c2d2d1cbadb946d967e17757bd5b2d129d4d3ed71f2da0c70607d04476ac2"
+        },
+        {
+          "path": "artifacts/craft-index-233-server/mods/ftb-quests-neoforge-2101.1.36.jar",
+          "bytes": 1609984,
+          "sha256": "6a39982c4b3afc00b1e788041a4f0d394e1659e3b3a6e5d078cd790bc36d0018"
+        },
+        {
+          "path": "artifacts/craft-index-233-server/mods/ftb-teams-neoforge-2101.1.11.jar",
+          "bytes": 308236,
+          "sha256": "e6bcd670493624e6906df872a9c6af4a33fe6405cac57a32c59cd4cd5838c655"
+        }
+      ],
+      "logs": [
+        {
+          "path": "artifacts/craft-index-native-233-seed.log",
+          "bytes": 32324,
+          "sha256": "9df2df94ed315905722d954c306f903030e689cf0035c11ef55fed348875ec05"
+        },
+        {
+          "path": "artifacts/craft-index-native-233-recover.log",
+          "bytes": 16455,
+          "sha256": "95a7fc3596b0b178c8c0a4ce7f93a5d15713cc0a8daa42a68ce56246f1b548d3"
+        }
+      ]
+    }
+  ],
+  "packages": [
+    {
+      "path": "artifacts/craft-index-ordinary-21.1.248-build/libs/citizens-2.0.43-neoforge-SNAPSHOT-sources.jar",
+      "bytes": 1129013,
+      "sha256": "2bd54a9502d6b43dc9b3f4cb7eaad5e2e80fd5945c0915fd76b2e1cf8a13c452",
+      "matchingProductionClasses": 0
+    },
+    {
+      "path": "artifacts/craft-index-ordinary-21.1.248-build/libs/citizens-2.0.43-neoforge-SNAPSHOT.jar",
+      "bytes": 4095780,
+      "sha256": "c080231255136cab12e906a8bfa8030e2d47c84929a4fc1460c4279d09f6aaed",
+      "matchingProductionClasses": 1023
+    },
+    {
+      "path": "artifacts/craft-index-ordinary-21.1.248-build/libs/yuuniverse-interactions-2.0.43-neoforge-SNAPSHOT.jar",
+      "bytes": 204146,
+      "sha256": "11a8a64c321d0117fa28ea38b4ad954ac74201dffd9996789d5bcfd13b3b7ae6",
+      "matchingProductionClasses": 74
+    },
+    {
+      "path": "artifacts/craft-index-ordinary-21.1.233-build/libs/citizens-2.0.43-neoforge-SNAPSHOT-sources.jar",
+      "bytes": 1129013,
+      "sha256": "426af016db7662837f17451757e345e759748c7598d065f3aa19d286f1a4c99d",
+      "matchingProductionClasses": 0
+    },
+    {
+      "path": "artifacts/craft-index-ordinary-21.1.233-build/libs/citizens-2.0.43-neoforge-SNAPSHOT.jar",
+      "bytes": 4095780,
+      "sha256": "e1d7753acbd0e7ba9adf4e5e373523e0e74d8f3d2a2e0fa057cdab4e5f112b30",
+      "matchingProductionClasses": 1023
+    },
+    {
+      "path": "artifacts/craft-index-ordinary-21.1.233-build/libs/yuuniverse-interactions-2.0.43-neoforge-SNAPSHOT.jar",
+      "bytes": 204146,
+      "sha256": "46c704a7528f785f2d70bfbcbf8b0baf78764ac68f4f813886cd87adc60edbb6",
+      "matchingProductionClasses": 74
+    }
+  ],
+  "interactions": {
+    "results": {
+      "tests": 100,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    "log": {
+      "path": "artifacts/craft-index-interactions.log",
+      "bytes": 9537,
+      "sha256": "6246bac377fd2073a3cddc7b8d5811683ac3ca39c42447d32c0937d9f7c97494"
+    },
+    "reports": [
+      {
+        "path": "artifacts/craft-index-interactions-build/test-results/test/TEST-net.yuuniverse.interactions.ConditionsTest.xml",
+        "bytes": 1724,
+        "sha256": "e4dce0a500f71f4e0104bc238e03a3070a6579099bc53f8741e8451516c6d3da"
+      },
+      {
+        "path": "artifacts/craft-index-interactions-build/test-results/test/TEST-net.yuuniverse.interactions.DialogueDisplaySettingsTest.xml",
+        "bytes": 28049,
+        "sha256": "ff72a2bb86c0e45a179a7c5a50c828e7fc48cfcf3f7243da808db6d224113210"
+      },
+      {
+        "path": "artifacts/craft-index-interactions-build/test-results/test/TEST-net.yuuniverse.interactions.DialogueWriterTest.xml",
+        "bytes": 119606,
+        "sha256": "a763fa951580d1e1cbe45036620d066558e2993888c3af1a2c4fa505fd5e5f5d"
+      },
+      {
+        "path": "artifacts/craft-index-interactions-build/test-results/test/TEST-net.yuuniverse.interactions.InfluenceTest.xml",
+        "bytes": 465960,
+        "sha256": "8a72d26d91c5b2c303367aa1b959338bb42682232ba4000b703c639a30d3e3e9"
+      },
+      {
+        "path": "artifacts/craft-index-interactions-build/test-results/test/TEST-net.yuuniverse.interactions.InlineDialogueTest.xml",
+        "bytes": 1212,
+        "sha256": "b74386dc94e3989372be263f90bcc5cfe9fcc0eac65f55cf9895f36237b5236b"
+      },
+      {
+        "path": "artifacts/craft-index-interactions-build/test-results/test/TEST-net.yuuniverse.interactions.LegacyItemDataTest.xml",
+        "bytes": 2399,
+        "sha256": "dfaaf5278ba6c1f26248dc4e7518322dfe35656fb685787f988568e5985cea18"
+      },
+      {
+        "path": "artifacts/craft-index-interactions-build/test-results/test/TEST-net.yuuniverse.interactions.LegacyParityAuditTest.xml",
+        "bytes": 140311,
+        "sha256": "d1b163ef293d4aa8d7d42490367549500f17863f66240a4a3cbfcdc43705ffb0"
+      },
+      {
+        "path": "artifacts/craft-index-interactions-build/test-results/test/TEST-net.yuuniverse.interactions.ServerTransfersTest.xml",
+        "bytes": 1249,
+        "sha256": "b284c29a78ae3fe36e0805a0e4e164287bd5d581248a6a149af0112dc2992302"
+      },
+      {
+        "path": "artifacts/craft-index-interactions-build/test-results/test/TEST-net.yuuniverse.interactions.WorldsTest.xml",
+        "bytes": 15255,
+        "sha256": "71db081285e643e1dba8309adbfc0829a798bd64e0bf35da52c8cb65bc2b518c"
+      }
+    ]
+  },
+  "create": {
+    "checks": 263,
+    "components": {
+      "CREATEBATCHAUDIT": 23,
+      "CREATEPRESSAUDIT": 16,
+      "CREATETRANSPORTAUDIT": 21,
+      "CREATEBASINAUDIT": 23,
+      "CREATEFLUIDAUDIT": 28,
+      "CREATEDEPLOYERAUDIT": 26,
+      "CREATEFANAUDIT": 31,
+      "CREATEASSEMBLYAUDIT": 41,
+      "CREATEAUDIT": 54
+    },
+    "log": {
+      "path": "artifacts/craft-index-create.log",
+      "bytes": 70034,
+      "sha256": "8dc717a5399ff6d90de31624642915ef6ba5d4ccc62269c5e1b1c45914babb5a"
+    },
+    "providers": [
+      {
+        "path": "artifacts/craft-index-create-final-server/mods/architectury-13.0.11-neoforge.jar",
+        "bytes": 584734,
+        "sha256": "9cc92f2c09533fc5482c60f993bd891c655a0e32b637037cdcb7c2b23adedeeb"
+      },
+      {
+        "path": "artifacts/craft-index-create-final-server/mods/create.jar",
+        "bytes": 19138095,
+        "sha256": "5602a16796957cb5c7fb829c10c6b54bf9d228931c7680636710b6a60d92822e"
+      },
+      {
+        "path": "artifacts/craft-index-create-final-server/mods/ftb-library-neoforge-2101.1.37.jar",
+        "bytes": 1439881,
+        "sha256": "624c2d2d1cbadb946d967e17757bd5b2d129d4d3ed71f2da0c70607d04476ac2"
+      },
+      {
+        "path": "artifacts/craft-index-create-final-server/mods/ftb-quests-neoforge-2101.1.36.jar",
+        "bytes": 1609984,
+        "sha256": "6a39982c4b3afc00b1e788041a4f0d394e1659e3b3a6e5d078cd790bc36d0018"
+      },
+      {
+        "path": "artifacts/craft-index-create-final-server/mods/ftb-teams-neoforge-2101.1.11.jar",
+        "bytes": 308236,
+        "sha256": "e6bcd670493624e6906df872a9c6af4a33fe6405cac57a32c59cd4cd5838c655"
+      },
+      {
+        "path": "artifacts/craft-index-create-final-server/mods/kubejs-neoforge-2101.7.2-build.377.jar",
+        "bytes": 2294111,
+        "sha256": "df9a8458b1f83fed06ba54684977911795a5153a462b81a610895f5b1f2f0cbf"
+      },
+      {
+        "path": "artifacts/craft-index-create-final-server/mods/rhino-2101.2.8-build.91.jar",
+        "bytes": 980936,
+        "sha256": "1d53d962aa4dac54bcbb4f998c1845980cf194318f1d6b1580ea6ac15cce5ef3"
+      }
+    ],
+    "preparation": {
+      "path": "artifacts/craft-index-create-prepare.log",
+      "bytes": 104,
+      "sha256": "2c94079e55d9f33a681896815061f132b52ef6f28f98784628fa1d2b6657c762"
+    },
+    "initialScript": {
+      "path": "artifacts/craft-index-create-initial-script.js",
+      "bytes": 281,
+      "sha256": "07d53a2637f51d1a2e1b365a5e38daf3d89e62af7831fa9e9df56c85c1501e54"
+    },
+    "failedSetup": {
+      "path": "artifacts/craft-index-create-first.log",
+      "bytes": 21724,
+      "sha256": "df97a63eb20e05bba952c9fac81453e01082c2d95c3a1ca2bebee15ea9549bf5"
+    }
+  },
+  "stopped": {
+    "journals": [
+      "C:\\Users\\ben_l\\Documents\\Coding\\citizens2-neoforged\\artifacts\\craft-index-248-server\\craft-world\\citizens\\commerce-tasks\\.journal.lock",
+      "C:\\Users\\ben_l\\Documents\\Coding\\citizens2-neoforged\\artifacts\\craft-index-248-server\\craft-world\\citizens\\quest-deliveries\\.journal.lock",
+      "C:\\Users\\ben_l\\Documents\\Coding\\citizens2-neoforged\\artifacts\\craft-index-248-server\\craft-world\\citizens\\quest-evidence\\journal\\.journal.lock",
+      "C:\\Users\\ben_l\\Documents\\Coding\\citizens2-neoforged\\artifacts\\craft-index-248-server\\craft-world\\citizens\\quest-rewards\\.journal.lock",
+      "C:\\Users\\ben_l\\Documents\\Coding\\citizens2-neoforged\\artifacts\\craft-index-233-server\\craft-world\\citizens\\commerce-tasks\\.journal.lock",
+      "C:\\Users\\ben_l\\Documents\\Coding\\citizens2-neoforged\\artifacts\\craft-index-233-server\\craft-world\\citizens\\quest-deliveries\\.journal.lock",
+      "C:\\Users\\ben_l\\Documents\\Coding\\citizens2-neoforged\\artifacts\\craft-index-233-server\\craft-world\\citizens\\quest-evidence\\journal\\.journal.lock",
+      "C:\\Users\\ben_l\\Documents\\Coding\\citizens2-neoforged\\artifacts\\craft-index-233-server\\craft-world\\citizens\\quest-rewards\\.journal.lock",
+      "C:\\Users\\ben_l\\Documents\\Coding\\citizens2-neoforged\\artifacts\\craft-index-create-server\\create-world\\citizens\\commerce-tasks\\.journal.lock",
+      "C:\\Users\\ben_l\\Documents\\Coding\\citizens2-neoforged\\artifacts\\craft-index-create-server\\create-world\\citizens\\quest-deliveries\\.journal.lock",
+      "C:\\Users\\ben_l\\Documents\\Coding\\citizens2-neoforged\\artifacts\\craft-index-create-server\\create-world\\citizens\\quest-evidence\\journal\\.journal.lock",
+      "C:\\Users\\ben_l\\Documents\\Coding\\citizens2-neoforged\\artifacts\\craft-index-create-server\\create-world\\citizens\\quest-rewards\\.journal.lock",
+      "C:\\Users\\ben_l\\Documents\\Coding\\citizens2-neoforged\\artifacts\\craft-index-create-final-server\\assembly-evidence-14047703560458686421\\journal\\.journal.lock",
+      "C:\\Users\\ben_l\\Documents\\Coding\\citizens2-neoforged\\artifacts\\craft-index-create-final-server\\basin-evidence-12474770541631765190\\journal\\.journal.lock",
+      "C:\\Users\\ben_l\\Documents\\Coding\\citizens2-neoforged\\artifacts\\craft-index-create-final-server\\batch-evidence-6042396635760902993\\journal\\.journal.lock",
+      "C:\\Users\\ben_l\\Documents\\Coding\\citizens2-neoforged\\artifacts\\craft-index-create-final-server\\create-world\\citizens\\commerce-tasks\\.journal.lock",
+      "C:\\Users\\ben_l\\Documents\\Coding\\citizens2-neoforged\\artifacts\\craft-index-create-final-server\\create-world\\citizens\\quest-deliveries\\.journal.lock",
+      "C:\\Users\\ben_l\\Documents\\Coding\\citizens2-neoforged\\artifacts\\craft-index-create-final-server\\create-world\\citizens\\quest-evidence\\journal\\.journal.lock",
+      "C:\\Users\\ben_l\\Documents\\Coding\\citizens2-neoforged\\artifacts\\craft-index-create-final-server\\create-world\\citizens\\quest-rewards\\.journal.lock",
+      "C:\\Users\\ben_l\\Documents\\Coding\\citizens2-neoforged\\artifacts\\craft-index-create-final-server\\deployer-evidence-9562011674720518846\\journal\\.journal.lock",
+      "C:\\Users\\ben_l\\Documents\\Coding\\citizens2-neoforged\\artifacts\\craft-index-create-final-server\\fan-evidence-9507554909895609679\\journal\\.journal.lock",
+      "C:\\Users\\ben_l\\Documents\\Coding\\citizens2-neoforged\\artifacts\\craft-index-create-final-server\\fluid-evidence-1593681916260386574\\journal\\.journal.lock",
+      "C:\\Users\\ben_l\\Documents\\Coding\\citizens2-neoforged\\artifacts\\craft-index-create-final-server\\machine-evidence-5365958295616036121\\journal\\.journal.lock",
+      "C:\\Users\\ben_l\\Documents\\Coding\\citizens2-neoforged\\artifacts\\craft-index-create-final-server\\press-evidence-1004010210564787342\\journal\\.journal.lock",
+      "C:\\Users\\ben_l\\Documents\\Coding\\citizens2-neoforged\\artifacts\\craft-index-create-final-server\\transport-evidence-4225625532468207991\\journal\\.journal.lock",
+      "C:\\Users\\ben_l\\Documents\\Coding\\citizens2-neoforged\\artifacts\\craft-storage-2026-10-23\\entries-1024\\.journal.lock",
+      "C:\\Users\\ben_l\\Documents\\Coding\\citizens2-neoforged\\artifacts\\craft-storage-2026-10-23\\entries-256\\.journal.lock",
+      "C:\\Users\\ben_l\\Documents\\Coding\\citizens2-neoforged\\artifacts\\craft-storage-2026-10-23\\entries-4096\\.journal.lock"
+    ],
+    "createdAt": "2026-10-23T13:32:27.4001071+08:00",
+    "worlds": [
+      {
+        "world": "craft-world",
+        "fixture": "craft-index-248-server"
+      },
+      {
+        "world": "craft-world",
+        "fixture": "craft-index-233-server"
+      },
+      {
+        "world": "create-world",
+        "fixture": "craft-index-create-server"
+      },
+      {
+        "world": "create-world",
+        "fixture": "craft-index-create-final-server"
+      },
+      {
+        "world": "acceptance-world",
+        "fixture": "ordinary-client-acceptance-server"
+      }
+    ]
+  },
+  "stoppedEvidence": {
+    "path": "artifacts/craft-index-stopped.json",
+    "bytes": 5060,
+    "sha256": "3d1bb8ab5e142bbf7350500ec2017d9d0583365dba4c0b71bdf1a2fc18652d78"
+  },
+  "stoppedVerifier": {
+    "path": "artifacts/confirm-craft-index-stopped.ps1",
+    "bytes": 1445,
+    "sha256": "702af41aca14090a69f7fa4e714011fb3830f74dc45bb69ca33630147f6a8fef"
+  },
+  "pinnedClientReference": {
+    "path": "artifacts/logging-reader-pinned-client-before.json",
+    "bytes": 17435,
+    "sha256": "1f2f9f42f4f6584508d78b1ec677a9f28254184197e56ac8c202b235a739e1fa"
+  },
+  "sources": [
+    {
+      "path": "tools/craft-storage-audit/net/citizensnpcs/audit/CraftStorageAudit.java",
+      "bytes": 7009,
+      "sha256": "0378ccdaa3b28351e4a8bdc159d5fe7297ab3bdc9593559c9fd812ccb2c56172"
+    },
+    {
+      "path": "tools/run-craft-storage-audit.ps1",
+      "bytes": 1917,
+      "sha256": "e8186ea9d4270f7b234a28db3ba84610d0ecf61609688f9b61f2bcee2adacc57"
+    },
+    {
+      "path": "tools/record-craft-index-validation.py",
+      "bytes": 10738,
+      "sha256": "9173a2f692c91f39654a8aad9cd524aeaf8d4b99926a0d478bf3b9e273a1bd21"
+    },
+    {
+      "path": "neoforge/src/main/java/net/citizensnpcs/util/QuestEvidenceJournal.java",
+      "bytes": 22110,
+      "sha256": "fc8b8d99ab296cc68f869f89334493b697eecfc005b3ef210f95830175679655"
+    },
+    {
+      "path": "neoforge/src/main/java/net/citizensnpcs/util/CraftQuestEvidence.java",
+      "bytes": 20795,
+      "sha256": "b577bcd0fb8ea2af24d3c54b26a1ef0fac58e1d68ec97a989a7b4e7181f1ae24"
+    },
+    {
+      "path": "neoforge/src/test/java/net/citizensnpcs/util/QuestEvidenceJournalTest.java",
+      "bytes": 20761,
+      "sha256": "49b6e98af5932d45a6a6c0b4bc8afd282e6b9caf03001c144ae93cd8d2f59f7b"
+    }
+  ],
+  "nativeHarnessSources": [
+    {
+      "path": "tools/craft-recovery-runtime-audit/net/citizensnpcs/audit/CraftBindingRuntimeAudit.java",
+      "bytes": 10279,
+      "sha256": "8e1fb93ac7cf88b684d20ba831bb3b913e4e722ce3dbf448994be1985f8a3d60"
+    },
+    {
+      "path": "tools/craft-recovery-runtime-audit/net/citizensnpcs/audit/CraftRecoveryRuntimeAudit.java",
+      "bytes": 13211,
+      "sha256": "9b6e7c5acea6abe331fb53a94c60db5feef97a90449a6524173d1109d46774dc"
+    },
+    {
+      "path": "tools/create-runtime-audit/net/yuuniverse/interactions/AssemblyCrashRuntimeAudit.java",
+      "bytes": 23607,
+      "sha256": "35950957a18d76eeca23eef163cf40e87157d9fd84bf3e32546eb82b01dc8823"
+    },
+    {
+      "path": "tools/create-runtime-audit/net/yuuniverse/interactions/AssemblyRuntimeAudit.java",
+      "bytes": 38824,
+      "sha256": "30c862817bc93127b77796b02c576786f3a501b7cf69fa3878498daef8493c5b"
+    },
+    {
+      "path": "tools/create-runtime-audit/net/yuuniverse/interactions/BasinCrashRuntimeAudit.java",
+      "bytes": 18691,
+      "sha256": "413a45a691e63b4f842415f22bf0f9431a2f963516b9a05a58793e7d5ab08103"
+    },
+    {
+      "path": "tools/create-runtime-audit/net/yuuniverse/interactions/BasinMachineRuntimeAudit.java",
+      "bytes": 23532,
+      "sha256": "bb40ac00ef1e84bf141ad3eb8b10432d4d9f202042fef1d3537ae5141cfb41c6"
+    },
+    {
+      "path": "tools/create-runtime-audit/net/yuuniverse/interactions/BatchMachineRuntimeAudit.java",
+      "bytes": 20007,
+      "sha256": "eea2293ec4d54f4c5a9d276b8e02969309527bcc67f2193b2eb80575034251c4"
+    },
+    {
+      "path": "tools/create-runtime-audit/net/yuuniverse/interactions/CreateRuntimeAudit.java",
+      "bytes": 28784,
+      "sha256": "b963209e5fab2a3a39e7cea31db0a0ed03f1002171929b91e8040281f341b070"
+    },
+    {
+      "path": "tools/create-runtime-audit/net/yuuniverse/interactions/DeployerRuntimeAudit.java",
+      "bytes": 20854,
+      "sha256": "33b97bd6229fcf624b60f87e455dbc4b9f5cbf44a9eff1e08560d7f30c5e9f78"
+    },
+    {
+      "path": "tools/create-runtime-audit/net/yuuniverse/interactions/FanCrashRuntimeAudit.java",
+      "bytes": 21905,
+      "sha256": "d52b314841a488af1a6ab0f4cac8804c85cead1d61b924b64d9dc76b12d34103"
+    },
+    {
+      "path": "tools/create-runtime-audit/net/yuuniverse/interactions/FanRuntimeAudit.java",
+      "bytes": 26873,
+      "sha256": "8f5aab69cf080b7ffac9bc6f1dc795695977495c9a44356bbd698bfd8af0379e"
+    },
+    {
+      "path": "tools/create-runtime-audit/net/yuuniverse/interactions/FluidMachineRuntimeAudit.java",
+      "bytes": 22729,
+      "sha256": "b2c255d6eb896c4c308a658dbca808d76655ed379e10de8d562f8c7b489d1f9a"
+    },
+    {
+      "path": "tools/create-runtime-audit/net/yuuniverse/interactions/MachineCrashRuntimeAudit.java",
+      "bytes": 11817,
+      "sha256": "d0846960f1b4dda628f382cbb8849844a54812a800d6b53636f9c469ac46d60f"
+    },
+    {
+      "path": "tools/create-runtime-audit/net/yuuniverse/interactions/MachineRemainderItem.java",
+      "bytes": 1706,
+      "sha256": "b332e864308ef7393e868741d2504e9fdcb0e603538983efa24ca52531d69897"
+    },
+    {
+      "path": "tools/create-runtime-audit/net/yuuniverse/interactions/PressMachineRuntimeAudit.java",
+      "bytes": 13556,
+      "sha256": "a8d32df6ed0710fd410d6832aa20238e24034ad517cdb0be4348a1b65fc87317"
+    },
+    {
+      "path": "tools/create-runtime-audit/net/yuuniverse/interactions/TransportPressRuntimeAudit.java",
+      "bytes": 20539,
+      "sha256": "d9dec9fa5cb31fc9b7f6a675ba4943eaa7b2a6480fb0cdc08e77a9e346911538"
+    }
+  ],
+  "limits": [
+    "Bounded warm journal lookup/allocation measurement, not production tick or startup throughput guarantees",
+    "Derived indexes add memory proportional to retained entries/scopes; total memory/disk remain unbounded",
+    "No pruning, schema change, separate persisted index or new crash/device-loss guarantee",
+    "Broader retention/recovery, original migration inputs, supported Paradigm inbound contract and deferred physical clients remain open"
+  ]
+}

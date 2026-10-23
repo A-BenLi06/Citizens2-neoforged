@@ -8,6 +8,13 @@ Citizens retains NPC behavior and its existing native extension contracts. Yuuni
 
 ## Selected artifacts and sides
 
+Progress 2026-10-23, UTC+08:00: [craft admission indexes](craft-admission-indexes-2026-10-23.md)
+derive observation/generation/task reads from validated immutable evidence,
+preserving replay owners, REVIEW fences and query-time checked totals. The real
+before/after workload retains all 15,456 immutable records unchanged. Fresh
+validation passes 828 ordinary tests per target, 100 Interactions and 299 native
+checks. Retention, broader recovery, migration and deferred clients remain.
+
 Progress 2026-10-23, UTC+08:00: [Guard native restart acceptance](guard-restart-2026-10-23.md)
 adds actual world/player/Citizens-store restart for the two original recruited
 guards and five ordinary/native-AI/packet NPCs on both targets. Seed/recovery and

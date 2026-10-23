@@ -1,5 +1,11 @@
 # Crafting outcomes and quest evidence journal
 
+Update 2026-10-23, UTC+08:00: [craft admission indexes](craft-admission-indexes-2026-10-23.md)
+derive observation/generation/task reads after validating histories and companions.
+Gameplay avoids unrelated retained history while administrative snapshots retain
+their ordering. Immutable schemas, replay owners, review fences, durable-write
+ordering and query-time checked totals remain required. No history is pruned.
+
 Update 2026-10-22, UTC+08:00: [craft binding validation](craft-binding-validation-2026-10-22.md)
 adds companion validation under exclusive journal ownership, after complete
 history loading and before PREPARED recovery writes. A rejected companion leaves

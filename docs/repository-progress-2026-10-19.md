@@ -10,6 +10,13 @@ This review covers repository structure, native implementation boundaries, upstr
 
 ## Repository and implementation boundaries
 
+Update 2026-10-23, UTC+08:00: [craft admission indexes](craft-admission-indexes-2026-10-23.md)
+remove full retained-history snapshots/scans from craft admission, outcome lookup
+and projection. All 15,456 real immutable records remain unchanged; scoped reads
+preserve replay ordering, review fences and query-time overflow. Fresh validation
+passes 828 ordinary tests per target, 100 Interactions and 299 native checks.
+Retention/device-loss, broader recovery, migration and deferred client gates remain.
+
 Update 2026-10-23, UTC+08:00: [Guard native restart acceptance](guard-restart-2026-10-23.md)
 passes 12 seed + 31 recovery checks on each target, plus fresh 41-check coexistence
 regressions on each: 168 assertions. Native guard identities/inventories/modes,
