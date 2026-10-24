@@ -77,7 +77,10 @@ public class MCNavigationStrategy extends AbstractPathStrategy {
         }
         target = dest;
         Location to = dest;
-        pathIssuer = m -> m.getNavigation().moveTo(to.getX(), to.getY(), to.getZ(), parameters.speedModifier());
+        // The coordinate moveTo overload searches with a one-block target tolerance. It may finish on an adjacent
+        // block even when Citizens requests a smaller arrival margin; a location request must reach its target block.
+        pathIssuer = m -> m.getNavigation().moveTo(
+                m.getNavigation().createPath(to.getX(), to.getY(), to.getZ(), 0), parameters.speedModifier());
         oldWaterMalus = prepare();
     }
 

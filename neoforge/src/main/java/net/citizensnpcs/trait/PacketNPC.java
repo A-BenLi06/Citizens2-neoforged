@@ -25,7 +25,8 @@ import net.minecraft.world.phys.AABB;
 
 /**
  * Makes an NPC exist only as packets: its entity is never added to the world, so vanilla never ticks it, never saves it
- * and never runs collision or AI for it.
+ * and never runs collision or AI for it while idle. An active navigation request receives native entity ticks so that
+ * move controls, navigation and physics can consume Citizens' movement instructions.
  * <p>
  * This is useful for decorative NPCs. What a viewer sees is produced by {@link EntityPacketTracker}; Citizens still
  * updates its traits and reconciles viewers, while the entity does not receive vanilla world ticks.
@@ -80,6 +81,13 @@ public class PacketNPC extends Trait {
     public static boolean isPacketEntity(Entity entity) {
         PacketNPC trait = activeTrait(entity.getId());
         return trait != null && trait.npc.getEntity() == entity;
+    }
+
+    /** Only an unpaused navigation request owns simulation of an otherwise decorative virtual root. */
+    public static boolean shouldTickNavigation(Entity entity) {
+        PacketNPC trait = activeTrait(entity.getId());
+        return trait != null && trait.npc.getEntity() == entity && entity.isAlive()
+                && trait.npc.getNavigator().isNavigating() && !trait.npc.getNavigator().isPaused();
     }
 
     /** Snapshot virtual roots absent from native level iteration, for traversal of their real passengers. */

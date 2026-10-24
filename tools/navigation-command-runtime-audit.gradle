@@ -1,0 +1,48 @@
+allprojects {
+    def outputPath = gradle.startParameter.projectProperties.get('navigationCommandBuildDir')
+    if (outputPath == null) throw new GradleException('Supply an isolated navigationCommandBuildDir')
+    layout.buildDirectory.set(file(outputPath))
+    afterEvaluate { p ->
+        if (p.extensions.findByName('neoForge') == null) return
+        def fixturePath = gradle.startParameter.projectProperties.get('navigationCommandFixture')
+        if (fixturePath == null) throw new GradleException('Supply an isolated navigationCommandFixture')
+        def artifacts = p.file('../artifacts').toPath().toAbsolutePath().normalize()
+        def fixture = p.file(fixturePath).toPath().toAbsolutePath().normalize()
+        def output = p.layout.buildDirectory.get().asFile.toPath().toAbsolutePath().normalize()
+        if (!fixture.startsWith(artifacts) || !output.startsWith(artifacts))
+            throw new GradleException('Fixture and build must be confined to task artifacts')
+        def original = gradle.startParameter.projectProperties.get('navigationCommandOriginalSources')
+        def regression = gradle.startParameter.projectProperties.get('navigationCommandRegression')
+        if (regression != null && !(regression in ['interaction-label', 'packet-hologram']))
+            throw new GradleException('Unknown navigation regression')
+        if (regression != null && original != null) throw new GradleException('Original control must use command probe')
+        def marker = regression == 'interaction-label' ? 'INTERACTIONLABELAUDIT' : regression == 'packet-hologram' ? 'PACKETHOLOGRAMAUDIT' : 'NAVCOMMANDAUDIT'
+        if (original != null) {
+            def source = p.file(original).toPath().toAbsolutePath().normalize()
+            if (!source.startsWith(artifacts)) throw new GradleException('Original sources must be under artifacts')
+            p.sourceSets.main.java.setSrcDirs([source.toFile()])
+        }
+        p.sourceSets.main.java.srcDir(p.file('../tools/' + (regression ?: 'navigation-command') + '-runtime-audit'))
+        p.neoForge.runs.named('server') { gameDirectory = fixture.toFile() }
+        p.tasks.named('prepareServerRun') {
+            doLast {
+                if (!fixture.resolve('navigation-command-fixture.txt').toFile().isFile()
+                        || fixture.resolve('complete.json').toFile().exists()
+                        || fixture.resolve('logs/latest.log').toFile().exists())
+                    throw new GradleException('Prepare a fresh isolated fixture; preserve accepted attempts')
+            }
+        }
+        p.tasks.named('runServer') {
+            timeout = java.time.Duration.ofMinutes(4)
+            doLast {
+                def log = fixture.resolve('logs/latest.log').toFile().getText('UTF-8')
+                if (original != null) {
+                    if (!log.contains('AssertionError: ordinary_rejected_path_edit_preserves_all_state'))
+                        throw new GradleException('Original command mutation defect was not reproduced')
+                } else if (log.contains('[' + marker + '] FAILED') || !log.contains('[' + marker + '] COMPLETE')) {
+                    throw new GradleException('Navigation command audit failed or incomplete')
+                }
+            }
+        }
+    }
+}

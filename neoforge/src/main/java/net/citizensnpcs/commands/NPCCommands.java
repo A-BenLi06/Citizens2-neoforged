@@ -795,9 +795,11 @@ public class NPCCommands {
             modifiers = { "speed" },
             min = 2,
             max = 2,
+            strictArguments = true,
             permission = "citizens.npc.speed")
     public void speed(CommandContext args, CommandSourceStack sender, NPC npc) throws CommandException {
         float newSpeed = (float) Math.abs(args.getDouble(1));
+        if (!Float.isFinite(newSpeed)) throw new CommandUsageException();
         npc.getNavigator().getDefaultParameters().speedModifier(newSpeed);
         Messaging.sendTr(sender, Messages.SPEED_MODIFIER_SET, newSpeed);
     }
@@ -809,9 +811,11 @@ public class NPCCommands {
             modifiers = { "velocity", "vel" },
             min = 4,
             max = 4,
+            strictArguments = true,
             permission = "citizens.npc.velocity")
     public void velocity(CommandContext args, CommandSourceStack sender, NPC npc, @Arg(1) double x, @Arg(2) double y,
             @Arg(3) double z) throws CommandException {
+        if (!Double.isFinite(x) || !Double.isFinite(y) || !Double.isFinite(z)) throw new CommandUsageException();
         if (!npc.isSpawned())
             throw new CommandException(Messages.MOUNT_NPC_MUST_BE_SPAWNED, npc.getName());
         npc.getEntity().setDeltaMovement(x, y, z);
@@ -2924,6 +2928,7 @@ public class NPCCommands {
             modifiers = { "pathopt", "po", "patho" },
             min = 1,
             max = 1,
+            strictArguments = true,
             permission = "citizens.npc.pathfindingoptions")
     @Requirements(selected = true, ownership = true)
     public void pathfindingOptions(CommandContext args, CommandSourceStack sender, NPC npc,
@@ -2935,6 +2940,19 @@ public class NPCCommands {
             @Flag("path-distance-margin") Double pathDistanceMargin, @Flag("attack-range") Double attackRange,
             @Flag("falling-distance") Integer fallingDistance,
             @Flag("pathfinder-type") PathfinderType pathfinderType) throws CommandException {
+        // Prepare the whole edit before publishing any parameter or metadata changes.
+        if (stationaryTicks != null && stationaryTicks < 0
+                || range != null && (!Float.isFinite(range) || range < 1)
+                || destinationTeleportMargin != null && (!Double.isFinite(destinationTeleportMargin) || destinationTeleportMargin < 0)
+                || distanceMargin != null && (!Double.isFinite(distanceMargin) || distanceMargin < 0)
+                || pathDistanceMargin != null && (!Double.isFinite(pathDistanceMargin) || pathDistanceMargin < 0)
+                || attackRange != null && (!Double.isFinite(attackRange) || attackRange < 0))
+            throw new CommandUsageException();
+        Integer attackDelay = null;
+        if (duration != null) {
+            try { attackDelay = Durations.toTicks(duration); }
+            catch (ArithmeticException overflow) { throw new CommandUsageException(); }
+        }
         NavigatorParameters params = npc.getNavigator().getDefaultParameters();
         String output = "";
 
@@ -2949,10 +2967,10 @@ public class NPCCommands {
             output += Messaging.tr(avoidwater ? Messages.PATHFINDING_OPTIONS_AVOID_WATER_SET
                     : Messages.PATHFINDING_OPTIONS_AVOID_WATER_UNSET, npc.getName());
         }
-        if (duration != null) {
-            params.attackDelayTicks(Durations.toTicks(duration));
+        if (attackDelay != null) {
+            params.attackDelayTicks(attackDelay);
             output += Messaging.tr(Messages.PATHFINDING_OPTIONS_ATTACK_DELAY_TICKS_SET, npc.getName(),
-                    Durations.toTicks(duration));
+                    attackDelay);
         }
         if (opendoors != null) {
             npc.data().setPersistent(NPC.Metadata.PATHFINDER_OPEN_DOORS, opendoors);
@@ -2960,42 +2978,30 @@ public class NPCCommands {
                     : Messages.PATHFINDING_OPTIONS_OPEN_DOORS_UNSET, npc.getName());
         }
         if (stationaryTicks != null) {
-            if (stationaryTicks < 0)
-                throw new CommandUsageException();
             params.stationaryTicks(stationaryTicks);
             output += " "
                     + Messaging.tr(Messages.PATHFINDING_OPTIONS_STATIONARY_TICKS_SET, npc.getName(), stationaryTicks);
         }
         if (destinationTeleportMargin != null) {
-            if (destinationTeleportMargin < 0)
-                throw new CommandUsageException();
             params.destinationTeleportMargin(destinationTeleportMargin);
             output += " " + Messaging.tr(Messages.PATHFINDING_OPTIONS_DESTINATION_TELEPORT_MARGIN_SET, npc.getName(),
                     destinationTeleportMargin);
         }
         if (distanceMargin != null) {
-            if (distanceMargin < 0)
-                throw new CommandUsageException();
             params.distanceMargin(distanceMargin);
             output += " "
                     + Messaging.tr(Messages.PATHFINDING_OPTIONS_DISTANCE_MARGIN_SET, npc.getName(), distanceMargin);
         }
         if (range != null) {
-            if (range < 1)
-                throw new CommandUsageException();
             params.range(range);
             output += " " + Messaging.tr(Messages.PATHFINDING_RANGE_SET, range);
         }
         if (pathDistanceMargin != null) {
-            if (pathDistanceMargin < 0)
-                throw new CommandUsageException();
             params.pathDistanceMargin(pathDistanceMargin);
             output += " " + Messaging.tr(Messages.PATHFINDING_OPTIONS_PATH_DISTANCE_MARGIN_SET, npc.getName(),
                     pathDistanceMargin);
         }
         if (attackRange != null) {
-            if (attackRange < 0)
-                throw new CommandUsageException();
             params.attackRange(attackRange);
             output += " " + Messaging.tr(Messages.PATHFINDING_OPTIONS_ATTACK_RANGE_SET, npc.getName(), attackRange);
         }

@@ -24,8 +24,13 @@ public abstract class ServerLevelPassengerMixin {
         for (Entity root : PacketNPC.getRootEntities(level)) {
             if (!PacketNPC.isPacketEntity(root) || root.getVehicle() != null || root.level() != level) continue;
             if (!level.isPositionEntityTicking(root.blockPosition()) || level.tickRateManager().isEntityFrozen(root)) continue;
-            // World iteration skips mounted entities. A virtual root is absent from that iteration, so its real
-            // passengers otherwise never rideTick. Enter only the native passenger traversal; never tick the root.
+            // A virtual root is absent from world iteration. Active navigation needs the same native movement tick
+            // as a world NPC, including exactly one traversal of its passengers. Idle roots remain decorative.
+            if (PacketNPC.shouldTickNavigation(root)) {
+                level.guardEntityTick(level::tickNonPassenger, root);
+                continue;
+            }
+            // World iteration skips mounted entities, so real passengers of idle roots still need rideTick.
             level.guardEntityTick(vehicle -> {
                 for (Entity child : vehicle.getPassengers()) tickPassenger(vehicle, child);
             }, root);

@@ -1,0 +1,1513 @@
+{
+  "recordedAt": "2026-10-24T11:42:51.953858+08:00",
+  "targets": [
+    {
+      "neoForge": "21.1.233",
+      "tests": {
+        "tests": 842,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "suites": 117,
+      "build": {
+        "path": "artifacts/navigation-command-accepted-core.log",
+        "bytes": 75261,
+        "sha256": "4aad90550a32770ef3b212995efc6cfcb3aa96501ff2471d360ec396237c5e61"
+      },
+      "reports": [
+        {
+          "path": "artifacts/navigation-command-core-build/test-results/test/TEST-net.citizensnpcs.api.ai.BehaviorRemovalTest.xml",
+          "bytes": 1173,
+          "sha256": "db52834948addb28372adf9cfe91e608d909a78254aebe3825fefdf956d54709"
+        },
+        {
+          "path": "artifacts/navigation-command-core-build/test-results/test/TEST-net.citizensnpcs.api.ai.CoalescedBehaviorTest.xml",
+          "bytes": 1061,
+          "sha256": "952c978f29696c47cf2b1ba16be97694776c068ef93fff568686220be4496693"
+        },
+        {
+          "path": "artifacts/navigation-command-core-build/test-results/test/TEST-net.citizensnpcs.api.ai.IfElseResetTest.xml",
+          "bytes": 480,
+          "sha256": "f663dd4ce6aa3cd13c7fce0e9f237ebefe0fa3ff82e46752139a66ceb03eb95b"
+        },
+        {
+          "path": "artifacts/navigation-command-core-build/test-results/test/TEST-net.citizensnpcs.api.ai.ParallelBehaviorLifecycleTest.xml",
+          "bytes": 961,
+          "sha256": "ebd74b0a701e750f2c6d2cec1d1938a07312e0620eb131ec628db4bfe4bb7647"
+        },
+        {
+          "path": "artifacts/navigation-command-core-build/test-results/test/TEST-net.citizensnpcs.api.ai.ParallelCompositeTest.xml",
+          "bytes": 910,
+          "sha256": "34e57ebf44216f9c76399e2a526d1cc0b90033c40be9c14d8a063b4b0f4fb97c"
+        },
+        {
+          "path": "artifacts/navigation-command-core-build/test-results/test/TEST-net.citizensnpcs.api.ai.SelectorTerminalResetTest.xml",
+          "bytes": 651,
+          "sha256": "490bf0eb0fcdc3775068d1cda77433bf9542fd85af66da9dad43ff790cf4401e"
+        },
+        {
+          "path": "artifacts/navigation-command-core-build/test-results/test/TEST-net.citizensnpcs.api.ai.SequenceRemovalTest.xml",
+          "bytes": 901,
+          "sha256": "e228f48df1fa0486a4d226f415e3ec1a8abe0a50a3cbbc498ea350541c22037b"
+        },
+        {
+          "path": "artifacts/navigation-command-core-build/test-results/test/TEST-net.citizensnpcs.api.ai.SequenceResetCallbackTest.xml",
+          "bytes": 656,
+          "sha256": "d8525d593c95180c0079bbcd230b20a5cd8b1377dc5c7fee485f0fcdc572db4d"
+        },
+        {
+          "path": "artifacts/navigation-command-core-build/test-results/test/TEST-net.citizensnpcs.api.ai.TimeoutDecoratorTest.xml",
+          "bytes": 2045,
+          "sha256": "fee5bc0df6e7cf466d060c08e70b8898f1de6a27a42f1fde406fd69400c12b3b"
+        },
+        {
+          "path": "artifacts/navigation-command-core-build/test-results/test/TEST-net.citizensnpcs.api.ai.tree.BehaviorContextTest.xml",
+          "bytes": 1390,
+          "sha256": "869e398e1d1134962950a6c279bd1009ed48311f2cd34dc467728c8c197ed637"
+        },
+        {
+          "path": "artifacts/navigation-command-core-build/test-results/test/TEST-net.citizensnpcs.api.ai.tree.BehaviorSignalsTest.xml",
+          "bytes": 1252,
+          "sha256": "ddcd71863c0ffacda15f6c349696924750afaf3c09c2bc613e8b25608623be70"
+        },
+        {
+          "path": "artifacts/navigation-command-core-build/test-results/test/TEST-net.citizensnpcs.api.ai.tree.BlockBehaviorInputTest.xml",
+          "bytes": 815,
+          "sha256": "e30d600635babc621d7936bb704a8ed829991d5b68099a53180e3962018eb899"
+        },
+        {
+          "path": "artifacts/navigation-command-core-build/test-results/test/TEST-net.citizensnpcs.api.ai.tree.CooldownBehaviorTest.xml",
+          "bytes": 781,
+          "sha256": "83f4d0655a7a6c78b4e5c574cf2908871823bd76e9b922eaccd57141bbc5418f"
+        },
+        {
+          "path": "artifacts/navigation-command-core-build/test-results/test/TEST-net.citizensnpcs.api.ai.tree.DecoratorTest.xml",
+          "bytes": 935,
+          "sha256": "a424a9852085f918e45040af76004ee4efe3dbe0eea467ab904bdcc51a2b08ef"
+        },
+        {
+          "path": "artifacts/navigation-command-core-build/test-results/test/TEST-net.citizensnpcs.api.ai.tree.IfElseLifecycleTest.xml",
+          "bytes": 908,
+          "sha256": "82c0ca740377cfd6344cd755c2b81cd0b56cdd8f7080749bc1b53c2ce11c6aea"
+        },
+        {
+          "path": "artifacts/navigation-command-core-build/test-results/test/TEST-net.citizensnpcs.api.ai.tree.LoopTest.xml",
+          "bytes": 1305,
+          "sha256": "efdaf2f72992b51dd6daefeed4f20e03cf88d55b8723751e9c2bb19920158c58"
+        },
+        {
+          "path": "artifacts/navigation-command-core-build/test-results/test/TEST-net.citizensnpcs.api.ai.tree.RepeatTest.xml",
+          "bytes": 1592,
+          "sha256": "51d2fba948fe4db2fc8a6252ec3d28a48f7daaffb7057b447e524258e2754569"
+        },
+        {
+          "path": "artifacts/navigation-command-core-build/test-results/test/TEST-net.citizensnpcs.api.ai.tree.RetryDecoratorTest.xml",
+          "bytes": 1981,
+          "sha256": "b18d4e808d75164d301a70f2f29b87b16e1e1522ea422cd41d8697a3a7808fcd"
+        },
+        {
+          "path": "artifacts/navigation-command-core-build/test-results/test/TEST-net.citizensnpcs.api.ai.tree.SignalTargetIdTest.xml",
+          "bytes": 788,
+          "sha256": "0b16090f595f1f3680053e3a1029d7c27a1ebfdad3754a1a5b4ad60942524c13"
+        },
+        {
+          "path": "artifacts/navigation-command-core-build/test-results/test/TEST-net.citizensnpcs.api.ai.tree.StatusMapperTest.xml",
+          "bytes": 800,
+          "sha256": "705b8095f6440a200d52c726c5e8b6c44c8c81d1ef99951737095a8050e2f8b6"
+        },
+        {
+          "path": "artifacts/navigation-command-core-build/test-results/test/TEST-net.citizensnpcs.api.ai.tree.TimerDecoratorTest.xml",
+          "bytes": 1878,
+          "sha256": "4fe467ff34aded90e7f1ab0c7ca3445cbe8acdf9705ee472d91c0e8962d97dc7"
+        },
+        {
+          "path": "artifacts/navigation-command-core-build/test-results/test/TEST-net.citizensnpcs.api.ai.tree.WaitBehaviorTest.xml",
+          "bytes": 1333,
+          "sha256": "19783a4ae8924283e21f77a72dcaccd1a42743630673ada2820f8dcc095b2699"
+        },
+        {
+          "path": "artifacts/navigation-command-core-build/test-results/test/TEST-net.citizensnpcs.api.ai.tree.WaitForSignalTest.xml",
+          "bytes": 940,
+          "sha256": "d694ba20c25019c68d8b97fe2ac852314bba6176c53a521969df763a2b7c06bd"
+        },
+        {
+          "path": "artifacts/navigation-command-core-build/test-results/test/TEST-net.citizensnpcs.api.ai.tree.WaitUntilBehaviorTest.xml",
+          "bytes": 1544,
+          "sha256": "95699c933db8db0dfb5ffaa55f766204ffbc3505fb409cc59cd03afdab9715c2"
+        },
+        {
+          "path": "artifacts/navigation-command-core-build/test-results/test/TEST-net.citizensnpcs.api.ai.tree.WalkToValidationTest.xml",
+          "bytes": 799,
+          "sha256": "ecea405123b00065dc94d6d0a968a40285ec7f250c38bf627c6be6039f8c548d"
+        },
+        {
+          "path": "artifacts/navigation-command-core-build/test-results/test/TEST-net.citizensnpcs.api.ai.tree.WanderBehaviorTest.xml",
+          "bytes": 635,
+          "sha256": "c9d9cc7b72bf116ef19f923d4070a3da6625006c2b51a7f8369a966e363f91ea"
+        },
+        {
+          "path": "artifacts/navigation-command-core-build/test-results/test/TEST-net.citizensnpcs.api.command.CommandContextQuotingTest.xml",
+          "bytes": 672,
+          "sha256": "82b7db996d3cc0abb70eaa12333bdca8410a2bda7c00086de84d60312644a5db"
+        },
+        {
+          "path": "artifacts/navigation-command-core-build/test-results/test/TEST-net.citizensnpcs.api.command.CommandLocationTest.xml",
+          "bytes": 1197,
+          "sha256": "ed16a17b94d2e50afd826bfb54b721eb2160bacbc29e4e2be6e14f3751b76a00"
+        },
+        {
+          "path": "artifacts/navigation-command-core-build/test-results/test/TEST-net.citizensnpcs.api.command.NPCCommandTargetTest.xml",
+          "bytes": 1121,
+          "sha256": "4768454464589c0872b5c5957424fda60897181fd6714fad02c9bd298f90efad"
+        },
+        {
+          "path": "artifacts/navigation-command-core-build/test-results/test/TEST-net.citizensnpcs.api.command.StrictCommandArgumentsTest.xml",
+          "bytes": 629,
+          "sha256": "e76470781eba187fde8ac31e8898b325d78697efc3b8e6c98e6527c35a274dbe"
+        },
+        {
+          "path": "artifacts/navigation-command-core-build/test-results/test/TEST-net.citizensnpcs.api.expr.ExpressionRegistryTest.xml",
+          "bytes": 11673,
+          "sha256": "e2cdc351ca450245c80ad0bd1bd6fad9cd87b9764ec91df61af134df789980b2"
+        },
+        {
+          "path": "artifacts/navigation-command-core-build/test-results/test/TEST-net.citizensnpcs.api.expr.ExpressionScopeTest.xml",
+          "bytes": 2216,
+          "sha256": "cd1d4a4402b4690fcd4ded3432490e4aca877fb06a38a9802f891a2d55918a86"
+        },
+        {
+          "path": "artifacts/navigation-command-core-build/test-results/test/TEST-net.citizensnpcs.api.expr.MemoryCharacterTest.xml",
+          "bytes": 648,
+          "sha256": "572d834d01f8e1b5fb5041c5654b04397b4a6439219401e20a182ce8f718288d"
+        },
+        {
+          "path": "artifacts/navigation-command-core-build/test-results/test/TEST-net.citizensnpcs.api.expr.MemoryKeyIdentityTest.xml",
+          "bytes": 795,
+          "sha256": "f2244b5bb1617d23a74140cca5e542d72c48be748df48a827ae6afc7800950db"
+        },
+        {
+          "path": "artifacts/navigation-command-core-build/test-results/test/TEST-net.citizensnpcs.api.expr.MemoryKeysTest.xml",
+          "bytes": 921,
+          "sha256": "4dbda9dfd674761b2edbfd770c98762c6056dd55dbc3bc4aebaa8d1aa16ff43b"
+        },
+        {
+          "path": "artifacts/navigation-command-core-build/test-results/test/TEST-net.citizensnpcs.api.expr.MemoryListPersistenceTest.xml",
+          "bytes": 1112,
+          "sha256": "341cd0c9f395e7513c124bf80865f30419491b2678686273bc0410597b99092b"
+        },
+        {
+          "path": "artifacts/navigation-command-core-build/test-results/test/TEST-net.citizensnpcs.api.expr.MemoryListQueriesTest.xml",
+          "bytes": 781,
+          "sha256": "c990dcf53e407d294d657f61c52befed9cd4f231d674e55a4ddb8b77b38a3b67"
+        },
+        {
+          "path": "artifacts/navigation-command-core-build/test-results/test/TEST-net.citizensnpcs.api.gui.InventoryMenuTest.xml",
+          "bytes": 1975,
+          "sha256": "36ff12b3fb9353143087671ed2efbaebf53f277eef599d45081addb7decfe72a"
+        },
+        {
+          "path": "artifacts/navigation-command-core-build/test-results/test/TEST-net.citizensnpcs.api.hpastar.HPAGraphTest.xml",
+          "bytes": 2637,
+          "sha256": "efdf44a8a1d7c3d01678c723c4be0ef6366228224c40a73e6646fd31d0ce27e2"
+        },
+        {
+          "path": "artifacts/navigation-command-core-build/test-results/test/TEST-net.citizensnpcs.api.npc.NPCDataStoreTest.xml",
+          "bytes": 4318,
+          "sha256": "5da4637b175592411d1f1028dcba9467b317d804e79f920e5babc3fc57d9593e"
+        },
+        {
+          "path": "artifacts/navigation-command-core-build/test-results/test/TEST-net.citizensnpcs.api.npc.templates.CommandEventRegistrationTest.xml",
+          "bytes": 1536,
+          "sha256": "c6ca39c1c8b9041e46ff9f40a6a25cc3c7fa9da9922eac0d5b543899e84a9a29"
+        },
+        {
+          "path": "artifacts/navigation-command-core-build/test-results/test/TEST-net.citizensnpcs.api.npc.templates.TemplateApplicationLifecycleTest.xml",
+          "bytes": 2533,
+          "sha256": "89dd7f7eb7c12a3665d4764767ee618dbc14312b14eb66677a7f221ac4c93d81"
+        },
+        {
+          "path": "artifacts/navigation-command-core-build/test-results/test/TEST-net.citizensnpcs.api.npc.templates.TemplateEventPersistenceTest.xml",
+          "bytes": 1765,
+          "sha256": "bf6ea62b012473de13a33c7a4dc5ac82b77d02a1c6983620de04bb3fe3868afd"
+        },
+        {
+          "path": "artifacts/navigation-command-core-build/test-results/test/TEST-net.citizensnpcs.api.npc.templates.TemplateEventReplacementTest.xml",
+          "bytes": 1043,
+          "sha256": "411c4211cb962dd1974bd0c080cfc2fe7fa6dcf7dbc4a6dbad09ed0088ec6953"
+        },
+        {
+          "path": "artifacts/navigation-command-core-build/test-results/test/TEST-net.citizensnpcs.api.npc.templates.TemplateGenerationTest.xml",
+          "bytes": 2362,
+          "sha256": "4f805e4aa4d4090afa6b320225f4fde5d2355bda99cc99c0bb3772d82f82bf93"
+        },
+        {
+          "path": "artifacts/navigation-command-core-build/test-results/test/TEST-net.citizensnpcs.api.npc.templates.TemplateMigrationTest.xml",
+          "bytes": 3414,
+          "sha256": "f0dc721ee93e0b24d84755309dd07427b2ee0e8c590025abea4e2ed1a2c103b5"
+        },
+        {
+          "path": "artifacts/navigation-command-core-build/test-results/test/TEST-net.citizensnpcs.api.npc.templates.TemplateRegistryReloadTest.xml",
+          "bytes": 45017,
+          "sha256": "f098d2af4c65be0a89c631d0a34296e76dd1efd369a150e871be19afc9990493"
+        },
+        {
+          "path": "artifacts/navigation-command-core-build/test-results/test/TEST-net.citizensnpcs.api.npc.templates.TemplateWorkspaceTest.xml",
+          "bytes": 798,
+          "sha256": "32e04af6fdc7cd7acd861481a509d190c5072a65392f98f13097a237201d7387"
+        },
+        {
+          "path": "artifacts/navigation-command-core-build/test-results/test/TEST-net.citizensnpcs.api.npc.templates.TraitTemplateFormTest.xml",
+          "bytes": 1666,
+          "sha256": "29015f793e15dfcc015e4a7676f8d2da2e763477c6e15844a0dff21d261b9ee8"
+        },
+        {
+          "path": "artifacts/navigation-command-core-build/test-results/test/TEST-net.citizensnpcs.api.npc.templates.YamlReplacementActionTest.xml",
+          "bytes": 1940,
+          "sha256": "4ecab13cc13aa49cb5e81aa32f5ad2de3d93d85de91ef85c4ec561f8d06696c1"
+        },
+        {
+          "path": "artifacts/navigation-command-core-build/test-results/test/TEST-net.citizensnpcs.api.npc.templates.YamlReplacementValidationTest.xml",
+          "bytes": 829,
+          "sha256": "775d04cb5751b15d80db238b297c8561ffdbed2e793726eea7995ec4246f1592"
+        },
+        {
+          "path": "artifacts/navigation-command-core-build/test-results/test/TEST-net.citizensnpcs.api.persistence.LocationWorldNameTest.xml",
+          "bytes": 930,
+          "sha256": "05e53bba9a14df8b11edc78603ddc1436e0f002b12fe861210ba297428c4afdc"
+        },
+        {
+          "path": "artifacts/navigation-command-core-build/test-results/test/TEST-net.citizensnpcs.api.persistence.PersistenceDelegateFailureTest.xml",
+          "bytes": 869,
+          "sha256": "c809af8d1b5513a0420001960375f4f2990602dfc015048a19545fa0f8f40723"
+        },
+        {
+          "path": "artifacts/navigation-command-core-build/test-results/test/TEST-net.citizensnpcs.api.persistence.PersistenceLoaderLegacyValuesTest.xml",
+          "bytes": 11000,
+          "sha256": "78b03c898e98662edc476eb90d77b267666e66df959e2a7de1f5a9cfe940bd34"
+        },
+        {
+          "path": "artifacts/navigation-command-core-build/test-results/test/TEST-net.citizensnpcs.api.persistence.PersistenceMapKeysTest.xml",
+          "bytes": 818,
+          "sha256": "b0a6c82814eb0affcd6ae892689f1791541be202967bf3daa750dfe2fae9bdf6"
+        },
+        {
+          "path": "artifacts/navigation-command-core-build/test-results/test/TEST-net.citizensnpcs.api.persistence.StrictPersistenceTest.xml",
+          "bytes": 513,
+          "sha256": "4a89cb17b16e88df12740c89649c05d9f50e2774e87b14e43d0ebe68667f8138"
+        },
+        {
+          "path": "artifacts/navigation-command-core-build/test-results/test/TEST-net.citizensnpcs.api.util.DurationConversionTest.xml",
+          "bytes": 766,
+          "sha256": "0cd01af8d9dc2c508e65cc92dd1789fbc3427bc61021f51853fe65bfa4d20b23"
+        },
+        {
+          "path": "artifacts/navigation-command-core-build/test-results/test/TEST-net.citizensnpcs.api.util.DurationParsingTest.xml",
+          "bytes": 894,
+          "sha256": "6526d22e54cb11fd83a2ac887de06f357713f2f0631a2926823164a2ea4f26ce"
+        },
+        {
+          "path": "artifacts/navigation-command-core-build/test-results/test/TEST-net.citizensnpcs.api.util.ItemStorageTest.xml",
+          "bytes": 3195,
+          "sha256": "723b90e0a72ae17b0b8d1e039c7eedc9e767dd7819db3fb0f7141758b5320aa9"
+        },
+        {
+          "path": "artifacts/navigation-command-core-build/test-results/test/TEST-net.citizensnpcs.api.util.LegacyBukkitMetaTest.xml",
+          "bytes": 3377,
+          "sha256": "20681b1660ac02c7e70caa7b600c104198c1f0d44ed0d6d4b032afdb50ab3031"
+        },
+        {
+          "path": "artifacts/navigation-command-core-build/test-results/test/TEST-net.citizensnpcs.api.util.LegacyBukkitMetaTypesTest.xml",
+          "bytes": 3701,
+          "sha256": "f9538f1e347a3e78a13a65330c4077f6b569003f91877bee0ecf1617545219e8"
+        },
+        {
+          "path": "artifacts/navigation-command-core-build/test-results/test/TEST-net.citizensnpcs.api.util.LegacyFireworksTest.xml",
+          "bytes": 4313,
+          "sha256": "24d2839020007b1f46954244a92a958b8489453b99e1e37246b8dc03244c7bda"
+        },
+        {
+          "path": "artifacts/navigation-command-core-build/test-results/test/TEST-net.citizensnpcs.api.util.LegacyStructuredItemsTest.xml",
+          "bytes": 5173,
+          "sha256": "8436e3fd7c739a957693215a7ea76ae459dffed421a169e3b42c3e6795813af8"
+        },
+        {
+          "path": "artifacts/navigation-command-core-build/test-results/test/TEST-net.citizensnpcs.api.util.MemoryDataKeyCopyTest.xml",
+          "bytes": 662,
+          "sha256": "b504429b4437c431098783e1d8ab7691672fa036ecfd14abf3a6b28abee17fc9"
+        },
+        {
+          "path": "artifacts/navigation-command-core-build/test-results/test/TEST-net.citizensnpcs.api.util.MemoryDataKeyTransactionTest.xml",
+          "bytes": 2181,
+          "sha256": "7fb5354359ec34a58efc35efe8ea471be221672731f670a40bf06e6486b723b4"
+        },
+        {
+          "path": "artifacts/navigation-command-core-build/test-results/test/TEST-net.citizensnpcs.api.util.NPCCommandFormatTest.xml",
+          "bytes": 1457,
+          "sha256": "2662ce15c2ccc170d1aefed46038dfd54a331242c8d88140390333d5f9144ad2"
+        },
+        {
+          "path": "artifacts/navigation-command-core-build/test-results/test/TEST-net.citizensnpcs.api.util.PermissionDefaultsTest.xml",
+          "bytes": 1110,
+          "sha256": "1c9ea7e5b542ee4327f1262d2e6e6ed15e46e3d8431c5f5455a82937ab103efd"
+        },
+        {
+          "path": "artifacts/navigation-command-core-build/test-results/test/TEST-net.citizensnpcs.api.util.schedulers.adapter.NeoForgeSchedulerTest.xml",
+          "bytes": 1013,
+          "sha256": "5bb8244de3c8b2e4369df69f4e98d215ae871629ca1f5b4b65f1de15e729bfef"
+        },
+        {
+          "path": "artifacts/navigation-command-core-build/test-results/test/TEST-net.citizensnpcs.api.util.StoredItemListTest.xml",
+          "bytes": 2729,
+          "sha256": "195cfb332b412dcad90cc8e0d13fa74e8a8f5793804742b1da948d3a61229c5c"
+        },
+        {
+          "path": "artifacts/navigation-command-core-build/test-results/test/TEST-net.citizensnpcs.api.util.StoredItemsTest.xml",
+          "bytes": 2990,
+          "sha256": "85cde2d31e13e3748101dc1ebf406631e936e586beb1a467ea08adc01c007049"
+        },
+        {
+          "path": "artifacts/navigation-command-core-build/test-results/test/TEST-net.citizensnpcs.api.util.TextParserTest.xml",
+          "bytes": 3409,
+          "sha256": "3418e0592a922e4024c6937bdc9fde7f289fc2cfd46e80e654c3a5ef41a3186c"
+        },
+        {
+          "path": "artifacts/navigation-command-core-build/test-results/test/TEST-net.citizensnpcs.api.util.TranslatorFormatTest.xml",
+          "bytes": 841,
+          "sha256": "472b3a5f2d5b14830e6530bf6e2e39ebcec2607646c9d1dd1716e8d2325330dc"
+        },
+        {
+          "path": "artifacts/navigation-command-core-build/test-results/test/TEST-net.citizensnpcs.api.util.TriggerAddInputTest.xml",
+          "bytes": 767,
+          "sha256": "aa53920140ff7e9fbe1483741808bb9a7ff45d7a4aa68c88c53a87bf74b9937b"
+        },
+        {
+          "path": "artifacts/navigation-command-core-build/test-results/test/TEST-net.citizensnpcs.api.util.YamlStorageRoundTripTest.xml",
+          "bytes": 59912,
+          "sha256": "4e78f76d0876d346ecac7bd6d4da21d1f54fdddaa8c17935e89c12b402360b03"
+        },
+        {
+          "path": "artifacts/navigation-command-core-build/test-results/test/TEST-net.citizensnpcs.api.util.YamlStorageWriteTest.xml",
+          "bytes": 4030,
+          "sha256": "239c4be956da8d223df7a60e3facc22f06f949efb452719c2fb77fdb1a0b0771"
+        },
+        {
+          "path": "artifacts/navigation-command-core-build/test-results/test/TEST-net.citizensnpcs.commands.EntityCommandParsingTest.xml",
+          "bytes": 666,
+          "sha256": "242582a5a1b0c14e068f0be418a7e1795f6178db01df0c7794b44c3f7d29fca7"
+        },
+        {
+          "path": "artifacts/navigation-command-core-build/test-results/test/TEST-net.citizensnpcs.commands.history.CommandHistoryTest.xml",
+          "bytes": 1277,
+          "sha256": "a6ce883014b5cc1e5bcbe5f283c010e3b933eef113942df9db1163d2be52b75d"
+        },
+        {
+          "path": "artifacts/navigation-command-core-build/test-results/test/TEST-net.citizensnpcs.commands.NavigationCommandValidationTest.xml",
+          "bytes": 1352,
+          "sha256": "cf30e11c3e9fc515cc43057f08b74b720caa238d4c42b74cfc14571601c2207a"
+        },
+        {
+          "path": "artifacts/navigation-command-core-build/test-results/test/TEST-net.citizensnpcs.commands.PresentationCommandParsingTest.xml",
+          "bytes": 1002,
+          "sha256": "be17489e5db2c8ab9e914f1652f2178161ebe5b2330700ee21a53f05de2c60ac"
+        },
+        {
+          "path": "artifacts/navigation-command-core-build/test-results/test/TEST-net.citizensnpcs.commands.TemplateCommandValidationTest.xml",
+          "bytes": 510,
+          "sha256": "6abb0d379bf74cec6a912d1cff7602f594b0a0f223a418ea4dccb66dfe486b45"
+        },
+        {
+          "path": "artifacts/navigation-command-core-build/test-results/test/TEST-net.citizensnpcs.npc.ai.tree.BehaviorCommandFlagsTest.xml",
+          "bytes": 790,
+          "sha256": "9b2f531d027c2814aaa4b7680df650ec7bb46846409bfa52b372dca162101fe9"
+        },
+        {
+          "path": "artifacts/navigation-command-core-build/test-results/test/TEST-net.citizensnpcs.npc.ai.tree.BehaviorTreeParserTest.xml",
+          "bytes": 9174,
+          "sha256": "b25409eaee22e53b0a2797d3e579b57d3578c8c41f2604e01d2974b6a34b49f2"
+        },
+        {
+          "path": "artifacts/navigation-command-core-build/test-results/test/TEST-net.citizensnpcs.npc.ai.tree.MolangMemoryBindingTest.xml",
+          "bytes": 1450,
+          "sha256": "ae13820c602facd1000181486d91fd97f62e3d1d21a5fe3127076fb5706fcfb5"
+        },
+        {
+          "path": "artifacts/navigation-command-core-build/test-results/test/TEST-net.citizensnpcs.npc.ai.tree.MolangScopeIsolationTest.xml",
+          "bytes": 12098,
+          "sha256": "6e5751feff3d55a029c27c9c8e44cb8aa2772127dd49e2b36ef9364e3749dc56"
+        },
+        {
+          "path": "artifacts/navigation-command-core-build/test-results/test/TEST-net.citizensnpcs.npc.skin.SkinCacheReloadTest.xml",
+          "bytes": 1196,
+          "sha256": "46e41403d6db62fe4583458c4d3ec57b58101f6987b84055296d63f6d50692f5"
+        },
+        {
+          "path": "artifacts/navigation-command-core-build/test-results/test/TEST-net.citizensnpcs.SettingsTest.xml",
+          "bytes": 35771,
+          "sha256": "60ab5c0ab090b945730f96253aa1cf1d3473fcaacb906e2dcda06f5665ee9fe7"
+        },
+        {
+          "path": "artifacts/navigation-command-core-build/test-results/test/TEST-net.citizensnpcs.trait.HologramItemTest.xml",
+          "bytes": 899,
+          "sha256": "aab3ffec49118bcb27f0cd453a1cde76d4f67b8ee14e4b3a88f8f37c4c7feec6"
+        },
+        {
+          "path": "artifacts/navigation-command-core-build/test-results/test/TEST-net.citizensnpcs.trait.SentinelTargetMatchingTest.xml",
+          "bytes": 1142,
+          "sha256": "642b72ca7c4b809fc0baf7d3dea6a539985a5c65539a7b22a178eb08a942f107"
+        },
+        {
+          "path": "artifacts/navigation-command-core-build/test-results/test/TEST-net.citizensnpcs.trait.shop.ExperienceArithmeticTest.xml",
+          "bytes": 773,
+          "sha256": "2a1104f8e0342996012d1b49f908963aaf3869417f5dcf01928512267b105af8"
+        },
+        {
+          "path": "artifacts/navigation-command-core-build/test-results/test/TEST-net.citizensnpcs.trait.shop.InventoryPublicationRecoveryTest.xml",
+          "bytes": 1503,
+          "sha256": "d95c195f39866f09ed62340834f01dd64698e16c8c5e1feee3b20ed25ed3a5f3"
+        },
+        {
+          "path": "artifacts/navigation-command-core-build/test-results/test/TEST-net.citizensnpcs.trait.shop.InventoryTransactionIsolationTest.xml",
+          "bytes": 1199,
+          "sha256": "58d80d6c6ab682e4a654ec0f0ad875779496797722c1a57dbdbe8d0a4681de46"
+        },
+        {
+          "path": "artifacts/navigation-command-core-build/test-results/test/TEST-net.citizensnpcs.trait.shop.ItemActionTest.xml",
+          "bytes": 1580,
+          "sha256": "08acf749ab817b55c569a5210d995fb5725ddce318d8280c801acd0959162f9d"
+        },
+        {
+          "path": "artifacts/navigation-command-core-build/test-results/test/TEST-net.citizensnpcs.trait.shop.ItemQuantityTest.xml",
+          "bytes": 1433,
+          "sha256": "e24ba15b8b49a64c9a75823b96d3798e02035740ee24720dd908f9ed2e2e4898"
+        },
+        {
+          "path": "artifacts/navigation-command-core-build/test-results/test/TEST-net.citizensnpcs.trait.shop.ItemReceiptTest.xml",
+          "bytes": 1208,
+          "sha256": "a4896dff5cda1f402572de3a601d10d0b58b6ec52f664b183c1fab02b2ef4419"
+        },
+        {
+          "path": "artifacts/navigation-command-core-build/test-results/test/TEST-net.citizensnpcs.trait.shop.MoneyArithmeticTest.xml",
+          "bytes": 898,
+          "sha256": "c8148ba3adf0289042f9da56c313bf74bde3c876af0e430c2398652661b6ee9c"
+        },
+        {
+          "path": "artifacts/navigation-command-core-build/test-results/test/TEST-net.citizensnpcs.trait.shop.NPCShopTest.xml",
+          "bytes": 1598,
+          "sha256": "e9da0cd9ed1757f4f54bc15723df8c3ff343c34cd2984a866dd73e7c9f657ecc"
+        },
+        {
+          "path": "artifacts/navigation-command-core-build/test-results/test/TEST-net.citizensnpcs.trait.shop.ShopSessionOwnerTest.xml",
+          "bytes": 662,
+          "sha256": "9f565eabbc5ca94f1ec893cd63b9c81e3b11b1dc1c8e71e8466c19c1f8424fc0"
+        },
+        {
+          "path": "artifacts/navigation-command-core-build/test-results/test/TEST-net.citizensnpcs.trait.shop.ShopTransactionTest.xml",
+          "bytes": 1066,
+          "sha256": "63441c5f87163a73e8d1740843c83e3fa2ea492cca452f24fd59e58b13a26728"
+        },
+        {
+          "path": "artifacts/navigation-command-core-build/test-results/test/TEST-net.citizensnpcs.trait.shop.StoredShopsTest.xml",
+          "bytes": 2717,
+          "sha256": "6603089a68701748f5eeb2e4b5c405224fc873926cb5de03d78f6dfe05f51bef"
+        },
+        {
+          "path": "artifacts/navigation-command-core-build/test-results/test/TEST-net.citizensnpcs.trait.text.TextEditorInputTest.xml",
+          "bytes": 769,
+          "sha256": "ff059aa62ac4983df5f86586e458408adf9b6c9c9f0b105d4b625c8b153e1032"
+        },
+        {
+          "path": "artifacts/navigation-command-core-build/test-results/test/TEST-net.citizensnpcs.trait.TraitNameMappingTest.xml",
+          "bytes": 1066,
+          "sha256": "477f1793ebe0e1ecf7fbc0f6096a35602d3a975733eb9356764a2501c14543dc"
+        },
+        {
+          "path": "artifacts/navigation-command-core-build/test-results/test/TEST-net.citizensnpcs.trait.waypoint.triggers.NumericTriggerInputTest.xml",
+          "bytes": 865,
+          "sha256": "f58610f44005e8ac5530b73c8d41f61a62be4183a6364cb3391cb9a1c3b35d42"
+        },
+        {
+          "path": "artifacts/navigation-command-core-build/test-results/test/TEST-net.citizensnpcs.trait.waypoint.triggers.TeleportTriggerInputTest.xml",
+          "bytes": 851,
+          "sha256": "5aadd9b12d38ac454c856d446a6c006b66e886e7100a56919dcfa2e2f5869f38"
+        },
+        {
+          "path": "artifacts/navigation-command-core-build/test-results/test/TEST-net.citizensnpcs.trait.waypoint.triggers.WaypointTriggerSaveTest.xml",
+          "bytes": 1024,
+          "sha256": "d503c718c5b4c85a89b2215400edf9040aa9fe03b2088fc099433d8a8fdd041f"
+        },
+        {
+          "path": "artifacts/navigation-command-core-build/test-results/test/TEST-net.citizensnpcs.util.CommerceTaskJournalTest.xml",
+          "bytes": 2374,
+          "sha256": "6fb28f923ba0fb5dc7091d534253c6240e2d0663b9922472ff5148d255f6b006"
+        },
+        {
+          "path": "artifacts/navigation-command-core-build/test-results/test/TEST-net.citizensnpcs.util.DimensionLookupTest.xml",
+          "bytes": 748,
+          "sha256": "b4a65b1ceb48d2cb9417468ff7f125ccc6459405735736f89be3673832b582de"
+        },
+        {
+          "path": "artifacts/navigation-command-core-build/test-results/test/TEST-net.citizensnpcs.util.EconomyShopMenusTest.xml",
+          "bytes": 607,
+          "sha256": "e7d786708a3ae7cad90660225f47f7706636a716a90831f84f2b4407356ba164"
+        },
+        {
+          "path": "artifacts/navigation-command-core-build/test-results/test/TEST-net.citizensnpcs.util.JournalRecordDecodingTest.xml",
+          "bytes": 5324,
+          "sha256": "29913944fedc950e7c723417ca268c15fc5a9200e5584579fd02f6b94857b4a3"
+        },
+        {
+          "path": "artifacts/navigation-command-core-build/test-results/test/TEST-net.citizensnpcs.util.LuckPermsGroupsTest.xml",
+          "bytes": 609,
+          "sha256": "8c0c78bfa51290dad22674c0379b04348390d5847cdba6d2a4e42956f9d36e63"
+        },
+        {
+          "path": "artifacts/navigation-command-core-build/test-results/test/TEST-net.citizensnpcs.util.ParadigmGroupsTest.xml",
+          "bytes": 1205,
+          "sha256": "625be52bff38adc3fc0c47ed8287a8df86f2e0f6d183f8dc4cbcba44703ae03a"
+        },
+        {
+          "path": "artifacts/navigation-command-core-build/test-results/test/TEST-net.citizensnpcs.util.ParadigmPermissionWriterTest.xml",
+          "bytes": 2862,
+          "sha256": "dad8a033582d61ac97b0845b7cd655f9676401510e7914f75e1e0a03c68fdf91"
+        },
+        {
+          "path": "artifacts/navigation-command-core-build/test-results/test/TEST-net.citizensnpcs.util.ProviderPlaceholderExportsTest.xml",
+          "bytes": 1092,
+          "sha256": "94e166cac789d387fbbf371c312d06552ca6960d5bfaa60277a1b39a4ad3c108"
+        },
+        {
+          "path": "artifacts/navigation-command-core-build/test-results/test/TEST-net.citizensnpcs.util.QuestDeliveryJournalTest.xml",
+          "bytes": 1862,
+          "sha256": "81c94b66d7dee74d3b8bc4cc9442a2d12211699507758dcf20e2f694c8bc666b"
+        },
+        {
+          "path": "artifacts/navigation-command-core-build/test-results/test/TEST-net.citizensnpcs.util.QuestDeliveryStorageTest.xml",
+          "bytes": 1137,
+          "sha256": "2c6c7ac52fe761070deb9c1ae117d1211b9501827b21b9fd46f1f3789111feb1"
+        },
+        {
+          "path": "artifacts/navigation-command-core-build/test-results/test/TEST-net.citizensnpcs.util.QuestEvidenceJournalTest.xml",
+          "bytes": 2812,
+          "sha256": "5a8decba2fca86e330ac3322cfe6562180e2587cf047e9cb03274b4d3cc56419"
+        },
+        {
+          "path": "artifacts/navigation-command-core-build/test-results/test/TEST-net.citizensnpcs.util.QuestRewardJournalTest.xml",
+          "bytes": 1538,
+          "sha256": "5bef10d69238eeeb5b0c261686ce69b12f103041e38da8faa870b0f84aed85e9"
+        },
+        {
+          "path": "artifacts/navigation-command-core-build/test-results/test/TEST-net.citizensnpcs.util.YuuniverseEconomyTest.xml",
+          "bytes": 1499,
+          "sha256": "df05408e42c4cfa3962c773c7001b7b5c40865c0194c693a039de8d5ded98b5e"
+        }
+      ],
+      "nativeChecks": 229,
+      "nativeLog": {
+        "path": "artifacts/navigation-command-native-final-233.log",
+        "bytes": 47748,
+        "sha256": "f8a56beec6a4a020a0f7095c3d077e36877f9795b372f47a211e928e3a2890b5"
+      },
+      "completion": {
+        "path": "artifacts/navigation-command-final-233-server/complete.json",
+        "bytes": 15551,
+        "sha256": "6bf3c72aa77787f7ac16f5afe797bf38b541ba733dae3cd953db0b563a6a6b09"
+      },
+      "saves": {
+        "path": "artifacts/navigation-command-final-233-server/config/citizens/saves.yml",
+        "bytes": 1414,
+        "sha256": "b522ca212372af9bcb1018b90ffb702178d24993f545c8e3f1ae1ebbafca6d90"
+      },
+      "entityRegions": [
+        {
+          "path": "artifacts/navigation-command-final-233-server/navigation-command-world/entities/r.-1.-1.mca",
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "path": "artifacts/navigation-command-final-233-server/navigation-command-world/entities/r.-1.0.mca",
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "path": "artifacts/navigation-command-final-233-server/navigation-command-world/entities/r.0.-1.mca",
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "path": "artifacts/navigation-command-final-233-server/navigation-command-world/entities/r.0.0.mca",
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        }
+      ],
+      "finalStates": [
+        {
+          "uuid": "85a94d46-2c94-47a4-80ba-37e9236e4da0",
+          "name": "ordinaryNavigation",
+          "location": {
+            "world": "minecraft:overworld",
+            "x": 4.6591,
+            "y": -60.0,
+            "z": 4.5269,
+            "bodyYaw": 86.59743,
+            "pitch": 68.9695,
+            "yaw": 86.5974
+          },
+          "distanceToGoal": 0.8438225050329008
+        },
+        {
+          "uuid": "2016b312-55cb-4f00-8448-a78e24e4ddf9",
+          "name": "packetNavigation",
+          "location": {
+            "world": "minecraft:overworld",
+            "x": 4.5222,
+            "y": -60.0,
+            "z": 7.5497,
+            "bodyYaw": 85.20093,
+            "pitch": 45.0849,
+            "yaw": 85.2009
+          },
+          "distanceToGoal": 0.7581971577366927
+        }
+      ],
+      "productionClassesMatchNative": 1024,
+      "packages": [
+        {
+          "path": "artifacts/navigation-command-core-build/libs/citizens-2.0.43-neoforge-SNAPSHOT-sources.jar",
+          "bytes": 1131961,
+          "sha256": "f96ba06655ed3b1d31e0fa532cb4bd2ff2b46c1ddcdfeb625157958332ef161e"
+        },
+        {
+          "path": "artifacts/navigation-command-core-build/libs/citizens-2.0.43-neoforge-SNAPSHOT.jar",
+          "bytes": 4101933,
+          "sha256": "c6e8847ea6ca5e0202d83ac500e441ee3d21e9b64619c212cc0317681f4a2cdd"
+        },
+        {
+          "path": "artifacts/navigation-command-core-build/libs/yuuniverse-interactions-2.0.43-neoforge-SNAPSHOT.jar",
+          "bytes": 204146,
+          "sha256": "453e393c86f472c9e10beb85d7f37c74f329b772fcc1d7e12cc38a70eba5d80e"
+        }
+      ]
+    },
+    {
+      "neoForge": "21.1.248",
+      "tests": {
+        "tests": 842,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "suites": 117,
+      "build": {
+        "path": "artifacts/navigation-command-accepted-selected.log",
+        "bytes": 75479,
+        "sha256": "82ca5ec11e33223602a914eb5bd7ec4c159e3805fa1f5f9ac3358d9308c02e7d"
+      },
+      "reports": [
+        {
+          "path": "artifacts/navigation-command-selected-build/test-results/test/TEST-net.citizensnpcs.api.ai.BehaviorRemovalTest.xml",
+          "bytes": 1174,
+          "sha256": "2e587a5a6e719a84592a2b3ce81adaccfba568b9949106c15414301649f97fd9"
+        },
+        {
+          "path": "artifacts/navigation-command-selected-build/test-results/test/TEST-net.citizensnpcs.api.ai.CoalescedBehaviorTest.xml",
+          "bytes": 1060,
+          "sha256": "6384de74a41c0f0cd0687f1a0924db53f16f797a2fc8e8536275bdc6e3cb4041"
+        },
+        {
+          "path": "artifacts/navigation-command-selected-build/test-results/test/TEST-net.citizensnpcs.api.ai.IfElseResetTest.xml",
+          "bytes": 482,
+          "sha256": "f52676c3fe99ab2c331b5dbe52cceb3d586392de17be0d8d2956fcb537930d98"
+        },
+        {
+          "path": "artifacts/navigation-command-selected-build/test-results/test/TEST-net.citizensnpcs.api.ai.ParallelBehaviorLifecycleTest.xml",
+          "bytes": 961,
+          "sha256": "17e9062f019522b996e04cfb82fd4fb7294d1644f120ea7192db687e69b5db58"
+        },
+        {
+          "path": "artifacts/navigation-command-selected-build/test-results/test/TEST-net.citizensnpcs.api.ai.ParallelCompositeTest.xml",
+          "bytes": 910,
+          "sha256": "b6ea4ea67ace8b5b5793274a564ea58f78e0bb0625b6989e5c4c6dca2ce17adf"
+        },
+        {
+          "path": "artifacts/navigation-command-selected-build/test-results/test/TEST-net.citizensnpcs.api.ai.SelectorTerminalResetTest.xml",
+          "bytes": 649,
+          "sha256": "e16cb18dc90e317bdc3fe4a0df265ae351c3f03781793e46a61689b70fae68e6"
+        },
+        {
+          "path": "artifacts/navigation-command-selected-build/test-results/test/TEST-net.citizensnpcs.api.ai.SequenceRemovalTest.xml",
+          "bytes": 902,
+          "sha256": "9c3f426ed6b8a26c5128a0334cedf1b3149aba90663e9e326471d39626ffe59a"
+        },
+        {
+          "path": "artifacts/navigation-command-selected-build/test-results/test/TEST-net.citizensnpcs.api.ai.SequenceResetCallbackTest.xml",
+          "bytes": 656,
+          "sha256": "e6920549e914b7624ce0b5382a29d9d77e331f62ccbdcc8f49fa202d7d6a22ba"
+        },
+        {
+          "path": "artifacts/navigation-command-selected-build/test-results/test/TEST-net.citizensnpcs.api.ai.TimeoutDecoratorTest.xml",
+          "bytes": 2045,
+          "sha256": "0b5332a78b3cefb8cbed165e92c19054e8de6c49428e6d41f79df63d2766ec90"
+        },
+        {
+          "path": "artifacts/navigation-command-selected-build/test-results/test/TEST-net.citizensnpcs.api.ai.tree.BehaviorContextTest.xml",
+          "bytes": 1390,
+          "sha256": "490ac82a619768469f61210693b37f44591e960b12185210401b2bddf6c7127d"
+        },
+        {
+          "path": "artifacts/navigation-command-selected-build/test-results/test/TEST-net.citizensnpcs.api.ai.tree.BehaviorSignalsTest.xml",
+          "bytes": 1253,
+          "sha256": "4adab212aca0a3252057152834111c5bde676665ffae2b46ffed0242daffcfcf"
+        },
+        {
+          "path": "artifacts/navigation-command-selected-build/test-results/test/TEST-net.citizensnpcs.api.ai.tree.BlockBehaviorInputTest.xml",
+          "bytes": 815,
+          "sha256": "577bada38ff8325b30a11e47f11ac14528e926fe613f63ab3688b36adff327fc"
+        },
+        {
+          "path": "artifacts/navigation-command-selected-build/test-results/test/TEST-net.citizensnpcs.api.ai.tree.CooldownBehaviorTest.xml",
+          "bytes": 781,
+          "sha256": "522ce91c1248d7c2ca694e840cbc95a75fa638dc06acd5fa692330a89efc21a4"
+        },
+        {
+          "path": "artifacts/navigation-command-selected-build/test-results/test/TEST-net.citizensnpcs.api.ai.tree.DecoratorTest.xml",
+          "bytes": 935,
+          "sha256": "1b8821a6518a534b3a56a067f1f7d363c0bed69e9d01464c21d487eaffed3625"
+        },
+        {
+          "path": "artifacts/navigation-command-selected-build/test-results/test/TEST-net.citizensnpcs.api.ai.tree.IfElseLifecycleTest.xml",
+          "bytes": 908,
+          "sha256": "2adb00f2e87303dfb2b65cc662a5de042920a6cdb4e85a24b323b4d4087eecb3"
+        },
+        {
+          "path": "artifacts/navigation-command-selected-build/test-results/test/TEST-net.citizensnpcs.api.ai.tree.LoopTest.xml",
+          "bytes": 1305,
+          "sha256": "77d2ff66a3e81def0cb02d346a8310859a5a0331bf73ca2dc135eb4157383e5e"
+        },
+        {
+          "path": "artifacts/navigation-command-selected-build/test-results/test/TEST-net.citizensnpcs.api.ai.tree.RepeatTest.xml",
+          "bytes": 1590,
+          "sha256": "9c8f74287a9e456929e4e4c70d679075a9e881cb7475c7f24d25540d841e7721"
+        },
+        {
+          "path": "artifacts/navigation-command-selected-build/test-results/test/TEST-net.citizensnpcs.api.ai.tree.RetryDecoratorTest.xml",
+          "bytes": 1983,
+          "sha256": "64f0038b07937929e540f448c9d95b5d71657d76d12994444d01d0422fb9882e"
+        },
+        {
+          "path": "artifacts/navigation-command-selected-build/test-results/test/TEST-net.citizensnpcs.api.ai.tree.SignalTargetIdTest.xml",
+          "bytes": 788,
+          "sha256": "2f8f9d38dd1294dfce488ca53e8add8f23109c0a4e0db48e397b855a139ede02"
+        },
+        {
+          "path": "artifacts/navigation-command-selected-build/test-results/test/TEST-net.citizensnpcs.api.ai.tree.StatusMapperTest.xml",
+          "bytes": 801,
+          "sha256": "8893ceb3348a86307c1e86cdb2a1012dfb19adc5f22d59405af349ca278083ef"
+        },
+        {
+          "path": "artifacts/navigation-command-selected-build/test-results/test/TEST-net.citizensnpcs.api.ai.tree.TimerDecoratorTest.xml",
+          "bytes": 1882,
+          "sha256": "c2d6afc389979420e4bf9e05e287d462e2876709aff33aa08385d4238acef52d"
+        },
+        {
+          "path": "artifacts/navigation-command-selected-build/test-results/test/TEST-net.citizensnpcs.api.ai.tree.WaitBehaviorTest.xml",
+          "bytes": 1333,
+          "sha256": "90f9611d0fe60e5eca04e0acce971ba7d058a0a0fdabe169e165b9b105b4b7f3"
+        },
+        {
+          "path": "artifacts/navigation-command-selected-build/test-results/test/TEST-net.citizensnpcs.api.ai.tree.WaitForSignalTest.xml",
+          "bytes": 940,
+          "sha256": "7879a1f9a160c3973bd3d68bce4cef69f3ffab4c4628b78c582afe5a927e0398"
+        },
+        {
+          "path": "artifacts/navigation-command-selected-build/test-results/test/TEST-net.citizensnpcs.api.ai.tree.WaitUntilBehaviorTest.xml",
+          "bytes": 1547,
+          "sha256": "f14a53e5502006cda9db37ff78a442f688539093b10fd08c9e1ba6e604c32d04"
+        },
+        {
+          "path": "artifacts/navigation-command-selected-build/test-results/test/TEST-net.citizensnpcs.api.ai.tree.WalkToValidationTest.xml",
+          "bytes": 797,
+          "sha256": "32708e26fe7f3f505d5e111b86488c506ac905f07ae920d6acc378aa1144cd33"
+        },
+        {
+          "path": "artifacts/navigation-command-selected-build/test-results/test/TEST-net.citizensnpcs.api.ai.tree.WanderBehaviorTest.xml",
+          "bytes": 634,
+          "sha256": "ed41ac81605d4aa8ab0cf62b41e1d839bc710d1c09c84b3520b93de7fe8bbdc9"
+        },
+        {
+          "path": "artifacts/navigation-command-selected-build/test-results/test/TEST-net.citizensnpcs.api.command.CommandContextQuotingTest.xml",
+          "bytes": 672,
+          "sha256": "14bdc936269bbe3f3e81e6b0c13cfb1871b0fb874d622180a89000d9bac2ad15"
+        },
+        {
+          "path": "artifacts/navigation-command-selected-build/test-results/test/TEST-net.citizensnpcs.api.command.CommandLocationTest.xml",
+          "bytes": 1198,
+          "sha256": "9978c5db6620f4046fb84bdc3d22d9c76ab2354128bc179dc443327d340bb00f"
+        },
+        {
+          "path": "artifacts/navigation-command-selected-build/test-results/test/TEST-net.citizensnpcs.api.command.NPCCommandTargetTest.xml",
+          "bytes": 1121,
+          "sha256": "125741af17f1a0e080a79a8039e65f2a89cf6e792f07dc6abb4894b415de27d1"
+        },
+        {
+          "path": "artifacts/navigation-command-selected-build/test-results/test/TEST-net.citizensnpcs.api.command.StrictCommandArgumentsTest.xml",
+          "bytes": 629,
+          "sha256": "23e5176400752d78bab653016fb00bc5640b22e3dd4f058a0cb8504b31691a5e"
+        },
+        {
+          "path": "artifacts/navigation-command-selected-build/test-results/test/TEST-net.citizensnpcs.api.expr.ExpressionRegistryTest.xml",
+          "bytes": 11674,
+          "sha256": "8000723e925f1c0e2a0ed24d0cbec1efd8031503b835fc560d038d2bdfb9b9d7"
+        },
+        {
+          "path": "artifacts/navigation-command-selected-build/test-results/test/TEST-net.citizensnpcs.api.expr.ExpressionScopeTest.xml",
+          "bytes": 2214,
+          "sha256": "921802106731c1e164745b062c0c87a19c77ed0220135061f312608ffde418f7"
+        },
+        {
+          "path": "artifacts/navigation-command-selected-build/test-results/test/TEST-net.citizensnpcs.api.expr.MemoryCharacterTest.xml",
+          "bytes": 648,
+          "sha256": "1508a9f9eae78c751db4f9cd656e1b2bd8670237dd96b535576a2ffab3f6604c"
+        },
+        {
+          "path": "artifacts/navigation-command-selected-build/test-results/test/TEST-net.citizensnpcs.api.expr.MemoryKeyIdentityTest.xml",
+          "bytes": 796,
+          "sha256": "4efeb4a1e3eb6a14fde0676c494453e7b1fcf8dfe38723772d12ad320f91e7ae"
+        },
+        {
+          "path": "artifacts/navigation-command-selected-build/test-results/test/TEST-net.citizensnpcs.api.expr.MemoryKeysTest.xml",
+          "bytes": 921,
+          "sha256": "375f4c98448d22ee1689434238ac1eeb125bdc45bf91cf77be7ea752fdff1fcd"
+        },
+        {
+          "path": "artifacts/navigation-command-selected-build/test-results/test/TEST-net.citizensnpcs.api.expr.MemoryListPersistenceTest.xml",
+          "bytes": 1112,
+          "sha256": "b970874f2c8dba7eef9ac68fc954e7715f38e8b09fba69a8f540e92f45a408d5"
+        },
+        {
+          "path": "artifacts/navigation-command-selected-build/test-results/test/TEST-net.citizensnpcs.api.expr.MemoryListQueriesTest.xml",
+          "bytes": 783,
+          "sha256": "45dcdf30f4fb6d446c317d8ecdbef7ddd1a1790a85cbef2bd8e245ba08beacea"
+        },
+        {
+          "path": "artifacts/navigation-command-selected-build/test-results/test/TEST-net.citizensnpcs.api.gui.InventoryMenuTest.xml",
+          "bytes": 1977,
+          "sha256": "70e3ad17d086c56e991161ba1fe70eb058dccb78aa9be9ffb194f408ce54ff08"
+        },
+        {
+          "path": "artifacts/navigation-command-selected-build/test-results/test/TEST-net.citizensnpcs.api.hpastar.HPAGraphTest.xml",
+          "bytes": 2641,
+          "sha256": "8662ece185d42cb0e9ec20fc3be96bfcfd52ccec22ee2d4910745dac1d3b1525"
+        },
+        {
+          "path": "artifacts/navigation-command-selected-build/test-results/test/TEST-net.citizensnpcs.api.npc.NPCDataStoreTest.xml",
+          "bytes": 4316,
+          "sha256": "a67f7b00b6512b4965f95861e14062c672770eb39eeb0600b46738275855b37a"
+        },
+        {
+          "path": "artifacts/navigation-command-selected-build/test-results/test/TEST-net.citizensnpcs.api.npc.templates.CommandEventRegistrationTest.xml",
+          "bytes": 1534,
+          "sha256": "35fdf333ccec90971785fb9e18a544050f7b7b1a8c78baa9ed643952b6a26b84"
+        },
+        {
+          "path": "artifacts/navigation-command-selected-build/test-results/test/TEST-net.citizensnpcs.api.npc.templates.TemplateApplicationLifecycleTest.xml",
+          "bytes": 2532,
+          "sha256": "8d1cf6351df2199253210f575fd22f2e769c28d1bd1902f0ea434e81428324e7"
+        },
+        {
+          "path": "artifacts/navigation-command-selected-build/test-results/test/TEST-net.citizensnpcs.api.npc.templates.TemplateEventPersistenceTest.xml",
+          "bytes": 1764,
+          "sha256": "927e1465e7fe60fb5978075b72b2a56d68164158802fd38d3f4fc70f28f08d7d"
+        },
+        {
+          "path": "artifacts/navigation-command-selected-build/test-results/test/TEST-net.citizensnpcs.api.npc.templates.TemplateEventReplacementTest.xml",
+          "bytes": 1043,
+          "sha256": "70a551c40add7429b3090300d39945d23024a91425a2a2b497c24c2163536642"
+        },
+        {
+          "path": "artifacts/navigation-command-selected-build/test-results/test/TEST-net.citizensnpcs.api.npc.templates.TemplateGenerationTest.xml",
+          "bytes": 2364,
+          "sha256": "a4bf5b4bf3188fcb63fbcd2acacbdff444d3ceac2c82c3f5a8449f03cc89fad0"
+        },
+        {
+          "path": "artifacts/navigation-command-selected-build/test-results/test/TEST-net.citizensnpcs.api.npc.templates.TemplateMigrationTest.xml",
+          "bytes": 3416,
+          "sha256": "5ae2902faf426b80c1acc39151c8aa27461394a7ada1e3db63257e66cf959863"
+        },
+        {
+          "path": "artifacts/navigation-command-selected-build/test-results/test/TEST-net.citizensnpcs.api.npc.templates.TemplateRegistryReloadTest.xml",
+          "bytes": 45016,
+          "sha256": "dbbcc5c028618646f0870e604c757946241ccec307e15ef929b51f0854596cce"
+        },
+        {
+          "path": "artifacts/navigation-command-selected-build/test-results/test/TEST-net.citizensnpcs.api.npc.templates.TemplateWorkspaceTest.xml",
+          "bytes": 798,
+          "sha256": "a93af5a7b9da6ee0c6cbbc166d870cc9716ae794962af145ca953efba059d095"
+        },
+        {
+          "path": "artifacts/navigation-command-selected-build/test-results/test/TEST-net.citizensnpcs.api.npc.templates.TraitTemplateFormTest.xml",
+          "bytes": 1666,
+          "sha256": "7e8b9f2115fd877f92dda56f05e17322cce19035bf9f682bd0fb20ee3f68433d"
+        },
+        {
+          "path": "artifacts/navigation-command-selected-build/test-results/test/TEST-net.citizensnpcs.api.npc.templates.YamlReplacementActionTest.xml",
+          "bytes": 1938,
+          "sha256": "ef79f7fb25a4b9f95250bb6faf8271f998509f74280636fd852dbebff3078c1e"
+        },
+        {
+          "path": "artifacts/navigation-command-selected-build/test-results/test/TEST-net.citizensnpcs.api.npc.templates.YamlReplacementValidationTest.xml",
+          "bytes": 829,
+          "sha256": "9305cfb3f918e2f60c1e9b8356ecdeb9510fda33e51cd12ec02bb9d7b13f09a0"
+        },
+        {
+          "path": "artifacts/navigation-command-selected-build/test-results/test/TEST-net.citizensnpcs.api.persistence.LocationWorldNameTest.xml",
+          "bytes": 931,
+          "sha256": "0e9bf07bd05a9bcfddd336193bbbeef2e04d340cddb867d0c07d11442e7c212b"
+        },
+        {
+          "path": "artifacts/navigation-command-selected-build/test-results/test/TEST-net.citizensnpcs.api.persistence.PersistenceDelegateFailureTest.xml",
+          "bytes": 869,
+          "sha256": "eac0bb3887bf2c26be68c0ee31b602ec65786d64f1d54d2b1e955ffa41c6b82d"
+        },
+        {
+          "path": "artifacts/navigation-command-selected-build/test-results/test/TEST-net.citizensnpcs.api.persistence.PersistenceLoaderLegacyValuesTest.xml",
+          "bytes": 11000,
+          "sha256": "8cff75b5ee0bf6f03c6b6df8493bed5874d7eb6cabdbca2161264515358ce2d7"
+        },
+        {
+          "path": "artifacts/navigation-command-selected-build/test-results/test/TEST-net.citizensnpcs.api.persistence.PersistenceMapKeysTest.xml",
+          "bytes": 819,
+          "sha256": "b64d0cd5e1ac538fd41170a65e8bab1bd6c1b24afc1a5fb6e7ee8f3326ce54be"
+        },
+        {
+          "path": "artifacts/navigation-command-selected-build/test-results/test/TEST-net.citizensnpcs.api.persistence.StrictPersistenceTest.xml",
+          "bytes": 513,
+          "sha256": "6c84a7bf18ccfb166fa8ca97f54542b830b4adcf494417b69525848e51e4b33a"
+        },
+        {
+          "path": "artifacts/navigation-command-selected-build/test-results/test/TEST-net.citizensnpcs.api.util.DurationConversionTest.xml",
+          "bytes": 766,
+          "sha256": "ec17653d3763df89ebaff0602d83429ac59d5ec4451a8309d8d87e9df349bf92"
+        },
+        {
+          "path": "artifacts/navigation-command-selected-build/test-results/test/TEST-net.citizensnpcs.api.util.DurationParsingTest.xml",
+          "bytes": 894,
+          "sha256": "30bcc3282f93e6ac6d5e72849c4e288b4834e1b6b2a16652c8c5f6a33255ea5c"
+        },
+        {
+          "path": "artifacts/navigation-command-selected-build/test-results/test/TEST-net.citizensnpcs.api.util.ItemStorageTest.xml",
+          "bytes": 3197,
+          "sha256": "439276ab05feb6eb7f08e96652a9ec3b1d3df082e9509fe4d8409829bb08cb77"
+        },
+        {
+          "path": "artifacts/navigation-command-selected-build/test-results/test/TEST-net.citizensnpcs.api.util.LegacyBukkitMetaTest.xml",
+          "bytes": 3376,
+          "sha256": "4e0ff219ee0d02a34902d01fbde8dcad684c84d444d15f6367a7e9fbb60a769f"
+        },
+        {
+          "path": "artifacts/navigation-command-selected-build/test-results/test/TEST-net.citizensnpcs.api.util.LegacyBukkitMetaTypesTest.xml",
+          "bytes": 3699,
+          "sha256": "51f736748822448f66afaa148227811e0d4a8517f1d24fc383469b8e1cc7f19e"
+        },
+        {
+          "path": "artifacts/navigation-command-selected-build/test-results/test/TEST-net.citizensnpcs.api.util.LegacyFireworksTest.xml",
+          "bytes": 4312,
+          "sha256": "2df01c96a2954fdf2cce1afe96027d86f44edc5a3a2a5097b27358d46838454d"
+        },
+        {
+          "path": "artifacts/navigation-command-selected-build/test-results/test/TEST-net.citizensnpcs.api.util.LegacyStructuredItemsTest.xml",
+          "bytes": 5173,
+          "sha256": "f46bebce488f4318c5d6e29d460a5d9f81b86bdd6a2614615d5c177328a8f0ec"
+        },
+        {
+          "path": "artifacts/navigation-command-selected-build/test-results/test/TEST-net.citizensnpcs.api.util.MemoryDataKeyCopyTest.xml",
+          "bytes": 662,
+          "sha256": "d5930d6c0f34e031ec871584c81a692d0bed6acbb1bdd0be49adefb9795f46f7"
+        },
+        {
+          "path": "artifacts/navigation-command-selected-build/test-results/test/TEST-net.citizensnpcs.api.util.MemoryDataKeyTransactionTest.xml",
+          "bytes": 2181,
+          "sha256": "8c00738c4757fbcf8ed6a1a36007a29c5fdd09da8b24ced4cccb5b2f66f2bac7"
+        },
+        {
+          "path": "artifacts/navigation-command-selected-build/test-results/test/TEST-net.citizensnpcs.api.util.NPCCommandFormatTest.xml",
+          "bytes": 1463,
+          "sha256": "df1aae0e75e4634594b0e93fa052cc7a1bbdac1fea1becc522f5d810d97af2c4"
+        },
+        {
+          "path": "artifacts/navigation-command-selected-build/test-results/test/TEST-net.citizensnpcs.api.util.PermissionDefaultsTest.xml",
+          "bytes": 1110,
+          "sha256": "273070e6171a092868cab4fa231331e50599e63ece1f0fcb69f9f25d6355dff2"
+        },
+        {
+          "path": "artifacts/navigation-command-selected-build/test-results/test/TEST-net.citizensnpcs.api.util.schedulers.adapter.NeoForgeSchedulerTest.xml",
+          "bytes": 1013,
+          "sha256": "baaa4e59ce5eeb8a26bde7474249a9be8f8af0c0f0e1a6042c45152908676944"
+        },
+        {
+          "path": "artifacts/navigation-command-selected-build/test-results/test/TEST-net.citizensnpcs.api.util.StoredItemListTest.xml",
+          "bytes": 2730,
+          "sha256": "79844a8e9ff05d3b6038fc0d7c8902ff9542a5001ccfb2bcbf2fd0b0e84134df"
+        },
+        {
+          "path": "artifacts/navigation-command-selected-build/test-results/test/TEST-net.citizensnpcs.api.util.StoredItemsTest.xml",
+          "bytes": 2990,
+          "sha256": "b58582eb5559090f4b329f54c4a02ba9be2dc016c34af5a59f7ab59571581523"
+        },
+        {
+          "path": "artifacts/navigation-command-selected-build/test-results/test/TEST-net.citizensnpcs.api.util.TextParserTest.xml",
+          "bytes": 3410,
+          "sha256": "163bac82e423f5cf58fa2a902f581c7dc0a6bd4d38a5c009702e9488e412c483"
+        },
+        {
+          "path": "artifacts/navigation-command-selected-build/test-results/test/TEST-net.citizensnpcs.api.util.TranslatorFormatTest.xml",
+          "bytes": 841,
+          "sha256": "9a375b129d12bfc6e24865238f38cad8702d087af8dbe7991ec5edf1dc13f50f"
+        },
+        {
+          "path": "artifacts/navigation-command-selected-build/test-results/test/TEST-net.citizensnpcs.api.util.TriggerAddInputTest.xml",
+          "bytes": 767,
+          "sha256": "220880a51dab17f107b6ebc715a24e41e5967a7abb128eebc09de71b27b6b556"
+        },
+        {
+          "path": "artifacts/navigation-command-selected-build/test-results/test/TEST-net.citizensnpcs.api.util.YamlStorageRoundTripTest.xml",
+          "bytes": 59910,
+          "sha256": "fb34adb70538e73b9badc17f296d9807802ea2f6acec6e6f45f606721975eb40"
+        },
+        {
+          "path": "artifacts/navigation-command-selected-build/test-results/test/TEST-net.citizensnpcs.api.util.YamlStorageWriteTest.xml",
+          "bytes": 4033,
+          "sha256": "c52a51dec2628ea59dd64774341de7beb1f4d14afa449aceb3a4feae85a760b0"
+        },
+        {
+          "path": "artifacts/navigation-command-selected-build/test-results/test/TEST-net.citizensnpcs.commands.EntityCommandParsingTest.xml",
+          "bytes": 666,
+          "sha256": "a961313c31a1a209063580987fcec5defc7f5665a63deac00ca35eeb7308b332"
+        },
+        {
+          "path": "artifacts/navigation-command-selected-build/test-results/test/TEST-net.citizensnpcs.commands.history.CommandHistoryTest.xml",
+          "bytes": 1277,
+          "sha256": "9de37f6e5ab8a4ae83f93bbf6c07ab254a4e86c374aa6db7f218fe8720b60efc"
+        },
+        {
+          "path": "artifacts/navigation-command-selected-build/test-results/test/TEST-net.citizensnpcs.commands.NavigationCommandValidationTest.xml",
+          "bytes": 1352,
+          "sha256": "23f9cd27614bea3b6c23a1a49916fa8c4b76e589c6e6385db0cf7202efe499f6"
+        },
+        {
+          "path": "artifacts/navigation-command-selected-build/test-results/test/TEST-net.citizensnpcs.commands.PresentationCommandParsingTest.xml",
+          "bytes": 1002,
+          "sha256": "6e244b018d3019d81e0916f643fada31380d388fbf2784fb2d6ae5e6cb7821f9"
+        },
+        {
+          "path": "artifacts/navigation-command-selected-build/test-results/test/TEST-net.citizensnpcs.commands.TemplateCommandValidationTest.xml",
+          "bytes": 510,
+          "sha256": "9e976674fea1fdc212d97630732a336f96e59aba970ecae2f3dac65a0383ce74"
+        },
+        {
+          "path": "artifacts/navigation-command-selected-build/test-results/test/TEST-net.citizensnpcs.npc.ai.tree.BehaviorCommandFlagsTest.xml",
+          "bytes": 788,
+          "sha256": "1037a01ddb10fd5d1a616bd8c37d35abda3a362aa04b2a5a015149b1d48ed257"
+        },
+        {
+          "path": "artifacts/navigation-command-selected-build/test-results/test/TEST-net.citizensnpcs.npc.ai.tree.BehaviorTreeParserTest.xml",
+          "bytes": 9174,
+          "sha256": "6f094bb66517f93f2beba21b3d0436796a1ddbea27d607935bb028f976a3609d"
+        },
+        {
+          "path": "artifacts/navigation-command-selected-build/test-results/test/TEST-net.citizensnpcs.npc.ai.tree.MolangMemoryBindingTest.xml",
+          "bytes": 1451,
+          "sha256": "d2b09534d75a36053ea7b430ecab51c97775b875aa844b503caf9e4e43e6d674"
+        },
+        {
+          "path": "artifacts/navigation-command-selected-build/test-results/test/TEST-net.citizensnpcs.npc.ai.tree.MolangScopeIsolationTest.xml",
+          "bytes": 12096,
+          "sha256": "1223b9d773a93ceb50f087848e88acbcb9891cfb32c3d05ff09eeb6859a1468c"
+        },
+        {
+          "path": "artifacts/navigation-command-selected-build/test-results/test/TEST-net.citizensnpcs.npc.skin.SkinCacheReloadTest.xml",
+          "bytes": 1200,
+          "sha256": "bbab6a69ac471962ab50df14d0b2f15fdecec9b1b8af5e88cc711aec3b167379"
+        },
+        {
+          "path": "artifacts/navigation-command-selected-build/test-results/test/TEST-net.citizensnpcs.SettingsTest.xml",
+          "bytes": 35769,
+          "sha256": "e191aa2609235439f014f6fdd58e5bed8d8a245ed2eb4eac3b4b9aa0f3cc03ff"
+        },
+        {
+          "path": "artifacts/navigation-command-selected-build/test-results/test/TEST-net.citizensnpcs.trait.HologramItemTest.xml",
+          "bytes": 899,
+          "sha256": "e77ac5b19e4089ff65b944e938e01675f595370e3edaa36c353470359508ce8b"
+        },
+        {
+          "path": "artifacts/navigation-command-selected-build/test-results/test/TEST-net.citizensnpcs.trait.SentinelTargetMatchingTest.xml",
+          "bytes": 1141,
+          "sha256": "9ee8f54c717649b03f3d6cf62fc8dbdb4357302a3183d21b89c4a4b82ab51ba6"
+        },
+        {
+          "path": "artifacts/navigation-command-selected-build/test-results/test/TEST-net.citizensnpcs.trait.shop.ExperienceArithmeticTest.xml",
+          "bytes": 777,
+          "sha256": "90148b3abedfcd775750fb0fe482d3e2dcf4c46e412f2c8376a553ee04ad4a87"
+        },
+        {
+          "path": "artifacts/navigation-command-selected-build/test-results/test/TEST-net.citizensnpcs.trait.shop.InventoryPublicationRecoveryTest.xml",
+          "bytes": 1503,
+          "sha256": "0ff0b96ccac6d379967ab5fea6f7b2dfb74ee7f61de6a540fa9f40d4005935c1"
+        },
+        {
+          "path": "artifacts/navigation-command-selected-build/test-results/test/TEST-net.citizensnpcs.trait.shop.InventoryTransactionIsolationTest.xml",
+          "bytes": 1199,
+          "sha256": "968313954a44bab36382bfb07c203426799e8e26dbf98c7036e9d8781f70aa38"
+        },
+        {
+          "path": "artifacts/navigation-command-selected-build/test-results/test/TEST-net.citizensnpcs.trait.shop.ItemActionTest.xml",
+          "bytes": 1583,
+          "sha256": "77692e66dc9326b993b8746df3efc7ea0a7cc8f6d5c547a1f726663dac862003"
+        },
+        {
+          "path": "artifacts/navigation-command-selected-build/test-results/test/TEST-net.citizensnpcs.trait.shop.ItemQuantityTest.xml",
+          "bytes": 1437,
+          "sha256": "c46eb9a1f1e341f1eaf64aab21011aade5581cd838d3559a6a12a736d9d2e85c"
+        },
+        {
+          "path": "artifacts/navigation-command-selected-build/test-results/test/TEST-net.citizensnpcs.trait.shop.ItemReceiptTest.xml",
+          "bytes": 1208,
+          "sha256": "5e2c8e2b13e823548bfd1f0c424dde06c9c50816058698dd7792ccba24942065"
+        },
+        {
+          "path": "artifacts/navigation-command-selected-build/test-results/test/TEST-net.citizensnpcs.trait.shop.MoneyArithmeticTest.xml",
+          "bytes": 899,
+          "sha256": "6dc45f4eeda41f0c3633b1b66c7272cb456678010d27bdee24de31852f6b5cd5"
+        },
+        {
+          "path": "artifacts/navigation-command-selected-build/test-results/test/TEST-net.citizensnpcs.trait.shop.NPCShopTest.xml",
+          "bytes": 1602,
+          "sha256": "814b4193db7b032b5e358ea2623b2bddc8a4c94a07af68a4e78806c99d970a42"
+        },
+        {
+          "path": "artifacts/navigation-command-selected-build/test-results/test/TEST-net.citizensnpcs.trait.shop.ShopSessionOwnerTest.xml",
+          "bytes": 662,
+          "sha256": "97ed731ac0f9a7bea737bd37aa1513660a481b19aff0a5a5fe0f56aeb27def00"
+        },
+        {
+          "path": "artifacts/navigation-command-selected-build/test-results/test/TEST-net.citizensnpcs.trait.shop.ShopTransactionTest.xml",
+          "bytes": 1067,
+          "sha256": "624e86668fabcc50645beff95bc3262eee0e882de04beb06061e7b55af4ad598"
+        },
+        {
+          "path": "artifacts/navigation-command-selected-build/test-results/test/TEST-net.citizensnpcs.trait.shop.StoredShopsTest.xml",
+          "bytes": 2717,
+          "sha256": "0a8b486e0a9995cd1893eb5a876c32d1c940f522ed49b65377b9c3d902d37957"
+        },
+        {
+          "path": "artifacts/navigation-command-selected-build/test-results/test/TEST-net.citizensnpcs.trait.text.TextEditorInputTest.xml",
+          "bytes": 771,
+          "sha256": "8f419c0007bbb6563c7507c4d11db92f1c3434fce35d00852bbc05d10f77d294"
+        },
+        {
+          "path": "artifacts/navigation-command-selected-build/test-results/test/TEST-net.citizensnpcs.trait.TraitNameMappingTest.xml",
+          "bytes": 1070,
+          "sha256": "12a40be2119ad27e78dbcf9a64c45d04e689580f836e595037556f64f6aa571b"
+        },
+        {
+          "path": "artifacts/navigation-command-selected-build/test-results/test/TEST-net.citizensnpcs.trait.waypoint.triggers.NumericTriggerInputTest.xml",
+          "bytes": 869,
+          "sha256": "070f69871eaadf785563d776e6aa16c44493238fa3218e07c94837051ed26bf0"
+        },
+        {
+          "path": "artifacts/navigation-command-selected-build/test-results/test/TEST-net.citizensnpcs.trait.waypoint.triggers.TeleportTriggerInputTest.xml",
+          "bytes": 850,
+          "sha256": "181702747a99825d1dea12ab5faee4723790ccee3d5ae6dbfd489edb393c6a6a"
+        },
+        {
+          "path": "artifacts/navigation-command-selected-build/test-results/test/TEST-net.citizensnpcs.trait.waypoint.triggers.WaypointTriggerSaveTest.xml",
+          "bytes": 1024,
+          "sha256": "517eb4c85336a141096ef782780c268ab7ad32de0ada07341d2e254806a6e007"
+        },
+        {
+          "path": "artifacts/navigation-command-selected-build/test-results/test/TEST-net.citizensnpcs.util.CommerceTaskJournalTest.xml",
+          "bytes": 2373,
+          "sha256": "0915f0a7308c3dd5e8e4a5446d5faf37f1a102ddf5b50b23607bb2e51e7101fa"
+        },
+        {
+          "path": "artifacts/navigation-command-selected-build/test-results/test/TEST-net.citizensnpcs.util.DimensionLookupTest.xml",
+          "bytes": 748,
+          "sha256": "8999880225a1893d3928c7cd045334074784bba2a7ce4944e7b4ea8ba8e97d69"
+        },
+        {
+          "path": "artifacts/navigation-command-selected-build/test-results/test/TEST-net.citizensnpcs.util.EconomyShopMenusTest.xml",
+          "bytes": 607,
+          "sha256": "27dc07f203c783d18bf07e2c86f88aa9abfa3f916fcbb65a530775e781c886ff"
+        },
+        {
+          "path": "artifacts/navigation-command-selected-build/test-results/test/TEST-net.citizensnpcs.util.JournalRecordDecodingTest.xml",
+          "bytes": 5321,
+          "sha256": "7d207e4ca8787b29522ab542be6dfca546d2f031c638adcb4f1da1f542859c62"
+        },
+        {
+          "path": "artifacts/navigation-command-selected-build/test-results/test/TEST-net.citizensnpcs.util.LuckPermsGroupsTest.xml",
+          "bytes": 609,
+          "sha256": "fb5a9646a46e336caffdce3f0acd62c1aa7d8da38940d72a307f6053d628c50f"
+        },
+        {
+          "path": "artifacts/navigation-command-selected-build/test-results/test/TEST-net.citizensnpcs.util.ParadigmGroupsTest.xml",
+          "bytes": 1211,
+          "sha256": "6f6557b5d6e15fb0c9ea48ea62d4037d9ee74fa41a4b2a64ad7d0d4c3d7c3462"
+        },
+        {
+          "path": "artifacts/navigation-command-selected-build/test-results/test/TEST-net.citizensnpcs.util.ParadigmPermissionWriterTest.xml",
+          "bytes": 2862,
+          "sha256": "36e6d651fd5836a4b62368dbe6bdaa714463caac9145f885d6a2a1c368df05ef"
+        },
+        {
+          "path": "artifacts/navigation-command-selected-build/test-results/test/TEST-net.citizensnpcs.util.ProviderPlaceholderExportsTest.xml",
+          "bytes": 1092,
+          "sha256": "9ee33de4d757e51e5b4bc7542efa21352054e97b7bb78e18f95210914a85d108"
+        },
+        {
+          "path": "artifacts/navigation-command-selected-build/test-results/test/TEST-net.citizensnpcs.util.QuestDeliveryJournalTest.xml",
+          "bytes": 1865,
+          "sha256": "40b251bba54a0a00fec5bc899d577ff2f131158433a98c097c614daaf5f824cb"
+        },
+        {
+          "path": "artifacts/navigation-command-selected-build/test-results/test/TEST-net.citizensnpcs.util.QuestDeliveryStorageTest.xml",
+          "bytes": 1137,
+          "sha256": "cb03388bee28f8255e8311469c0c9ae08f2f0590514d0aba24c8b1922bd1f73d"
+        },
+        {
+          "path": "artifacts/navigation-command-selected-build/test-results/test/TEST-net.citizensnpcs.util.QuestEvidenceJournalTest.xml",
+          "bytes": 2811,
+          "sha256": "c2c1019874073566b1e49ba33fc007815ea8a87bcb6920597263e26d73310211"
+        },
+        {
+          "path": "artifacts/navigation-command-selected-build/test-results/test/TEST-net.citizensnpcs.util.QuestRewardJournalTest.xml",
+          "bytes": 1538,
+          "sha256": "12a9371ea354d24395fa9a3af7a2dfb59b425a422d57e7ebef1f1dd5e031e7f3"
+        },
+        {
+          "path": "artifacts/navigation-command-selected-build/test-results/test/TEST-net.citizensnpcs.util.YuuniverseEconomyTest.xml",
+          "bytes": 1500,
+          "sha256": "2a36db61988606d5ced610f2c1bb1cfbb1c0ec91e4c13460595956a8d60bb9fd"
+        }
+      ],
+      "nativeChecks": 229,
+      "nativeLog": {
+        "path": "artifacts/navigation-command-native-final-248.log",
+        "bytes": 45727,
+        "sha256": "f03c416ecff05ff2728c6e1e7bf88efa8ae0c92eae2dfbadc06832bd5f134d69"
+      },
+      "completion": {
+        "path": "artifacts/navigation-command-final-248-server/complete.json",
+        "bytes": 15551,
+        "sha256": "aa40d433f7c43b7ac96ea6401423cb0589c7bafb47eb0fe942289b6022a5eb48"
+      },
+      "saves": {
+        "path": "artifacts/navigation-command-final-248-server/config/citizens/saves.yml",
+        "bytes": 1414,
+        "sha256": "2c5500889469492cd217307862f50f3a5ac5077f1bfe25293690916cb074447a"
+      },
+      "entityRegions": [
+        {
+          "path": "artifacts/navigation-command-final-248-server/navigation-command-world/entities/r.-1.-1.mca",
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "path": "artifacts/navigation-command-final-248-server/navigation-command-world/entities/r.-1.0.mca",
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "path": "artifacts/navigation-command-final-248-server/navigation-command-world/entities/r.0.-1.mca",
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "path": "artifacts/navigation-command-final-248-server/navigation-command-world/entities/r.0.0.mca",
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        }
+      ],
+      "finalStates": [
+        {
+          "uuid": "39586869-43c6-4c4e-a1d5-931df967be1a",
+          "name": "ordinaryNavigation",
+          "location": {
+            "world": "minecraft:overworld",
+            "x": 4.6591,
+            "y": -60.0,
+            "z": 4.5269,
+            "bodyYaw": 86.59743,
+            "pitch": 68.9695,
+            "yaw": 86.5974
+          },
+          "distanceToGoal": 0.8438225050329008
+        },
+        {
+          "uuid": "3af59df6-f83a-4c8d-99b9-10bc05b37caf",
+          "name": "packetNavigation",
+          "location": {
+            "world": "minecraft:overworld",
+            "x": 4.5222,
+            "y": -60.0,
+            "z": 7.5497,
+            "bodyYaw": 85.20093,
+            "pitch": 45.0849,
+            "yaw": 85.2009
+          },
+          "distanceToGoal": 0.7581971577366927
+        }
+      ],
+      "productionClassesMatchNative": 1024,
+      "packages": [
+        {
+          "path": "artifacts/navigation-command-selected-build/libs/citizens-2.0.43-neoforge-SNAPSHOT-sources.jar",
+          "bytes": 1131961,
+          "sha256": "b36a5033aa2e4e6a48337386617940788e007fa031d1bbf163276db335ceffc9"
+        },
+        {
+          "path": "artifacts/navigation-command-selected-build/libs/citizens-2.0.43-neoforge-SNAPSHOT.jar",
+          "bytes": 4101933,
+          "sha256": "9a9c06d812bc7a70c785b5dfd329e5f5f4d7c4412a0fac7c94002c26fb695ee0"
+        },
+        {
+          "path": "artifacts/navigation-command-selected-build/libs/yuuniverse-interactions-2.0.43-neoforge-SNAPSHOT.jar",
+          "bytes": 204146,
+          "sha256": "e21194f4a71ed2e6dc889c68b8256701da8e0a6deae35c5c772dcce3344753a0"
+        }
+      ]
+    }
+  ],
+  "regressions": [
+    {
+      "name": "interaction-label",
+      "checks": 393,
+      "log": {
+        "path": "artifacts/navigation-interaction-label-regression.log",
+        "bytes": 67084,
+        "sha256": "85b96b859da2e425f668cc0b4a88f746b6271741100a2465f773835e5f867b90"
+      },
+      "productionClassesMatchNative": 1024
+    },
+    {
+      "name": "packet-hologram",
+      "checks": 170,
+      "log": {
+        "path": "artifacts/navigation-packet-hologram-regression.log",
+        "bytes": 39899,
+        "sha256": "2c3d1bdc6afb2b237810ae5d64efc75e55c6c4b9c51eb92b243c77ef9fa8a3a7"
+      },
+      "productionClassesMatchNative": 1024
+    }
+  ],
+  "totalNativeChecks": 1021,
+  "negativeControl": {
+    "path": "artifacts/navigation-command-native-before.log",
+    "bytes": 20738,
+    "sha256": "ef4b3b5715f332fb361c280388b4ea8b544158e34d96fdbf3fff371bdd9af71a"
+  },
+  "originalUnitFailures": [
+    {
+      "path": "artifacts/navigation-command-before-test-results/TEST-net.citizensnpcs.commands.NavigationCommandValidationTest.xml",
+      "bytes": 11910,
+      "sha256": "20c8e855fa0c309ae672a714e2837f06c318f3a3b03a50115f28f94d88099ebf"
+    }
+  ],
+  "excludedNativeAttempts": [
+    {
+      "path": "artifacts/navigation-command-native-233.log",
+      "bytes": 45361,
+      "sha256": "cef02243a37e2a2377982750c3610f40308b996586a4462aead8ef2584184c79"
+    },
+    {
+      "path": "artifacts/navigation-command-native-233-retry.log",
+      "bytes": 46283,
+      "sha256": "21af87ca4af7075fef8da4ea9be3648bf7441268dbd25d1a928d23500840a3e1"
+    }
+  ],
+  "replayGuard": {
+    "protectedFiles": 142,
+    "before": {
+      "path": "artifacts/navigation-command-replay-guard-before.json",
+      "bytes": 23090,
+      "sha256": "b349f05d282dc43f42b10b381803df207fe93d4bf532d5d0da7f0116804fe9be"
+    },
+    "log": {
+      "path": "artifacts/navigation-command-replay-guard.log",
+      "bytes": 1266,
+      "sha256": "2adc665791677cfcf0a44a1eb12d6807ce846adeec578978915760855c6a5b32"
+    },
+    "process": {
+      "path": "artifacts/navigation-command-replay-guard-exit.json",
+      "bytes": 77,
+      "sha256": "a4c81bbfc2024518be920964bc5c30799fed3444f1389e54dd25254e11356cd1"
+    }
+  },
+  "sources": [
+    {
+      "path": "neoforge/src/main/java/net/citizensnpcs/commands/NPCCommands.java",
+      "bytes": 234150,
+      "sha256": "acd41dfd9d2337074f0d68976b1a480037b97d679e09501025f03d06ea8be8e8"
+    },
+    {
+      "path": "neoforge/src/main/java/net/citizensnpcs/trait/PacketNPC.java",
+      "bytes": 13892,
+      "sha256": "c82713c4aa867973633a3e1a6f3e020e63ae22c4ebf985683e551f046798522c"
+    },
+    {
+      "path": "neoforge/src/main/java/net/citizensnpcs/mixin/ServerLevelPassengerMixin.java",
+      "bytes": 2568,
+      "sha256": "056081d454eddb945b28592041f052417e1ab74811d2cb05d77c80dcc258d1d7"
+    },
+    {
+      "path": "neoforge/src/main/java/net/citizensnpcs/npc/ai/MCNavigationStrategy.java",
+      "bytes": 8082,
+      "sha256": "be84cb5c32a5d5a2985cfd6220fa9237158ab241d908eda469f0a82184e53c45"
+    },
+    {
+      "path": "neoforge/src/test/java/net/citizensnpcs/commands/NavigationCommandValidationTest.java",
+      "bytes": 5704,
+      "sha256": "0c13839d5982dd953d8bd6b8338ccb2a0f7583be630b1a0fc17375a2dde31e25"
+    },
+    {
+      "path": "tools/prepare-navigation-command-audit.ps1",
+      "bytes": 1659,
+      "sha256": "0d91601a01c15df855e60253d613b7676f28d6474e483c93f2542fe7b2c34d94"
+    },
+    {
+      "path": "tools/navigation-command-runtime-audit.gradle",
+      "bytes": 3286,
+      "sha256": "c07c1ff154d5a78f8e61f3808ed4bf8a2e56ee176a568a8ef5e9c93a43974e1d"
+    },
+    {
+      "path": "tools/navigation-command-runtime-audit/net/citizensnpcs/audit/NavigationCommandRuntimeAudit.java",
+      "bytes": 15729,
+      "sha256": "674146f92693a3faffe92aa9738b4370cf8699281b90a32b11df4fab1985e510"
+    },
+    {
+      "path": "tools/record-navigation-command-validation.py",
+      "bytes": 11742,
+      "sha256": "e714af85527626d86828a34d3fcab808721edcb1815dfc79169f03730cff2bdf"
+    },
+    {
+      "path": "tools/record-guard-restart-validation.py",
+      "bytes": 15367,
+      "sha256": "207eaf9d9854560651d9ad79b0de5e5e7a932367eed9fd6180339642e4631249"
+    },
+    {
+      "path": "tools/interaction-label-runtime-audit/net/citizensnpcs/audit/InteractionLabelRuntimeAudit.java",
+      "bytes": 21267,
+      "sha256": "804dbcffa4e056629794c098e3b05925bcea245b0ca71d6a7326ac6ac62903bb"
+    },
+    {
+      "path": "tools/packet-hologram-runtime-audit/net/citizensnpcs/audit/PacketHologramRuntimeAudit.java",
+      "bytes": 26770,
+      "sha256": "27d91a99026b2702f29cfa1bb5356851fc9f1f7cb72e58010466d384b37148fc"
+    }
+  ],
+  "limits": [
+    "Native synthetic actors; ordinary physical-client test remains deferred",
+    "Packet entity simulation is limited to active unpaused navigation on unmounted virtual roots",
+    "No production restart, provider activation or release publication"
+  ]
+}

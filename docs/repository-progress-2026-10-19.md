@@ -1,5 +1,13 @@
 # Repository progress review
 
+Update 2026-10-24, UTC+08:00: [navigation command validation and virtual movement](navigation-commands-2026-10-24.md)
+pass complete ordinary builds with 842 tests and 229 native navigation checks
+per target. Invalid edits preserve state, active packet roots receive native
+movement ticks, and vanilla location paths request the actual target block.
+Fresh label/mount regressions pass 563 checks, for 1,021 accepted native checks.
+Independent stopped YAML/NBT, production-class and separate-package verification
+passes. The next core gap is persistence of attack range/delay and path distance margin.
+
 Update 2026-10-24, UTC+08:00: [template event persistence](template-event-persistence-2026-10-24.md)
 now has complete ordinary build/test runs (836 tests per target) and 126 native
 seed/restart checks on 21.1.233/21.1.248. Stopped NPC YAML and scoreboard NBT are

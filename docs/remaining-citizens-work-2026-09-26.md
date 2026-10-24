@@ -1,5 +1,12 @@
 # Remaining Citizens work
 
+2026-10-24, UTC+08:00: [navigation command validation and actual virtual walking](navigation-commands-2026-10-24.md)
+pass 842 unit tests and 229 native navigation checks per supported target.
+Fresh label/mount regressions pass 563 checks; independent stopped-state,
+production-class and package verification passes (1,021 accepted native checks total).
+Next core work: persist command-edited attack range/delay and path distance margin
+through save/restart; the current navigator serializer omits these parameters.
+
 2026-10-24, UTC+08:00: [current core completion scope](core-completion-scope-2026-10-24.md)
 supersedes older individual third-party implementation/acceptance gates below.
 Preserve existing integrations and provide stable native extension interfaces;
