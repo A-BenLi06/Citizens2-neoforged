@@ -6,6 +6,13 @@ Repository: `A-BenLi06/Citizens2-neoforged` (public).
 Release tag: `v2.0.43-neoforge-20261024`.
 Release notes: [2026-10-24 snapshot](release-2026-10-24.md).
 
+Published 2026-10-24T12:36:08+08:00 (UTC+08:00) as a non-draft prerelease:
+https://github.com/A-BenLi06/Citizens2-neoforged/releases/tag/v2.0.43-neoforge-20261024
+
+The annotated release tag points to `08d43ea`. All 12 uploaded assets were
+verified against GitHub's reported SHA-256 digest, byte size and upload state
+before publication. The existing release was retained.
+
 Public asset staging: `artifacts/github-release-2026-10-24/`.
 Combined ZIP: `citizens-neoforge-deployment-2026-10-24.zip`.
 Size: 38,671,513 bytes.
