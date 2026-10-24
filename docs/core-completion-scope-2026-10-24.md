@@ -33,10 +33,13 @@ target block. Both supported targets pass 842 ordinary tests and 229 native
 navigation checks each. Fresh label/mount regressions pass another 563 checks;
 independent stopped YAML/NBT, production-class and package verification passes.
 
-The next demonstrated core persistence gap is in `CitizensNavigator.save/load`:
-command-edited attack range, attack delay and path distance margin are absent
-from serialization. Verify and repair their save/restart behavior next. Physical
-ordinary-client acceptance remains deferred.
+The [navigation settings persistence repair](navigation-settings-persistence-2026-10-24.md)
+now retains command-edited attack range/delay and path distance margin through
+cloning, snapshots, reload and restart. Both targets pass 847 ordinary tests and
+122 native seed/restart checks each. Default snapshots clear stale overrides
+for these fields. Independent saved-state/class/package verification passes.
+Review other navigation scalar defaults and remaining Citizens-owned contracts
+next. Physical ordinary-client acceptance remains deferred.
 
 The interrupted GriefLogger lookup experiment is superseded draft work. Its
 already-started original-provider reproduction stopped normally and the draft

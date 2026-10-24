@@ -24,15 +24,16 @@ allprojects {
         }
         p.sourceSets.main.java.srcDir(p.file('../tools/' + (regression ?: 'navigation-command') + '-runtime-audit'))
         p.neoForge.runs.named('server') { gameDirectory = fixture.toFile() }
-        p.tasks.named('prepareServerRun') {
-            doLast {
+        def checkFixture = {
                 if (!fixture.resolve('navigation-command-fixture.txt').toFile().isFile()
                         || fixture.resolve('complete.json').toFile().exists()
                         || fixture.resolve('logs/latest.log').toFile().exists())
                     throw new GradleException('Prepare a fresh isolated fixture; preserve accepted attempts')
-            }
         }
+        p.tasks.named('prepareServerRun') { doLast { checkFixture() } }
         p.tasks.named('runServer') {
+            // Preparation may be UP-TO-DATE; always reject completed/attempted fixtures before Java starts.
+            doFirst { checkFixture() }
             timeout = java.time.Duration.ofMinutes(4)
             doLast {
                 def log = fixture.resolve('logs/latest.log').toFile().getText('UTF-8')

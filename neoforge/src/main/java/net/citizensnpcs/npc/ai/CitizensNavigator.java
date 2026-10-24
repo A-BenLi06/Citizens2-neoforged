@@ -204,6 +204,10 @@ public class CitizensNavigator implements Navigator, Runnable {
         if (root.keyExists("distancemargin")) {
             defaultParams.distanceMargin(root.getDouble("distancemargin"));
         }
+        // Missing override keys represent the configured defaults, including a snapshot loaded onto a live NPC.
+        defaultParams.pathDistanceMargin(root.getDouble("pathdistancemargin", Setting.DEFAULT_PATH_DISTANCE_MARGIN.asDouble()));
+        defaultParams.attackRange(root.getDouble("attackrange", Setting.NPC_ATTACK_DISTANCE.asDouble()));
+        defaultParams.attackDelayTicks(root.getInt("attackdelayticks", DEFAULT_ATTACK_DELAY_TICKS));
         if (root.keyExists("destinationteleportmargin")) {
             defaultParams.destinationTeleportMargin(root.getDouble("destinationteleportmargin"));
         }
@@ -230,6 +234,10 @@ public class CitizensNavigator implements Navigator, Runnable {
                 Setting.DEFAULT_DESTINATION_TELEPORT_MARGIN.asDouble());
         writeOrClearDouble(root, "distancemargin", defaultParams.distanceMargin(),
                 Setting.DEFAULT_DISTANCE_MARGIN.asDouble());
+        writeOrClearDouble(root, "pathdistancemargin", defaultParams.pathDistanceMargin(),
+                Setting.DEFAULT_PATH_DISTANCE_MARGIN.asDouble());
+        writeOrClearDouble(root, "attackrange", defaultParams.attackRange(), Setting.NPC_ATTACK_DISTANCE.asDouble());
+        writeOrClearInt(root, "attackdelayticks", defaultParams.attackDelayTicks(), DEFAULT_ATTACK_DELAY_TICKS);
         writeOrClearInt(root, "updatepathrate", defaultParams.updatePathRate(),
                 Setting.DEFAULT_PATHFINDER_UPDATE_PATH_RATE.asTicks());
         // upstream compares this one against asTicks() of a plain block count, which is a copy-paste slip; the setting is
@@ -721,4 +729,5 @@ public class CitizensNavigator implements Navigator, Runnable {
             ResourceLocation.fromNamespaceAndPath(Citizens.MOD_ID, "navigation_chunk_ticket"),
             CitizensNavigator::releaseStaleTickets);
     private static final float UNINITIALISED_SPEED = 0.3f;
+    private static final int DEFAULT_ATTACK_DELAY_TICKS = new NavigatorParameters().attackDelayTicks();
 }

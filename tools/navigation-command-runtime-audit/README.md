@@ -20,7 +20,9 @@ Set-Location neoforge
 
 Choose new names for every attempt. Preparation rejects existing directories;
 launch rejects prior server logs or completion markers before starting Java. Preserve failed
-worlds/logs rather than repairing evidence in place.
+worlds/logs rather than repairing evidence in place. Execution repeats the
+preflight even if preparation is cached/skipped; see the navigation settings
+acceptance report for the retained cache-bypass reproduction and corrected checks.
 
 The command probe uses actual Brigadier dispatch for ordinary and packet pig NPCs.
 It checks rejected compound edits, numeric boundaries, non-finite/overflow values,

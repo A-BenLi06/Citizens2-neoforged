@@ -68,8 +68,9 @@ pins sources, XML results, packages, native evidence and excluded attempts.
 
 Review also confirmed a remaining persistence gap: `CitizensNavigator.save/load`
 omits command-edited attack range, attack delay and path distance margin. The
-native tests above verify those live settings; this batch does not claim that
-the omitted settings survive restart. That is the next core repair.
+native tests above verify those live settings. The subsequent
+[navigation settings repair](navigation-settings-persistence-2026-10-24.md) now
+adds cloning, reload and full-restart persistence coverage for those fields.
 
 Workflow: [native audit instructions](../tools/navigation-command-runtime-audit/README.md).
 Physical ordinary-client acceptance remains explicitly deferred. No production

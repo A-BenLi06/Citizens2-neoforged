@@ -1,0 +1,45 @@
+allprojects {
+    def outputPath = gradle.startParameter.projectProperties.get('navigationSettingsBuildDir')
+    if (outputPath == null) throw new GradleException('Supply an isolated navigationSettingsBuildDir')
+    layout.buildDirectory.set(file(outputPath))
+    afterEvaluate { p ->
+        if (p.extensions.findByName('neoForge') == null) return
+        def fixturePath = gradle.startParameter.projectProperties.get('navigationSettingsFixture')
+        if (fixturePath == null) throw new GradleException('Supply an isolated navigationSettingsFixture')
+        def artifacts = p.file('../artifacts').toPath().toAbsolutePath().normalize()
+        def fixture = p.file(fixturePath).toPath().toAbsolutePath().normalize()
+        def output = p.layout.buildDirectory.get().asFile.toPath().toAbsolutePath().normalize()
+        if (!fixture.startsWith(artifacts) || !output.startsWith(artifacts))
+            throw new GradleException('Fixture and build must be confined to task artifacts')
+        def original = gradle.startParameter.projectProperties.get('navigationSettingsOriginalSources')
+        if (original != null) {
+            def source = p.file(original).toPath().toAbsolutePath().normalize()
+            if (!source.startsWith(artifacts)) throw new GradleException('Original sources must be under artifacts')
+            p.sourceSets.main.java.setSrcDirs([source.toFile()])
+        }
+        p.sourceSets.main.java.srcDir(p.file('../tools/navigation-settings-runtime-audit'))
+        p.neoForge.runs.named('server') { gameDirectory = fixture.toFile() }
+        def checkPhase = {
+                if (!fixture.resolve('navigation-settings-fixture.txt').toFile().isFile())
+                    throw new GradleException('Prepare an isolated navigation settings fixture first')
+                def phase = fixture.resolve('phase.txt').toFile().text.strip()
+                if (!(phase in ['seed', 'recover']) || fixture.resolve(phase + '.started').toFile().exists())
+                    throw new GradleException('Invalid or attempted phase; preserve the prior run')
+        }
+        p.tasks.named('prepareServerRun') { doLast { checkPhase() } }
+        p.tasks.named('runServer') {
+            // Preparation may be UP-TO-DATE on restart. This check must run on every Java execution.
+            doFirst { checkPhase() }
+            timeout = java.time.Duration.ofMinutes(4)
+            doLast {
+                def log = fixture.resolve('logs/latest.log').toFile().getText('UTF-8')
+                if (original != null) {
+                    if (!log.contains('AssertionError: ordinary_snapshot_contains_attack_settings'))
+                        throw new GradleException('Original navigation settings loss was not reproduced')
+                } else if (log.contains('[NAVSETTINGSAUDIT] FAILED') || !log.contains('[NAVSETTINGSAUDIT] COMPLETE')) {
+                    throw new GradleException('Navigation settings audit failed or incomplete')
+                }
+            }
+        }
+    }
+}

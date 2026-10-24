@@ -6,7 +6,11 @@ per target. Invalid edits preserve state, active packet roots receive native
 movement ticks, and vanilla location paths request the actual target block.
 Fresh label/mount regressions pass 563 checks, for 1,021 accepted native checks.
 Independent stopped YAML/NBT, production-class and separate-package verification
-passes. The next core gap is persistence of attack range/delay and path distance margin.
+passes. The [navigation settings persistence follow-up](navigation-settings-persistence-2026-10-24.md)
+now retains attack range/delay and path distance margin through clone, reload and
+full restart. Both targets pass 847 ordinary tests and 122 native checks each;
+independent saved-state and release provenance checks pass. Remaining navigation
+scalar default restoration still needs review. Physical-client acceptance stays deferred.
 
 Update 2026-10-24, UTC+08:00: [template event persistence](template-event-persistence-2026-10-24.md)
 now has complete ordinary build/test runs (836 tests per target) and 126 native

@@ -1,0 +1,1627 @@
+{
+  "recordedAt": "2026-10-24T12:03:45.169133+08:00",
+  "totalNativeChecks": 244,
+  "targets": [
+    {
+      "neoForge": "21.1.233",
+      "tests": {
+        "tests": 847,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "suites": 118,
+      "unitLog": {
+        "path": "artifacts/navigation-settings-unit-final.log",
+        "bytes": 76035,
+        "sha256": "ca87203cca91fa88ba60fb93a39c65678f2fd12cfa6fe650854b4a6177e64c14"
+      },
+      "reports": [
+        {
+          "path": "artifacts/navigation-settings-unit-build/test-results/test/TEST-net.citizensnpcs.api.ai.BehaviorRemovalTest.xml",
+          "bytes": 1173,
+          "sha256": "fe08e2e48c7a68919f0ae903d7b97975c0bd44bd8e8741fdac4285db539499e8"
+        },
+        {
+          "path": "artifacts/navigation-settings-unit-build/test-results/test/TEST-net.citizensnpcs.api.ai.CoalescedBehaviorTest.xml",
+          "bytes": 1061,
+          "sha256": "0d7433dd555036e40fcd61887ceec7818f26515a4a96ba57c7dd5461ede86efc"
+        },
+        {
+          "path": "artifacts/navigation-settings-unit-build/test-results/test/TEST-net.citizensnpcs.api.ai.IfElseResetTest.xml",
+          "bytes": 482,
+          "sha256": "7113a178163b2c53959937da4d285c3d3673cb0ddd116e222158203c419ff383"
+        },
+        {
+          "path": "artifacts/navigation-settings-unit-build/test-results/test/TEST-net.citizensnpcs.api.ai.ParallelBehaviorLifecycleTest.xml",
+          "bytes": 955,
+          "sha256": "180b4d59d06ce1ace551581c4973d4b4448aaedfe5eedaf77196a352b7d847cd"
+        },
+        {
+          "path": "artifacts/navigation-settings-unit-build/test-results/test/TEST-net.citizensnpcs.api.ai.ParallelCompositeTest.xml",
+          "bytes": 910,
+          "sha256": "ef27fb5b97d42f1362e1854fe9a9eb171c145cefbe837ad02a20b73bee174ffb"
+        },
+        {
+          "path": "artifacts/navigation-settings-unit-build/test-results/test/TEST-net.citizensnpcs.api.ai.SelectorTerminalResetTest.xml",
+          "bytes": 651,
+          "sha256": "d3f11a308000401843b633d6c1d815230fc78f6ce2848a1fe2a4b9c29eeb8af0"
+        },
+        {
+          "path": "artifacts/navigation-settings-unit-build/test-results/test/TEST-net.citizensnpcs.api.ai.SequenceRemovalTest.xml",
+          "bytes": 902,
+          "sha256": "63786dbde48c483d6eade2a3ff0ab85eb80ebb2475a3a9fd3eceb7d6c057728f"
+        },
+        {
+          "path": "artifacts/navigation-settings-unit-build/test-results/test/TEST-net.citizensnpcs.api.ai.SequenceResetCallbackTest.xml",
+          "bytes": 654,
+          "sha256": "607a78e318b52b068ffa5fdfb1171ded754ec42f9b414dca759a53896e3fc308"
+        },
+        {
+          "path": "artifacts/navigation-settings-unit-build/test-results/test/TEST-net.citizensnpcs.api.ai.TimeoutDecoratorTest.xml",
+          "bytes": 2045,
+          "sha256": "d878509c558ff99064d3d74c8cf28c0f50ffe84d99a613b9023c33ef308fb54f"
+        },
+        {
+          "path": "artifacts/navigation-settings-unit-build/test-results/test/TEST-net.citizensnpcs.api.ai.tree.BehaviorContextTest.xml",
+          "bytes": 1389,
+          "sha256": "175120e3ff53bbdcb6df3372ff6c1ebf705ee62b565b2c95d4e15936b7b8b99e"
+        },
+        {
+          "path": "artifacts/navigation-settings-unit-build/test-results/test/TEST-net.citizensnpcs.api.ai.tree.BehaviorSignalsTest.xml",
+          "bytes": 1253,
+          "sha256": "b3f644e11dc00692f0605554d44a94f2fdbf4abaa3108e0f11f46def705ea695"
+        },
+        {
+          "path": "artifacts/navigation-settings-unit-build/test-results/test/TEST-net.citizensnpcs.api.ai.tree.BlockBehaviorInputTest.xml",
+          "bytes": 814,
+          "sha256": "29904675b209053a259c7acb867b36745687c3332a7a9cd148d93562d41e2b31"
+        },
+        {
+          "path": "artifacts/navigation-settings-unit-build/test-results/test/TEST-net.citizensnpcs.api.ai.tree.CooldownBehaviorTest.xml",
+          "bytes": 780,
+          "sha256": "d13733f0bb3760a8bad569764d1729d1d79067e3f2b0141f79bba59ba5068200"
+        },
+        {
+          "path": "artifacts/navigation-settings-unit-build/test-results/test/TEST-net.citizensnpcs.api.ai.tree.DecoratorTest.xml",
+          "bytes": 935,
+          "sha256": "52fb3bf68653cceb0c78111c330b996b2d5cb08872a6a3889943072972598a75"
+        },
+        {
+          "path": "artifacts/navigation-settings-unit-build/test-results/test/TEST-net.citizensnpcs.api.ai.tree.IfElseLifecycleTest.xml",
+          "bytes": 908,
+          "sha256": "84400088c0dbf167cc6acc2a4b2e84599e54c368c1599e86f59c25f7205236e6"
+        },
+        {
+          "path": "artifacts/navigation-settings-unit-build/test-results/test/TEST-net.citizensnpcs.api.ai.tree.LoopTest.xml",
+          "bytes": 1303,
+          "sha256": "18f281f4825bcb8e41ac10c3c6ccd929e0c056488f44c1a655ddf8c8d07697b8"
+        },
+        {
+          "path": "artifacts/navigation-settings-unit-build/test-results/test/TEST-net.citizensnpcs.api.ai.tree.RepeatTest.xml",
+          "bytes": 1592,
+          "sha256": "29044843dc4fc2c7699c9e1740024daef23b07dac385bfe9f8548f60b8ff0474"
+        },
+        {
+          "path": "artifacts/navigation-settings-unit-build/test-results/test/TEST-net.citizensnpcs.api.ai.tree.RetryDecoratorTest.xml",
+          "bytes": 1981,
+          "sha256": "565db34c5cb17cddc6aa26cc45d6ba35b7391dee82ca7717b362a6aaf764425d"
+        },
+        {
+          "path": "artifacts/navigation-settings-unit-build/test-results/test/TEST-net.citizensnpcs.api.ai.tree.SignalTargetIdTest.xml",
+          "bytes": 788,
+          "sha256": "57cd52962a06e1fdd04c66d1ba5754c72d45406f5b6f3af4407035cfafcfb07e"
+        },
+        {
+          "path": "artifacts/navigation-settings-unit-build/test-results/test/TEST-net.citizensnpcs.api.ai.tree.StatusMapperTest.xml",
+          "bytes": 800,
+          "sha256": "ee0be70163c1394ec762a0c9ebc2b43e76e5aedaf5c2e544d1abf23e485e4eed"
+        },
+        {
+          "path": "artifacts/navigation-settings-unit-build/test-results/test/TEST-net.citizensnpcs.api.ai.tree.TimerDecoratorTest.xml",
+          "bytes": 1879,
+          "sha256": "48f631d92b6f2d83998c21b8522890e1569161d42983c1942af3cfcead523708"
+        },
+        {
+          "path": "artifacts/navigation-settings-unit-build/test-results/test/TEST-net.citizensnpcs.api.ai.tree.WaitBehaviorTest.xml",
+          "bytes": 1333,
+          "sha256": "04ab9af0f2715aa5769354b673f37af06293598d3174374fda8736f8b490d97d"
+        },
+        {
+          "path": "artifacts/navigation-settings-unit-build/test-results/test/TEST-net.citizensnpcs.api.ai.tree.WaitForSignalTest.xml",
+          "bytes": 940,
+          "sha256": "61abe78605c37b5a41ae6661204563de9d7e4b156adbac4dabc21b16c6f286a1"
+        },
+        {
+          "path": "artifacts/navigation-settings-unit-build/test-results/test/TEST-net.citizensnpcs.api.ai.tree.WaitUntilBehaviorTest.xml",
+          "bytes": 1545,
+          "sha256": "23ec7e601ee8b0f282f468a96378ce03e6dd3ac2012f802811b80fad5f9e5624"
+        },
+        {
+          "path": "artifacts/navigation-settings-unit-build/test-results/test/TEST-net.citizensnpcs.api.ai.tree.WalkToValidationTest.xml",
+          "bytes": 799,
+          "sha256": "3d4a76add89452f021f011bb4249b8000032c7d7171b39cebd6804a84bd817f6"
+        },
+        {
+          "path": "artifacts/navigation-settings-unit-build/test-results/test/TEST-net.citizensnpcs.api.ai.tree.WanderBehaviorTest.xml",
+          "bytes": 635,
+          "sha256": "dfc9157beef8251b7fb205b24d2e0e77126bf73d60b824cd2785cffae82c6934"
+        },
+        {
+          "path": "artifacts/navigation-settings-unit-build/test-results/test/TEST-net.citizensnpcs.api.command.CommandContextQuotingTest.xml",
+          "bytes": 672,
+          "sha256": "3565072f5d657877c4b8de564808387c00b5a0096c26bcab27a1a36748573a92"
+        },
+        {
+          "path": "artifacts/navigation-settings-unit-build/test-results/test/TEST-net.citizensnpcs.api.command.CommandLocationTest.xml",
+          "bytes": 1198,
+          "sha256": "f1529e82b32574c31349918e1cb6be471047f2a9f3e9da49e9c31903a0e7e164"
+        },
+        {
+          "path": "artifacts/navigation-settings-unit-build/test-results/test/TEST-net.citizensnpcs.api.command.NPCCommandTargetTest.xml",
+          "bytes": 1121,
+          "sha256": "421976580f462c99d5655b8ab72efe1aa5d82033a2fa343039008d88a7573455"
+        },
+        {
+          "path": "artifacts/navigation-settings-unit-build/test-results/test/TEST-net.citizensnpcs.api.command.StrictCommandArgumentsTest.xml",
+          "bytes": 630,
+          "sha256": "a2beec0f66214adef2ad336428606c92a353cb83aa5c79b7e3e3c9d4a4a56124"
+        },
+        {
+          "path": "artifacts/navigation-settings-unit-build/test-results/test/TEST-net.citizensnpcs.api.expr.ExpressionRegistryTest.xml",
+          "bytes": 11674,
+          "sha256": "ea9c021d2166379b67db4cf77a3f25414f393fa07d1329ab0b45910478fc2e3f"
+        },
+        {
+          "path": "artifacts/navigation-settings-unit-build/test-results/test/TEST-net.citizensnpcs.api.expr.ExpressionScopeTest.xml",
+          "bytes": 2216,
+          "sha256": "8fdf7d1739c27c030cc8d64f691be2d65ccf9a52ee46ff1eed66f9a2eb57d847"
+        },
+        {
+          "path": "artifacts/navigation-settings-unit-build/test-results/test/TEST-net.citizensnpcs.api.expr.MemoryCharacterTest.xml",
+          "bytes": 646,
+          "sha256": "7873a96801f9c1702c44c5e736128058130f0a530878def81a389f9e0b056208"
+        },
+        {
+          "path": "artifacts/navigation-settings-unit-build/test-results/test/TEST-net.citizensnpcs.api.expr.MemoryKeyIdentityTest.xml",
+          "bytes": 796,
+          "sha256": "18e75c1ea5a21322f602c668865fe39e33840e49ecb89fa12aecb1b839a146ec"
+        },
+        {
+          "path": "artifacts/navigation-settings-unit-build/test-results/test/TEST-net.citizensnpcs.api.expr.MemoryKeysTest.xml",
+          "bytes": 919,
+          "sha256": "649f65e3876e70682c5f79e3309d9f1e09e08fb0ac0449ddb5eabbae873dd914"
+        },
+        {
+          "path": "artifacts/navigation-settings-unit-build/test-results/test/TEST-net.citizensnpcs.api.expr.MemoryListPersistenceTest.xml",
+          "bytes": 1109,
+          "sha256": "53401116c8985b386ad3c8e4745e61e1ec9d929853daaea34cac1188ee8e32a1"
+        },
+        {
+          "path": "artifacts/navigation-settings-unit-build/test-results/test/TEST-net.citizensnpcs.api.expr.MemoryListQueriesTest.xml",
+          "bytes": 781,
+          "sha256": "a94d9e056e9296fdc2f30daf3f5401995436ba6b931b86e884ef3086f551c1f8"
+        },
+        {
+          "path": "artifacts/navigation-settings-unit-build/test-results/test/TEST-net.citizensnpcs.api.gui.InventoryMenuTest.xml",
+          "bytes": 1975,
+          "sha256": "807db7188d22df02783f3884f0d84cbb16b9455a8d4c308308f6cb3300213dcf"
+        },
+        {
+          "path": "artifacts/navigation-settings-unit-build/test-results/test/TEST-net.citizensnpcs.api.hpastar.HPAGraphTest.xml",
+          "bytes": 2638,
+          "sha256": "974c499fa7dd2fced01512057170c62ad41e0ae2cf66d189e05a1cf61881eb75"
+        },
+        {
+          "path": "artifacts/navigation-settings-unit-build/test-results/test/TEST-net.citizensnpcs.api.npc.NPCDataStoreTest.xml",
+          "bytes": 4319,
+          "sha256": "49643fab4a8bb7751557b74dae9a320a74bea6e4cbb7e15dacdcd9bc1d2b9295"
+        },
+        {
+          "path": "artifacts/navigation-settings-unit-build/test-results/test/TEST-net.citizensnpcs.api.npc.templates.CommandEventRegistrationTest.xml",
+          "bytes": 1536,
+          "sha256": "485fe5b189b23bd8db867a412d4f7dbd700eec8caf1f69757150fbe25a9a0a3c"
+        },
+        {
+          "path": "artifacts/navigation-settings-unit-build/test-results/test/TEST-net.citizensnpcs.api.npc.templates.TemplateApplicationLifecycleTest.xml",
+          "bytes": 2534,
+          "sha256": "534b7d9f49947438fa70f155887c95bbf9b8db52d2d2077447c6238391448d51"
+        },
+        {
+          "path": "artifacts/navigation-settings-unit-build/test-results/test/TEST-net.citizensnpcs.api.npc.templates.TemplateEventPersistenceTest.xml",
+          "bytes": 1764,
+          "sha256": "0b9fa2862b6119d8a8a168f3080ce7f10e99aa61515387ff96328fc65ff96a7b"
+        },
+        {
+          "path": "artifacts/navigation-settings-unit-build/test-results/test/TEST-net.citizensnpcs.api.npc.templates.TemplateEventReplacementTest.xml",
+          "bytes": 1043,
+          "sha256": "c3e367b0d163f86fd366baf8c99eec50016bf29a83c8f6c473fd3d4e667bb4fb"
+        },
+        {
+          "path": "artifacts/navigation-settings-unit-build/test-results/test/TEST-net.citizensnpcs.api.npc.templates.TemplateGenerationTest.xml",
+          "bytes": 2364,
+          "sha256": "0f42ded390cd52ae8d54383a87268edff10d551e83dee3910be1cf96f23d510d"
+        },
+        {
+          "path": "artifacts/navigation-settings-unit-build/test-results/test/TEST-net.citizensnpcs.api.npc.templates.TemplateMigrationTest.xml",
+          "bytes": 3415,
+          "sha256": "fcca3bedec2778b36338d749576c6a6bca3c31c83c9073f1aa83058b1cff267e"
+        },
+        {
+          "path": "artifacts/navigation-settings-unit-build/test-results/test/TEST-net.citizensnpcs.api.npc.templates.TemplateRegistryReloadTest.xml",
+          "bytes": 45015,
+          "sha256": "6f3bca00976485d07a5019790139433f216dea5a05ab0def7581bb1996938880"
+        },
+        {
+          "path": "artifacts/navigation-settings-unit-build/test-results/test/TEST-net.citizensnpcs.api.npc.templates.TemplateWorkspaceTest.xml",
+          "bytes": 798,
+          "sha256": "e375064cec01955360d1fa23dcb34b30c95abb5a702142cd7845e16ac233b0b7"
+        },
+        {
+          "path": "artifacts/navigation-settings-unit-build/test-results/test/TEST-net.citizensnpcs.api.npc.templates.TraitTemplateFormTest.xml",
+          "bytes": 1666,
+          "sha256": "7b707b2f71a01a330ad6c64f846f680e17c4c0fa6183027063879baee91a0d2b"
+        },
+        {
+          "path": "artifacts/navigation-settings-unit-build/test-results/test/TEST-net.citizensnpcs.api.npc.templates.YamlReplacementActionTest.xml",
+          "bytes": 1934,
+          "sha256": "4f3cc6d92e0dea0c6d2b0018679c7477a9f4fbbec511b45fc26c0455805fe0d5"
+        },
+        {
+          "path": "artifacts/navigation-settings-unit-build/test-results/test/TEST-net.citizensnpcs.api.npc.templates.YamlReplacementValidationTest.xml",
+          "bytes": 827,
+          "sha256": "841876e5290beddc83c70f12a8555740a0b575b67fdf8653f2c3f9bfe5954f39"
+        },
+        {
+          "path": "artifacts/navigation-settings-unit-build/test-results/test/TEST-net.citizensnpcs.api.persistence.LocationWorldNameTest.xml",
+          "bytes": 928,
+          "sha256": "8c3fe01d42b16ed6d8646727c674964456046638da95f5dfabfb9c8cc9e8ed0c"
+        },
+        {
+          "path": "artifacts/navigation-settings-unit-build/test-results/test/TEST-net.citizensnpcs.api.persistence.PersistenceDelegateFailureTest.xml",
+          "bytes": 869,
+          "sha256": "dfdeac2d1e42629ba19e3f68df43b07382c94676662ec7431f582f568b908c79"
+        },
+        {
+          "path": "artifacts/navigation-settings-unit-build/test-results/test/TEST-net.citizensnpcs.api.persistence.PersistenceLoaderLegacyValuesTest.xml",
+          "bytes": 10997,
+          "sha256": "bf3252a9fedd82b1b7fe10d4a5b56b083d3c4a2163a05a97ac4f0fe4549cc96b"
+        },
+        {
+          "path": "artifacts/navigation-settings-unit-build/test-results/test/TEST-net.citizensnpcs.api.persistence.PersistenceMapKeysTest.xml",
+          "bytes": 819,
+          "sha256": "2e9751032acdab5a626ca353a869e56003e6715483cd35b9d3cbcab2c24dfb6b"
+        },
+        {
+          "path": "artifacts/navigation-settings-unit-build/test-results/test/TEST-net.citizensnpcs.api.persistence.StrictPersistenceTest.xml",
+          "bytes": 513,
+          "sha256": "678c73ab3ba00fa6a35886753b3a321425b8a438a48710a58d32456feedcac2d"
+        },
+        {
+          "path": "artifacts/navigation-settings-unit-build/test-results/test/TEST-net.citizensnpcs.api.util.DurationConversionTest.xml",
+          "bytes": 764,
+          "sha256": "5264863d23b4502e1af994dd16d2ad77c27aad00914c3a5cf6e7f2a3c89d19b0"
+        },
+        {
+          "path": "artifacts/navigation-settings-unit-build/test-results/test/TEST-net.citizensnpcs.api.util.DurationParsingTest.xml",
+          "bytes": 892,
+          "sha256": "e786ea0b931d77f0acdd6b4828099c71cdd7da1268259f5387ddabea1470ed07"
+        },
+        {
+          "path": "artifacts/navigation-settings-unit-build/test-results/test/TEST-net.citizensnpcs.api.util.ItemStorageTest.xml",
+          "bytes": 3196,
+          "sha256": "61cabba6bf98a7a4bb8091a56f7ac8d3109e7670a610a6ea897e6deb82e55f73"
+        },
+        {
+          "path": "artifacts/navigation-settings-unit-build/test-results/test/TEST-net.citizensnpcs.api.util.LegacyBukkitMetaTest.xml",
+          "bytes": 3375,
+          "sha256": "5e4ac4606e61684017810283351ee40e21d914abd22874fba5513b700ff32039"
+        },
+        {
+          "path": "artifacts/navigation-settings-unit-build/test-results/test/TEST-net.citizensnpcs.api.util.LegacyBukkitMetaTypesTest.xml",
+          "bytes": 3700,
+          "sha256": "d3170dd6806e65f92308827f6a9295380bbe3223a1992d1d2306fa694ab91884"
+        },
+        {
+          "path": "artifacts/navigation-settings-unit-build/test-results/test/TEST-net.citizensnpcs.api.util.LegacyFireworksTest.xml",
+          "bytes": 4313,
+          "sha256": "7d282547bc03b3ba196a03ec91400146bc44c65f9399a14242e916d422dce11a"
+        },
+        {
+          "path": "artifacts/navigation-settings-unit-build/test-results/test/TEST-net.citizensnpcs.api.util.LegacyStructuredItemsTest.xml",
+          "bytes": 5173,
+          "sha256": "16b80c4d8a3015f933732685fafac1c7fde1340c0f4788ccde45d3812e3279b2"
+        },
+        {
+          "path": "artifacts/navigation-settings-unit-build/test-results/test/TEST-net.citizensnpcs.api.util.MemoryDataKeyCopyTest.xml",
+          "bytes": 662,
+          "sha256": "8c292437473c8d40491a51cdb44dbce8b940309fd47abb770b2e4ed98fa64412"
+        },
+        {
+          "path": "artifacts/navigation-settings-unit-build/test-results/test/TEST-net.citizensnpcs.api.util.MemoryDataKeyTransactionTest.xml",
+          "bytes": 2180,
+          "sha256": "64e8542abb3fc4144124c77d4a97e2e997fcefe85a0526ff40e0b8d2772d5f81"
+        },
+        {
+          "path": "artifacts/navigation-settings-unit-build/test-results/test/TEST-net.citizensnpcs.api.util.NPCCommandFormatTest.xml",
+          "bytes": 1462,
+          "sha256": "80b5c9b37f56ab98bba38f8b605a06c95fa010cc2784d4e44935068947534dbf"
+        },
+        {
+          "path": "artifacts/navigation-settings-unit-build/test-results/test/TEST-net.citizensnpcs.api.util.PermissionDefaultsTest.xml",
+          "bytes": 1110,
+          "sha256": "c91c82d00d95678ffe7eaae9e41738946b7b28245081b22b6ba300e4c441f59a"
+        },
+        {
+          "path": "artifacts/navigation-settings-unit-build/test-results/test/TEST-net.citizensnpcs.api.util.schedulers.adapter.NeoForgeSchedulerTest.xml",
+          "bytes": 1013,
+          "sha256": "852b02f3f2ebfc2b63e3f0b958747c1f2e83bf4d2d2dea8d1e677fec2c3ce29f"
+        },
+        {
+          "path": "artifacts/navigation-settings-unit-build/test-results/test/TEST-net.citizensnpcs.api.util.StoredItemListTest.xml",
+          "bytes": 2730,
+          "sha256": "72823046a8165da80767e7ad79163e7ce36554a270c206db3f203b31dc1b1b1c"
+        },
+        {
+          "path": "artifacts/navigation-settings-unit-build/test-results/test/TEST-net.citizensnpcs.api.util.StoredItemsTest.xml",
+          "bytes": 2990,
+          "sha256": "792a4783aaf2e586fe7b0fcacec6d96f3418882ee4250f7eb61b14c33d531964"
+        },
+        {
+          "path": "artifacts/navigation-settings-unit-build/test-results/test/TEST-net.citizensnpcs.api.util.TextParserTest.xml",
+          "bytes": 3408,
+          "sha256": "15a5f22d4ec7543f513a5ca785c062cfb2de7e1b85d40320929e1e7e909206f5"
+        },
+        {
+          "path": "artifacts/navigation-settings-unit-build/test-results/test/TEST-net.citizensnpcs.api.util.TranslatorFormatTest.xml",
+          "bytes": 840,
+          "sha256": "2668f1f13ac641fdf4f62dc5167d6f1930b25c90e246aea95a48c5f57578cd48"
+        },
+        {
+          "path": "artifacts/navigation-settings-unit-build/test-results/test/TEST-net.citizensnpcs.api.util.TriggerAddInputTest.xml",
+          "bytes": 767,
+          "sha256": "6c5e8c04f47ddd413037b482dddb00346234aaf5ac1c4278dc0d1692d3da7260"
+        },
+        {
+          "path": "artifacts/navigation-settings-unit-build/test-results/test/TEST-net.citizensnpcs.api.util.YamlStorageRoundTripTest.xml",
+          "bytes": 59910,
+          "sha256": "6783705308ba4a685c122be2866fc88e03f8c92f6c386b4ce4b209840064f1dc"
+        },
+        {
+          "path": "artifacts/navigation-settings-unit-build/test-results/test/TEST-net.citizensnpcs.api.util.YamlStorageWriteTest.xml",
+          "bytes": 4032,
+          "sha256": "255af545e146fb63d443e0d5965e753993dfe54287b2c8e692c1dd41e990f6e8"
+        },
+        {
+          "path": "artifacts/navigation-settings-unit-build/test-results/test/TEST-net.citizensnpcs.commands.EntityCommandParsingTest.xml",
+          "bytes": 666,
+          "sha256": "8c4130deb7081fc83151f66b37051f086fd50223e5c409decab13ac27cf06c9d"
+        },
+        {
+          "path": "artifacts/navigation-settings-unit-build/test-results/test/TEST-net.citizensnpcs.commands.history.CommandHistoryTest.xml",
+          "bytes": 1277,
+          "sha256": "e08884648e1bb2140f14a2d5685213d8b4fe6f6b39cec7a69185bbbdff3609a8"
+        },
+        {
+          "path": "artifacts/navigation-settings-unit-build/test-results/test/TEST-net.citizensnpcs.commands.NavigationCommandValidationTest.xml",
+          "bytes": 1352,
+          "sha256": "d5817f60d5c5e273351ccf27dbe2915a242d40329da31d47430ab98362e51ec1"
+        },
+        {
+          "path": "artifacts/navigation-settings-unit-build/test-results/test/TEST-net.citizensnpcs.commands.PresentationCommandParsingTest.xml",
+          "bytes": 1002,
+          "sha256": "7e3bcb251f08474c70d47a40a17b4a1477aef6ae08959d5b809a86219881bb09"
+        },
+        {
+          "path": "artifacts/navigation-settings-unit-build/test-results/test/TEST-net.citizensnpcs.commands.TemplateCommandValidationTest.xml",
+          "bytes": 510,
+          "sha256": "6ddc287e3a2b57c905cbed8324875957bc55d778fbe3ef9727dba535da000bb9"
+        },
+        {
+          "path": "artifacts/navigation-settings-unit-build/test-results/test/TEST-net.citizensnpcs.npc.ai.NavigationSettingsPersistenceTest.xml",
+          "bytes": 1187,
+          "sha256": "2b746ee738530e269b70acef75419c9f6c90b1335037b9cd685dcf40e9305a3b"
+        },
+        {
+          "path": "artifacts/navigation-settings-unit-build/test-results/test/TEST-net.citizensnpcs.npc.ai.tree.BehaviorCommandFlagsTest.xml",
+          "bytes": 792,
+          "sha256": "556b848bde9c0124c2f833b1d5283d90744e63cbd5621b3f0400c3da7493b179"
+        },
+        {
+          "path": "artifacts/navigation-settings-unit-build/test-results/test/TEST-net.citizensnpcs.npc.ai.tree.BehaviorTreeParserTest.xml",
+          "bytes": 9173,
+          "sha256": "b8c4aef6dc6020de94118c5a6c95e286d0fec23d91e59e5799af46b52a7780e6"
+        },
+        {
+          "path": "artifacts/navigation-settings-unit-build/test-results/test/TEST-net.citizensnpcs.npc.ai.tree.MolangMemoryBindingTest.xml",
+          "bytes": 1447,
+          "sha256": "d6b02b41ba550331d43aaddd7da8e5e8b24eaeac62ca43ea0e074c7416f69e5e"
+        },
+        {
+          "path": "artifacts/navigation-settings-unit-build/test-results/test/TEST-net.citizensnpcs.npc.ai.tree.MolangScopeIsolationTest.xml",
+          "bytes": 12098,
+          "sha256": "c169a3ebc4c2481ef28094ca2fc4873db91ea8697f838fd9fbc5c863872b03fb"
+        },
+        {
+          "path": "artifacts/navigation-settings-unit-build/test-results/test/TEST-net.citizensnpcs.npc.skin.SkinCacheReloadTest.xml",
+          "bytes": 1198,
+          "sha256": "504f3106851a53d1478a379632b3370e5657dac5525c08f113911f2ccaf80092"
+        },
+        {
+          "path": "artifacts/navigation-settings-unit-build/test-results/test/TEST-net.citizensnpcs.SettingsTest.xml",
+          "bytes": 35769,
+          "sha256": "c4274c94634f41aecc1a413a94f0caa0eb3ccb7102fe4d544a1226780e8ceb4f"
+        },
+        {
+          "path": "artifacts/navigation-settings-unit-build/test-results/test/TEST-net.citizensnpcs.trait.HologramItemTest.xml",
+          "bytes": 897,
+          "sha256": "02976d48a6d2b26f47f4b54cda3c57b8fead21975bc328580ee9416c5f378815"
+        },
+        {
+          "path": "artifacts/navigation-settings-unit-build/test-results/test/TEST-net.citizensnpcs.trait.SentinelTargetMatchingTest.xml",
+          "bytes": 1141,
+          "sha256": "37251de2e129491804f6dee1401ad340f576f72e5175c52e6d62c6b9e902f8da"
+        },
+        {
+          "path": "artifacts/navigation-settings-unit-build/test-results/test/TEST-net.citizensnpcs.trait.shop.ExperienceArithmeticTest.xml",
+          "bytes": 777,
+          "sha256": "9a23a992854544c23f12c52731c71d85f01128a3177eda99cc26729df3ee67da"
+        },
+        {
+          "path": "artifacts/navigation-settings-unit-build/test-results/test/TEST-net.citizensnpcs.trait.shop.InventoryPublicationRecoveryTest.xml",
+          "bytes": 1503,
+          "sha256": "fe390f005d9f93df0bf32090b5be9169b872cbe462b7c96b3b834c9495fbd4f6"
+        },
+        {
+          "path": "artifacts/navigation-settings-unit-build/test-results/test/TEST-net.citizensnpcs.trait.shop.InventoryTransactionIsolationTest.xml",
+          "bytes": 1199,
+          "sha256": "7722c196d207f7cffda84131570e216ab678d857fa45fef52fd1454acba551c5"
+        },
+        {
+          "path": "artifacts/navigation-settings-unit-build/test-results/test/TEST-net.citizensnpcs.trait.shop.ItemActionTest.xml",
+          "bytes": 1583,
+          "sha256": "da264538ae122f7665bf0435eb5fe92a8e9fccf68e9e1b8dc467753bd9b0fbeb"
+        },
+        {
+          "path": "artifacts/navigation-settings-unit-build/test-results/test/TEST-net.citizensnpcs.trait.shop.ItemQuantityTest.xml",
+          "bytes": 1437,
+          "sha256": "fd33a428ac632339bc8daec91a848d7682d98144b8abcc3e4e2bacf107f8eb04"
+        },
+        {
+          "path": "artifacts/navigation-settings-unit-build/test-results/test/TEST-net.citizensnpcs.trait.shop.ItemReceiptTest.xml",
+          "bytes": 1208,
+          "sha256": "07bb0f7872a672a464157d493e57d82e60e4f738cbe03aafc028ab41f064d635"
+        },
+        {
+          "path": "artifacts/navigation-settings-unit-build/test-results/test/TEST-net.citizensnpcs.trait.shop.MoneyArithmeticTest.xml",
+          "bytes": 900,
+          "sha256": "a5d26dbca5d01942cd548ffcbd7cd189ac9835d9f1dee4ff186f2374e5ce7d72"
+        },
+        {
+          "path": "artifacts/navigation-settings-unit-build/test-results/test/TEST-net.citizensnpcs.trait.shop.NPCShopTest.xml",
+          "bytes": 1602,
+          "sha256": "f944fe30c8b3fe6cb5218fcafc4687d5c922c9ac3e25477b77d174541a1cf249"
+        },
+        {
+          "path": "artifacts/navigation-settings-unit-build/test-results/test/TEST-net.citizensnpcs.trait.shop.ShopSessionOwnerTest.xml",
+          "bytes": 661,
+          "sha256": "e3cd94f15b7d6d4716397b2a2732e8d1e6a992196ffff74f87a0e0160bc98b2b"
+        },
+        {
+          "path": "artifacts/navigation-settings-unit-build/test-results/test/TEST-net.citizensnpcs.trait.shop.ShopTransactionTest.xml",
+          "bytes": 1067,
+          "sha256": "c37c42d503024b6e4144969683bf4bec0f592adfa99c060391b0b43b289dc010"
+        },
+        {
+          "path": "artifacts/navigation-settings-unit-build/test-results/test/TEST-net.citizensnpcs.trait.shop.StoredShopsTest.xml",
+          "bytes": 2718,
+          "sha256": "177178c45a372ac22dcb4a6ece54ff1adcfe25195ed830d14ca1ac9f061cad44"
+        },
+        {
+          "path": "artifacts/navigation-settings-unit-build/test-results/test/TEST-net.citizensnpcs.trait.text.TextEditorInputTest.xml",
+          "bytes": 771,
+          "sha256": "13191b6d52c7c90510b31aa09798d623d92c9c2f363ca883567557bf3e011cfe"
+        },
+        {
+          "path": "artifacts/navigation-settings-unit-build/test-results/test/TEST-net.citizensnpcs.trait.TraitNameMappingTest.xml",
+          "bytes": 1066,
+          "sha256": "dddb2ec51e705d6d435868f792345c462b1fbd235c420273d5a8e9803150d1c5"
+        },
+        {
+          "path": "artifacts/navigation-settings-unit-build/test-results/test/TEST-net.citizensnpcs.trait.waypoint.triggers.NumericTriggerInputTest.xml",
+          "bytes": 869,
+          "sha256": "fcb607743772b1c9836e846bda4387a4f6021f2ecf408b67dac94cb74c1c47d7"
+        },
+        {
+          "path": "artifacts/navigation-settings-unit-build/test-results/test/TEST-net.citizensnpcs.trait.waypoint.triggers.TeleportTriggerInputTest.xml",
+          "bytes": 851,
+          "sha256": "7d9c0a5030cc613583ea11397259fa5e9c28480f3ab61045fc307065528682aa"
+        },
+        {
+          "path": "artifacts/navigation-settings-unit-build/test-results/test/TEST-net.citizensnpcs.trait.waypoint.triggers.WaypointTriggerSaveTest.xml",
+          "bytes": 1024,
+          "sha256": "8e124b6a6b2c0328ad99d11d1ca2f9158c7a0fd1c6841e65428d351dc81614f6"
+        },
+        {
+          "path": "artifacts/navigation-settings-unit-build/test-results/test/TEST-net.citizensnpcs.util.CommerceTaskJournalTest.xml",
+          "bytes": 2371,
+          "sha256": "0271a4b48a337acf4600c6c93ad3b59fff8f42ffd7007bcdad40d38e24bba114"
+        },
+        {
+          "path": "artifacts/navigation-settings-unit-build/test-results/test/TEST-net.citizensnpcs.util.DimensionLookupTest.xml",
+          "bytes": 748,
+          "sha256": "0747ebb29bed1713038406f7f49f1925052a807ba59710f57b1f629bd3be3e0a"
+        },
+        {
+          "path": "artifacts/navigation-settings-unit-build/test-results/test/TEST-net.citizensnpcs.util.EconomyShopMenusTest.xml",
+          "bytes": 607,
+          "sha256": "bbf30e6519542860445dedb7d1400499053b1d405c4238600cc82d86ef37cd53"
+        },
+        {
+          "path": "artifacts/navigation-settings-unit-build/test-results/test/TEST-net.citizensnpcs.util.JournalRecordDecodingTest.xml",
+          "bytes": 5324,
+          "sha256": "ebc09277c05504d85311f4b0e9897e1712ac3c8dde7b2057cb98cf4a42b19a80"
+        },
+        {
+          "path": "artifacts/navigation-settings-unit-build/test-results/test/TEST-net.citizensnpcs.util.LuckPermsGroupsTest.xml",
+          "bytes": 609,
+          "sha256": "52a6dcf34a79017861fd6224d42b8e670b93682e10f2898cf6b05eb69e7a1a84"
+        },
+        {
+          "path": "artifacts/navigation-settings-unit-build/test-results/test/TEST-net.citizensnpcs.util.ParadigmGroupsTest.xml",
+          "bytes": 1209,
+          "sha256": "7317d4f929e1f359d7e8ebc049ec60dea3cdcb8228ba0d7cd470b64c478281f4"
+        },
+        {
+          "path": "artifacts/navigation-settings-unit-build/test-results/test/TEST-net.citizensnpcs.util.ParadigmPermissionWriterTest.xml",
+          "bytes": 2860,
+          "sha256": "aca797f6e6c87433e9ac594c9eedea2689bc31423bdcb4bd2ce07c9587ba748f"
+        },
+        {
+          "path": "artifacts/navigation-settings-unit-build/test-results/test/TEST-net.citizensnpcs.util.ProviderPlaceholderExportsTest.xml",
+          "bytes": 1093,
+          "sha256": "31dcac1eec11ecaa496d99f7f3a8ca79e23957576bd3c9d05d5588934da700e3"
+        },
+        {
+          "path": "artifacts/navigation-settings-unit-build/test-results/test/TEST-net.citizensnpcs.util.QuestDeliveryJournalTest.xml",
+          "bytes": 1865,
+          "sha256": "cf0da68d2b22f22f1b4300094ed08903c3dd0e861d86ee76b83f6ba9ec71c7ed"
+        },
+        {
+          "path": "artifacts/navigation-settings-unit-build/test-results/test/TEST-net.citizensnpcs.util.QuestDeliveryStorageTest.xml",
+          "bytes": 1137,
+          "sha256": "7f430f7bcb44bf2472cefe1a596f467450bb7783f6845b034aa2901b5303a15a"
+        },
+        {
+          "path": "artifacts/navigation-settings-unit-build/test-results/test/TEST-net.citizensnpcs.util.QuestEvidenceJournalTest.xml",
+          "bytes": 2812,
+          "sha256": "ae27ed3cbd7b94863599994158d69710889d66453e3c68ef13cd009c9b106bfe"
+        },
+        {
+          "path": "artifacts/navigation-settings-unit-build/test-results/test/TEST-net.citizensnpcs.util.QuestRewardJournalTest.xml",
+          "bytes": 1537,
+          "sha256": "a1b624b2c0d6640521b4510033248ce1693cd6f37990da4b7192b5c10ef705af"
+        },
+        {
+          "path": "artifacts/navigation-settings-unit-build/test-results/test/TEST-net.citizensnpcs.util.YuuniverseEconomyTest.xml",
+          "bytes": 1500,
+          "sha256": "45b756612962f4fad6ab6df9b3a21f15bdec41cc0d1185ba1166ed4f98830dfa"
+        }
+      ],
+      "native": [
+        {
+          "phase": "seed",
+          "checks": 84,
+          "log": {
+            "path": "artifacts/navigation-settings-native-final-233-seed.log",
+            "bytes": 29735,
+            "sha256": "c3e1f3914aaab51583a380c5021e431bd7c350799d2aa816b25196a37d1de0b5"
+          },
+          "complete": {
+            "path": "artifacts/navigation-settings-final-233-server/seed.complete.json",
+            "bytes": 7524,
+            "sha256": "f44fb082091e2861bf5bcb61e4f3f3c05f8462fa24c3a1b18112215779a3df32"
+          },
+          "saves": {
+            "path": "artifacts/navigation-settings-final-233-server/evidence/seed/saves.yml",
+            "bytes": 1770,
+            "sha256": "e324fd22554bc4981a8eca218740bb356e10e8ee2337a2182a7010984659dac6"
+          },
+          "finalStates": [
+            {
+              "uuid": "34a1f222-991d-411d-b0db-d7373709b6e7",
+              "name": "ordinarySettings",
+              "location": {
+                "world": "minecraft:overworld",
+                "x": 9.407,
+                "y": -60.0,
+                "z": 3.4073,
+                "pitch": 36.0964,
+                "yaw": 314.9778,
+                "bodyYaw": 314.9778
+              },
+              "distanceToGoal": 0.8384165372891924
+            },
+            {
+              "uuid": "36d2ce08-a279-41fb-b56e-60a34329969b",
+              "name": "packetSettings",
+              "location": {
+                "world": "minecraft:overworld",
+                "x": 9.407,
+                "y": -60.0,
+                "z": 6.4073,
+                "pitch": 36.0964,
+                "yaw": 314.9778,
+                "bodyYaw": 314.9778
+              },
+              "distanceToGoal": 0.8384165372891924
+            }
+          ]
+        },
+        {
+          "phase": "recover",
+          "checks": 38,
+          "log": {
+            "path": "artifacts/navigation-settings-native-final-233-recover.log",
+            "bytes": 19605,
+            "sha256": "196d65527ecfc7c46f2373396136c6a5013e1db02d74fb46b04e5d2d46a23cac"
+          },
+          "complete": {
+            "path": "artifacts/navigation-settings-final-233-server/recover.complete.json",
+            "bytes": 4419,
+            "sha256": "29a914718f5b96a5a1c8f5ef4dbcbdb01def03b8b22723b221d4be6af5576e4d"
+          },
+          "saves": {
+            "path": "artifacts/navigation-settings-final-233-server/config/citizens/saves.yml",
+            "bytes": 1598,
+            "sha256": "fb1811b832d5b179408eddbceb44f43e4cc56d7dfcc857d10d0d9f827e606562"
+          },
+          "finalStates": [
+            {
+              "uuid": "34a1f222-991d-411d-b0db-d7373709b6e7",
+              "name": "ordinarySettings",
+              "location": {
+                "world": "minecraft:overworld",
+                "x": 4.7768,
+                "y": -60.0,
+                "z": 3.4308,
+                "pitch": 33.0921,
+                "yaw": 53.769,
+                "bodyYaw": 53.769
+              },
+              "distanceToGoal": 0.9630196675042517
+            },
+            {
+              "uuid": "36d2ce08-a279-41fb-b56e-60a34329969b",
+              "name": "packetSettings",
+              "location": {
+                "world": "minecraft:overworld",
+                "x": 4.7768,
+                "y": -60.0,
+                "z": 6.4308,
+                "pitch": 33.0921,
+                "yaw": 53.769,
+                "bodyYaw": 53.769
+              },
+              "distanceToGoal": 0.9630196675042519
+            }
+          ]
+        }
+      ],
+      "config": {
+        "path": "artifacts/navigation-settings-final-233-server/config/citizens/config.yml",
+        "bytes": 4092,
+        "sha256": "d984c66165a21417d0395b4f1722cfce3b4bbc63a15c2748853bf3759ec69ea7"
+      },
+      "expected": {
+        "path": "artifacts/navigation-settings-final-233-server/expected.json",
+        "bytes": 7524,
+        "sha256": "f44fb082091e2861bf5bcb61e4f3f3c05f8462fa24c3a1b18112215779a3df32"
+      },
+      "productionClassesMatchNative": 1024,
+      "packages": [
+        {
+          "path": "artifacts/navigation-settings-unit-build/libs/citizens-2.0.43-neoforge-SNAPSHOT-sources.jar",
+          "bytes": 1132128,
+          "sha256": "c0962483eebdc32f5ac5aa1057d5c25c15689179c1d286e58607bd32f5d1a14b"
+        },
+        {
+          "path": "artifacts/navigation-settings-unit-build/libs/citizens-2.0.43-neoforge-SNAPSHOT.jar",
+          "bytes": 4102122,
+          "sha256": "ac93f2ebfb56447b8815f6fb8ce6075d28c07299d497ef70a4b78602964d8806"
+        },
+        {
+          "path": "artifacts/navigation-settings-unit-build/libs/yuuniverse-interactions-2.0.43-neoforge-SNAPSHOT.jar",
+          "bytes": 204146,
+          "sha256": "1669d5b426786c898d425b54bbeb6db80bd5119908a2ae624092fa37bfed69be"
+        }
+      ]
+    },
+    {
+      "neoForge": "21.1.248",
+      "tests": {
+        "tests": 847,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "suites": 118,
+      "unitLog": {
+        "path": "artifacts/navigation-settings-unit-selected-final.log",
+        "bytes": 76018,
+        "sha256": "84df95485579aa44b102a3f7c733315ea26cec2aaec4f87fb88637d056dc1f55"
+      },
+      "reports": [
+        {
+          "path": "artifacts/navigation-settings-selected-build/test-results/test/TEST-net.citizensnpcs.api.ai.BehaviorRemovalTest.xml",
+          "bytes": 1173,
+          "sha256": "f46687bd2ed73a01fa75392361e5c513eea09d1a486040dfaccaf7d8e974ca3d"
+        },
+        {
+          "path": "artifacts/navigation-settings-selected-build/test-results/test/TEST-net.citizensnpcs.api.ai.CoalescedBehaviorTest.xml",
+          "bytes": 1061,
+          "sha256": "ca932a65f1742086208136d7457dd7a0a65d7009fa1029e1bdd76d88fd7e244a"
+        },
+        {
+          "path": "artifacts/navigation-settings-selected-build/test-results/test/TEST-net.citizensnpcs.api.ai.IfElseResetTest.xml",
+          "bytes": 482,
+          "sha256": "b24874c9f116ceed27a14e31c8718718ec07da2634eaebcac5bf4e1746f526cc"
+        },
+        {
+          "path": "artifacts/navigation-settings-selected-build/test-results/test/TEST-net.citizensnpcs.api.ai.ParallelBehaviorLifecycleTest.xml",
+          "bytes": 959,
+          "sha256": "7b1a55baedccf409bc9b64e57c8a81d2c8bdc6442c57322e987d0e631ed32e96"
+        },
+        {
+          "path": "artifacts/navigation-settings-selected-build/test-results/test/TEST-net.citizensnpcs.api.ai.ParallelCompositeTest.xml",
+          "bytes": 908,
+          "sha256": "c50dd54c2b78a3cfdacf053349485cd393480f5a22fcf10bab7c3ef85e4349b2"
+        },
+        {
+          "path": "artifacts/navigation-settings-selected-build/test-results/test/TEST-net.citizensnpcs.api.ai.SelectorTerminalResetTest.xml",
+          "bytes": 651,
+          "sha256": "f5f6d99808fa5dc006ee00879d517b0d39c36c34cb3ac1654f279ba24ccf5f92"
+        },
+        {
+          "path": "artifacts/navigation-settings-selected-build/test-results/test/TEST-net.citizensnpcs.api.ai.SequenceRemovalTest.xml",
+          "bytes": 900,
+          "sha256": "7b71ef045c2990a4f2e4f49a95b68d35c485a2011069cd1077a16701931d2a5d"
+        },
+        {
+          "path": "artifacts/navigation-settings-selected-build/test-results/test/TEST-net.citizensnpcs.api.ai.SequenceResetCallbackTest.xml",
+          "bytes": 654,
+          "sha256": "be110536602779ce0c2efe20f6a6cfc8ba4f9821a022ab06922392c84a172523"
+        },
+        {
+          "path": "artifacts/navigation-settings-selected-build/test-results/test/TEST-net.citizensnpcs.api.ai.TimeoutDecoratorTest.xml",
+          "bytes": 2035,
+          "sha256": "2cf5b96f794a3888b826c597919756300825e7a3066753209696f336783b5f3c"
+        },
+        {
+          "path": "artifacts/navigation-settings-selected-build/test-results/test/TEST-net.citizensnpcs.api.ai.tree.BehaviorContextTest.xml",
+          "bytes": 1390,
+          "sha256": "275b7be4e0070a66a5276c07ab48342146bef79b05e91f03d03aff81b0ecf83e"
+        },
+        {
+          "path": "artifacts/navigation-settings-selected-build/test-results/test/TEST-net.citizensnpcs.api.ai.tree.BehaviorSignalsTest.xml",
+          "bytes": 1252,
+          "sha256": "1b85ce056ee8f821c7654c1893a262f2afdd1c31377b13f60252df2df8281afa"
+        },
+        {
+          "path": "artifacts/navigation-settings-selected-build/test-results/test/TEST-net.citizensnpcs.api.ai.tree.BlockBehaviorInputTest.xml",
+          "bytes": 811,
+          "sha256": "ef5340e2b69b8bee507b55c94909b4397f96527423750a44c1226c7653e0fc97"
+        },
+        {
+          "path": "artifacts/navigation-settings-selected-build/test-results/test/TEST-net.citizensnpcs.api.ai.tree.CooldownBehaviorTest.xml",
+          "bytes": 781,
+          "sha256": "3563faf31e2d9d3c9f04f8d682cda315977157102e3152e3a666b6d46a4c6c02"
+        },
+        {
+          "path": "artifacts/navigation-settings-selected-build/test-results/test/TEST-net.citizensnpcs.api.ai.tree.DecoratorTest.xml",
+          "bytes": 935,
+          "sha256": "bd77883cc6f668d00e1ab6a20050f4e3c6b9c706f9477c23e6e2a0ee99dc7768"
+        },
+        {
+          "path": "artifacts/navigation-settings-selected-build/test-results/test/TEST-net.citizensnpcs.api.ai.tree.IfElseLifecycleTest.xml",
+          "bytes": 907,
+          "sha256": "7f024f83c33a921e9ee1349452e43ffdd81c05d87c5c126b736d33ec92fd420f"
+        },
+        {
+          "path": "artifacts/navigation-settings-selected-build/test-results/test/TEST-net.citizensnpcs.api.ai.tree.LoopTest.xml",
+          "bytes": 1303,
+          "sha256": "20f41d6e9b4f334bb51a039a42f085daba647ad8cea6623a61bb1e32635ce184"
+        },
+        {
+          "path": "artifacts/navigation-settings-selected-build/test-results/test/TEST-net.citizensnpcs.api.ai.tree.RepeatTest.xml",
+          "bytes": 1591,
+          "sha256": "e2c4ec21d1c4be90161625802e4d0433bca6fe0f39b65815faddb25e69f8f375"
+        },
+        {
+          "path": "artifacts/navigation-settings-selected-build/test-results/test/TEST-net.citizensnpcs.api.ai.tree.RetryDecoratorTest.xml",
+          "bytes": 1981,
+          "sha256": "1328b03e03c480fb67f3313bbfbfe027ca0ad4300b7e8c6c13960c572576e776"
+        },
+        {
+          "path": "artifacts/navigation-settings-selected-build/test-results/test/TEST-net.citizensnpcs.api.ai.tree.SignalTargetIdTest.xml",
+          "bytes": 786,
+          "sha256": "476087c97d50fb9194037d9794d2fae4d8b938bd8da746b763474cc1bef4a0cd"
+        },
+        {
+          "path": "artifacts/navigation-settings-selected-build/test-results/test/TEST-net.citizensnpcs.api.ai.tree.StatusMapperTest.xml",
+          "bytes": 801,
+          "sha256": "cc31966e52c144c2d004aa8fc76f24990b6a6fa58e8d10445031e6ce160e44ec"
+        },
+        {
+          "path": "artifacts/navigation-settings-selected-build/test-results/test/TEST-net.citizensnpcs.api.ai.tree.TimerDecoratorTest.xml",
+          "bytes": 1874,
+          "sha256": "448065fae5a8adac92917ccc35812a000bf41ca52e35933d4b987e1086e976ea"
+        },
+        {
+          "path": "artifacts/navigation-settings-selected-build/test-results/test/TEST-net.citizensnpcs.api.ai.tree.WaitBehaviorTest.xml",
+          "bytes": 1333,
+          "sha256": "31da2aa54f0badcb10cc55fa5553a4c105812a1c241a2dbce7e933e53bda1752"
+        },
+        {
+          "path": "artifacts/navigation-settings-selected-build/test-results/test/TEST-net.citizensnpcs.api.ai.tree.WaitForSignalTest.xml",
+          "bytes": 940,
+          "sha256": "3b33e5cb76933323a868b1743c75a07e8e5729c92a07311de1eec97acae4ea58"
+        },
+        {
+          "path": "artifacts/navigation-settings-selected-build/test-results/test/TEST-net.citizensnpcs.api.ai.tree.WaitUntilBehaviorTest.xml",
+          "bytes": 1547,
+          "sha256": "3b5432889df30b652a61793978478661a1e5f0c86bc59ccc294256f8b8f6c516"
+        },
+        {
+          "path": "artifacts/navigation-settings-selected-build/test-results/test/TEST-net.citizensnpcs.api.ai.tree.WalkToValidationTest.xml",
+          "bytes": 799,
+          "sha256": "ce5fa941333b6f63c95ece63d3ad0c705c6eeedaef1911c49828bbae8160f987"
+        },
+        {
+          "path": "artifacts/navigation-settings-selected-build/test-results/test/TEST-net.citizensnpcs.api.ai.tree.WanderBehaviorTest.xml",
+          "bytes": 634,
+          "sha256": "ebb5e614d1f105eee41e00c642174a79de63e03fb1256485bacca6decccdeac4"
+        },
+        {
+          "path": "artifacts/navigation-settings-selected-build/test-results/test/TEST-net.citizensnpcs.api.command.CommandContextQuotingTest.xml",
+          "bytes": 672,
+          "sha256": "bb68d39a9de82a9091bfbdbb56a5aed19e236ca2ee87e6e5a8470e77ef24d692"
+        },
+        {
+          "path": "artifacts/navigation-settings-selected-build/test-results/test/TEST-net.citizensnpcs.api.command.CommandLocationTest.xml",
+          "bytes": 1196,
+          "sha256": "7bdb2f257a74675b726de59353ab0db5cf132c1ca0edec0a032907587a49113d"
+        },
+        {
+          "path": "artifacts/navigation-settings-selected-build/test-results/test/TEST-net.citizensnpcs.api.command.NPCCommandTargetTest.xml",
+          "bytes": 1121,
+          "sha256": "184e3bfd2b1b8e577c1ddb17dc4daf23ed1872f759ed915a52103ebb730211e1"
+        },
+        {
+          "path": "artifacts/navigation-settings-selected-build/test-results/test/TEST-net.citizensnpcs.api.command.StrictCommandArgumentsTest.xml",
+          "bytes": 630,
+          "sha256": "e5bebc8834ea00cc078c4daa1de5d537187b913e819cd34bc004248b706b4454"
+        },
+        {
+          "path": "artifacts/navigation-settings-selected-build/test-results/test/TEST-net.citizensnpcs.api.expr.ExpressionRegistryTest.xml",
+          "bytes": 11674,
+          "sha256": "4e7f54c16b4c8fa4bd57385cf2e524ed56a3863a5e44d82863860b5fc4585a2b"
+        },
+        {
+          "path": "artifacts/navigation-settings-selected-build/test-results/test/TEST-net.citizensnpcs.api.expr.ExpressionScopeTest.xml",
+          "bytes": 2216,
+          "sha256": "6ae06cc74e25860047bc821f9dd939555e4f78b6dc9c0e2d1d6c31beb288f064"
+        },
+        {
+          "path": "artifacts/navigation-settings-selected-build/test-results/test/TEST-net.citizensnpcs.api.expr.MemoryCharacterTest.xml",
+          "bytes": 648,
+          "sha256": "875c3db5df97626266ac19e70c199b19d62f1d3993e8b896fd92699cd555b7b8"
+        },
+        {
+          "path": "artifacts/navigation-settings-selected-build/test-results/test/TEST-net.citizensnpcs.api.expr.MemoryKeyIdentityTest.xml",
+          "bytes": 794,
+          "sha256": "4ef70069115cf3c7726becf1c39eafb6858bf3180c1acbb34ae433b37ddd2150"
+        },
+        {
+          "path": "artifacts/navigation-settings-selected-build/test-results/test/TEST-net.citizensnpcs.api.expr.MemoryKeysTest.xml",
+          "bytes": 921,
+          "sha256": "ea92fd1dc4f8dcb9ff694168872c2f3376068e5a84116cee5fad8c04d0cbc9b4"
+        },
+        {
+          "path": "artifacts/navigation-settings-selected-build/test-results/test/TEST-net.citizensnpcs.api.expr.MemoryListPersistenceTest.xml",
+          "bytes": 1112,
+          "sha256": "e9a9ea440cf64ff2d5c6c7eed1bc4f9e960b408f12a8f6ef844daa3430fb2727"
+        },
+        {
+          "path": "artifacts/navigation-settings-selected-build/test-results/test/TEST-net.citizensnpcs.api.expr.MemoryListQueriesTest.xml",
+          "bytes": 783,
+          "sha256": "045f05aeeaf8965cf686621a3ac93353c659c447e4620211060729f87a96e822"
+        },
+        {
+          "path": "artifacts/navigation-settings-selected-build/test-results/test/TEST-net.citizensnpcs.api.gui.InventoryMenuTest.xml",
+          "bytes": 1975,
+          "sha256": "6dbb460dd5c9b3affd33ef6749901c830a015db5b32d571ee9c079bc90d6b259"
+        },
+        {
+          "path": "artifacts/navigation-settings-selected-build/test-results/test/TEST-net.citizensnpcs.api.hpastar.HPAGraphTest.xml",
+          "bytes": 2640,
+          "sha256": "341ed19ec498c2d4b0a09f5b67ba528da93e3f02dcd728b4a7e401f218046d55"
+        },
+        {
+          "path": "artifacts/navigation-settings-selected-build/test-results/test/TEST-net.citizensnpcs.api.npc.NPCDataStoreTest.xml",
+          "bytes": 4318,
+          "sha256": "ae6ef42e7fc9bd03181c4f0fef3decef17ba73534157c9c268392f5186333283"
+        },
+        {
+          "path": "artifacts/navigation-settings-selected-build/test-results/test/TEST-net.citizensnpcs.api.npc.templates.CommandEventRegistrationTest.xml",
+          "bytes": 1536,
+          "sha256": "f5f171d4ea09037a13870d9f8706c7301f03f7c0ce5b6072712e1d6d68afc198"
+        },
+        {
+          "path": "artifacts/navigation-settings-selected-build/test-results/test/TEST-net.citizensnpcs.api.npc.templates.TemplateApplicationLifecycleTest.xml",
+          "bytes": 2534,
+          "sha256": "ffd37568246ece2a646ebe72050340bc98d66db3a87affc7710b15f5b6ea1ff0"
+        },
+        {
+          "path": "artifacts/navigation-settings-selected-build/test-results/test/TEST-net.citizensnpcs.api.npc.templates.TemplateEventPersistenceTest.xml",
+          "bytes": 1765,
+          "sha256": "16e0baa04fb8baf607bf62a68fd38bfc045d428860bb9660d91109266e296494"
+        },
+        {
+          "path": "artifacts/navigation-settings-selected-build/test-results/test/TEST-net.citizensnpcs.api.npc.templates.TemplateEventReplacementTest.xml",
+          "bytes": 1043,
+          "sha256": "4c81b77bad577786e9d4c4b3664e53a3c842cebea0812268d5d0c9281a329016"
+        },
+        {
+          "path": "artifacts/navigation-settings-selected-build/test-results/test/TEST-net.citizensnpcs.api.npc.templates.TemplateGenerationTest.xml",
+          "bytes": 2365,
+          "sha256": "94313398ddac13393ed1c20c0a56cbea963fd1c86c5346d89c234f6751225c1c"
+        },
+        {
+          "path": "artifacts/navigation-settings-selected-build/test-results/test/TEST-net.citizensnpcs.api.npc.templates.TemplateMigrationTest.xml",
+          "bytes": 3416,
+          "sha256": "fd1af0c4295b62eda07d712dd2c56171150e1e34e20665fee4b2e798b5a6e41f"
+        },
+        {
+          "path": "artifacts/navigation-settings-selected-build/test-results/test/TEST-net.citizensnpcs.api.npc.templates.TemplateRegistryReloadTest.xml",
+          "bytes": 45017,
+          "sha256": "062b8797c2e1e44f4accdb2a13867d84236496d70b100bbef97db3d4930e9dc7"
+        },
+        {
+          "path": "artifacts/navigation-settings-selected-build/test-results/test/TEST-net.citizensnpcs.api.npc.templates.TemplateWorkspaceTest.xml",
+          "bytes": 798,
+          "sha256": "961fa0b7e3840895197c90f0727992fa8f3514ce16b51dfd4c320730ed4079aa"
+        },
+        {
+          "path": "artifacts/navigation-settings-selected-build/test-results/test/TEST-net.citizensnpcs.api.npc.templates.TraitTemplateFormTest.xml",
+          "bytes": 1666,
+          "sha256": "68d0c0f8b9376a5153051c1d024f1c293ed52ae77aa344488ff4163bcf24f3ba"
+        },
+        {
+          "path": "artifacts/navigation-settings-selected-build/test-results/test/TEST-net.citizensnpcs.api.npc.templates.YamlReplacementActionTest.xml",
+          "bytes": 1936,
+          "sha256": "21a3618c3396ce101ae359a6be1766d8ecea5953d0c67f2a95617a69d735353f"
+        },
+        {
+          "path": "artifacts/navigation-settings-selected-build/test-results/test/TEST-net.citizensnpcs.api.npc.templates.YamlReplacementValidationTest.xml",
+          "bytes": 829,
+          "sha256": "4de8b52229719335c5e10fc113425fcf487c3f6bac097082bf6715ee30de696c"
+        },
+        {
+          "path": "artifacts/navigation-settings-selected-build/test-results/test/TEST-net.citizensnpcs.api.persistence.LocationWorldNameTest.xml",
+          "bytes": 932,
+          "sha256": "05245a1f3abbb6fb8341995756c43a1b147edbe35b869ace190bf2c995a227ba"
+        },
+        {
+          "path": "artifacts/navigation-settings-selected-build/test-results/test/TEST-net.citizensnpcs.api.persistence.PersistenceDelegateFailureTest.xml",
+          "bytes": 869,
+          "sha256": "d2b1be0ec51704329bb8637a0e0a02a68e41aa374dd23feef5929b0d539c3101"
+        },
+        {
+          "path": "artifacts/navigation-settings-selected-build/test-results/test/TEST-net.citizensnpcs.api.persistence.PersistenceLoaderLegacyValuesTest.xml",
+          "bytes": 11000,
+          "sha256": "36d7f3ad1461d8462850be32b0e80e7b137fc8fd7fbf064a7344477136a18197"
+        },
+        {
+          "path": "artifacts/navigation-settings-selected-build/test-results/test/TEST-net.citizensnpcs.api.persistence.PersistenceMapKeysTest.xml",
+          "bytes": 819,
+          "sha256": "f8d01219ec208dfc5d538e07d726ae09209fcad8a14e08ef5b3f9cd13467dec2"
+        },
+        {
+          "path": "artifacts/navigation-settings-selected-build/test-results/test/TEST-net.citizensnpcs.api.persistence.StrictPersistenceTest.xml",
+          "bytes": 513,
+          "sha256": "d6caa8af43b79fcd9bf9915a3fd30eff6b5094faf8db344bfb19888c1c9f6b89"
+        },
+        {
+          "path": "artifacts/navigation-settings-selected-build/test-results/test/TEST-net.citizensnpcs.api.util.DurationConversionTest.xml",
+          "bytes": 766,
+          "sha256": "e061ba103f7c69c96509e41f7c4b4f76fe2013aa72952e37b40c57df7892fc52"
+        },
+        {
+          "path": "artifacts/navigation-settings-selected-build/test-results/test/TEST-net.citizensnpcs.api.util.DurationParsingTest.xml",
+          "bytes": 890,
+          "sha256": "ae1b50086e1832551a4ccac5d9be3359f978f7f250905e9e8eb83702cc7a3f16"
+        },
+        {
+          "path": "artifacts/navigation-settings-selected-build/test-results/test/TEST-net.citizensnpcs.api.util.ItemStorageTest.xml",
+          "bytes": 3197,
+          "sha256": "78d062e673c3df32bfc85ce18dc51762a1257acc98dd19044a3a062533277d65"
+        },
+        {
+          "path": "artifacts/navigation-settings-selected-build/test-results/test/TEST-net.citizensnpcs.api.util.LegacyBukkitMetaTest.xml",
+          "bytes": 3377,
+          "sha256": "b703064b5a3b8414d098de8ada82af637c68d9225c92d25b0cb7575ecb3e15be"
+        },
+        {
+          "path": "artifacts/navigation-settings-selected-build/test-results/test/TEST-net.citizensnpcs.api.util.LegacyBukkitMetaTypesTest.xml",
+          "bytes": 3701,
+          "sha256": "4f16364358a70d0685764bef3b982daf497bedb0ac70a086a0cff97258334e28"
+        },
+        {
+          "path": "artifacts/navigation-settings-selected-build/test-results/test/TEST-net.citizensnpcs.api.util.LegacyFireworksTest.xml",
+          "bytes": 4313,
+          "sha256": "1b7b0ffff48e706f61ac1a911343045eb9299ceb0bedbe8d1a38f9832c880960"
+        },
+        {
+          "path": "artifacts/navigation-settings-selected-build/test-results/test/TEST-net.citizensnpcs.api.util.LegacyStructuredItemsTest.xml",
+          "bytes": 5172,
+          "sha256": "1f4a49f09e2d0485a23ec66fc4e5942520d06303307a2d67729ed7c2aca78c70"
+        },
+        {
+          "path": "artifacts/navigation-settings-selected-build/test-results/test/TEST-net.citizensnpcs.api.util.MemoryDataKeyCopyTest.xml",
+          "bytes": 660,
+          "sha256": "db44f2e3f55cb5be745aaccf912186860ca5ed5d5b1725e975acbb246bf948fe"
+        },
+        {
+          "path": "artifacts/navigation-settings-selected-build/test-results/test/TEST-net.citizensnpcs.api.util.MemoryDataKeyTransactionTest.xml",
+          "bytes": 2179,
+          "sha256": "d7efeac01e0836786a2c7d9f34cc55c29b8df6c92611a2b927c98787885db823"
+        },
+        {
+          "path": "artifacts/navigation-settings-selected-build/test-results/test/TEST-net.citizensnpcs.api.util.NPCCommandFormatTest.xml",
+          "bytes": 1457,
+          "sha256": "19e92c1f6c6968c9157c24d51ef96163c5933f49eaf590f3ed3babb5011a0a42"
+        },
+        {
+          "path": "artifacts/navigation-settings-selected-build/test-results/test/TEST-net.citizensnpcs.api.util.PermissionDefaultsTest.xml",
+          "bytes": 1110,
+          "sha256": "da0ddce9871505179970f910a988c8c88da86ec855b56082393311e82fdda104"
+        },
+        {
+          "path": "artifacts/navigation-settings-selected-build/test-results/test/TEST-net.citizensnpcs.api.util.schedulers.adapter.NeoForgeSchedulerTest.xml",
+          "bytes": 1013,
+          "sha256": "7b8f6abcf277f3ed922a86f454f59264023997d1d913047e677c4f74e16f5da4"
+        },
+        {
+          "path": "artifacts/navigation-settings-selected-build/test-results/test/TEST-net.citizensnpcs.api.util.StoredItemListTest.xml",
+          "bytes": 2730,
+          "sha256": "e3e976a8a647306b2acfd43dcd90ac1c9d0f1812f6c787103f3a00fbe3c61d9b"
+        },
+        {
+          "path": "artifacts/navigation-settings-selected-build/test-results/test/TEST-net.citizensnpcs.api.util.StoredItemsTest.xml",
+          "bytes": 2992,
+          "sha256": "37f7f3cc693acdde884d3e3078911e4a74a18ae4d96d46a93c49a097de4bdea9"
+        },
+        {
+          "path": "artifacts/navigation-settings-selected-build/test-results/test/TEST-net.citizensnpcs.api.util.TextParserTest.xml",
+          "bytes": 3410,
+          "sha256": "be0badede40e437ffc65c983af9cc3035cd3d26c99469f290747d0a80644888c"
+        },
+        {
+          "path": "artifacts/navigation-settings-selected-build/test-results/test/TEST-net.citizensnpcs.api.util.TranslatorFormatTest.xml",
+          "bytes": 839,
+          "sha256": "46787b544070e9cdeea478459dc4450a35ccdeef9acde6e1f33d66ff13340c72"
+        },
+        {
+          "path": "artifacts/navigation-settings-selected-build/test-results/test/TEST-net.citizensnpcs.api.util.TriggerAddInputTest.xml",
+          "bytes": 767,
+          "sha256": "1aed682603a5a39f0d6404a726539ebc350e88cd4106970e67d346a5cea1d0a0"
+        },
+        {
+          "path": "artifacts/navigation-settings-selected-build/test-results/test/TEST-net.citizensnpcs.api.util.YamlStorageRoundTripTest.xml",
+          "bytes": 59912,
+          "sha256": "c5610576d5cf413f5df9b23c7f00443e5f29433e3a64e84f82171f554a1cedb5"
+        },
+        {
+          "path": "artifacts/navigation-settings-selected-build/test-results/test/TEST-net.citizensnpcs.api.util.YamlStorageWriteTest.xml",
+          "bytes": 4030,
+          "sha256": "a03fa693d8620397baec86ae5d5a9756699b4b954c92dcc369c894cc31bcde91"
+        },
+        {
+          "path": "artifacts/navigation-settings-selected-build/test-results/test/TEST-net.citizensnpcs.commands.EntityCommandParsingTest.xml",
+          "bytes": 665,
+          "sha256": "2f1d079079ff893c5b0f7a7b5feec824d6d276d68fc484191b92e808c9384772"
+        },
+        {
+          "path": "artifacts/navigation-settings-selected-build/test-results/test/TEST-net.citizensnpcs.commands.history.CommandHistoryTest.xml",
+          "bytes": 1275,
+          "sha256": "4a70261548d23d5c4aa687340e410dcf545d20e7fe26d30af6b82286f041ccd7"
+        },
+        {
+          "path": "artifacts/navigation-settings-selected-build/test-results/test/TEST-net.citizensnpcs.commands.NavigationCommandValidationTest.xml",
+          "bytes": 1352,
+          "sha256": "006dcb50eab7cdbbe452b2f5d18f685664e837f52e6074d83b83ed7796cefff7"
+        },
+        {
+          "path": "artifacts/navigation-settings-selected-build/test-results/test/TEST-net.citizensnpcs.commands.PresentationCommandParsingTest.xml",
+          "bytes": 1002,
+          "sha256": "6d9c0bc7ed68213ec885787dab08388e6907c2b8089b722fbad5fadfa477b4c7"
+        },
+        {
+          "path": "artifacts/navigation-settings-selected-build/test-results/test/TEST-net.citizensnpcs.commands.TemplateCommandValidationTest.xml",
+          "bytes": 510,
+          "sha256": "01206ea26e337161231175389fefd261a05daa3fef44e185c08c7e630a965838"
+        },
+        {
+          "path": "artifacts/navigation-settings-selected-build/test-results/test/TEST-net.citizensnpcs.npc.ai.NavigationSettingsPersistenceTest.xml",
+          "bytes": 1183,
+          "sha256": "cd74573ad18b895b09a17ac2ab287b8e741f263d6e70bd5129eece94457a8c2b"
+        },
+        {
+          "path": "artifacts/navigation-settings-selected-build/test-results/test/TEST-net.citizensnpcs.npc.ai.tree.BehaviorCommandFlagsTest.xml",
+          "bytes": 790,
+          "sha256": "79917845a70f7a0673f4f2840e6d44d61180af8216c72d4a71894259733f4b85"
+        },
+        {
+          "path": "artifacts/navigation-settings-selected-build/test-results/test/TEST-net.citizensnpcs.npc.ai.tree.BehaviorTreeParserTest.xml",
+          "bytes": 9167,
+          "sha256": "6deb1288d162e730bcee52a668a4c9894e822b6e70b54b3cf56ea0bf43ab82fa"
+        },
+        {
+          "path": "artifacts/navigation-settings-selected-build/test-results/test/TEST-net.citizensnpcs.npc.ai.tree.MolangMemoryBindingTest.xml",
+          "bytes": 1450,
+          "sha256": "6043c158c83e3b05810bb3a85c852047e74aa448efe06dfb0698e6685500a73d"
+        },
+        {
+          "path": "artifacts/navigation-settings-selected-build/test-results/test/TEST-net.citizensnpcs.npc.ai.tree.MolangScopeIsolationTest.xml",
+          "bytes": 12095,
+          "sha256": "a0a42ef10cf7047757a37e254134415efa09b3934839fe0cf7ad12dc9f946171"
+        },
+        {
+          "path": "artifacts/navigation-settings-selected-build/test-results/test/TEST-net.citizensnpcs.npc.skin.SkinCacheReloadTest.xml",
+          "bytes": 1198,
+          "sha256": "dce6dd35293c5bf49ba93d9c7b62b5863449ac7f295acacde299e4179f94d242"
+        },
+        {
+          "path": "artifacts/navigation-settings-selected-build/test-results/test/TEST-net.citizensnpcs.SettingsTest.xml",
+          "bytes": 35770,
+          "sha256": "b14af340a3155f79674723922455ea3f4a702c71f8b8bb097ac2bcde58fef040"
+        },
+        {
+          "path": "artifacts/navigation-settings-selected-build/test-results/test/TEST-net.citizensnpcs.trait.HologramItemTest.xml",
+          "bytes": 899,
+          "sha256": "7a2a0c0a4616035a1aa034eaf41d41df99e2440f295eaf3bb69b4df5dc3bac98"
+        },
+        {
+          "path": "artifacts/navigation-settings-selected-build/test-results/test/TEST-net.citizensnpcs.trait.SentinelTargetMatchingTest.xml",
+          "bytes": 1138,
+          "sha256": "4229728ab5da99ed2d7567af506f74a912514979e422045d9d753fb7f8b6ca7e"
+        },
+        {
+          "path": "artifacts/navigation-settings-selected-build/test-results/test/TEST-net.citizensnpcs.trait.shop.ExperienceArithmeticTest.xml",
+          "bytes": 775,
+          "sha256": "32d4155e3197d62b9b48c56a40921fdb9a75d25de92889c82514cdf747ad5ee3"
+        },
+        {
+          "path": "artifacts/navigation-settings-selected-build/test-results/test/TEST-net.citizensnpcs.trait.shop.InventoryPublicationRecoveryTest.xml",
+          "bytes": 1502,
+          "sha256": "a7d12ca7222000f918325720c4f035a66f01eba69649400dcd12031a37c4f650"
+        },
+        {
+          "path": "artifacts/navigation-settings-selected-build/test-results/test/TEST-net.citizensnpcs.trait.shop.InventoryTransactionIsolationTest.xml",
+          "bytes": 1199,
+          "sha256": "99f7f02c28bdcd60dcfbb3fde8cc163d622e2f8c1cacc4ecedf947f4984e3269"
+        },
+        {
+          "path": "artifacts/navigation-settings-selected-build/test-results/test/TEST-net.citizensnpcs.trait.shop.ItemActionTest.xml",
+          "bytes": 1581,
+          "sha256": "99a7b1cdd3d1062f320251596d193da57dc5ee93bfb4d4bac5e02a9591dc6605"
+        },
+        {
+          "path": "artifacts/navigation-settings-selected-build/test-results/test/TEST-net.citizensnpcs.trait.shop.ItemQuantityTest.xml",
+          "bytes": 1434,
+          "sha256": "4cdfa4fa4c3ea1e32c2e4f60c60cf579826969054f86ccfcc821c1dcb8a312f8"
+        },
+        {
+          "path": "artifacts/navigation-settings-selected-build/test-results/test/TEST-net.citizensnpcs.trait.shop.ItemReceiptTest.xml",
+          "bytes": 1208,
+          "sha256": "1299cd8862883c4ce7bce024e5ef20261875781eb90726dd90cbeb41ffabe866"
+        },
+        {
+          "path": "artifacts/navigation-settings-selected-build/test-results/test/TEST-net.citizensnpcs.trait.shop.MoneyArithmeticTest.xml",
+          "bytes": 900,
+          "sha256": "ab0de11877a60cabd05e0b2b9e9ffcc4880e4e22d15e7aa2b1b84d27ceb08c0a"
+        },
+        {
+          "path": "artifacts/navigation-settings-selected-build/test-results/test/TEST-net.citizensnpcs.trait.shop.NPCShopTest.xml",
+          "bytes": 1594,
+          "sha256": "fddfbf5923aa3add9241c8c002962a041da8c2978b5954359f7b1b2328325a9f"
+        },
+        {
+          "path": "artifacts/navigation-settings-selected-build/test-results/test/TEST-net.citizensnpcs.trait.shop.ShopSessionOwnerTest.xml",
+          "bytes": 662,
+          "sha256": "28db5ab59bce72226aacb4e882507a853937cddb8936355ccbb73aec48bf2916"
+        },
+        {
+          "path": "artifacts/navigation-settings-selected-build/test-results/test/TEST-net.citizensnpcs.trait.shop.ShopTransactionTest.xml",
+          "bytes": 1067,
+          "sha256": "60312108b411c5d96fe1dc86140cf01bff98300050508028ea3c3c17fc537dd9"
+        },
+        {
+          "path": "artifacts/navigation-settings-selected-build/test-results/test/TEST-net.citizensnpcs.trait.shop.StoredShopsTest.xml",
+          "bytes": 2717,
+          "sha256": "d06ec4f2f23215117461b6a1eb06e778bd84cfff4ae05d9a37294e495559a966"
+        },
+        {
+          "path": "artifacts/navigation-settings-selected-build/test-results/test/TEST-net.citizensnpcs.trait.text.TextEditorInputTest.xml",
+          "bytes": 771,
+          "sha256": "89fcd31acb04609d4ca59682694082edbce395846e7e55d4674c91bb1922abd6"
+        },
+        {
+          "path": "artifacts/navigation-settings-selected-build/test-results/test/TEST-net.citizensnpcs.trait.TraitNameMappingTest.xml",
+          "bytes": 1067,
+          "sha256": "49496a71d8dac7fa324ac992e1a5f7b20bb6740d5073895b81acf4d87c3d7ca8"
+        },
+        {
+          "path": "artifacts/navigation-settings-selected-build/test-results/test/TEST-net.citizensnpcs.trait.waypoint.triggers.NumericTriggerInputTest.xml",
+          "bytes": 869,
+          "sha256": "265ab03612e87e42a64d121f821a5b9a03c1bd7a4f777f6ee98be249b71b6144"
+        },
+        {
+          "path": "artifacts/navigation-settings-selected-build/test-results/test/TEST-net.citizensnpcs.trait.waypoint.triggers.TeleportTriggerInputTest.xml",
+          "bytes": 853,
+          "sha256": "9d5a58e7b95269029eea840434a71f49403939d051923eac04291531ea71586d"
+        },
+        {
+          "path": "artifacts/navigation-settings-selected-build/test-results/test/TEST-net.citizensnpcs.trait.waypoint.triggers.WaypointTriggerSaveTest.xml",
+          "bytes": 1023,
+          "sha256": "ae30909e1cc013a0955d85cbbe06168f3613d581e6606e0b0254777b53d3560a"
+        },
+        {
+          "path": "artifacts/navigation-settings-selected-build/test-results/test/TEST-net.citizensnpcs.util.CommerceTaskJournalTest.xml",
+          "bytes": 2372,
+          "sha256": "d9bc6bee87aaa5cf25286ba7f4955b577602d700fc76e5f786d4bf367d73c9f6"
+        },
+        {
+          "path": "artifacts/navigation-settings-selected-build/test-results/test/TEST-net.citizensnpcs.util.DimensionLookupTest.xml",
+          "bytes": 746,
+          "sha256": "ec1f7f9fef7fd8a40642b5826ef4766752560f5c6c84dd2d6794d4102d14f875"
+        },
+        {
+          "path": "artifacts/navigation-settings-selected-build/test-results/test/TEST-net.citizensnpcs.util.EconomyShopMenusTest.xml",
+          "bytes": 607,
+          "sha256": "0d7c209348c055544065c87945b6b2957acbd9acf2b2c2ae82a6f5e04c155a78"
+        },
+        {
+          "path": "artifacts/navigation-settings-selected-build/test-results/test/TEST-net.citizensnpcs.util.JournalRecordDecodingTest.xml",
+          "bytes": 5325,
+          "sha256": "f3b68a0a3df5d26a6b78081292224a1f2927b5883439a0780b2c4c24645e7031"
+        },
+        {
+          "path": "artifacts/navigation-settings-selected-build/test-results/test/TEST-net.citizensnpcs.util.LuckPermsGroupsTest.xml",
+          "bytes": 609,
+          "sha256": "789cad3d87db468f31ba85a28b49cd8c9d95a89428e3ab63115f2a97d250bad5"
+        },
+        {
+          "path": "artifacts/navigation-settings-selected-build/test-results/test/TEST-net.citizensnpcs.util.ParadigmGroupsTest.xml",
+          "bytes": 1207,
+          "sha256": "3b92ca8a814e593bebb53365ebd0f3023e22ea93aab14ff872ae1a04270e522d"
+        },
+        {
+          "path": "artifacts/navigation-settings-selected-build/test-results/test/TEST-net.citizensnpcs.util.ParadigmPermissionWriterTest.xml",
+          "bytes": 2860,
+          "sha256": "a07d0d5d3511ee899e5c6778bc156082eb1096d310bb5b70fcd27f3e91787f29"
+        },
+        {
+          "path": "artifacts/navigation-settings-selected-build/test-results/test/TEST-net.citizensnpcs.util.ProviderPlaceholderExportsTest.xml",
+          "bytes": 1092,
+          "sha256": "9d8b5a7ce3d554797e1a8777a591e61b82ababb047ac10a4d794d9a385c0e43b"
+        },
+        {
+          "path": "artifacts/navigation-settings-selected-build/test-results/test/TEST-net.citizensnpcs.util.QuestDeliveryJournalTest.xml",
+          "bytes": 1864,
+          "sha256": "0a584a3ab2817d75066c70f4ee0213c2b2e5afe094387e9a101e33ce7127cdcb"
+        },
+        {
+          "path": "artifacts/navigation-settings-selected-build/test-results/test/TEST-net.citizensnpcs.util.QuestDeliveryStorageTest.xml",
+          "bytes": 1136,
+          "sha256": "0c9ccbb83eefae2b1c9535a2b1cafda587283d5e8b77d44a44c928b9b719a66b"
+        },
+        {
+          "path": "artifacts/navigation-settings-selected-build/test-results/test/TEST-net.citizensnpcs.util.QuestEvidenceJournalTest.xml",
+          "bytes": 2812,
+          "sha256": "f04c9d1266478397292e2c05e9c96e7444bfa51285f4ac1cff73ea8f85436b95"
+        },
+        {
+          "path": "artifacts/navigation-settings-selected-build/test-results/test/TEST-net.citizensnpcs.util.QuestRewardJournalTest.xml",
+          "bytes": 1538,
+          "sha256": "a980cd592d0938fdff789b6bf0c6e196667f4097eec7e2d0dfca675909869c0f"
+        },
+        {
+          "path": "artifacts/navigation-settings-selected-build/test-results/test/TEST-net.citizensnpcs.util.YuuniverseEconomyTest.xml",
+          "bytes": 1500,
+          "sha256": "72ac343a134204d782d3a1b66a15c172932020562ab8136ce316da8927f26788"
+        }
+      ],
+      "native": [
+        {
+          "phase": "seed",
+          "checks": 84,
+          "log": {
+            "path": "artifacts/navigation-settings-native-final-248-seed.log",
+            "bytes": 30832,
+            "sha256": "b74cea2b10f149391f1bb6a90ee3fcc09f64bfcf3b9a6b21725603c4c73c582b"
+          },
+          "complete": {
+            "path": "artifacts/navigation-settings-final-248-server/seed.complete.json",
+            "bytes": 7524,
+            "sha256": "66f509a60fa571fa5a13b12870c5fdccbbd46cdf9f2026ab64cbb85f7893bfb5"
+          },
+          "saves": {
+            "path": "artifacts/navigation-settings-final-248-server/evidence/seed/saves.yml",
+            "bytes": 1770,
+            "sha256": "29ae2ee02d7184d25da97dec4029de938f13dd883dd56ea9f9ca0d36677d15b2"
+          },
+          "finalStates": [
+            {
+              "uuid": "cf8bd064-69fe-4bac-83a4-f291671bb2c1",
+              "name": "ordinarySettings",
+              "location": {
+                "world": "minecraft:overworld",
+                "x": 9.407,
+                "y": -60.0,
+                "z": 3.4073,
+                "pitch": 36.0964,
+                "yaw": 314.9778,
+                "bodyYaw": 314.9778
+              },
+              "distanceToGoal": 0.8384165372891924
+            },
+            {
+              "uuid": "03fe5f1e-0cb3-4176-9b31-e1029ff26f01",
+              "name": "packetSettings",
+              "location": {
+                "world": "minecraft:overworld",
+                "x": 9.407,
+                "y": -60.0,
+                "z": 6.4073,
+                "pitch": 36.0964,
+                "yaw": 314.9778,
+                "bodyYaw": 314.9778
+              },
+              "distanceToGoal": 0.8384165372891924
+            }
+          ]
+        },
+        {
+          "phase": "recover",
+          "checks": 38,
+          "log": {
+            "path": "artifacts/navigation-settings-native-final-248-recover.log",
+            "bytes": 19698,
+            "sha256": "94dff31b66a22a45a31cf0940739ea83faa858a72bdd9f88d15ccdc556329930"
+          },
+          "complete": {
+            "path": "artifacts/navigation-settings-final-248-server/recover.complete.json",
+            "bytes": 4419,
+            "sha256": "a883c606a68b94fe9367c0b4724191e9d7d4d3ec4b435e82c5b63b273502731c"
+          },
+          "saves": {
+            "path": "artifacts/navigation-settings-final-248-server/config/citizens/saves.yml",
+            "bytes": 1598,
+            "sha256": "2381a0ff55efa1f89c0ecc8e34d57d2ab4d9db0e62389fea12b6ea11286069c2"
+          },
+          "finalStates": [
+            {
+              "uuid": "cf8bd064-69fe-4bac-83a4-f291671bb2c1",
+              "name": "ordinarySettings",
+              "location": {
+                "world": "minecraft:overworld",
+                "x": 4.7768,
+                "y": -60.0,
+                "z": 3.4308,
+                "pitch": 33.0921,
+                "yaw": 53.769,
+                "bodyYaw": 53.769
+              },
+              "distanceToGoal": 0.9630196675042517
+            },
+            {
+              "uuid": "03fe5f1e-0cb3-4176-9b31-e1029ff26f01",
+              "name": "packetSettings",
+              "location": {
+                "world": "minecraft:overworld",
+                "x": 4.7768,
+                "y": -60.0,
+                "z": 6.4308,
+                "pitch": 33.0921,
+                "yaw": 53.769,
+                "bodyYaw": 53.769
+              },
+              "distanceToGoal": 0.9630196675042519
+            }
+          ]
+        }
+      ],
+      "config": {
+        "path": "artifacts/navigation-settings-final-248-server/config/citizens/config.yml",
+        "bytes": 4092,
+        "sha256": "d984c66165a21417d0395b4f1722cfce3b4bbc63a15c2748853bf3759ec69ea7"
+      },
+      "expected": {
+        "path": "artifacts/navigation-settings-final-248-server/expected.json",
+        "bytes": 7524,
+        "sha256": "66f509a60fa571fa5a13b12870c5fdccbbd46cdf9f2026ab64cbb85f7893bfb5"
+      },
+      "productionClassesMatchNative": 1024,
+      "packages": [
+        {
+          "path": "artifacts/navigation-settings-selected-build/libs/citizens-2.0.43-neoforge-SNAPSHOT-sources.jar",
+          "bytes": 1132128,
+          "sha256": "0770e448ef80fbeea6636e9fd07c98fa836845515d01409dea53bf70c84d1625"
+        },
+        {
+          "path": "artifacts/navigation-settings-selected-build/libs/citizens-2.0.43-neoforge-SNAPSHOT.jar",
+          "bytes": 4102122,
+          "sha256": "97ceb92c44cb898c956866eca6684c6f6c3a97e91acb0af7aafccbe3c1b3d64b"
+        },
+        {
+          "path": "artifacts/navigation-settings-selected-build/libs/yuuniverse-interactions-2.0.43-neoforge-SNAPSHOT.jar",
+          "bytes": 204146,
+          "sha256": "dea846b811929ed166a627ebd5373d043a676ea59073819ef16da88ae4d8d81d"
+        }
+      ]
+    }
+  ],
+  "negativeControl": {
+    "path": "artifacts/navigation-settings-native-before.log",
+    "bytes": 21854,
+    "sha256": "fd3f0c502c6dfae5e40deb490fc75322db3823c074dd80b33c738c0fd4dd4975"
+  },
+  "originalCommit": "fbc5862",
+  "originalUnitResults": [
+    {
+      "path": "artifacts/navigation-settings-before-test-results/TEST-net.citizensnpcs.npc.ai.NavigationSettingsPersistenceTest.xml",
+      "bytes": 4642,
+      "sha256": "6e57789228fe765e166ed051dec4cab9f490c692cb68c2ddb27b08882894bb5c"
+    }
+  ],
+  "sources": [
+    {
+      "path": "neoforge/src/main/java/net/citizensnpcs/npc/ai/CitizensNavigator.java",
+      "bytes": 32076,
+      "sha256": "62fb1a7a61139be0663e23ecfcb333596febbee8b016b342c01c63b892b62f77"
+    },
+    {
+      "path": "neoforge/src/main/java/net/citizensnpcs/api/ai/NavigatorParameters.java",
+      "bytes": 19401,
+      "sha256": "4054c980997f5a26901f713c48f5f55058004a6cba1def8e2813aeedae6131b6"
+    },
+    {
+      "path": "neoforge/src/main/java/net/citizensnpcs/api/trait/trait/Spawned.java",
+      "bytes": 1143,
+      "sha256": "1269901cef78b825ea1f66327717c665b8d937428654092f399473f6d63dc3c4"
+    },
+    {
+      "path": "neoforge/src/main/java/net/citizensnpcs/api/persistence/PersistenceLoader.java",
+      "bytes": 37245,
+      "sha256": "ba1fe798de7b42cd1fa5f9bc3f6d90508a0919e2fc6b0fc61e78397dde1aad17"
+    },
+    {
+      "path": "neoforge/src/test/java/net/citizensnpcs/npc/ai/NavigationSettingsPersistenceTest.java",
+      "bytes": 3764,
+      "sha256": "89778a019bd5713b2bca8af88c77a0819689d87746b721fa268f97848eaeae91"
+    },
+    {
+      "path": "tools/navigation-settings-runtime-audit/net/citizensnpcs/audit/NavigationSettingsRuntimeAudit.java",
+      "bytes": 12910,
+      "sha256": "fe9378c2e9a5db98cdd479525ccdc018b27eb8fda1c8689746b563ac8f95c714"
+    },
+    {
+      "path": "tools/prepare-navigation-settings-audit.ps1",
+      "bytes": 2401,
+      "sha256": "ce2d658e392f56ac8483fcc89760aa8e989c681f6e408d5622289d9596529fc8"
+    },
+    {
+      "path": "tools/navigation-settings-runtime-audit.gradle",
+      "bytes": 3005,
+      "sha256": "0e5e8e93f3652c89a385877984722c4cca734498d315087f7ec2a70ffed78281"
+    },
+    {
+      "path": "tools/navigation-command-runtime-audit.gradle",
+      "bytes": 3456,
+      "sha256": "c730b8f55d0f967babaa7a9b50b8836b923139dc154c03dbd2a6f7b6c31505cd"
+    },
+    {
+      "path": "tools/record-navigation-settings-validation.py",
+      "bytes": 13931,
+      "sha256": "601a2e97fcac2a93d09f2b16f6941c36b626839de4bd3840515aed7040907ab1"
+    },
+    {
+      "path": "tools/record-guard-restart-validation.py",
+      "bytes": 15367,
+      "sha256": "207eaf9d9854560651d9ad79b0de5e5e7a932367eed9fd6180339642e4631249"
+    }
+  ],
+  "defaultRestoreFailure": [
+    {
+      "path": "artifacts/navigation-settings-default-restore-before-test-results/TEST-net.citizensnpcs.npc.ai.NavigationSettingsPersistenceTest.xml",
+      "bytes": 1704,
+      "sha256": "517784e17477ada9052a76abf17f09361ebd8b52f90c0174b74ba9ef6252ac4b"
+    }
+  ],
+  "supersededSeed": {
+    "path": "artifacts/navigation-settings-native-233-seed.log",
+    "bytes": 26820,
+    "sha256": "808b65bb1154daca53558cf1642b808ba9e7f51c16630886984a2012ca8604ea"
+  },
+  "retainedRecorderFailure": {
+    "path": "artifacts/navigation-settings-independent-initial.log",
+    "bytes": 536,
+    "sha256": "ff98ed1ac64031eff30d29ecf8145db6f021ec241cf83725d9ae51c571f52041"
+  },
+  "replayGuard": {
+    "protectedFiles": 60,
+    "before": {
+      "path": "artifacts/navigation-settings-guard-fixed-before.json",
+      "bytes": 9328,
+      "sha256": "c2c74374e1562aeba76277f7827db97c00800490b4f33d1f31773d26bc0ab8e5"
+    },
+    "log": {
+      "path": "artifacts/navigation-settings-replay-guard.log",
+      "bytes": 1161,
+      "sha256": "bcba737f19821cb5523b0fd394ab073f71ab42962d3ae820fe348d3fe1d54f67"
+    },
+    "process": {
+      "path": "artifacts/navigation-settings-guard-exit.json",
+      "bytes": 77,
+      "sha256": "60993ff742a6ae4e62597a3e98518e653237e995658e46248fe8f83b7991a3df"
+    }
+  },
+  "commandReplayGuard": {
+    "protectedFiles": 45,
+    "before": {
+      "path": "artifacts/navigation-command-guard-fixed-before.json",
+      "bytes": 7061,
+      "sha256": "795d782d2b2d765f4716cd41544c58d452bb8644d8cef82a514c081d32074989"
+    },
+    "log": {
+      "path": "artifacts/navigation-command-guard-fixed.log",
+      "bytes": 2763,
+      "sha256": "8d2baf3ce93e1dbe35b61f24dab4aa1800368a5f8c5f77d91f475f8e983135d8"
+    },
+    "process": {
+      "path": "artifacts/navigation-command-guard-fixed-exit.json",
+      "bytes": 77,
+      "sha256": "c04b3013d22d1efac74a83a88fb7b9ea1db47a0cd04157b246863876cb2572de"
+    }
+  },
+  "rejectedStartup": {
+    "log": {
+      "path": "artifacts/navigation-settings-replay-guard-initial.log",
+      "bytes": 16732,
+      "sha256": "57e6c84b9a68ac07f8280e12f46b75e78e720d72d6523ed58f4265f1342c8954"
+    },
+    "serverLog": {
+      "path": "artifacts/navigation-settings-guard-initial-server.log",
+      "bytes": 17377,
+      "sha256": "6d1061d37293a929db47f7b6cfb8143fb967fb1e27e3e94fda244cb14990673b"
+    },
+    "changedFiles": {
+      "path": "artifacts/navigation-settings-guard-initial-changes.json",
+      "bytes": 1308,
+      "sha256": "84f9fec0ce5f21ef7b8baf8ceaae3e5db06389e8aa181d13bd281f4213c0d3fb"
+    },
+    "before": {
+      "path": "artifacts/navigation-settings-guard-before.json",
+      "bytes": 9041,
+      "sha256": "9541d82598aaa859ee4a6dc9e385db628a89e5760260cadcdb1b3bc1eee0ffc1"
+    }
+  },
+  "limits": [
+    "Native synthetic fixture; physical ordinary-client acceptance remains deferred",
+    "Existing callback/strategy runtime objects are not serialized",
+    "The initial cached-preparation guard test started a baseline JVM; audit admission rejected before actions. NPC snapshot semantics remain exact; world/log files changed",
+    "No production or provider activation or release publication"
+  ]
+}
