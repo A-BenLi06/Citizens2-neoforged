@@ -4,6 +4,13 @@ Prepared 2026-10-24T17:19:33+08:00 (UTC+08:00).
 Source checkpoint: `a25ff03c485dbee6456509d69dd65a7aa9ad5308`.
 Target: Minecraft 1.21.1 / NeoForge 21.1.248 / Java 21.
 
+Published 2026-10-24T17:20:30+08:00 (UTC+08:00):
+https://github.com/A-BenLi06/Citizens2-neoforged/releases/tag/v2.1.0
+
+The annotated tag points to `c6421fd`. All nine uploaded assets match GitHub's
+reported SHA-256, byte size and uploaded state. Verified `isDraft=false`,
+`isPrerelease=false` and the repository latest-release tag `v2.1.0`.
+
 | Runtime artifact | Bytes | SHA-256 |
 |---|---:|---|
 | citizens-2.1.0.jar | 4,102,089 | adb97390851888b2efe1a166edc75d87ccc3e4d184159de73437b96ace74f445 |

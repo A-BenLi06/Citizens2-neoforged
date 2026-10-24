@@ -3616,3 +3616,9 @@ Full goal stays active. Fan/deployer/filling/emptying/sequenced assembly and bro
 - Verified all 1,024 Citizens and 74 Interactions production class bytes equal the latest accepted ordinary snapshot. Only Citizens' manifest/descriptor and Interactions' manifest differ. Archive namespaces, fixture exclusions, CRCs and internal checksums pass.
 - Prepared nine public assets under artifacts/github-release-2.1.0: two runtime JARs, two source archives, existing repository license, deployment notes, manifest, combined ZIP and checksum list. No Economy, GriefLogger, private Paradigm, world or database files are included. Added the durable artifact receipt with binary hashes and source provenance.
 - Combined ZIP citizens-interactions-2.1.0-neoforge.zip is 5,311,436 bytes, SHA-256 467800e4a7c9847d42c462c75c1f64228d126c83c1305e33ebf8927a98986cbb. Next publication step uses tag v2.1.0 as a stable latest release, verifying remote asset hashes before making the draft public. Author and committer: A-BenLi06 <ben_li06@outlook.com>.
+
+## 2026-10-24T17:20:32+08:00 (UTC+08:00) - Publish Citizens and Interactions v2.1.0 stable
+
+- Pushed the release branch and user-authored annotated v2.1.0 tag at c6421fd. Uploaded nine assets to a draft and matched every GitHub asset digest, byte size and upload state against local files before publishing.
+- Published https://github.com/A-BenLi06/Citizens2-neoforged/releases/tag/v2.1.0 at 2026-10-24T17:20:30+08:00. Independently verified non-draft/non-prerelease status and that GitHub's latest-release endpoint returns v2.1.0. Both runtime mod versions are 2.1.0; prior snapshot releases remain available.
+- Recorded publication evidence in the durable artifact receipt. Production remains untouched; no additional gameplay tests or client acceptance is claimed. Preserved unrelated _nul and tools/__pycache__/. Author and committer: A-BenLi06 <ben_li06@outlook.com>.
