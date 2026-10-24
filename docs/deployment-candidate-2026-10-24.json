@@ -1,0 +1,69 @@
+{
+  "target": {
+    "minecraft": "1.21.1",
+    "neoForge": "21.1.248",
+    "java": 21,
+    "os": "Windows 10"
+  },
+  "citizensSourceCommit": "d0a78157b7edec1b7c684e627fd26216ed245dc1",
+  "providerInventory": "artifacts/integrated-provider-final-server/integrated-audit-candidate.json",
+  "mods": [
+    {
+      "modId": "citizens",
+      "version": "2.0.43-neoforge-SNAPSHOT",
+      "source": "artifacts/deployment-build-20261024/output/libs/citizens-2.0.43-neoforge-SNAPSHOT.jar",
+      "filename": "citizens-2.0.43-neoforge-SNAPSHOT.jar",
+      "sha256": "c6aa479615b0ef1d2df0b7b0b14223b05853da44f07bdb844524faf817678fff",
+      "sourceCommit": "d0a78157b7edec1b7c684e627fd26216ed245dc1"
+    },
+    {
+      "modId": "interactions",
+      "version": "2.0.43-neoforge-SNAPSHOT",
+      "source": "artifacts/deployment-build-20261024/output/libs/yuuniverse-interactions-2.0.43-neoforge-SNAPSHOT.jar",
+      "filename": "yuuniverse-interactions-2.0.43-neoforge-SNAPSHOT.jar",
+      "sha256": "f98ea76eeb7b7ac5ad39773cf1b764736d95b301195caf61a0823378fce391cd",
+      "sourceCommit": "d0a78157b7edec1b7c684e627fd26216ed245dc1"
+    },
+    {
+      "modId": "yuuniverse_economy",
+      "version": "0.5.9-SNAPSHOT",
+      "source": "../yuuniverse-economy/build/libs/yuuniverse-economy-0.5.9-SNAPSHOT.jar",
+      "filename": "yuuniverse-economy-0.5.9-SNAPSHOT.jar",
+      "sha256": "fc24deb2eefab0cb3eb87a3bb70a59897b9ad1a3b13f851ebb6f73994fdd75b7",
+      "sourceCommit": "4737db6ad4d3f575608789ba546eb21213919e88"
+    },
+    {
+      "modId": "grieflogger",
+      "version": "1.2.10-1.21.1-yuuniverse.10",
+      "source": "artifacts/grieflogger-entity-schema-release/grieflogger-1.2.10-1.21.1-yuuniverse.10-neoforge.jar",
+      "filename": "grieflogger-1.2.10-1.21.1-yuuniverse.10-neoforge.jar",
+      "sha256": "ed433e6fa6cae9ce1574ff60255ac2fea6aedbabfc4b5b21596047bc5a99e94f",
+      "sourceCommit": "d5aa191acb6c2155c37857eac67deb6efc97f49e"
+    },
+    {
+      "modId": "paradigm",
+      "version": "2.5.0",
+      "source": "artifacts/paradigm-hologram-private-final-build/Paradigm-neoforge-1.21.1-2.5.0-hologram-private.jar",
+      "filename": "Paradigm-neoforge-1.21.1-2.5.0-hologram-private.jar",
+      "sha256": "936d8148bed628628d810675a0e6c456469bca81b70ef110916bb9fc22952866",
+      "sourceCommit": "72681180e2cedd5a74c42bcefefdac3a96457f65"
+    }
+  ],
+  "sourceArchives": [
+    "artifacts/deployment-build-20261024/output/libs/citizens-2.0.43-neoforge-SNAPSHOT-sources.jar",
+    "../yuuniverse-economy/build/libs/yuuniverse-economy-0.5.9-SNAPSHOT-sources.jar",
+    "artifacts/deployment-build-20261024/grieflogger-sources.zip",
+    "artifacts/deployment-build-20261024/paradigm-private-sources.zip"
+  ],
+  "supportingFiles": [
+    "docs/deployment-candidate-2026-10-24.json",
+    "artifacts/deployment-build-20261024/build.log",
+    "docs/navigation-settings-persistence-2026-10-24.md",
+    "docs/navigation-commands-2026-10-24.md",
+    "docs/template-event-persistence-2026-10-24.md",
+    "docs/integrated-provider-acceptance-2026-10-23.md",
+    "docs/paradigm-hologram-repair-2026-10-23.md",
+    "docs/logging-entity-registry-2026-10-23.md",
+    "artifacts/deployment-build-20261024/release.init.gradle"
+  ]
+}
